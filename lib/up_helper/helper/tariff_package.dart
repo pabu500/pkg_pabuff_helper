@@ -1,0 +1,4 @@
+enum TariffPackageKey {
+  name,
+  label,
+}

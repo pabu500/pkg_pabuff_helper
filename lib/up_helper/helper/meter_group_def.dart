@@ -1,0 +1,4 @@
+enum MeterGroupKey {
+  name,
+  label,
+}
