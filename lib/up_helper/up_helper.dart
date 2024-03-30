@@ -31,3 +31,5 @@ export 'model/mdl_scope_profile.dart';
 export 'model/mdl_payment_mode_setting.dart';
 export 'model/mdl_tenant.dart';
 export 'model/mdl_meter_group.dart';
+
+export 'exceptions.dart';

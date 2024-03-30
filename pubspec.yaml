@@ -1,4 +1,4 @@
-name: pkg_buff_helper
+name: buff_helper
 description: "Buff Helper package project"
 version: 1.0.1
 homepage:
@@ -13,7 +13,7 @@ dependencies:
 
   csv: ^6.0.0
   download: ^1.0.0
-  intl: ^0.19.0
+  intl: ^0.18.0
   loading_animation_widget: ^1.2.1
   flutter_svg: ^2.0.10+1
   toggle_switch: ^2.3.0

@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../util/util.dart';
+
 const Widget horizontalSpaceTiny = SizedBox(width: 5.0);
 const Widget horizontalSpaceSmall = SizedBox(width: 10.0);
 const Widget horizontalSpaceRegular = SizedBox(width: 18.0);
@@ -21,12 +23,12 @@ const Widget verticalSpaceLarge = SizedBox(height: 50.0);
 // double screenHeightPercentage(BuildContext context, {double percentage = 1}) =>
 //     screenHeight(context) * percentage;
 
-// double screenWidthPercentage(BuildContext context,
-//     {double percentage = 1, double max = 500}) {
-//   double width = screenWidth(context) * percentage;
-//   width > max ? width = max : width;
-//   return width;
-// }
+double screenWidthPercentage(BuildContext context,
+    {double percentage = 1, double max = 500}) {
+  double width = screenWidth(context) * percentage;
+  width > max ? width = max : width;
+  return width;
+}
 
 Size? getSize(GlobalKey key) {
   if (key.currentContext == null) return null;

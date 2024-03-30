@@ -1,6 +1,5 @@
+import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:pkg_buff_helper/pkg_buff_helper.dart';
 
 void main() {
   test('adds one to input values', () {
