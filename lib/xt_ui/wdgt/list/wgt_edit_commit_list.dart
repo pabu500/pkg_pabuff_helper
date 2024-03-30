@@ -44,6 +44,7 @@ class WgtEditCommitList extends StatefulWidget {
     this.displayMode = 'list',
     this.onToggleListPaneMode,
     this.multiSelection = false,
+    this.itemExt = 36,
   }) : super(key: key);
 
   final String listPrefix;
@@ -53,7 +54,7 @@ class WgtEditCommitList extends StatefulWidget {
   final List<Map<String, dynamic>> listConfig;
   //list of items to be displayed
   final List<Map<String, dynamic>> listItems;
-  final Future<dynamic> Function()? doCommit;
+  final Function? doCommit;
   final bool showCommit;
   final double? compareValue;
   final double? altCompareValue;
@@ -73,6 +74,7 @@ class WgtEditCommitList extends StatefulWidget {
   final String displayMode;
   final Function(String, String)? onToggleListPaneMode;
   final bool multiSelection;
+  final double itemExt;
 
   //for list of functions to be called when to set the modified flag for list fields
   List<Function(bool)>? fieldUpdateModified = [];
@@ -215,7 +217,7 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
     // if (widget.showCommit || _modified) {
     //   widget.listConfig.last['width'] = _lastColWidth + 30;
     // }
-    double itemExt = 36;
+    double itemExt = widget.itemExt;
     _listItemStyle = TextStyle(
       fontSize: 13.5,
       color: Theme.of(context).hintColor,

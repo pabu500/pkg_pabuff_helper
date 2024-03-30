@@ -1,6 +1,6 @@
 library pkg_buff_helper;
 
-export 'util/util.dart';
+export 'util/xt_util.dart';
 export 'xt_ui/xt_ui.dart';
 export 'up_helper/up_helper.dart';
 
