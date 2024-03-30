@@ -4,7 +4,7 @@ enum Evs2HistoryType {
   active_meter_count_history,
   active_kwh_consumption_history,
   total_topup_history,
-  top_kwh_consumption_by_building,
+  top_kwh_usage_by_building,
   // tariff,
   meter_tariff,
   transaction_log,
