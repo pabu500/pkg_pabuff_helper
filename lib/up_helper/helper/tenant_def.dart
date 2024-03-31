@@ -2,6 +2,7 @@ enum TenantType {
   cw_nus_internal,
   cw_nus_external,
   cw_nus_retail_dining,
+  cw_nus_virtual,
 }
 
 enum TenantKey {
@@ -22,6 +23,8 @@ String getTenantTypeTag(TenantType? tenantType) {
       return 'External';
     case TenantType.cw_nus_retail_dining:
       return 'Retail&Dining';
+    case TenantType.cw_nus_virtual:
+      return 'Virtual';
     default:
       return '';
   }
@@ -35,6 +38,8 @@ TenantType? getTenantType(String tenantType) {
       return TenantType.cw_nus_external;
     case 'cw_nus_retail_dining':
       return TenantType.cw_nus_retail_dining;
+    case 'cw_nus_virtual':
+      return TenantType.cw_nus_virtual;
     default:
       return null;
   }
