@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../util/util.dart';
 import '../../style/xt_styles.dart';
 import '../form/wgt_update_password.dart';
+import '../xt_wgt_popup_button.dart';
 import 'evs2_list_text.dart';
 import 'get_pagenation_bar.dart';
 import '../file/wgt_save_table.dart';
@@ -851,34 +852,26 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
       /*, GlobalKey buttonKey*/ bool disabled) {
     return Tooltip(
       message: disabled ? item['disabledTooltip'] ?? '' : '',
-      child: item['passwordResetPopupButton'](
-        username,
-        userId,
-        index,
-        disabled,
+      child: xtWgtPopupButton(
+        xOffset: 35,
+        popupWidth: 335,
+        popupHeight: 180,
+        flexHeight: true,
+        popupChild: WgtUpdatePassword(
+          username: username,
+          userId: userId,
+          requireOldPassword: false,
+          passwordLengthMin: 3,
+          aclScopeStr: item['aclScopeStr'],
+        ),
+        direction: 'left',
+        child: Icon(
+          Icons.password,
+          color: disabled
+              ? Theme.of(context).hintColor.withOpacity(0.34)
+              : Theme.of(context).colorScheme.primary.withOpacity(0.5),
+        ),
       ),
-      // xtWgtPopupButton(
-      //   xOffset: 35,
-      //   popupWidth: 335,
-      //   popupHeight: 180,
-      //   flexHeight: true,
-      //   popupChild: WgtUpdatePassword(
-      //     username: username,
-      //     userId: userId,
-      //     requireOldPassword: false,
-      //     passwordLengthMin: 3,
-      //     aclScope: _loggedInUser!.isAdminAndUp()
-      //         ? AclScope.global
-      //         : _scopeProfile.getEffectiveScope(),
-      //   ),
-      //   direction: 'left',
-      //   child: Icon(
-      //     Icons.password,
-      //     color: disabled
-      //         ? Theme.of(context).hintColor.withOpacity(0.34)
-      //         : Theme.of(context).colorScheme.primary.withOpacity(0.5),
-      //   ),
-      // ),
     );
   }
 }

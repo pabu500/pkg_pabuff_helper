@@ -14,6 +14,7 @@ enum ProjectScope {
   GLOBAL,
   EMS_SMRT,
   EMS_CW_NUS,
+  MMC_GI_DE,
 }
 
 enum SiteScope {
@@ -36,6 +37,8 @@ enum SiteScope {
   CW_NUS_KRC,
   CW_NUS_BTC,
   CW_NUS_UTOWN,
+
+  GI_DE_DEMO,
 }
 
 const evs2Projects = [
@@ -316,6 +319,8 @@ String getProjectDisplayString(ProjectScope project) {
       return 'EMS_SMRT';
     case ProjectScope.EMS_CW_NUS:
       return 'EMS_CW_NUS';
+    case ProjectScope.MMC_GI_DE:
+      return 'MC_GI_DE';
   }
 }
 
@@ -345,6 +350,8 @@ ItemType getProjectMeterType(ProjectScope project) {
       return ItemType.meter_3p;
     case ProjectScope.EMS_CW_NUS:
       return ItemType.meter_iwow;
+    case ProjectScope.MMC_GI_DE:
+      return ItemType.meter;
   }
 }
 
