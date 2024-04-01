@@ -1,9 +1,8 @@
+import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
 
-import '../../../util/util.dart';
-import '../../xt_helpers.dart';
 import '../list/get_commit_button.dart';
 
 // import 'comm_user_service.dart';
@@ -11,7 +10,7 @@ import '../list/get_commit_button.dart';
 class WgtUpdatePassword extends StatefulWidget {
   const WgtUpdatePassword({
     Key? key,
-    required this.username,
+    required this.requestByUsername,
     required this.userId,
     this.titleWidget,
     this.showUsername = true,
@@ -19,13 +18,14 @@ class WgtUpdatePassword extends StatefulWidget {
     this.requireOldPassword = true,
     this.passwordLengthMin = 6,
     this.width = 320,
-    required this.aclScopeStr,
+    this.aclScopeStr = 'self',
     this.sideExpanded = true,
     this.padding,
+    required this.updatePassword,
   }) : super(key: key);
 
   final Widget? titleWidget;
-  final String username;
+  final String requestByUsername;
   final int userId;
   final bool showUsername;
   final bool showBorder;
@@ -35,12 +35,14 @@ class WgtUpdatePassword extends StatefulWidget {
   final double width;
   final bool sideExpanded;
   final EdgeInsetsGeometry? padding;
+  final Function updatePassword;
 
   @override
   _WgtUpdatePasswordState createState() => _WgtUpdatePasswordState();
 }
 
 class _WgtUpdatePasswordState extends State<WgtUpdatePassword> {
+  // String? _newPassword;
   late double _width;
   final double _height = 180;
 
@@ -64,21 +66,21 @@ class _WgtUpdatePasswordState extends State<WgtUpdatePassword> {
       _errorText = '';
     });
     try {
-      // Map<String, dynamic> result = await doUpdateKeyValue(
-      //   widget.userId,
-      //   'password',
-      //   _controllerNewPassword.text.trim(),
-      //   checkOldPassword: widget.requireOldPassword ? 'true' : 'false',
-      //   oldVal: _controllerOldPassword.text.trim(),
-      //   SvcClaim(
-      //     username: _loggedInUser!.username,
-      //     scope: widget.aclScope.name,
-      //     target: getAclTargetStr(AclTarget.evs2user_p_profile),
-      //     operation: AclOperation.update.name,
-      //   ),
-      // );
+      Map<String, dynamic> result = await widget.updatePassword(
+        widget.userId,
+        'password',
+        _controllerNewPassword.text.trim(),
+        checkOldPassword: widget.requireOldPassword ? 'true' : 'false',
+        oldVal: _controllerOldPassword.text.trim(),
+        SvcClaim(
+          username: widget.requestByUsername,
+          scope: widget.aclScopeStr,
+          target: getAclTargetStr(AclTarget.evs2user_p_profile),
+          operation: AclOperation.update.name,
+        ),
+      );
 
-      // return result;
+      return result;
     } catch (e) {
       if (kDebugMode) {
         print(e);
@@ -156,7 +158,7 @@ class _WgtUpdatePasswordState extends State<WgtUpdatePassword> {
                     ? Padding(
                         padding: const EdgeInsets.only(top: 8, bottom: 5),
                         child: Text(
-                          widget.username,
+                          widget.requestByUsername,
                           style: TextStyle(
                               fontSize: 18,
                               color:

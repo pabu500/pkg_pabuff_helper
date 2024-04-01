@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../util/util.dart';
 import '../../style/xt_styles.dart';
 import '../form/wgt_update_password.dart';
+import '../wgt_popup_button.dart';
 import '../xt_wgt_popup_button.dart';
 import 'evs2_list_text.dart';
 import 'get_pagenation_bar.dart';
@@ -46,6 +47,8 @@ class WgtEditCommitList extends StatefulWidget {
     this.onToggleListPaneMode,
     this.multiSelection = false,
     this.itemExt = 36,
+    this.requestByUsername,
+    this.aclScopeStr,
   }) : super(key: key);
 
   final String listPrefix;
@@ -76,6 +79,8 @@ class WgtEditCommitList extends StatefulWidget {
   final Function(String, String)? onToggleListPaneMode;
   final bool multiSelection;
   final double itemExt;
+  final String? requestByUsername;
+  final String? aclScopeStr;
 
   //for list of functions to be called when to set the modified flag for list fields
   List<Function(bool)>? fieldUpdateModified = [];
@@ -852,17 +857,20 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
       /*, GlobalKey buttonKey*/ bool disabled) {
     return Tooltip(
       message: disabled ? item['disabledTooltip'] ?? '' : '',
-      child: xtWgtPopupButton(
+      child: WgtPopupButton(
+        width: 200,
+        height: 300,
         xOffset: 35,
         popupWidth: 335,
-        popupHeight: 180,
-        flexHeight: true,
+        popupHeight: 250,
+        // flexHeight: true,
         popupChild: WgtUpdatePassword(
-          username: username,
+          requestByUsername: widget.requestByUsername!,
+          aclScopeStr: widget.aclScopeStr!,
           userId: userId,
           requireOldPassword: false,
           passwordLengthMin: 3,
-          aclScopeStr: item['aclScopeStr'],
+          updatePassword: item['updatePassword'],
         ),
         direction: 'left',
         child: Icon(
