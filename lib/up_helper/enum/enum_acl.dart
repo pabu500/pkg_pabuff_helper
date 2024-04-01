@@ -109,6 +109,7 @@ enum AclTarget {
   evs2_ops_dashboard_p_comm_stat,
   evs2_ops_dashboard_p_active_count_history,
   evs2_ops_dashboard_p_recent_active_count,
+  evs2_ops_dashboard_p_health,
 
   evs2_ops_meter_manager_p_entity,
   evs2_ops_meter_manager_p_meter_info_list_pane_switch,
