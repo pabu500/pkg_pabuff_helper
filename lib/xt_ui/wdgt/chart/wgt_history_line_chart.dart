@@ -44,6 +44,8 @@ class WgtHistoryLineChart extends StatefulWidget {
     this.gridColor,
     this.lineColor,
     this.getTooltipText,
+    this.showBelowBarData = false,
+    this.belowBarColor,
   })  : bottomTextColor =
             bottomTextColor ?? AppColors.contentColorYellow.withOpacity(0.62),
         bottomTouchedTextColor =
@@ -87,6 +89,8 @@ class WgtHistoryLineChart extends StatefulWidget {
   final Color? gridColor;
   final Color? lineColor;
   final String Function(double, String)? getTooltipText;
+  final bool showBelowBarData;
+  final Color? belowBarColor;
 
   @override
   State<WgtHistoryLineChart> createState() => _WgtHistoryLineChartState();
@@ -415,7 +419,10 @@ class _WgtHistoryLineChartState extends State<WgtHistoryLineChart> {
                   strokeColor: color,
                 );
               }),
-          belowBarData: BarAreaData(show: false),
+          belowBarData: BarAreaData(
+            show: widget.showBelowBarData,
+            color: widget.belowBarColor,
+          ),
           spots: chartData,
         ));
       }
