@@ -40,7 +40,10 @@ class WgtHistoryLineChart extends StatefulWidget {
     this.showEmptyMessage = false,
     this.maxVal,
     this.bottomTextAngle,
+    this.showGrid = true,
     this.gridColor,
+    this.lineColor,
+    this.getTooltipText,
   })  : bottomTextColor =
             bottomTextColor ?? AppColors.contentColorYellow.withOpacity(0.62),
         bottomTouchedTextColor =
@@ -80,7 +83,10 @@ class WgtHistoryLineChart extends StatefulWidget {
   final bool showTitle;
   final String title;
   final double? bottomTextAngle;
+  final bool showGrid;
   final Color? gridColor;
+  final Color? lineColor;
+  final String Function(double, String)? getTooltipText;
 
   @override
   State<WgtHistoryLineChart> createState() => _WgtHistoryLineChartState();
@@ -295,9 +301,15 @@ class _WgtHistoryLineChartState extends State<WgtHistoryLineChart> {
 
       bool showTimestamp =
           (singleTimestampLabel && barSpot.y <= yMin) || !singleTimestampLabel;
+      String text =
+          '${flSpot.y.toStringAsFixed(widget.yDecimal ?? 0)}${widget.valUnit ?? ''}${showTimestamp ? '\n' : ''}';
+      if (widget.getTooltipText != null) {
+        text = widget.getTooltipText!(flSpot.y, ''
+            // getDateTimeStrFromTimestamp(flSpot.x.toInt(), format: _timeFormat),
+            );
+      }
       return LineTooltipItem(
-        // '${flSpot.y.toInt()}${widget.valUnit ?? ''}${sapceSaveer ? '\n' : ''}',
-        '${flSpot.y.toStringAsFixed(widget.yDecimal ?? 0)}${widget.valUnit ?? ''}${showTimestamp ? '\n' : ''}',
+        text,
         TextStyle(
           color: textColor ?? widget.tooltipTextColor,
           fontWeight: FontWeight.bold,
@@ -340,7 +352,6 @@ class _WgtHistoryLineChartState extends State<WgtHistoryLineChart> {
                     )
                   ]
                 : [],
-
         textAlign: textAlign,
       );
     }).toList();
@@ -357,7 +368,7 @@ class _WgtHistoryLineChartState extends State<WgtHistoryLineChart> {
     _timeStampEnd = 0;
     int i = 0;
     for (var historyDataInfo in widget.historyDataSets) {
-      Color? lineColor;
+      Color? lineColor = widget.lineColor;
       if (widget.legend != null) {
         for (var legendItem in widget.legend!) {
           if (legendItem['name'] == historyDataInfo.keys.first) {
@@ -609,7 +620,7 @@ class _WgtHistoryLineChartState extends State<WgtHistoryLineChart> {
                           },
                         ),
                         gridData: FlGridData(
-                          show: true,
+                          show: widget.showGrid,
                           drawHorizontalLine: true,
                           drawVerticalLine: true,
                           // checkToShowHorizontalLine: (value) =>
