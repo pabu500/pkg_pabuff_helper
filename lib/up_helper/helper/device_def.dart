@@ -177,6 +177,35 @@ String getDeivceTypeUnit(dynamic deviceSubType) {
   }
 }
 
+String getDeivceTypeLabel(dynamic deviceSubType) {
+  switch (deviceSubType) {
+    case MeterType.electricity1p:
+      return 'Electricity';
+    case MeterType.electricity3p:
+      return 'Electricity 3P';
+    case MeterType.water:
+      return 'Water';
+    case MeterType.gas:
+      return 'Gas';
+    case MeterType.newater:
+      return 'NeWater';
+    case MeterType.btu:
+      return 'BTU';
+    case SensorType.temperature:
+      return 'Temperature';
+    case SensorType.humidity:
+      return 'Humidity';
+    case SensorType.ir:
+      return 'IR';
+    case SensorType.smoke:
+      return 'Smoke';
+    case SensorType.water_leak:
+      return 'Water Leak';
+    default:
+      return '';
+  }
+}
+
 Color getDeivceTypeColor(dynamic deviceSubType) {
   switch (deviceSubType) {
     case MeterType.electricity1p:
@@ -246,7 +275,8 @@ Widget getDeviceTypeIcon(dynamic deviceSubType,
       );
     case MeterType.btu:
       return Icon(
-        Symbols.heat,
+        // Symbols.heat,
+        Icons.hvac,
         size: theIconSize,
         color: iconColor ?? Colors.yellow.shade600,
       );
