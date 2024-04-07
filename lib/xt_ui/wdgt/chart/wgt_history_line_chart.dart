@@ -123,7 +123,7 @@ class _WgtHistoryLineChartState extends State<WgtHistoryLineChart> {
     List<FlSpot> chartData = [];
     Map<String, dynamic> firstData = historyData.first;
     bool isDouble = firstData[valKey] is double;
-    _maxY = 0;
+    // _maxY = 0;
     _minY = double.infinity;
     for (var historyDataItem in historyData) {
       int timestamp =
@@ -371,6 +371,7 @@ class _WgtHistoryLineChartState extends State<WgtHistoryLineChart> {
     _timeStampStart = 0;
     _timeStampEnd = 0;
     int i = 0;
+    _maxY = 0;
     for (var historyDataInfo in widget.historyDataSets) {
       Color? lineColor = widget.lineColor;
       if (widget.legend != null) {
@@ -380,7 +381,6 @@ class _WgtHistoryLineChartState extends State<WgtHistoryLineChart> {
           }
         }
       }
-
       for (List<Map<String, dynamic>> historyData
           in historyDataInfo.values.toList()) {
         _numOfSpots = historyData.length;
