@@ -198,3 +198,33 @@ String getCommaNumberStr(double? value, {int decimal = 0}) {
   }
   return commaFormat.format(double.parse(valueStr));
 }
+
+String getValueUnitDisplayStr(
+  double? value,
+  String? unit, {
+  int decimal = 0,
+  bool useK = false,
+  double kThreshold = 1000000,
+  String kUnit = 'k',
+}) {
+  double? useValue = value;
+  bool isK = false;
+  if (value == null) {
+    return '-';
+  }
+
+  if (useK && value >= kThreshold) {
+    useValue = value / 1000;
+    isK = true;
+  }
+
+  String valueStr = getCommaNumberStr(useValue, decimal: decimal);
+  if (unit != null) {
+    if (isK) {
+      valueStr = '$valueStr$kUnit';
+    } else {
+      valueStr = '$valueStr $unit';
+    }
+  }
+  return valueStr;
+}

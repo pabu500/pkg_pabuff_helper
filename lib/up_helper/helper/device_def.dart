@@ -177,6 +177,35 @@ String getDeivceTypeUnit(dynamic deviceSubType) {
   }
 }
 
+String getDeivceTypeUnitK(dynamic deviceSubType) {
+  switch (deviceSubType) {
+    case MeterType.electricity1p:
+      return 'MWh';
+    case MeterType.electricity3p:
+      return 'MWh';
+    case MeterType.water:
+      return 'km³';
+    case MeterType.gas:
+      return 'km³';
+    case MeterType.newater:
+      return 'km³';
+    case MeterType.btu:
+      return 'MWh';
+    case SensorType.temperature:
+      return '-';
+    case SensorType.humidity:
+      return '-';
+    case SensorType.ir:
+      return '-';
+    case SensorType.smoke:
+      return '-';
+    case SensorType.water_leak:
+      return '-';
+    default:
+      return '-';
+  }
+}
+
 String getDeivceTypeLabel(dynamic deviceSubType) {
   switch (deviceSubType) {
     case MeterType.electricity1p:

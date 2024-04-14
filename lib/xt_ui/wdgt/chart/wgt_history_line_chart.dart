@@ -15,6 +15,7 @@ class WgtHistoryLineChart extends StatefulWidget {
     this.chartRatio = 1.5,
     this.showMaxYValue = false,
     this.showMinYValue = false,
+    this.showKonY,
     this.yDecimal,
     this.reservedSizeLeft,
     this.rereservedSizeBottom,
@@ -46,6 +47,7 @@ class WgtHistoryLineChart extends StatefulWidget {
     this.getTooltipText,
     this.showBelowBarData = false,
     this.belowBarColor,
+    this.yDecimalK = 0,
   })  : bottomTextColor =
             bottomTextColor ?? AppColors.contentColorYellow.withOpacity(0.62),
         bottomTouchedTextColor =
@@ -60,6 +62,7 @@ class WgtHistoryLineChart extends StatefulWidget {
   final String timeKey;
   final String valKey;
   final String? valUnit;
+  final bool? showKonY;
   final List<Map<String, List<Map<String, dynamic>>>> historyDataSets;
   final bool showMaxYValue;
   final bool showMinYValue;
@@ -91,6 +94,7 @@ class WgtHistoryLineChart extends StatefulWidget {
   final String Function(double, String)? getTooltipText;
   final bool showBelowBarData;
   final Color? belowBarColor;
+  final int yDecimalK;
 
   @override
   State<WgtHistoryLineChart> createState() => _WgtHistoryLineChartState();
@@ -116,6 +120,7 @@ class _WgtHistoryLineChartState extends State<WgtHistoryLineChart> {
 
   int _displayDecimal = 2;
   // List<Map<String, dynamic>> _legend = [];
+  int _yDecimal = 0;
 
   List<FlSpot> genHistoryChartData(
       List<Map<String, dynamic>> historyData, String timeKey, String valKey,
@@ -175,7 +180,9 @@ class _WgtHistoryLineChartState extends State<WgtHistoryLineChart> {
       child: Text(
           // text,
           // yTitles[index],
-          value.toStringAsFixed(_displayDecimal),
+          (widget.showKonY ?? false)
+              ? getK(value, widget.yDecimalK)
+              : value.toStringAsFixed(_yDecimal),
           style: style,
           textAlign: TextAlign.center),
     );
@@ -431,6 +438,7 @@ class _WgtHistoryLineChartState extends State<WgtHistoryLineChart> {
     if (_range == 0) {
       _range = 0.1 * _minY; //widget.minY;
     }
+    _yDecimal = widget.yDecimal ?? decideDisplayDecimal(0.5 * _maxY);
   }
 
   @override
