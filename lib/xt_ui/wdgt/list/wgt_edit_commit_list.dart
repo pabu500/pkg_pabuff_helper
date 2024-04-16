@@ -6,7 +6,6 @@ import '../../../util/util.dart';
 import '../../style/xt_styles.dart';
 import '../form/wgt_update_password.dart';
 import '../wgt_popup_button.dart';
-import '../xt_wgt_popup_button.dart';
 import 'evs2_list_text.dart';
 import 'get_pagenation_bar.dart';
 import '../file/wgt_save_table.dart';
@@ -18,7 +17,7 @@ import 'wgt_list_sort_icon.dart';
 // ignore: must_be_immutable
 class WgtEditCommitList extends StatefulWidget {
   WgtEditCommitList({
-    Key? key,
+    super.key,
     this.width,
     this.height,
     required this.listConfig,
@@ -49,7 +48,7 @@ class WgtEditCommitList extends StatefulWidget {
     this.itemExt = 36,
     this.requestByUsername,
     this.aclScopeStr,
-  }) : super(key: key);
+  });
 
   final String listPrefix;
   final double? width;
@@ -240,7 +239,7 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
       _listHeight += 60;
     }
     double height = _listHeight > (widget.height ?? 830)
-        ? (widget.height ?? 830)
+        ? (widget.height ?? 900)
         : _listHeight < 120
             ? 120
             : _listHeight;
@@ -252,7 +251,7 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
       ),
       child: ListView.builder(
           key: _listKey,
-          shrinkWrap: true,
+          shrinkWrap: false,
           // padding: EdgeInsets.all(0),
           itemExtent: itemExt,
           //1 for header, 1 for footer, 1 for footer padding
@@ -297,6 +296,11 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
               if (!rowExists) {
                 _modifiedRows.add(modifiedRow);
               }
+
+              return Transform.translate(
+                  offset: Offset(0, itemExt - 30),
+                  child:
+                      _buildListItem(index, row, modifiedRow, _postCommitRows));
 
               return _buildListItem(index, row, modifiedRow, _postCommitRows);
             }
