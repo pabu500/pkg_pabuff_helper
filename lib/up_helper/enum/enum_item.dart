@@ -15,6 +15,7 @@ enum ItemType {
   job_type,
   job,
   job_type_sub,
+  fleet_history,
 }
 
 enum ItemFinderType {
@@ -38,4 +39,6 @@ enum ItemIdType {
   custom,
   panel_tag,
   alt_name,
+  site_tag,
+  scope_str,
 }

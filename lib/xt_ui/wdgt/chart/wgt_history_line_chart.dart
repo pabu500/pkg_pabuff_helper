@@ -48,6 +48,8 @@ class WgtHistoryLineChart extends StatefulWidget {
     this.showBelowBarData = false,
     this.belowBarColor,
     this.yDecimalK = 0,
+    this.leftPadding,
+    this.rightPadding,
   })  : bottomTextColor =
             bottomTextColor ?? AppColors.contentColorYellow.withOpacity(0.62),
         bottomTouchedTextColor =
@@ -95,6 +97,8 @@ class WgtHistoryLineChart extends StatefulWidget {
   final bool showBelowBarData;
   final Color? belowBarColor;
   final int yDecimalK;
+  final double? leftPadding;
+  final double? rightPadding;
 
   @override
   State<WgtHistoryLineChart> createState() => _WgtHistoryLineChartState();
@@ -478,7 +482,9 @@ class _WgtHistoryLineChartState extends State<WgtHistoryLineChart> {
         AspectRatio(
           aspectRatio: widget.chartRatio,
           child: Padding(
-            padding: const EdgeInsets.only(right: 13.0, left: 13.0),
+            padding: EdgeInsets.only(
+                right: widget.rightPadding ?? 13.0,
+                left: widget.leftPadding ?? 13.0),
             child: LayoutBuilder(
               builder: (context, constraints) {
                 return Stack(

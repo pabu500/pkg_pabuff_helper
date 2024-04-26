@@ -15,6 +15,7 @@ enum Evs2HistoryType {
   meter_list_usage_summary,
   meter_list_consolidated_usage_history,
   tenant_list_usage_summary,
+  fleet_health,
 }
 
 class Evs2HistoryModel {
