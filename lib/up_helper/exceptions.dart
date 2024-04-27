@@ -17,3 +17,8 @@ class ItemNotFoundException implements Exception {
   final String message;
   ItemNotFoundException(this.message);
 }
+
+class EmptyHistoryException implements Exception {
+  final String message;
+  EmptyHistoryException(this.message);
+}

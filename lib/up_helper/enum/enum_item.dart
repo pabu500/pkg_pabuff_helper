@@ -15,7 +15,7 @@ enum ItemType {
   job_type,
   job,
   job_type_sub,
-  fleet_history,
+  fleet_health,
 }
 
 enum ItemFinderType {
