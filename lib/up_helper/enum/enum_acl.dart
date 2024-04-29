@@ -150,3 +150,11 @@ enum AclOperation {
   list,
   full,
 }
+
+enum AuthProvider {
+  local,
+  google,
+  facebook,
+  apple,
+  microsoft,
+}

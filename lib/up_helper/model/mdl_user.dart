@@ -78,7 +78,7 @@ enum PushType {
   longPolling, //long polling
 }
 
-class User {
+class Evs2User {
   int? id = 0;
   String? username = '';
   String? email = '';
@@ -105,8 +105,10 @@ class User {
   List<ProjectScope>? projectScopes;
   List<SiteScope>? siteScopes;
   String? resetPasswordToken;
+  AuthProvider? authProvider;
+  Map<String, dynamic>? authInfo;
 
-  User({
+  Evs2User({
     this.id,
     this.username,
     this.email,
@@ -132,9 +134,11 @@ class User {
     this.projectScopes,
     this.siteScopes,
     this.resetPasswordToken,
+    this.authProvider,
+    this.authInfo,
   });
 
-  factory User.fromJson(Map<String, dynamic> respJson) {
+  factory Evs2User.fromJson(Map<String, dynamic> respJson) {
     try {
       Map<String, dynamic> userJson = respJson['userInfo'];
 
@@ -143,7 +147,7 @@ class User {
       Map<String, dynamic>? _rolePermMap;
       _rolePermMap = rolePermProfile['role_perm_map'];
 
-      return User(
+      return Evs2User(
         id: userJson['id'],
         username: userJson['username'],
         email: userJson['email'] ?? '',
@@ -170,10 +174,10 @@ class User {
       if (kDebugMode) {
         print(e);
       }
-      return User();
+      return Evs2User();
     }
   }
-  factory User.fromJson2(Map<String, dynamic> respJson) {
+  factory Evs2User.fromJson2(Map<String, dynamic> respJson) {
     try {
       Map<String, dynamic> userJson = respJson['userInfo'];
       List<String> roles = [...userJson['roles'].map((e) => e.toString())];
@@ -192,7 +196,7 @@ class User {
       if (userJson['scope_str'] != null && userJson['scope_str'] != '') {
         scopes = [...userJson['scope_str'].split(scopeStrDelimiter)];
       }
-      return User(
+      return Evs2User(
         id: userJson['id'],
         username: userJson['username'],
         email: userJson['email'] ?? '',
@@ -218,7 +222,7 @@ class User {
       if (kDebugMode) {
         print({'exception in User.fromJson2:$e'});
       }
-      return User();
+      return Evs2User();
     }
   }
 
@@ -239,6 +243,8 @@ class User {
       'fcm_reg_token': fcmRegToken,
       'scope_str': scopeStr,
       'dest_portal': destPortal,
+      'auth_provider': 'local',
+      'auth_info': {},
     };
   }
 
@@ -261,6 +267,8 @@ class User {
       'scope_str': scopeStr ?? '',
       'dest_portal': destPortal ?? '',
       'reset_password_token': resetPasswordToken ?? '',
+      'auth_provider': 'local',
+      'auth_info': {},
     };
   }
 

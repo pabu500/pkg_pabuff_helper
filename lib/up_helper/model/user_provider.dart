@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'mdl_user.dart';
 
 class UserProvider extends ChangeNotifier {
-  User? _currentUser;
+  Evs2User? _currentUser;
 
-  User? get currentUser => _currentUser;
+  Evs2User? get currentUser => _currentUser;
 
-  set currentUser(User? user) {
+  set currentUser(Evs2User? user) {
     _currentUser = user;
     notifyListeners();
   }
 
-  void iniUser(User user) {
+  void iniUser(Evs2User user) {
     _currentUser = user;
   }
 }
