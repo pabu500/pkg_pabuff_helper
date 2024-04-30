@@ -139,6 +139,36 @@ class Evs2User {
     this.authInfo,
   });
 
+  void logout() {
+    id = 0;
+    username = '';
+    email = '';
+    emailVerified = false;
+    fullName = '';
+    password = '';
+    phone = '';
+    role = 0;
+    enabled = false;
+    prefDarkMode = false;
+    rolePermMap = {};
+    maxRank = 0;
+    roles = [];
+    permissions = [];
+    permission2s = [];
+    address = '';
+    fcmRegToken = '';
+    pushType = PushType.none;
+    scopeStr = '';
+    stripeEpts = {};
+    destPortal = '';
+    scopes = [];
+    projectScopes = [];
+    siteScopes = [];
+    resetPasswordToken = '';
+    authProvider = null;
+    authInfo = {};
+  }
+
   factory Evs2User.fromJson(Map<String, dynamic> respJson) {
     try {
       Map<String, dynamic> userJson = respJson['userInfo'];
