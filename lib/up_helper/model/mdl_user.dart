@@ -22,6 +22,7 @@ enum UserKey {
   address,
   projectScope,
   siteScope,
+  authProvider,
 }
 
 enum AclRole {
