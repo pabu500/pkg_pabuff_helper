@@ -4,17 +4,17 @@ import 'package:flutter/material.dart';
 class PatternPainter extends CustomPainter {
   const PatternPainter({
     Key? key,
-    this.pattern = 'solid',
+    this.pattern = 'diagonal',
     this.color = Colors.black,
-    this.spacing = 8,
-    this.width,
-    this.height,
+    this.spacing = 10,
+    // this.width,
+    // this.height,
   });
   final String pattern;
   final Color color;
   final double spacing;
-  final double? width;
-  final double? height;
+  // final double? width;
+  // final double? height;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -27,12 +27,12 @@ class PatternPainter extends CustomPainter {
 
     if (pattern == 'diagonal') {
       // Draw diagonal lines across the canvas
-      for (double i = 0;
-          i < (width ?? size.width) + (height ?? size.height);
-          i += spacing * sqrt(2)) {
+      for (double i = 0; i < size.width + size.height; i += spacing * sqrt(2)) {
         canvas.drawLine(
-          Offset(0, i),
-          Offset((width ?? size.width), i - (width ?? size.width)),
+          Offset(i <= size.height ? 0 : (i - size.height),
+              i <= size.height ? i : size.height),
+          Offset(i <= size.width ? i : size.width,
+              i <= size.width ? 0 : i - size.width),
           paint,
         );
       }
