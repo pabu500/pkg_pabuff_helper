@@ -6,7 +6,7 @@ class PatternPainter extends CustomPainter {
     Key? key,
     this.pattern = 'solid',
     this.color = Colors.black,
-    this.spacing = 10,
+    this.spacing = 8,
     this.width,
     this.height,
   });
