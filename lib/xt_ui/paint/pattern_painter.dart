@@ -8,20 +8,20 @@ class PatternPainter extends CustomPainter {
     this.color = Colors.black,
     this.spacing = 10,
     this.backgroundColor = Colors.white,
-    // this.width,
-    // this.height,
+    this.width,
+    this.height,
   });
   final String pattern;
   final Color color;
   final double spacing;
   final Color backgroundColor;
-  // final double? width;
-  // final double? height;
+  final double? width;
+  final double? height;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final width = size.width;
-    final height = size.height;
+    final width = this.width ?? size.width;
+    final height = this.height ?? size.height;
     final backgroundPaint = Paint()..color = backgroundColor;
     canvas.drawRect(Rect.fromLTWH(0, 0, width, height), backgroundPaint);
 
