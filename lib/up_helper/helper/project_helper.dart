@@ -196,6 +196,22 @@ List<SiteScope> getProjectSites(
   return [];
 }
 
+double getProjectMeterUsageFactor(ProjectScope? projectScope,
+    List<Map<String, dynamic>> scopeProfiles, MeterType? meterType) {
+  if (projectScope == null) return 1.0;
+  if (meterType == null) return 1.0;
+  for (var scopeProfile in scopeProfiles) {
+    if (scopeProfile['project_scope'] == projectScope) {
+      if (scopeProfile['meter_usage_factor'] != null) {
+        if (scopeProfile['meter_usage_factor'][meterType] != null) {
+          return scopeProfile['meter_usage_factor'][meterType] as double;
+        }
+      }
+    }
+  }
+  return 1.0;
+}
+
 String getProjectScopeStrFromScopeStr(String scopeStr) {
   if (scopeStr.contains('nus')) {
     return 'evs2_nus';
