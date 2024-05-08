@@ -13,6 +13,11 @@ Map<String, dynamic> getElementMapByKey(
   return foundMap;
 }
 
+double getRoundUp(double value, int decimals) {
+  num mod = pow(10.0, decimals);
+  return ((value * mod).ceil() / mod);
+}
+
 Map<String, dynamic> getElementMapByValue(
     List<Map<String, dynamic>> listOfMaps, String keyName, String keyValue) {
   Map<String, dynamic> foundMap = listOfMaps
