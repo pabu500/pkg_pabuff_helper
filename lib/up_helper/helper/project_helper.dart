@@ -168,8 +168,10 @@ ProjectScope getProjectScopeFromStr2(String scopeStr) {
 SiteScope getSiteScopeFromStr2(String scopeStr) {
   for (SiteScope siteScope in SiteScope.values) {
     // if (scopeStr.toLowerCase().contains(siteScope.name.toLowerCase())) {
-    // if (scopeStr.toLowerCase() == 'site_${siteScope.name.toLowerCase()}') {
-    if (scopeStr.toLowerCase() == siteScope.name.toLowerCase()) {
+    if (scopeStr.toLowerCase() == 'site_${siteScope.name.toLowerCase()}') {
+      // if (scopeStr.toLowerCase() == siteScope.name.toLowerCase()) {
+      return siteScope;
+    } else if (scopeStr.toLowerCase() == siteScope.name.toLowerCase()) {
       return siteScope;
     }
   }
