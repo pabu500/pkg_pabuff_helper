@@ -23,6 +23,7 @@ enum UserKey {
   projectScope,
   siteScope,
   authProvider,
+  resetPasswordOnFirstLogin,
 }
 
 enum AclRole {
@@ -68,7 +69,8 @@ enum DestPortal {
   evs2op,
   evs2cp,
   bmsup,
-  emsup,
+  emsop,
+  emstp,
   none,
 }
 
@@ -491,8 +493,10 @@ class Evs2User {
         return DestPortal.evs2cp;
       case 'bmsup':
         return DestPortal.bmsup;
-      case 'emsup':
-        return DestPortal.emsup;
+      case 'emsop':
+        return DestPortal.emsop;
+      case 'emstp':
+        return DestPortal.emstp;
       default:
         return DestPortal.none;
     }

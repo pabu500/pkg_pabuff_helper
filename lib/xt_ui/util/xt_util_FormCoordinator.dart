@@ -38,8 +38,13 @@ class xt_util_FormCorrdinator {
     fieldSave[fieldKey] = hdlSave;
   }
 
-  bool precheckAll() {
+  bool precheckAll({bool checkPasswd = true}) {
     for (Enum key in formErrors.keys) {
+      if (!checkPasswd) {
+        if (key.toString().contains('password')) {
+          continue;
+        }
+      }
       if (formErrors[key] != null) {
         return false;
       }
@@ -47,15 +52,25 @@ class xt_util_FormCorrdinator {
     return true;
   }
 
-  void toggleDisabledAll(bool disabled) {
+  void toggleDisabledAll(bool disabled, {bool checkPasswd = true}) {
     for (Enum key in fieldToggleDisalbed.keys) {
-      fieldToggleDisalbed[key]!(disabled);
+      if (!checkPasswd) {
+        if (key.toString().toLowerCase().contains('password')) {
+          continue;
+        }
+      }
+      fieldToggleDisalbed[key]?.call(disabled);
     }
   }
 
-  void clearTextAll() {
+  void clearTextAll({bool checkPasswd = true}) {
     for (Enum key in fieldClearText.keys) {
-      fieldClearText[key]!();
+      if (!checkPasswd) {
+        if (key.toString().toLowerCase().contains('password')) {
+          continue;
+        }
+      }
+      fieldClearText[key]?.call();
     }
   }
 
@@ -74,8 +89,13 @@ class xt_util_FormCorrdinator {
     );
   }
 
-  bool validateAll() {
+  bool validateAll({bool checkPasswd = true}) {
     for (Enum key in fieldValidators.keys) {
+      if (!checkPasswd) {
+        if (key.toString().toLowerCase().contains('password')) {
+          continue;
+        }
+      }
       Function? func = fieldValidators[key];
       if (func != null) {
         String? result = func(formData[key] ?? '');
@@ -96,13 +116,15 @@ class xt_util_FormCorrdinator {
     return true;
   }
 
-  void saveAll() {
-    // for (Enum key in fieldSave.keys) {
-    //   Function? func = fieldSave[key];
-    //   if (func != null) {
-    //     func(formData[key]);
-    //   }
-    // }
-    fieldSave.forEach((key, func) => {func()});
+  void saveAll({bool checkPasswd = true}) {
+    for (Enum key in fieldSave.keys) {
+      if (!checkPasswd) {
+        if (key.toString().toLowerCase().contains('password')) {
+          continue;
+        }
+      }
+      fieldSave[key]?.call();
+    }
+    // fieldSave.forEach((key, func) => {func()});
   }
 }

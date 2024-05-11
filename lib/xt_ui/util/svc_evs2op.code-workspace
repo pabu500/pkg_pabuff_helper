@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "../../../../svc_evs2op"
+		},
+		{
+			"name": "pkg_pabuff_helper",
+			"path": "../../.."
+		}
+	],
+	"settings": {
+		"terminal.integrated.env.windows": {}
+	}
+}
