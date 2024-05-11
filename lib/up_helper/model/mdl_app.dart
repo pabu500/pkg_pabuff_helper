@@ -90,6 +90,7 @@ const meterGroupInfo = 'Meter Group Info';
 const meterGroupUsage = 'Meter Group Usage';
 const createMeterGroup = 'Create Meter Group';
 const userOps = 'User Ops';
+const tenantUserAssignment = 'Tenant User Assignment';
 const meterIssueCheck = 'Issue Check';
 const taskInfo = 'Task Info';
 const billingRecordInfo = 'Billing Record Info';
