@@ -1,3 +1,4 @@
+import '../../xt_ui/style/app_colors.dart';
 import '../enum/enum_item.dart';
 import '../up_helper.dart';
 
@@ -84,6 +85,260 @@ const cwNusSites = [
   SiteScope.SG_ALL,
   SiteScope.NONE,
 ];
+
+final scopeProfiles = [
+  {
+    'project_scope': ProjectScope.EVS2_PA,
+    'project_sites': [
+      SiteScope.PA_ATP,
+    ],
+    'timezone': 8,
+    'currency': 'SGD',
+    'validate_entity_sn': mmsSnValidator,
+    'validate_entity_displayname': (displayname) {
+      //8 digits, start with '1'
+      RegExp exp1 = RegExp(r'^1\d{7}$');
+      RegExp exp2 = RegExp(r'^2\d{7}$');
+      RegExp exp3 = RegExp(r'^3\d{7}$');
+      if (exp1.hasMatch(displayname) ||
+          exp2.hasMatch(displayname) ||
+          exp3.hasMatch(displayname)) {
+        return null;
+      } else {
+        return 'Invalid displayname';
+      }
+    },
+    'meter_phases': ['1p'],
+  },
+  {
+    'project_scope': ProjectScope.MMC_GI_DE,
+    'project_sites': [
+      SiteScope.GI_DE_DEMO,
+    ],
+    'timezone': 8,
+    'currency': 'SGD',
+    'validate_entity_sn': mmsSnValidator,
+    'validate_entity_displayname': (displayname) {
+      //8 digits, start with '1'
+      RegExp exp1 = RegExp(r'^1\d{7}$');
+      RegExp exp2 = RegExp(r'^2\d{7}$');
+      RegExp exp3 = RegExp(r'^3\d{7}$');
+      if (exp1.hasMatch(displayname) ||
+          exp2.hasMatch(displayname) ||
+          exp3.hasMatch(displayname)) {
+        return null;
+      } else {
+        return 'Invalid displayname';
+      }
+    },
+    'meter_phases': ['1p'],
+  },
+  {
+    'project_scope': ProjectScope.SG_ALL,
+    'project_sites': [
+      SiteScope.NUS_PGPR,
+      SiteScope.NUS_YNC,
+      SiteScope.NUS_RVRC,
+      SiteScope.NUS_UTOWN,
+      SiteScope.SUTD_CAMPUS,
+      SiteScope.NTU_MR,
+    ],
+    'timezone': 8,
+    'currency': 'SGD',
+    'validate_entity_sn': mmsSnValidator,
+    'validate_entity_displayname': (displayname) {
+      //8 digits, start with '1'
+      RegExp exp1 = RegExp(r'^1\d{7}$');
+      RegExp exp2 = RegExp(r'^2\d{7}$');
+      RegExp exp3 = RegExp(r'^3\d{7}$');
+      if (exp1.hasMatch(displayname) ||
+          exp2.hasMatch(displayname) ||
+          exp3.hasMatch(displayname)) {
+        return null;
+      } else {
+        return 'Invalid displayname';
+      }
+    },
+    'meter_phases': ['1p'],
+  },
+  {
+    'project_scope': ProjectScope.EVS2_NUS,
+    'timezone': 8,
+    'currency': 'SGD',
+    'validate_entity_displayname': (displayname) {
+      //8 digits, start with '1'
+      RegExp exp = RegExp(r'^1\d{7}$');
+      if (exp.hasMatch(displayname)) {
+        return null;
+      } else {
+        return 'Invalid displayname';
+      }
+    },
+    'payment_mode_setting': {
+      {
+        'payment_mode': PaymentMode.stripe,
+        'active': false,
+        'show': true,
+      },
+      {
+        'payment_mode': PaymentMode.netsQR,
+        'active': false,
+        'show': true,
+        'pub_key': 'd877185d-af96-43a5-9f53-48a3c543c3d5',
+      },
+      {
+        'payment_mode': PaymentMode.enets,
+        'active': true,
+        'show': true,
+        'pub_key': '154eb31c-0f72-45bb-9249-84a1036fd1ca',
+      },
+    },
+  },
+  {
+    'project_scope': ProjectScope.EVS2_SUTD,
+    'timezone': 8,
+    'currency': 'SGD',
+    'validate_meter_displayname': (displayname) {
+      //8 digits, start with '2'
+      RegExp exp = RegExp(r'^2\d{7}$');
+      if (exp.hasMatch(displayname)) {
+        return null;
+      } else {
+        return 'Invalid displayname';
+      }
+    },
+    'payment_mode_setting': [
+      {
+        'payment_mode': PaymentMode.stripe,
+        'active': false,
+        'show': true,
+      },
+      {
+        'payment_mode': PaymentMode.netsQR,
+        'active': false,
+        'show': true,
+      },
+      {
+        'payment_mode': PaymentMode.enets,
+        'active': true,
+        'show': true,
+      },
+    ],
+  },
+  {
+    'project_scope': ProjectScope.EVS2_NTU,
+    'timezone': 8,
+    'currency': 'SGD',
+    'validate_entity_displayname': (displayname) {
+      //8 digits, start with '3'
+      RegExp exp = RegExp(r'^3\d{7}$');
+      if (exp.hasMatch(displayname)) {
+        return null;
+      } else {
+        return 'Invalid displayname';
+      }
+    },
+    'payment_mode_setting': [
+      {
+        'payment_mode': PaymentMode.stripe,
+        'active': true,
+        'show': true,
+        //'publishableKey':
+        'pub_key':
+            'pk_live_51MokvvAzcY0NKTCHoedkapOh9Tl9VEwT3Nz2bRn0vcGugAmFJBoOrH0GprHSj99GLhaDByJyciLVOmsoSiuHuY7F00N9f88BqB',
+        'merchant_identifier': 'merchant.com.evs2.ntu',
+        'pay_svc_host_url': 'https://p3.evs.com.sg'
+      },
+      {
+        'payment_mode': PaymentMode.netsQR,
+        'active': false,
+        'show': true,
+      },
+      {
+        'payment_mode': PaymentMode.enets,
+        'active': false,
+        'show': true,
+      },
+    ],
+  },
+  {
+    'project_scope': ProjectScope.EMS_SMRT,
+    'meter_type': ItemType.meter_3p,
+    'project_sites': [
+      SiteScope.SMRT_Clementi,
+      SiteScope.SMRT_Dover,
+      SiteScope.SMRT_Buona_Vista,
+      SiteScope.SMRT_Commonwealth,
+      SiteScope.SMRT_Queenstown,
+    ],
+    'timezone': 8,
+    'currency': 'SGD',
+    'validate_entity_displayname': (displayname) {
+      //8 digits, start with '3'
+      RegExp exp = RegExp(r'^3\d{7}$');
+      if (exp.hasMatch(displayname)) {
+        return null;
+      } else {
+        return 'Invalid displayname';
+      }
+    },
+    'validate_entity_sn': (sn) {
+      return null;
+    },
+  },
+  {
+    'project_scope': ProjectScope.EMS_CW_NUS,
+    'meter_type': ItemType.meter_iwow,
+    'project_sites': [
+      {
+        'key': SiteScope.CW_NUS_KRC,
+        'name': 'KRC',
+        'color': AppColors.contentColorCyan,
+      },
+      {
+        'key': SiteScope.CW_NUS_BTC,
+        'name': 'BTC',
+        'color': AppColors.contentColorLightGrey,
+      },
+      {
+        'key': SiteScope.CW_NUS_UTOWN,
+        'name': 'UTown',
+        'color': AppColors.contentColorLightTeal,
+      },
+    ],
+    'timezone': 8,
+    'currency': 'SGD',
+    'validate_entity_displayname': (displayname) {
+      //8 digits, start with '3'
+      RegExp exp = RegExp(r'^3\d{7}$');
+      if (exp.hasMatch(displayname)) {
+        return null;
+      } else {
+        return 'Invalid displayname';
+      }
+    },
+    'validate_entity_sn': (sn) {
+      return null;
+    },
+    'meter_usage_factor': {
+      MeterType.btu: 1 / 3.5168528421,
+      MeterType.electricity1p: 1,
+      MeterType.electricity3p: 1,
+      MeterType.gas: 1,
+      MeterType.water: 1,
+    }
+  }
+];
+
+String? mmsSnValidator(value) {
+  //12 digits, start with '202', all digits
+  RegExp exp = RegExp(r'^202\d{9}$');
+  if (exp.hasMatch(value)) {
+    return null;
+  } else {
+    return 'Invalid sn';
+  }
+}
 
 ScopeProfile? getActivePortalScopeProfile(ProjectScope activePortalProjectScope,
     List<Map<String, dynamic>> scopeProfiles) {

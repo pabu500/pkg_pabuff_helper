@@ -9,3 +9,9 @@ const Color evs2NTUyellow = Color(0xffe6ab39);
 const Color evs2SUTDwhite = Color(0xffffffff);
 
 final Color commitColor = Colors.amber.shade900.withOpacity(0.95);
+
+const Color sgGreenLight = Color.fromARGB(255, 0, 203, 203);
+const Color spGreen1 = Color(0xff00abb5);
+const Color spGreen2 = Color(0xff2184a1);
+const Color spGreen3 = Color(0xff2a5267);
+const Color spBlue1 = Color(0xff38567c);
