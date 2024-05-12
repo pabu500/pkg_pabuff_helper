@@ -110,6 +110,9 @@ class Evs2User {
   String? resetPasswordToken;
   AuthProvider? authProvider;
   Map<String, dynamic>? authInfo;
+  String? tenantId;
+  String? tenantName;
+  String? tenantLabel;
 
   Evs2User({
     this.id,
@@ -139,6 +142,9 @@ class Evs2User {
     this.resetPasswordToken,
     this.authProvider,
     this.authInfo,
+    this.tenantId,
+    this.tenantName,
+    this.tenantLabel,
   });
 
   void logout() {
@@ -169,6 +175,9 @@ class Evs2User {
     resetPasswordToken = '';
     authProvider = null;
     authInfo = {};
+    tenantId = '';
+    tenantName = '';
+    tenantLabel = '';
   }
 
   factory Evs2User.fromJson(Map<String, dynamic> respJson) {
@@ -250,6 +259,9 @@ class Evs2User {
         scopes: scopes,
         permission2s: permission2s,
         resetPasswordToken: userJson['reset_password_token'] ?? '',
+        tenantId: userJson['tenant_id'] ?? '',
+        tenantName: userJson['tenant_name'] ?? '',
+        tenantLabel: userJson['tenant_label'] ?? '',
       );
     } catch (e) {
       if (kDebugMode) {
@@ -302,6 +314,9 @@ class Evs2User {
       'reset_password_token': resetPasswordToken ?? '',
       'auth_provider': 'local',
       'auth_info': {},
+      'tenant_id': tenantId ?? '',
+      'tenant_name': tenantName ?? '',
+      'tenant_label': tenantLabel ?? '',
     };
   }
 
