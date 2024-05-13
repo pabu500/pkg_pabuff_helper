@@ -228,3 +228,34 @@ String getValueUnitDisplayStr(
   }
   return valueStr;
 }
+
+final Color statColorDark = Colors.grey.shade800;
+final defStatStyleLarge = TextStyle(
+  fontSize: 30,
+  fontWeight: FontWeight.bold,
+  color: Colors.grey.shade800,
+);
+final defStatStyle = TextStyle(
+  fontSize: 21,
+  fontWeight: FontWeight.bold,
+  color: Colors.grey.shade600,
+);
+final defStatStyleSmall = TextStyle(
+  fontSize: 13,
+  color: Colors.grey.shade600,
+);
+
+Widget getStatWithUnit(String statStr, String unit,
+    {TextStyle? statStrStyle, TextStyle? unitStyle, bool showUnit = true}) {
+  return Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(statStr, style: statStrStyle ?? defStatStyle),
+      if (showUnit)
+        Padding(
+          padding: const EdgeInsets.only(left: 5),
+          child: Text(unit, style: unitStyle ?? defStatStyleSmall),
+        ),
+    ],
+  );
+}

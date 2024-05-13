@@ -159,8 +159,12 @@ class _WgtTopStatBoxState extends State<WgtTopStatBox> {
       if (kDebugMode) {
         print(e);
       }
-      if (e.toString().contains('ore') && e.toString().contains('server')) {
-        _errorText = 'ORE offline';
+      if (e.toString().contains('type meter group found')) {
+        _valueStr = '--';
+      } else {
+        if (e.toString().contains('ore') && e.toString().contains('server')) {
+          _errorText = 'ORE offline';
+        }
       }
     } finally {
       setState(() {
@@ -327,7 +331,7 @@ class _WgtTopStatBoxState extends State<WgtTopStatBox> {
   @override
   Widget build(BuildContext context) {
     String valueStr = widget.mockValueStr ?? _valueStr;
-    if (widget.mockValueStr == null) {
+    if (widget.mockValueStr == null && '--' != valueStr) {
       double value = double.tryParse(valueStr) ?? 0;
       if (widget.adjK) {
         if (value > 1000000) {

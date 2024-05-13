@@ -277,3 +277,26 @@ String getLocalDatetimeStr(DateTime datetime, int timezone,
           .toUtc()
           .add(Duration(hours: timezone)));
 }
+
+String getTimeRangeStr(DateTime from, DateTime to,
+    {String? targetInterval, bool useMiddle = false}) {
+  DateTime middleReading = from.add(Duration(
+    milliseconds: to.difference(from).inMilliseconds ~/ 2,
+  ));
+  String format = 'yyyy-MM-dd HH:mm:ss';
+  if (targetInterval == 'hourly') {
+    format = 'yyyy-MM-dd HH:mm';
+  } else if (targetInterval == 'daily') {
+    format = 'yyyy-MM-dd';
+  } else if (targetInterval == 'weekly') {
+    format = 'yyyy-MM-dd';
+  } else if (targetInterval == 'monthly') {
+    format = 'yyyy-MM';
+  } else if (targetInterval == 'yearly') {
+    format = 'yyyy';
+  }
+  String fromStr = getDateTimeStrFromDateTime(from, format: format);
+  String toStr = getDateTimeStrFromDateTime(to, format: format);
+  String middleStr = getDateTimeStrFromDateTime(middleReading, format: format);
+  return useMiddle ? middleStr : '$fromStr -- $toStr';
+}

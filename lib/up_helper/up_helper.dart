@@ -2,12 +2,15 @@ library evs2up_helper;
 
 export 'enum/enum_acl.dart';
 
+export 'def/bill_def.dart';
+
 export 'helper/auth_helper.dart';
 export 'helper/project_helper.dart';
 export 'helper/acl_helper.dart';
 export 'helper/device_def.dart';
 export 'helper/tariff_package.dart';
 export 'helper/meter_group_def.dart';
+export 'helper/meter_type_helper.dart';
 
 export 'model/mdl_acl_permission.dart';
 export 'model/mdl_acl_permission2.dart';

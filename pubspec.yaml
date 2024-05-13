@@ -1,6 +1,6 @@
 name: buff_helper
 description: "Buff Helper package project"
-version: 1.0.1
+version: 1.1.0
 homepage:
 
 environment:
@@ -21,6 +21,8 @@ dependencies:
   fl_chart: ^0.67.0
   material_symbols_icons: ^4.2719.3
   firebase_auth: ^4.19.4
+  month_year_picker: ^0.3.0+1
+  calendar_date_picker2: ^1.0.2
 
 dev_dependencies:
   flutter_test:

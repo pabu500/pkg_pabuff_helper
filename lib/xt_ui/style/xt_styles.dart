@@ -39,6 +39,11 @@ const TextStyle captionStyle = TextStyle(
   fontWeight: FontWeight.w400,
 );
 
+const TextStyle opsWidgetTitle = TextStyle(
+  fontSize: 18,
+  fontWeight: FontWeight.bold,
+);
+
 BoxDecoration panelBoxDecor(Color boarderColor,
     {Color? bgColor, double? radius}) {
   return BoxDecoration(
