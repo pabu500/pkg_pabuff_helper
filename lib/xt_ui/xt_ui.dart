@@ -32,3 +32,4 @@ export 'wdgt/scope/get_effective_scope_tag.dart';
 export 'wdgt/ctrl/wgt_dash_control.dart';
 export 'wdgt/input/wgt_text_field2.dart';
 export 'wdgt/input/wgt_finder_field_input.dart';
+export 'wdgt/datetime/wgt_data_range_picker_monthly.dart';

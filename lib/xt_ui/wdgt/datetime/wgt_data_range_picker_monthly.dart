@@ -1,5 +1,4 @@
 import 'package:buff_helper/pkg_buff_helper.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:month_year_picker/month_year_picker.dart';
 
@@ -9,8 +8,8 @@ class WgtDateRangePickerMonthly extends StatefulWidget {
   const WgtDateRangePickerMonthly({
     Key? key,
     // required this.context,
-    required this.scopeProfile,
     required this.onRangeSet,
+    required this.scopeProfile,
     this.onMonthPicked,
     this.timeZone = 8,
     this.iniStartDateTime,
@@ -20,6 +19,7 @@ class WgtDateRangePickerMonthly extends StatefulWidget {
     // this.selectedEndDate,
     // this.isCustomRange = false,
     this.showMonthly = true,
+    this.monthPicked,
   }) : super(key: key);
 
   // final BuildContext context;
@@ -30,7 +30,7 @@ class WgtDateRangePickerMonthly extends StatefulWidget {
   final DateTime? iniStartDateTime;
   final DateTime? iniEndDateTime;
   final DateTime? lastDate;
-  // final DateTime? monthPicked;
+  final DateTime? monthPicked;
   // final DateTime? selectedStartDate;
   // final DateTime? selectedEndDate;
   // final bool isCustomRange;
@@ -86,6 +86,7 @@ class _WgtDateRangePickerMonthlyState extends State<WgtDateRangePickerMonthly> {
   @override
   void initState() {
     super.initState();
+    _monthPicked = widget.monthPicked;
     _selectedStartDate = widget.iniStartDateTime;
     _selectedEndDate = widget.iniEndDateTime;
   }
@@ -134,9 +135,9 @@ class _WgtDateRangePickerMonthlyState extends State<WgtDateRangePickerMonthly> {
             borderRadius: BorderRadius.circular(5),
           ),
           child: WgtDateRangePicker2(
-            width: 290,
-            scopeProfile: widget.scopeProfile,
             timezone: widget.timeZone,
+            scopeProfile: widget.scopeProfile,
+            width: 290,
             updateRangeByParent: true,
             startDateTime: _selectedStartDate,
             endDateTime: _selectedEndDate,
