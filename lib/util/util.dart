@@ -3,7 +3,19 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
+import '../xt_ui/style/app_colors.dart';
 // import 'dart:ui';
+
+Color getBalPercentageColor(double balPercentage) {
+  return balPercentage < 0.01
+      ? AppColors.contentColorDarkRed
+      : balPercentage < 0.20
+          ? Colors.redAccent.withOpacity(0.6)
+          : balPercentage < 0.5
+              ? Colors.orange.withOpacity(0.6)
+              : Colors.green.withOpacity(0.6);
+}
 
 Map<String, dynamic> getElementMapByKey(
     List<Map<String, dynamic>> listOfMaps, String key) {
