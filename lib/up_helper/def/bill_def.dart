@@ -124,7 +124,7 @@ Color getBillingLcSatusColor(String? statusStr) {
   }
 }
 
-Map<String, dynamic> getLcStatusTag(row, fieldKey) {
+Map<String, dynamic> getBillingLcStatusTag(row, fieldKey) {
   if ((row['lc_status'] ?? '').isEmpty) {
     return {};
   }

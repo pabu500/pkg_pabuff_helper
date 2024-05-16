@@ -3,6 +3,7 @@ library evs2up_helper;
 export 'enum/enum_acl.dart';
 
 export 'def/bill_def.dart';
+export 'def/op_def.dart';
 
 export 'helper/auth_helper.dart';
 export 'helper/project_helper.dart';
