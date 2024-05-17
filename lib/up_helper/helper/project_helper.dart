@@ -163,6 +163,12 @@ final scopeProfiles = [
   },
   {
     'project_scope': ProjectScope.EVS2_NUS,
+    'project_sites': [
+      SiteScope.NUS_PGPR,
+      SiteScope.NUS_YNC,
+      SiteScope.NUS_RVRC,
+      SiteScope.NUS_UTOWN,
+    ],
     'timezone': 8,
     'currency': 'SGD',
     'validate_entity_displayname': (displayname) {
@@ -196,6 +202,7 @@ final scopeProfiles = [
   },
   {
     'project_scope': ProjectScope.EVS2_SUTD,
+    'project_sites': [SiteScope.SUTD_CAMPUS],
     'timezone': 8,
     'currency': 'SGD',
     'validate_meter_displayname': (displayname) {
@@ -227,6 +234,7 @@ final scopeProfiles = [
   },
   {
     'project_scope': ProjectScope.EVS2_NTU,
+    'project_sites': [SiteScope.NTU_MR],
     'timezone': 8,
     'currency': 'SGD',
     'validate_entity_displayname': (displayname) {
@@ -321,7 +329,7 @@ final scopeProfiles = [
       return null;
     },
     'meter_usage_factor': {
-      MeterType.btu: 1 / 3.5168528421,
+      MeterType.btu: 1 / 3.516, //1 / 3.5168528421,
       MeterType.electricity1p: 1,
       MeterType.electricity3p: 1,
       MeterType.gas: 1,
