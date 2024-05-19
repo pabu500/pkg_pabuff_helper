@@ -870,7 +870,7 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
         // flexHeight: true,
         popupChild: WgtUpdatePassword(
           requestByUsername: widget.requestByUsername!,
-          aclScopeStr: widget.aclScopeStr!,
+          aclScopeStr: item['aclScopeStr'] ?? widget.aclScopeStr!,
           userId: userId,
           requireOldPassword: false,
           passwordLengthMin: 3,
