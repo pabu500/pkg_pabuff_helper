@@ -235,7 +235,7 @@ class _xtTextFieldState extends State<xtTextField> {
       suffix = txTextInputSuffix('waiting', null);
     });
 
-    var dbresult = await widget.doCommCheckUnique!(field, val);
+    var dbresult = await widget.doCommCheckUnique!(field, val.toLowerCase());
 
     setState(() {
       if (dbresult == 'available') {
@@ -245,7 +245,7 @@ class _xtTextFieldState extends State<xtTextField> {
       } else {
         dbUnique = false;
         suffix = null;
-        if (dbresult == 'taken') {
+        if (dbresult.contains('taken')) {
           errorText = '${field.name} already used';
         } else {
           errorText = 'Service Error';
