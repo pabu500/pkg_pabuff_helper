@@ -1,6 +1,7 @@
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:month_year_picker/month_year_picker.dart';
+import 'package:month_picker_dialog/month_picker_dialog.dart';
+// import 'package:month_year_picker/month_year_picker.dart';
 
 import 'wgt_date_range_picker2.dart';
 
@@ -51,7 +52,7 @@ class _WgtDateRangePickerMonthlyState extends State<WgtDateRangePickerMonthly> {
   Future<void> _onMonthlyPressed() async {
     String? locale = 'en';
     final localeObj = locale != null ? Locale(locale) : null;
-    final selected = await showMonthYearPicker(
+    final selected = await showMonthPicker(
       context: context,
       initialDate: _monthPicked ?? DateTime.now(),
       firstDate: DateTime(2020),
