@@ -17,8 +17,8 @@ dependencies:
   loading_animation_widget: ^1.2.1
   flutter_svg: ^2.0.10+1
   toggle_switch: ^2.3.0
-  file_picker: ^8.0.0+1
-  fl_chart: ^0.67.0
+  file_picker: ^8.0.3
+  fl_chart: ^0.68.0
   material_symbols_icons: ^4.2719.3
   firebase_auth: ^4.19.4
   # month_year_picker: ^0.3.0+1
@@ -28,7 +28,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.0
+  flutter_lints: ^4.0.0
 
 
 # For information on the generic Dart part of this file, see the
