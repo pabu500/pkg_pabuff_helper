@@ -1,6 +1,6 @@
 name: buff_helper
 description: "Buff Helper package project"
-version: 1.1.2
+version: 1.2.0
 homepage:
 
 environment:
@@ -24,6 +24,10 @@ dependencies:
   # month_year_picker: ^0.3.0+1
   month_picker_dialog: ^2.5.0
   calendar_date_picker2: ^1.0.2
+  pdf: ^3.10.8
+  printing: ^5.12.0
+  path_provider: ^2.1.3
+  open_file: ^3.3.2
 
 dev_dependencies:
   flutter_test:

@@ -1,6 +1,8 @@
-library evs2up_helper;
+library up_helper;
 
 export 'enum/enum_acl.dart';
+export 'enum/enum_datetime.dart';
+export 'enum/enum_item.dart';
 
 export 'def/bill_def.dart';
 export 'def/op_def.dart';
