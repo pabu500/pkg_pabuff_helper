@@ -10,6 +10,7 @@ enum TenantKey {
   sap_wbs,
   location_tag,
   tenant_type,
+  alt_name,
 }
 
 String getTenantTypeTag(TenantType? tenantType) {
