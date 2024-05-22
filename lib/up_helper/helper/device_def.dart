@@ -27,6 +27,15 @@ enum MeterType {
   btu,
 }
 
+enum MeterTypeTag {
+  E,
+  E3P,
+  W,
+  B,
+  N,
+  G,
+}
+
 enum DeviceStatus {
   ok,
   warning,
