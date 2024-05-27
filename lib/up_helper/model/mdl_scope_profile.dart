@@ -1,4 +1,3 @@
-import '../enum/enum_item.dart';
 import '../up_helper.dart';
 
 class ScopeProfile /*extends ChangeNotifier*/ {

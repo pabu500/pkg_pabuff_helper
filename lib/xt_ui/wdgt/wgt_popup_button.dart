@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class WgtPopupButton extends StatelessWidget {
   const WgtPopupButton({
-    Key? key,
+    super.key,
     // this.buttonKey,
     required this.child,
     required this.width,
@@ -17,7 +17,7 @@ class WgtPopupButton extends StatelessWidget {
     this.disabled,
     this.xOffset = 0,
     this.center = false,
-  }) : super(key: key);
+  });
 
   // final GlobalKey buttonKey = GlobalKey();
   final Widget child;

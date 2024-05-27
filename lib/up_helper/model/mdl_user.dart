@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 import '../enum/enum_acl.dart';
+import '../helper/auth_helper.dart';
 import '../helper/project_helper.dart';
 import 'mdl_acl_permission.dart';
 import 'mdl_acl_permission2.dart';
@@ -80,6 +82,81 @@ enum PushType {
   apns, //apple push notification service
   longPolling, //long polling
 }
+
+Map<String, dynamic> getDestPortalTag(row, fieldKey) {
+  if ((row['dest_portal'] ?? '').isEmpty) {
+    return {};
+  }
+  if (row['dest_portal'] == '-') {
+    return {};
+  }
+  String valueStr = row['dest_portal'].toString().toLowerCase();
+  DestPortal? status = DestPortal.values.byName(valueStr);
+  if (status == DestPortal.none) {
+    return {};
+  }
+
+  return {
+    'tag': getDestPortalTagStr(valueStr),
+    'color': getDestPortalColor(status.name),
+    'tooltip': getDestPortalMessage(status.name),
+  };
+}
+
+String getDestPortalTagStr(String? statusStr) {
+  if (statusStr == null) {
+    return 'N/A';
+  }
+  DestPortal? status = DestPortal.values.byName(statusStr);
+
+  return destPortalInfo[status]!['tag'];
+}
+
+String getDestPortalMessage(String? statusStr) {
+  if (statusStr == null) {
+    return 'N/A';
+  }
+  DestPortal? status = DestPortal.values.byName(statusStr);
+
+  return destPortalInfo[status]!['tooltip'];
+}
+
+Color getDestPortalColor(String? statusStr) {
+  if (statusStr == null || statusStr.isEmpty) {
+    return Colors.transparent;
+  }
+  DestPortal? status = DestPortal.values.byName(statusStr);
+
+  return destPortalInfo[status]!['color'];
+}
+
+final Map<DestPortal, dynamic> destPortalInfo = {
+  DestPortal.bmsup: {
+    'tag': 'BMSUP',
+    'color': Colors.lime.shade800,
+    'tooltip': 'BMS User Portal',
+  },
+  DestPortal.emsop: {
+    'tag': 'EMSOP',
+    'color': Colors.green,
+    'tooltip': 'EMS Ops Portal',
+  },
+  DestPortal.emstp: {
+    'tag': 'EMSTP',
+    'color': Colors.purple.shade800.withOpacity(0.7),
+    'tooltip': 'EMS Tenant Portal',
+  },
+  DestPortal.evs2cp: {
+    'tag': 'EVSCP',
+    'color': Colors.orangeAccent.withOpacity(0.5),
+    'tooltip': 'EVS2 Consumer Portal',
+  },
+  DestPortal.evs2op: {
+    'tag': 'EVSOP',
+    'color': Colors.teal.withOpacity(0.7),
+    'tooltip': 'EVS2 Ops Portal',
+  },
+};
 
 class Evs2User {
   int? id = 0;
@@ -211,6 +288,10 @@ class Evs2User {
         scopeStr: userJson['scope_str'] ?? '',
         // paySvcUrl: userJson['pay_svc_url'] ?? {},
         resetPasswordToken: userJson['reset_password_token'] ?? '',
+        tenantId: userJson['tenant_id'] ?? '',
+        tenantName: userJson['tenant_name'] ?? '',
+        tenantLabel: userJson['tenant_label'] ?? '',
+        authProvider: AuthProvider.values.byName(userJson['auth_provider']),
       );
     } catch (e) {
       if (kDebugMode) {
@@ -238,6 +319,8 @@ class Evs2User {
       if (userJson['scope_str'] != null && userJson['scope_str'] != '') {
         scopes = [...userJson['scope_str'].split(scopeStrDelimiter)];
       }
+      AuthProvider? authProvider =
+          AuthProvider.values.byName(userJson['auth_provider'] ?? 'local');
       return Evs2User(
         id: userJson['id'],
         username: userJson['username'],
@@ -262,6 +345,7 @@ class Evs2User {
         tenantId: userJson['tenant_id'] ?? '',
         tenantName: userJson['tenant_name'] ?? '',
         tenantLabel: userJson['tenant_label'] ?? '',
+        authProvider: authProvider,
       );
     } catch (e) {
       if (kDebugMode) {
@@ -288,7 +372,7 @@ class Evs2User {
       'fcm_reg_token': fcmRegToken,
       'scope_str': scopeStr,
       'dest_portal': destPortal,
-      'auth_provider': 'local',
+      'auth_provider': authProvider?.name ?? 'local',
       'auth_info': {},
     };
   }
@@ -312,7 +396,7 @@ class Evs2User {
       'scope_str': scopeStr ?? '',
       'dest_portal': destPortal ?? '',
       'reset_password_token': resetPasswordToken ?? '',
-      'auth_provider': 'local',
+      'auth_provider': authProvider?.name ?? 'local',
       'auth_info': {},
       'tenant_id': tenantId ?? '',
       'tenant_name': tenantName ?? '',

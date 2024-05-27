@@ -201,6 +201,19 @@ class AppColors {
     return colorList;
   }
 
+  static List<Color> getColorListBlueGrey() {
+    List<Color> colorList = [];
+    colorList = [
+      contentColorCyan,
+      Colors.blueGrey.shade200,
+      Colors.teal.shade200,
+      Colors.blue.shade200,
+      // contentColorBlue,
+      // contentColorDarkTeal,
+    ];
+    return colorList;
+  }
+
   static List<Color> getColorListGreys() {
     List<Color> colorList = [];
     colorList = [

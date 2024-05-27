@@ -862,8 +862,8 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
     return Tooltip(
       message: disabled ? item['disabledTooltip'] ?? '' : '',
       child: WgtPopupButton(
-        width: 200,
-        height: 300,
+        width: 35,
+        height: 35,
         xOffset: 35,
         popupWidth: 335,
         popupHeight: 250,

@@ -7,7 +7,7 @@ import 'wgt_date_range_picker2.dart';
 
 class WgtDateRangePickerMonthly extends StatefulWidget {
   const WgtDateRangePickerMonthly({
-    Key? key,
+    super.key,
     // required this.context,
     required this.onRangeSet,
     required this.scopeProfile,
@@ -21,7 +21,7 @@ class WgtDateRangePickerMonthly extends StatefulWidget {
     // this.isCustomRange = false,
     this.showMonthly = true,
     this.monthPicked,
-  }) : super(key: key);
+  });
 
   // final BuildContext context;
   final ScopeProfile scopeProfile;

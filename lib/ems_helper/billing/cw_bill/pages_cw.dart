@@ -250,7 +250,7 @@ class Bill {
 
   pw.Widget _buildFooter(pw.Context context) {
     return pw.Row(
-      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: pw.MainAxisAlignment.center,
       crossAxisAlignment: pw.CrossAxisAlignment.end,
       children: [
         pw.Container(),
@@ -270,6 +270,10 @@ class Bill {
         //     color: PdfColors.white,
         //   ),
         // ),
+        pw.Text(
+          billingRecName,
+          style: const pw.TextStyle(color: _darkColor, fontSize: 9),
+        ),
       ],
     );
   }
@@ -313,7 +317,7 @@ class Bill {
                 pw.SizedBox(height: 20),
                 pw.Text(
                     customerType == 'cw_nus_internal'
-                        ? 'UTILITES INVOICE'
+                        ? 'MEMO' //'UTILITES INVOICE'
                         : 'TAX INVOICE',
                     style: pw.TextStyle(
                         color: _darkColor,
@@ -785,9 +789,13 @@ class Bill {
 
     List<Map<String, dynamic>>? trendingLastMonthSuper = [];
     for (int i = 0; i < trending.length; i++) {
+      trending[i]['label'] = trending[i]['label'] + '  ';
       var item = trending[i];
       if (i == trending.length - 1) {
-        trendingLastMonthSuper.add(item);
+        trendingLastMonthSuper.add({
+          'label': item['label'],
+          'value': item['value'],
+        });
       } else {
         trendingLastMonthSuper.add({
           'label': item['label'],
