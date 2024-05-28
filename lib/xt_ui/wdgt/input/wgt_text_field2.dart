@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class xtTextField2 extends StatefulWidget {
-  xtTextField2({
-    Key? key,
+  const xtTextField2({
+    super.key,
     required this.onChanged,
     this.controller,
     this.initialValue,
@@ -29,7 +29,7 @@ class xtTextField2 extends StatefulWidget {
     this.scanner,
     this.showClearButton = true,
     this.enabled = true,
-  }) : super(key: key);
+  });
 
   final Function onChanged;
   final TextEditingController? controller;

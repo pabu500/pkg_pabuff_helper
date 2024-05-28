@@ -4,8 +4,8 @@ import 'package:flutter/services.dart';
 import 'wgt_text_field2.dart';
 
 class WgtFinderFieldInput extends StatefulWidget {
-  WgtFinderFieldInput({
-    Key? key,
+  const WgtFinderFieldInput({
+    super.key,
     this.width = 220,
     this.height = 70,
     this.initialValue,
@@ -33,7 +33,7 @@ class WgtFinderFieldInput extends StatefulWidget {
     // this.enableSearchButton,
     this.onUpdateEnableSearchButton,
     this.scanner,
-  }) : super(key: key);
+  });
 
   final double width;
   final double height;
@@ -70,11 +70,13 @@ class WgtFinderFieldInput extends StatefulWidget {
 class _WgtFinderFieldInputState extends State<WgtFinderFieldInput> {
   late final TextEditingController _controller;
   String _value = '';
+  UniqueKey? _resetKey;
 
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController(text: widget.initialValue);
+    _resetKey = widget.resetKey;
   }
 
   @override
@@ -85,6 +87,12 @@ class _WgtFinderFieldInputState extends State<WgtFinderFieldInput> {
 
   @override
   Widget build(BuildContext context) {
+    if (_resetKey != widget.resetKey) {
+      _controller.clear();
+      _controller.text = widget.initialValue ?? '';
+      _value = widget.initialValue ?? '';
+      _resetKey = widget.resetKey;
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -126,6 +134,7 @@ class _WgtFinderFieldInputState extends State<WgtFinderFieldInput> {
                 }
               },
               onClear: () {
+                _controller.clear();
                 widget.onClear?.call();
                 widget.onUpdateEnableSearchButton?.call();
                 widget.onModified?.call();
