@@ -250,7 +250,7 @@ class Bill {
 
   pw.Widget _buildFooter(pw.Context context) {
     return pw.Row(
-      mainAxisAlignment: pw.MainAxisAlignment.center,
+      mainAxisAlignment: pw.MainAxisAlignment.start,
       crossAxisAlignment: pw.CrossAxisAlignment.end,
       children: [
         pw.Container(),
@@ -271,7 +271,7 @@ class Bill {
         //   ),
         // ),
         pw.Text(
-          billingRecName,
+          'Bill Number:$billingRecName',
           style: const pw.TextStyle(color: _darkColor, fontSize: 9),
         ),
       ],
