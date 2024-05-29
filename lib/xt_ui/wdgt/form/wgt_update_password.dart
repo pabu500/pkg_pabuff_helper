@@ -9,7 +9,7 @@ import '../list/get_commit_button.dart';
 
 class WgtUpdatePassword extends StatefulWidget {
   const WgtUpdatePassword({
-    Key? key,
+    super.key,
     required this.requestByUsername,
     required this.userId,
     this.titleWidget,
@@ -22,7 +22,7 @@ class WgtUpdatePassword extends StatefulWidget {
     this.sideExpanded = true,
     this.padding,
     required this.updatePassword,
-  }) : super(key: key);
+  });
 
   final Widget? titleWidget;
   final String requestByUsername;
