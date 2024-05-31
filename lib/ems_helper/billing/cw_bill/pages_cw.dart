@@ -16,7 +16,7 @@ const int gasIcon = 0xec19;
 const int waterDropIcon = 0xe798;
 
 const int usageDecimals = 3;
-const int rateDecimals = 3;
+const int rateDecimals = 4;
 
 const tableHeaders = ['Category', 'Budget', 'Expense', 'Result'];
 
