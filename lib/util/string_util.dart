@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:buff_helper/util/util.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dart:ui' as ui;
@@ -186,9 +187,15 @@ String getK(double amount, int kDecimal) {
   return k;
 }
 
-String getCommaNumberStr(double? value, {int decimal = 0}) {
+String getCommaNumberStr(double? value,
+    {int decimal = 0, bool isRoundUp = false}) {
   final NumberFormat commaFormat = NumberFormat.decimalPattern('en_us');
-  String valueStr = value == null ? '-' : value.toStringAsFixed(decimal);
+  String valueStr = (value == null)
+      ? '-'
+      : isRoundUp
+          ? getRoundUp(value, decimal).toStringAsFixed(decimal)
+          : value.toStringAsFixed(decimal);
+
   if (valueStr.contains('.')) {
     valueStr = valueStr.replaceAll(RegExp(r'0*$'), '');
     valueStr = valueStr.replaceAll(RegExp(r'\.$'), '');

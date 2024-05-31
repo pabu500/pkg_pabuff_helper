@@ -26,8 +26,9 @@ Map<String, dynamic> getElementMapByKey(
 }
 
 double getRoundUp(double value, int decimals) {
-  num mod = pow(10.0, decimals + 1);
-  return ((value * mod).ceil() / mod);
+  num mod = pow(10.0, decimals);
+  double result = ((value * mod).ceil() / mod);
+  return result;
 }
 
 Map<String, dynamic> getElementMapByValue(
