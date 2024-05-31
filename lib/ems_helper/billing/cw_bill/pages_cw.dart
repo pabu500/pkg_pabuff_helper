@@ -15,6 +15,9 @@ const int hvacIcon = 0xf10e;
 const int gasIcon = 0xec19;
 const int waterDropIcon = 0xe798;
 
+const int usageDecimals = 3;
+const int rateDecimals = 3;
+
 const tableHeaders = ['Category', 'Budget', 'Expense', 'Result'];
 
 Future<Uint8List> generateInvoice(
@@ -747,7 +750,7 @@ class Bill {
                             style: textStyle,
                           ),
                           pw.Text(
-                            '${usage.toStringAsFixed(2)} $typeUnit',
+                            '${usage.toStringAsFixed(usageDecimals)} $typeUnit',
                             style: textStyle,
                           ),
                         ],
@@ -760,7 +763,7 @@ class Bill {
                             style: textStyle,
                           ),
                           pw.Text(
-                            '\$${rate.toStringAsFixed(2)}',
+                            '\$${rate.toStringAsFixed(rateDecimals)}',
                             style: textStyle,
                           ),
                         ],
