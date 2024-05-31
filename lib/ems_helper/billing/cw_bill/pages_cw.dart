@@ -474,7 +474,8 @@ class Bill {
 
     double? subTotalAmt = totalAmount;
     if (subTotalAmt != null) {
-      subTotalAmt = getRoundUp(subTotalAmt, 2);
+      // subTotalAmt = getRoundUp(subTotalAmt, 2);
+      // subTotalAmt = getRound(subTotalAmt, 2);
     }
     double? totalAmt = subTotalAmt;
     bool applyGst = false;
@@ -482,10 +483,16 @@ class Bill {
     if (TenantType.cw_nus_internal != getTenantType(customerType)) {
       applyGst = true;
       if (subTotalAmt != null && gst != null) {
+        subTotalAmt = getRound(subTotalAmt, 2);
         gstAmt = subTotalAmt * gst! / 100;
         gstAmt = getRoundUp(gstAmt, 2);
         // total = subTotal + subTotal * (gst / 100);
         totalAmt = subTotalAmt + gstAmt;
+      }
+    } else {
+      applyGst = false;
+      if (subTotalAmt != null) {
+        totalAmt = getRoundUp(subTotalAmt, 2);
       }
     }
     return applyGst
@@ -573,7 +580,7 @@ class Bill {
                       ),
                       pw.Expanded(child: pw.Container()),
                       pw.Text(
-                        _formatCurrency(totalAmount),
+                        _formatCurrency(totalAmount, isRoundUp: true),
                         style: pw.TextStyle(
                           fontWeight: pw.FontWeight.bold,
                         ),
@@ -953,11 +960,11 @@ class Bill {
     );
   }
 
-  String _formatCurrency(double? amount) {
+  String _formatCurrency(double? amount, {bool isRoundUp = false}) {
     if (amount == null) {
       return '-';
     }
-    return '\$${amount.toStringAsFixed(2)}';
+    return '\$${isRoundUp ? getRoundUp(amount, 2) : amount.toStringAsFixed(2)}';
   }
 
   String _formatDate(DateTime date) {

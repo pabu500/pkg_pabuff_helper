@@ -31,6 +31,12 @@ double getRoundUp(double value, int decimals) {
   return result;
 }
 
+double getRound(double value, int decimals) {
+  num mod = pow(10.0, decimals);
+  double result = ((value * mod).round() / mod);
+  return result;
+}
+
 Map<String, dynamic> getElementMapByValue(
     List<Map<String, dynamic>> listOfMaps, String keyName, String keyValue) {
   Map<String, dynamic> foundMap = listOfMaps

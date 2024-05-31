@@ -13,9 +13,9 @@ import 'dart:html' as html;
 
 class WgtBillRenderPdf extends StatefulWidget {
   const WgtBillRenderPdf({
-    Key? key,
+    super.key,
     required this.billingInfo,
-  }) : super(key: key);
+  });
 
   final Map<String, dynamic> billingInfo;
 
