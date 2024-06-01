@@ -10,13 +10,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_signin_button/button_list.dart';
+import 'package:flutter_signin_button/button_view.dart';
+import 'package:go_router/go_router.dart';
+import 'package:local_auth/local_auth.dart';
 
-import '../../xt_ui/wdgt/form/wgt_update_password.dart';
+import 'comm_sso.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key, required this.activePortalProjectScope});
+  const LoginPage({
+    super.key,
+    required this.activePortalProjectScope,
+    required this.onAssignUserToProvider,
+  });
 
   final ProjectScope activePortalProjectScope;
+  final Function onAssignUserToProvider;
 
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -207,14 +216,8 @@ class _LoginPageState extends State<LoginPage> {
       if (_savePassword) {
         _saveToStorage(user.username!);
       }
-      if (context.mounted) {
-        Provider.of<UserProvider>(context, listen: false).currentUser = user;
-        if (user.useOpsDashboard()) {
-          context.go('/ops_dashboard');
-        } else {
-          context.go('/dashboard');
-        }
-      }
+
+      widget.onAssignUserToProvider(user);
     } else {
       setState(() {
         _errorText ?? 'Service Error';
@@ -287,6 +290,7 @@ class _LoginPageState extends State<LoginPage> {
         String email =
             decodeEmailAddress(FirebaseAuth.instance.currentUser!.email!);
         Map<String, dynamic> result = await verifyEmailAddress(
+            widget.activePortalProjectScope,
             {'email': email, 'auth_provider': 'microsoft'});
         if (result['is_sso_email_valid'] == true) {
           result['email'] = email;
@@ -437,7 +441,6 @@ class _LoginPageState extends State<LoginPage> {
                       padding: const EdgeInsets.only(top: 13),
                       child: _credExpired
                           ? WgtUpdatePassword(
-                            requestByUsername: 
                               titleWidget: const Column(
                                 children: [
                                   xtInfoBox(
@@ -452,7 +455,7 @@ class _LoginPageState extends State<LoginPage> {
                                   verticalSpaceSmall,
                                 ],
                               ),
-                              username:
+                              requestByUsername:
                                   formCoordinator.formData[UserKey.username]!,
                               userId: _userId,
                               updatePassword: doUpdateKeyValue,
