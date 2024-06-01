@@ -88,9 +88,6 @@ class WgtItemHistoryGetter extends StatefulWidget {
 }
 
 class _WgtItemHistoryGetterState extends State<WgtItemHistoryGetter> {
-  late ScopeProfile _scopeProfile;
-  late Evs2User? _loggedInUser;
-
   //loading
   late DateTime _lastLoadingTime;
   DateTime? _lastRequestTime;
@@ -156,7 +153,7 @@ class _WgtItemHistoryGetterState extends State<WgtItemHistoryGetter> {
     if (!_isCustomRange) {
       DateTime endDate = _endDate ??
           widget.endDate ??
-          getTargetLocalDatetimeNow(_scopeProfile.timezone);
+          getTargetLocalDatetimeNow(widget.scopeProfile.timezone);
       DateTime startDate = widget.startDate ??
           endDate.subtract(Duration(minutes: _selectedTimeRangeMinutes + 1));
 
@@ -206,7 +203,7 @@ class _WgtItemHistoryGetterState extends State<WgtItemHistoryGetter> {
           widget.activePortalProjectScope,
           queryMap,
           SvcClaim(
-            username: _loggedInUser!.username,
+            username: widget.loggedInUser.username,
             scope: AclScope.global.name,
             target: widget.historyType.name,
             operation: AclOperation.list.name,
@@ -231,9 +228,9 @@ class _WgtItemHistoryGetterState extends State<WgtItemHistoryGetter> {
               'to_datetime': _endDate.toString(),
               'target': widget.historyType.name,
               'operation': AclOperation.list.name,
-              'site_tag': _scopeProfile.selectedSiteScope == null
+              'site_tag': widget.scopeProfile.selectedSiteScope == null
                   ? ''
-                  : _scopeProfile.selectedSiteScope!.name,
+                  : widget.scopeProfile.selectedSiteScope!.name,
               'project_scope': widget.activePortalProjectScope.name,
             },
           });
@@ -273,7 +270,7 @@ class _WgtItemHistoryGetterState extends State<WgtItemHistoryGetter> {
         widget.activePortalProjectScope,
         queryMap,
         SvcClaim(
-          username: _loggedInUser!.username,
+          username: widget.loggedInUser.username,
           scope: AclScope.global.name,
           target: widget.historyType.name,
           operation: AclOperation.list.name,
@@ -746,7 +743,7 @@ class _WgtItemHistoryGetterState extends State<WgtItemHistoryGetter> {
                                         _selectedTimeRangeMinutes = item;
                                       });
                                       _endDate = getTargetLocalDatetimeNow(
-                                          _scopeProfile.timezone);
+                                          widget.scopeProfile.timezone);
                                       _startDate = _endDate!.subtract(Duration(
                                           minutes: _selectedTimeRangeMinutes));
                                       _isCustomRange = false;
@@ -792,7 +789,7 @@ class _WgtItemHistoryGetterState extends State<WgtItemHistoryGetter> {
                                   _isCustomRange ||
                                   _endDate == null ||
                                   _endDate!.isAfter(getTargetLocalDatetimeNow(
-                                          _scopeProfile.timezone)
+                                          widget.scopeProfile.timezone)
                                       .subtract(const Duration(hours: 1)))
                               ? null
                               : () async {
@@ -864,8 +861,8 @@ class _WgtItemHistoryGetterState extends State<WgtItemHistoryGetter> {
               ),
               verticalSpaceTiny,
               widget.showNormalization &&
-                      _loggedInUser!.hasPermmision2(
-                          _scopeProfile.getEffectiveScope(),
+                      widget.loggedInUser.hasPermmision2(
+                          widget.scopeProfile.getEffectiveScope(),
                           AclTarget.meter_p_trending_est_option,
                           AclOperation.read)
                   ? false //activePortalProjectScope == ProjectScope.EMS_CW_NUS
