@@ -1,12 +1,12 @@
+import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../xt_ui.dart';
-
 class xtTextField extends StatefulWidget {
   xtTextField(
-      {Key? key,
+      {super.key,
+      required this.activePortalProjectScope,
       this.decoration,
       this.onTap,
       this.onChanged,
@@ -25,12 +25,12 @@ class xtTextField extends StatefulWidget {
       this.order,
       this.maxLength,
       this.inputFormatters,
-      this.disabled})
-      : super(key: key);
+      this.disabled});
 
+  final ProjectScope activePortalProjectScope;
   InputDecoration? decoration;
   bool? requireUnique;
-  Future<String> Function(Enum, String)? doCommCheckUnique;
+  Future<String> Function(ProjectScope, Enum, String)? doCommCheckUnique;
   bool? obscureText;
 
   void Function()? onTap;
@@ -111,8 +111,8 @@ class _xtTextFieldState extends State<xtTextField> {
               //filled and validated and db check needed
 
               if (widget.tfKey != null && widget.doCommCheckUnique != null) {
-                checkUnique(widget.tfKey!,
-                    _controller.text /*, widget.doCommCheckUnique!*/);
+                checkUnique(widget.activePortalProjectScope, widget.tfKey!,
+                    _controller.text);
               }
             }
           }
@@ -223,6 +223,7 @@ class _xtTextFieldState extends State<xtTextField> {
   }
 
   Future<void> checkUnique(
+    ProjectScope activePojectScope,
     Enum field,
     String val,
     /*Future<String> doCommFunc(Enum fld, String v)*/
@@ -235,7 +236,8 @@ class _xtTextFieldState extends State<xtTextField> {
       suffix = txTextInputSuffix('waiting', null);
     });
 
-    var dbresult = await widget.doCommCheckUnique!(field, val.toLowerCase());
+    var dbresult = await widget.doCommCheckUnique!(
+        activePojectScope, field, val.toLowerCase());
 
     setState(() {
       if (dbresult == 'available') {
