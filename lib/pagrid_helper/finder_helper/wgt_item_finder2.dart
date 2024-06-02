@@ -259,8 +259,20 @@ class _WgtItemFinder2State extends State<WgtItemFinder2> {
   }
 
   void _iniScopesPreload() {
-    _projectScopes = widget.loggedInUser.projectScopes!;
-    _siteScopes = widget.loggedInUser.siteScopes!;
+    if (widget.loggedInUser.projectScopes == null) {
+      if (kDebugMode) {
+        print('itemFilder: projectScopes is null');
+      }
+    } else {
+      _projectScopes = widget.loggedInUser.projectScopes!;
+    }
+    if (widget.loggedInUser.siteScopes == null) {
+      if (kDebugMode) {
+        print('itemFilder: siteScopes is null');
+      }
+    } else {
+      _siteScopes = widget.loggedInUser.siteScopes!;
+    }
     if (_projectScopes.length == 1) {
       _selectedProjectScope = _projectScopes[0];
     }

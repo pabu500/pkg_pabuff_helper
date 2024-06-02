@@ -150,7 +150,7 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
   void initState() {
     super.initState();
 
-    _viewOnly = !(widget.loggedInUser!.hasPermmision2(
+    _viewOnly = !(widget.loggedInUser.hasPermmision2(
             widget.scopeProfile.getEffectiveScope(),
             AclTarget.bill_p_info,
             AclOperation.read) ||

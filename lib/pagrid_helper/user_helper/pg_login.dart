@@ -205,25 +205,24 @@ class _LoginPageState extends State<LoginPage> {
         }
       }
       return;
-    }
+    } finally {
+      if (user != null) {
+        if (_savePassword) {
+          _saveToStorage(user.username!);
+        }
 
-    setState(() {
-      _wait = false;
-    });
-    if (toggleWait != null) {
-      toggleWait(_wait);
-    }
-
-    if (user != null) {
-      if (_savePassword) {
-        _saveToStorage(user.username!);
+        widget.onAssignUserToProvider(user);
+      } else {
+        setState(() {
+          _errorText ?? 'Service Error';
+        });
       }
-
-      widget.onAssignUserToProvider(user);
-    } else {
       setState(() {
-        _errorText ?? 'Service Error';
+        _wait = false;
       });
+      if (toggleWait != null) {
+        toggleWait(_wait);
+      }
     }
   }
 
@@ -575,7 +574,8 @@ class _LoginPageState extends State<LoginPage> {
                                       ),
                                     ),
                                     if (widget.activePortalProjectScope ==
-                                        ProjectScope.EMS_CW_NUS)
+                                            ProjectScope.EMS_CW_NUS &&
+                                        widget.destPortal == DestPortal.emsop)
                                       Padding(
                                         padding: const EdgeInsets.only(top: 13),
                                         child: SignInButton(
