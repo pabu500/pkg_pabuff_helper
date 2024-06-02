@@ -26,7 +26,8 @@ class WgtTopStatBox extends StatefulWidget {
   });
 
   final ProjectScope activePortalProjectScope;
-  final Future<dynamic> Function(Map<String, dynamic>, SvcClaim) getStat;
+  final Future<dynamic> Function(ProjectScope, Map<String, dynamic>, SvcClaim)
+      getStat;
   final ScopeProfile scopeProfile;
   final Evs2User loggedInUser;
   final UniqueKey? statKey;
@@ -94,6 +95,7 @@ class _WgtTopStatBoxState extends State<WgtTopStatBox> {
     });
     try {
       activeMeterCount = await widget.getStat(
+          widget.activePortalProjectScope,
           {
             'tenant_id': widget.loggedInUser.tenantId,
           },
@@ -137,6 +139,7 @@ class _WgtTopStatBoxState extends State<WgtTopStatBox> {
     };
     try {
       usage = await widget.getStat(
+        widget.activePortalProjectScope,
         queryMap,
         SvcClaim(
           username: widget.loggedInUser.username,
@@ -181,6 +184,7 @@ class _WgtTopStatBoxState extends State<WgtTopStatBox> {
     });
     try {
       topupTotal = await widget.getStat(
+        widget.activePortalProjectScope,
         {
           'project_scope': widget.scopeProfile.selectedProjectScope,
           'site_scope': widget.scopeProfile.selectedSiteScope
@@ -216,6 +220,7 @@ class _WgtTopStatBoxState extends State<WgtTopStatBox> {
     });
     try {
       mmsStatus = await widget.getStat(
+          widget.activePortalProjectScope,
           {},
           SvcClaim(
             username: widget.loggedInUser.username,
@@ -248,6 +253,7 @@ class _WgtTopStatBoxState extends State<WgtTopStatBox> {
     });
     try {
       commUsage = await widget.getStat(
+        widget.activePortalProjectScope,
         {},
         SvcClaim(
           username: widget.loggedInUser.username,
