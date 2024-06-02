@@ -84,9 +84,10 @@ const cwNusSites = [
   SiteScope.NONE,
 ];
 
-ScopeProfile? getActiveScopeProfile(String activeScope) {
+ScopeProfile? getActiveScopeProfile(String activePortalProjectScope) {
   for (var scopeProfile in scopeProfiles) {
-    if ((scopeProfile['project_scope'] as ProjectScope).name == activeScope) {
+    if ((scopeProfile['project_scope'] as ProjectScope).name ==
+        activePortalProjectScope) {
       return ScopeProfile.fromJson(scopeProfile);
     }
   }
