@@ -20,10 +20,12 @@ import 'comm_sso.dart';
 class LoginPage extends StatefulWidget {
   const LoginPage({
     super.key,
+    required this.destPortal,
     required this.activePortalProjectScope,
     required this.onAssignUserToProvider,
   });
 
+  final DestPortal destPortal;
   final ProjectScope activePortalProjectScope;
   final Function onAssignUserToProvider;
 
@@ -173,8 +175,8 @@ class _LoginPageState extends State<LoginPage> {
 
     Evs2User? user;
     try {
-      user = await doLogin(
-          widget.activePortalProjectScope, formCoordinator.formData);
+      user = await doLogin(widget.destPortal, widget.activePortalProjectScope,
+          formCoordinator.formData);
     } catch (err) {
       String errMsg = err.toString();
       Map<String, dynamic> errMap =

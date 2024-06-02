@@ -278,7 +278,7 @@ Future<String> doUserCheckUnique(
   }
 }
 
-Future<Evs2User> doLogin(
+Future<Evs2User> doLogin(DestPortal destPortal,
     ProjectScope activePortalProjectScope, Map<Enum, String> formData) async {
   final response = await http.post(
     Uri.parse(UrlController(activePortalProjectScope)
@@ -292,11 +292,11 @@ Future<Evs2User> doLogin(
       UserKey.email.name: formData[UserKey.email]!,
       UserKey.authProvider.name: formData[UserKey.authProvider] ?? '',
       // UserKey.emailVerified.name: formData[UserKey.emailVerified]!,
-      UserKey.destPortal.name:
-          activePortalProjectScope == ProjectScope.EMS_CW_NUS ||
-                  activePortalProjectScope == ProjectScope.EMS_SMRT
-              ? DestPortal.emsop.name
-              : DestPortal.evs2op.name,
+      UserKey.destPortal.name: destPortal.name,
+      // activePortalProjectScope == ProjectScope.EMS_CW_NUS ||
+      //         activePortalProjectScope == ProjectScope.EMS_SMRT
+      //     ? DestPortal.emsop.name
+      //     : DestPortal.evs2op.name,
     }),
   );
   // final response = await http.post(
