@@ -26,6 +26,7 @@ class WgtBillingRecFinder extends StatefulWidget {
     this.initialType,
     this.iniShowPanel = true,
     this.onShowPanel,
+    this.sidePadding = EdgeInsets.zero,
   });
   // final bool showMeterSn;
 
@@ -49,6 +50,7 @@ class WgtBillingRecFinder extends StatefulWidget {
   final String? initialType;
   final bool iniShowPanel;
   final Function? onShowPanel;
+  final EdgeInsets sidePadding;
 
   @override
   _WgtBillingRecFinderState createState() => _WgtBillingRecFinderState();
@@ -160,6 +162,7 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
       loggedInUser: widget.loggedInUser,
       scopeProfile: widget.scopeProfile,
       showSiteScopeSelector: false,
+      sidePadding: widget.sidePadding,
       sectionName: widget.sectionName,
       panelTitle: panelTitle,
       panelName: panelName,
