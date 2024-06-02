@@ -40,6 +40,7 @@ class WgtItemFinder2 extends StatefulWidget {
     this.onShowPanel,
     this.showProjectScopeSelector = true,
     this.showSiteScopeSelector = true,
+    this.sidePadding = EdgeInsets.zero,
   });
 
   final ScopeProfile scopeProfile;
@@ -75,6 +76,7 @@ class WgtItemFinder2 extends StatefulWidget {
   final Function? onShowPanel;
   final bool showProjectScopeSelector;
   final bool showSiteScopeSelector;
+  final EdgeInsets sidePadding;
 
   @override
   _WgtItemFinder2State createState() => _WgtItemFinder2State();
@@ -363,7 +365,7 @@ class _WgtItemFinder2State extends State<WgtItemFinder2> {
   Widget completedWidget(double width) {
     return width > 800
         ? Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 0),
+            padding: widget.sidePadding,
             child: getItemPickerWide(width),
           )
         : getItemPickerNarrow();

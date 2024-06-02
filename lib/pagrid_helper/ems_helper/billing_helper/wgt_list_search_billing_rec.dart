@@ -26,6 +26,7 @@ class WgtListSearchBillingRec extends StatefulWidget {
     this.listConfig,
     this.tenantName,
     this.lcStatusList,
+    this.finderSidePadding = EdgeInsets.zero,
   });
 
   final ScopeProfile scopeProfile;
@@ -43,6 +44,7 @@ class WgtListSearchBillingRec extends StatefulWidget {
   final List<Map<String, dynamic>>? listConfig;
   final String? tenantName;
   final List<BillingLcStatus>? lcStatusList;
+  final EdgeInsets finderSidePadding;
 
   @override
   _WgtListSearchBillingRecState createState() =>
@@ -354,6 +356,7 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
               // initialType: getMeterTypeTag(MeterType.electricity1p),
               initialNoR: widget.initialNoR,
               iniShowPanel: widget.iniShowPanel,
+              sidePadding: widget.finderSidePadding,
               onShowPanel: widget.onShowPanel,
               onSearching: () {
                 setState(() {

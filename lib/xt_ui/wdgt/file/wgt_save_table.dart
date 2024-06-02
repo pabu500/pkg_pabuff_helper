@@ -97,7 +97,7 @@ class _SaveTableState extends State<SaveTable> {
     //   mimeType: MimeType.csv,
     // );
     // print('file saved..');
-    if (context.mounted) {
+    if (mounted) {
       String msg = 'Report saved to $filename';
       showSnackBar(context, msg);
     }
