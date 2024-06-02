@@ -1,6 +1,4 @@
-import '../../xt_ui/style/app_colors.dart';
-import '../enum/enum_item.dart';
-import '../up_helper.dart';
+import '../../pkg_buff_helper.dart';
 
 enum ProjectScope {
   EVS2_PA,
@@ -85,6 +83,15 @@ const cwNusSites = [
   SiteScope.SG_ALL,
   SiteScope.NONE,
 ];
+
+ScopeProfile? getActiveScopeProfile(String activeScope) {
+  for (var scopeProfile in scopeProfiles) {
+    if ((scopeProfile['project_scope'] as ProjectScope).name == activeScope) {
+      return ScopeProfile.fromJson(scopeProfile);
+    }
+  }
+  return null;
+}
 
 final scopeProfiles = [
   {
