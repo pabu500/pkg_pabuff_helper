@@ -20,11 +20,9 @@ Future<dynamic> queryMeterUsageSummary(
   //   throw Exception(err);
   // }
 
-  UrlController urlController = UrlController(activePortalProjectScope);
-
   final response = await http.post(
-    Uri.parse(urlController.getUrl(
-        SvcType.oresvc, UrlBase.eptGetMeterListUsageSummary)),
+    Uri.parse(UrlController(activePortalProjectScope)
+        .getUrl(SvcType.oresvc, UrlBase.eptGetMeterListUsageSummary)),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
       'Authorization': 'Bearer $svcToken',
@@ -110,10 +108,8 @@ Future<dynamic> queryMeterConsolidatedUsageHistory(
   //   throw Exception(err);
   // }
 
-  UrlController urlController = UrlController(activePortalProjectScope);
-
   final response = await http.post(
-    Uri.parse(urlController.getUrl(
+    Uri.parse(UrlController(activePortalProjectScope).getUrl(
         SvcType.oresvc, UrlBase.eptGetMeterListConsolidatedUsageHistory)),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',

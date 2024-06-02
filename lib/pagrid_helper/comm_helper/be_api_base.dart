@@ -198,7 +198,7 @@ class UrlBase {
       '/ops_dashboard/get_total_topup_history';
   static const String eptGetActiveMeterCountHistory =
       '/ops_dashboard/get_active_meter_count_history';
-  static const String eptGetAcitveKwhConsumptionHistory =
+  static const String eptGetAcitveUsageHistory =
       '/ops_dashboard/get_active_kwh_consumption_history';
   static const String eptGetRlsHistory = '/get_rls_history';
   static const String eptGetMonthToDateUsage =
@@ -255,7 +255,7 @@ class UrlBase {
   //comm_data
   static const String eptCommDataGetRecentComsumption =
       '/comm_data/get_active_consumption';
-  static const String eptCommDataGetMonthToDateConsumtionTotal =
+  static const String eptCommDataGetMonthToDateUsageTotal =
       '/comm_data/get_month_to_date_consumption_total';
   static const String eptGetMeterInfo = '/get_meter_info';
   static const String eptGetHistory = '/get_history';

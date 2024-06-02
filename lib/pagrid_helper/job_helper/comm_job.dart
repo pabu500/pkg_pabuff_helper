@@ -22,9 +22,9 @@ Future<dynamic> doPostJob(
   //   throw Exception(err);
   // }
 
-  UrlController urlController = UrlController(activePortalProjectScope);
   final response = await http.post(
-    Uri.parse(urlController.getUrl(SvcType.oresvc, UrlBase.eptPostJob)),
+    Uri.parse(UrlController(activePortalProjectScope)
+        .getUrl(SvcType.oresvc, UrlBase.eptPostJob)),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
       'Authorization': 'Bearer $svcToken',

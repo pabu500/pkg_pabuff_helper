@@ -1,7 +1,7 @@
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
 
-import '../finder_helper/wgt_item_finder2.dart';
+import '../../finder_helper/wgt_item_finder2.dart';
 
 class WgtBillingRecFinder extends StatefulWidget {
   const WgtBillingRecFinder({
