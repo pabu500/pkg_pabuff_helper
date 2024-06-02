@@ -305,7 +305,7 @@ class UrlBase {
   static const String eptOreHello = '/hello';
   static const String eptGetSysVar = '/get_sys_var';
 
-  //tenant manager
+  //Tenant manager
   static const String eptCreateTenant = '/tenant/create_tenant';
   static const String eptUpdateTenantMeterGroups = '/tenant/update_items';
   static const String eptGetTenantMeterGroups = '/tenant/get_meter_groups';
@@ -319,6 +319,10 @@ class UrlBase {
       '/tenant_usage/get_tenant_list_usage_summary';
   static const String eptGetTenantListConsolidatedUsageHistory =
       '/tenant_usage/get_tenant_list_consolidated_usage_history';
+
+  // Tenant Dashboard
+  static const String eptTenantGetActiveUsage =
+      '/tenant_dashboard/get_active_usage';
 
   //meter group
   static const String eptCreateMeterGroup = '/meter_group/create_meter_group';

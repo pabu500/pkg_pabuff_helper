@@ -164,11 +164,15 @@ Future<dynamic> pullActiveMeterCountHistory(
 
 Future<dynamic> getRecentUsage(
   ProjectScope activePortalProjectScope,
+  DestPortal destPortal,
   Map<String, dynamic> queryMap,
   SvcClaim svcClaim,
 ) async {
   svcClaim.svcName = SvcType.oresvc.name;
   svcClaim.endpoint = UrlBase.eptGetActiveKwhConsumption;
+  if (destPortal == DestPortal.emstp) {
+    svcClaim.endpoint = UrlBase.eptTenantGetActiveUsage;
+  }
 
   String svcToken = '';
   // try {
@@ -182,7 +186,7 @@ Future<dynamic> getRecentUsage(
   try {
     final response = await http.post(
       Uri.parse(UrlController(activePortalProjectScope)
-          .getUrl(SvcType.oresvc, UrlBase.eptGetActiveKwhConsumption)),
+          .getUrl(SvcType.oresvc, svcClaim.endpoint!)),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $svcToken',
@@ -212,12 +216,13 @@ Future<dynamic> getRecentUsage(
       throw Exception(jsonDecode(response.body)['error']);
     }
   } catch (err) {
-    String explainedMessage = explainException(err);
-    if (explainedMessage.isEmpty) {
-      throw Exception(err);
-    } else {
-      throw Exception('ore_$explainedMessage');
-    }
+    // String explainedMessage = explainException(err);
+    // if (explainedMessage.isEmpty) {
+    //   throw Exception(err);
+    // } else {
+    //   throw Exception('ore_$explainedMessage');
+    // }
+    throw Exception(err);
   }
 }
 

@@ -7,6 +7,7 @@ class WgtTopStatBox extends StatefulWidget {
   const WgtTopStatBox({
     super.key,
     required this.activePortalProjectScope,
+    required this.destPortal,
     required this.scopeProfile,
     required this.loggedInUser,
     required this.getStat,
@@ -26,8 +27,9 @@ class WgtTopStatBox extends StatefulWidget {
   });
 
   final ProjectScope activePortalProjectScope;
-  final Future<dynamic> Function(ProjectScope, Map<String, dynamic>, SvcClaim)
-      getStat;
+  final DestPortal destPortal;
+  final Future<dynamic> Function(
+      ProjectScope, DestPortal, Map<String, dynamic>, SvcClaim) getStat;
   final ScopeProfile scopeProfile;
   final Evs2User loggedInUser;
   final UniqueKey? statKey;
@@ -96,6 +98,7 @@ class _WgtTopStatBoxState extends State<WgtTopStatBox> {
     try {
       activeMeterCount = await widget.getStat(
           widget.activePortalProjectScope,
+          widget.destPortal,
           {
             'tenant_id': widget.loggedInUser.tenantId,
           },
@@ -140,6 +143,7 @@ class _WgtTopStatBoxState extends State<WgtTopStatBox> {
     try {
       usage = await widget.getStat(
         widget.activePortalProjectScope,
+        widget.destPortal,
         queryMap,
         SvcClaim(
           username: widget.loggedInUser.username,
@@ -162,7 +166,9 @@ class _WgtTopStatBoxState extends State<WgtTopStatBox> {
       if (kDebugMode) {
         print(e);
       }
-      if (e.toString().contains('type meter group found')) {
+      String errMsg = e.toString();
+      if (errMsg.contains('type meter group found') ||
+          errMsg.contains('type meter group not found')) {
         _valueStr = '--';
       } else {
         if (e.toString().contains('ore') && e.toString().contains('server')) {
@@ -185,6 +191,7 @@ class _WgtTopStatBoxState extends State<WgtTopStatBox> {
     try {
       topupTotal = await widget.getStat(
         widget.activePortalProjectScope,
+        widget.destPortal,
         {
           'project_scope': widget.scopeProfile.selectedProjectScope,
           'site_scope': widget.scopeProfile.selectedSiteScope
@@ -221,6 +228,7 @@ class _WgtTopStatBoxState extends State<WgtTopStatBox> {
     try {
       mmsStatus = await widget.getStat(
           widget.activePortalProjectScope,
+          widget.destPortal,
           {},
           SvcClaim(
             username: widget.loggedInUser.username,
@@ -254,6 +262,7 @@ class _WgtTopStatBoxState extends State<WgtTopStatBox> {
     try {
       commUsage = await widget.getStat(
         widget.activePortalProjectScope,
+        widget.destPortal,
         {},
         SvcClaim(
           username: widget.loggedInUser.username,
