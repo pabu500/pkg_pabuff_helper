@@ -7,7 +7,6 @@ import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 import '../../../xt_ui/wdgt/show_model_bottom_sheet.dart';
 import 'wgt_bill_rec_finder.dart';
-import 'wgt_bill_view.dart';
 
 class WgtListSearchBillingRec extends StatefulWidget {
   const WgtListSearchBillingRec({
@@ -24,6 +23,9 @@ class WgtListSearchBillingRec extends StatefulWidget {
     this.iniShowPanel = true,
     this.onShowPanel,
     this.onListPopulated,
+    this.listConfig,
+    this.tenantName,
+    this.lcStatusList,
   });
 
   final ScopeProfile scopeProfile;
@@ -38,6 +40,9 @@ class WgtListSearchBillingRec extends StatefulWidget {
   final bool iniShowPanel;
   final Function? onShowPanel;
   final Function? onListPopulated;
+  final List<Map<String, dynamic>>? listConfig;
+  final String? tenantName;
+  final List<BillingLcStatus>? lcStatusList;
 
   @override
   _WgtListSearchBillingRecState createState() =>
@@ -159,152 +164,156 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
     _selectedType = widget.initialType;
 
     _listConfig.clear();
-    _listConfig.addAll([
-      {
-        'title': 'id',
-        'fieldKey': 'id',
-        'show': false,
-        'editable': false,
-        'width': 0.0,
-      },
-      {
-        'title': 'Created',
-        'fieldKey': 'created_timestamp',
-        'width': 150.0,
-        'showSort': true,
-      },
-      {
-        'title': 'Type',
-        'fieldKey': 'gen_type',
-        'width': 60.0,
-        'showSort': true,
-        'useWidget': 'tag',
-        'getTag': getGenTypeTag,
-      },
-      {
-        'title': 'Identifier',
-        'fieldKey': 'name',
-        'editable': widget.loggedInUser.isAdminAndUp(),
-        'width': 255.0,
-        'showSort': true,
-        'clickCopy': true,
-      },
-      {
-        'title': 'Tenant Label',
-        'fieldKey': 'tenant_label',
-        'editable': widget.loggedInUser.isAdminAndUp(),
-        'width': 210.0,
-        // 'showSort': true,
-        'clickCopy': true,
-      },
-      {
-        'title': 'From',
-        'fieldKey': 'from_timestamp',
-        'editable': widget.loggedInUser.isAdminAndUp(),
-        'width': 150.0,
-        'showSort': true,
-        // 'clickCopy': true,
-      },
-      {
-        'title': 'To',
-        'fieldKey': 'to_timestamp',
-        'editable': widget.loggedInUser.isAdminAndUp(),
-        'width': 150.0,
-        // 'showSort': true,
-        // 'clickCopy': true,
-      },
-      {
-        'title': 'Rate E',
-        'fieldKey': 'tariff_package_rate_id_e_rate',
-        'width': 60.0,
-      },
-      {
-        'title': 'Rate W',
-        'fieldKey': 'tariff_package_rate_id_w_rate',
-        'width': 60.0,
-      },
-      {
-        'title': 'Rate B',
-        'fieldKey': 'tariff_package_rate_id_b_rate',
-        'width': 60.0,
-      },
-      {
-        'title': 'Rate N',
-        'fieldKey': 'tariff_package_rate_id_n_rate',
-        'width': 60.0,
-      },
-      {
-        'title': 'Rate G',
-        'fieldKey': 'tariff_package_rate_id_g_rate',
-        'width': 60.0,
-      },
-      {
-        'title': 'LC',
-        'fieldKey': 'lc_status',
-        'width': 60.0,
-        'showSort': true,
-        'useWidget': 'tag',
-        'getTag': getBillingLcStatusTag,
-      },
-    ]);
+    if (widget.listConfig != null) {
+      _listConfig.addAll(widget.listConfig!);
+    } else {
+      _listConfig.addAll([
+        {
+          'title': 'id',
+          'fieldKey': 'id',
+          'show': false,
+          'editable': false,
+          'width': 0.0,
+        },
+        {
+          'title': 'Created',
+          'fieldKey': 'created_timestamp',
+          'width': 150.0,
+          'showSort': true,
+        },
+        {
+          'title': 'Type',
+          'fieldKey': 'gen_type',
+          'width': 60.0,
+          'showSort': true,
+          'useWidget': 'tag',
+          'getTag': getGenTypeTag,
+        },
+        {
+          'title': 'Identifier',
+          'fieldKey': 'name',
+          'editable': widget.loggedInUser.isAdminAndUp(),
+          'width': 255.0,
+          'showSort': true,
+          'clickCopy': true,
+        },
+        {
+          'title': 'Tenant Label',
+          'fieldKey': 'tenant_label',
+          'editable': widget.loggedInUser.isAdminAndUp(),
+          'width': 210.0,
+          // 'showSort': true,
+          'clickCopy': true,
+        },
+        {
+          'title': 'From',
+          'fieldKey': 'from_timestamp',
+          'editable': widget.loggedInUser.isAdminAndUp(),
+          'width': 150.0,
+          'showSort': true,
+          // 'clickCopy': true,
+        },
+        {
+          'title': 'To',
+          'fieldKey': 'to_timestamp',
+          'editable': widget.loggedInUser.isAdminAndUp(),
+          'width': 150.0,
+          // 'showSort': true,
+          // 'clickCopy': true,
+        },
+        {
+          'title': 'Rate E',
+          'fieldKey': 'tariff_package_rate_id_e_rate',
+          'width': 60.0,
+        },
+        {
+          'title': 'Rate W',
+          'fieldKey': 'tariff_package_rate_id_w_rate',
+          'width': 60.0,
+        },
+        {
+          'title': 'Rate B',
+          'fieldKey': 'tariff_package_rate_id_b_rate',
+          'width': 60.0,
+        },
+        {
+          'title': 'Rate N',
+          'fieldKey': 'tariff_package_rate_id_n_rate',
+          'width': 60.0,
+        },
+        {
+          'title': 'Rate G',
+          'fieldKey': 'tariff_package_rate_id_g_rate',
+          'width': 60.0,
+        },
+        {
+          'title': 'LC',
+          'fieldKey': 'lc_status',
+          'width': 60.0,
+          'showSort': true,
+          'useWidget': 'tag',
+          'getTag': getBillingLcStatusTag,
+        },
+      ]);
 
-    _listConfig.addAll([
-      {
-        'title': 'Bill',
-        'fieldKey': 'info',
-        'editable': true,
-        'width': 40.0,
-        'useWidget': 'iconButton',
-        'iconData': Symbols.request_quote,
-        'iconColor': _viewOnly ? Colors.grey.withOpacity(0.7) : null,
-        'iconTooltip': 'View Bill',
-        'onTap': _viewOnly
-            ? null
-            : (BuildContext context,
-                Map<String, dynamic> item,
-                List<Map<String, dynamic>> items,
-                Map<String, dynamic> queryMap) {
-                if (kDebugMode) {
-                  print('Config profile for ${item['tenant_name']}');
-                }
+      _listConfig.addAll([
+        {
+          'title': 'Bill',
+          'fieldKey': 'info',
+          'editable': true,
+          'width': 40.0,
+          'useWidget': 'iconButton',
+          'iconData': Symbols.request_quote,
+          'iconColor': _viewOnly ? Colors.grey.withOpacity(0.7) : null,
+          'iconTooltip': 'View Bill',
+          'onTap': _viewOnly
+              ? null
+              : (BuildContext context,
+                  Map<String, dynamic> item,
+                  List<Map<String, dynamic>> items,
+                  Map<String, dynamic> queryMap) {
+                  if (kDebugMode) {
+                    print('Config profile for ${item['tenant_name']}');
+                  }
 
-                String tpE = 'not set';
-                if (item['tariff_package_id_e'] != null &&
-                    item['tariff_package_id_e'] != -1) {
-                  tpE = item['tariff_package_id_e']['name'];
-                }
-                String tpW = 'not set';
-                if (item['tariff_package_id_w'] != null &&
-                    item['tariff_package_id_w'] != -1) {
-                  tpW = item['tariff_package_id_w']['name'];
-                }
-                String tpB = 'not set';
-                if (item['tariff_package_id_b'] != null &&
-                    item['tariff_package_id_b'] != -1) {
-                  tpB = item['tariff_package_id_b']['name'];
-                }
-                String tpN = 'not set';
-                if (item['tariff_package_id_n'] != null &&
-                    item['tariff_package_id_n'] != -1) {
-                  tpN = item['tariff_package_id_n']['name'];
-                }
+                  String tpE = 'not set';
+                  if (item['tariff_package_id_e'] != null &&
+                      item['tariff_package_id_e'] != -1) {
+                    tpE = item['tariff_package_id_e']['name'];
+                  }
+                  String tpW = 'not set';
+                  if (item['tariff_package_id_w'] != null &&
+                      item['tariff_package_id_w'] != -1) {
+                    tpW = item['tariff_package_id_w']['name'];
+                  }
+                  String tpB = 'not set';
+                  if (item['tariff_package_id_b'] != null &&
+                      item['tariff_package_id_b'] != -1) {
+                    tpB = item['tariff_package_id_b']['name'];
+                  }
+                  String tpN = 'not set';
+                  if (item['tariff_package_id_n'] != null &&
+                      item['tariff_package_id_n'] != -1) {
+                    tpN = item['tariff_package_id_n']['name'];
+                  }
 
-                xtShowModelBottomSheet(
-                  context,
-                  WgtBillView(
-                    activePortalProjectScope: widget.activePortalProjectScope,
-                    loggedInUser: widget.loggedInUser,
-                    scopeProfile: widget.scopeProfile,
-                    billingRecIndexStr: item['id'],
-                    defaultBillLcStatus: item['lc_status'], //'generated',
-                    modes: const ['pdf', 'widget'],
-                  ),
-                );
-              },
+                  xtShowModelBottomSheet(
+                    context,
+                    WgtBillView(
+                      activePortalProjectScope: widget.activePortalProjectScope,
+                      loggedInUser: widget.loggedInUser,
+                      scopeProfile: widget.scopeProfile,
+                      billingRecIndexStr: item['id'],
+                      defaultBillLcStatus: item['lc_status'], //'generated',
+                      modes: const ['pdf', 'widget'],
+                    ),
+                  );
+                },
+        }
+      ]);
+      if (widget.opColConfig != null) {
+        _listConfig.add(widget.opColConfig!);
       }
-    ]);
-    if (widget.opColConfig != null) {
-      _listConfig.add(widget.opColConfig!);
     }
   }
 
@@ -334,11 +343,13 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
           ),
           verticalSpaceTiny,
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            padding: const EdgeInsets.symmetric(horizontal: 0.0),
             child: WgtBillingRecFinder(
               activePortalProjectScope: widget.activePortalProjectScope,
               loggedInUser: widget.loggedInUser,
               scopeProfile: widget.scopeProfile,
+              tenantName: widget.tenantName,
+              lcStatusList: widget.lcStatusList,
               idConstraintKey: 'name',
               // initialType: getMeterTypeTag(MeterType.electricity1p),
               initialNoR: widget.initialNoR,

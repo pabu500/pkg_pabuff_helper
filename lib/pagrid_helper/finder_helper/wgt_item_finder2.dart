@@ -26,6 +26,7 @@ class WgtItemFinder2 extends StatefulWidget {
     // required this.defaultMaxNumberOfRecords,
     this.itemNameText = 'Item Name',
     this.itemLabelText = 'Item Label',
+    this.fixedItemName,
     // this.itemTypeList = const [],
     this.getAdditionalPropWidget,
     this.additionalPropQueryMap = const {},
@@ -60,6 +61,7 @@ class WgtItemFinder2 extends StatefulWidget {
   final Widget? timeRangePicker;
   final String itemNameText;
   final String itemLabelText;
+  final String? fixedItemName;
   // final List<String> itemTypeList;
   final Widget Function(Function, Function)? getAdditionalPropWidget;
   final Map<String, dynamic> additionalPropQueryMap;
@@ -238,6 +240,10 @@ class _WgtItemFinder2State extends State<WgtItemFinder2> {
     _itemName = null;
     _resetKeyItemName = UniqueKey();
 
+    if (widget.fixedItemName != null) {
+      _itemName = widget.fixedItemName;
+    }
+
     _numberOfRecordsController.clear();
 
     _selectedProjectScope = null;
@@ -278,6 +284,10 @@ class _WgtItemFinder2State extends State<WgtItemFinder2> {
     }
     if (_siteScopes.length == 1) {
       _selectedSiteScope = _siteScopes[0];
+    }
+
+    if (widget.fixedItemName != null) {
+      _itemName = widget.fixedItemName;
     }
 
     // for (var entry in (widget.additionalPropQueryMap).entries) {
@@ -353,7 +363,7 @@ class _WgtItemFinder2State extends State<WgtItemFinder2> {
   Widget completedWidget(double width) {
     return width > 800
         ? Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30),
+            padding: const EdgeInsets.symmetric(horizontal: 0),
             child: getItemPickerWide(width),
           )
         : getItemPickerNarrow();
@@ -486,6 +496,7 @@ class _WgtItemFinder2State extends State<WgtItemFinder2> {
             labelText: widget.itemLabelText,
             hintText: widget.itemLabelText,
             initialValue: _itemLabel,
+            isInitialValueMutable: widget.fixedItemName == null,
             resetKey: _resetKeyItemLabel,
             onChanged: (value) {
               _itemLabel = value;
@@ -523,7 +534,8 @@ class _WgtItemFinder2State extends State<WgtItemFinder2> {
             width: 220,
             labelText: widget.itemNameText,
             hintText: widget.itemNameText,
-            initialValue: _itemName,
+            initialValue: widget.fixedItemName ?? _itemName,
+            isInitialValueMutable: widget.fixedItemName == null,
             resetKey: _resetKeyItemName,
             onChanged: (value) {
               _itemName = value;

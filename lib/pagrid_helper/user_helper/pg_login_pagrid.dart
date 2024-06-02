@@ -17,8 +17,8 @@ import 'package:local_auth/local_auth.dart';
 
 import 'comm_sso.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({
+class LoginPagePagrid extends StatefulWidget {
+  const LoginPagePagrid({
     super.key,
     required this.destPortal,
     required this.activePortalProjectScope,
@@ -30,10 +30,10 @@ class LoginPage extends StatefulWidget {
   final Function onAssignUserToProvider;
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _LoginPagePagridState createState() => _LoginPagePagridState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPagePagridState extends State<LoginPagePagrid> {
   final GlobalKey _keyMainButton = GlobalKey();
   String _errorText = '';
   bool _wait = false;

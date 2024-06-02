@@ -9,6 +9,7 @@ class WgtFinderFieldInput extends StatefulWidget {
     this.width = 220,
     this.height = 70,
     this.initialValue,
+    this.isInitialValueMutable = true,
     this.onChanged,
     this.onEditingComplete,
     this.onTap,
@@ -38,6 +39,7 @@ class WgtFinderFieldInput extends StatefulWidget {
   final double width;
   final double height;
   final String? initialValue;
+  final bool isInitialValueMutable;
   final Function? onChanged;
   final Function? onEditingComplete;
   final Function? onTap;
@@ -93,6 +95,13 @@ class _WgtFinderFieldInputState extends State<WgtFinderFieldInput> {
       _value = widget.initialValue ?? '';
       _resetKey = widget.resetKey;
     }
+
+    bool enableEdit = true;
+    if (widget.initialValue != null) {
+      if (!widget.isInitialValueMutable) {
+        enableEdit = false;
+      }
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -103,6 +112,8 @@ class _WgtFinderFieldInputState extends State<WgtFinderFieldInput> {
               labelText: widget.labelText,
               hintText: widget.hintText,
               initialValue: widget.initialValue,
+              enabled: enableEdit,
+              showClearButton: enableEdit,
               resetKey: widget.resetKey,
               validator: widget.validator,
               scanner: widget.scanner,

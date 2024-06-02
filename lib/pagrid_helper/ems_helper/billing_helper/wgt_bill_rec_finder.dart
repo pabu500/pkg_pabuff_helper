@@ -9,6 +9,8 @@ class WgtBillingRecFinder extends StatefulWidget {
     required this.scopeProfile,
     required this.loggedInUser,
     required this.activePortalProjectScope,
+    this.tenantName,
+    this.lcStatusList,
     this.sectionName = '',
     this.width,
     this.onModified,
@@ -31,6 +33,8 @@ class WgtBillingRecFinder extends StatefulWidget {
   final Evs2User loggedInUser;
   final ProjectScope activePortalProjectScope;
   final String sectionName;
+  final String? tenantName;
+  final List<BillingLcStatus>? lcStatusList;
   final void Function()? onModified;
   final void Function()? onSearching;
   final void Function(Map<String, dynamic> itemFindResult) onResult;
@@ -86,11 +90,18 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
         BillGenType.auto.name,
         BillGenType.manual.name,
       ]);
-      _lcStatusList.addAll([
-        '   ',
-        BillingLcStatus.generated.name,
-        BillingLcStatus.released.name,
-      ]);
+      if (widget.lcStatusList == null) {
+        _lcStatusList.addAll([
+          '   ',
+          BillingLcStatus.generated.name,
+          BillingLcStatus.released.name,
+        ]);
+      } else {
+        _lcStatusList.addAll(widget.lcStatusList!.map((e) => e.name));
+      }
+      if (_lcStatusList.length == 1) {
+        _selectedLcStatus = _lcStatusList[0];
+      }
     }
 
     // _additionalPropQueryMap = {
@@ -129,6 +140,9 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
       // _isMonthly = false;
       _selectedGenType = null;
       _selectedLcStatus = null;
+      if (_lcStatusList.length == 1) {
+        _selectedLcStatus = _lcStatusList[0];
+      }
     });
   }
 
@@ -150,6 +164,7 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
       panelTitle: panelTitle,
       panelName: panelName,
       itemNameText: 'Identifier',
+      fixedItemName: widget.tenantName,
       itemType: ItemType.billing_rec,
       initialNoR: widget.initialNoR,
       iniShowPanel: widget.iniShowPanel,
