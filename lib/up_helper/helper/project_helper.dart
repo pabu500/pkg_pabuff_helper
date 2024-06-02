@@ -84,9 +84,9 @@ const cwNusSites = [
   SiteScope.NONE,
 ];
 
-ScopeProfile? getActiveScopeProfile(String activePortalProjectScope) {
+ScopeProfile? getActiveScopeProfile(ProjectScope activePortalProjectScope) {
   for (var scopeProfile in scopeProfiles) {
-    if ((scopeProfile['project_scope'] as ProjectScope).name ==
+    if ((scopeProfile['project_scope'] as ProjectScope) ==
         activePortalProjectScope) {
       return ScopeProfile.fromJson(scopeProfile);
     }
@@ -692,5 +692,68 @@ AclScope getAclSiteScope(SiteScope? siteScope) {
       return AclScope.site_smrt_queenstown;
     default:
       return AclScope.self;
+  }
+}
+
+final the24 = [
+  '10010001',
+  '10010002',
+  '10010003',
+  '10010004',
+  '10010005',
+  '10010006',
+  '10010007',
+  '10010008',
+  '10010009',
+  '10010010',
+  '10010011',
+  '10010012',
+  '10010013',
+  '10010014',
+  '10010015',
+  '10010016',
+  '10010017',
+  '10010018',
+  '10010019',
+  '10010020',
+  '10010021',
+  '10010022',
+  '10010023',
+  '10010024',
+];
+
+bool isRVRC24(String displayname) {
+  //if 10010001 to 10010024, yes,
+  if (the24.contains(displayname)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool is2401EVS1(String displayname) {
+  //if 10100034 to 10101302, yes,
+  int? displaynameInt = int.tryParse(displayname);
+  if (displaynameInt == null) {
+    return false;
+  }
+  if (displaynameInt >= 10100034 && displaynameInt <= 10101302) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+//CAPT
+bool is2402EVS1(String displayname) {
+  //if 10100034 to 10101302, yes,
+  int? displaynameInt = int.tryParse(displayname);
+  if (displaynameInt == null) {
+    return false;
+  }
+  if (displaynameInt >= 10100500 && displaynameInt <= 10100694) {
+    return true;
+  } else {
+    return false;
   }
 }

@@ -14,7 +14,6 @@ export 'helper/device_def.dart';
 export 'helper/tariff_package.dart';
 export 'helper/meter_group_def.dart';
 export 'helper/meter_type_helper.dart';
-
 export 'model/mdl_acl_permission.dart';
 export 'model/mdl_acl_permission2.dart';
 export 'model/mdl_acl_setting.dart';
@@ -37,5 +36,6 @@ export 'model/mdl_scope_profile.dart';
 export 'model/mdl_payment_mode_setting.dart';
 export 'model/mdl_tenant.dart';
 export 'model/mdl_meter_group.dart';
+export 'model/model_theme.dart';
 
 export 'exceptions.dart';
