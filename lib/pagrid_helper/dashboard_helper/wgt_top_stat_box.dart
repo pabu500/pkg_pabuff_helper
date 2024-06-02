@@ -1,15 +1,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../../../pkg_buff_helper.dart';
+import '../../pkg_buff_helper.dart';
 
 class WgtTopStatBox extends StatefulWidget {
   const WgtTopStatBox({
-    Key? key,
-    required this.getStat,
+    super.key,
+    required this.activePortalProjectScope,
     required this.scopeProfile,
     required this.loggedInUser,
-    required this.activePortalProjectScope,
+    required this.getStat,
     this.statKey,
     this.title = '',
     this.iconSize = 25,
@@ -23,7 +23,7 @@ class WgtTopStatBox extends StatefulWidget {
     this.mockValueStr,
     this.statType,
     this.adjK = true,
-  }) : super(key: key);
+  });
 
   final ProjectScope activePortalProjectScope;
   final Future<dynamic> Function(Map<String, dynamic>, SvcClaim) getStat;
