@@ -382,7 +382,7 @@ class _WgtUsageStatCoreState extends State<WgtUsageStatCore> {
         : Row(
             children: [
               SizedBox(
-                width: 180,
+                width: 160,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
