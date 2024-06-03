@@ -189,7 +189,8 @@ String getK(double amount, int kDecimal) {
 
 String getCommaNumberStr(double? value,
     {int decimal = 0, bool isRoundUp = false}) {
-  final NumberFormat commaFormat = NumberFormat.decimalPattern('en_us');
+  final NumberFormat commaFormat = NumberFormat.decimalPatternDigits(
+      locale: 'en_us', decimalDigits: decimal);
   String valueStr = (value == null)
       ? '-'
       : isRoundUp
@@ -203,7 +204,8 @@ String getCommaNumberStr(double? value,
   if (valueStr == '-') {
     return valueStr;
   }
-  return commaFormat.format(double.parse(valueStr));
+  String formattedValue = commaFormat.format(double.parse(valueStr));
+  return formattedValue;
 }
 
 String getValueUnitDisplayStr(

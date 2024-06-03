@@ -3,15 +3,13 @@ import 'package:buff_helper/up_helper/helper/tenant_def.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-import 'wgt_meter_stat_core.dart';
-
 Widget getTypeUsageStat(BuildContext context, String meterType, double usage,
     {int usageDecimals = 3,
     int rateDecimals = 4,
     int costDecimals = 2,
     bool isSubTenant = false}) {
   MeterType? type = getMeterType(meterType);
-  Color statColor = Theme.of(context).colorScheme.onBackground.withOpacity(0.7);
+  Color statColor = Theme.of(context).colorScheme.onSurface.withOpacity(0.7);
   return Padding(
     padding: const EdgeInsets.only(top: 10),
     child: Container(

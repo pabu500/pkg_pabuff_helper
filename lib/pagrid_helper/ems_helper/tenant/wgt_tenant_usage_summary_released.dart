@@ -67,6 +67,8 @@ class WgtTenantUsageSummaryReleased extends StatefulWidget {
 
 class _WgtTenantUsageSummaryReleasedState
     extends State<WgtTenantUsageSummaryReleased> {
+  final widgetWidth = 720.0;
+
   double? _netUsageE;
   double? _netUsageW;
   double? _netUsageB;
@@ -454,7 +456,7 @@ class _WgtTenantUsageSummaryReleasedState
       }
     }
     return SizedBox(
-      width: 700,
+      width: widgetWidth,
       child: Column(
         children: [
           verticalSpaceSmall,
@@ -520,7 +522,7 @@ class _WgtTenantUsageSummaryReleasedState
                                 ? _rateN
                                 : _rateG,
                 statColor:
-                    Theme.of(context).colorScheme.onBackground.withOpacity(0.7),
+                    Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                 showTrending: false,
                 statVirticalStack: false,
                 height: 110,
@@ -543,7 +545,7 @@ class _WgtTenantUsageSummaryReleasedState
       }
     }
     return SizedBox(
-      width: 700,
+      width: widgetWidth,
       child: Column(
         children: [
           verticalSpaceSmall,
@@ -629,7 +631,7 @@ class _WgtTenantUsageSummaryReleasedState
       }
     }
     return SizedBox(
-      width: 700,
+      width: widgetWidth,
       child: Column(
         children: [
           verticalSpaceSmall,
@@ -713,7 +715,7 @@ class _WgtTenantUsageSummaryReleasedState
         ),
         verticalSpaceSmall,
         Container(
-          width: 700,
+          width: widgetWidth,
           padding: const EdgeInsets.symmetric(horizontal: 3),
           constraints: const BoxConstraints(
             maxHeight: 55,

@@ -669,7 +669,7 @@ class _WgtTenantUsageSummaryState extends State<WgtTenantUsageSummary> {
       typeGroups.add(getGroupMeterStat(groupInfo, meterType));
     }
     return SizedBox(
-      width: 700,
+      width: 720,
       child: Column(
         children: [...typeGroups],
       ),
