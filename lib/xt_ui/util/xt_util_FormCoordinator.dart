@@ -1,3 +1,5 @@
+import 'package:buff_helper/pkg_buff_helper.dart';
+
 class xt_util_FormCorrdinator {
   Map<Enum, String> formData = {};
   Map<Enum, String?> formErrors = {};
@@ -74,7 +76,7 @@ class xt_util_FormCorrdinator {
     }
   }
 
-  Future<void> checkUniques() async {
+  Future<void> checkUniques(ProjectScope activePortalProjectScope) async {
     //Future.forEach will execute the functions sequentially, i.e. wait for each to complete before starting the next
     //Future.wait will execute the functions in parallel
     await Future.wait(
@@ -82,7 +84,7 @@ class xt_util_FormCorrdinator {
         if (formData[key] != null) {
           Function? func = fieldCheckUnique[key];
           if (func != null) {
-            await func(key, formData[key]);
+            await func(activePortalProjectScope, key, formData[key]);
           }
         }
       }),
