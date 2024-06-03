@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'bill_calc.dart';
-import 'comm_billing.dart';
 
 class WgtBillView extends StatefulWidget {
   const WgtBillView({
@@ -13,16 +12,18 @@ class WgtBillView extends StatefulWidget {
     required this.loggedInUser,
     required this.billingRecIndexStr,
     required this.defaultBillLcStatus,
-    this.showRenderModeSwitch = true,
+    // this.showRenderModeSwitch = true,
     this.modes = const ['wgt', 'pdf'],
+    this.genTypes = const ['generated', 'released'],
   });
 
   final ScopeProfile scopeProfile;
   final Evs2User loggedInUser;
   final ProjectScope activePortalProjectScope;
   final String billingRecIndexStr;
-  final bool showRenderModeSwitch;
+  // final bool showRenderModeSwitch;
   final List<String> modes;
+  final List<String> genTypes;
   final String defaultBillLcStatus;
 
   @override
@@ -40,6 +41,7 @@ class _WgtBillViewState extends State<WgtBillView> {
   String _renderMode = 'wgt'; // wgt, pdf
   late String _lcStatusDisplay; // released, generated
   bool _showGenTypeSwitch = false;
+  bool _showRenderModeSwitch = false;
 
   double _usageFactorE = 1;
   double _usageFactorW = 1;
@@ -100,7 +102,10 @@ class _WgtBillViewState extends State<WgtBillView> {
     _pullFails = 0;
     _lcStatusDisplay = widget.defaultBillLcStatus;
 
-    _showGenTypeSwitch = _lcStatusDisplay == 'released';
+    _showGenTypeSwitch = /*_lcStatusDisplay == 'released'*/
+        widget.genTypes.length > 1;
+    _showRenderModeSwitch = widget.modes.length > 1;
+    _renderMode = widget.modes[0];
 
     _usageFactorE = getProjectMeterUsageFactor(
         widget.scopeProfile.selectedProjectScope,
@@ -140,7 +145,7 @@ class _WgtBillViewState extends State<WgtBillView> {
       child: Column(
         children: [
           verticalSpaceSmall,
-          if (widget.showRenderModeSwitch && !_gettingBill)
+          if (_showRenderModeSwitch && !_gettingBill)
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
