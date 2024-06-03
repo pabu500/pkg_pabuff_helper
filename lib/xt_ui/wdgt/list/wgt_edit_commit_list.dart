@@ -1,10 +1,7 @@
+import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
-
-import '../../../util/util.dart';
-import '../../style/xt_styles.dart';
-import '../form/wgt_update_password.dart';
 import '../wgt_popup_button.dart';
 import 'evs2_list_text.dart';
 import 'get_pagenation_bar.dart';
@@ -20,6 +17,7 @@ class WgtEditCommitList extends StatefulWidget {
     super.key,
     this.width,
     this.height,
+    required this.activePortalProjectScope,
     required this.listConfig,
     required this.listItems,
     this.showCommit = true,
@@ -50,6 +48,7 @@ class WgtEditCommitList extends StatefulWidget {
     this.aclScopeStr,
   });
 
+  final ProjectScope activePortalProjectScope;
   final String listPrefix;
   final double? width;
   final double? height;
@@ -869,6 +868,7 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
         popupHeight: 250,
         // flexHeight: true,
         popupChild: WgtUpdatePassword(
+          activePortalProjectScope: widget.activePortalProjectScope,
           requestByUsername: widget.requestByUsername!,
           aclScopeStr: item['aclScopeStr'] ?? widget.aclScopeStr!,
           userId: userId,

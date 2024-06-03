@@ -418,6 +418,7 @@ class _PgMyProfileState extends State<PgMyProfile> {
               height: 330,
               padding: const EdgeInsets.only(right: 40),
               child: WgtUpdatePassword(
+                activePortalProjectScope: widget.activePortalProjectScope,
                 width: _width,
                 padding: EdgeInsets.zero,
                 showUsername: false,

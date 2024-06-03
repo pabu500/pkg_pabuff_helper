@@ -10,6 +10,7 @@ import '../list/get_commit_button.dart';
 class WgtUpdatePassword extends StatefulWidget {
   const WgtUpdatePassword({
     super.key,
+    required this.activePortalProjectScope,
     required this.requestByUsername,
     required this.userId,
     this.titleWidget,
@@ -24,6 +25,7 @@ class WgtUpdatePassword extends StatefulWidget {
     required this.updatePassword,
   });
 
+  final ProjectScope activePortalProjectScope;
   final Widget? titleWidget;
   final String requestByUsername;
   final int userId;
@@ -67,6 +69,7 @@ class _WgtUpdatePasswordState extends State<WgtUpdatePassword> {
     });
     try {
       Map<String, dynamic> result = await widget.updatePassword(
+        widget.activePortalProjectScope,
         widget.userId,
         'password',
         _controllerNewPassword.text.trim(),

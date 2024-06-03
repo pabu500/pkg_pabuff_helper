@@ -437,6 +437,8 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
                           scrollDirection: Axis.horizontal,
                           child: WgtEditCommitList(
                             key: _listKey,
+                            activePortalProjectScope:
+                                widget.activePortalProjectScope,
                             listPrefix: 'billing_rec',
                             itemExt: 40,
                             // width:_tableWidth, //0.95 * MediaQuery.of(context).size.width,

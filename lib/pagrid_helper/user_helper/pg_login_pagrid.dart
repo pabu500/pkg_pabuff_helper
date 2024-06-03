@@ -440,6 +440,8 @@ class _LoginPagePagridState extends State<LoginPagePagrid> {
                       padding: const EdgeInsets.only(top: 13),
                       child: _credExpired
                           ? WgtUpdatePassword(
+                              activePortalProjectScope:
+                                  widget.activePortalProjectScope,
                               titleWidget: const Column(
                                 children: [
                                   xtInfoBox(
