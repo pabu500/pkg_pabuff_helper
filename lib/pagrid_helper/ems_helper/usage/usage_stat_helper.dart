@@ -527,7 +527,7 @@ Widget getTotal(
                   statStrStyle: defStatStyle.copyWith(
                     color: Theme.of(context)
                         .colorScheme
-                        .onBackground
+                        .onSurface
                         .withOpacity(0.7),
                   ),
                 ),
@@ -556,7 +556,7 @@ Widget getTotal(
                   statStrStyle: defStatStyle.copyWith(
                     color: Theme.of(context)
                         .colorScheme
-                        .onBackground
+                        .onSurface
                         .withOpacity(0.7),
                   ),
                 ),
@@ -576,7 +576,7 @@ Widget getTotal(
                   style: defStatStyleLarge.copyWith(
                     color: Theme.of(context)
                         .colorScheme
-                        .onBackground
+                        .onSurface
                         .withOpacity(0.7),
                   ),
                 ),
@@ -584,13 +584,11 @@ Widget getTotal(
               horizontalSpaceSmall,
               getStatWithUnit(
                 // getCommaNumberStr(total, decimal: 2),
-                getCommaNumberStr(totalAmt, decimal: 2, isRoundUp: true),
+                getCommaNumberStr(totalAmt, decimal: 2, isRoundUp: false),
                 'SGD',
                 statStrStyle: defStatStyleLarge.copyWith(
-                  color: Theme.of(context)
-                      .colorScheme
-                      .onBackground
-                      .withOpacity(0.7),
+                  color:
+                      Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                 ),
               ),
             ],
