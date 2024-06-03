@@ -67,7 +67,7 @@ class WgtTenantUsageSummaryReleased extends StatefulWidget {
 
 class _WgtTenantUsageSummaryReleasedState
     extends State<WgtTenantUsageSummaryReleased> {
-  final widgetWidth = 720.0;
+  final widgetWidth = 750.0;
 
   double? _netUsageE;
   double? _netUsageW;
@@ -410,14 +410,6 @@ class _WgtTenantUsageSummaryReleasedState
         MeterType? meterType = getMeterType(meterTypeTag);
         if (meterType != null) {
           autoUsageList.add(
-            // Padding(
-            //   padding: const EdgeInsets.only(top: 10),
-            //   child: getTypeUsageStat(
-            //     context,
-            //     meterTypeTag,
-            //     usageVal,
-            //   ),
-            // ),
             Padding(
               padding: const EdgeInsets.only(top: 10),
               child: WgtUsageStatCore(
@@ -435,7 +427,7 @@ class _WgtTenantUsageSummaryReleasedState
                                 ? _rateN
                                 : _rateG,
                 statColor:
-                    Theme.of(context).colorScheme.onBackground.withOpacity(0.7),
+                    Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                 showTrending: false,
                 statVirticalStack: false,
                 height: 110,
@@ -497,14 +489,6 @@ class _WgtTenantUsageSummaryReleasedState
         MeterType? meterType = getMeterType(meterTypeTag);
         if (meterType != null) {
           subTenantUsageList.add(
-            // Padding(
-            //   padding: const EdgeInsets.only(top: 10),
-            //   child: getTypeUsageStat(
-            //     context,
-            //     meterTypeTag,
-            //     usageVal,
-            //   ),
-            // ),
             Padding(
               padding: const EdgeInsets.only(top: 10),
               child: WgtUsageStatCore(

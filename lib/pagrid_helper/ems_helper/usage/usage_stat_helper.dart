@@ -3,13 +3,18 @@ import 'package:buff_helper/up_helper/helper/tenant_def.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-Widget getTypeUsageStat(BuildContext context, String meterType, double usage,
+Widget getTypeUsageStat(
+    BuildContext context, String meterTypeTag, Map<String, double> usage,
     {int usageDecimals = 3,
     int rateDecimals = 4,
     int costDecimals = 2,
     bool isSubTenant = false}) {
-  MeterType? type = getMeterType(meterType);
+  MeterType? type = getMeterType(meterTypeTag);
   Color statColor = Theme.of(context).colorScheme.onSurface.withOpacity(0.7);
+  double usageVal = usage['usage_factored'] as double;
+  // if (usage['usage_factored'] != null) {
+  //   usageVal = usage['usage_factored'] as double;
+  // }
   return Padding(
     padding: const EdgeInsets.only(top: 10),
     child: Container(
@@ -33,7 +38,7 @@ Widget getTypeUsageStat(BuildContext context, String meterType, double usage,
                   getDeviceTypeIcon(type, iconSize: 21, iconColor: statColor),
                   // horizontalSpaceTiny,
                   Text(
-                    meterType.toUpperCase(),
+                    meterTypeTag.toUpperCase(),
                     style: TextStyle(
                       fontSize: 18,
                       color: statColor,
@@ -56,8 +61,8 @@ Widget getTypeUsageStat(BuildContext context, String meterType, double usage,
                 ),
                 getStatWithUnit(
                   isSubTenant
-                      ? '(${getCommaNumberStr(usage, decimal: usageDecimals)})'
-                      : getCommaNumberStr(usage, decimal: usageDecimals),
+                      ? '(${getCommaNumberStr(usageVal, decimal: usageDecimals)})'
+                      : getCommaNumberStr(usageVal, decimal: usageDecimals),
                   getDeivceTypeUnit(type),
                   statStrStyle: defStatStyleLarge.copyWith(
                     color: statColor,
@@ -65,6 +70,11 @@ Widget getTypeUsageStat(BuildContext context, String meterType, double usage,
                   unitStyle: defStatStyleSmall,
                   showUnit: false,
                 ),
+                if ((usage['factor'] ?? 1) < 0.99999)
+                  Text(
+                    'Factor: ${(1 / (usage['factor'] ?? 1)).toStringAsFixed(5)}',
+                    style: defStatStyleSmall,
+                  ),
               ],
             ),
           ),
@@ -262,24 +272,24 @@ Widget getUsageTypeStat(
 }
 
 Widget getTypeUsageNet(
-  BuildContext context,
-  Evs2User loggedInUser,
-  ScopeProfile scopeProfile,
-  ProjectScope activePortalProjectScope,
-  double? netUsageE,
-  double? rateE,
-  double? netUsageW,
-  double? rateW,
-  double? netUsageB,
-  double? rateB,
-  double? netUsageN,
-  double? rateN,
-  double? netUsageG,
-  double? rateG, {
-  int usageDecimals = 3,
-  int rateDecimals = 4,
-  int costDecimals = 2,
-}) {
+    BuildContext context,
+    Evs2User loggedInUser,
+    ScopeProfile scopeProfile,
+    ProjectScope activePortalProjectScope,
+    double? netUsageE,
+    double? rateE,
+    double? netUsageW,
+    double? rateW,
+    double? netUsageB,
+    double? rateB,
+    double? netUsageN,
+    double? rateN,
+    double? netUsageG,
+    double? rateG,
+    {int usageDecimals = 3,
+    int rateDecimals = 4,
+    int costDecimals = 2,
+    double width = 720}) {
   if (netUsageE == null &&
       netUsageW == null &&
       netUsageB == null &&
@@ -288,7 +298,7 @@ Widget getTypeUsageNet(
     return Container();
   }
   return SizedBox(
-    width: 700,
+    width: width,
     child: Column(children: [
       Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -306,11 +316,6 @@ Widget getTypeUsageNet(
           ),
         ],
       ),
-      // if (netUsageE != null) getTypeUsageStat(context, 'E', netUsageE),
-      // if (netUsageW != null) getTypeUsageStat(context, 'W', netUsageW),
-      // if (netUsageB != null) getTypeUsageStat(context, 'B', netUsageB),
-      // if (netUsageN != null) getTypeUsageStat(context, 'N', netUsageN),
-      // if (netUsageG != null) getTypeUsageStat(context, 'G', netUsageG),
       if (netUsageE != null)
         Padding(
           padding: const EdgeInsets.only(top: 10),
@@ -449,7 +454,8 @@ Widget getTotal(
     double? costG,
     double? costLineItems,
     double gst,
-    String tenantType) {
+    String tenantType,
+    {double width = 750.0}) {
   double? totalCost;
   if (costE != null) {
     totalCost = (totalCost ?? 0) + costE;
@@ -481,7 +487,7 @@ Widget getTotal(
     applyGst = true;
     if (subTotalAmt != null && gst != null) {
       subTotalAmt = getRound(subTotalAmt, 2);
-      gstAmt = subTotalAmt * gst! / 100;
+      gstAmt = subTotalAmt * gst / 100;
       gstAmt = getRoundUp(gstAmt, 2);
       // total = subTotal + subTotal * (gst / 100);
       totalAmt = subTotalAmt + gstAmt;
@@ -493,7 +499,7 @@ Widget getTotal(
     }
   }
   return Container(
-    width: 700,
+    width: width,
     // height: 80,
     padding: const EdgeInsets.symmetric(horizontal: 21),
     // constraints: const BoxConstraints(maxHeight: 130),
@@ -597,9 +603,9 @@ Widget getTotal(
   );
 }
 
-Widget getAutoUsageExcludedInfo(BuildContext context) {
+Widget getAutoUsageExcludedInfo(BuildContext context, {double width = 720}) {
   return Container(
-    width: 700,
+    width: width,
     padding: const EdgeInsets.symmetric(horizontal: 3),
     constraints: const BoxConstraints(
       maxHeight: 55,

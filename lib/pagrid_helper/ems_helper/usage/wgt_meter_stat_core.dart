@@ -403,12 +403,11 @@ class _WgtUsageStatCoreState extends State<WgtUsageStatCore> {
                       ),
                       showUnit: false,
                     ),
-                    ((widget.meterStat['factor'] ?? 1) == 1)
-                        ? Container()
-                        : Text(
-                            'Factor: ${(1 / widget.meterStat['factor']).toStringAsFixed(5)}',
-                            style: defStatStyleSmall,
-                          ),
+                    if ((widget.meterStat['factor'] ?? 1) < 0.999999)
+                      Text(
+                        'Factor: ${(1 / widget.meterStat['factor']).toStringAsFixed(5)}',
+                        style: defStatStyleSmall,
+                      ),
                   ],
                 ),
               ),

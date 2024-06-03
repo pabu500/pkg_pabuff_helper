@@ -67,6 +67,8 @@ class WgtTenantUsageSummary extends StatefulWidget {
 }
 
 class _WgtTenantUsageSummaryState extends State<WgtTenantUsageSummary> {
+  final double widgetWidth = 750;
+
   double? _netUsageE;
   double? _netUsageW;
   double? _netUsageB;
@@ -312,18 +314,22 @@ class _WgtTenantUsageSummaryState extends State<WgtTenantUsageSummary> {
       for (var mg in subTenantUsage['tenant_usage_summary']) {
         String meterGroupName = mg['meter_group_name'] ?? '';
         String meterGroupLabel = mg['meter_group_label'] ?? '';
-        String meterType = mg['meter_type'] ?? '';
+        String meterTypeTag = mg['meter_type'] ?? '';
         final meterGroupUsageSummary = mg['meter_group_usage_summary'] ?? [];
         final meterListUsageSummary =
             meterGroupUsageSummary['meter_list_usage_summary'] ?? [];
+        double factor = getProjectMeterUsageFactor(
+            widget.scopeProfile.selectedProjectScope,
+            scopeProfiles,
+            getMeterType(meterTypeTag));
         for (var meter in meterListUsageSummary) {
           String usageStr = meter['usage'] ?? '';
           double? usageVal = double.tryParse(usageStr);
           double? percentage = meter['percentage'];
 
           if (usageVal != null) {
-            double usage = usageVal * ((percentage ?? 100) / 100);
-            switch (meterType) {
+            double usage = factor * usageVal * ((percentage ?? 100) / 100);
+            switch (meterTypeTag) {
               case 'E':
                 subTenantUsageE ??= 0;
                 subTenantUsageE += usage;
@@ -465,186 +471,6 @@ class _WgtTenantUsageSummaryState extends State<WgtTenantUsageSummary> {
     );
   }
 
-  // Widget getUsageTitle() {
-  //   String rangeStr = getTimeRangeStr(
-  //     widget.fromDatetime,
-  //     widget.toDatetime,
-  //     targetInterval: widget.isMonthly ? 'monthly' : 'daily',
-  //     useMiddle: widget.isMonthly ? true : false,
-  //   );
-  //   return ConstrainedBox(
-  //     constraints: const BoxConstraints(maxWidth: 350),
-  //     child: Container(
-  //       padding: const EdgeInsets.only(right: 8),
-  //       decoration: BoxDecoration(
-  //         border: Border(
-  //           right: BorderSide(
-  //             color: Theme.of(context).hintColor,
-  //             width: 1,
-  //           ),
-  //         ),
-  //       ),
-  //       child: Column(
-  //         crossAxisAlignment: CrossAxisAlignment.start,
-  //         children: [
-  //           Text(
-  //             widget.tenantLabel ?? '',
-  //             style: TextStyle(
-  //               fontSize: 21,
-  //               fontWeight: FontWeight.bold,
-  //               color: Theme.of(context).hintColor,
-  //             ),
-  //           ),
-  //           Row(
-  //             mainAxisAlignment: MainAxisAlignment.start,
-  //             children: [
-  //               Text(
-  //                 widget.tenantName,
-  //                 style: TextStyle(
-  //                   fontSize: 15,
-  //                   fontWeight: FontWeight.bold,
-  //                   color: Theme.of(context).hintColor.withOpacity(0.7),
-  //                 ),
-  //               ),
-  //               horizontalSpaceRegular,
-  //               Text(
-  //                 widget.tenantAccountId,
-  //                 style: TextStyle(
-  //                   fontSize: 15,
-  //                   fontWeight: FontWeight.bold,
-  //                   color: Theme.of(context).hintColor.withOpacity(0.7),
-  //                 ),
-  //               ),
-  //             ],
-  //           ),
-  //           verticalSpaceSmall,
-  //           Text(
-  //             rangeStr,
-  //             style: TextStyle(
-  //               fontSize: 15,
-  //               fontWeight: FontWeight.bold,
-  //               color: Theme.of(context).hintColor,
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
-
-  // Widget getUsageTypeStat() {
-  //   TextStyle valueStyle = TextStyle(
-  //     fontWeight: FontWeight.bold,
-  //     fontSize: 34,
-  //     color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-  //     // color: Colors.grey.shade800,
-  //   );
-  //   return Row(
-  //     children: [
-  //       if (_netUsageE != null)
-  //         Padding(
-  //           padding: const EdgeInsets.only(left: 13),
-  //           child: Column(
-  //             children: [
-  //               getMeterTypeWidget(MeterType.electricity1p, context),
-  //               widget.isBillMode
-  //                   ? getStatWithUnit(
-  //                       getCommaNumberStr(_costE,
-  //                           decimal: /*widget.costDecimals*/ 2),
-  //                       'SGD',
-  //                       statStrStyle: valueStyle)
-  //                   : getStatWithUnit(
-  //                       getCommaNumberStr(_netUsageE,
-  //                           decimal: widget.usageDecimals),
-  //                       getDeivceTypeUnit(MeterType.electricity1p),
-  //                       statStrStyle: valueStyle),
-  //             ],
-  //           ),
-  //         ),
-  //       if (_netUsageW != null)
-  //         Padding(
-  //           padding: const EdgeInsets.only(left: 13),
-  //           child: Column(
-  //             children: [
-  //               getMeterTypeWidget(MeterType.water, context),
-  //               widget.isBillMode
-  //                   ? getStatWithUnit(
-  //                       getCommaNumberStr(_costW,
-  //                           decimal: /*widget.costDecimals*/ 2),
-  //                       'SGD',
-  //                       statStrStyle: valueStyle)
-  //                   : getStatWithUnit(
-  //                       getCommaNumberStr(_netUsageW,
-  //                           decimal: widget.usageDecimals),
-  //                       getDeivceTypeUnit(MeterType.water),
-  //                       statStrStyle: valueStyle),
-  //             ],
-  //           ),
-  //         ),
-  //       if (_netUsageB != null)
-  //         Padding(
-  //           padding: const EdgeInsets.only(left: 13),
-  //           child: Column(
-  //             children: [
-  //               getMeterTypeWidget(MeterType.btu, context),
-  //               widget.isBillMode
-  //                   ? getStatWithUnit(
-  //                       getCommaNumberStr(_costB,
-  //                           decimal: /*widget.costDecimals*/ 2),
-  //                       'SGD',
-  //                       statStrStyle: valueStyle)
-  //                   : getStatWithUnit(
-  //                       getCommaNumberStr(_netUsageB,
-  //                           decimal: widget.usageDecimals),
-  //                       getDeivceTypeUnit(MeterType.btu),
-  //                       statStrStyle: valueStyle),
-  //             ],
-  //           ),
-  //         ),
-  //       if (_netUsageN != null)
-  //         Padding(
-  //           padding: const EdgeInsets.only(left: 13),
-  //           child: Column(
-  //             children: [
-  //               getMeterTypeWidget(MeterType.newater, context),
-  //               widget.isBillMode
-  //                   ? getStatWithUnit(
-  //                       getCommaNumberStr(_costN,
-  //                           decimal: /*widget.costDecimals*/ 2),
-  //                       'SGD',
-  //                       statStrStyle: valueStyle)
-  //                   : getStatWithUnit(
-  //                       getCommaNumberStr(_netUsageN,
-  //                           decimal: widget.usageDecimals),
-  //                       getDeivceTypeUnit(MeterType.newater),
-  //                       statStrStyle: valueStyle),
-  //             ],
-  //           ),
-  //         ),
-  //       if (_netUsageG != null)
-  //         Padding(
-  //           padding: const EdgeInsets.only(left: 13),
-  //           child: Column(
-  //             children: [
-  //               getMeterTypeWidget(MeterType.gas, context),
-  //               widget.isBillMode
-  //                   ? getStatWithUnit(
-  //                       getCommaNumberStr(_costG,
-  //                           decimal: /*widget.costDecimals*/ 2),
-  //                       'SGD',
-  //                       statStrStyle: valueStyle)
-  //                   : getStatWithUnit(
-  //                       getCommaNumberStr(_netUsageG,
-  //                           decimal: widget.usageDecimals),
-  //                       getDeivceTypeUnit(MeterType.gas),
-  //                       statStrStyle: valueStyle),
-  //             ],
-  //           ),
-  //         ),
-  //     ],
-  //   );
-  // }
-
   List<Widget> getStat() {
     List<Widget> typeStat = [];
 
@@ -669,7 +495,7 @@ class _WgtTenantUsageSummaryState extends State<WgtTenantUsageSummary> {
       typeGroups.add(getGroupMeterStat(groupInfo, meterType));
     }
     return SizedBox(
-      width: 720,
+      width: widgetWidth,
       child: Column(
         children: [...typeGroups],
       ),
@@ -866,7 +692,7 @@ class _WgtTenantUsageSummaryState extends State<WgtTenantUsageSummary> {
       }
     }
     return SizedBox(
-      width: 700,
+      width: widgetWidth,
       child: Column(
         children: [
           verticalSpaceSmall,
@@ -922,8 +748,7 @@ class _WgtTenantUsageSummaryState extends State<WgtTenantUsageSummary> {
               getCommaNumberStr(valueVal, decimal: 2),
               'SGD',
               statStrStyle: defStatStyle.copyWith(
-                color:
-                    Theme.of(context).colorScheme.onBackground.withOpacity(0.7),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
               ),
             ),
           ],
@@ -951,7 +776,7 @@ class _WgtTenantUsageSummaryState extends State<WgtTenantUsageSummary> {
         ),
         verticalSpaceSmall,
         Container(
-          width: 700,
+          width: widgetWidth,
           padding: const EdgeInsets.symmetric(horizontal: 3),
           constraints: const BoxConstraints(
             maxHeight: 55,
@@ -978,6 +803,7 @@ class _WgtTenantUsageSummaryState extends State<WgtTenantUsageSummary> {
     for (var subTenantUsage in widget.subTenantListUsageSummary) {
       String tenantName = subTenantUsage['tenant_name'] ?? '';
       String tenantLabel = subTenantUsage['tenant_label'] ?? '';
+
       subTenantUsageList.add(
         getSubTenantUsage(
           tenantName,
@@ -991,25 +817,36 @@ class _WgtTenantUsageSummaryState extends State<WgtTenantUsageSummary> {
     );
   }
 
+  // widget only, no calculation
   Widget getSubTenantUsage(
       String tenantName, String tenantLabel, Map<String, double> typeUsage) {
     List<Widget> typeUsageList = [];
-    for (var usageType in typeUsage.keys) {
-      if (typeUsage[usageType] == null) {
+    Map<String, double> usage = {};
+    for (var usageTypeTag in typeUsage.keys) {
+      if (typeUsage[usageTypeTag] == null) {
         if (kDebugMode) {
           print('typeUsage[usageType] is null');
         }
+      } else {
+        double usageVal = typeUsage[usageTypeTag] as double;
+        double usageFactor = getProjectMeterUsageFactor(
+            widget.scopeProfile.selectedProjectScope,
+            scopeProfiles,
+            getMeterType(usageTypeTag));
+        usage['usage_factored'] = usageVal;
+        usage['factor'] = usageFactor;
       }
-      typeUsageList.add(getTypeUsageStat(
-          context, usageType, typeUsage[usageType]!,
-          usageDecimals: widget.usageDecimals,
-          rateDecimals: widget.rateDecimals,
-          costDecimals: widget.costDecimals,
-          isSubTenant: true));
+      typeUsageList.add(
+        getTypeUsageStat(context, usageTypeTag, usage,
+            usageDecimals: widget.usageDecimals,
+            rateDecimals: widget.rateDecimals,
+            costDecimals: widget.costDecimals,
+            isSubTenant: true),
+      );
     }
 
     return SizedBox(
-      width: 700,
+      width: widgetWidth,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
