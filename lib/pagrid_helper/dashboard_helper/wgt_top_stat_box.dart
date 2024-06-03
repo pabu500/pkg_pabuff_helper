@@ -353,6 +353,8 @@ class _WgtTopStatBoxState extends State<WgtTopStatBox> {
           _isK = true;
           value = value / 1000;
           valueStr = getCommaNumberStr(value);
+        } else {
+          _isK = false;
         }
       }
       valueStr = getCommaNumberStr(value);
@@ -453,7 +455,9 @@ class _WgtTopStatBoxState extends State<WgtTopStatBox> {
                   if (_statUnit.isNotEmpty)
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.8),
+                        color: _statUnit.contains('MWh')
+                            ? Colors.yellowAccent.shade100.withOpacity(0.8)
+                            : Colors.white.withOpacity(0.8),
                         borderRadius: BorderRadius.circular(3),
                       ),
                       padding: const EdgeInsets.fromLTRB(2, 0, 2, 0),
