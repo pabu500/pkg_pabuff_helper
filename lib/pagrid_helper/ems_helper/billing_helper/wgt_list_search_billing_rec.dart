@@ -307,7 +307,7 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
                       scopeProfile: widget.scopeProfile,
                       billingRecIndexStr: item['id'],
                       defaultBillLcStatus: item['lc_status'], //'generated',
-                      modes: const ['pdf', 'widget'],
+                      modes: const ['widget', 'pdf'],
                     ),
                   );
                 },

@@ -164,12 +164,12 @@ Widget getUsageTypeStat(
   double? costG, {
   int usageDecimals = 3,
   int rateDecimals = 4,
-  int costDecimals = 2,
+  int costDecimals = 3,
 }) {
   TextStyle valueStyle = TextStyle(
     fontWeight: FontWeight.bold,
     fontSize: 34,
-    color: Theme.of(context).colorScheme.onBackground.withOpacity(0.7),
+    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
     // color: Colors.grey.shade800,
   );
   return Row(
