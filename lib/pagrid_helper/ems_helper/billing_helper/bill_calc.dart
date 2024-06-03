@@ -366,7 +366,9 @@ class BillCalc {
     double usageFactor,
   ) {
     double usage = 0;
+    String typeTag = '';
     for (var item in typeGroupList) {
+      typeTag = item['meter_type'] ?? '';
       final meterGroupUsageSummary = item['meter_group_usage_summary'] ?? [];
       if (meterGroupUsageSummary.isNotEmpty) {
         final meterListUsageSummary =
@@ -386,16 +388,17 @@ class BillCalc {
         }
       }
       usage = usage * usageFactor;
+    }
 
-      if (manualUsage.isNotEmpty) {
-        String key = 'manual_usage_${item['meter_type']}'.toLowerCase();
-        String manualUsageStr = manualUsage[key] ?? '';
-        double? manualUsageVal = double.tryParse(manualUsageStr);
-        if (manualUsageVal != null) {
-          usage += manualUsageVal;
-        }
+    if (manualUsage.isNotEmpty) {
+      String key = 'manual_usage_$typeTag'.toLowerCase();
+      String manualUsageStr = manualUsage[key] ?? '';
+      double? manualUsageVal = double.tryParse(manualUsageStr);
+      if (manualUsageVal != null) {
+        usage += manualUsageVal;
       }
     }
+
     return usage;
   }
 
