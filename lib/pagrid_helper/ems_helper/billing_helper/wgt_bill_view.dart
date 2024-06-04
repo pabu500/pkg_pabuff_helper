@@ -54,9 +54,9 @@ class _WgtBillViewState extends State<WgtBillView> {
 
   Future<dynamic> _getUsageFactor(
       DateTime fromDateTime, DateTime toDateTime) async {
-    setState(() {
-      _gettingUsageFactor = true;
-    });
+    // setState(() {
+    //   _gettingUsageFactor = true;
+    // });
     try {
       List<String> types = ['E', 'W', 'B', 'N', 'G'];
 
@@ -106,9 +106,9 @@ class _WgtBillViewState extends State<WgtBillView> {
         print('Error: $e');
       }
     } finally {
-      setState(() {
-        _gettingUsageFactor = false;
-      });
+      // setState(() {
+      //   _gettingUsageFactor = false;
+      // });
     }
   }
 
@@ -137,6 +137,14 @@ class _WgtBillViewState extends State<WgtBillView> {
       if (billResult['result'] != null) {
         _bill.addAll(billResult['result']);
       }
+
+      if (_bill.isNotEmpty) {
+        DateTime fromDatetime =
+            getTargetDatetimeFromTargetStr(_bill['from_timestamp']);
+        DateTime toDatetime =
+            getTargetDatetimeFromTargetStr(_bill['to_timestamp']);
+        await _getUsageFactor(fromDatetime, toDatetime);
+      }
     } catch (err) {
       _pullFails++;
       if (kDebugMode) {
@@ -155,14 +163,6 @@ class _WgtBillViewState extends State<WgtBillView> {
       setState(() {
         _gettingBill = false;
       });
-    }
-
-    if (_bill.isNotEmpty) {
-      DateTime fromDatetime =
-          getTargetDatetimeFromTargetStr(_bill['from_timestamp']);
-      DateTime toDatetime =
-          getTargetDatetimeFromTargetStr(_bill['to_timestamp']);
-      await _getUsageFactor(fromDatetime, toDatetime);
     }
   }
 
@@ -416,6 +416,7 @@ class _WgtBillViewState extends State<WgtBillView> {
       typeRates: typeRates,
       manualUsages: manualUsage,
       autoUsageSummary: usageSummary,
+      subTenantUsageSummary: subTenantListUsageSummary,
       lineItems: [lineItem],
       usageFactorE: _usageFactorE!,
       usageFactorW: _usageFactorW!,
@@ -713,7 +714,7 @@ class _WgtBillViewState extends State<WgtBillView> {
               'billTo': toTimestampStr,
               'billDate': _bill['created_timestamp'],
               'billTimeRangeStr': billTimeRangeStr,
-              'tenantUsageSummary': [],
+              'tenantUsageSummary': const [],
               'totalAmount': billCalc.totalAmount,
               'typeRateE': billCalc.rateE,
               'typeRateW': billCalc.rateW,

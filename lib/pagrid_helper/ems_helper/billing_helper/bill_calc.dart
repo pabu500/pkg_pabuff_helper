@@ -31,6 +31,12 @@ class BillCalc {
   double? _billedSubTenantUsageN;
   double? _billedSubTenantUsageG;
 
+  double? _subTenantUsageE;
+  double? _subTenantUsageW;
+  double? _subTenantUsageB;
+  double? _subTenantUsageN;
+  double? _subTenantUsageG;
+
   double? _manualUsageE;
   double? _manualUsageW;
   double? _manualUsageB;
@@ -109,15 +115,21 @@ class BillCalc {
     required double usageFactorB,
     required double usageFactorN,
     required double usageFactorG,
+    List<Map<String, dynamic>> subTenantUsageSummary = const [],
   }) {
     _getRates(typeRates);
     if (!calReleased) {
       _sortGroups(autoUsageSummary, manualUsages);
-      _usageE = _calcGroupUsage(_groupsE, manualUsages, usageFactorE);
-      _usageW = _calcGroupUsage(_groupsW, manualUsages, usageFactorW);
-      _usageB = _calcGroupUsage(_groupsB, manualUsages, usageFactorB);
-      _usageN = _calcGroupUsage(_groupsN, manualUsages, usageFactorN);
-      _usageG = _calcGroupUsage(_groupsG, manualUsages, usageFactorG);
+      _usageE = _calcTypeUsage(
+          _groupsE, manualUsages, subTenantUsageSummary, usageFactorE);
+      _usageW = _calcTypeUsage(
+          _groupsW, manualUsages, subTenantUsageSummary, usageFactorW);
+      _usageB = _calcTypeUsage(
+          _groupsB, manualUsages, subTenantUsageSummary, usageFactorB);
+      _usageN = _calcTypeUsage(
+          _groupsN, manualUsages, subTenantUsageSummary, usageFactorN);
+      _usageG = _calcTypeUsage(
+          _groupsG, manualUsages, subTenantUsageSummary, usageFactorG);
     } else {
       if (billedAutoUsages['billed_auto_usage_e'] != null) {
         _billedAutoUsageE =
@@ -360,46 +372,99 @@ class BillCalc {
     _rateG = double.tryParse(rateGStr);
   }
 
-  double _calcGroupUsage(
+  double? _calcMeterGroupUsageTotal(
+      List<Map<String, dynamic>> meterListUsageSummary) {
+    double? usage;
+    for (var meter in meterListUsageSummary) {
+      String usageStr = meter['usage'] ?? '';
+      double? usageVal = double.tryParse(usageStr);
+      double? percentage = meter['percentage'];
+
+      if (usageVal != null) {
+        usage ??= 0;
+
+        if (percentage != null) {
+          usage += usageVal * (percentage / 100);
+        } else {
+          usage += usageVal;
+        }
+      }
+    }
+    return usage;
+  }
+
+  double _calcTypeUsage(
     List<Map<String, dynamic>> typeGroupList,
     Map<String, dynamic> manualUsage,
+    List<Map<String, dynamic>> subTenantUsageSummary,
     double usageFactor,
   ) {
-    double usage = 0;
+    double typeUsageTotal = 0;
     String typeTag = '';
     for (var item in typeGroupList) {
       typeTag = item['meter_type'] ?? '';
       final meterGroupUsageSummary = item['meter_group_usage_summary'] ?? [];
       if (meterGroupUsageSummary.isNotEmpty) {
-        final meterListUsageSummary =
-            meterGroupUsageSummary['meter_list_usage_summary'] ?? [];
-        for (var meter in meterListUsageSummary) {
-          String usageStr = meter['usage'] ?? '';
-          double? usageVal = double.tryParse(usageStr);
-          double? percentage = meter['percentage'];
+        List<Map<String, dynamic>> meterListUsageSummary = [];
+        for (var mg in meterGroupUsageSummary['meter_list_usage_summary']) {
+          meterListUsageSummary.add(mg);
+        }
 
-          if (usageVal != null) {
-            if (percentage != null) {
-              usage += usageVal * (percentage / 100);
-            } else {
-              usage += usageVal;
+        double groupUsageTotal =
+            _calcMeterGroupUsageTotal(meterListUsageSummary) ?? 0;
+        typeUsageTotal += groupUsageTotal;
+
+        // for (var meter in meterListUsageSummary) {
+        //   String usageStr = meter['usage'] ?? '';
+        //   double? usageVal = double.tryParse(usageStr);
+        //   double? percentage = meter['percentage'];
+
+        //   if (usageVal != null) {
+        //     if (percentage != null) {
+        //       usage += usageVal * (percentage / 100);
+        //     } else {
+        //       usage += usageVal;
+        //     }
+        //   }
+        // }
+      }
+    }
+
+    if (typeGroupList.isNotEmpty) {
+      for (var item in subTenantUsageSummary) {
+        final tenantUsageSummary = item['tenant_usage_summary'] ?? [];
+        for (var tenant in tenantUsageSummary) {
+          String usageType = tenant['meter_type'] ?? '';
+          if (usageType != typeTag) {
+            continue;
+          }
+          final meterGroupUsageSummary =
+              tenant['meter_group_usage_summary'] ?? [];
+          if (meterGroupUsageSummary.isNotEmpty) {
+            List<Map<String, dynamic>> meterListUsageSummary = [];
+            for (var mg in meterGroupUsageSummary['meter_list_usage_summary']) {
+              meterListUsageSummary.add(mg);
             }
+            double subUsasgeTotal =
+                _calcMeterGroupUsageTotal(meterListUsageSummary) ?? 0;
+            typeUsageTotal -= subUsasgeTotal;
           }
         }
       }
-      usage = usage * usageFactor;
     }
+
+    typeUsageTotal = typeUsageTotal * usageFactor;
 
     if (manualUsage.isNotEmpty) {
       String key = 'manual_usage_$typeTag'.toLowerCase();
       String manualUsageStr = manualUsage[key] ?? '';
       double? manualUsageVal = double.tryParse(manualUsageStr);
       if (manualUsageVal != null) {
-        usage += manualUsageVal;
+        typeUsageTotal += manualUsageVal;
       }
     }
 
-    return usage;
+    return typeUsageTotal;
   }
 
   void _calcLineItems(List<Map<String, dynamic>> lineItems) {
