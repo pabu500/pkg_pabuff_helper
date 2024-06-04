@@ -1,4 +1,5 @@
 import 'package:buff_helper/pkg_buff_helper.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../finder_helper/wgt_item_finder2.dart';
@@ -143,6 +144,9 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
       _selectedGenType = null;
       _selectedLcStatus = null;
       if (_lcStatusList.length == 1) {
+        if (kDebugMode) {
+          print('lcStatusList: $_lcStatusList');
+        }
         _selectedLcStatus = _lcStatusList[0];
       }
     });

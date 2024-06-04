@@ -43,11 +43,74 @@ class _WgtBillViewState extends State<WgtBillView> {
   bool _showGenTypeSwitch = false;
   bool _showRenderModeSwitch = false;
 
-  double _usageFactorE = 1;
-  double _usageFactorW = 1;
-  double _usageFactorB = 1;
-  double _usageFactorN = 1;
-  double _usageFactorG = 1;
+  double? _usageFactorE;
+  double? _usageFactorW;
+  double? _usageFactorB;
+  double? _usageFactorN;
+  double? _usageFactorG;
+
+  bool _gettingUsageFactor = false;
+  int _pullFailed = 0;
+
+  Future<dynamic> _getUsageFactor(
+      DateTime fromDateTime, DateTime toDateTime) async {
+    setState(() {
+      _gettingUsageFactor = true;
+    });
+    try {
+      List<String> types = ['E', 'W', 'B', 'N', 'G'];
+
+      for (var type in types) {
+        final usageFactorStr = await getSysVar(
+            widget.activePortalProjectScope,
+            {
+              'name': 'usage_factor_$type'.toLowerCase(),
+              'scope_str':
+                  widget.scopeProfile.getEffectiveScopeStr().toLowerCase(),
+              'from_timestamp': fromDateTime.toIso8601String(),
+              'to_timestamp': toDateTime.toIso8601String(),
+            },
+            SvcClaim(
+              scope: AclScope.global.name,
+              target: getAclTargetStr(AclTarget.bill_p_info),
+              operation: AclOperation.read.name,
+            ));
+
+        double? usageFactor = double.tryParse(usageFactorStr);
+        if (usageFactor == null) {
+          throw Exception('Invalid usage factor');
+        }
+
+        switch (type) {
+          case 'E':
+            _usageFactorE = usageFactor;
+            break;
+          case 'W':
+            _usageFactorW = usageFactor;
+            break;
+          case 'B':
+            _usageFactorB = usageFactor;
+            break;
+          case 'N':
+            _usageFactorN = usageFactor;
+            break;
+          case 'G':
+            _usageFactorG = usageFactor;
+            break;
+          default:
+        }
+      }
+    } catch (e) {
+      _pullFailed++;
+      if (kDebugMode) {
+        print('Error: $e');
+      }
+    } finally {
+      setState(() {
+        _gettingUsageFactor = false;
+      });
+    }
+  }
 
   Future<dynamic> _getBill() async {
     setState(() {
@@ -93,6 +156,14 @@ class _WgtBillViewState extends State<WgtBillView> {
         _gettingBill = false;
       });
     }
+
+    if (_bill.isNotEmpty) {
+      DateTime fromDatetime =
+          getTargetDatetimeFromTargetStr(_bill['from_timestamp']);
+      DateTime toDatetime =
+          getTargetDatetimeFromTargetStr(_bill['to_timestamp']);
+      await _getUsageFactor(fromDatetime, toDatetime);
+    }
   }
 
   @override
@@ -106,23 +177,6 @@ class _WgtBillViewState extends State<WgtBillView> {
         widget.genTypes.length > 1;
     _showRenderModeSwitch = widget.modes.length > 1;
     _renderMode = widget.modes[0];
-
-    _usageFactorE = getProjectMeterUsageFactor(
-        widget.scopeProfile.selectedProjectScope,
-        scopeProfiles,
-        MeterType.electricity1p);
-    _usageFactorW = getProjectMeterUsageFactor(
-        widget.scopeProfile.selectedProjectScope,
-        scopeProfiles,
-        MeterType.water);
-    _usageFactorB = getProjectMeterUsageFactor(
-        widget.scopeProfile.selectedProjectScope, scopeProfiles, MeterType.btu);
-    _usageFactorN = getProjectMeterUsageFactor(
-        widget.scopeProfile.selectedProjectScope,
-        scopeProfiles,
-        MeterType.newater);
-    _usageFactorG = getProjectMeterUsageFactor(
-        widget.scopeProfile.selectedProjectScope, scopeProfiles, MeterType.gas);
   }
 
   @override
@@ -363,11 +417,11 @@ class _WgtBillViewState extends State<WgtBillView> {
       manualUsages: manualUsage,
       autoUsageSummary: usageSummary,
       lineItems: [lineItem],
-      usageFactorE: _usageFactorE,
-      usageFactorW: _usageFactorW,
-      usageFactorB: _usageFactorB,
-      usageFactorN: _usageFactorN,
-      usageFactorG: _usageFactorG,
+      usageFactorE: _usageFactorE!,
+      usageFactorW: _usageFactorW!,
+      usageFactorB: _usageFactorB!,
+      usageFactorN: _usageFactorN!,
+      usageFactorG: _usageFactorG!,
     );
 
     return _renderMode == 'pdf'
@@ -431,6 +485,13 @@ class _WgtBillViewState extends State<WgtBillView> {
                 _bill['exclude_auto_usage'] == 'true' ? true : false,
             meterTypeRates: tariffRates,
             gst: double.tryParse(gst ?? ''),
+            usageFactor: {
+              'E': _usageFactorE,
+              'W': _usageFactorW,
+              'B': _usageFactorB,
+              'N': _usageFactorN,
+              'G': _usageFactorG,
+            },
           );
   }
 
@@ -453,48 +514,48 @@ class _WgtBillViewState extends State<WgtBillView> {
     autoUsages['billed_auto_usage_n'] = billedAutoUsages['billed_auto_usage_n'];
     autoUsages['billed_auto_usage_g'] = billedAutoUsages['billed_auto_usage_g'];
 
-    // double usageFactorE = getProjectMeterUsageFactor(
-    //     _scopeProfile.selectedProjectScope,
-    //     scopeProfiles,
-    //     MeterType.electricity1p);
-    // double usageFactorW = getProjectMeterUsageFactor(
-    //     _scopeProfile.selectedProjectScope, scopeProfiles, MeterType.water);
-    // double usageFactorB = getProjectMeterUsageFactor(
-    //     _scopeProfile.selectedProjectScope, scopeProfiles, MeterType.btu);
-    // double usageFactorN = getProjectMeterUsageFactor(
-    //     _scopeProfile.selectedProjectScope, scopeProfiles, MeterType.newater);
-    // double usageFactorG = getProjectMeterUsageFactor(
-    //     _scopeProfile.selectedProjectScope, scopeProfiles, MeterType.gas);
+    Map<String, dynamic> billedUsageFactors = _bill['billed_usage_factor'];
+    Map<String, dynamic> usageFactor = {};
+    usageFactor['billed_usage_factor_e'] =
+        double.tryParse(billedUsageFactors['billed_usage_factor_e']);
+    usageFactor['billed_usage_factor_w'] =
+        double.tryParse(billedUsageFactors['billed_usage_factor_w']);
+    usageFactor['billed_usage_factor_b'] =
+        double.tryParse(billedUsageFactors['billed_usage_factor_b']);
+    usageFactor['billed_usage_factor_n'] =
+        double.tryParse(billedUsageFactors['billed_usage_factor_n']);
+    usageFactor['billed_usage_factor_g'] =
+        double.tryParse(billedUsageFactors['billed_usage_factor_g']);
 
     if (autoUsages['billed_auto_usage_e'] != null) {
       double billedAutoUsageE =
           double.tryParse(autoUsages['billed_auto_usage_e'])!;
       autoUsages['billed_auto_usage_e'] =
-          (billedAutoUsageE * _usageFactorE).toString();
+          (billedAutoUsageE * usageFactor['billed_usage_factor_e']).toString();
     }
     if (autoUsages['billed_auto_usage_w'] != null) {
       double billedAutoUsageW =
           double.tryParse(autoUsages['billed_auto_usage_w'])!;
       autoUsages['billed_auto_usage_w'] =
-          (billedAutoUsageW * _usageFactorW).toString();
+          (billedAutoUsageW * usageFactor['billed_usage_factor_w']).toString();
     }
     if (autoUsages['billed_auto_usage_b'] != null) {
       double billedAutoUsageB =
           double.tryParse(autoUsages['billed_auto_usage_b'])!;
       autoUsages['billed_auto_usage_b'] =
-          (billedAutoUsageB * _usageFactorB).toString();
+          (billedAutoUsageB * usageFactor['billed_usage_factor_b']).toString();
     }
     if (autoUsages['billed_auto_usage_n'] != null) {
       double billedAutoUsageN =
           double.tryParse(autoUsages['billed_auto_usage_n'])!;
       autoUsages['billed_auto_usage_n'] =
-          (billedAutoUsageN * _usageFactorN).toString();
+          (billedAutoUsageN * usageFactor['billed_usage_factor_n']).toString();
     }
     if (autoUsages['billed_auto_usage_g'] != null) {
       double billedAutoUsageG =
           double.tryParse(autoUsages['billed_auto_usage_g'])!;
       autoUsages['billed_auto_usage_g'] =
-          (billedAutoUsageG * _usageFactorG).toString();
+          (billedAutoUsageG * usageFactor['billed_usage_factor_g']).toString();
     }
 
     Map<String, dynamic> subTenantUsages = {};
@@ -515,31 +576,36 @@ class _WgtBillViewState extends State<WgtBillView> {
       double billedSubTenantUsageE =
           double.tryParse(subTenantUsages['billed_sub_tenant_usage_e'])!;
       subTenantUsages['billed_sub_tenant_usage_e'] =
-          (billedSubTenantUsageE * _usageFactorE).toString();
+          (billedSubTenantUsageE * usageFactor['billed_usage_factor_e'])
+              .toString();
     }
     if (subTenantUsages['billed_sub_tenant_usage_w'] != null) {
       double billedSubTenantUsageW =
           double.tryParse(subTenantUsages['billed_sub_tenant_usage_w'])!;
       subTenantUsages['billed_sub_tenant_usage_w'] =
-          (billedSubTenantUsageW * _usageFactorW).toString();
+          (billedSubTenantUsageW * usageFactor['billed_usage_factor_w'])
+              .toString();
     }
     if (subTenantUsages['billed_sub_tenant_usage_b'] != null) {
       double billedSubTenantUsageB =
           double.tryParse(subTenantUsages['billed_sub_tenant_usage_b'])!;
       subTenantUsages['billed_sub_tenant_usage_b'] =
-          (billedSubTenantUsageB * _usageFactorB).toString();
+          (billedSubTenantUsageB * usageFactor['billed_usage_factor_b'])
+              .toString();
     }
     if (subTenantUsages['billed_sub_tenant_usage_n'] != null) {
       double billedSubTenantUsageN =
           double.tryParse(subTenantUsages['billed_sub_tenant_usage_n'])!;
       subTenantUsages['billed_sub_tenant_usage_n'] =
-          (billedSubTenantUsageN * _usageFactorN).toString();
+          (billedSubTenantUsageN * usageFactor['billed_usage_factor_n'])
+              .toString();
     }
     if (subTenantUsages['billed_sub_tenant_usage_g'] != null) {
       double billedSubTenantUsageG =
           double.tryParse(subTenantUsages['billed_sub_tenant_usage_g'])!;
       subTenantUsages['billed_sub_tenant_usage_g'] =
-          (billedSubTenantUsageG * _usageFactorG).toString();
+          (billedSubTenantUsageG * usageFactor['billed_usage_factor_g'])
+              .toString();
     }
 
     Map<String, dynamic> manualUsage = {};
@@ -627,11 +693,11 @@ class _WgtBillViewState extends State<WgtBillView> {
       billedSubTenantUsages: subTenantUsages,
       lineItems: [lineItem],
       billedTrendingSnapShot: billedTrendingSnapShot,
-      usageFactorE: _usageFactorE,
-      usageFactorW: _usageFactorW,
-      usageFactorB: _usageFactorB,
-      usageFactorN: _usageFactorN,
-      usageFactorG: _usageFactorG,
+      usageFactorE: usageFactor['billed_usage_factor_e'],
+      usageFactorW: usageFactor['billed_usage_factor_w'],
+      usageFactorB: usageFactor['billed_usage_factor_b'],
+      usageFactorN: usageFactor['billed_usage_factor_n'],
+      usageFactorG: usageFactor['billed_usage_factor_g'],
     );
 
     return _renderMode == 'pdf'
@@ -689,6 +755,7 @@ class _WgtBillViewState extends State<WgtBillView> {
             tenantType: tenantType,
             billedAutoUsages: autoUsages,
             billedSubTenantUsages: subTenantUsages,
+            billedUsageFactor: usageFactor,
             manualUsages: manualUsage,
             lineItems: [lineItem],
             excludeAutoUsage:

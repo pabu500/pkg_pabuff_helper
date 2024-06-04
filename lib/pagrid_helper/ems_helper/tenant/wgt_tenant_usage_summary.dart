@@ -34,6 +34,7 @@ class WgtTenantUsageSummary extends StatefulWidget {
     this.usageDecimals = 3,
     this.rateDecimals = 4,
     this.costDecimals = 3,
+    this.usageFactor,
   });
 
   final ScopeProfile scopeProfile;
@@ -61,6 +62,7 @@ class WgtTenantUsageSummary extends StatefulWidget {
   final int usageDecimals;
   final int rateDecimals;
   final int costDecimals;
+  final Map<String, dynamic>? usageFactor;
 
   @override
   State<WgtTenantUsageSummary> createState() => _WgtTenantUsageSummaryState();
@@ -104,13 +106,84 @@ class _WgtTenantUsageSummaryState extends State<WgtTenantUsageSummary> {
   final List<Map<String, dynamic>> _groupsN = [];
   final List<Map<String, dynamic>> _groupsG = [];
 
-  double _usageFactorE = 1;
-  double _usageFactorW = 1;
-  double _usageFactorB = 1;
-  double _usageFactorN = 1;
-  double _usageFactorG = 1;
+  double? _usageFactorE;
+  double? _usageFactorW;
+  double? _usageFactorB;
+  double? _usageFactorN;
+  double? _usageFactorG;
 
   String _renderMode = 'wgt'; // wgt, pdf
+
+  bool _gettingUsageFactor = false;
+  int _pullFailed = 0;
+
+  Future<dynamic> _getUsageFactor() async {
+    if (widget.usageFactor != null) {
+      _usageFactorE = widget.usageFactor!['usage_factor_e'];
+      _usageFactorW = widget.usageFactor!['usage_factor_w'];
+      _usageFactorB = widget.usageFactor!['usage_factor_b'];
+      _usageFactorN = widget.usageFactor!['usage_factor_n'];
+      _usageFactorG = widget.usageFactor!['usage_factor_g'];
+      return;
+    }
+
+    setState(() {
+      _gettingUsageFactor = true;
+    });
+    try {
+      List<String> types = ['E', 'W', 'B', 'N', 'G'];
+
+      for (var type in types) {
+        final usageFactorStr = await getSysVar(
+            widget.activePortalProjectScope,
+            {
+              'name': 'usage_factor_$type'.toLowerCase(),
+              'scope_str':
+                  widget.scopeProfile.getEffectiveScopeStr().toLowerCase(),
+              'from_timestamp': widget.fromDatetime.toIso8601String(),
+              'to_timestamp': widget.toDatetime.toIso8601String(),
+            },
+            SvcClaim(
+              scope: AclScope.global.name,
+              target: getAclTargetStr(AclTarget.bill_p_info),
+              operation: AclOperation.read.name,
+            ));
+
+        double? usageFactor = double.tryParse(usageFactorStr);
+        if (usageFactor == null) {
+          throw Exception('Invalid usage factor');
+        }
+
+        switch (type) {
+          case 'E':
+            _usageFactorE = usageFactor;
+            break;
+          case 'W':
+            _usageFactorW = usageFactor;
+            break;
+          case 'B':
+            _usageFactorB = usageFactor;
+            break;
+          case 'N':
+            _usageFactorN = usageFactor;
+            break;
+          case 'G':
+            _usageFactorG = usageFactor;
+            break;
+          default:
+        }
+      }
+    } catch (e) {
+      _pullFailed++;
+      if (kDebugMode) {
+        print('Error: $e');
+      }
+    } finally {
+      setState(() {
+        _gettingUsageFactor = false;
+      });
+    }
+  }
 
   // bool _showChart = false;
   void _getRates() {
@@ -231,35 +304,35 @@ class _WgtTenantUsageSummaryState extends State<WgtTenantUsageSummary> {
             widget.scopeProfile.selectedProjectScope,
             scopeProfiles,
             MeterType.electricity1p);
-        _netUsageE = _netUsageE! - _subUsageE * _usageFactorE;
+        _netUsageE = _netUsageE! - _subUsageE * _usageFactorE!;
       }
       if (_netUsageW != null) {
         _usageFactorW = getProjectMeterUsageFactor(
             widget.scopeProfile.selectedProjectScope,
             scopeProfiles,
             MeterType.water);
-        _netUsageW = _netUsageW! - _subUsageW * _usageFactorW;
+        _netUsageW = _netUsageW! - _subUsageW * _usageFactorW!;
       }
       if (_netUsageB != null) {
         _usageFactorB = getProjectMeterUsageFactor(
             widget.scopeProfile.selectedProjectScope,
             scopeProfiles,
             MeterType.btu);
-        _netUsageB = _netUsageB! - _subUsageB * _usageFactorB;
+        _netUsageB = _netUsageB! - _subUsageB * _usageFactorB!;
       }
       if (_netUsageN != null) {
         _usageFactorN = getProjectMeterUsageFactor(
             widget.scopeProfile.selectedProjectScope,
             scopeProfiles,
             MeterType.newater);
-        _netUsageN = _netUsageN! - _subUsageN * _usageFactorN;
+        _netUsageN = _netUsageN! - _subUsageN * _usageFactorN!;
       }
       if (_netUsageG != null) {
         _usageFactorG = getProjectMeterUsageFactor(
             widget.scopeProfile.selectedProjectScope,
             scopeProfiles,
             MeterType.gas);
-        _netUsageG = _netUsageG! - _subUsageG * _usageFactorG;
+        _netUsageG = _netUsageG! - _subUsageG * _usageFactorG!;
       }
     }
 
@@ -399,6 +472,34 @@ class _WgtTenantUsageSummaryState extends State<WgtTenantUsageSummary> {
 
   @override
   Widget build(BuildContext context) {
+    if (_pullFailed > 3) {
+      return getErrorTextPrompt(
+          context: context, errorText: 'Failed to get usage factor');
+    }
+
+    return (_usageFactorE == null ||
+                _usageFactorW == null ||
+                _usageFactorB == null ||
+                _usageFactorN == null ||
+                _usageFactorG == null) &&
+            !_gettingUsageFactor
+        ? FutureBuilder(
+            future: _getUsageFactor(),
+            builder: (context, snapshot) {
+              if (_gettingUsageFactor) {
+                return Center(
+                  child: xtWait(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                );
+              }
+              return completedWidget();
+            },
+          )
+        : completedWidget();
+  }
+
+  Widget completedWidget() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 13),
       child: Container(

@@ -162,11 +162,18 @@ class _WgtItemFinder2State extends State<WgtItemFinder2> {
       for (var entry in additionalTypeQueryMap.entries) {
         _additionalTypeQueryMap[entry.key] = entry.value ?? '';
       }
-    } else {
-      for (var entry in (widget.additionalTypeQueryMap).entries) {
-        _additionalTypeQueryMap[entry.key] = entry.value ?? '';
-      }
-      for (var entry in (widget.additionalTypeQueryMap2).entries) {
+    }
+    // else {
+    //   for (var entry in (widget.additionalTypeQueryMap).entries) {
+    //     _additionalTypeQueryMap[entry.key] = entry.value ?? '';
+    //   }
+    //   for (var entry in (widget.additionalTypeQueryMap2).entries) {
+    //     _additionalTypeQueryMap2[entry.key] = entry.value ?? '';
+    //   }
+    // }
+    if (additionalTypeQueryMap2 != null) {
+      _additionalTypeQueryMap2.clear();
+      for (var entry in additionalTypeQueryMap2.entries) {
         _additionalTypeQueryMap2[entry.key] = entry.value ?? '';
       }
     }

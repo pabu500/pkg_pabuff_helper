@@ -289,7 +289,7 @@ Widget getTypeUsageNet(
     {int usageDecimals = 3,
     int rateDecimals = 4,
     int costDecimals = 2,
-    double width = 720}) {
+    double width = 750}) {
   if (netUsageE == null &&
       netUsageW == null &&
       netUsageB == null &&

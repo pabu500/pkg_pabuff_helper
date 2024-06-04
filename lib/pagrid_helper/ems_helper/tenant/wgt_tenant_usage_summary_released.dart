@@ -30,11 +30,13 @@ class WgtTenantUsageSummaryReleased extends StatefulWidget {
     this.lineItems = const [],
     this.billedAutoUsages = const {},
     this.billedSubTenantUsages = const {},
+    required this.billedUsageFactor,
     this.usageDecimals = 3,
     this.rateDecimals = 4,
     this.costDecimals = 3,
   });
 
+  final Map<String, dynamic> billedUsageFactor;
   final ScopeProfile scopeProfile;
   final Evs2User loggedInUser;
   final ProjectScope activePortalProjectScope;
@@ -93,11 +95,18 @@ class _WgtTenantUsageSummaryReleasedState
   late final double? _subTenantUsageN;
   late final double? _subTenantUsageG;
 
+  late final double _billedUsageFactorE;
+  late final double _billedUsageFactorW;
+  late final double _billedUsageFactorB;
+  late final double _billedUsageFactorN;
+  late final double _billedUsageFactorG;
+
   late final double _rateE;
   late final double _rateW;
   late final double _rateB;
   late final double _rateN;
   late final double _rateG;
+
   late final double _gst;
 
   double? _costE;
