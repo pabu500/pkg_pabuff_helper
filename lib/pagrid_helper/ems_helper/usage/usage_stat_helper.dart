@@ -603,6 +603,116 @@ Widget getTotal(
   );
 }
 
+Widget getTotal2(BuildContext context, double gst, double? subTotalAmt,
+    double gstAmt, double totalAmt, String tenantType,
+    {double width = 750.0}) {
+  bool applyGst = tenantType != 'cw_nus_internal';
+
+  return Container(
+    width: width,
+    // height: 80,
+    padding: const EdgeInsets.symmetric(horizontal: 21),
+    // constraints: const BoxConstraints(maxHeight: 130),
+    decoration: BoxDecoration(
+      border:
+          Border.all(color: Theme.of(context).colorScheme.primary, width: 1),
+      borderRadius: BorderRadius.circular(5.0),
+    ),
+    child: Column(
+      children: [
+        if (applyGst)
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 210,
+                  child: Text(
+                    'Sub Total',
+                    style: defStatStyle,
+                  ),
+                ),
+                horizontalSpaceSmall,
+                getStatWithUnit(
+                  getCommaNumberStr(subTotalAmt, decimal: 2),
+                  'SGD',
+                  statStrStyle: defStatStyle.copyWith(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.7),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        if (applyGst)
+          Padding(
+            padding: const EdgeInsets.only(top: 5),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 210,
+                  child: Text(
+                    'GST ($gst%)',
+                    style: defStatStyle,
+                  ),
+                ),
+                horizontalSpaceSmall,
+                getStatWithUnit(
+                  // getCommaNumberStr(subTotal * (gst / 100), decimal: 2),
+                  getCommaNumberStr(gstAmt, decimal: 2),
+                  'SGD',
+                  statStrStyle: defStatStyle.copyWith(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.7),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        Padding(
+          padding: const EdgeInsets.only(top: 5),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 210,
+                child: Text(
+                  'Total',
+                  style: defStatStyleLarge.copyWith(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.7),
+                  ),
+                ),
+              ),
+              horizontalSpaceSmall,
+              getStatWithUnit(
+                // getCommaNumberStr(total, decimal: 2),
+                getCommaNumberStr(totalAmt, decimal: 2, isRoundUp: false),
+                'SGD',
+                statStrStyle: defStatStyleLarge.copyWith(
+                  color:
+                      Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
 Widget getAutoUsageExcludedInfo(BuildContext context, {double width = 720}) {
   return Container(
     width: width,

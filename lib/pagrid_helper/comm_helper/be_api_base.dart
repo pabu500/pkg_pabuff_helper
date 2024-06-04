@@ -366,4 +366,5 @@ class UrlBase {
   static const String eptCheckTpInfo = '/billing/check_tp_rate_info';
   static const String eptGetReleaseCandidate = '/billing/get_rc';
   static const String eptReleaseBills = '/billing/release_bills';
+  static const String eptGetUsageFactor = '/billing/get_usage_factor';
 }

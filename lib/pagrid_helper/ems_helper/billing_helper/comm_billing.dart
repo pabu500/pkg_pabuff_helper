@@ -5,6 +5,48 @@ import 'dart:convert';
 
 import '../../comm_helper/be_api_base.dart';
 
+Future<dynamic> getUsageFactor(
+  ProjectScope activePortalProjectScope,
+  Map<String, String> queryMap,
+  SvcClaim svcClaim,
+) async {
+  svcClaim.svcName = SvcType.oresvc.name;
+  svcClaim.endpoint = UrlBase.eptGetUsageFactor;
+
+  String svcToken = '';
+  // try {
+  //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
+  // } catch (err) {
+  //   throw Exception(err);
+  // }
+
+  final response = await http.post(
+    Uri.parse(UrlController(activePortalProjectScope)
+        .getUrl(SvcType.oresvc, svcClaim.endpoint!)),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer $svcToken',
+    },
+    body: jsonEncode(SvcQuery(svcClaim, queryMap).toJson()),
+  );
+
+  if (response.statusCode == 200) {
+    final responseBody = jsonDecode(response.body);
+
+    if (responseBody['info'] != null) {
+      throw Exception(responseBody['info']);
+    }
+    if (responseBody['error'] != null) {
+      throw Exception(responseBody['error']);
+    }
+    return {'usage_factor_list': responseBody['usage_factor_list']};
+  } else if (response.statusCode == 403) {
+    throw Exception("You are not authorized to perform this operation");
+  } else {
+    throw Exception(jsonDecode(response.body)['error']);
+  }
+}
+
 Future<dynamic> getBill(
   ProjectScope activePortalProjectScope,
   Map<String, String> queryMap,
