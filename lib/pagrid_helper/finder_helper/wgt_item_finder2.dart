@@ -494,6 +494,7 @@ class _WgtItemFinder2State extends State<WgtItemFinder2> {
           width: width,
           // height: height,
           child: WgtFinderFieldInput(
+            activePortalProjectScope: widget.activePortalProjectScope,
             width: 220,
             labelText: widget.itemLabelText,
             hintText: widget.itemLabelText,
@@ -533,6 +534,7 @@ class _WgtItemFinder2State extends State<WgtItemFinder2> {
           width: width,
           // height: height,
           child: WgtFinderFieldInput(
+            activePortalProjectScope: widget.activePortalProjectScope,
             width: 220,
             labelText: widget.itemNameText,
             hintText: widget.itemNameText,
@@ -597,6 +599,7 @@ class _WgtItemFinder2State extends State<WgtItemFinder2> {
           width: width,
           // height: height,
           child: xtTextField2(
+              activePortalProjectScope: widget.activePortalProjectScope,
               labelText: labelText,
               hintText: hintText,
               initialValue: initialValue,

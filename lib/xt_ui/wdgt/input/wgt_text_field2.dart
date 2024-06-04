@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 class xtTextField2 extends StatefulWidget {
   const xtTextField2({
     super.key,
+    required this.activePortalProjectScope,
     required this.onChanged,
     this.controller,
     this.initialValue,
@@ -31,6 +32,7 @@ class xtTextField2 extends StatefulWidget {
     this.enabled = true,
   });
 
+  final ProjectScope activePortalProjectScope;
   final Function onChanged;
   final TextEditingController? controller;
   final String? initialValue;
@@ -39,7 +41,7 @@ class xtTextField2 extends StatefulWidget {
   final Function? onEditingComplete;
   final Function? onTap;
   final Function? validator;
-  final Function? checkUnique;
+  final Function(ProjectScope, String, String, String)? checkUnique;
   final String? uniqueKey;
   final String? tableName;
   final int maxLines;
@@ -79,7 +81,8 @@ class _xtTextField2State extends State<xtTextField2> {
     _controller.text = widget.initialValue ?? '';
   }
 
-  Future<void> checkUnique(String field, String val, String table) async {
+  Future<void> checkUnique(ProjectScope activePortalPrjectScope, String field,
+      String val, String table) async {
     if (val.trim().isEmpty) {
       return;
     }
@@ -92,7 +95,7 @@ class _xtTextField2State extends State<xtTextField2> {
     }
     try {
       Map<String, dynamic> result =
-          await widget.checkUnique!(field, val, table);
+          await widget.checkUnique!(activePortalPrjectScope, field, val, table);
       if (result['exists'] != null) {
         bool exists = result['exists'] == true;
         setState(() {
@@ -141,8 +144,8 @@ class _xtTextField2State extends State<xtTextField2> {
           if (_controller.text.trim().isNotEmpty) {
             if (widget.checkUnique != null) {
               if (!_uniqueChecked && _isValidated) {
-                checkUnique(
-                    widget.uniqueKey!, _controller.text, widget.tableName!);
+                checkUnique(widget.activePortalProjectScope, widget.uniqueKey!,
+                    _controller.text, widget.tableName!);
               }
             }
           }
@@ -200,7 +203,8 @@ class _xtTextField2State extends State<xtTextField2> {
           widget.onEditingComplete?.call();
 
           if (widget.checkUnique != null) {
-            checkUnique(widget.uniqueKey!, _controller.text, widget.tableName!);
+            checkUnique(widget.activePortalProjectScope, widget.uniqueKey!,
+                _controller.text, widget.tableName!);
           }
         },
         maxLines: widget.maxLines,
