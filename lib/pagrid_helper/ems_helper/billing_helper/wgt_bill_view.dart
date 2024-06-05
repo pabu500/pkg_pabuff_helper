@@ -1,8 +1,6 @@
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import '../tenant/usage_calc.dart';
-import '../tenant/wgt_tenant_usage_summary2.dart';
 import 'bill_calc.dart';
 
 class WgtBillView extends StatefulWidget {

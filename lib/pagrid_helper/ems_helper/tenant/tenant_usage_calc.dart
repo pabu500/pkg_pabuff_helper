@@ -5,7 +5,7 @@ import 'mdl_ems_type_usage.dart';
 
 class EmsTypeUsageCalc {
   //input
-  late final double _gst;
+  late final double? _gst;
   late final Map<String, dynamic> _typeRates;
   late final Map<String, dynamic> _usageFactor;
 
@@ -49,13 +49,13 @@ class EmsTypeUsageCalc {
   List<Map<String, dynamic>> get trendingN => _trendingN;
   List<Map<String, dynamic>> get trendingG => _trendingG;
 
-  double get gst => _gst;
+  double? get gst => _gst;
   double? get subTotalCost => _subTotalCost;
   double? get gstAmount => _gstAmount;
   double? get totalCost => _totalCost;
 
   EmsTypeUsageCalc({
-    required double gst,
+    double? gst,
     Map<String, dynamic> typeRates = const {},
     Map<String, dynamic> usageFactor = const {},
     List<Map<String, dynamic>> autoUsageSummary = const [],

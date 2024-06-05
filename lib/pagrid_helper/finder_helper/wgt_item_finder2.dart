@@ -206,8 +206,8 @@ class _WgtItemFinder2State extends State<WgtItemFinder2> {
         widget.activePortalProjectScope,
         queryMap,
         SvcClaim(
-          username: widget.loggedInUser!.username,
-          scope: widget.loggedInUser!.isAdminAndUp()
+          username: widget.loggedInUser.username,
+          scope: widget.loggedInUser.isAdminAndUp()
               ? AclScope.global.name
               : widget.scopeProfile.getEffectiveScopeStr(),
           target: getAclTargetStr(aclTarget),

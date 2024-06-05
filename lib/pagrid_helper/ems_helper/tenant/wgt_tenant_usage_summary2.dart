@@ -1,4 +1,3 @@
-import 'package:buff_helper/pagrid_helper/ems_helper/tenant/usage_calc.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 
@@ -21,7 +20,7 @@ class WgtTenantUsageSummary2 extends StatefulWidget {
     required this.tenantName,
     required this.tenantType,
     required this.excludeAutoUsage,
-    required this.usageCalc,
+    this.usageCalc,
     // required this.usageFactor,
     this.typeRates,
     this.renderMode = 'wgt', // wgt, pdf
@@ -45,7 +44,7 @@ class WgtTenantUsageSummary2 extends StatefulWidget {
   final ProjectScope activePortalProjectScope;
   final ScopeProfile scopeProfile;
   final Evs2User loggedInUser;
-  final EmsTypeUsageCalc usageCalc;
+  final EmsTypeUsageCalc? usageCalc;
   final ItemType itemType;
   final bool isMonthly;
   final DateTime fromDatetime;
@@ -153,6 +152,11 @@ class _WgtTenantUsageSummary2State extends State<WgtTenantUsageSummary2> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.usageCalc == null) {
+      return getErrorTextPrompt(
+          context: context, errorText: 'Usage data not available');
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 13),
       child: Container(
@@ -184,16 +188,16 @@ class _WgtTenantUsageSummary2State extends State<WgtTenantUsageSummary2> {
                 getUsageTypeStat(
                   context,
                   widget.isBillMode,
-                  widget.usageCalc.typeUsageE!.usage,
-                  widget.usageCalc.typeUsageE!.cost,
-                  widget.usageCalc.typeUsageW!.usage,
-                  widget.usageCalc.typeUsageW!.cost,
-                  widget.usageCalc.typeUsageB!.usage,
-                  widget.usageCalc.typeUsageB!.cost,
-                  widget.usageCalc.typeUsageN!.usage,
-                  widget.usageCalc.typeUsageN!.cost,
-                  widget.usageCalc.typeUsageG!.usage,
-                  widget.usageCalc.typeUsageG!.cost,
+                  widget.usageCalc!.typeUsageE!.usage,
+                  widget.usageCalc!.typeUsageE!.cost,
+                  widget.usageCalc!.typeUsageW!.usage,
+                  widget.usageCalc!.typeUsageW!.cost,
+                  widget.usageCalc!.typeUsageB!.usage,
+                  widget.usageCalc!.typeUsageB!.cost,
+                  widget.usageCalc!.typeUsageN!.usage,
+                  widget.usageCalc!.typeUsageN!.cost,
+                  widget.usageCalc!.typeUsageG!.usage,
+                  widget.usageCalc!.typeUsageG!.cost,
                 ),
               ],
             ),
@@ -211,10 +215,10 @@ class _WgtTenantUsageSummary2State extends State<WgtTenantUsageSummary2> {
             if (widget.isBillMode)
               getTotal2(
                 context,
-                widget.usageCalc.gst,
-                widget.usageCalc.subTotalCost,
-                widget.usageCalc.gstAmount,
-                widget.usageCalc.totalCost,
+                widget.usageCalc!.gst!,
+                widget.usageCalc!.subTotalCost,
+                widget.usageCalc!.gstAmount,
+                widget.usageCalc!.totalCost,
                 widget.tenantType,
               ),
           ],
@@ -529,7 +533,7 @@ class _WgtTenantUsageSummary2State extends State<WgtTenantUsageSummary2> {
 
   Widget getSubTenantUsageList() {
     List<Widget> subTenantUsageList = [];
-    for (var subTenantUsage in widget.usageCalc.subTenantUsage) {
+    for (var subTenantUsage in widget.usageCalc!.subTenantUsage) {
       String tenantName = subTenantUsage['tenant_name'] ?? '';
       String tenantLabel = subTenantUsage['tenant_label'] ?? '';
       List<EmsTypeUsage> typeUsageList = subTenantUsage['type_usage_list'];
