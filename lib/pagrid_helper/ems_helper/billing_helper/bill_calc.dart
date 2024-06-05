@@ -356,20 +356,25 @@ class BillCalc {
   }
 
   void _getRates(Map<String, dynamic> typeRates) {
-    String rateEStr = typeRates['E'] ?? 'x';
-    _rateE = double.tryParse(rateEStr);
+    // String rateEStr = typeRates['E'] ?? 'x';
+    // _rateE = double.tryParse(rateEStr);
+    _rateE = typeRates['E'];
 
-    String rateWStr = typeRates['W'] ?? 'x';
-    _rateW = double.tryParse(rateWStr);
+    // String rateWStr = typeRates['W'] ?? 'x';
+    // _rateW = double.tryParse(rateWStr);
+    _rateW = typeRates['W'];
 
-    String rateBStr = typeRates['B'] ?? 'x';
-    _rateB = double.tryParse(rateBStr);
+    // String rateBStr = typeRates['B'] ?? 'x';
+    // _rateB = double.tryParse(rateBStr);
+    _rateB = typeRates['B'];
 
-    String rateNStr = typeRates['N'] ?? 'x';
-    _rateN = double.tryParse(rateNStr);
+    // String rateNStr = typeRates['N'] ?? 'x';
+    // _rateN = double.tryParse(rateNStr);
+    _rateN = typeRates['N'];
 
-    String rateGStr = typeRates['G'] ?? 'x';
-    _rateG = double.tryParse(rateGStr);
+    // String rateGStr = typeRates['G'] ?? 'x';
+    // _rateG = double.tryParse(rateGStr);
+    _rateG = typeRates['G'];
   }
 
   double? _calcMeterGroupUsageTotal(

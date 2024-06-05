@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../usage/usage_stat_helper.dart';
+import 'mdl_ems_type_usage.dart';
 
 class WgtTenantUsageSummary2 extends StatefulWidget {
   const WgtTenantUsageSummary2({
@@ -20,27 +21,31 @@ class WgtTenantUsageSummary2 extends StatefulWidget {
     required this.tenantName,
     required this.tenantType,
     required this.excludeAutoUsage,
+    required this.usageCalc,
+    // required this.usageFactor,
+    this.typeRates,
     this.renderMode = 'wgt', // wgt, pdf
     this.showRenderModeSwitch = false,
     this.tenantLabel,
     this.tenantAccountId = '',
+    // for rendering, not calculation
     this.tenantUsageSummary = const [],
     this.subTenantListUsageSummary = const [],
+    this.manualUsages = const [],
     this.isBillMode = false,
-    this.meterTypeRates = const {},
-    this.gst,
-    this.manualUsages = const {},
+    // this.meterTypeRates = const {},
+    // this.gst,
     this.lineItems = const [],
     // this.billedAutoUsages = const {},
     this.usageDecimals = 3,
     this.rateDecimals = 4,
     this.costDecimals = 3,
-    this.usageFactor,
   });
 
+  final ProjectScope activePortalProjectScope;
   final ScopeProfile scopeProfile;
   final Evs2User loggedInUser;
-  final ProjectScope activePortalProjectScope;
+  final EmsTypeUsageCalc usageCalc;
   final ItemType itemType;
   final bool isMonthly;
   final DateTime fromDatetime;
@@ -53,9 +58,9 @@ class WgtTenantUsageSummary2 extends StatefulWidget {
   final List<Map<String, dynamic>> tenantUsageSummary;
   final List<Map<String, dynamic>> subTenantListUsageSummary;
   final bool isBillMode;
-  final Map<String, dynamic> meterTypeRates;
-  final double? gst;
-  final Map<String, dynamic> manualUsages;
+  // final Map<String, dynamic> meterTypeRates;
+  // final double? gst;
+  final List<Map<String, dynamic>> manualUsages;
   final List<Map<String, dynamic>> lineItems;
   final String renderMode;
   final bool showRenderModeSwitch;
@@ -63,7 +68,8 @@ class WgtTenantUsageSummary2 extends StatefulWidget {
   final int usageDecimals;
   final int rateDecimals;
   final int costDecimals;
-  final Map<String, dynamic>? usageFactor;
+  // final Map<String, dynamic> usageFactor;
+  final Map<String, dynamic>? typeRates;
 
   @override
   State<WgtTenantUsageSummary2> createState() => _WgtTenantUsageSummary2State();
@@ -74,144 +80,54 @@ class _WgtTenantUsageSummary2State extends State<WgtTenantUsageSummary2> {
 
   final List<String> _meterTypes = ['E', 'W', 'B', 'N', 'G'];
 
-  final Map<String, dynamic> _usageFactor = {};
-  final Map<String, dynamic> _typeRates = {};
+  // final Map<String, dynamic> _typeRates = {};
 
   final List<Map<String, dynamic>> _manualUsageList = [];
   final List<Map<String, dynamic>> _lineItemList = [];
 
-  late final EmsTypeUsageCalc _emsTypeUsageCalc;
-
-  // double? _netUsageE;
-  // double? _netUsageW;
-  // double? _netUsageB;
-  // double? _netUsageN;
-  // double? _netUsageG;
-
-  // late final double _subUsageE;
-  // late final double _subUsageW;
-  // late final double _subUsageB;
-  // late final double _subUsageN;
-  // late final double _subUsageG;
-
-  // late final double _rateE;
-  // late final double _rateW;
-  // late final double _rateB;
-  // late final double _rateN;
-  // late final double _rateG;
-  // late final double _gst;
-
-  // double? _costE;
-  // double? _costW;
-  // double? _costB;
-  // double? _costN;
-  // double? _costG;
-
-  // double? _costLineItems;
-
-  // late final double _costTotal;
-
-  // final List<Map<String, dynamic>> _groupsE = [];
-  // final List<Map<String, dynamic>> _groupsW = [];
-  // final List<Map<String, dynamic>> _groupsB = [];
-  // final List<Map<String, dynamic>> _groupsN = [];
-  // final List<Map<String, dynamic>> _groupsG = [];
-
-  // double? _usageFactorE;
-  // double? _usageFactorW;
-  // double? _usageFactorB;
-  // double? _usageFactorN;
-  // double? _usageFactorG;
+  // late final EmsTypeUsageCalc _emsTypeUsageCalc;
 
   String _renderMode = 'wgt'; // wgt, pdf
 
-  bool _gettingUsageFactor = false;
-  int _pullFailed = 0;
+  // void _sortManualUsage() {
+  //   _manualUsageList.clear();
+  //   for (var key in widget.manualUsages.keys) {
+  //     String usageStr = widget.manualUsages[key] ?? '';
+  //     double? usageVal = double.tryParse(usageStr);
+  //     if (usageVal != null) {
+  //       _manualUsageList.add({
+  //         'meter_type': key.split('_').last,
+  //         'usage': usageVal,
+  //       });
+  //     }
+  //   }
+  // }
 
-  Future<dynamic> _getUsageFactor() async {
-    if (widget.usageFactor != null) {
-      for (var type in _meterTypes) {
-        _usageFactor[type] = widget.usageFactor!['usage_factor_$type'];
-      }
-      return;
-    }
+  // void _sortRates() {
+  //   for (var type in _meterTypes) {
+  //     if (widget.meterTypeRates[type] == null) {
+  //       continue;
+  //     }
+  //     String rateStr = widget.meterTypeRates[type]['result']['rate'] ?? '0';
+  //     double? rateVal = double.tryParse(rateStr);
+  //     if (rateVal != null) {
+  //       _typeRates[type] = rateVal;
+  //     }
+  //   }
+  // }
 
-    setState(() {
-      _gettingUsageFactor = true;
-    });
-    try {
-      final usageFactorListReuslt = await getUsageFactor(
-        widget.activePortalProjectScope,
-        {
-          'scope_str': widget.scopeProfile.getEffectiveScopeStr().toLowerCase(),
-          'from_timestamp': widget.fromDatetime.toIso8601String(),
-          'to_timestamp': widget.toDatetime.toIso8601String(),
-        },
-        SvcClaim(
-          scope: AclScope.global.name,
-          target: getAclTargetStr(AclTarget.bill_p_info),
-          operation: AclOperation.read.name,
-        ),
-      );
+  // void _sortLineItems() {
+  //   _lineItemList.clear();
 
-      for (var usageFactor in usageFactorListReuslt['usage_factor_list']) {
-        String type = usageFactor['meter_type'] ?? '';
-        double? factor = double.tryParse(usageFactor['usage_factor'] ?? '');
-        if (factor != null) {
-          usageFactor[type] = factor;
-        }
-      }
-    } catch (e) {
-      _pullFailed++;
-      if (kDebugMode) {
-        print('Error: $e');
-      }
-    } finally {
-      setState(() {
-        _gettingUsageFactor = false;
-      });
-    }
-  }
-
-  void _sortManualUsage() {
-    _manualUsageList.clear();
-    for (var key in widget.manualUsages.keys) {
-      String usageStr = widget.manualUsages[key] ?? '';
-      double? usageVal = double.tryParse(usageStr);
-      if (usageVal != null) {
-        _manualUsageList.add({
-          'meter_type': key.split('_').last,
-          'usage': usageVal,
-        });
-      }
-    }
-  }
-
-  void _sortRates() {
-    for (var type in _meterTypes) {
-      if (widget.meterTypeRates[type] == null) {
-        continue;
-      }
-      String rateStr = widget.meterTypeRates[type]['result']['rate'] ?? '0';
-      double? rateVal = double.tryParse(rateStr);
-      if (rateVal != null) {
-        _typeRates[type] = rateVal;
-      }
-    }
-  }
-
-  void _sortLineItems() {
-    _lineItemList.clear();
-
-    for (var lineItem in widget.lineItems) {
-      String valueStr = lineItem['amount'] ?? '';
-      double? valueVal = double.tryParse(valueStr);
-      if (valueVal != null) {
-        lineItem['amount'] = valueVal;
-      }
-      _lineItemList.add(lineItem);
-    }
-  }
+  //   for (var lineItem in widget.lineItems) {
+  //     String valueStr = lineItem['amount'] ?? '';
+  //     double? valueVal = double.tryParse(valueStr);
+  //     if (valueVal != null) {
+  //       lineItem['amount'] = valueVal;
+  //     }
+  //     _lineItemList.add(lineItem);
+  //   }
+  // }
 
   @override
   void initState() {
@@ -220,46 +136,23 @@ class _WgtTenantUsageSummary2State extends State<WgtTenantUsageSummary2> {
     // _calcUsage();
     // _calcLineItems();
 
-    _sortRates();
-    _sortManualUsage();
+    // _sortRates();
+    // _sortManualUsage();
 
-    _emsTypeUsageCalc = EmsTypeUsageCalc(
-      gst: widget.gst!,
-      typeRates: _typeRates,
-      usageFactor: _usageFactor,
-      autoUsageSummary: widget.tenantUsageSummary,
-      subTenantUsageSummary: widget.subTenantListUsageSummary,
-      manualUsageList: _manualUsageList,
-      lineItemList: widget.lineItems,
-    );
-    _emsTypeUsageCalc.doCalc();
+    // _emsTypeUsageCalc = EmsTypeUsageCalc(
+    //   gst: widget.gst!,
+    //   typeRates: widget.typeRates ?? {},
+    //   usageFactor: widget.usageFactor,
+    //   autoUsageSummary: widget.tenantUsageSummary,
+    //   subTenantUsageSummary: widget.subTenantListUsageSummary,
+    //   manualUsageList: _manualUsageList,
+    //   lineItemList: widget.lineItems,
+    // );
+    // _emsTypeUsageCalc.doCalc();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_pullFailed > 3) {
-      return getErrorTextPrompt(
-          context: context, errorText: 'Failed to get usage factor');
-    }
-
-    return _usageFactor.isEmpty && !_gettingUsageFactor
-        ? FutureBuilder(
-            future: _getUsageFactor(),
-            builder: (context, snapshot) {
-              if (_gettingUsageFactor) {
-                return Center(
-                  child: xtWait(
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                );
-              }
-              return completedWidget();
-            },
-          )
-        : completedWidget();
-  }
-
-  Widget completedWidget() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 13),
       child: Container(
@@ -291,16 +184,16 @@ class _WgtTenantUsageSummary2State extends State<WgtTenantUsageSummary2> {
                 getUsageTypeStat(
                   context,
                   widget.isBillMode,
-                  _emsTypeUsageCalc.typeUsageE.usage,
-                  _emsTypeUsageCalc.typeUsageE.cost,
-                  _emsTypeUsageCalc.typeUsageW.usage,
-                  _emsTypeUsageCalc.typeUsageW.cost,
-                  _emsTypeUsageCalc.typeUsageB.usage,
-                  _emsTypeUsageCalc.typeUsageB.cost,
-                  _emsTypeUsageCalc.typeUsageN.usage,
-                  _emsTypeUsageCalc.typeUsageN.cost,
-                  _emsTypeUsageCalc.typeUsageG.usage,
-                  _emsTypeUsageCalc.typeUsageG.cost,
+                  widget.usageCalc.typeUsageE!.usage,
+                  widget.usageCalc.typeUsageE!.cost,
+                  widget.usageCalc.typeUsageW!.usage,
+                  widget.usageCalc.typeUsageW!.cost,
+                  widget.usageCalc.typeUsageB!.usage,
+                  widget.usageCalc.typeUsageB!.cost,
+                  widget.usageCalc.typeUsageN!.usage,
+                  widget.usageCalc.typeUsageN!.cost,
+                  widget.usageCalc.typeUsageG!.usage,
+                  widget.usageCalc.typeUsageG!.cost,
                 ),
               ],
             ),
@@ -318,10 +211,10 @@ class _WgtTenantUsageSummary2State extends State<WgtTenantUsageSummary2> {
             if (widget.isBillMode)
               getTotal2(
                 context,
-                _emsTypeUsageCalc.gst,
-                _emsTypeUsageCalc.subTotalCost,
-                _emsTypeUsageCalc.gstAmount!,
-                _emsTypeUsageCalc.totalCost!,
+                widget.usageCalc.gst,
+                widget.usageCalc.subTotalCost,
+                widget.usageCalc.gstAmount,
+                widget.usageCalc.totalCost,
                 widget.tenantType,
               ),
           ],
@@ -466,7 +359,7 @@ class _WgtTenantUsageSummary2State extends State<WgtTenantUsageSummary2> {
         calcUsageFromReadings: calcUsageFromReadings,
         activePortalProjectScope: widget.activePortalProjectScope,
         isBillMode: widget.isBillMode,
-        rate: _typeRates[meterTypeTag] ?? 0,
+        rate: widget.typeRates?[meterTypeTag] ?? 0,
         statColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
         showTrending: false,
         statVirticalStack: false,
@@ -489,10 +382,11 @@ class _WgtTenantUsageSummary2State extends State<WgtTenantUsageSummary2> {
       return Container();
     }
     List<Widget> manualUsageList = [];
-    for (var key in widget.manualUsages.keys) {
-      String usageStr = widget.manualUsages[key] ?? '';
-      double? usageVal = double.tryParse(usageStr);
-      String meterTypeTag = key.split('_').last;
+    for (var item in widget.manualUsages) {
+      // String usageStr = item['usage'] ?? '';
+      // double? usageVal = double.tryParse(usageStr);
+      double? usageVal = item['usage'];
+      String meterTypeTag = item['meter_type'] ?? '';
       if (usageVal != null) {
         MeterType? meterType = getMeterType(meterTypeTag);
         if (meterType != null) {
@@ -504,9 +398,9 @@ class _WgtTenantUsageSummary2State extends State<WgtTenantUsageSummary2> {
                 scopeProfile: widget.scopeProfile,
                 activePortalProjectScope: widget.activePortalProjectScope,
                 isBillMode: widget.isBillMode,
-                rate: _typeRates[meterTypeTag] ?? 0,
+                rate: widget.typeRates?[meterTypeTag] ?? 0,
                 statColor:
-                    Theme.of(context).colorScheme.onBackground.withOpacity(0.7),
+                    Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                 showTrending: false,
                 statVirticalStack: false,
                 height: 110,
@@ -519,7 +413,7 @@ class _WgtTenantUsageSummary2State extends State<WgtTenantUsageSummary2> {
                 itemType: widget.itemType,
                 historyType: Evs2HistoryType.meter_list_usage_summary,
                 isStaticUsageStat: true,
-                meterStat: {'usage': usageStr},
+                meterStat: {'usage': usageVal.toString()},
               ),
             ),
           );
@@ -635,15 +529,16 @@ class _WgtTenantUsageSummary2State extends State<WgtTenantUsageSummary2> {
 
   Widget getSubTenantUsageList() {
     List<Widget> subTenantUsageList = [];
-    for (var subTenantUsage in widget.subTenantListUsageSummary) {
+    for (var subTenantUsage in widget.usageCalc.subTenantUsage) {
       String tenantName = subTenantUsage['tenant_name'] ?? '';
       String tenantLabel = subTenantUsage['tenant_label'] ?? '';
+      List<EmsTypeUsage> typeUsageList = subTenantUsage['type_usage_list'];
 
       subTenantUsageList.add(
         getSubTenantUsage(
           tenantName,
           tenantLabel,
-          subTenantUsage['type_usage'] ?? {},
+          typeUsageList,
         ),
       );
     }
@@ -653,26 +548,15 @@ class _WgtTenantUsageSummary2State extends State<WgtTenantUsageSummary2> {
   }
 
   // widget only, no calculation
-  Widget getSubTenantUsage(
-      String tenantName, String tenantLabel, Map<String, double> typeUsage) {
-    List<Widget> typeUsageList = [];
+  Widget getSubTenantUsage(String tenantName, String tenantLabel,
+      List<EmsTypeUsage> emsTypeUsageList) {
     Map<String, double> usage = {};
-    for (var usageTypeTag in typeUsage.keys) {
-      if (typeUsage[usageTypeTag] == null) {
-        if (kDebugMode) {
-          print('typeUsage[usageType] is null');
-        }
-      } else {
-        double usageVal = typeUsage[usageTypeTag] as double;
-        double usageFactor = getProjectMeterUsageFactor(
-            widget.scopeProfile.selectedProjectScope,
-            scopeProfiles,
-            getMeterType(usageTypeTag));
-        usage['usage_factored'] = usageVal;
-        usage['factor'] = usageFactor;
-      }
+    List<Widget> typeUsageList = [];
+    for (EmsTypeUsage typeUsage in emsTypeUsageList) {
+      usage['usage_factored'] = typeUsage.usageFactored!;
+      usage['factor'] = typeUsage.factor!;
       typeUsageList.add(
-        getTypeUsageStat(context, usageTypeTag, usage,
+        getTypeUsageStat(context, typeUsage.typeTag!, usage,
             usageDecimals: widget.usageDecimals,
             rateDecimals: widget.rateDecimals,
             costDecimals: widget.costDecimals,

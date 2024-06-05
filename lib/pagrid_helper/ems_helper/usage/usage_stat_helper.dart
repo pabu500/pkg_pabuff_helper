@@ -604,7 +604,7 @@ Widget getTotal(
 }
 
 Widget getTotal2(BuildContext context, double gst, double? subTotalAmt,
-    double gstAmt, double totalAmt, String tenantType,
+    double? gstAmt, double? totalAmt, String tenantType,
     {double width = 750.0}) {
   bool applyGst = tenantType != 'cw_nus_internal';
 
@@ -697,8 +697,10 @@ Widget getTotal2(BuildContext context, double gst, double? subTotalAmt,
               ),
               horizontalSpaceSmall,
               getStatWithUnit(
-                // getCommaNumberStr(total, decimal: 2),
-                getCommaNumberStr(totalAmt, decimal: 2, isRoundUp: false),
+                applyGst
+                    ? getCommaNumberStr(totalAmt, decimal: 2, isRoundUp: false)
+                    : getCommaNumberStr(subTotalAmt,
+                        decimal: 2, isRoundUp: false),
                 'SGD',
                 statStrStyle: defStatStyleLarge.copyWith(
                   color:
@@ -713,7 +715,7 @@ Widget getTotal2(BuildContext context, double gst, double? subTotalAmt,
   );
 }
 
-Widget getAutoUsageExcludedInfo(BuildContext context, {double width = 720}) {
+Widget getAutoUsageExcludedInfo(BuildContext context, {double width = 750}) {
   return Container(
     width: width,
     padding: const EdgeInsets.symmetric(horizontal: 3),

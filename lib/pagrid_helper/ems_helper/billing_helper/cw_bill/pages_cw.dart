@@ -37,6 +37,8 @@ Future<Uint8List> generateInvoice(
     billFromStr: billInfo['billFrom'],
     billToStr: billInfo['billTo'],
     billDateStr: billInfo['billDate'],
+    subTotalAmount: billInfo['subTotalAmount'],
+    gstAmount: billInfo['gstAmt'],
     totalAmount: billInfo['totalAmount'],
     typeRateE: billInfo['typeRateE'],
     typeRateW: billInfo['typeRateW'],
@@ -81,6 +83,8 @@ class Bill {
     required this.billToStr,
     required this.billDateStr,
     required this.billTimeRangeStr,
+    required this.subTotalAmount,
+    required this.gstAmount,
     required this.totalAmount,
     required this.typeRateE,
     required this.typeRateW,
@@ -121,6 +125,8 @@ class Bill {
   final String billToStr;
   final String billDateStr;
   final String billTimeRangeStr;
+  final double? subTotalAmount;
+  final double? gstAmount;
   final double? totalAmount;
   final double? typeRateE;
   final double? typeRateW;
@@ -475,28 +481,28 @@ class Bill {
   pw.Widget _getContentFooter(pw.Context context) {
     double width = 130;
 
-    double? subTotalAmt = totalAmount;
-    if (subTotalAmt != null) {
-      // subTotalAmt = getRoundUp(subTotalAmt, 2);
-      // subTotalAmt = getRound(subTotalAmt, 2);
-    }
-    double? totalAmt = subTotalAmt;
+    // double? subTotalAmt = totalAmount;
+    // if (subTotalAmt != null) {
+    //   // subTotalAmt = getRoundUp(subTotalAmt, 2);
+    //   // subTotalAmt = getRound(subTotalAmt, 2);
+    // }
+    // double? totalAmt = subTotalAmt;
     bool applyGst = false;
-    double? gstAmt;
+    // double? gstAmt;
     if (TenantType.cw_nus_internal != getTenantType(customerType)) {
       applyGst = true;
-      if (subTotalAmt != null && gst != null) {
-        subTotalAmt = getRound(subTotalAmt, 2);
-        gstAmt = subTotalAmt * gst! / 100;
-        gstAmt = getRoundUp(gstAmt, 2);
-        // total = subTotal + subTotal * (gst / 100);
-        totalAmt = subTotalAmt + gstAmt;
-      }
+      //   if (subTotalAmt != null && gst != null) {
+      //     subTotalAmt = getRound(subTotalAmt, 2);
+      //     gstAmt = subTotalAmt * gst! / 100;
+      //     gstAmt = getRoundUp(gstAmt, 2);
+      //     // total = subTotal + subTotal * (gst / 100);
+      //     totalAmt = subTotalAmt + gstAmt;
+      // }
     } else {
       applyGst = false;
-      if (subTotalAmt != null) {
-        totalAmt = getRoundUp(subTotalAmt, 2);
-      }
+      //   if (subTotalAmt != null) {
+      //     totalAmt = getRoundUp(subTotalAmt, 2);
+      //   }
     }
     return applyGst
         ? pw.Container(
@@ -518,7 +524,7 @@ class Bill {
                           ),
                           pw.Expanded(child: pw.Container()),
                           pw.Text(
-                            _formatCurrency(subTotalAmt),
+                            _formatCurrency(subTotalAmount),
                             style: pw.TextStyle(
                               fontWeight: pw.FontWeight.bold,
                             ),
@@ -536,7 +542,7 @@ class Bill {
                           pw.Expanded(child: pw.Container()),
                           pw.Text(
                             // _formatCurrency(subTotalAmt * (gst / 100)),
-                            _formatCurrency(gstAmt),
+                            _formatCurrency(gstAmount),
                             style: pw.TextStyle(
                               fontWeight: pw.FontWeight.bold,
                             ),
@@ -553,7 +559,7 @@ class Bill {
                           ),
                           pw.Expanded(child: pw.Container()),
                           pw.Text(
-                            _formatCurrency(totalAmt),
+                            _formatCurrency(totalAmount),
                             style: pw.TextStyle(
                               fontWeight: pw.FontWeight.bold,
                             ),
@@ -583,7 +589,7 @@ class Bill {
                       ),
                       pw.Expanded(child: pw.Container()),
                       pw.Text(
-                        _formatCurrency(totalAmount, isRoundUp: true),
+                        _formatCurrency(subTotalAmount, isRoundUp: true),
                         style: pw.TextStyle(
                           fontWeight: pw.FontWeight.bold,
                         ),
@@ -647,14 +653,14 @@ class Bill {
           _getTypeRow(boltIcon, 'Electricity', 'kWh', typeRateE!, typeUsageE!,
               typeCostE!,
               trending: trendingE),
-        if (typeCostW != null)
-          _getTypeRow(
-              waterIcon, 'Water', 'CuM', typeRateW!, typeUsageW!, typeCostW!,
-              trending: trendingW),
         if (typeCostB != null)
           _getTypeRow(
               hvacIcon, 'BTU', 'kWh', typeRateB!, typeUsageB!, typeCostB!,
               trending: trendingB),
+        if (typeCostW != null)
+          _getTypeRow(
+              waterIcon, 'Water', 'CuM', typeRateW!, typeUsageW!, typeCostW!,
+              trending: trendingW),
         if (typeCostN != null)
           _getTypeRow(waterDropIcon, 'NewWater', 'CuM', typeRateN!, typeUsageN!,
               typeCostN!,

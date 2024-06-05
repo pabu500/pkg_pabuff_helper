@@ -1,7 +1,8 @@
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
+import '../tenant/usage_calc.dart';
+import '../tenant/wgt_tenant_usage_summary2.dart';
 import 'bill_calc.dart';
 
 class WgtBillView extends StatefulWidget {
@@ -31,8 +32,9 @@ class WgtBillView extends StatefulWidget {
 }
 
 class _WgtBillViewState extends State<WgtBillView> {
+  final List<String> usageTypeTags = ['E', 'W', 'B', 'N', 'G'];
+
   bool _gettingBill = false;
-  bool _gettingTrendings = false;
   int _pullFails = 0;
   bool _isSwitching = false;
   String _errorText = '';
@@ -42,75 +44,6 @@ class _WgtBillViewState extends State<WgtBillView> {
   late String _lcStatusDisplay; // released, generated
   bool _showGenTypeSwitch = false;
   bool _showRenderModeSwitch = false;
-
-  double? _usageFactorE;
-  double? _usageFactorW;
-  double? _usageFactorB;
-  double? _usageFactorN;
-  double? _usageFactorG;
-
-  bool _gettingUsageFactor = false;
-  int _pullFailed = 0;
-
-  Future<dynamic> _getUsageFactor(
-      DateTime fromDateTime, DateTime toDateTime) async {
-    // setState(() {
-    //   _gettingUsageFactor = true;
-    // });
-    try {
-      List<String> types = ['E', 'W', 'B', 'N', 'G'];
-
-      for (var type in types) {
-        final usageFactorStr = await getSysVar(
-            widget.activePortalProjectScope,
-            {
-              'name': 'usage_factor_$type'.toLowerCase(),
-              'scope_str':
-                  widget.scopeProfile.getEffectiveScopeStr().toLowerCase(),
-              'from_timestamp': fromDateTime.toIso8601String(),
-              'to_timestamp': toDateTime.toIso8601String(),
-            },
-            SvcClaim(
-              scope: AclScope.global.name,
-              target: getAclTargetStr(AclTarget.bill_p_info),
-              operation: AclOperation.read.name,
-            ));
-
-        double? usageFactor = double.tryParse(usageFactorStr);
-        if (usageFactor == null) {
-          throw Exception('Invalid usage factor');
-        }
-
-        switch (type) {
-          case 'E':
-            _usageFactorE = usageFactor;
-            break;
-          case 'W':
-            _usageFactorW = usageFactor;
-            break;
-          case 'B':
-            _usageFactorB = usageFactor;
-            break;
-          case 'N':
-            _usageFactorN = usageFactor;
-            break;
-          case 'G':
-            _usageFactorG = usageFactor;
-            break;
-          default:
-        }
-      }
-    } catch (e) {
-      _pullFailed++;
-      if (kDebugMode) {
-        print('Error: $e');
-      }
-    } finally {
-      // setState(() {
-      //   _gettingUsageFactor = false;
-      // });
-    }
-  }
 
   Future<dynamic> _getBill() async {
     setState(() {
@@ -136,14 +69,6 @@ class _WgtBillViewState extends State<WgtBillView> {
       );
       if (billResult['result'] != null) {
         _bill.addAll(billResult['result']);
-      }
-
-      if (_bill.isNotEmpty) {
-        DateTime fromDatetime =
-            getTargetDatetimeFromTargetStr(_bill['from_timestamp']);
-        DateTime toDatetime =
-            getTargetDatetimeFromTargetStr(_bill['to_timestamp']);
-        await _getUsageFactor(fromDatetime, toDatetime);
       }
     } catch (err) {
       _pullFails++;
@@ -189,10 +114,11 @@ class _WgtBillViewState extends State<WgtBillView> {
       }
       pullData = false;
       return SizedBox(
-          height: 60,
-          child: Center(
-              child:
-                  getErrorTextPrompt(context: context, errorText: _errorText)));
+        height: 60,
+        child: Center(
+          child: getErrorTextPrompt(context: context, errorText: _errorText),
+        ),
+      );
     }
 
     return SingleChildScrollView(
@@ -319,44 +245,7 @@ class _WgtBillViewState extends State<WgtBillView> {
     DateTime fromDatetime,
     DateTime toDatetime,
   ) {
-    List<Map<String, dynamic>> usageSummary = [];
-    if (_bill['tenant_usage_summary'] != null) {
-      for (var item in _bill['tenant_usage_summary']) {
-        usageSummary.add(item);
-      }
-    }
-    Map<String, dynamic> tariffRates = _bill['meter_type_rates'];
-    Map<String, dynamic> manualUsage = {};
-    if (_bill['manual_usage_e'] != null) {
-      manualUsage['manual_usage_e'] = _bill['manual_usage_e'];
-    }
-    if (_bill['manual_usage_w'] != null) {
-      manualUsage['manual_usage_w'] = _bill['manual_usage_w'];
-    }
-    if (_bill['manual_usage_b'] != null) {
-      manualUsage['manual_usage_b'] = _bill['manual_usage_b'];
-    }
-    if (_bill['manual_usage_n'] != null) {
-      manualUsage['manual_usage_n'] = _bill['manual_usage_n'];
-    }
-    if (_bill['manual_usage_g'] != null) {
-      manualUsage['manual_usage_g'] = _bill['manual_usage_g'];
-    }
-    Map<String, dynamic> lineItem = {};
-    if (_bill['line_item_label_1'] != null) {
-      lineItem['label'] = _bill['line_item_label_1'];
-    }
-    if (_bill['line_item_amount_1'] != null) {
-      lineItem['amount'] = _bill['line_item_amount_1'];
-    }
-
-    List<Map<String, dynamic>> subTenantListUsageSummary = [];
-    if (_bill['sub_tenant_list_usage_summary'] != null) {
-      for (var item in _bill['sub_tenant_list_usage_summary']) {
-        subTenantListUsageSummary.add(item);
-      }
-    }
-
+    // sort time
     bool isMonthly = _bill['is_monthly'] == 'true' ? true : false;
     String billTimeRangeStr = getTimeRangeStr(
       fromDatetime,
@@ -365,65 +254,150 @@ class _WgtBillViewState extends State<WgtBillView> {
       useMiddle: isMonthly ? true : false,
     );
 
-    String? typeRateE;
-    String? gst;
-    if (tariffRates['E'] != null) {
-      typeRateE = tariffRates['E']['result']['rate'];
-      gst = tariffRates['E']['result']['gst'];
-    }
-    String? typeRateW;
-    if (tariffRates['W'] != null) {
-      typeRateW = tariffRates['W']['result']['rate'];
-      gst = tariffRates['W']['result']['gst'];
-    }
-    String? typeRateB;
-    if (tariffRates['B'] != null) {
-      typeRateB = tariffRates['B']['result']['rate'];
-      gst = tariffRates['B']['result']['gst'];
-    }
-    String? typeRateN;
-    if (tariffRates['N'] != null) {
-      typeRateN = tariffRates['N']['result']['rate'];
-      gst = tariffRates['N']['result']['gst'];
-    }
-    String? typeRateG;
-    if (tariffRates['G'] != null) {
-      typeRateG = tariffRates['G']['result']['rate'];
-      gst = tariffRates['G']['result']['gst'];
+    //sort auto usage
+    List<Map<String, dynamic>> usageSummary = [];
+    if (_bill['tenant_usage_summary'] != null) {
+      for (var item in _bill['tenant_usage_summary']) {
+        usageSummary.add(item);
+      }
     }
 
-    // String? gst = _bill['gst'];
+    // Map<String, dynamic> manualUsage = {};
+    // if (_bill['manual_usage_e'] != null) {
+    //   manualUsage['manual_usage_e'] = _bill['manual_usage_e'];
+    // }
+    // if (_bill['manual_usage_w'] != null) {
+    //   manualUsage['manual_usage_w'] = _bill['manual_usage_w'];
+    // }
+    // if (_bill['manual_usage_b'] != null) {
+    //   manualUsage['manual_usage_b'] = _bill['manual_usage_b'];
+    // }
+    // if (_bill['manual_usage_n'] != null) {
+    //   manualUsage['manual_usage_n'] = _bill['manual_usage_n'];
+    // }
+    // if (_bill['manual_usage_g'] != null) {
+    //   manualUsage['manual_usage_g'] = _bill['manual_usage_g'];
+    // }
 
+    //sort manual usage
+    List<Map<String, dynamic>> manualUsage = [];
+    for (var typeTag in usageTypeTags) {
+      if (_bill['manual_usage_$typeTag'.toLowerCase()] != null) {
+        String usageStr = _bill['manual_usage_$typeTag'.toLowerCase()];
+        double? usage = double.tryParse(usageStr);
+        manualUsage.add({
+          'meter_type': typeTag,
+          'usage': usage,
+        });
+      }
+    }
+
+    //sort sub tenant usage
+    List<Map<String, dynamic>> subTenantListUsageSummary = [];
+    if (_bill['sub_tenant_list_usage_summary'] != null) {
+      for (var tenant in _bill['sub_tenant_list_usage_summary']) {
+        subTenantListUsageSummary.add(tenant);
+      }
+    }
+
+    //sort line items
+    List<Map<String, dynamic>> lineItems = [];
+    if (_bill['line_item_label_1'] != null) {
+      lineItems.add({
+        'label': _bill['line_item_label_1'],
+        'amount': _bill['line_item_amount_1'],
+      });
+    }
+    // Map<String, dynamic> lineItem = {};
+    // if (_bill['line_item_label_1'] != null) {
+    //   lineItem['label'] = _bill['line_item_label_1'];
+    // }
+    // if (_bill['line_item_amount_1'] != null) {
+    //   lineItem['amount'] = _bill['line_item_amount_1'];
+    // }
+
+    //sort type rates
+    Map<String, dynamic> meterTypeRates = _bill['meter_type_rates'];
     Map<String, dynamic> typeRates = {};
-    if (typeRateE != null) {
-      typeRates['E'] = typeRateE;
+    double? gst;
+    for (String typeTag in usageTypeTags) {
+      if (meterTypeRates[typeTag] != null) {
+        String typeRateStr = meterTypeRates[typeTag]['result']['rate'];
+        double? typeRate = double.tryParse(typeRateStr);
+        typeRates[typeTag] = typeRate;
+
+        if (gst == null) {
+          String gstStr = meterTypeRates[typeTag]['result']['gst'];
+          gst = double.tryParse(gstStr);
+        }
+      }
     }
-    if (typeRateW != null) {
-      typeRates['W'] = typeRateW;
-    }
-    if (typeRateB != null) {
-      typeRates['B'] = typeRateB;
-    }
-    if (typeRateN != null) {
-      typeRates['N'] = typeRateN;
-    }
-    if (typeRateG != null) {
-      typeRates['G'] = typeRateG;
+    // String? typeRateE;
+    // String? gst;
+    // if (meterTypeRates['E'] != null) {
+    //   typeRateE = meterTypeRates['E']['result']['rate'];
+    //   gst = meterTypeRates['E']['result']['gst'];
+    // }
+    // String? typeRateW;
+    // if (meterTypeRates['W'] != null) {
+    //   typeRateW = meterTypeRates['W']['result']['rate'];
+    //   gst = meterTypeRates['W']['result']['gst'];
+    // }
+    // String? typeRateB;
+    // if (meterTypeRates['B'] != null) {
+    //   typeRateB = meterTypeRates['B']['result']['rate'];
+    //   gst = meterTypeRates['B']['result']['gst'];
+    // }
+    // String? typeRateN;
+    // if (meterTypeRates['N'] != null) {
+    //   typeRateN = meterTypeRates['N']['result']['rate'];
+    //   gst = meterTypeRates['N']['result']['gst'];
+    // }
+    // String? typeRateG;
+    // if (meterTypeRates['G'] != null) {
+    //   typeRateG = meterTypeRates['G']['result']['rate'];
+    //   gst = meterTypeRates['G']['result']['gst'];
+    // }
+
+    // sort usage factor
+    Map<String, dynamic> usageFactor = {};
+    if (_bill['usage_factor_list'] != null) {
+      for (var item in _bill['usage_factor_list']) {
+        String key = item['name'].replaceAll('usage_factor_', '').toUpperCase();
+        String valueStr = item['value'];
+        double? value = double.tryParse(valueStr);
+        usageFactor[key] = value;
+      }
     }
 
-    BillCalc billCalc = BillCalc(
-      calReleased: false,
+    // BillCalc billCalc = BillCalc(
+    //   calReleased: false,
+    //   typeRates: typeRates,
+    //   manualUsages: manualUsage,
+    //   autoUsageSummary: usageSummary,
+    //   subTenantUsageSummary: subTenantListUsageSummary,
+    //   lineItems: [lineItem],
+    //   usageFactorE: usageFactor['E'],
+    //   usageFactorW: usageFactor['W'],
+    //   usageFactorB: usageFactor['B'],
+    //   usageFactorN: usageFactor['N'],
+    //   usageFactorG: usageFactor['G'],
+    // );
+
+    if (gst == null) {
+      throw Exception('gst is null');
+    }
+
+    EmsTypeUsageCalc emsTypeUsageCalc = EmsTypeUsageCalc(
+      gst: gst,
       typeRates: typeRates,
-      manualUsages: manualUsage,
+      usageFactor: usageFactor,
       autoUsageSummary: usageSummary,
       subTenantUsageSummary: subTenantListUsageSummary,
-      lineItems: [lineItem],
-      usageFactorE: _usageFactorE!,
-      usageFactorW: _usageFactorW!,
-      usageFactorB: _usageFactorB!,
-      usageFactorN: _usageFactorN!,
-      usageFactorG: _usageFactorG!,
+      manualUsageList: manualUsage,
+      lineItemList: lineItems,
     );
+    emsTypeUsageCalc.doCalc();
 
     return _renderMode == 'pdf'
         ? WgtBillRenderPdf(
@@ -432,42 +406,45 @@ class _WgtBillViewState extends State<WgtBillView> {
               'customerAccountId': accountId,
               'customerLabel': tenantLabel,
               'customerType': tenantType,
-              'gst': double.tryParse(gst ?? ''),
+              'gst': gst,
               'billingRecName': _bill['billing_rec_name'],
               'billFrom': fromTimestampStr,
               'billTo': toTimestampStr,
               'billDate': _bill['created_timestamp'],
               'billTimeRangeStr': billTimeRangeStr,
               'tenantUsageSummary': usageSummary,
-              'totalAmount': billCalc.totalAmount,
-              'typeRateE': billCalc.rateE,
-              'typeRateW': billCalc.rateW,
-              'typeRateB': billCalc.rateB,
-              'typeRateN': billCalc.rateN,
-              'typeRateG': billCalc.rateG,
-              'typeUsageE': billCalc.usageE,
-              'typeUsageW': billCalc.usageW,
-              'typeUsageB': billCalc.usageB,
-              'typeUsageN': billCalc.usageN,
-              'typeUsageG': billCalc.usageG,
-              'typeCostE': billCalc.costE,
-              'typeCostW': billCalc.costW,
-              'typeCostB': billCalc.costB,
-              'typeCostN': billCalc.costN,
-              'typeCostG': billCalc.costG,
-              'trendingE': billCalc.trendingE,
-              'trendingW': billCalc.trendingW,
-              'trendingB': billCalc.trendingB,
-              'trendingN': billCalc.trendingN,
-              'trendingG': billCalc.trendingG,
-              'lineItemLabel1': billCalc.costLineItemLabel1,
-              'lineItemValue1': billCalc.costLineItemValue1,
+              'subTotalAmount': emsTypeUsageCalc.subTotalCost,
+              'gstAmount': emsTypeUsageCalc.gstAmount,
+              'totalAmount': emsTypeUsageCalc.totalCost,
+              'typeRateE': emsTypeUsageCalc.typeUsageE?.rate,
+              'typeRateW': emsTypeUsageCalc.typeUsageW?.rate,
+              'typeRateB': emsTypeUsageCalc.typeUsageB?.rate,
+              'typeRateN': emsTypeUsageCalc.typeUsageN?.rate,
+              'typeRateG': emsTypeUsageCalc.typeUsageG?.rate,
+              'typeUsageE': emsTypeUsageCalc.typeUsageE?.usageFactored,
+              'typeUsageW': emsTypeUsageCalc.typeUsageW?.usageFactored,
+              'typeUsageB': emsTypeUsageCalc.typeUsageB?.usageFactored,
+              'typeUsageN': emsTypeUsageCalc.typeUsageN?.usageFactored,
+              'typeUsageG': emsTypeUsageCalc.typeUsageG?.usageFactored,
+              'typeCostE': emsTypeUsageCalc.typeUsageE?.cost,
+              'typeCostW': emsTypeUsageCalc.typeUsageW?.cost,
+              'typeCostB': emsTypeUsageCalc.typeUsageB?.cost,
+              'typeCostN': emsTypeUsageCalc.typeUsageN?.cost,
+              'typeCostG': emsTypeUsageCalc.typeUsageG?.cost,
+              'trendingE': emsTypeUsageCalc.trendingE,
+              'trendingW': emsTypeUsageCalc.trendingW,
+              'trendingB': emsTypeUsageCalc.trendingB,
+              'trendingN': emsTypeUsageCalc.trendingN,
+              'trendingG': emsTypeUsageCalc.trendingG,
+              'lineItemLabel1': emsTypeUsageCalc.getLineItem(0)?['label'],
+              'lineItemValue1': emsTypeUsageCalc.getLineItem(0)?['amount'],
             },
           )
-        : WgtTenantUsageSummary(
+        : WgtTenantUsageSummary2(
             activePortalProjectScope: widget.activePortalProjectScope,
             loggedInUser: widget.loggedInUser,
             scopeProfile: widget.scopeProfile,
+            usageCalc: emsTypeUsageCalc,
             isBillMode: true,
             showRenderModeSwitch: true,
             itemType: ItemType.meter_iwow,
@@ -481,18 +458,10 @@ class _WgtBillViewState extends State<WgtBillView> {
             tenantUsageSummary: usageSummary,
             subTenantListUsageSummary: subTenantListUsageSummary,
             manualUsages: manualUsage,
-            lineItems: [lineItem],
+            lineItems: lineItems,
             excludeAutoUsage:
                 _bill['exclude_auto_usage'] == 'true' ? true : false,
-            meterTypeRates: tariffRates,
-            gst: double.tryParse(gst ?? ''),
-            usageFactor: {
-              'E': _usageFactorE,
-              'W': _usageFactorW,
-              'B': _usageFactorB,
-              'N': _usageFactorN,
-              'G': _usageFactorG,
-            },
+            typeRates: typeRates,
           );
   }
 
