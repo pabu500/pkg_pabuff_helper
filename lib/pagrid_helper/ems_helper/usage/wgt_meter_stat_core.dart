@@ -32,6 +32,7 @@ class WgtUsageStatCore extends StatefulWidget {
     this.usageDecimals = 3,
     this.rateDecimals = 5,
     this.costDecimals = 3,
+    this.showFactored = true,
   });
 
   final ScopeProfile scopeProfile;
@@ -58,6 +59,7 @@ class WgtUsageStatCore extends StatefulWidget {
   final bool isSubstractUsage;
   final bool showRate;
   final bool calcUsageFromReadings;
+  final bool showFactored;
 
   @override
   State<WgtUsageStatCore> createState() => _WgtUsageStatCoreState();
@@ -319,6 +321,9 @@ class _WgtUsageStatCoreState extends State<WgtUsageStatCore> {
             widget.scopeProfile.selectedProjectScope,
             scopeProfiles,
             widget.meterType);
+        if (!widget.showFactored) {
+          usage = usageFactor = 1;
+        }
         usage = usage * usageFactor;
       }
     } else {
@@ -403,7 +408,8 @@ class _WgtUsageStatCoreState extends State<WgtUsageStatCore> {
                       ),
                       showUnit: false,
                     ),
-                    if ((widget.meterStat['factor'] ?? 1) < 0.999999)
+                    if (widget.showFactored &&
+                        (widget.meterStat['factor'] ?? 1) < 0.999999)
                       Text(
                         'Factor: ${(1 / widget.meterStat['factor']).toStringAsFixed(5)}',
                         style: defStatStyleSmall,

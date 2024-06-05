@@ -334,6 +334,9 @@ class EmsTypeUsageCalc {
       List<Map<String, dynamic>> conlidatedHistoryList = [];
       String meterType = item['meter_type'] ?? '';
       final mgTrendingSnapShot = item['meter_group_trending_snapshot'] ?? [];
+      if (mgTrendingSnapShot.isEmpty) {
+        continue;
+      }
       final mgConsolidatedUsageHistory =
           mgTrendingSnapShot['meter_list_consolidated_usage_history'] ?? [];
 

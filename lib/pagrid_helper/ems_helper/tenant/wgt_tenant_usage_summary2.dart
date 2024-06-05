@@ -21,6 +21,7 @@ class WgtTenantUsageSummary2 extends StatefulWidget {
     required this.tenantType,
     required this.excludeAutoUsage,
     this.usageCalc,
+    this.showFactored = true,
     // required this.usageFactor,
     this.typeRates,
     this.renderMode = 'wgt', // wgt, pdf
@@ -45,6 +46,7 @@ class WgtTenantUsageSummary2 extends StatefulWidget {
   final ScopeProfile scopeProfile;
   final Evs2User loggedInUser;
   final EmsTypeUsageCalc? usageCalc;
+  final bool showFactored;
   final ItemType itemType;
   final bool isMonthly;
   final DateTime fromDatetime;
@@ -360,6 +362,7 @@ class _WgtTenantUsageSummary2State extends State<WgtTenantUsageSummary2> {
       child: WgtUsageStatCore(
         loggedInUser: widget.loggedInUser,
         scopeProfile: widget.scopeProfile,
+        showFactored: widget.showFactored,
         calcUsageFromReadings: calcUsageFromReadings,
         activePortalProjectScope: widget.activePortalProjectScope,
         isBillMode: widget.isBillMode,
