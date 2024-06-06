@@ -86,7 +86,7 @@ class UrlBase {
   static const String _rDestPortalEvs2cp = 'https://cp2.evs.com.sg';
 
   static const String _dOresvcUrl = 'http://localhost:8018';
-  static const String _rOresvcUrl = 'https://ore.evs.com.sg';
+  static const String _rOresvcUrl = 'https://dev-oresvc.evs.com.sg';
   static const String _rOresvcUrlNTU = 'https://ore-ntu.evs.com.sg';
   static const String _rOresvcUrlSMRT = 'https://ore-smrt.web-ems.com';
   static const String _rOresvcUrlCwNus =

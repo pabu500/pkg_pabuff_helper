@@ -20,6 +20,7 @@ class WgtItemHistoryPresenter extends StatefulWidget {
     required this.itemId,
     required this.itemIdType,
     required this.historyType,
+    this.meterType,
     // required this.chartLabel,
     // required this.dataFields,
     this.showTitle = true,
@@ -58,7 +59,7 @@ class WgtItemHistoryPresenter extends StatefulWidget {
   final ProjectScope activePortalProjectScope;
 
   final ItemType itemType;
-
+  final MeterType? meterType;
   final String itemId;
   final ItemIdType itemIdType;
   final Evs2HistoryType historyType;
@@ -300,7 +301,9 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
             }
           ],
           'timeKey': 'time',
-          'unit': 'kWh',
+          'unit': widget.meterType == null
+              ? 'kWh'
+              : getDeivceTypeUnit(widget.meterType!),
           'chartType': ChartType.bar,
           'dataType': DataType.diff,
           'color': Colors.blue.withOpacity(0.7),

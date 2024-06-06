@@ -780,9 +780,7 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
                                             ? Container()
                                             : InkWell(
                                                 onTap: () {
-                                                  configItem['onTap'](
-                                                    row[configItem['fieldKey']],
-                                                  );
+                                                  configItem['onTap'](row);
                                                 },
                                                 child: Tooltip(
                                                   message: configItem[
