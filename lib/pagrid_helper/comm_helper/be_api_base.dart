@@ -91,7 +91,7 @@ class UrlBase {
   static const String _rOresvcUrlSMRT = 'https://ore-smrt.web-ems.com';
   static const String _rOresvcUrlCwNus =
       // 'https://ore.evs.com.sg';
-      'https://dev-oresvc.web-ems.com.sg';
+      'https://dev-oresvc.evs.com.sg';
 
   static const String _dUsersvcUrl = 'http://13.228.16.206:8081';
   static const String _rUsersvcUrl = 'https://evs2u.evs.com.sg';
