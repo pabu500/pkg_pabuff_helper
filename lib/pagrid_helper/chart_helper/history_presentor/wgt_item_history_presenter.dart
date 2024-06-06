@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
 
 import '../../../xt_ui/wdgt/file/wgt_save_table.dart';
+import '../../app_helper/pagrid_app_config.dart';
 import 'wgt_item_history_getter.dart';
 
 class WgtItemHistoryPresenter extends StatefulWidget {
@@ -15,7 +16,7 @@ class WgtItemHistoryPresenter extends StatefulWidget {
     super.key,
     required this.scopeProfile,
     required this.loggedInUser,
-    required this.activePortalProjectScope,
+    required this.appConfig,
     required this.itemType,
     required this.itemId,
     required this.itemIdType,
@@ -56,7 +57,7 @@ class WgtItemHistoryPresenter extends StatefulWidget {
 
   final ScopeProfile scopeProfile;
   final Evs2User loggedInUser;
-  final ProjectScope activePortalProjectScope;
+  final PaGridAppConfig appConfig;
 
   final ItemType itemType;
   final MeterType? meterType;
@@ -216,7 +217,7 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
   void _iniHistorySetting() {
     if (widget.itemType == ItemType.fleet_health) {
       _readingTypeConfig.clear();
-      if (widget.activePortalProjectScope == ProjectScope.SG_ALL) {
+      if (widget.appConfig.activePortalProjectScope == ProjectScope.SG_ALL) {
         _readingTypeConfig.addAll({
           'score1': {
             'title': 'Last Reading Too Old',
@@ -243,7 +244,8 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
             'color': Colors.orange.shade300,
           },
         });
-      } else if (widget.activePortalProjectScope == ProjectScope.EMS_CW_NUS) {
+      } else if (widget.appConfig.activePortalProjectScope ==
+          ProjectScope.EMS_CW_NUS) {
         _readingTypeConfig.addAll({
           'score1': {
             'title': 'Last Reading Too Old',
@@ -545,7 +547,7 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
           WgtItemHistoryGetter(
             loggedInUser: widget.loggedInUser,
             scopeProfile: widget.scopeProfile,
-            activePortalProjectScope: widget.activePortalProjectScope,
+            appConfig: widget.appConfig,
             genMeta: widget.genMeta,
             // forceAlignTimeRange: true,
             forceAlignTimeRange: _getReadingTypeConfig(
@@ -1212,7 +1214,7 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
 
   Widget getListRepresentation() {
     return WgtHistoryRepList(
-      activePortalProjectScope: widget.activePortalProjectScope,
+      appConfig: widget.appConfig,
       loggedInUser: widget.loggedInUser,
       scopeProfile: widget.scopeProfile,
       itemId: widget.itemId,

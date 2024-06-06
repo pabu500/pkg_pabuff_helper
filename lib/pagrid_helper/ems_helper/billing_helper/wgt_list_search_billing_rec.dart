@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:buff_helper/pagrid_helper/pagrid_helper.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +12,7 @@ import 'wgt_bill_rec_finder.dart';
 class WgtListSearchBillingRec extends StatefulWidget {
   const WgtListSearchBillingRec({
     super.key,
-    required this.activePortalProjectScope,
+    required this.appConfig,
     required this.scopeProfile,
     required this.loggedInUser,
     this.title = 'List/Search Billing Records',
@@ -31,7 +32,7 @@ class WgtListSearchBillingRec extends StatefulWidget {
 
   final ScopeProfile scopeProfile;
   final Evs2User loggedInUser;
-  final ProjectScope activePortalProjectScope;
+  final PaGridAppConfig appConfig;
   final String title;
   final bool isPickerMode;
   // final Function? onSubmitPicked;
@@ -105,7 +106,7 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
 
     try {
       itemFindResult = await doListItems(
-        widget.activePortalProjectScope,
+        widget.appConfig,
         _queryMap,
         SvcClaim(
           username: widget.loggedInUser!.username,
@@ -302,7 +303,7 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
                   xtShowModelBottomSheet(
                     context,
                     WgtBillView(
-                      activePortalProjectScope: widget.activePortalProjectScope,
+                      appConfig: widget.appConfig,
                       loggedInUser: widget.loggedInUser,
                       scopeProfile: widget.scopeProfile,
                       billingRecIndexStr: item['id'],
@@ -350,7 +351,7 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 0.0),
             child: WgtBillingRecFinder(
-              activePortalProjectScope: widget.activePortalProjectScope,
+              appConfig: widget.appConfig,
               loggedInUser: widget.loggedInUser,
               scopeProfile: widget.scopeProfile,
               tenantName: widget.tenantName,
@@ -437,8 +438,7 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
                           scrollDirection: Axis.horizontal,
                           child: WgtEditCommitList(
                             key: _listKey,
-                            activePortalProjectScope:
-                                widget.activePortalProjectScope,
+                            appConfig: widget.appConfig,
                             listPrefix: 'billing_rec',
                             itemExt: 40,
                             // width:_tableWidth, //0.95 * MediaQuery.of(context).size.width,

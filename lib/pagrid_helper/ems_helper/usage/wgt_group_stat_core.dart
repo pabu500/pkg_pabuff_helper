@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 
 import 'package:fl_chart/fl_chart.dart';
 
+import '../../app_helper/pagrid_app_config.dart';
+
 class WgtMeterGroupStatCore extends StatefulWidget {
   const WgtMeterGroupStatCore({
     super.key,
     required this.scopeProfile,
     required this.loggedInUser,
-    required this.activePortalProjectScope,
+    required this.appConfig,
     this.noData = false,
     this.chartKey,
     required this.itemType,
@@ -30,7 +32,7 @@ class WgtMeterGroupStatCore extends StatefulWidget {
 
   final ScopeProfile scopeProfile;
   final Evs2User loggedInUser;
-  final ProjectScope activePortalProjectScope;
+  final PaGridAppConfig appConfig;
   final bool noData;
   final UniqueKey? chartKey;
   final ItemType itemType;
@@ -98,15 +100,16 @@ class _WgtMeterGroupStatCoreState extends State<WgtMeterGroupStatCore> {
         'item_id_type': widget.meterIdType.name,
         'item_id_list': itemIds.join(','),
         'item_type': widget.itemType.name,
-        'group_name': widget.activePortalProjectScope == ProjectScope.EMS_CW_NUS
-            ? widget.groupId
-            : '',
+        'group_name':
+            widget.appConfig.activePortalProjectScope == ProjectScope.EMS_CW_NUS
+                ? widget.groupId
+                : '',
       };
       if (kDebugMode) {
         print('_getMeterConsumptionSummary pulling data');
       }
       result = await queryMeterConsolidatedUsageHistory(
-        widget.activePortalProjectScope,
+        widget.appConfig,
         queryMap,
         duration,
         SvcClaim(

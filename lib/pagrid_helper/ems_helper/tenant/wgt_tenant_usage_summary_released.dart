@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../app_helper/pagrid_app_config.dart';
 import '../usage/usage_stat_helper.dart';
 
 class WgtTenantUsageSummaryReleased extends StatefulWidget {
@@ -11,7 +12,7 @@ class WgtTenantUsageSummaryReleased extends StatefulWidget {
     super.key,
     required this.scopeProfile,
     required this.loggedInUser,
-    required this.activePortalProjectScope,
+    required this.appConfig,
     required this.itemType,
     required this.isMonthly,
     required this.fromDatetime,
@@ -39,7 +40,7 @@ class WgtTenantUsageSummaryReleased extends StatefulWidget {
   final Map<String, dynamic> billedUsageFactor;
   final ScopeProfile scopeProfile;
   final Evs2User loggedInUser;
-  final ProjectScope activePortalProjectScope;
+  final PaGridAppConfig appConfig;
   final ItemType itemType;
   final bool isMonthly;
   final DateTime fromDatetime;
@@ -370,7 +371,7 @@ class _WgtTenantUsageSummaryReleasedState
               context,
               widget.loggedInUser,
               widget.scopeProfile,
-              widget.activePortalProjectScope,
+              widget.appConfig,
               _netUsageE,
               _rateE,
               _netUsageW,
@@ -424,7 +425,7 @@ class _WgtTenantUsageSummaryReleasedState
               child: WgtUsageStatCore(
                 loggedInUser: widget.loggedInUser,
                 scopeProfile: widget.scopeProfile,
-                activePortalProjectScope: widget.activePortalProjectScope,
+                appConfig: widget.appConfig,
                 isBillMode: widget.isBillMode,
                 rate: meterType == MeterType.electricity1p
                     ? _rateE
@@ -503,7 +504,7 @@ class _WgtTenantUsageSummaryReleasedState
               child: WgtUsageStatCore(
                 loggedInUser: widget.loggedInUser,
                 scopeProfile: widget.scopeProfile,
-                activePortalProjectScope: widget.activePortalProjectScope,
+                appConfig: widget.appConfig,
                 isBillMode: widget.isBillMode,
                 rate: meterType == MeterType.electricity1p
                     ? _rateE
@@ -583,7 +584,7 @@ class _WgtTenantUsageSummaryReleasedState
               child: WgtUsageStatCore(
                 loggedInUser: widget.loggedInUser,
                 scopeProfile: widget.scopeProfile,
-                activePortalProjectScope: widget.activePortalProjectScope,
+                appConfig: widget.appConfig,
                 isBillMode: widget.isBillMode,
                 rate: meterType == MeterType.electricity1p
                     ? _rateE

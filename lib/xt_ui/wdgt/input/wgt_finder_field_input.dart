@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../up_helper/up_helper.dart';
+import '../../../pagrid_helper/app_helper/pagrid_app_config.dart';
 import 'wgt_text_field2.dart';
 
 class WgtFinderFieldInput extends StatefulWidget {
   const WgtFinderFieldInput({
     super.key,
-    required this.activePortalProjectScope,
+    required this.appConfig,
     this.width = 220,
     this.height = 70,
     this.initialValue,
@@ -38,7 +38,7 @@ class WgtFinderFieldInput extends StatefulWidget {
     this.scanner,
   });
 
-  final ProjectScope activePortalProjectScope;
+  final PaGridAppConfig appConfig;
   final double width;
   final double height;
   final String? initialValue;
@@ -111,7 +111,7 @@ class _WgtFinderFieldInputState extends State<WgtFinderFieldInput> {
         SizedBox(
           width: widget.width,
           child: xtTextField2(
-              activePortalProjectScope: widget.activePortalProjectScope,
+              appConfig: widget.appConfig,
               controller: _controller,
               labelText: widget.labelText,
               hintText: widget.hintText,

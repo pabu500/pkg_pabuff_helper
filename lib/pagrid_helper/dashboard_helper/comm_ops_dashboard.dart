@@ -1,12 +1,13 @@
 import 'dart:convert';
 
+import 'package:buff_helper/pagrid_helper/pagrid_helper.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:http/http.dart' as http;
 
 import '../comm_helper/be_api_base.dart';
 
 Future<dynamic> getMmsStatus(
-    ProjectScope activePortalProjectScope, SvcClaim svcClaim) async {
+    PaGridAppConfig appConfig, SvcClaim svcClaim) async {
   svcClaim.svcName = SvcType.oresvc.name;
   svcClaim.endpoint = UrlBase.eptGetMmsSatus;
 
@@ -21,7 +22,7 @@ Future<dynamic> getMmsStatus(
 
   try {
     final response = await http.post(
-      Uri.parse(UrlController(activePortalProjectScope)
+      Uri.parse(UrlController(appConfig)
           .getUrl(SvcType.oresvc, UrlBase.eptGetMmsSatus)),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
@@ -58,7 +59,7 @@ Future<dynamic> getMmsStatus(
 }
 
 Future<dynamic> getActiveMeterCount(
-    ProjectScope activePortalProjectScope, SvcClaim svcClaim) async {
+    PaGridAppConfig appConfig, SvcClaim svcClaim) async {
   svcClaim.svcName = SvcType.oresvc.name;
   svcClaim.endpoint = UrlBase.eptGetActiveMeterCount;
 
@@ -73,7 +74,7 @@ Future<dynamic> getActiveMeterCount(
 
   try {
     final response = await http.post(
-      Uri.parse(UrlController(activePortalProjectScope)
+      Uri.parse(UrlController(appConfig)
           .getUrl(SvcType.oresvc, UrlBase.eptGetActiveMeterCount)),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
@@ -110,7 +111,7 @@ Future<dynamic> getActiveMeterCount(
 }
 
 Future<dynamic> pullActiveMeterCountHistory(
-    ProjectScope activePortalProjectScope, SvcClaim svcClaim) async {
+    PaGridAppConfig appConfig, SvcClaim svcClaim) async {
   svcClaim.svcName = SvcType.oresvc.name;
   svcClaim.endpoint = UrlBase.eptGetActiveMeterCountHistory;
 
@@ -124,7 +125,7 @@ Future<dynamic> pullActiveMeterCountHistory(
   // }
 
   final response = await http.post(
-    Uri.parse(UrlController(activePortalProjectScope)
+    Uri.parse(UrlController(appConfig)
         .getUrl(SvcType.oresvc, UrlBase.eptGetActiveMeterCountHistory)),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
@@ -163,7 +164,7 @@ Future<dynamic> pullActiveMeterCountHistory(
 }
 
 Future<dynamic> getRecentUsage(
-  ProjectScope activePortalProjectScope,
+  PaGridAppConfig appConfig,
   DestPortal destPortal,
   Map<String, dynamic> queryMap,
   SvcClaim svcClaim,
@@ -185,8 +186,8 @@ Future<dynamic> getRecentUsage(
 
   try {
     final response = await http.post(
-      Uri.parse(UrlController(activePortalProjectScope)
-          .getUrl(SvcType.oresvc, svcClaim.endpoint!)),
+      Uri.parse(
+          UrlController(appConfig).getUrl(SvcType.oresvc, svcClaim.endpoint!)),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $svcToken',
@@ -227,7 +228,7 @@ Future<dynamic> getRecentUsage(
 }
 
 Future<dynamic> pullActiveUsageHistory(
-  ProjectScope activePortalProjectScope,
+  PaGridAppConfig appConfig,
   SvcClaim svcClaim,
   ProjectScope? projectScope,
   SiteScope? siteScope,
@@ -245,7 +246,7 @@ Future<dynamic> pullActiveUsageHistory(
   // }
 
   final response = await http.post(
-    Uri.parse(UrlController(activePortalProjectScope)
+    Uri.parse(UrlController(appConfig)
         .getUrl(SvcType.oresvc, UrlBase.eptGetAcitveUsageHistory)),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
@@ -289,7 +290,7 @@ Future<dynamic> pullActiveUsageHistory(
 }
 
 Future<dynamic> getRecentTopupTotal(
-  ProjectScope activePortalProjectScope,
+  PaGridAppConfig appConfig,
   SvcClaim svcClaim,
   ProjectScope? projectScope,
   SiteScope? siteScope,
@@ -308,7 +309,7 @@ Future<dynamic> getRecentTopupTotal(
 
   try {
     final response = await http.post(
-      Uri.parse(UrlController(activePortalProjectScope)
+      Uri.parse(UrlController(appConfig)
           .getUrl(SvcType.oresvc, UrlBase.eptGetRecentTotalTopup)),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
@@ -348,7 +349,7 @@ Future<dynamic> getRecentTopupTotal(
 }
 
 Future<dynamic> pullTotalTopupHistory(
-  ProjectScope activePortalProjectScope,
+  PaGridAppConfig appConfig,
   SvcClaim svcClaim,
   ProjectScope? projectScope,
   SiteScope? siteScope,
@@ -366,7 +367,7 @@ Future<dynamic> pullTotalTopupHistory(
   // }
 
   final response = await http.post(
-    Uri.parse(UrlController(activePortalProjectScope)
+    Uri.parse(UrlController(appConfig)
         .getUrl(SvcType.oresvc, UrlBase.eptGetTotalTopupHistory)),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
@@ -414,7 +415,7 @@ Future<dynamic> pullTotalTopupHistory(
 }
 
 Future<dynamic> getRecentCommDataUsage(
-    ProjectScope activePortalProjectScope, SvcClaim svcClaim) async {
+    PaGridAppConfig appConfig, SvcClaim svcClaim) async {
   svcClaim.svcName = SvcType.oresvc.name;
   svcClaim.endpoint = UrlBase.eptCommDataGetRecentComsumption;
 
@@ -429,7 +430,7 @@ Future<dynamic> getRecentCommDataUsage(
 
   try {
     final response = await http.post(
-      Uri.parse(UrlController(activePortalProjectScope)
+      Uri.parse(UrlController(appConfig)
           .getUrl(SvcType.oresvc, UrlBase.eptCommDataGetRecentComsumption)),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
@@ -466,7 +467,7 @@ Future<dynamic> getRecentCommDataUsage(
 }
 
 Future<dynamic> pullKwhUsageByBuilding(
-  ProjectScope activePortalProjectScope,
+  PaGridAppConfig appConfig,
   Map<String, dynamic> queryMap,
   SvcClaim svcClaim,
 ) async {
@@ -485,7 +486,7 @@ Future<dynamic> pullKwhUsageByBuilding(
   // }
 
   final response = await http.post(
-    Uri.parse(UrlController(activePortalProjectScope)
+    Uri.parse(UrlController(appConfig)
         .getUrl(SvcType.oresvc, UrlBase.eptGetTopKwhUsageByBuilding)),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
@@ -531,7 +532,7 @@ Future<dynamic> pullKwhUsageByBuilding(
 }
 
 Future<dynamic> pullMonthToDateCommDataUsageStat(
-    ProjectScope activePortalProjectScope, SvcClaim svcClaim) async {
+    PaGridAppConfig appConfig, SvcClaim svcClaim) async {
   svcClaim.svcName = SvcType.oresvc.name;
   svcClaim.endpoint = UrlBase.eptCommDataGetMonthToDateUsageTotal;
 
@@ -545,7 +546,7 @@ Future<dynamic> pullMonthToDateCommDataUsageStat(
   // }
 
   final response = await http.post(
-    Uri.parse(UrlController(activePortalProjectScope)
+    Uri.parse(UrlController(appConfig)
         .getUrl(SvcType.oresvc, UrlBase.eptCommDataGetMonthToDateUsageTotal)),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
@@ -621,7 +622,7 @@ Future<dynamic> pullMonthToDateCommDataUsageStat(
 }
 
 Future<dynamic> getRecentUsageHistory(
-  ProjectScope activePortalProjectScope,
+  PaGridAppConfig appConfig,
   Map<String, dynamic> queryMap,
   SvcClaim svcClaim,
 ) async {
@@ -638,7 +639,7 @@ Future<dynamic> getRecentUsageHistory(
   // }
 
   final response = await http.post(
-    Uri.parse(UrlController(activePortalProjectScope)
+    Uri.parse(UrlController(appConfig)
         .getUrl(SvcType.oresvc, UrlBase.eptGetAllUsageHistory)),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',

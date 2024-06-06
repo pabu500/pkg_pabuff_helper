@@ -4,16 +4,17 @@ import 'package:buff_helper/pagrid_helper/comm_helper/be_api_base.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:http/http.dart' as http;
 
-Future<dynamic> getVersion(
-    ProjectScope activePortalProjectScope, String appName) async {
-  String projectScope = activePortalProjectScope.name;
+import '../app_helper/pagrid_app_config.dart';
+
+Future<dynamic> getVersion(PaGridAppConfig appConfig, String appName) async {
+  String projectScope = appConfig.activePortalProjectScope.name;
   if (projectScope == 'SG_ALL') {
     // projectScope = 'EVS2_NUS';
   }
   try {
     final response = await http.get(
       Uri.parse(
-          '${UrlController(activePortalProjectScope).getUrl(SvcType.oresvc, UrlBase.eptOreGetVerion)}/$appName/$projectScope'),
+          '${UrlController(appConfig).getUrl(SvcType.oresvc, UrlBase.eptOreGetVerion)}/$appName/$projectScope'),
     );
 
     if (response.statusCode == 200) {
@@ -27,10 +28,10 @@ Future<dynamic> getVersion(
   }
 }
 
-Future<dynamic> getOreVersion(ProjectScope activePortalProjectScope) async {
+Future<dynamic> getOreVersion(PaGridAppConfig appConfig) async {
   try {
     final response = await http.get(
-      Uri.parse(UrlController(activePortalProjectScope)
+      Uri.parse(UrlController(appConfig)
           .getUrl(SvcType.oresvc, UrlBase.eptOreGetVerion)),
     );
 
@@ -47,7 +48,7 @@ Future<dynamic> getOreVersion(ProjectScope activePortalProjectScope) async {
 }
 
 Future<dynamic> getSysVar(
-  ProjectScope activePortalProjectScope,
+  PaGridAppConfig appConfig,
   Map<String, dynamic> queryMap,
   SvcClaim svcClaim,
 ) async {
@@ -60,8 +61,8 @@ Future<dynamic> getSysVar(
   //   throw Exception(err);
   // }
   final response = await http.post(
-    Uri.parse(UrlController(activePortalProjectScope)
-        .getUrl(SvcType.oresvc, UrlBase.eptGetSysVar)),
+    Uri.parse(
+        UrlController(appConfig).getUrl(SvcType.oresvc, UrlBase.eptGetSysVar)),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
       'Authorization': 'Bearer $svcToken',

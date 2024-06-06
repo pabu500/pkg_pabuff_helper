@@ -7,10 +7,11 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-Future<AclSetting> getAclSetting(ProjectScope activePortalProjectScope) async {
-  final response = await http.get(Uri.parse(
-      UrlController(activePortalProjectScope)
-          .getUrl(SvcType.usersvc, UrlBase.eptUsersvcGetAclSetting)));
+import '../app_helper/pagrid_app_config.dart';
+
+Future<AclSetting> getAclSetting(PaGridAppConfig appConfig) async {
+  final response = await http.get(Uri.parse(UrlController(appConfig)
+      .getUrl(SvcType.usersvc, UrlBase.eptUsersvcGetAclSetting)));
 
   if (response.statusCode == 200) {
     return AclSetting.fromJson(jsonDecode(response.body));
@@ -19,10 +20,9 @@ Future<AclSetting> getAclSetting(ProjectScope activePortalProjectScope) async {
   }
 }
 
-Future<String> getAppToken(ProjectScope activePortalProjectScope) async {
-  final response = await http.get(Uri.parse(
-      UrlController(activePortalProjectScope)
-          .getUrl(SvcType.usersvc, UrlBase.eptUsersvcGetAppToken)));
+Future<String> getAppToken(PaGridAppConfig appConfig) async {
+  final response = await http.get(Uri.parse(UrlController(appConfig)
+      .getUrl(SvcType.usersvc, UrlBase.eptUsersvcGetAppToken)));
 
   if (response.statusCode == 200) {
     return jsonDecode(response.body)['token'];
@@ -31,16 +31,16 @@ Future<String> getAppToken(ProjectScope activePortalProjectScope) async {
   }
 }
 
-Future<List<dynamic>> getPgk(ProjectScope activePortalProjectScope) async {
+Future<List<dynamic>> getPgk(PaGridAppConfig appConfig) async {
   final String appToken;
   try {
-    appToken = await getAppToken(activePortalProjectScope);
+    appToken = await getAppToken(appConfig);
   } catch (e) {
     throw Exception('Failed to load App Token');
   }
 
   final response = await http.post(
-    Uri.parse(UrlController(activePortalProjectScope)
+    Uri.parse(UrlController(appConfig)
         .getUrl(SvcType.usersvc, UrlBase.eptUsersvcGetPgk)),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
@@ -62,7 +62,7 @@ Future<List<dynamic>> getPgk(ProjectScope activePortalProjectScope) async {
 }
 
 Future<Evs2User> doCreateUser(
-    ProjectScope activePortalProjectScope, Map<Enum, String> formData) async {
+    PaGridAppConfig appConfig, Map<Enum, String> formData) async {
   // String? token = await getToken();
   // print('token: $token');
   String scopeStr = 'none';
@@ -76,7 +76,7 @@ Future<Evs2User> doCreateUser(
 
   try {
     final response = await http.post(
-      Uri.parse(UrlController(activePortalProjectScope)
+      Uri.parse(UrlController(appConfig)
           .getUrl(SvcType.usersvc, UrlBase.eptUsersvcRegister)),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
@@ -111,7 +111,7 @@ Future<Evs2User> doCreateUser(
 }
 
 Future<dynamic> doBatchCreateUsers(
-    ProjectScope activePortalProjectScope,
+    PaGridAppConfig appConfig,
     List<Map<String, dynamic>> userList,
     AclScope userScope,
     SvcClaim svcClaim) async {
@@ -126,7 +126,7 @@ Future<dynamic> doBatchCreateUsers(
   // }
 
   final response = await http.post(
-    Uri.parse(UrlController(activePortalProjectScope)
+    Uri.parse(UrlController(appConfig)
         .getUrl(SvcType.usersvc, UrlBase.eptUsersvcBatchReg)),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
@@ -167,12 +167,12 @@ Future<dynamic> doBatchCreateUsers(
 }
 
 Future<Evs2User> doUpdateProfile(
-    ProjectScope activePortalProjectScope, Map<Enum, String> formData) async {
+    PaGridAppConfig appConfig, Map<Enum, String> formData) async {
   // String? token = await getToken();
   // print('token: $token');
 
   final response = await http.post(
-    Uri.parse(UrlController(activePortalProjectScope)
+    Uri.parse(UrlController(appConfig)
         .getUrl(SvcType.usersvc, UrlBase.eptUsersvcUpdateProfile)),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
@@ -194,23 +194,22 @@ Future<Evs2User> doUpdateProfile(
   }
 }
 
-Future<dynamic> doUpdateKeyValue(ProjectScope activePortalProjectScope, int id,
-    String key, String value, SvcClaim svcClaim,
+Future<dynamic> doUpdateKeyValue(PaGridAppConfig appConfig, int id, String key,
+    String value, SvcClaim svcClaim,
     {String? oldVal, String? checkOldPassword}) async {
   svcClaim.svcName = SvcType.usersvc.name;
   svcClaim.endpoint = UrlBase.eptUsersvcUpdateKeyVal;
 
   String svcToken = '';
   try {
-    svcToken =
-        await svcGate(activePortalProjectScope, svcClaim /*, queryByUser*/);
+    svcToken = await svcGate(appConfig, svcClaim /*, queryByUser*/);
   } catch (err) {
     throw Exception(err);
   }
 
   try {
     final response = await http.post(
-      Uri.parse(UrlController(activePortalProjectScope)
+      Uri.parse(UrlController(appConfig)
           .getUrl(SvcType.usersvc, UrlBase.eptUsersvcUpdateKeyVal)),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
@@ -251,7 +250,7 @@ Future<dynamic> doUpdateKeyValue(ProjectScope activePortalProjectScope, int id,
 }
 
 Future<String> doUserCheckUnique(
-    ProjectScope activePortalProjectScope, Enum field, String val,
+    PaGridAppConfig appConfig, Enum field, String val,
     {String? table}) async {
   try {
     //for testing
@@ -259,7 +258,7 @@ Future<String> doUserCheckUnique(
 
     final response = await http.get(
       Uri.parse(
-          '${UrlController(activePortalProjectScope).getUrl(SvcType.usersvc, UrlBase.eptUsersvcCheckUnique)}/${field.name}/$val'),
+          '${UrlController(appConfig).getUrl(SvcType.usersvc, UrlBase.eptUsersvcCheckUnique)}/${field.name}/$val'),
       // headers: <String, String>{
       //   'Content-Type': 'application/json; charset=UTF-8',
       // },
@@ -278,10 +277,10 @@ Future<String> doUserCheckUnique(
   }
 }
 
-Future<Evs2User> doLogin(DestPortal destPortal,
-    ProjectScope activePortalProjectScope, Map<Enum, String> formData) async {
+Future<Evs2User> doLogin(DestPortal destPortal, PaGridAppConfig appConfig,
+    Map<Enum, String> formData) async {
   final response = await http.post(
-    Uri.parse(UrlController(activePortalProjectScope)
+    Uri.parse(UrlController(appConfig)
         .getUrl(SvcType.usersvc, UrlBase.eptUsersvcLogin)),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
@@ -293,8 +292,8 @@ Future<Evs2User> doLogin(DestPortal destPortal,
       UserKey.authProvider.name: formData[UserKey.authProvider] ?? '',
       // UserKey.emailVerified.name: formData[UserKey.emailVerified]!,
       UserKey.destPortal.name: destPortal.name,
-      // activePortalProjectScope == ProjectScope.EMS_CW_NUS ||
-      //         activePortalProjectScope == ProjectScope.EMS_SMRT
+      // appConfig == ProjectScope.EMS_CW_NUS ||
+      //         appConfig == ProjectScope.EMS_SMRT
       //     ? DestPortal.emsop.name
       //     : DestPortal.evs2op.name,
     }),
@@ -352,13 +351,13 @@ Future<Evs2User> doLogin(DestPortal destPortal,
 }
 
 Future<bool> doCheckExists(
-    ProjectScope activePortalProjectScope, Enum field, String val) async {
+    PaGridAppConfig appConfig, Enum field, String val) async {
   //for testing
   // await Future.delayed(const Duration(milliseconds: 500));
 
   final response = await http.get(
     Uri.parse(
-        '${UrlController(activePortalProjectScope).getUrl(SvcType.usersvc, UrlBase.eptUsersvcCheckExists)}/${field.name}/$val'),
+        '${UrlController(appConfig).getUrl(SvcType.usersvc, UrlBase.eptUsersvcCheckExists)}/${field.name}/$val'),
     // headers: <String, String>{
     //   'Content-Type': 'application/json; charset=UTF-8',
     // },
@@ -381,7 +380,7 @@ Future<bool> doCheckExists(
 }
 
 Future<dynamic> doCheckKeyVal(
-  ProjectScope activePortalProjectScope,
+  PaGridAppConfig appConfig,
   int userId,
   String key,
   SvcClaim svcClaim,
@@ -397,7 +396,7 @@ Future<dynamic> doCheckKeyVal(
   // }
 
   final response = await http.post(
-    Uri.parse(UrlController(activePortalProjectScope)
+    Uri.parse(UrlController(appConfig)
         .getUrl(SvcType.usersvc, UrlBase.eptUsersvcGetUserKeyVal)),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
@@ -426,12 +425,12 @@ Future<dynamic> doCheckKeyVal(
 }
 
 Future<bool> doForgotPassword(
-    ProjectScope activePortalProjectScope, Map<Enum, String> formData) async {
+    PaGridAppConfig appConfig, Map<Enum, String> formData) async {
   //for testing
   await Future.delayed(const Duration(milliseconds: 500));
 
   final response = await http.post(
-    Uri.parse(UrlController(activePortalProjectScope)
+    Uri.parse(UrlController(appConfig)
         .getUrl(SvcType.usersvc, UrlBase.eptUsersvcForgotPassword)),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
@@ -450,15 +449,14 @@ Future<bool> doForgotPassword(
   }
 }
 
-Future<dynamic> doUpdateUsers(ProjectScope activePortalProjectScope,
+Future<dynamic> doUpdateUsers(PaGridAppConfig appConfig,
     List<Map<String, dynamic>> modifiedUsers, SvcClaim svcClaim) async {
   svcClaim.svcName = SvcType.usersvc.name;
   svcClaim.endpoint = UrlBase.eptUsersvcUpdateUsers;
 
   String svcToken = '';
   try {
-    svcToken =
-        await svcGate(activePortalProjectScope, svcClaim /*, queryByUser*/);
+    svcToken = await svcGate(appConfig, svcClaim /*, queryByUser*/);
   } catch (err) {
     throw Exception(err);
   }
@@ -468,7 +466,7 @@ Future<dynamic> doUpdateUsers(ProjectScope activePortalProjectScope,
   // }
 
   final response = await http.post(
-    Uri.parse(UrlController(activePortalProjectScope)
+    Uri.parse(UrlController(appConfig)
         .getUrl(SvcType.usersvc, UrlBase.eptUsersvcUpdateUsers)),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
@@ -533,7 +531,7 @@ Future<dynamic> doUpdateUsers(ProjectScope activePortalProjectScope,
 // }
 
 Future<dynamic> applySvcToken(
-    ProjectScope activePortalProjectScope, SvcClaim svcClaim) async {
+    PaGridAppConfig appConfig, SvcClaim svcClaim) async {
   const _storage = FlutterSecureStorage();
   String? userToken = await _storage.read(key: 'evs2_user_token');
 
@@ -545,7 +543,7 @@ Future<dynamic> applySvcToken(
   // await Future.delayed(const Duration(milliseconds: 500));
 
   final response = await http.post(
-    Uri.parse(UrlController(activePortalProjectScope)
+    Uri.parse(UrlController(appConfig)
         .getUrl(SvcType.usersvc, UrlBase.eptUsersvcApplySvcToken)),
     // Uri.http(URLController.usersvcAuthority, URLController.pathApplySvcToken),
     headers: <String, String>{
@@ -572,8 +570,8 @@ Future<dynamic> applySvcToken(
   }
 }
 
-Future<dynamic> svcGate(ProjectScope activePortalProjectScope,
-    SvcClaim svcClaim /*, User user*/) async {
+Future<dynamic> svcGate(
+    PaGridAppConfig appConfig, SvcClaim svcClaim /*, User user*/) async {
   const storage = FlutterSecureStorage();
   String? userToken = await storage.read(key: 'evs2_user_token');
   if (userToken == null) {
@@ -582,7 +580,7 @@ Future<dynamic> svcGate(ProjectScope activePortalProjectScope,
 
   String svcToken = '';
   try {
-    svcToken = await applySvcToken(activePortalProjectScope, svcClaim);
+    svcToken = await applySvcToken(appConfig, svcClaim);
     if (isJwtToken(svcToken)) return svcToken;
   } on SocketException {
     throw Exception("Unable to connect to authentication server");
@@ -593,7 +591,7 @@ Future<dynamic> svcGate(ProjectScope activePortalProjectScope,
 }
 
 Future<dynamic> updateBatchUserOpProgress(
-    ProjectScope activePortalProjectScope, String op) async {
+    PaGridAppConfig appConfig, String op) async {
   // await Future.delayed(const Duration(seconds: 1));
   try {
     // if (!context.mounted) {
@@ -601,7 +599,7 @@ Future<dynamic> updateBatchUserOpProgress(
     // }
     final response = await http.get(
       Uri.parse(
-          "${UrlController(activePortalProjectScope).getUrl(SvcType.usersvc, UrlBase.eptUsersvcPollingUserBatchOpProgress)}?op=$op"),
+          "${UrlController(appConfig).getUrl(SvcType.usersvc, UrlBase.eptUsersvcPollingUserBatchOpProgress)}?op=$op"),
     );
 
     if (response.statusCode == 200) {
@@ -648,7 +646,7 @@ Future<dynamic> updateBatchUserOpProgress(
 }
 
 Future<dynamic> doGetUserTenant(
-  ProjectScope activePortalProjectScope,
+  PaGridAppConfig appConfig,
   Map<String, dynamic> reqMap,
   SvcClaim svcClaim,
 ) async {
@@ -669,7 +667,7 @@ Future<dynamic> doGetUserTenant(
 
   try {
     final response = await http.post(
-      Uri.parse(UrlController(activePortalProjectScope)
+      Uri.parse(UrlController(appConfig)
           .getUrl(SvcType.oresvc, UrlBase.eptGetUserTenant)),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
@@ -695,7 +693,7 @@ Future<dynamic> doGetUserTenant(
 }
 
 Future<dynamic> doSetUserTenant(
-  ProjectScope activePortalProjectScope,
+  PaGridAppConfig appConfig,
   Map<String, dynamic> reqMap,
   SvcClaim svcClaim,
 ) async {
@@ -716,7 +714,7 @@ Future<dynamic> doSetUserTenant(
 
   try {
     final response = await http.post(
-      Uri.parse(UrlController(activePortalProjectScope)
+      Uri.parse(UrlController(appConfig)
           .getUrl(SvcType.oresvc, UrlBase.eptSetUserTenant)),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',

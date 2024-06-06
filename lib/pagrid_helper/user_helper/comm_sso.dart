@@ -1,6 +1,3 @@
-// import 'dart:html';
-
-import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -8,12 +5,13 @@ import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:convert';
 
+import '../app_helper/pagrid_app_config.dart';
 import '../comm_helper/be_api_base.dart';
 
 Future<dynamic> verifyEmailAddress(
-    ProjectScope activePortalProjectScope, Map<String, dynamic> reqMap) async {
+    PaGridAppConfig appConfig, Map<String, dynamic> reqMap) async {
   final response = await http.post(
-    Uri.parse(UrlController(activePortalProjectScope)
+    Uri.parse(UrlController(appConfig)
         .getUrl(SvcType.usersvc, UrlBase.eptUsersvcSsoVerifyEmailAddress)),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',

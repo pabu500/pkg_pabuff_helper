@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../app_helper/pagrid_app_config.dart';
 import '../usage/usage_stat_helper.dart';
 
 class WgtTenantUsageSummary extends StatefulWidget {
@@ -11,7 +12,7 @@ class WgtTenantUsageSummary extends StatefulWidget {
     super.key,
     required this.scopeProfile,
     required this.loggedInUser,
-    required this.activePortalProjectScope,
+    required this.appConfig,
     required this.itemType,
     required this.isMonthly,
     required this.fromDatetime,
@@ -39,7 +40,7 @@ class WgtTenantUsageSummary extends StatefulWidget {
 
   final ScopeProfile scopeProfile;
   final Evs2User loggedInUser;
-  final ProjectScope activePortalProjectScope;
+  final PaGridAppConfig appConfig;
   final ItemType itemType;
   final bool isMonthly;
   final DateTime fromDatetime;
@@ -135,7 +136,7 @@ class _WgtTenantUsageSummaryState extends State<WgtTenantUsageSummary> {
 
       for (var type in types) {
         final usageFactorStr = await getSysVar(
-            widget.activePortalProjectScope,
+            widget.appConfig,
             {
               'name': 'usage_factor_$type'.toLowerCase(),
               'scope_str':
@@ -673,7 +674,7 @@ class _WgtTenantUsageSummaryState extends State<WgtTenantUsageSummary> {
             child: WgtMeterGroupStatCore(
               loggedInUser: widget.loggedInUser,
               scopeProfile: widget.scopeProfile,
-              activePortalProjectScope: widget.activePortalProjectScope,
+              appConfig: widget.appConfig,
               statColor:
                   Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
               itemType: widget.itemType,
@@ -706,7 +707,7 @@ class _WgtTenantUsageSummaryState extends State<WgtTenantUsageSummary> {
         loggedInUser: widget.loggedInUser,
         scopeProfile: widget.scopeProfile,
         calcUsageFromReadings: calcUsageFromReadings,
-        activePortalProjectScope: widget.activePortalProjectScope,
+        appConfig: widget.appConfig,
         isBillMode: widget.isBillMode,
         rate: meterType == MeterType.electricity1p
             ? _rateE
@@ -752,7 +753,7 @@ class _WgtTenantUsageSummaryState extends State<WgtTenantUsageSummary> {
               child: WgtUsageStatCore(
                 loggedInUser: widget.loggedInUser,
                 scopeProfile: widget.scopeProfile,
-                activePortalProjectScope: widget.activePortalProjectScope,
+                appConfig: widget.appConfig,
                 isBillMode: widget.isBillMode,
                 rate: meterType == MeterType.electricity1p
                     ? _rateE

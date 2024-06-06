@@ -1,3 +1,4 @@
+import 'package:buff_helper/pagrid_helper/pagrid_helper.dart';
 import 'package:buff_helper/up_helper/up_helper.dart';
 import 'package:flutter/foundation.dart';
 
@@ -16,11 +17,10 @@ class UrlController {
   late String _destPortalURL;
   String get destPortalURL => _destPortalURL;
 
-  UrlController(ProjectScope activeProjectScope) {
-    _activePortalProjectScope = activeProjectScope;
-    _usersvcURL = getProjectHostUser(activeProjectScope);
-    _oresvcURL = getProjectHostOre(activeProjectScope);
-    _destPortalURL = getProjectHostDestPortal(activeProjectScope);
+  UrlController(PaGridAppConfig appConfig) {
+    _usersvcURL = getProjectHostUser(appConfig);
+    _oresvcURL = getProjectHostOre(appConfig);
+    _destPortalURL = getProjectHostDestPortal(appConfig);
   }
 
   String getUrl(SvcType svcType, String endpoint) {
@@ -32,33 +32,70 @@ class UrlController {
     }
   }
 
-  String getProjectHostUser(ProjectScope activeProjectScope) {
+  String getProjectHostUser(PaGridAppConfig paGridAppConfig) {
+    ProjectScope activeProjectScope = paGridAppConfig.activePortalProjectScope;
+    bool useDevUsersvc = paGridAppConfig.useDevUsersvc;
     switch (activeProjectScope) {
       case ProjectScope.EVS2_NTU:
-        return kDebugMode ? UrlBase.dUsersvcUrl : UrlBase.rUsersvcUrl;
+        return kDebugMode
+            ? UrlBase.dUsersvcUrl
+            : useDevUsersvc
+                ? UrlBase.rDevUsersvcUrl
+                : UrlBase.rProdUsersvcUrl;
       case ProjectScope.EMS_SMRT:
-        return kDebugMode ? UrlBase.dUsersvcUrl : UrlBase.rUsersvcUrl;
+        return kDebugMode
+            ? UrlBase.dUsersvcUrl
+            : useDevUsersvc
+                ? UrlBase.rDevUsersvcUrl
+                : UrlBase.rProdUsersvcUrl;
       case ProjectScope.EMS_CW_NUS:
-        return kDebugMode ? UrlBase.dUsersvcUrl : UrlBase.rUsersvcUrl;
+        return kDebugMode
+            ? UrlBase.dUsersvcUrl
+            : useDevUsersvc
+                ? UrlBase.rDevUsersvcUrl
+                : UrlBase.rProdUsersvcUrl;
       default:
-        return kDebugMode ? UrlBase.dUsersvcUrl : UrlBase.rUsersvcUrl;
+        return kDebugMode
+            ? UrlBase.dUsersvcUrl
+            : useDevUsersvc
+                ? UrlBase.rDevUsersvcUrl
+                : UrlBase.rProdUsersvcUrl;
     }
   }
 
-  String getProjectHostOre(ProjectScope activeProjectScope) {
+  String getProjectHostOre(PaGridAppConfig paGridAppConfig) {
+    ProjectScope activeProjectScope = paGridAppConfig.activePortalProjectScope;
+    bool useDevOresvc = paGridAppConfig.useDevOresvc;
     switch (activeProjectScope) {
       case ProjectScope.EVS2_NTU:
-        return kDebugMode ? UrlBase.dOresvcUrl : UrlBase.rOresvcUrlNTU;
+        return kDebugMode
+            ? UrlBase.dOresvcUrl
+            : useDevOresvc
+                ? UrlBase.rDevOresvcUrlNTU
+                : UrlBase.rProdOresvcUrlNTU;
       case ProjectScope.EMS_SMRT:
-        return kDebugMode ? UrlBase.dOresvcUrl : UrlBase.rOresvcUrlSMRT;
+        return kDebugMode
+            ? UrlBase.dOresvcUrl
+            : useDevOresvc
+                ? UrlBase.rDevOresvcUrlSMRT
+                : UrlBase.rProdOresvcUrlSMRT;
       case ProjectScope.EMS_CW_NUS:
-        return kDebugMode ? UrlBase.dOresvcUrl : UrlBase.rOresvcUrlCwNus;
+        return kDebugMode
+            ? UrlBase.dOresvcUrl
+            : useDevOresvc
+                ? UrlBase.rDevOresvcUrlCwNus
+                : UrlBase.rProdOresvcUrlCwNus;
       default:
-        return kDebugMode ? UrlBase.dOresvcUrl : UrlBase.rOresvcUrl;
+        return kDebugMode
+            ? UrlBase.dOresvcUrl
+            : useDevOresvc
+                ? UrlBase.rDevOresvcUrlNTU
+                : UrlBase.rProdOresvcUrlNTU;
     }
   }
 
-  String getProjectHostDestPortal(ProjectScope activeProjectScope) {
+  String getProjectHostDestPortal(PaGridAppConfig paGridAppConfig) {
+    ProjectScope activeProjectScope = paGridAppConfig.activePortalProjectScope;
     switch (activeProjectScope) {
       case ProjectScope.EVS2_NTU:
         return kDebugMode
@@ -86,27 +123,34 @@ class UrlBase {
   static const String _rDestPortalEvs2cp = 'https://cp2.evs.com.sg';
 
   static const String _dOresvcUrl = 'http://localhost:8018';
-  static const String _rOresvcUrl = 'https://ore.evs.com.sg';
-  static const String _rOresvcUrlNTU = 'https://ore-ntu.evs.com.sg';
-  static const String _rOresvcUrlSMRT = 'https://ore-smrt.web-ems.com';
-  static const String _rOresvcUrlCwNus =
-      // 'https://ore.evs.com.sg';
-      'https://dev9-oresvc.evs.com.sg';
+  static const String _rOresvc = 'https://ore.evs.com.sg';
+  static const String _rDevOresvcNTU = _rOresvc;
+  static const String _rProdOresvcUrlNTU = 'https://ore-ntu.evs.com.sg';
+  static const String _rDevOresvcUrlSMRT = _rOresvc;
+  static const String _rProdOresvcUrlSMRT = 'https://ore-smrt.web-ems.com';
+  static const String _rProdOresvcUrlCwNus =
+      'https://oresvc-cw-nus.web-ems.com';
+  static const String _rDevOresvcUrlCwNus = _rOresvc;
 
   static const String _dUsersvcUrl = 'http://13.228.16.206:8081';
-  static const String _rUsersvcUrl = 'https://evs2u.evs.com.sg';
+  static const String _rDevUsersvcUrl = 'https://evs2u.evs.com.sg';
+  static const String _rProdUsersvcUrl = 'https://evs2u.evs.com.sg';
 
   static get dDestPortalEvs2cp => _dDestPortalEvs2cp;
   static get rDestPortalEvs2cp => _rDestPortalEvs2cp;
 
   static get dUsersvcUrl => _dUsersvcUrl;
-  static get rUsersvcUrl => _rUsersvcUrl;
+  static get rDevUsersvcUrl => _rDevUsersvcUrl;
+  static get rProdUsersvcUrl => _rProdUsersvcUrl;
 
   static get dOresvcUrl => _dOresvcUrl;
-  static get rOresvcUrl => _rOresvcUrl;
-  static get rOresvcUrlNTU => _rOresvcUrlNTU;
-  static get rOresvcUrlSMRT => _rOresvcUrlSMRT;
-  static get rOresvcUrlCwNus => _rOresvcUrlCwNus;
+  static get rOresvcUrl => _rOresvc;
+  static get rProdOresvcUrlNTU => _rProdOresvcUrlNTU;
+  static get rDevOresvcUrlNTU => _rDevOresvcNTU;
+  static get rProdOresvcUrlSMRT => _rProdOresvcUrlSMRT;
+  static get rDevOresvcUrlSMRT => _rDevOresvcUrlSMRT;
+  static get rProdOresvcUrlCwNus => _rProdOresvcUrlCwNus;
+  static get rDevOresvcUrlCwNus => _rDevOresvcUrlCwNus;
 
   // static get destPortalEvs2cp =>
   //     kReleaseMode ? _rDestPortalEvs2cp : _dDestPortalEvs2cp;

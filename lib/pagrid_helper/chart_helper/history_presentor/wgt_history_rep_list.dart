@@ -3,6 +3,7 @@ import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../../app_helper/pagrid_app_config.dart';
 import '../../job_helper/get_job_scheduled_box.dart';
 import '../../job_helper/wgt_post_job.dart';
 import '../../../xt_ui/wdgt/file/wgt_save_table.dart';
@@ -11,7 +12,7 @@ import '../../../xt_ui/wdgt/list/evs2_list_text.dart';
 class WgtHistoryRepList extends StatefulWidget {
   const WgtHistoryRepList({
     super.key,
-    required this.activePortalProjectScope,
+    required this.appConfig,
     required this.scopeProfile,
     required this.loggedInUser,
     required this.itemId,
@@ -31,7 +32,7 @@ class WgtHistoryRepList extends StatefulWidget {
     this.jobRequest = const {},
   });
 
-  final ProjectScope activePortalProjectScope;
+  final PaGridAppConfig appConfig;
   final ScopeProfile scopeProfile;
   final Evs2User loggedInUser;
   final String itemId;
@@ -296,8 +297,8 @@ class _WgtHistoryRepListState extends State<WgtHistoryRepList> {
                                 : WgtPostJob(
                                     loggedInUser: widget.loggedInUser,
                                     scopeProfile: widget.scopeProfile,
-                                    activePortalProjectScope:
-                                        widget.activePortalProjectScope,
+                                    appConfig:
+                                        widget.appConfig, //widget.appConfig,
                                     title: 'Post Job',
                                     jobRequest: widget.jobRequest,
                                     iconSize: 55,

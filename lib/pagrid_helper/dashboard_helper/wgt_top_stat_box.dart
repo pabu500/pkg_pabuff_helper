@@ -1,3 +1,4 @@
+import 'package:buff_helper/pagrid_helper/pagrid_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -6,7 +7,7 @@ import '../../pkg_buff_helper.dart';
 class WgtTopStatBox extends StatefulWidget {
   const WgtTopStatBox({
     super.key,
-    required this.activePortalProjectScope,
+    required this.appConfig,
     required this.destPortal,
     required this.scopeProfile,
     required this.loggedInUser,
@@ -26,10 +27,10 @@ class WgtTopStatBox extends StatefulWidget {
     this.adjK = true,
   });
 
-  final ProjectScope activePortalProjectScope;
+  final PaGridAppConfig appConfig;
   final DestPortal destPortal;
   final Future<dynamic> Function(
-      ProjectScope, DestPortal, Map<String, dynamic>, SvcClaim) getStat;
+      PaGridAppConfig, DestPortal, Map<String, dynamic>, SvcClaim) getStat;
   final ScopeProfile scopeProfile;
   final Evs2User loggedInUser;
   final UniqueKey? statKey;
@@ -97,7 +98,7 @@ class _WgtTopStatBoxState extends State<WgtTopStatBox> {
     });
     try {
       activeMeterCount = await widget.getStat(
-          widget.activePortalProjectScope,
+          widget.appConfig,
           widget.destPortal,
           {
             'tenant_id': widget.loggedInUser.tenantId,
@@ -142,7 +143,7 @@ class _WgtTopStatBoxState extends State<WgtTopStatBox> {
     };
     try {
       usage = await widget.getStat(
-        widget.activePortalProjectScope,
+        widget.appConfig,
         widget.destPortal,
         queryMap,
         SvcClaim(
@@ -190,7 +191,7 @@ class _WgtTopStatBoxState extends State<WgtTopStatBox> {
     });
     try {
       topupTotal = await widget.getStat(
-        widget.activePortalProjectScope,
+        widget.appConfig,
         widget.destPortal,
         {
           'project_scope': widget.scopeProfile.selectedProjectScope,
@@ -227,7 +228,7 @@ class _WgtTopStatBoxState extends State<WgtTopStatBox> {
     });
     try {
       mmsStatus = await widget.getStat(
-          widget.activePortalProjectScope,
+          widget.appConfig,
           widget.destPortal,
           {},
           SvcClaim(
@@ -261,7 +262,7 @@ class _WgtTopStatBoxState extends State<WgtTopStatBox> {
     });
     try {
       commUsage = await widget.getStat(
-        widget.activePortalProjectScope,
+        widget.appConfig,
         widget.destPortal,
         {},
         SvcClaim(
@@ -378,7 +379,7 @@ class _WgtTopStatBoxState extends State<WgtTopStatBox> {
         );
       } else if (widget.statType == TopStatType.meterUsage) {
         _infoIcon = getDeviceTypeIcon(widget.meterType);
-        if (widget.activePortalProjectScope == ProjectScope.SG_ALL) {
+        if (widget.appConfig.activePortalProjectScope == ProjectScope.SG_ALL) {
           _infoIcon = const Icon(
             Icons.bolt,
             color: Colors.lightGreenAccent,

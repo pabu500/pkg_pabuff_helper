@@ -1,12 +1,13 @@
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import '../../app_helper/pagrid_app_config.dart';
 import 'bill_calc.dart';
 
 class WgtBillView extends StatefulWidget {
   const WgtBillView({
     super.key,
-    required this.activePortalProjectScope,
+    required this.appConfig,
     required this.scopeProfile,
     required this.loggedInUser,
     required this.billingRecIndexStr,
@@ -18,7 +19,7 @@ class WgtBillView extends StatefulWidget {
 
   final ScopeProfile scopeProfile;
   final Evs2User loggedInUser;
-  final ProjectScope activePortalProjectScope;
+  final PaGridAppConfig appConfig;
   final String billingRecIndexStr;
   // final bool showRenderModeSwitch;
   final List<String> modes;
@@ -56,7 +57,7 @@ class _WgtBillViewState extends State<WgtBillView> {
 
     try {
       Map<String, dynamic> billResult = await getBill(
-        widget.activePortalProjectScope,
+        widget.appConfig,
         queryMap,
         SvcClaim(
           username: widget.loggedInUser.username,
@@ -374,7 +375,7 @@ class _WgtBillViewState extends State<WgtBillView> {
             },
           )
         : WgtTenantUsageSummary2(
-            activePortalProjectScope: widget.activePortalProjectScope,
+            appConfig: widget.appConfig,
             loggedInUser: widget.loggedInUser,
             scopeProfile: widget.scopeProfile,
             usageCalc: emsTypeUsageCalc,
@@ -643,7 +644,7 @@ class _WgtBillViewState extends State<WgtBillView> {
             },
           )
         : WgtTenantUsageSummaryReleased(
-            activePortalProjectScope: widget.activePortalProjectScope,
+            appConfig: widget.appConfig,
             loggedInUser: widget.loggedInUser,
             scopeProfile: widget.scopeProfile,
             isBillMode: true,

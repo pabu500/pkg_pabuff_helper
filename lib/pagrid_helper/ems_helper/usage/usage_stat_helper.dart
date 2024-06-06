@@ -3,6 +3,8 @@ import 'package:buff_helper/up_helper/helper/tenant_def.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../app_helper/pagrid_app_config.dart';
+
 Widget getTypeUsageStat(
     BuildContext context, String meterTypeTag, Map<String, double> usage,
     {int usageDecimals = 3,
@@ -280,7 +282,7 @@ Widget getTypeUsageNet(
     BuildContext context,
     Evs2User loggedInUser,
     ScopeProfile scopeProfile,
-    ProjectScope activePortalProjectScope,
+    PaGridAppConfig appConfig,
     double? netUsageE,
     double? rateE,
     double? netUsageW,
@@ -327,7 +329,7 @@ Widget getTypeUsageNet(
           child: WgtUsageStatCore(
             loggedInUser: loggedInUser,
             scopeProfile: scopeProfile,
-            activePortalProjectScope: activePortalProjectScope,
+            appConfig: appConfig,
             isBillMode: true,
             rate: rateE,
             statColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
@@ -352,7 +354,7 @@ Widget getTypeUsageNet(
           child: WgtUsageStatCore(
             loggedInUser: loggedInUser,
             scopeProfile: scopeProfile,
-            activePortalProjectScope: activePortalProjectScope,
+            appConfig: appConfig,
             isBillMode: true,
             rate: rateW,
             statColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
@@ -377,7 +379,7 @@ Widget getTypeUsageNet(
           child: WgtUsageStatCore(
             loggedInUser: loggedInUser,
             scopeProfile: scopeProfile,
-            activePortalProjectScope: activePortalProjectScope,
+            appConfig: appConfig,
             isBillMode: true,
             rate: rateB,
             statColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
@@ -402,7 +404,7 @@ Widget getTypeUsageNet(
           child: WgtUsageStatCore(
             loggedInUser: loggedInUser,
             scopeProfile: scopeProfile,
-            activePortalProjectScope: activePortalProjectScope,
+            appConfig: appConfig,
             isBillMode: true,
             rate: rateN,
             statColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
@@ -427,7 +429,7 @@ Widget getTypeUsageNet(
           child: WgtUsageStatCore(
             loggedInUser: loggedInUser,
             scopeProfile: scopeProfile,
-            activePortalProjectScope: activePortalProjectScope,
+            appConfig: appConfig,
             isBillMode: true,
             rate: rateG,
             statColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),

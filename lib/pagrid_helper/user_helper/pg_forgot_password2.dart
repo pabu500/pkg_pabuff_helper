@@ -3,9 +3,12 @@ import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
 
 class ForgotPassword extends StatefulWidget {
-  ForgotPassword({super.key, required this.activePortalProjectScope});
+  const ForgotPassword({
+    super.key,
+    required this.appConfig,
+  });
 
-  final ProjectScope activePortalProjectScope;
+  final PaGridAppConfig appConfig;
 
   @override
   _ForgotPasswordState createState() => _ForgotPasswordState();
@@ -40,7 +43,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
               child: Column(
                 children: [
                   xtTextField(
-                    activePortalProjectScope: widget.activePortalProjectScope,
+                    appConfig: widget.appConfig,
                     tfKey: UserKey.email,
                     maxLength: maxEmailLength,
                     formCoordinator: formCoordinator,
@@ -89,7 +92,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       bool? emailExists;
                       try {
                         emailExists = await doCheckExists(
-                            widget.activePortalProjectScope,
+                            widget.appConfig,
                             UserKey.email,
                             formCoordinator.formData[UserKey.email]!);
                       } catch (err) {
@@ -146,8 +149,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       // formCoordinator.toggleDisabledAll(false);
                       bool? email_sent_success;
                       email_sent_success = await doForgotPassword(
-                              widget.activePortalProjectScope,
-                              formCoordinator.formData)
+                              widget.appConfig, formCoordinator.formData)
                           .catchError((err) {
                         setState(() {
                           _wait = false;

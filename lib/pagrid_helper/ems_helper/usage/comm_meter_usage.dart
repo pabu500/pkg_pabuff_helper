@@ -2,10 +2,11 @@ import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import '../../app_helper/pagrid_app_config.dart';
 import '../../comm_helper/be_api_base.dart';
 
 Future<dynamic> queryMeterUsageSummary(
-  ProjectScope activePortalProjectScope,
+  PaGridAppConfig appConfig,
   Map<String, String> queryMap,
   Duration duration,
   SvcClaim svcClaim,
@@ -21,7 +22,7 @@ Future<dynamic> queryMeterUsageSummary(
   // }
 
   final response = await http.post(
-    Uri.parse(UrlController(activePortalProjectScope)
+    Uri.parse(UrlController(appConfig)
         .getUrl(SvcType.oresvc, UrlBase.eptGetMeterListUsageSummary)),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
@@ -93,7 +94,7 @@ Future<dynamic> queryMeterUsageSummary(
 }
 
 Future<dynamic> queryMeterConsolidatedUsageHistory(
-  ProjectScope activePortalProjectScope,
+  PaGridAppConfig appConfig,
   Map<String, String> queryMap,
   Duration duration,
   SvcClaim svcClaim,
@@ -109,7 +110,7 @@ Future<dynamic> queryMeterConsolidatedUsageHistory(
   // }
 
   final response = await http.post(
-    Uri.parse(UrlController(activePortalProjectScope).getUrl(
+    Uri.parse(UrlController(appConfig).getUrl(
         SvcType.oresvc, UrlBase.eptGetMeterListConsolidatedUsageHistory)),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',

@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import '../comm_helper/be_api_base.dart';
 
 Future<dynamic> doPostJob(
-  ProjectScope activePortalProjectScope,
+  PaGridAppConfig appConfig,
   JobTaskType jobType,
   Map<String, String> requst,
   List<Map<String, dynamic>> opList,
@@ -23,8 +23,8 @@ Future<dynamic> doPostJob(
   // }
 
   final response = await http.post(
-    Uri.parse(UrlController(activePortalProjectScope)
-        .getUrl(SvcType.oresvc, UrlBase.eptPostJob)),
+    Uri.parse(
+        UrlController(appConfig).getUrl(SvcType.oresvc, UrlBase.eptPostJob)),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
       'Authorization': 'Bearer $svcToken',

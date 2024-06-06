@@ -2,6 +2,7 @@ import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../../app_helper/pagrid_app_config.dart';
 import '../../finder_helper/wgt_item_finder2.dart';
 
 class WgtBillingRecFinder extends StatefulWidget {
@@ -9,7 +10,7 @@ class WgtBillingRecFinder extends StatefulWidget {
     super.key,
     required this.scopeProfile,
     required this.loggedInUser,
-    required this.activePortalProjectScope,
+    required this.appConfig,
     this.tenantName,
     this.lcStatusList,
     this.sectionName = '',
@@ -33,7 +34,7 @@ class WgtBillingRecFinder extends StatefulWidget {
 
   final ScopeProfile scopeProfile;
   final Evs2User loggedInUser;
-  final ProjectScope activePortalProjectScope;
+  final PaGridAppConfig appConfig;
   final String sectionName;
   final String? tenantName;
   final List<BillingLcStatus>? lcStatusList;
@@ -87,7 +88,7 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
     super.initState();
 
     _genTypeList.clear();
-    if (widget.activePortalProjectScope == ProjectScope.EMS_CW_NUS) {
+    if (widget.appConfig.activePortalProjectScope == ProjectScope.EMS_CW_NUS) {
       _genTypeList.addAll([
         '   ',
         BillGenType.auto.name,
@@ -162,7 +163,7 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
         height: 1, color: Theme.of(context).hintColor.withOpacity(0.3));
 
     return WgtItemFinder2(
-      activePortalProjectScope: widget.activePortalProjectScope,
+      appConfig: widget.appConfig,
       loggedInUser: widget.loggedInUser,
       scopeProfile: widget.scopeProfile,
       showSiteScopeSelector: false,

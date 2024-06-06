@@ -19,12 +19,12 @@ class LoginPagePagrid extends StatefulWidget {
   const LoginPagePagrid({
     super.key,
     required this.destPortal,
-    required this.activePortalProjectScope,
+    required this.appConfig,
     required this.onAssignUserToProvider,
   });
 
   final DestPortal destPortal;
-  final ProjectScope activePortalProjectScope;
+  final PaGridAppConfig appConfig;
   final Function onAssignUserToProvider;
 
   @override
@@ -173,8 +173,8 @@ class _LoginPagePagridState extends State<LoginPagePagrid> {
 
     Evs2User? user;
     try {
-      user = await doLogin(widget.destPortal, widget.activePortalProjectScope,
-          formCoordinator.formData);
+      user = await doLogin(
+          widget.destPortal, widget.appConfig, formCoordinator.formData);
     } catch (err) {
       String errMsg = err.toString();
       Map<String, dynamic> errMap =
@@ -289,8 +289,7 @@ class _LoginPagePagridState extends State<LoginPagePagrid> {
         String email =
             decodeEmailAddress(FirebaseAuth.instance.currentUser!.email!);
         Map<String, dynamic> result = await verifyEmailAddress(
-            widget.activePortalProjectScope,
-            {'email': email, 'auth_provider': 'microsoft'});
+            widget.appConfig, {'email': email, 'auth_provider': 'microsoft'});
         if (result['is_sso_email_valid'] == true) {
           result['email'] = email;
           return result;
@@ -440,8 +439,8 @@ class _LoginPagePagridState extends State<LoginPagePagrid> {
                       padding: const EdgeInsets.only(top: 13),
                       child: _credExpired
                           ? WgtUpdatePassword(
-                              activePortalProjectScope:
-                                  widget.activePortalProjectScope,
+                              appConfig: widget
+                                  .appConfig, //widget.appConfig, //appConfig,
                               titleWidget: const Column(
                                 children: [
                                   xtInfoBox(
@@ -473,8 +472,7 @@ class _LoginPagePagridState extends State<LoginPagePagrid> {
                                 child: Column(
                                   children: [
                                     xtTextField(
-                                      activePortalProjectScope:
-                                          widget.activePortalProjectScope,
+                                      appConfig: widget.appConfig,
                                       order: tabIndex++,
                                       tfKey: UserKey.identifier,
                                       maxLength: maxEmailLength,
@@ -496,8 +494,7 @@ class _LoginPagePagridState extends State<LoginPagePagrid> {
                                     ),
                                     // TextField(
                                     xtTextField(
-                                      activePortalProjectScope:
-                                          widget.activePortalProjectScope,
+                                      appConfig: widget.appConfig,
                                       order: tabIndex++,
                                       tfKey: UserKey.password,
                                       maxLength: maxPasswordLength,
@@ -573,7 +570,8 @@ class _LoginPagePagridState extends State<LoginPagePagrid> {
                                             )),
                                       ),
                                     ),
-                                    if (widget.activePortalProjectScope ==
+                                    if (widget.appConfig
+                                                .activePortalProjectScope ==
                                             ProjectScope.EMS_CW_NUS &&
                                         widget.destPortal == DestPortal.emsop)
                                       Padding(

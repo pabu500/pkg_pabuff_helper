@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../app_helper/pagrid_app_config.dart';
 import '../usage/usage_stat_helper.dart';
 import 'mdl_ems_type_usage.dart';
 
@@ -12,7 +13,7 @@ class WgtTenantUsageSummary2 extends StatefulWidget {
     super.key,
     required this.scopeProfile,
     required this.loggedInUser,
-    required this.activePortalProjectScope,
+    required this.appConfig,
     required this.itemType,
     required this.isMonthly,
     required this.fromDatetime,
@@ -42,7 +43,7 @@ class WgtTenantUsageSummary2 extends StatefulWidget {
     this.costDecimals = 3,
   });
 
-  final ProjectScope activePortalProjectScope;
+  final PaGridAppConfig appConfig;
   final ScopeProfile scopeProfile;
   final Evs2User loggedInUser;
   final EmsTypeUsageCalc? usageCalc;
@@ -335,7 +336,7 @@ class _WgtTenantUsageSummary2State extends State<WgtTenantUsageSummary2> {
             child: WgtMeterGroupStatCore(
               loggedInUser: widget.loggedInUser,
               scopeProfile: widget.scopeProfile,
-              activePortalProjectScope: widget.activePortalProjectScope,
+              appConfig: widget.appConfig,
               statColor:
                   Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
               itemType: widget.itemType,
@@ -369,7 +370,7 @@ class _WgtTenantUsageSummary2State extends State<WgtTenantUsageSummary2> {
         scopeProfile: widget.scopeProfile,
         showFactoredUsage: widget.showFactoredUsage,
         calcUsageFromReadings: calcUsageFromReadings,
-        activePortalProjectScope: widget.activePortalProjectScope,
+        appConfig: widget.appConfig,
         isBillMode: widget.isBillMode,
         rate: widget.typeRates?[meterTypeTag] ?? 0,
         statColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
@@ -408,7 +409,7 @@ class _WgtTenantUsageSummary2State extends State<WgtTenantUsageSummary2> {
               child: WgtUsageStatCore(
                 loggedInUser: widget.loggedInUser,
                 scopeProfile: widget.scopeProfile,
-                activePortalProjectScope: widget.activePortalProjectScope,
+                appConfig: widget.appConfig,
                 isBillMode: widget.isBillMode,
                 rate: widget.typeRates?[meterTypeTag] ?? 0,
                 statColor:

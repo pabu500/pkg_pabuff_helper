@@ -3,12 +3,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 
+import '../app_helper/pagrid_app_config.dart';
+
 class WgtItemFinder2 extends StatefulWidget {
   const WgtItemFinder2({
     super.key,
     required this.scopeProfile,
     required this.loggedInUser,
-    required this.activePortalProjectScope,
+    required this.appConfig,
     required this.itemType,
     this.sectionName = '',
     this.panelName = '',
@@ -45,7 +47,7 @@ class WgtItemFinder2 extends StatefulWidget {
 
   final ScopeProfile scopeProfile;
   final Evs2User loggedInUser;
-  final ProjectScope activePortalProjectScope;
+  final PaGridAppConfig appConfig;
   final ItemType itemType;
   final String sectionName;
   final String panelName;
@@ -203,7 +205,7 @@ class _WgtItemFinder2State extends State<WgtItemFinder2> {
 
     try {
       result = await doListItems(
-        widget.activePortalProjectScope,
+        widget.appConfig,
         queryMap,
         SvcClaim(
           username: widget.loggedInUser.username,
@@ -501,7 +503,7 @@ class _WgtItemFinder2State extends State<WgtItemFinder2> {
           width: width,
           // height: height,
           child: WgtFinderFieldInput(
-            activePortalProjectScope: widget.activePortalProjectScope,
+            appConfig: widget.appConfig,
             width: 220,
             labelText: widget.itemLabelText,
             hintText: widget.itemLabelText,
@@ -541,7 +543,7 @@ class _WgtItemFinder2State extends State<WgtItemFinder2> {
           width: width,
           // height: height,
           child: WgtFinderFieldInput(
-            activePortalProjectScope: widget.activePortalProjectScope,
+            appConfig: widget.appConfig,
             width: 220,
             labelText: widget.itemNameText,
             hintText: widget.itemNameText,
@@ -606,7 +608,7 @@ class _WgtItemFinder2State extends State<WgtItemFinder2> {
           width: width,
           // height: height,
           child: xtTextField2(
-              activePortalProjectScope: widget.activePortalProjectScope,
+              appConfig: widget.appConfig,
               labelText: labelText,
               hintText: hintText,
               initialValue: initialValue,

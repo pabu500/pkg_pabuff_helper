@@ -1,8 +1,9 @@
+import 'package:buff_helper/pagrid_helper/pagrid_helper.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 
 Future<dynamic> pullUsageFactor({
-  required ProjectScope activePortalProjectScope,
+  required PaGridAppConfig appConfig,
   required String scopeStr,
   required DateTime fromDatetime,
   required DateTime toDatetime,
@@ -24,7 +25,7 @@ Future<dynamic> pullUsageFactor({
 
   try {
     final usageFactorListReuslt = await getUsageFactor(
-      activePortalProjectScope,
+      appConfig,
       {
         'scope_str': scopeStr,
         'from_timestamp': fromDatetime.toIso8601String(),

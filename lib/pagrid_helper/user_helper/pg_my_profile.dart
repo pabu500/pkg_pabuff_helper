@@ -7,12 +7,12 @@ import 'package:flutter/material.dart';
 class PgMyProfile extends StatefulWidget {
   const PgMyProfile({
     super.key,
-    required this.activePortalProjectScope,
+    required this.appConfig,
     required this.loggedInUser,
     required this.scopeProfile,
   });
 
-  final ProjectScope activePortalProjectScope;
+  final PaGridAppConfig appConfig;
   final Evs2User loggedInUser;
   final ScopeProfile scopeProfile;
 
@@ -50,7 +50,7 @@ class _PgMyProfileState extends State<PgMyProfile> {
 
     try {
       Map<String, dynamic> result = await doUpdateKeyValue(
-        widget.activePortalProjectScope,
+        widget.appConfig,
         widget.loggedInUser.id!,
         key,
         value,
@@ -80,7 +80,7 @@ class _PgMyProfileState extends State<PgMyProfile> {
   Future<dynamic> _checkValue(String key) async {
     try {
       Map<String, dynamic> result = await doCheckKeyVal(
-        widget.activePortalProjectScope,
+        widget.appConfig,
         widget.loggedInUser.id!,
         key,
         SvcClaim(
@@ -418,7 +418,7 @@ class _PgMyProfileState extends State<PgMyProfile> {
               height: 330,
               padding: const EdgeInsets.only(right: 40),
               child: WgtUpdatePassword(
-                activePortalProjectScope: widget.activePortalProjectScope,
+                appConfig: widget.appConfig,
                 width: _width,
                 padding: EdgeInsets.zero,
                 showUsername: false,

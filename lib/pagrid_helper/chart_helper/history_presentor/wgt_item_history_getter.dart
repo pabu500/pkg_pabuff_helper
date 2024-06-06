@@ -6,13 +6,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../../xt_ui/wdgt/datetime/wgt_date_range_picker2.dart';
+import '../../app_helper/pagrid_app_config.dart';
 
 class WgtItemHistoryGetter extends StatefulWidget {
   const WgtItemHistoryGetter({
     super.key,
     required this.scopeProfile,
     required this.loggedInUser,
-    required this.activePortalProjectScope,
+    required this.appConfig,
     this.genMeta = true,
     // this.externalKeyReshfreshed = false,
     this.getterParentLoaded = false,
@@ -50,7 +51,7 @@ class WgtItemHistoryGetter extends StatefulWidget {
   // final bool externalKeyReshfreshed;
   final ScopeProfile scopeProfile;
   final Evs2User loggedInUser;
-  final ProjectScope activePortalProjectScope;
+  final PaGridAppConfig appConfig;
   final bool genMeta;
   final bool getterParentLoaded;
   final UniqueKey? externalKeyReshfrehKey;
@@ -200,7 +201,7 @@ class _WgtItemHistoryGetterState extends State<WgtItemHistoryGetter> {
           print('pull history $_startDate - $_endDate');
         }
         historyResult = await pullItemHistory(
-          widget.activePortalProjectScope,
+          widget.appConfig,
           queryMap,
           SvcClaim(
             username: widget.loggedInUser.username,
@@ -231,7 +232,7 @@ class _WgtItemHistoryGetterState extends State<WgtItemHistoryGetter> {
               'site_tag': widget.scopeProfile.selectedSiteScope == null
                   ? ''
                   : widget.scopeProfile.selectedSiteScope!.name,
-              'project_scope': widget.activePortalProjectScope.name,
+              'project_scope': widget.appConfig.activePortalProjectScope.name,
             },
           });
           return 'too many records';
@@ -254,11 +255,11 @@ class _WgtItemHistoryGetterState extends State<WgtItemHistoryGetter> {
         'clear_repeated_readings_only':
             widget.clearRepeatedReadingsOnly ? 'true' : 'false',
         'raw_data_check': widget.rawDataCheck ? 'true' : 'false',
-        'detect_restart_event':
-            widget.activePortalProjectScope == ProjectScope.EMS_SMRT &&
-                    widget.itemType == ItemType.meter_3p
-                ? 'true'
-                : 'false',
+        'detect_restart_event': widget.appConfig.activePortalProjectScope ==
+                    ProjectScope.EMS_SMRT &&
+                widget.itemType == ItemType.meter_3p
+            ? 'true'
+            : 'false',
         // 'get_count_only': 'false',
         'force_align_time_range': widget.forceAlignTimeRange ? 'true' : 'false',
         'gen_meta': widget.genMeta ? 'true' : 'false',
@@ -267,7 +268,7 @@ class _WgtItemHistoryGetterState extends State<WgtItemHistoryGetter> {
         print('pull history $_startDate - $_endDate');
       }
       historyResult = await pullItemHistory(
-        widget.activePortalProjectScope,
+        widget.appConfig,
         queryMap,
         SvcClaim(
           username: widget.loggedInUser.username,
@@ -598,9 +599,10 @@ class _WgtItemHistoryGetterState extends State<WgtItemHistoryGetter> {
   void initState() {
     super.initState();
 
-    _normalization = widget.activePortalProjectScope == ProjectScope.EMS_CW_NUS
-        ? false
-        : true;
+    _normalization =
+        widget.appConfig.activePortalProjectScope == ProjectScope.EMS_CW_NUS
+            ? false
+            : true;
 
     _selectedTimeRangeMinutes = widget.lookBackMinutes[0];
 

@@ -2,13 +2,14 @@ import 'package:buff_helper/up_helper/up_helper.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import '../app_helper/pagrid_app_config.dart';
 import 'be_api_base.dart';
 
-Future<dynamic> doCheckUnique(ProjectScope activePortalProjectScope,
-    String field, String val, String table) async {
+Future<dynamic> doCheckUnique(
+    PaGridAppConfig appConfig, String field, String val, String table) async {
   try {
     //use query string instead of path
-    UrlController urlController = UrlController(activePortalProjectScope);
+    UrlController urlController = UrlController(appConfig);
 
     final response = await http.get(
       Uri.parse(
@@ -26,7 +27,7 @@ Future<dynamic> doCheckUnique(ProjectScope activePortalProjectScope,
 }
 
 Future<dynamic> doListItems(
-  ProjectScope activePortalProjectScope,
+  PaGridAppConfig appConfig,
   Map<String, dynamic> queryMap,
   SvcClaim svcClaim,
 ) async {
@@ -40,7 +41,7 @@ Future<dynamic> doListItems(
   //   throw Exception(err);
   // }
 
-  UrlController urlController = UrlController(activePortalProjectScope);
+  UrlController urlController = UrlController(appConfig);
 
   final response = await http.post(
     Uri.parse(urlController.getUrl(SvcType.oresvc, UrlBase.eptListItems)),
@@ -86,7 +87,7 @@ Future<dynamic> doListItems(
 }
 
 Future<dynamic> getItemInfo(
-  ProjectScope activePortalProjectScope,
+  PaGridAppConfig appConfig,
   Map<String, String> queryMap,
   SvcClaim svcClaim,
 ) async {
@@ -100,7 +101,7 @@ Future<dynamic> getItemInfo(
   //   throw Exception(err);
   // }
 
-  UrlController urlController = UrlController(activePortalProjectScope);
+  UrlController urlController = UrlController(appConfig);
 
   final response = await http.post(
     Uri.parse(urlController.getUrl(SvcType.oresvc, UrlBase.eptGetItemInfo)),
@@ -132,7 +133,7 @@ Future<dynamic> getItemInfo(
 }
 
 Future<dynamic> doCheckItemSnIwow(
-  ProjectScope activePortalProjectScope,
+  PaGridAppConfig appConfig,
   String meterName,
   SvcClaim svcClaim,
 ) async {
@@ -146,7 +147,7 @@ Future<dynamic> doCheckItemSnIwow(
   //   throw Exception(err);
   // }
 
-  UrlController urlController = UrlController(activePortalProjectScope);
+  UrlController urlController = UrlController(appConfig);
 
   final response = await http.post(
     Uri.parse(urlController.getUrl(SvcType.oresvc, UrlBase.eptGetItemSnIwow)),
@@ -178,7 +179,7 @@ Future<dynamic> doCheckItemSnIwow(
 }
 
 Future<dynamic> pullItemLastReading(
-  ProjectScope activePortalProjectScope,
+  PaGridAppConfig appConfig,
   Map<String, String> queryMap,
   SvcClaim svcClaim,
 ) async {
@@ -192,7 +193,7 @@ Future<dynamic> pullItemLastReading(
   //   throw Exception(err);
   // }
 
-  UrlController urlController = UrlController(activePortalProjectScope);
+  UrlController urlController = UrlController(appConfig);
   try {
     final response = await http.post(
       Uri.parse(
@@ -227,7 +228,7 @@ Future<dynamic> pullItemLastReading(
   }
 }
 
-Future<dynamic> pullItemHistory(ProjectScope activePortalProjectScope,
+Future<dynamic> pullItemHistory(PaGridAppConfig appConfig,
     Map<String, dynamic> queryMap, SvcClaim svcClaim) async {
   svcClaim.svcName = SvcType.oresvc.name;
   svcClaim.endpoint = UrlBase.eptGetTargetHistory;
@@ -241,7 +242,7 @@ Future<dynamic> pullItemHistory(ProjectScope activePortalProjectScope,
   //   throw Exception(err);
   // }
 
-  UrlController urlController = UrlController(activePortalProjectScope);
+  UrlController urlController = UrlController(appConfig);
 
   final response = await http.post(
     Uri.parse(

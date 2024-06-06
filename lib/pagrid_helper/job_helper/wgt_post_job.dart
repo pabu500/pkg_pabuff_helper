@@ -1,15 +1,15 @@
+import 'package:buff_helper/pagrid_helper/pagrid_helper.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import 'comm_job.dart';
-import 'job_def.dart';
 
 class WgtPostJob extends StatefulWidget {
   const WgtPostJob({
     super.key,
-    required this.activePortalProjectScope,
+    required this.appConfig,
     required this.scopeProfile,
     required this.loggedInUser,
     this.tooltip,
@@ -22,7 +22,7 @@ class WgtPostJob extends StatefulWidget {
     this.onPosted,
   });
 
-  final ProjectScope activePortalProjectScope;
+  final PaGridAppConfig appConfig;
   final ScopeProfile scopeProfile;
   final Evs2User loggedInUser;
   final String? title;
@@ -50,7 +50,7 @@ class _WgtPostJobState extends State<WgtPostJob> {
       }
 
       Map<String, dynamic> result = await doPostJob(
-        widget.activePortalProjectScope,
+        widget.appConfig,
         JobTaskType.itemHistory,
         jobRequest,
         widget.opList,

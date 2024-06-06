@@ -1,3 +1,4 @@
+import 'package:buff_helper/pagrid_helper/pagrid_helper.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 
@@ -10,7 +11,7 @@ import '../list/get_commit_button.dart';
 class WgtUpdatePassword extends StatefulWidget {
   const WgtUpdatePassword({
     super.key,
-    required this.activePortalProjectScope,
+    required this.appConfig,
     required this.requestByUsername,
     required this.userId,
     this.titleWidget,
@@ -25,7 +26,7 @@ class WgtUpdatePassword extends StatefulWidget {
     required this.updatePassword,
   });
 
-  final ProjectScope activePortalProjectScope;
+  final PaGridAppConfig appConfig;
   final Widget? titleWidget;
   final String requestByUsername;
   final int userId;
@@ -69,7 +70,7 @@ class _WgtUpdatePasswordState extends State<WgtUpdatePassword> {
     });
     try {
       Map<String, dynamic> result = await widget.updatePassword(
-        widget.activePortalProjectScope,
+        widget.appConfig,
         widget.userId,
         'password',
         _controllerNewPassword.text.trim(),

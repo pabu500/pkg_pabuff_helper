@@ -3,10 +3,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../pagrid_helper/app_helper/pagrid_app_config.dart';
+
 class xtTextField extends StatefulWidget {
   xtTextField(
       {super.key,
-      required this.activePortalProjectScope,
+      required this.appConfig,
       this.decoration,
       this.onTap,
       this.onChanged,
@@ -27,10 +29,10 @@ class xtTextField extends StatefulWidget {
       this.inputFormatters,
       this.disabled});
 
-  final ProjectScope activePortalProjectScope;
+  final PaGridAppConfig appConfig;
   InputDecoration? decoration;
   bool? requireUnique;
-  Future<String> Function(ProjectScope, Enum, String)? doCommCheckUnique;
+  Future<String> Function(PaGridAppConfig, Enum, String)? doCommCheckUnique;
   bool? obscureText;
 
   void Function()? onTap;
@@ -111,8 +113,7 @@ class _xtTextFieldState extends State<xtTextField> {
               //filled and validated and db check needed
 
               if (widget.tfKey != null && widget.doCommCheckUnique != null) {
-                checkUnique(widget.activePortalProjectScope, widget.tfKey!,
-                    _controller.text);
+                checkUnique(widget.appConfig, widget.tfKey!, _controller.text);
               }
             }
           }
@@ -223,7 +224,7 @@ class _xtTextFieldState extends State<xtTextField> {
   }
 
   Future<void> checkUnique(
-    ProjectScope activePojectScope,
+    PaGridAppConfig appConfig,
     Enum field,
     String val,
     /*Future<String> doCommFunc(Enum fld, String v)*/
@@ -236,8 +237,8 @@ class _xtTextFieldState extends State<xtTextField> {
       suffix = txTextInputSuffix('waiting', null);
     });
 
-    var dbresult = await widget.doCommCheckUnique!(
-        activePojectScope, field, val.toLowerCase());
+    var dbresult =
+        await widget.doCommCheckUnique!(appConfig, field, val.toLowerCase());
 
     setState(() {
       if (dbresult == 'available') {

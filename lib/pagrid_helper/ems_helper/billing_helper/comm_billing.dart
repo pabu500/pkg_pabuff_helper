@@ -1,3 +1,4 @@
+import 'package:buff_helper/pagrid_helper/pagrid_helper.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 
 import 'package:http/http.dart' as http;
@@ -6,7 +7,7 @@ import 'dart:convert';
 import '../../comm_helper/be_api_base.dart';
 
 Future<dynamic> getUsageFactor(
-  ProjectScope activePortalProjectScope,
+  PaGridAppConfig appConfig,
   Map<String, String> queryMap,
   SvcClaim svcClaim,
 ) async {
@@ -21,8 +22,8 @@ Future<dynamic> getUsageFactor(
   // }
 
   final response = await http.post(
-    Uri.parse(UrlController(activePortalProjectScope)
-        .getUrl(SvcType.oresvc, svcClaim.endpoint!)),
+    Uri.parse(
+        UrlController(appConfig).getUrl(SvcType.oresvc, svcClaim.endpoint!)),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
       'Authorization': 'Bearer $svcToken',
@@ -48,7 +49,7 @@ Future<dynamic> getUsageFactor(
 }
 
 Future<dynamic> getBill(
-  ProjectScope activePortalProjectScope,
+  PaGridAppConfig appConfig,
   Map<String, String> queryMap,
   // Duration duration,
   SvcClaim svcClaim,
@@ -64,8 +65,8 @@ Future<dynamic> getBill(
   // }
 
   final response = await http.post(
-    Uri.parse(UrlController(activePortalProjectScope)
-        .getUrl(SvcType.oresvc, UrlBase.eptGetBill)),
+    Uri.parse(
+        UrlController(appConfig).getUrl(SvcType.oresvc, UrlBase.eptGetBill)),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
       'Authorization': 'Bearer $svcToken',
@@ -92,7 +93,7 @@ Future<dynamic> getBill(
 }
 
 Future<dynamic> genBill(
-  ProjectScope activePortalProjectScope,
+  PaGridAppConfig appConfig,
   Map<String, dynamic> queryMap,
   // Duration duration,
   SvcClaim svcClaim,
@@ -108,7 +109,7 @@ Future<dynamic> genBill(
   // }
 
   final response = await http.post(
-    Uri.parse(UrlController(activePortalProjectScope)
+    Uri.parse(UrlController(appConfig)
         .getUrl(SvcType.oresvc, UrlBase.eptGenerateBillingRec)),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
@@ -136,7 +137,7 @@ Future<dynamic> genBill(
 }
 
 Future<dynamic> checkTpInfo(
-  ProjectScope activePortalProjectScope,
+  PaGridAppConfig appConfig,
   Map<String, String> queryMap,
   // Duration duration,
   SvcClaim svcClaim,
@@ -152,7 +153,7 @@ Future<dynamic> checkTpInfo(
   // }
 
   final response = await http.post(
-    Uri.parse(UrlController(activePortalProjectScope)
+    Uri.parse(UrlController(appConfig)
         .getUrl(SvcType.oresvc, UrlBase.eptCheckTpInfo)),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
@@ -182,7 +183,7 @@ Future<dynamic> checkTpInfo(
 }
 
 Future<dynamic> doGetReleaseCandidate(
-  ProjectScope activePortalProjectScope,
+  PaGridAppConfig appConfig,
   Map<String, dynamic> reqMap,
   SvcClaim svcClaim,
 ) async {
@@ -203,7 +204,7 @@ Future<dynamic> doGetReleaseCandidate(
 
   try {
     final response = await http.post(
-      Uri.parse(UrlController(activePortalProjectScope)
+      Uri.parse(UrlController(appConfig)
           .getUrl(SvcType.oresvc, UrlBase.eptGetReleaseCandidate)),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
@@ -237,7 +238,7 @@ Future<dynamic> doGetReleaseCandidate(
 }
 
 Future<dynamic> doReleaseBills(
-  ProjectScope activePortalProjectScope,
+  PaGridAppConfig appConfig,
   Map<String, dynamic> reqMap,
   SvcClaim svcClaim,
 ) async {
@@ -258,7 +259,7 @@ Future<dynamic> doReleaseBills(
 
   try {
     final response = await http.post(
-      Uri.parse(UrlController(activePortalProjectScope)
+      Uri.parse(UrlController(appConfig)
           .getUrl(SvcType.oresvc, UrlBase.eptReleaseBills)),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',

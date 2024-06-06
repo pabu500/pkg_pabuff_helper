@@ -3,6 +3,7 @@ import 'package:buff_helper/util/string_util.dart';
 import 'package:buff_helper/xt_ui/xt_ui.dart';
 import 'package:flutter/material.dart';
 
+import '../../app_helper/pagrid_app_config.dart';
 import '../../chart_helper/history_presentor/wgt_item_history_presenter.dart';
 
 class WgtUsageStatCore extends StatefulWidget {
@@ -10,7 +11,7 @@ class WgtUsageStatCore extends StatefulWidget {
     super.key,
     required this.scopeProfile,
     required this.loggedInUser,
-    required this.activePortalProjectScope,
+    required this.appConfig,
     this.noData = false,
     required this.meterType,
     required this.meterId,
@@ -37,7 +38,7 @@ class WgtUsageStatCore extends StatefulWidget {
 
   final ScopeProfile scopeProfile;
   final Evs2User loggedInUser;
-  final ProjectScope activePortalProjectScope;
+  final PaGridAppConfig appConfig;
   final bool noData;
   final MeterType meterType;
   final String meterId;
@@ -539,7 +540,7 @@ class _WgtUsageStatCoreState extends State<WgtUsageStatCore> {
     return WgtItemHistoryPresenter(
       loggedInUser: widget.loggedInUser,
       scopeProfile: widget.scopeProfile,
-      activePortalProjectScope: widget.activePortalProjectScope,
+      appConfig: widget.appConfig,
       height: height,
       width: width,
       bgColor: Colors.transparent,
