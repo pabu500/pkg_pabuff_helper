@@ -61,7 +61,7 @@ class BillCalc {
   double? _billedTotalUsageG;
 
   final List<Map<String, dynamic>> _trendingE = [];
-  final List<Map<String, dynamic>> _trendimgW = [];
+  final List<Map<String, dynamic>> _trendingW = [];
   final List<Map<String, dynamic>> _trendingB = [];
   final List<Map<String, dynamic>> _trendingN = [];
   final List<Map<String, dynamic>> _trendingG = [];
@@ -96,7 +96,7 @@ class BillCalc {
   get totalAmount => _totalAmount;
 
   get trendingE => _trendingE;
-  get trendingW => _trendimgW;
+  get trendingW => _trendingW;
   get trendingB => _trendingB;
   get trendingN => _trendingN;
   get trendingG => _trendingG;
@@ -536,8 +536,8 @@ class BillCalc {
         _trendingE.clear();
         _trendingE.addAll(conlidatedHistoryList);
       } else if (meterType == 'W') {
-        _trendimgW.clear();
-        _trendimgW.addAll(conlidatedHistoryList);
+        _trendingW.clear();
+        _trendingW.addAll(conlidatedHistoryList);
       } else if (meterType == 'B') {
         _trendingB.clear();
         _trendingB.addAll(conlidatedHistoryList);
@@ -569,7 +569,7 @@ class BillCalc {
         });
       }
       if (billedTotalUsageW != null) {
-        _trendimgW.add({
+        _trendingW.add({
           'time': item['billed_time_label'],
           'label': item['billed_time_label'],
           'value': billedTotalUsageW,
