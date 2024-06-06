@@ -8,13 +8,18 @@ Widget getTypeUsageStat(
     {int usageDecimals = 3,
     int rateDecimals = 4,
     int costDecimals = 2,
-    bool isSubTenant = false}) {
+    bool isSubTenant = false,
+    bool showFactoredUsage = true}) {
   MeterType? type = getMeterType(meterTypeTag);
   Color statColor = Theme.of(context).colorScheme.onSurface.withOpacity(0.7);
-  double usageVal = usage['usage_factored'] as double;
-  // if (usage['usage_factored'] != null) {
-  //   usageVal = usage['usage_factored'] as double;
-  // }
+  double usageVal = usage['usage'] as double;
+  if (showFactoredUsage) {
+    if (usage['factor'] != null) {
+      usageVal = usageVal * usage['factor']!;
+    } else {
+      throw Exception('Factor is null');
+    }
+  }
   return Padding(
     padding: const EdgeInsets.only(top: 10),
     child: Container(
@@ -70,7 +75,7 @@ Widget getTypeUsageStat(
                   unitStyle: defStatStyleSmall,
                   showUnit: false,
                 ),
-                if ((usage['factor'] ?? 1) < 0.99999)
+                if (showFactoredUsage && (usage['factor'] ?? 1) < 0.99999)
                   Text(
                     'Factor: ${(1 / (usage['factor'] ?? 1)).toStringAsFixed(5)}',
                     style: defStatStyleSmall,

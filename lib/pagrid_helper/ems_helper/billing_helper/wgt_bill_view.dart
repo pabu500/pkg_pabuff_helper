@@ -259,24 +259,6 @@ class _WgtBillViewState extends State<WgtBillView> {
         usageSummary.add(item);
       }
     }
-
-    // Map<String, dynamic> manualUsage = {};
-    // if (_bill['manual_usage_e'] != null) {
-    //   manualUsage['manual_usage_e'] = _bill['manual_usage_e'];
-    // }
-    // if (_bill['manual_usage_w'] != null) {
-    //   manualUsage['manual_usage_w'] = _bill['manual_usage_w'];
-    // }
-    // if (_bill['manual_usage_b'] != null) {
-    //   manualUsage['manual_usage_b'] = _bill['manual_usage_b'];
-    // }
-    // if (_bill['manual_usage_n'] != null) {
-    //   manualUsage['manual_usage_n'] = _bill['manual_usage_n'];
-    // }
-    // if (_bill['manual_usage_g'] != null) {
-    //   manualUsage['manual_usage_g'] = _bill['manual_usage_g'];
-    // }
-
     //sort manual usage
     List<Map<String, dynamic>> manualUsage = [];
     for (var typeTag in usageTypeTags) {
@@ -306,13 +288,6 @@ class _WgtBillViewState extends State<WgtBillView> {
         'amount': _bill['line_item_amount_1'],
       });
     }
-    // Map<String, dynamic> lineItem = {};
-    // if (_bill['line_item_label_1'] != null) {
-    //   lineItem['label'] = _bill['line_item_label_1'];
-    // }
-    // if (_bill['line_item_amount_1'] != null) {
-    //   lineItem['amount'] = _bill['line_item_amount_1'];
-    // }
 
     //sort type rates
     Map<String, dynamic> meterTypeRates = _bill['meter_type_rates'];
@@ -330,32 +305,6 @@ class _WgtBillViewState extends State<WgtBillView> {
         }
       }
     }
-    // String? typeRateE;
-    // String? gst;
-    // if (meterTypeRates['E'] != null) {
-    //   typeRateE = meterTypeRates['E']['result']['rate'];
-    //   gst = meterTypeRates['E']['result']['gst'];
-    // }
-    // String? typeRateW;
-    // if (meterTypeRates['W'] != null) {
-    //   typeRateW = meterTypeRates['W']['result']['rate'];
-    //   gst = meterTypeRates['W']['result']['gst'];
-    // }
-    // String? typeRateB;
-    // if (meterTypeRates['B'] != null) {
-    //   typeRateB = meterTypeRates['B']['result']['rate'];
-    //   gst = meterTypeRates['B']['result']['gst'];
-    // }
-    // String? typeRateN;
-    // if (meterTypeRates['N'] != null) {
-    //   typeRateN = meterTypeRates['N']['result']['rate'];
-    //   gst = meterTypeRates['N']['result']['gst'];
-    // }
-    // String? typeRateG;
-    // if (meterTypeRates['G'] != null) {
-    //   typeRateG = meterTypeRates['G']['result']['rate'];
-    //   gst = meterTypeRates['G']['result']['gst'];
-    // }
 
     // sort usage factor
     Map<String, dynamic> usageFactor = {};
@@ -367,20 +316,6 @@ class _WgtBillViewState extends State<WgtBillView> {
         usageFactor[key] = value;
       }
     }
-
-    // BillCalc billCalc = BillCalc(
-    //   calReleased: false,
-    //   typeRates: typeRates,
-    //   manualUsages: manualUsage,
-    //   autoUsageSummary: usageSummary,
-    //   subTenantUsageSummary: subTenantListUsageSummary,
-    //   lineItems: [lineItem],
-    //   usageFactorE: usageFactor['E'],
-    //   usageFactorW: usageFactor['W'],
-    //   usageFactorB: usageFactor['B'],
-    //   usageFactorN: usageFactor['N'],
-    //   usageFactorG: usageFactor['G'],
-    // );
 
     if (gst == null) {
       throw Exception('gst is null');

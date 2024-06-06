@@ -32,7 +32,7 @@ class WgtUsageStatCore extends StatefulWidget {
     this.usageDecimals = 3,
     this.rateDecimals = 5,
     this.costDecimals = 3,
-    this.showFactored = true,
+    this.showFactoredUsage = true,
   });
 
   final ScopeProfile scopeProfile;
@@ -59,7 +59,7 @@ class WgtUsageStatCore extends StatefulWidget {
   final bool isSubstractUsage;
   final bool showRate;
   final bool calcUsageFromReadings;
-  final bool showFactored;
+  final bool showFactoredUsage;
 
   @override
   State<WgtUsageStatCore> createState() => _WgtUsageStatCoreState();
@@ -308,7 +308,9 @@ class _WgtUsageStatCoreState extends State<WgtUsageStatCore> {
         double.tryParse(widget.meterStat['first_reading_val']);
     double? lastReadingValue =
         double.tryParse(widget.meterStat['last_reading_val']);
+
     double? usage;
+
     if (widget.calcUsageFromReadings) {
       usage = firstReadingValue == null || lastReadingValue == null
           ? null
@@ -316,23 +318,25 @@ class _WgtUsageStatCoreState extends State<WgtUsageStatCore> {
       if (percentage != null && usage != null) {
         usage = usage * (percentage / 100);
       }
-      if (usage != null) {
-        double usageFactor = getProjectMeterUsageFactor(
-            widget.scopeProfile.selectedProjectScope,
-            scopeProfiles,
-            widget.meterType);
-        if (!widget.showFactored) {
-          usage = usageFactor = 1;
-        }
-        usage = usage * usageFactor;
-      }
     } else {
-      usage = double.tryParse(
-          widget.meterStat['usage_factored'] ?? widget.meterStat['usage']);
+      usage = double.tryParse(widget.meterStat['usage']);
       if (percentage != null && usage != null) {
         usage = usage * (percentage / 100);
       }
     }
+    if (usage != null) {
+      double? usageFactor = widget.meterStat['factor'];
+
+      if (widget.showFactoredUsage) {
+        if (usageFactor == null) {
+          throw Exception('usageFactor is null');
+        }
+      } else {
+        usageFactor = 1;
+      }
+      usage = usage * usageFactor;
+    }
+
     //only to minutes substring(0, 16)
     String firstReadingTime = widget.meterStat['first_reading_time'] == null ||
             widget.meterStat['first_reading_time'].length < 16
@@ -408,7 +412,7 @@ class _WgtUsageStatCoreState extends State<WgtUsageStatCore> {
                       ),
                       showUnit: false,
                     ),
-                    if (widget.showFactored &&
+                    if (widget.showFactoredUsage &&
                         (widget.meterStat['factor'] ?? 1) < 0.999999)
                       Text(
                         'Factor: ${(1 / widget.meterStat['factor']).toStringAsFixed(5)}',

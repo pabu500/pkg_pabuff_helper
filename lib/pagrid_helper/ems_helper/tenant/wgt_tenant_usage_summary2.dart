@@ -21,7 +21,7 @@ class WgtTenantUsageSummary2 extends StatefulWidget {
     required this.tenantType,
     required this.excludeAutoUsage,
     this.usageCalc,
-    this.showFactored = true,
+    this.showFactoredUsage = true,
     // required this.usageFactor,
     this.typeRates,
     this.renderMode = 'wgt', // wgt, pdf
@@ -46,7 +46,7 @@ class WgtTenantUsageSummary2 extends StatefulWidget {
   final ScopeProfile scopeProfile;
   final Evs2User loggedInUser;
   final EmsTypeUsageCalc? usageCalc;
-  final bool showFactored;
+  final bool showFactoredUsage;
   final ItemType itemType;
   final bool isMonthly;
   final DateTime fromDatetime;
@@ -276,12 +276,17 @@ class _WgtTenantUsageSummary2State extends State<WgtTenantUsageSummary2> {
     List<Widget> meterList = [];
     List<Map<String, dynamic>> meterStatList = [];
 
-    double usageFactor = getProjectMeterUsageFactor(
-        widget.scopeProfile.selectedProjectScope, scopeProfiles, meterType);
+    // double usageFactor = getProjectMeterUsageFactor(widget.scopeProfile.selectedProjectScope, scopeProfiles, meterType);
+    double? usageFactor = widget.usageCalc!.typeUsageE!.factor;
     for (var meterStat in meterListUsageSummary) {
       String usageStr = meterStat['usage'] ?? '';
       double? usageVal = double.tryParse(usageStr);
-      if (usageVal != null) {
+      if (usageVal == null) {
+        if (kDebugMode) {
+          print('usageVal is null');
+        }
+      }
+      if (usageVal != null && usageFactor != null) {
         usageVal = usageVal * usageFactor;
         meterStat['usage_factored'] = usageVal.toString();
         meterStat['factor'] = usageFactor;
@@ -362,7 +367,7 @@ class _WgtTenantUsageSummary2State extends State<WgtTenantUsageSummary2> {
       child: WgtUsageStatCore(
         loggedInUser: widget.loggedInUser,
         scopeProfile: widget.scopeProfile,
-        showFactored: widget.showFactored,
+        showFactoredUsage: widget.showFactoredUsage,
         calcUsageFromReadings: calcUsageFromReadings,
         activePortalProjectScope: widget.activePortalProjectScope,
         isBillMode: widget.isBillMode,
@@ -560,6 +565,7 @@ class _WgtTenantUsageSummary2State extends State<WgtTenantUsageSummary2> {
     Map<String, double> usage = {};
     List<Widget> typeUsageList = [];
     for (EmsTypeUsage typeUsage in emsTypeUsageList) {
+      usage['usage'] = typeUsage.usage!;
       usage['usage_factored'] = typeUsage.usageFactored!;
       usage['factor'] = typeUsage.factor!;
       typeUsageList.add(
@@ -567,7 +573,8 @@ class _WgtTenantUsageSummary2State extends State<WgtTenantUsageSummary2> {
             usageDecimals: widget.usageDecimals,
             rateDecimals: widget.rateDecimals,
             costDecimals: widget.costDecimals,
-            isSubTenant: true),
+            isSubTenant: true,
+            showFactoredUsage: widget.showFactoredUsage),
       );
     }
 
