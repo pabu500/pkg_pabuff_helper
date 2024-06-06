@@ -38,7 +38,7 @@ Future<Uint8List> generateInvoice(
     billToStr: billInfo['billTo'],
     billDateStr: billInfo['billDate'],
     subTotalAmount: billInfo['subTotalAmount'],
-    gstAmount: billInfo['gstAmt'],
+    gstAmount: billInfo['gstAmount'],
     totalAmount: billInfo['totalAmount'],
     typeRateE: billInfo['typeRateE'],
     typeRateW: billInfo['typeRateW'],

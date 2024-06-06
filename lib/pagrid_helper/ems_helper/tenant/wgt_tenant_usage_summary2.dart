@@ -91,66 +91,10 @@ class _WgtTenantUsageSummary2State extends State<WgtTenantUsageSummary2> {
 
   String _renderMode = 'wgt'; // wgt, pdf
 
-  // void _sortManualUsage() {
-  //   _manualUsageList.clear();
-  //   for (var key in widget.manualUsages.keys) {
-  //     String usageStr = widget.manualUsages[key] ?? '';
-  //     double? usageVal = double.tryParse(usageStr);
-  //     if (usageVal != null) {
-  //       _manualUsageList.add({
-  //         'meter_type': key.split('_').last,
-  //         'usage': usageVal,
-  //       });
-  //     }
-  //   }
-  // }
-
-  // void _sortRates() {
-  //   for (var type in _meterTypes) {
-  //     if (widget.meterTypeRates[type] == null) {
-  //       continue;
-  //     }
-  //     String rateStr = widget.meterTypeRates[type]['result']['rate'] ?? '0';
-  //     double? rateVal = double.tryParse(rateStr);
-  //     if (rateVal != null) {
-  //       _typeRates[type] = rateVal;
-  //     }
-  //   }
-  // }
-
-  // void _sortLineItems() {
-  //   _lineItemList.clear();
-
-  //   for (var lineItem in widget.lineItems) {
-  //     String valueStr = lineItem['amount'] ?? '';
-  //     double? valueVal = double.tryParse(valueStr);
-  //     if (valueVal != null) {
-  //       lineItem['amount'] = valueVal;
-  //     }
-  //     _lineItemList.add(lineItem);
-  //   }
-  // }
-
   @override
   void initState() {
     super.initState();
     _renderMode = widget.renderMode;
-    // _calcUsage();
-    // _calcLineItems();
-
-    // _sortRates();
-    // _sortManualUsage();
-
-    // _emsTypeUsageCalc = EmsTypeUsageCalc(
-    //   gst: widget.gst!,
-    //   typeRates: widget.typeRates ?? {},
-    //   usageFactor: widget.usageFactor,
-    //   autoUsageSummary: widget.tenantUsageSummary,
-    //   subTenantUsageSummary: widget.subTenantListUsageSummary,
-    //   manualUsageList: _manualUsageList,
-    //   lineItemList: widget.lineItems,
-    // );
-    // _emsTypeUsageCalc.doCalc();
   }
 
   @override
@@ -278,7 +222,7 @@ class _WgtTenantUsageSummary2State extends State<WgtTenantUsageSummary2> {
     List<Map<String, dynamic>> meterStatList = [];
 
     // double usageFactor = getProjectMeterUsageFactor(widget.scopeProfile.selectedProjectScope, scopeProfiles, meterType);
-    double? usageFactor = widget.usageCalc!.typeUsageE!.factor;
+    double? usageFactor = widget.usageCalc!.getTypeUsageFactor(groupType);
     for (var meterStat in meterListUsageSummary) {
       String usageStr = meterStat['usage'] ?? '';
       double? usageVal = double.tryParse(usageStr);

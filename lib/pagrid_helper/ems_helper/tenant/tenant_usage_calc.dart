@@ -96,7 +96,24 @@ class EmsTypeUsageCalc {
     if (index > length - 1) {
       return null;
     }
-    return _lineItemList[index];
+
+    Map<String, dynamic> lineItem = {};
+    lineItem['label'] = _lineItemList[index]['label'];
+
+    String amtStr = _lineItemList[index]['amount'];
+    double? amt = double.tryParse(amtStr);
+    if (amt != null) {
+      amt = getRound(amt, 3);
+      lineItem['amount'] = amt;
+    } else {
+      throw Exception('Invalid amount');
+    }
+
+    return lineItem;
+  }
+
+  double? getTypeUsageFactor(String typeTag) {
+    return _usageFactor[typeTag];
   }
 
   void _sortSubTenantUsage() {
