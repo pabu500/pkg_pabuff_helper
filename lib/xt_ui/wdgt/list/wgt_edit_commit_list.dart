@@ -263,15 +263,18 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
               //footer
               return ListTile(
                   title: showPagination
-                      ? getPagenationBar(
-                          context,
-                          widget.maxRowsPerPage, //_rows.length,
-                          widget.totalCount,
-                          widget.currentPage,
-                          widget.onPreviousPage,
-                          widget.onNextPage,
-                          widget.onClickPage,
-                          narrow: widget.narrowPaginationBar,
+                      ? Padding(
+                          padding: const EdgeInsets.only(top: 5),
+                          child: getPagenationBar(
+                            context,
+                            widget.maxRowsPerPage, //_rows.length,
+                            widget.totalCount,
+                            widget.currentPage,
+                            widget.onPreviousPage,
+                            widget.onNextPage,
+                            widget.onClickPage,
+                            narrow: widget.narrowPaginationBar,
+                          ),
                         )
                       : Container());
             } else if (index == _rows.length + 2) {

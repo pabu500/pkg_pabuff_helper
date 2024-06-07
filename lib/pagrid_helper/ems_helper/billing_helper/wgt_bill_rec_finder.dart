@@ -171,6 +171,7 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
       sectionName: widget.sectionName,
       panelTitle: panelTitle,
       panelName: panelName,
+      itemLabelText: 'Tenant Label',
       itemNameText: 'Identifier',
       fixedItemName: widget.tenantName,
       itemType: ItemType.billing_rec,
@@ -195,19 +196,6 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
       // itemTypeList: _tenantTypeList,
       onResult: widget.onResult,
       onClearSearch: () {
-        // setState(() {
-        //   _startDateCreated = null;
-        //   _endDateCreated = null;
-        //   _startDateFrom = null;
-        //   _endDateFrom = null;
-        //   _additionalPropQueryMap.clear();
-        //   _additionalTypeQueryMap.clear();
-        //   _additionalTypeQueryMap2.clear();
-        //   _finderKey = UniqueKey();
-        //   // _isMonthly = false;
-        //   _selectedGenType = null;
-        //   _selectedLcStatus = null;
-        // });
         _reset();
 
         widget.onClearSearch?.call();
@@ -311,28 +299,6 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
                 widget.onModified?.call();
               },
             ),
-            // WgtDateRangePickerMonthly(
-            //   scopeProfile: _scopeProfile,
-            //   showMonthly: false,
-            //   key: _finderKey,
-            //   iniStartDateTime: _startDateFrom,
-            //   iniEndDateTime: _endDateFrom,
-            //   onRangeSet: (DateTime start, DateTime end) {
-            //     setState(() {
-            //       _startDateFrom = start;
-            //       _endDateFrom = end;
-
-            //       _additionalPropQueryMap.putIfAbsent('time_range', () => {});
-            //       _additionalPropQueryMap['time_range']['from_timestamp'] = {
-            //         'start_datetime': start.toIso8601String(),
-            //         'end_datetime': end.toIso8601String()
-            //       };
-            //     });
-
-            //     // updateEnableSearchButton();
-            //     widget.onModified?.call();
-            //   },
-            // ),
           ],
         ),
       ],
