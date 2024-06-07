@@ -184,13 +184,23 @@ class _WgtUsageStatCoreState extends State<WgtUsageStatCore> {
   }
 
   Widget getStatStatic() {
-    double usage =
-        widget.meterStat['usage_factored'] ?? widget.meterStat['usage'];
+    var usageFactoredObj = widget.meterStat['usage_factored'];
+    var usageObj = widget.meterStat['usage'];
+    if (usageFactoredObj is String) {
+      usageFactoredObj = double.tryParse(usageFactoredObj);
+    }
+    if (usageObj is String) {
+      usageObj = double.tryParse(usageObj);
+    }
+    double? usage = usageFactoredObj ?? usageObj;
+    if (usage == null) {
+      return getErrorTextPrompt(context: context, errorText: 'No usage data');
+    }
 
     //factor is applied outside of this widget
-    double usageFactor = 1;
-    // getProjectMeterUsageFactor(_scopeProfile.selectedProjectScope, scopeProfiles, widget.meterType);
-    usage = usage * usageFactor;
+    // double usageFactor = 1;
+    // // getProjectMeterUsageFactor(_scopeProfile.selectedProjectScope, scopeProfiles, widget.meterType);
+    // usage = usage * usageFactor;
 
     bool showRate = widget.isBillMode && widget.rate != null && widget.showRate;
     bool showCost = widget.isBillMode && widget.rate != null && widget.showRate;
@@ -310,7 +320,13 @@ class _WgtUsageStatCoreState extends State<WgtUsageStatCore> {
   }
 
   Widget getStat() {
-    double? percentage = widget.meterStat['percentage'];
+    var percentageObj = widget.meterStat['percentage'];
+    double? percentage;
+    if (percentageObj is String) {
+      percentage = double.tryParse(percentageObj);
+    } else {
+      percentage = percentageObj;
+    }
     bool showReading = percentage == null || percentage == 100.0;
     bool showPercentage =
         !widget.isBillMode && percentage != null && percentage != 100.0;
@@ -332,13 +348,25 @@ class _WgtUsageStatCoreState extends State<WgtUsageStatCore> {
         usage = usage * (percentage / 100);
       }
     } else {
-      usage = widget.meterStat['usage'];
+      var usageObj = widget.meterStat['usage'];
+      if (usageObj is String) {
+        usage = double.tryParse(usageObj);
+      } else {
+        usage = usageObj;
+      }
+
       if (percentage != null && usage != null) {
         usage = usage * (percentage / 100);
       }
     }
     if (usage != null) {
-      double? usageFactor = widget.meterStat['factor'];
+      var usageFactorObj = widget.meterStat['factor'];
+      double? usageFactor;
+      if (usageFactorObj is String) {
+        usageFactor = double.tryParse(usageFactorObj);
+      } else {
+        usageFactor = usageFactorObj;
+      }
 
       if (widget.showFactoredUsage) {
         if (usageFactor == null) {
