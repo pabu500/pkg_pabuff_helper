@@ -184,8 +184,8 @@ class _WgtUsageStatCoreState extends State<WgtUsageStatCore> {
   }
 
   Widget getStatStatic() {
-    double usage = double.parse(
-        widget.meterStat['usage_factored'] ?? widget.meterStat['usage']);
+    double usage =
+        widget.meterStat['usage_factored'] ?? widget.meterStat['usage'];
 
     //factor is applied outside of this widget
     double usageFactor = 1;
@@ -213,6 +213,12 @@ class _WgtUsageStatCoreState extends State<WgtUsageStatCore> {
                   unitStyle: defStatStyleSmall.copyWith(
                     color: widget.statColor ?? Colors.grey.shade800,
                   )),
+              if (widget.showFactoredUsage &&
+                  (widget.meterStat['factor'] ?? 1) < 0.999999)
+                Text(
+                  'Factor: ${(1 / widget.meterStat['factor']).toStringAsFixed(5)}',
+                  style: defStatStyleSmall,
+                ),
             ],
           )
         : Row(
@@ -240,6 +246,12 @@ class _WgtUsageStatCoreState extends State<WgtUsageStatCore> {
                       ),
                       showUnit: false,
                     ),
+                    if (widget.showFactoredUsage &&
+                        (widget.meterStat['factor'] ?? 1) < 0.999999)
+                      Text(
+                        'Factor: ${(1 / widget.meterStat['factor']).toStringAsFixed(5)}',
+                        style: defStatStyleSmall,
+                      ),
                   ],
                 ),
               ),
@@ -320,7 +332,7 @@ class _WgtUsageStatCoreState extends State<WgtUsageStatCore> {
         usage = usage * (percentage / 100);
       }
     } else {
-      usage = double.tryParse(widget.meterStat['usage']);
+      usage = widget.meterStat['usage'];
       if (percentage != null && usage != null) {
         usage = usage * (percentage / 100);
       }

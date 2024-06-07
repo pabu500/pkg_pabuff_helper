@@ -5,6 +5,7 @@ import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../app_helper/pagrid_app_config.dart';
+import '../tenant/wgt_tenant_usage_summary_released2.dart';
 import 'bill_calc.dart';
 
 class WgtBillView extends StatefulWidget {
@@ -420,38 +421,61 @@ class _WgtBillViewState extends State<WgtBillView> {
       useMiddle: isMonthly ? true : false,
     );
 
-    Map<String, dynamic> billedAutoUsages = {};
-    Map<String, dynamic> billedSubTenantUsages = {};
-    Map<String, dynamic> billedManualUsages = {};
-    Map<String, dynamic> billedUsageFactors = {};
-    Map<String, dynamic> billedRates = {};
+    Map<String, dynamic> billedAutoUsages = _bill['billed_auto_usages'] ?? {};
+    Map<String, dynamic> billedSubTenantUsages =
+        _bill['billed_sub_tenant_usages'] ?? {};
+    Map<String, dynamic> billedManualUsages =
+        _bill['billed_manual_usages'] ?? {};
+    Map<String, dynamic> billedUsageFactors =
+        _bill['billed_usage_factors'] ?? {};
+    Map<String, dynamic> billedRates = _bill['billed_rates'] ?? {};
     double? billedGst;
     for (String typeTag in usageTypeTags) {
       typeTag = typeTag.toLowerCase();
-      if (_bill['billed_auto_usage_$typeTag'] != null) {
-        billedAutoUsages['billed_auto_usage_$typeTag'] =
-            _bill['billed_auto_usage_$typeTag'];
+
+      var valueObj = billedAutoUsages['billed_auto_usage_$typeTag'] ?? '';
+      double? value;
+      if (valueObj is String) {
+        value = double.tryParse(valueObj);
+        billedAutoUsages['billed_auto_usage_$typeTag'] = value;
       }
-      if (_bill['billed_sub_tenant_usage_$typeTag'] != null) {
-        billedSubTenantUsages['billed_sub_tenant_usage_$typeTag'] =
-            _bill['billed_sub_tenant_usage_$typeTag'];
+
+      valueObj =
+          billedSubTenantUsages['billed_sub_tenant_usage_$typeTag'] ?? '';
+      if (valueObj is String) {
+        value = double.tryParse(valueObj);
+        billedSubTenantUsages['billed_sub_tenant_usage_$typeTag'] = value;
       }
-      if (_bill['billed_manual_usage_$typeTag'] != null) {
-        billedManualUsages['manual_usage_$typeTag'] =
-            _bill['billed_manual_usage_$typeTag'];
+
+      valueObj = billedManualUsages['manual_usage_$typeTag'] ?? '';
+      if (valueObj is String) {
+        value = double.tryParse(valueObj);
+        billedManualUsages['manual_usage_$typeTag'] = value;
       }
-      if (_bill['billed_usage_factor_$typeTag'] != null) {
-        billedUsageFactors['billed_usage_factor_$typeTag'] =
-            _bill['billed_usage_factor_$typeTag'];
+
+      valueObj = billedUsageFactors['billed_usage_factor_$typeTag'] ?? '';
+      if (valueObj is String) {
+        value = double.tryParse(valueObj);
+        billedUsageFactors['billed_usage_factor_$typeTag'] = value;
       }
-      if (_bill['billed_rate_$typeTag'] != null) {
-        billedRates['billed_rate_$typeTag'] = _bill['billed_rate_$typeTag'];
+
+      valueObj = billedRates['billed_rate_$typeTag'] ?? '';
+      if (valueObj is String) {
+        value = double.tryParse(valueObj);
+        billedRates['billed_rate_$typeTag'] = value;
       }
+
       if (billedGst == null) {
-        String gstStr = _bill['billed_rate_$typeTag']['result']['gst'];
-        billedGst = double.tryParse(gstStr);
-        if (billedGst == null) {
-          throw Exception('billed gst is null');
+        var gstObj = billedRates['billed_gst'] ?? '';
+        if (gstObj is String) {
+          billedGst = double.tryParse(gstObj);
+          if (billedGst == null) {
+            throw Exception('billed gst is null');
+          } else {
+            billedRates['billed_gst'] = billedGst;
+          }
+        } else if (gstObj is double) {
+          billedGst = gstObj;
         }
       }
     }
@@ -496,15 +520,21 @@ class _WgtBillViewState extends State<WgtBillView> {
       billedManualUsageB: billedManualUsages['manual_usage_b'],
       billedManualUsageN: billedManualUsages['manual_usage_n'],
       billedManualUsageG: billedManualUsages['manual_usage_g'],
-      billedRateE: billedRates['E'],
-      billedRateW: billedRates['W'],
-      billedRateB: billedRates['B'],
-      billedRateN: billedRates['N'],
-      billedRateG: billedRates['G'],
+      billedUsageFactorE: billedUsageFactors['billed_usage_factor_e'],
+      billedUsageFactorW: billedUsageFactors['billed_usage_factor_w'],
+      billedUsageFactorB: billedUsageFactors['billed_usage_factor_b'],
+      billedUsageFactorN: billedUsageFactors['billed_usage_factor_n'],
+      billedUsageFactorG: billedUsageFactors['billed_usage_factor_g'],
+      billedRateE: billedRates['billed_rate_e'],
+      billedRateW: billedRates['billed_rate_w'],
+      billedRateB: billedRates['billed_rate_b'],
+      billedRateN: billedRates['billed_rate_n'],
+      billedRateG: billedRates['billed_rate_g'],
       billedGst: billedGst,
       lineItemList: [lineItem],
       billedTrendingSnapShot: billedTrendingSnapShot,
     );
+    emsTypeUsageCalcReleased.doCalc();
 
     return _renderMode == 'pdf'
         ? WgtBillRenderPdf(
@@ -520,6 +550,8 @@ class _WgtBillViewState extends State<WgtBillView> {
               'billDate': _bill['created_timestamp'],
               'billTimeRangeStr': billTimeRangeStr,
               'tenantUsageSummary': const [],
+              'subTotalAmount': emsTypeUsageCalcReleased.subTotalCost,
+              'gstAmount': emsTypeUsageCalcReleased.gstAmount,
               'totalAmount': emsTypeUsageCalcReleased.totalCost,
               'typeRateE': emsTypeUsageCalcReleased.typeUsageE?.rate,
               'typeRateW': emsTypeUsageCalcReleased.typeUsageW?.rate,
@@ -547,11 +579,12 @@ class _WgtBillViewState extends State<WgtBillView> {
                   emsTypeUsageCalcReleased.getLineItem(0)?['amount'],
             },
           )
-        : WgtTenantUsageSummaryReleased(
+        : WgtTenantUsageSummaryReleased2(
             appConfig: widget.appConfig,
             loggedInUser: widget.loggedInUser,
             scopeProfile: widget.scopeProfile,
             isBillMode: true,
+            usageCalc: emsTypeUsageCalcReleased,
             showRenderModeSwitch: true,
             itemType: ItemType.meter_iwow,
             isMonthly: isMonthly,

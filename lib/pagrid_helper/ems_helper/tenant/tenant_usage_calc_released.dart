@@ -5,41 +5,41 @@ import 'mdl_ems_type_usage.dart';
 
 class EmsTypeUsageCalcReleased {
   //input
-  final double? _billedAutoUsageE;
-  final double? _billedAutoUsageW;
-  final double? _billedAutoUsageB;
-  final double? _billedAutoUsageN;
-  final double? _billedAutoUsageG;
+  late final double? _billedAutoUsageE;
+  late final double? _billedAutoUsageW;
+  late final double? _billedAutoUsageB;
+  late final double? _billedAutoUsageN;
+  late final double? _billedAutoUsageG;
 
-  final double? _billedSubTenantUsageE;
-  final double? _billedSubTenantUsageW;
-  final double? _billedSubTenantUsageB;
-  final double? _billedSubTenantUsageN;
-  final double? _billedSubTenantUsageG;
+  late final double? _billedSubTenantUsageE;
+  late final double? _billedSubTenantUsageW;
+  late final double? _billedSubTenantUsageB;
+  late final double? _billedSubTenantUsageN;
+  late final double? _billedSubTenantUsageG;
 
-  final double? _billedManualUsageE;
-  final double? _billedManualUsageW;
-  final double? _billedManualUsageB;
-  final double? _billedManualUsageN;
-  final double? _billedManualUsageG;
+  late final double? _billedManualUsageE;
+  late final double? _billedManualUsageW;
+  late final double? _billedManualUsageB;
+  late final double? _billedManualUsageN;
+  late final double? _billedManualUsageG;
 
-  final double? _billedUsageFactorE;
-  final double? _billedUsageFactorW;
-  final double? _billedUsageFactorB;
-  final double? _billedUsageFactorN;
-  final double? _billedUsageFactorG;
+  late final double? _billedUsageFactorE;
+  late final double? _billedUsageFactorW;
+  late final double? _billedUsageFactorB;
+  late final double? _billedUsageFactorN;
+  late final double? _billedUsageFactorG;
 
-  final double? _billedRateE;
-  final double? _billedRateW;
-  final double? _billedRateB;
-  final double? _billedRateN;
-  final double? _billedRateG;
+  late final double? _billedRateE;
+  late final double? _billedRateW;
+  late final double? _billedRateB;
+  late final double? _billedRateN;
+  late final double? _billedRateG;
 
-  final double? _billedGst;
+  late final double? _billedGst;
 
-  late final List<Map<String, dynamic>> _lineItemList;
+  late final List<Map<String, dynamic>>? _lineItemList;
 
-  final List<Map<String, dynamic>>? _billedTrendingSnapShot;
+  late final List<Map<String, dynamic>>? _billedTrendingSnapShot;
 
   //output
   EmsTypeUsage? _typeUsageE;
@@ -104,33 +104,37 @@ class EmsTypeUsageCalcReleased {
     double? billedGst,
     required List<Map<String, dynamic>>? lineItemList,
     List<Map<String, dynamic>>? billedTrendingSnapShot,
-  })  : _billedAutoUsageE = billedAutoUsageE,
-        _billedAutoUsageW = billedAutoUsageW,
-        _billedAutoUsageB = billedAutoUsageB,
-        _billedAutoUsageN = billedAutoUsageN,
-        _billedAutoUsageG = billedAutoUsageG,
-        _billedSubTenantUsageE = billedSubTenantUsageE,
-        _billedSubTenantUsageW = billedSubTenantUsageW,
-        _billedSubTenantUsageB = billedSubTenantUsageB,
-        _billedSubTenantUsageN = billedSubTenantUsageN,
-        _billedSubTenantUsageG = billedSubTenantUsageG,
-        _billedManualUsageE = billedManualUsageE,
-        _billedManualUsageW = billedManualUsageW,
-        _billedManualUsageB = billedManualUsageB,
-        _billedManualUsageN = billedManualUsageN,
-        _billedManualUsageG = billedManualUsageG,
-        _billedUsageFactorE = billedUsageFactorE,
-        _billedUsageFactorW = billedUsageFactorW,
-        _billedUsageFactorB = billedUsageFactorB,
-        _billedUsageFactorN = billedUsageFactorN,
-        _billedUsageFactorG = billedUsageFactorG,
-        _billedRateE = billedRateE,
-        _billedRateW = billedRateW,
-        _billedRateB = billedRateB,
-        _billedRateN = billedRateN,
-        _billedRateG = billedRateG,
-        _billedGst = billedGst,
-        _billedTrendingSnapShot = billedTrendingSnapShot;
+  }) {
+    _billedAutoUsageE = billedAutoUsageE;
+    _billedAutoUsageW = billedAutoUsageW;
+    _billedAutoUsageB = billedAutoUsageB;
+    _billedAutoUsageN = billedAutoUsageN;
+    _billedAutoUsageG = billedAutoUsageG;
+    _billedSubTenantUsageE = billedSubTenantUsageE;
+    _billedSubTenantUsageW = billedSubTenantUsageW;
+    _billedSubTenantUsageB = billedSubTenantUsageB;
+    _billedSubTenantUsageN = billedSubTenantUsageN;
+    _billedSubTenantUsageG = billedSubTenantUsageG;
+    _billedManualUsageE = billedManualUsageE;
+    _billedManualUsageW = billedManualUsageW;
+    _billedManualUsageB = billedManualUsageB;
+    _billedManualUsageN = billedManualUsageN;
+    _billedManualUsageG = billedManualUsageG;
+    _billedUsageFactorE = billedUsageFactorE;
+    _billedUsageFactorW = billedUsageFactorW;
+    _billedUsageFactorB = billedUsageFactorB;
+    _billedUsageFactorN = billedUsageFactorN;
+    _billedUsageFactorG = billedUsageFactorG;
+    _billedRateE = billedRateE;
+    _billedRateW = billedRateW;
+    _billedRateB = billedRateB;
+    _billedRateN = billedRateN;
+    _billedRateG = billedRateG;
+    _billedGst = billedGst;
+    _billedTrendingSnapShot = billedTrendingSnapShot;
+
+    _lineItemList = lineItemList;
+  }
 
   void doCalc() {
     _calcTypeUsage('E');
@@ -144,13 +148,37 @@ class EmsTypeUsageCalcReleased {
     _getUsageTrendingReleased();
   }
 
+  EmsTypeUsage getTypeUsage(String usageType) {
+    switch (usageType) {
+      case 'E':
+        return _typeUsageE!;
+      case 'W':
+        return _typeUsageW!;
+      case 'B':
+        return _typeUsageB!;
+      case 'N':
+        return _typeUsageN!;
+      case 'G':
+        return _typeUsageG!;
+      default:
+        throw Exception('Invalid usage type');
+    }
+  }
+
   Map<String, dynamic>? getLineItem(int index) {
+    if (_lineItemList == null || _lineItemList.isEmpty) {
+      return null;
+    }
     int length = _lineItemList.length;
     if (index > length - 1) {
       return null;
     }
+    if (_lineItemList[index].isEmpty) {
+      return null;
+    }
 
     Map<String, dynamic> lineItem = {};
+
     lineItem['label'] = _lineItemList[index]['label'];
 
     String amtStr = _lineItemList[index]['amount'];
@@ -267,12 +295,18 @@ class EmsTypeUsageCalcReleased {
       typeUsageTotal ??= 0;
       typeUsageTotal = typeUsageTotal - billedSubTenantUsage;
     }
+
+    if (billedUsageFactor != null && typeUsageTotal != null) {
+      typeUsageFactored = typeUsageTotal * billedUsageFactor;
+    }
+
+    // NOTE: manual usage is not factored
     if (billedManualUsage != null) {
       typeUsageTotal ??= 0;
       typeUsageTotal = typeUsageTotal + billedManualUsage;
-    }
-    if (billedUsageFactor != null && typeUsageTotal != null) {
-      typeUsageFactored = typeUsageTotal * billedUsageFactor;
+
+      typeUsageFactored ??= 0;
+      typeUsageFactored = typeUsageFactored + billedManualUsage;
     }
 
     final typeUsage = EmsTypeUsage(
@@ -310,28 +344,38 @@ class EmsTypeUsageCalcReleased {
     double? gstAmount;
 
     if (_typeUsageE != null) {
-      subTotalCost ??= 0;
-      subTotalCost = subTotalCost + _typeUsageE!.usageFactored!;
+      if (_typeUsageE!.cost != null) {
+        subTotalCost ??= 0;
+        subTotalCost = subTotalCost + _typeUsageE!.cost!;
+      }
     }
     if (_typeUsageW != null) {
-      subTotalCost ??= 0;
-      subTotalCost = subTotalCost + _typeUsageW!.usageFactored!;
+      if (_typeUsageW!.cost != null) {
+        subTotalCost ??= 0;
+        subTotalCost = subTotalCost + _typeUsageW!.cost!;
+      }
     }
     if (_typeUsageB != null) {
-      subTotalCost ??= 0;
-      subTotalCost = subTotalCost + _typeUsageB!.usageFactored!;
+      if (_typeUsageB!.cost != null) {
+        subTotalCost ??= 0;
+        subTotalCost = subTotalCost + _typeUsageB!.cost!;
+      }
     }
     if (_typeUsageN != null) {
-      subTotalCost ??= 0;
-      subTotalCost = subTotalCost + _typeUsageN!.usageFactored!;
+      if (_typeUsageN!.cost != null) {
+        subTotalCost ??= 0;
+        subTotalCost = subTotalCost + _typeUsageN!.cost!;
+      }
     }
     if (_typeUsageG != null) {
-      subTotalCost ??= 0;
-      subTotalCost = subTotalCost + _typeUsageG!.usageFactored!;
+      if (_typeUsageG!.cost != null) {
+        subTotalCost ??= 0;
+        subTotalCost = subTotalCost + _typeUsageG!.cost!;
+      }
     }
 
     if (_billedGst != null) {
-      gstAmount = subTotalCost! * _billedGst;
+      gstAmount = subTotalCost! * _billedGst / 100;
     } else {
       throw Exception('GST is not defined');
     }

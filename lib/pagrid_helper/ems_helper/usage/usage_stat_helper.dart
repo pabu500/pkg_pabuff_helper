@@ -206,23 +206,6 @@ Widget getUsageTypeStat(
             ],
           ),
         ),
-      if (netUsageW != null)
-        Padding(
-          padding: const EdgeInsets.only(left: 13),
-          child: Column(
-            children: [
-              getMeterTypeWidget(MeterType.water, context),
-              isBillMode
-                  ? getStatWithUnit(
-                      getCommaNumberStr(costW, decimal: costDecimals), 'SGD',
-                      statStrStyle: valueStyle)
-                  : getStatWithUnit(
-                      getCommaNumberStr(netUsageW, decimal: usageDecimals),
-                      getDeivceTypeUnit(MeterType.water),
-                      statStrStyle: valueStyle),
-            ],
-          ),
-        ),
       if (netUsageB != null)
         Padding(
           padding: const EdgeInsets.only(left: 13),
@@ -236,6 +219,23 @@ Widget getUsageTypeStat(
                   : getStatWithUnit(
                       getCommaNumberStr(netUsageB, decimal: usageDecimals),
                       getDeivceTypeUnit(MeterType.btu),
+                      statStrStyle: valueStyle),
+            ],
+          ),
+        ),
+      if (netUsageW != null)
+        Padding(
+          padding: const EdgeInsets.only(left: 13),
+          child: Column(
+            children: [
+              getMeterTypeWidget(MeterType.water, context),
+              isBillMode
+                  ? getStatWithUnit(
+                      getCommaNumberStr(costW, decimal: costDecimals), 'SGD',
+                      statStrStyle: valueStyle)
+                  : getStatWithUnit(
+                      getCommaNumberStr(netUsageW, decimal: usageDecimals),
+                      getDeivceTypeUnit(MeterType.water),
                       statStrStyle: valueStyle),
             ],
           ),
@@ -345,32 +345,7 @@ Widget getTypeUsageNet(
             itemType: ItemType.meter_iwow,
             historyType: Evs2HistoryType.meter_list_usage_summary,
             isStaticUsageStat: true,
-            meterStat: {'usage': netUsageE.toStringAsFixed(usageDecimals)},
-          ),
-        ),
-      if (netUsageW != null)
-        Padding(
-          padding: const EdgeInsets.only(top: 10),
-          child: WgtUsageStatCore(
-            loggedInUser: loggedInUser,
-            scopeProfile: scopeProfile,
-            appConfig: appConfig,
-            isBillMode: true,
-            rate: rateW,
-            statColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-            showTrending: false,
-            statVirticalStack: false,
-            height: 110,
-            usageDecimals: usageDecimals,
-            rateDecimals: rateDecimals,
-            costDecimals: costDecimals,
-            meterType: MeterType.water,
-            meterId: 'W',
-            meterIdType: ItemIdType.name,
-            itemType: ItemType.meter_iwow,
-            historyType: Evs2HistoryType.meter_list_usage_summary,
-            isStaticUsageStat: true,
-            meterStat: {'usage': netUsageW.toStringAsFixed(usageDecimals)},
+            meterStat: {'usage': netUsageE},
           ),
         ),
       if (netUsageB != null)
@@ -395,7 +370,32 @@ Widget getTypeUsageNet(
             itemType: ItemType.meter_iwow,
             historyType: Evs2HistoryType.meter_list_usage_summary,
             isStaticUsageStat: true,
-            meterStat: {'usage': netUsageB.toStringAsFixed(usageDecimals)},
+            meterStat: {'usage': netUsageB},
+          ),
+        ),
+      if (netUsageW != null)
+        Padding(
+          padding: const EdgeInsets.only(top: 10),
+          child: WgtUsageStatCore(
+            loggedInUser: loggedInUser,
+            scopeProfile: scopeProfile,
+            appConfig: appConfig,
+            isBillMode: true,
+            rate: rateW,
+            statColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+            showTrending: false,
+            statVirticalStack: false,
+            height: 110,
+            usageDecimals: usageDecimals,
+            rateDecimals: rateDecimals,
+            costDecimals: costDecimals,
+            meterType: MeterType.water,
+            meterId: 'W',
+            meterIdType: ItemIdType.name,
+            itemType: ItemType.meter_iwow,
+            historyType: Evs2HistoryType.meter_list_usage_summary,
+            isStaticUsageStat: true,
+            meterStat: {'usage': netUsageW},
           ),
         ),
       if (netUsageN != null)
@@ -420,7 +420,7 @@ Widget getTypeUsageNet(
             itemType: ItemType.meter_iwow,
             historyType: Evs2HistoryType.meter_list_usage_summary,
             isStaticUsageStat: true,
-            meterStat: {'usage': netUsageN.toStringAsFixed(usageDecimals)},
+            meterStat: {'usage': netUsageN},
           ),
         ),
       if (netUsageG != null)
@@ -445,7 +445,7 @@ Widget getTypeUsageNet(
             itemType: ItemType.meter_iwow,
             historyType: Evs2HistoryType.meter_list_usage_summary,
             isStaticUsageStat: true,
-            meterStat: {'usage': netUsageG.toStringAsFixed(usageDecimals)},
+            meterStat: {'usage': netUsageG},
           ),
         ),
     ]),

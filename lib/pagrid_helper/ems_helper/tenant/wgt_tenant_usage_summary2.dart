@@ -178,8 +178,8 @@ class _WgtTenantUsageSummary2State extends State<WgtTenantUsageSummary2> {
     List<Widget> typeStat = [];
 
     typeStat.add(getTypeStat('E'));
-    typeStat.add(getTypeStat('W'));
     typeStat.add(getTypeStat('B'));
+    typeStat.add(getTypeStat('W'));
     typeStat.add(getTypeStat('N'));
     typeStat.add(getTypeStat('G'));
 
@@ -233,7 +233,7 @@ class _WgtTenantUsageSummary2State extends State<WgtTenantUsageSummary2> {
       }
       if (usageVal != null && usageFactor != null) {
         usageVal = usageVal * usageFactor;
-        meterStat['usage_factored'] = usageVal.toString();
+        meterStat['usage_factored'] = usageVal;
         meterStat['factor'] = usageFactor;
       }
 
@@ -370,7 +370,7 @@ class _WgtTenantUsageSummary2State extends State<WgtTenantUsageSummary2> {
                 itemType: widget.itemType,
                 historyType: Evs2HistoryType.meter_list_usage_summary,
                 isStaticUsageStat: true,
-                meterStat: {'usage': usageVal.toString()},
+                meterStat: {'usage': usageVal},
               ),
             ),
           );
