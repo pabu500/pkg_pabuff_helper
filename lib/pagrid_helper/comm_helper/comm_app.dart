@@ -14,7 +14,7 @@ Future<dynamic> getVersion(PaGridAppConfig appConfig, String appName) async {
   try {
     final response = await http.get(
       Uri.parse(
-          '${UrlController(appConfig).getUrl(SvcType.oresvc, UrlBase.eptOreGetVerion)}/$appName/$projectScope'),
+          '${UrlController(appConfig).getUrl(SvcType.oresvc, UrlBase.eptGetVerion)}/$appName/$projectScope'),
     );
 
     if (response.statusCode == 200) {
@@ -31,8 +31,8 @@ Future<dynamic> getVersion(PaGridAppConfig appConfig, String appName) async {
 Future<dynamic> getOreVersion(PaGridAppConfig appConfig) async {
   try {
     final response = await http.get(
-      Uri.parse(UrlController(appConfig)
-          .getUrl(SvcType.oresvc, UrlBase.eptOreGetVerion)),
+      Uri.parse(
+          UrlController(appConfig).getUrl(SvcType.oresvc, UrlBase.eptOreHello)),
     );
 
     if (response.statusCode == 200) {
