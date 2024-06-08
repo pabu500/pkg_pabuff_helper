@@ -358,6 +358,7 @@ class UrlBase {
   static const String eptGetTenantMap = '/tenant/get_tenant_map';
   static const String eptGetUserTenant = '/tenant/get_user_tenant';
   static const String eptSetUserTenant = '/tenant/set_user_tenant';
+  static const String eptCheckMainTenant = '/tenant/check_main_tenant';
 
   //tenant_usage
   static const String eptGetTenantListUsageSummary =

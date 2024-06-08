@@ -589,7 +589,7 @@ class Bill {
                       ),
                       pw.Expanded(child: pw.Container()),
                       pw.Text(
-                        _formatCurrency(subTotalAmount, isRoundUp: true),
+                        _formatCurrency(subTotalAmount, isRoundUp: false),
                         style: pw.TextStyle(
                           fontWeight: pw.FontWeight.bold,
                         ),

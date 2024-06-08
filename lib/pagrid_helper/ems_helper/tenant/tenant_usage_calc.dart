@@ -21,7 +21,7 @@ class EmsTypeUsageCalc {
   EmsTypeUsage? _typeUsageN;
   EmsTypeUsage? _typeUsageG;
 
-  List<Map<String, dynamic>> _subTenantUsage = [];
+  final List<Map<String, dynamic>> _subTenantUsage = [];
 
   final List<Map<String, dynamic>> _trendingE = [];
   final List<Map<String, dynamic>> _trendingW = [];
