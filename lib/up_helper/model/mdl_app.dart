@@ -93,10 +93,10 @@ const userOps = 'User Ops';
 const tenantUserAssignment = 'Tenant User Assignment';
 const meterIssueCheck = 'Issue Check';
 const taskInfo = 'Task Info';
-const billingRecordInfo = 'Billing Record Info';
+const billingRecordInfo = 'Billing View';
 const listSearchBillingReord = 'List/Search Billing Record';
 const createNewBill = 'Create New Bill';
-const billRelease = 'Bill Release';
+const billRelease = 'Billing Ops';
 
 class AppModel extends ChangeNotifier {
   String? subDomain;

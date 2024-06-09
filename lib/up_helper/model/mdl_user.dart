@@ -65,6 +65,7 @@ enum AclRole {
   EVS2_Registered_User,
   EMS_Ops_Site_SMRT_Buona_Vista,
   EVS2_Basic_User,
+  EMS_Admin,
 }
 
 enum DestPortal {
@@ -518,7 +519,8 @@ class Evs2User {
         hasRole2(AclRole.Administrator) ||
         hasRole2(AclRole.EVS2_Admin_Root) ||
         hasRole2(AclRole.EVS2_Super_Admin) ||
-        hasRole2(AclRole.EVS2_Admin);
+        hasRole2(AclRole.EVS2_Admin) ||
+        hasRole2(AclRole.EMS_Admin);
   }
   // bool hasRole(AclRole role) {
   //   return rolePermMap!.containsKey(role.name);

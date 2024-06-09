@@ -1,3 +1,4 @@
+import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/wgt_bill_lc_status_update.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 
@@ -19,6 +20,8 @@ class WgtEditCommitList extends StatefulWidget {
     this.width,
     this.height,
     required this.appConfig,
+    required this.loggedInUser,
+    required this.scopeProfile,
     required this.listConfig,
     required this.listItems,
     this.showCommit = true,
@@ -45,11 +48,14 @@ class WgtEditCommitList extends StatefulWidget {
     this.onToggleListPaneMode,
     this.multiSelection = false,
     this.itemExt = 36,
-    this.requestByUsername,
+    // this.requestByUsername,
     this.aclScopeStr,
+    this.onRequestRefresh,
   });
 
   final PaGridAppConfig appConfig;
+  final Evs2User loggedInUser;
+  final ScopeProfile scopeProfile;
   final String listPrefix;
   final double? width;
   final double? height;
@@ -78,8 +84,9 @@ class WgtEditCommitList extends StatefulWidget {
   final Function(String, String)? onToggleListPaneMode;
   final bool multiSelection;
   final double itemExt;
-  final String? requestByUsername;
+  // final String? requestByUsername;
   final String? aclScopeStr;
+  final Function? onRequestRefresh;
 
   //for list of functions to be called when to set the modified flag for list fields
   List<Function(bool)>? fieldUpdateModified = [];
@@ -608,223 +615,226 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
                   clickCopy: configItem['clickCopy'] ?? false,
                 ),
               )
-            : configItem['useWidget'] == 'tag' || showTag
-                ? Tooltip(
-                    message: tagTooltip ??
-                        configItem['getTooltip']
-                            ?.call(row[configItem['fieldKey']]) ??
-                        '',
-                    waitDuration: const Duration(milliseconds: 300),
-                    child: SizedBox(
-                      width: width,
-                      child: Stack(
-                        children: [
-                          Container(
-                            // width: width,
-                            padding: const EdgeInsets.symmetric(horizontal: 5),
-                            decoration: BoxDecoration(
-                              color: tagColor ??
-                                  configItem['getColor']
-                                      ?.call(row[configItem['fieldKey']]),
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                            child: Text(tagText,
-                                style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onBackground,
-                                    fontSize: 13.5)),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                : configItem['useWidget'] == 'checkbox'
-                    ? Tooltip(
-                        message:
-                            disabled ? configItem['disabledTooltip'] ?? '' : '',
-                        waitDuration: const Duration(milliseconds: 500),
-                        child: SizedBox(
-                          width: width,
-                          child: Checkbox(
-                            // checkColor: Theme.of(context).hintColor,
-                            // activeColor: Theme.of(context).colorScheme.secondary,
-                            value: configItem['getVal']?.call(row) ??
-                                row[configItem['fieldKey']] ??
-                                false,
-                            onChanged: disabled
-                                ? null
-                                : (value) {
-                                    configItem['onChanged'](value, row);
-                                  },
-                          ),
-                        ),
+            : configItem['useWidget'] == 'billingLcSatusUpdate'
+                ? getBillingLcStatusControl(
+                    row: row,
+                    configItem: configItem,
+                    tagText: tagText,
+                    tagColor: tagColor,
+                    tagTooltip: tagTooltip,
+                    width: width)
+                : configItem['useWidget'] == 'tag' || showTag
+                    ? getTag(
+                        row: row,
+                        configItem: configItem,
+                        width: width,
+                        tagColor: tagColor,
+                        tagText: tagText,
+                        tagTooltip: tagTooltip,
                       )
-                    : configItem['useWidget'] == 'toggleSwitch'
-                        ? Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 5.0),
-                            child: Tooltip(
-                              message: disabled
-                                  ? 'value: ${row[configItem['fieldKey']] ? 'Yes' : 'No'} | info: ${configItem['disabledTooltip'] ?? ''}'
-                                  : 'value: ${row[configItem['fieldKey']] ? 'Yes' : 'No'}',
-                              waitDuration: const Duration(milliseconds: 500),
-                              child: WgtListToggleSwith(
-                                disabled: disabled,
-                                parentListWgt: widget,
-                                initialLabelIndex:
-                                    row[configItem['fieldKey']] == null
-                                        ? 0
-                                        : row[configItem['fieldKey']] as bool ==
-                                                true
-                                            ? 1
-                                            : 0,
-                                width: width,
-                                // clickEditable: false,
-                                fieldKey: configItem['fieldKey'],
-                                modifiedRow: modifiedRow,
-                                flagModified: flagModified,
+                    : configItem['useWidget'] == 'checkbox'
+                        ? Tooltip(
+                            message: disabled
+                                ? configItem['disabledTooltip'] ?? ''
+                                : '',
+                            waitDuration: const Duration(milliseconds: 500),
+                            child: SizedBox(
+                              width: width,
+                              child: Checkbox(
+                                // checkColor: Theme.of(context).hintColor,
+                                // activeColor: Theme.of(context).colorScheme.secondary,
+                                value: configItem['getVal']?.call(row) ??
+                                    row[configItem['fieldKey']] ??
+                                    false,
+                                onChanged: disabled
+                                    ? null
+                                    : (value) {
+                                        configItem['onChanged'](value, row);
+                                      },
                               ),
-                            ))
-                        : configItem['useWidget'] == 'iconButton'
+                            ),
+                          )
+                        : configItem['useWidget'] == 'toggleSwitch'
                             ? Padding(
-                                padding: const EdgeInsets.only(bottom: 8.0),
-                                child: SizedBox(
-                                  width: width,
-                                  height: 18,
-                                  child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: showAltIcon
-                                        ? Tooltip(
-                                            message:
-                                                configItem['altIconTooltip'],
-                                            child: Icon(
-                                              configItem['altIcon'],
-                                              color:
-                                                  Theme.of(context).hintColor,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 5.0),
+                                child: Tooltip(
+                                  message: disabled
+                                      ? 'value: ${row[configItem['fieldKey']] ? 'Yes' : 'No'} | info: ${configItem['disabledTooltip'] ?? ''}'
+                                      : 'value: ${row[configItem['fieldKey']] ? 'Yes' : 'No'}',
+                                  waitDuration:
+                                      const Duration(milliseconds: 500),
+                                  child: WgtListToggleSwith(
+                                    disabled: disabled,
+                                    parentListWgt: widget,
+                                    initialLabelIndex:
+                                        row[configItem['fieldKey']] == null
+                                            ? 0
+                                            : row[configItem['fieldKey']]
+                                                        as bool ==
+                                                    true
+                                                ? 1
+                                                : 0,
+                                    width: width,
+                                    // clickEditable: false,
+                                    fieldKey: configItem['fieldKey'],
+                                    modifiedRow: modifiedRow,
+                                    flagModified: flagModified,
+                                  ),
+                                ))
+                            : configItem['useWidget'] == 'iconButton'
+                                ? Padding(
+                                    padding: const EdgeInsets.only(bottom: 8.0),
+                                    child: SizedBox(
+                                      width: width,
+                                      height: 18,
+                                      child: Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: showAltIcon
+                                            ? Tooltip(
+                                                message: configItem[
+                                                    'altIconTooltip'],
+                                                child: Icon(
+                                                  configItem['altIcon'],
+                                                  color: Theme.of(context)
+                                                      .hintColor,
+                                                ),
+                                              )
+                                            : InkWell(
+                                                onTap: configItem['onTap'] ==
+                                                        null
+                                                    ? configItem['onTap']
+                                                    : () => configItem['onTap'](
+                                                        context,
+                                                        row,
+                                                        fullList!,
+                                                        widget.queryMap),
+                                                onHover: (val) {
+                                                  setState(() {
+                                                    if (val) {
+                                                      _widgetIndex = index;
+                                                    } else {
+                                                      _widgetIndex = -1;
+                                                    }
+                                                  });
+                                                },
+                                                child: showIcon
+                                                    ? Tooltip(
+                                                        waitDuration:
+                                                            const Duration(
+                                                                milliseconds:
+                                                                    500),
+                                                        message: configItem[
+                                                                'iconTooltip'] ??
+                                                            iconTooltip ??
+                                                            '',
+                                                        child: Icon(
+                                                          configItem[
+                                                                  'iconData'] ??
+                                                              Icons.edit,
+                                                          color: configItem[
+                                                                  'iconColor'] ??
+                                                              Theme.of(context)
+                                                                  .colorScheme
+                                                                  .primary
+                                                                  .withOpacity(
+                                                                      0.5),
+                                                          size: configItem[
+                                                              'iconSize'],
+                                                        ),
+                                                      )
+                                                    : Container(),
+                                              ),
+                                      ),
+                                    ),
+                                  )
+                                : configItem['useWidget'] == 'dropdown'
+                                    ? DropdownButton(
+                                        isExpanded: true,
+                                        value: row[configItem['fieldKey']],
+                                        items: configItem['dropdownItems']
+                                            .map<DropdownMenuItem<dynamic>>(
+                                                (item) {
+                                          return DropdownMenuItem(
+                                            value: item['value'],
+                                            child: Text(item['label']),
+                                          );
+                                        }).toList(),
+                                        onChanged: disabled
+                                            ? null
+                                            : (value) {
+                                                configItem['onChanged'](
+                                                    value, row);
+                                              },
+                                      )
+                                    : configItem['useWidget'] ==
+                                            'wgtPasswordResetPopupButton'
+                                        ? SizedBox(
+                                            width: width,
+                                            child: Align(
+                                              alignment: Alignment.centerLeft,
+                                              child:
+                                                  getWgtPasswordResetPopupButton(
+                                                configItem,
+                                                row['username'],
+                                                row['id'],
+                                                index,
+                                                disabled,
+                                              ),
                                             ),
                                           )
-                                        : InkWell(
-                                            onTap: configItem['onTap'] == null
-                                                ? configItem['onTap']
-                                                : () => configItem['onTap'](
-                                                    context,
-                                                    row,
-                                                    fullList!,
-                                                    widget.queryMap),
-                                            onHover: (val) {
-                                              setState(() {
-                                                if (val) {
-                                                  _widgetIndex = index;
-                                                } else {
-                                                  _widgetIndex = -1;
-                                                }
-                                              });
-                                            },
-                                            child: showIcon
-                                                ? Tooltip(
-                                                    waitDuration:
-                                                        const Duration(
-                                                            milliseconds: 500),
-                                                    message: configItem[
-                                                            'iconTooltip'] ??
-                                                        iconTooltip ??
-                                                        '',
-                                                    child: Icon(
-                                                      configItem['iconData'] ??
-                                                          Icons.edit,
-                                                      color: configItem[
-                                                              'iconColor'] ??
-                                                          Theme.of(context)
-                                                              .colorScheme
-                                                              .primary
-                                                              .withOpacity(0.5),
-                                                      size: configItem[
-                                                          'iconSize'],
-                                                    ),
-                                                  )
-                                                : Container(),
-                                          ),
-                                  ),
-                                ),
-                              )
-                            : configItem['useWidget'] == 'dropdown'
-                                ? DropdownButton(
-                                    isExpanded: true,
-                                    value: row[configItem['fieldKey']],
-                                    items: configItem['dropdownItems']
-                                        .map<DropdownMenuItem<dynamic>>((item) {
-                                      return DropdownMenuItem(
-                                        value: item['value'],
-                                        child: Text(item['label']),
-                                      );
-                                    }).toList(),
-                                    onChanged: disabled
-                                        ? null
-                                        : (value) {
-                                            configItem['onChanged'](value, row);
-                                          },
-                                  )
-                                : configItem['useWidget'] ==
-                                        'wgtPasswordResetPopupButton'
-                                    ? SizedBox(
-                                        width: width,
-                                        child: Align(
-                                          alignment: Alignment.centerLeft,
-                                          child: getWgtPasswordResetPopupButton(
-                                            configItem,
-                                            row['username'],
-                                            row['id'],
-                                            index,
-                                            disabled,
-                                          ),
-                                        ),
-                                      )
-                                    : configItem['useWidget'] == 'singleKey'
-                                        ? configItem['onTap'] == null
-                                            ? Container()
-                                            : InkWell(
-                                                onTap: () {
-                                                  configItem['onTap'](row);
-                                                },
-                                                child: Tooltip(
-                                                  message: configItem[
-                                                          'detailTooltip'] ??
-                                                      '',
-                                                  waitDuration: const Duration(
-                                                      milliseconds: 500),
-                                                  child: Evs2ListText(
-                                                    nonSelectable: true,
-                                                    // parentListWgt: widget,
-                                                    originalFullText:
-                                                        originalFullText,
-                                                    width: width,
-                                                    style: row[configItem[
-                                                                'fieldKey']] ==
-                                                            widget.currentItemId
-                                                        ? TextStyle(
-                                                            backgroundColor:
-                                                                Theme.of(
+                                        : configItem['useWidget'] == 'singleKey'
+                                            ? configItem['onTap'] == null
+                                                ? Container()
+                                                : InkWell(
+                                                    onTap: () {
+                                                      configItem['onTap'](row);
+                                                    },
+                                                    child: Tooltip(
+                                                      message: configItem[
+                                                              'detailTooltip'] ??
+                                                          '',
+                                                      waitDuration:
+                                                          const Duration(
+                                                              milliseconds:
+                                                                  500),
+                                                      child: Evs2ListText(
+                                                        nonSelectable: true,
+                                                        // parentListWgt: widget,
+                                                        originalFullText:
+                                                            originalFullText,
+                                                        width: width,
+                                                        style: row[configItem[
+                                                                    'fieldKey']] ==
+                                                                widget
+                                                                    .currentItemId
+                                                            ? TextStyle(
+                                                                backgroundColor:
+                                                                    Theme.of(
+                                                                            context)
+                                                                        .colorScheme
+                                                                        .primary,
+                                                                fontSize: 15,
+                                                                color: Colors
+                                                                    .white,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                              )
+                                                            : _listItemStyle
+                                                                .copyWith(
+                                                                color: Theme.of(
                                                                         context)
                                                                     .colorScheme
                                                                     .primary,
-                                                            fontSize: 15,
-                                                            color: Colors.white,
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                          )
-                                                        : _listItemStyle
-                                                            .copyWith(
-                                                            color: Theme.of(
-                                                                    context)
-                                                                .colorScheme
-                                                                .primary,
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                          ),
-                                                  ),
-                                                ),
-                                              )
-                                        : Container(),
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                              ),
+                                                      ),
+                                                    ),
+                                                  )
+                                            : Container(),
       );
     }
 
@@ -868,23 +878,93 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
         xOffset: 35,
         popupWidth: 335,
         popupHeight: 250,
-        // flexHeight: true,
+        direction: 'left',
         popupChild: WgtUpdatePassword(
           appConfig: widget.appConfig,
-          requestByUsername: widget.requestByUsername!,
+          requestByUsername: widget.loggedInUser.username!,
           aclScopeStr: item['aclScopeStr'] ?? widget.aclScopeStr!,
           userId: userId,
           requireOldPassword: false,
           passwordLengthMin: 3,
           updatePassword: item['updatePassword'],
         ),
-        direction: 'left',
         child: Icon(
           Icons.password,
           color: disabled
               ? Theme.of(context).hintColor.withOpacity(0.34)
               : Theme.of(context).colorScheme.primary.withOpacity(0.5),
         ),
+      ),
+    );
+  }
+
+  Widget getTag({
+    required Map<String, dynamic> row,
+    required Map<String, dynamic> configItem,
+    required String tagText,
+    Color? tagColor,
+    String? tagTooltip,
+    required double width,
+  }) {
+    return Tooltip(
+      message: tagTooltip ??
+          configItem['getTooltip']?.call(row[configItem['fieldKey']]) ??
+          '',
+      waitDuration: const Duration(milliseconds: 300),
+      child: SizedBox(
+        width: width,
+        child: Stack(
+          children: [
+            Container(
+              // width: width,
+              padding: const EdgeInsets.symmetric(horizontal: 5),
+              decoration: BoxDecoration(
+                color: tagColor ??
+                    configItem['getColor']?.call(row[configItem['fieldKey']]),
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Text(tagText,
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: 13.5)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget getBillingLcStatusControl({
+    required Map<String, dynamic> row,
+    required Map<String, dynamic> configItem,
+    required String tagText,
+    Color? tagColor,
+    String? tagTooltip,
+    required double width,
+  }) {
+    return WgtPopupButton(
+      width: 35,
+      height: 20,
+      popupWidth: 170,
+      popupHeight: 160,
+      direction: 'left',
+      popupChild: WgtBillLcStatusUpdate(
+        appConfig: widget.appConfig,
+        loggedInUser: widget.loggedInUser,
+        scopeProfile: widget.scopeProfile,
+        billingRec: row,
+        initialBillingLcStatusTagStr: tagText,
+        onUpdate: (tag) {
+          widget.onRequestRefresh?.call();
+        },
+      ),
+      child: getTag(
+        row: row,
+        configItem: configItem,
+        tagText: tagText,
+        tagColor: tagColor,
+        tagTooltip: tagTooltip,
+        width: width,
       ),
     );
   }

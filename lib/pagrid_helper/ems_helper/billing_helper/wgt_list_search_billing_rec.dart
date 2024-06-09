@@ -18,6 +18,7 @@ class WgtListSearchBillingRec extends StatefulWidget {
     this.title = 'List/Search Billing Records',
     this.isPickerMode = false,
     // this.onSubmitPicked,
+    this.allowLcStatusUpdate = false,
     this.initialNoR = 20,
     this.opColConfig,
     this.initialType,
@@ -35,6 +36,7 @@ class WgtListSearchBillingRec extends StatefulWidget {
   final PaGridAppConfig appConfig;
   final String title;
   final bool isPickerMode;
+  final bool allowLcStatusUpdate;
   // final Function? onSubmitPicked;
   final int initialNoR;
   final Map<String, dynamic>? opColConfig;
@@ -254,8 +256,9 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
           'fieldKey': 'lc_status',
           'width': 60.0,
           'showSort': true,
-          'useWidget': 'tag',
           'getTag': getBillingLcStatusTag,
+          'useWidget':
+              widget.allowLcStatusUpdate ? 'billingLcSatusUpdate' : null,
         },
       ]);
 
@@ -439,6 +442,8 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
                           child: WgtEditCommitList(
                             key: _listKey,
                             appConfig: widget.appConfig,
+                            loggedInUser: widget.loggedInUser,
+                            scopeProfile: widget.scopeProfile,
                             listPrefix: 'billing_rec',
                             itemExt: 40,
                             // width:_tableWidth, //0.95 * MediaQuery.of(context).size.width,
@@ -477,6 +482,11 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
                                 _sortOrder = sortOrder;
                               });
                               _getItemList();
+                            },
+                            onRequestRefresh: () {
+                              setState(() {
+                                _refreshKey = UniqueKey();
+                              });
                             },
                           ),
                         ),

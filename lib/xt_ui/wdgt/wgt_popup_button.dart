@@ -97,8 +97,8 @@ class WgtPopupButton extends StatelessWidget {
                     child: Dialog(
                       elevation: 0,
                       backgroundColor: Colors.transparent,
-                      child: Stack(
-                        alignment: AlignmentDirectional.center,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Container(
                             width: popupWidth,

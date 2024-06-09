@@ -4,7 +4,7 @@ export 'enum/enum_acl.dart';
 export 'enum/enum_datetime.dart';
 export 'enum/enum_item.dart';
 
-export 'def/bill_def.dart';
+export '../pagrid_helper/ems_helper/billing_helper/bill_def.dart';
 export 'def/op_def.dart';
 
 export 'helper/auth_helper.dart';

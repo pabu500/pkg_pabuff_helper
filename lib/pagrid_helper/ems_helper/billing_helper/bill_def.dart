@@ -2,19 +2,14 @@ import 'package:flutter/material.dart';
 
 enum BillGenType { manual, auto }
 
-enum BillingLcStatus { generated, released }
+enum BillingLcStatus { generated, released, mfd }
 
 String? getGenTypeTagStr(String? statusStr) {
   if ((statusStr ?? '').isEmpty) {
     return null;
   }
   BillGenType? status = BillGenType.values.byName(statusStr!);
-  switch (status) {
-    case BillGenType.auto:
-      return 'A';
-    case BillGenType.manual:
-      return 'M';
-  }
+  return genTypeInfo[status]!['tag'];
 }
 
 String getGenTypeMessage(String? statusStr) {
@@ -23,14 +18,7 @@ String getGenTypeMessage(String? statusStr) {
   }
   BillGenType? status = BillGenType.values.byName(statusStr);
 
-  switch (status) {
-    case BillGenType.auto:
-      return 'Auto';
-    case BillGenType.manual:
-      return 'Manual';
-    default:
-      return 'N/A';
-  }
+  return genTypeInfo[status]!['tooltip'];
 }
 
 Color getGenTypeColor(String? statusStr) {
@@ -39,14 +27,7 @@ Color getGenTypeColor(String? statusStr) {
   }
   BillGenType? status = BillGenType.values.byName(statusStr);
 
-  switch (status) {
-    case BillGenType.auto:
-      return Colors.teal;
-    case BillGenType.manual:
-      return Colors.orangeAccent.withOpacity(0.7);
-    default:
-      return Colors.transparent;
-  }
+  return genTypeInfo[status]!['color'];
 }
 
 final Map<BillGenType, dynamic> genTypeInfo = {
@@ -79,51 +60,6 @@ Map<String, dynamic> getGenTypeTag(row, fieldKey) {
   };
 }
 
-String? getBillingLcStatusTagStr(String? statusStr) {
-  if ((statusStr ?? '').isEmpty) {
-    return null;
-  }
-  BillingLcStatus? status = BillingLcStatus.values.byName(statusStr!);
-  switch (status) {
-    case BillingLcStatus.generated:
-      return 'Gn';
-    case BillingLcStatus.released:
-      return 'Rl';
-  }
-}
-
-String getBillingLcStatusMessage(String? statusStr) {
-  if (statusStr == null) {
-    return 'N/A';
-  }
-  BillingLcStatus? status = BillingLcStatus.values.byName(statusStr);
-
-  switch (status) {
-    case BillingLcStatus.generated:
-      return 'Generated';
-    case BillingLcStatus.released:
-      return 'Released';
-    default:
-      return 'N/A';
-  }
-}
-
-Color getBillingLcSatusColor(String? statusStr) {
-  if (statusStr == null || statusStr.isEmpty) {
-    return Colors.transparent;
-  }
-  BillingLcStatus? status = BillingLcStatus.values.byName(statusStr);
-
-  switch (status) {
-    case BillingLcStatus.generated:
-      return Colors.teal.withOpacity(0.8);
-    case BillingLcStatus.released:
-      return Colors.orangeAccent.withOpacity(0.7);
-    default:
-      return Colors.transparent;
-  }
-}
-
 Map<String, dynamic> getBillingLcStatusTag(row, fieldKey) {
   if ((row['lc_status'] ?? '').isEmpty) {
     return {};
@@ -140,3 +76,59 @@ Map<String, dynamic> getBillingLcStatusTag(row, fieldKey) {
     'tooltip': getBillingLcStatusMessage(status.name),
   };
 }
+
+String? getBillingLcStatusTagStr(String? statusStr) {
+  if ((statusStr ?? '').isEmpty) {
+    return null;
+  }
+  BillingLcStatus? status = BillingLcStatus.values.byName(statusStr!);
+  return billingLcStatusInfo[status]!['tag'];
+}
+
+String getBillingLcStatusMessage(String? statusStr) {
+  if (statusStr == null) {
+    return 'N/A';
+  }
+  BillingLcStatus? status = BillingLcStatus.values.byName(statusStr);
+
+  return billingLcStatusInfo[status]!['tooltip'];
+}
+
+Color getBillingLcSatusColor(String? statusStr) {
+  if (statusStr == null || statusStr.isEmpty) {
+    return Colors.transparent;
+  }
+  BillingLcStatus? status = BillingLcStatus.values.byName(statusStr);
+
+  return billingLcStatusInfo[status]!['color'];
+}
+
+BillingLcStatus? getBillingLcStatusFromTagStr(String? tagStr) {
+  if ((tagStr ?? '').isEmpty) {
+    return BillingLcStatus.generated;
+  }
+  for (var status in BillingLcStatus.values) {
+    if (billingLcStatusInfo[status]!['tag'] == tagStr) {
+      return status;
+    }
+  }
+  return null;
+}
+
+final Map<BillingLcStatus, dynamic> billingLcStatusInfo = {
+  BillingLcStatus.generated: {
+    'tag': 'Gn',
+    'color': Colors.teal.withOpacity(0.8),
+    'tooltip': 'Generated',
+  },
+  BillingLcStatus.released: {
+    'tag': 'Rl',
+    'color': Colors.orangeAccent.withOpacity(0.7),
+    'tooltip': 'Released',
+  },
+  BillingLcStatus.mfd: {
+    'tag': 'Dl',
+    'color': Colors.redAccent.shade200.withOpacity(0.7),
+    'tooltip': 'Marked for Delete',
+  },
+};
