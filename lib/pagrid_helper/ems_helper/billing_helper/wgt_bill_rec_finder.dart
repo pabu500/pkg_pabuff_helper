@@ -12,6 +12,7 @@ class WgtBillingRecFinder extends StatefulWidget {
     required this.loggedInUser,
     required this.appConfig,
     this.tenantName,
+    this.tenantLabel,
     this.lcStatusList,
     this.sectionName = '',
     this.width,
@@ -37,6 +38,7 @@ class WgtBillingRecFinder extends StatefulWidget {
   final PaGridAppConfig appConfig;
   final String sectionName;
   final String? tenantName;
+  final String? tenantLabel;
   final List<BillingLcStatus>? lcStatusList;
   final void Function()? onModified;
   final void Function()? onSearching;
@@ -174,6 +176,7 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
       itemLabelText: 'Tenant Label',
       itemNameText: 'Identifier',
       fixedItemName: widget.tenantName,
+      fixedItemLabel: widget.tenantLabel,
       itemType: ItemType.billing_rec,
       initialNoR: widget.initialNoR,
       iniShowPanel: widget.iniShowPanel,

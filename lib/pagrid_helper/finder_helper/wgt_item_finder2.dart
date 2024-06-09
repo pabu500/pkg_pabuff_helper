@@ -29,6 +29,7 @@ class WgtItemFinder2 extends StatefulWidget {
     this.itemNameText = 'Item Name',
     this.itemLabelText = 'Item Label',
     this.fixedItemName,
+    this.fixedItemLabel,
     // this.itemTypeList = const [],
     this.getAdditionalPropWidget,
     this.additionalPropQueryMap = const {},
@@ -65,6 +66,7 @@ class WgtItemFinder2 extends StatefulWidget {
   final String itemNameText;
   final String itemLabelText;
   final String? fixedItemName;
+  final String? fixedItemLabel;
   // final List<String> itemTypeList;
   final Widget Function(Function, Function)? getAdditionalPropWidget;
   final Map<String, dynamic> additionalPropQueryMap;
@@ -254,6 +256,9 @@ class _WgtItemFinder2State extends State<WgtItemFinder2> {
     if (widget.fixedItemName != null) {
       _itemName = widget.fixedItemName;
     }
+    if (widget.fixedItemLabel != null) {
+      _itemLabel = widget.fixedItemLabel;
+    }
 
     _numberOfRecordsController.clear();
 
@@ -299,6 +304,9 @@ class _WgtItemFinder2State extends State<WgtItemFinder2> {
 
     if (widget.fixedItemName != null) {
       _itemName = widget.fixedItemName;
+    }
+    if (widget.fixedItemLabel != null) {
+      _itemLabel = widget.fixedItemLabel;
     }
 
     // for (var entry in (widget.additionalPropQueryMap).entries) {
@@ -507,8 +515,8 @@ class _WgtItemFinder2State extends State<WgtItemFinder2> {
             width: 220,
             labelText: widget.itemLabelText,
             hintText: widget.itemLabelText,
-            initialValue: _itemLabel,
-            isInitialValueMutable: widget.fixedItemName == null,
+            initialValue: widget.fixedItemLabel ?? _itemLabel,
+            isInitialValueMutable: widget.fixedItemLabel == null,
             resetKey: _resetKeyItemLabel,
             onChanged: (value) {
               _itemLabel = value;
