@@ -606,11 +606,12 @@ class _WgtItemHistoryGetterState extends State<WgtItemHistoryGetter> {
 
     _selectedTimeRangeMinutes = widget.lookBackMinutes[0];
 
-    _maxNumberOfRecords = widget.itemType == ItemType.meter
+    _maxNumberOfRecords = (widget.itemType == ItemType.meter ||
+            widget.itemType == ItemType.meter_iwow)
         ? 3000
         : widget.itemType == ItemType.meter_3p
             ? 2500
-            : 1000;
+            : 1500 /* 30min interval, 30 days */;
 
     _lastLoadingTime = DateTime.now();
   }
