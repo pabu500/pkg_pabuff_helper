@@ -12,8 +12,8 @@ class WgtUpdatePassword extends StatefulWidget {
   const WgtUpdatePassword({
     super.key,
     required this.appConfig,
-    required this.requestByUsername,
-    required this.userId,
+    required this.loggedInUser,
+    // required this.userId,
     this.titleWidget,
     this.showUsername = true,
     this.showBorder = true,
@@ -28,8 +28,8 @@ class WgtUpdatePassword extends StatefulWidget {
 
   final PaGridAppConfig appConfig;
   final Widget? titleWidget;
-  final String requestByUsername;
-  final int userId;
+  final Evs2User loggedInUser;
+  // final int userId;
   final bool showUsername;
   final bool showBorder;
   final bool requireOldPassword;
@@ -71,13 +71,15 @@ class _WgtUpdatePasswordState extends State<WgtUpdatePassword> {
     try {
       Map<String, dynamic> result = await widget.updatePassword(
         widget.appConfig,
-        widget.userId,
+        // widget.userId,
+        widget.loggedInUser.id,
         'password',
         _controllerNewPassword.text.trim(),
         checkOldPassword: widget.requireOldPassword ? 'true' : 'false',
         oldVal: _controllerOldPassword.text.trim(),
         SvcClaim(
-          username: widget.requestByUsername,
+          userId: widget.loggedInUser.id,
+          username: widget.loggedInUser.username,
           scope: widget.aclScopeStr,
           target: getAclTargetStr(AclTarget.evs2user_p_profile),
           operation: AclOperation.update.name,
@@ -162,7 +164,7 @@ class _WgtUpdatePasswordState extends State<WgtUpdatePassword> {
                     ? Padding(
                         padding: const EdgeInsets.only(top: 8, bottom: 5),
                         child: Text(
-                          widget.requestByUsername,
+                          widget.loggedInUser.username ?? '',
                           style: TextStyle(
                               fontSize: 18,
                               color:

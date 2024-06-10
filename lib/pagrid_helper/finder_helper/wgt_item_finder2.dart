@@ -214,6 +214,7 @@ class _WgtItemFinder2State extends State<WgtItemFinder2> {
         widget.appConfig,
         queryMap,
         SvcClaim(
+          userId: widget.loggedInUser.id,
           username: widget.loggedInUser.username,
           scope: widget.loggedInUser.isAdminAndUp()
               ? AclScope.global.name

@@ -55,8 +55,8 @@ class _WgtPostJobState extends State<WgtPostJob> {
         jobRequest,
         widget.opList,
         SvcClaim(
-          userId: widget.loggedInUser!.id,
-          username: widget.loggedInUser!.username,
+          userId: widget.loggedInUser.id,
+          username: widget.loggedInUser.username,
           scope: widget.scopeProfile.getEffectiveScopeStr(),
           target: widget.jobRequest['target']!,
           operation: widget.jobRequest['operation']!,

@@ -113,6 +113,7 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
         widget.appConfig,
         _queryMap,
         SvcClaim(
+          userId: widget.loggedInUser.id,
           username: widget.loggedInUser!.username,
           scope: widget.loggedInUser.isAdminAndUp()
               ? AclScope.global.name

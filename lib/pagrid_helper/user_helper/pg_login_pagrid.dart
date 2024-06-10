@@ -38,7 +38,8 @@ class _LoginPagePagridState extends State<LoginPagePagrid> {
   bool _savePassword = true;
   // bool _remberMe = false;
   bool _credExpired = false;
-  int _userId = -1;
+  // int _userId = -1;
+  Evs2User? _loggedInUser;
 
   bool _useOpsDashboard = false;
 
@@ -175,6 +176,7 @@ class _LoginPagePagridState extends State<LoginPagePagrid> {
     try {
       user = await doLogin(
           widget.destPortal, widget.appConfig, formCoordinator.formData);
+      _loggedInUser = user;
     } catch (err) {
       String errMsg = err.toString();
       Map<String, dynamic> errMap =
@@ -198,7 +200,7 @@ class _LoginPagePagridState extends State<LoginPagePagrid> {
           print('creditials have expired');
           setState(() {
             _credExpired = true;
-            _userId = errMap['userId'];
+            // _userId = errMap['userId'];
           });
         }
       }
@@ -437,7 +439,7 @@ class _LoginPagePagridState extends State<LoginPagePagrid> {
                   } else {
                     return Padding(
                       padding: const EdgeInsets.only(top: 13),
-                      child: _credExpired
+                      child: _credExpired && _loggedInUser != null
                           ? WgtUpdatePassword(
                               appConfig: widget
                                   .appConfig, //widget.appConfig, //appConfig,
@@ -455,9 +457,9 @@ class _LoginPagePagridState extends State<LoginPagePagrid> {
                                   verticalSpaceSmall,
                                 ],
                               ),
-                              requestByUsername:
-                                  formCoordinator.formData[UserKey.username]!,
-                              userId: _userId,
+                              loggedInUser: _loggedInUser!,
+                              // requestByUsername:formCoordinator.formData[UserKey.username]!,
+                              // userId: _userId,
                               updatePassword: doUpdateKeyValue,
                             )
                           : AuthenticationLayout(

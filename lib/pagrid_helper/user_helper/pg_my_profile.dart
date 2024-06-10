@@ -55,6 +55,7 @@ class _PgMyProfileState extends State<PgMyProfile> {
         key,
         value,
         SvcClaim(
+          userId: widget.loggedInUser.id,
           username: widget.loggedInUser.username,
           scope: AclScope.self.name,
           target: getAclTargetStr(AclTarget.evs2user_p_profile),
@@ -84,6 +85,7 @@ class _PgMyProfileState extends State<PgMyProfile> {
         widget.loggedInUser.id!,
         key,
         SvcClaim(
+          userId: widget.loggedInUser.id,
           username: widget.loggedInUser.username,
           scope: AclScope.self.name,
           target: getAclTargetStr(AclTarget.evs2user_p_profile),
@@ -424,8 +426,9 @@ class _PgMyProfileState extends State<PgMyProfile> {
                 showUsername: false,
                 showBorder: false,
                 sideExpanded: false,
-                requestByUsername: widget.loggedInUser.username!,
-                userId: widget.loggedInUser.id!,
+                loggedInUser: widget.loggedInUser,
+                // requestByUsername: widget.loggedInUser.username!,
+                // userId: widget.loggedInUser.id!,
                 updatePassword: doUpdateKeyValue,
               ),
             ),

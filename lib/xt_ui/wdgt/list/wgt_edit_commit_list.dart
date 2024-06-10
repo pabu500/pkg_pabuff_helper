@@ -881,9 +881,9 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
         direction: 'left',
         popupChild: WgtUpdatePassword(
           appConfig: widget.appConfig,
-          requestByUsername: widget.loggedInUser.username!,
+          loggedInUser: widget.loggedInUser,
           aclScopeStr: item['aclScopeStr'] ?? widget.aclScopeStr!,
-          userId: userId,
+          // userId: userId,
           requireOldPassword: false,
           passwordLengthMin: 3,
           updatePassword: item['updatePassword'],

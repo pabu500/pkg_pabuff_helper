@@ -204,6 +204,7 @@ class _WgtItemHistoryGetterState extends State<WgtItemHistoryGetter> {
           widget.appConfig,
           queryMap,
           SvcClaim(
+            userId: widget.loggedInUser.id,
             username: widget.loggedInUser.username,
             scope: AclScope.global.name,
             target: widget.historyType.name,
@@ -271,6 +272,7 @@ class _WgtItemHistoryGetterState extends State<WgtItemHistoryGetter> {
         widget.appConfig,
         queryMap,
         SvcClaim(
+          userId: widget.loggedInUser.id,
           username: widget.loggedInUser.username,
           scope: AclScope.global.name,
           target: widget.historyType.name,

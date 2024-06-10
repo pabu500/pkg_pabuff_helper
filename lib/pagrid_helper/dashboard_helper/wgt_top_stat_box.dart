@@ -104,6 +104,7 @@ class _WgtTopStatBoxState extends State<WgtTopStatBox> {
             'tenant_id': widget.loggedInUser.tenantId,
           },
           SvcClaim(
+            userId: widget.loggedInUser.id,
             username: widget.loggedInUser.username,
             scope: AclScope.global.name,
             target: getAclTargetStr(AclTarget.meter_p_info),
@@ -147,6 +148,7 @@ class _WgtTopStatBoxState extends State<WgtTopStatBox> {
         widget.destPortal,
         queryMap,
         SvcClaim(
+          userId: widget.loggedInUser.id,
           username: widget.loggedInUser.username,
           scope: widget.scopeProfile.getEffectiveScopeStr(),
           target: getAclTargetStr(AclTarget.meter_p_info),
@@ -198,6 +200,7 @@ class _WgtTopStatBoxState extends State<WgtTopStatBox> {
           'site_scope': widget.scopeProfile.selectedSiteScope
         },
         SvcClaim(
+          userId: widget.loggedInUser.id,
           username: widget.loggedInUser.username,
           scope: AclScope.global.name,
           target: getAclTargetStr(AclTarget.meter_p_info),
@@ -232,6 +235,7 @@ class _WgtTopStatBoxState extends State<WgtTopStatBox> {
           widget.destPortal,
           {},
           SvcClaim(
+            userId: widget.loggedInUser.id,
             username: widget.loggedInUser.username,
             scope: AclScope.global.name,
             target: getAclTargetStr(AclTarget.meter_p_info),
@@ -266,6 +270,7 @@ class _WgtTopStatBoxState extends State<WgtTopStatBox> {
         widget.destPortal,
         {},
         SvcClaim(
+          userId: widget.loggedInUser.id,
           username: widget.loggedInUser.username,
           scope: AclScope.global.name,
           target: getAclTargetStr(AclTarget.meter_p_info),

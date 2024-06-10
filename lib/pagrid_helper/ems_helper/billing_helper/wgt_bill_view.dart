@@ -64,6 +64,7 @@ class _WgtBillViewState extends State<WgtBillView> {
         widget.appConfig,
         queryMap,
         SvcClaim(
+          userId: widget.loggedInUser.id,
           username: widget.loggedInUser.username,
           target: getAclTargetStr(AclTarget.bill_p_info),
           scope: widget.scopeProfile.getEffectiveScope().name,

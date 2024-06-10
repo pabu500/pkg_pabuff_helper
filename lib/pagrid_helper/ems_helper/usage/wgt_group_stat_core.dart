@@ -113,6 +113,7 @@ class _WgtMeterGroupStatCoreState extends State<WgtMeterGroupStatCore> {
         queryMap,
         duration,
         SvcClaim(
+          userId: widget.loggedInUser.id,
           username: widget.loggedInUser.username,
           scope: AclScope.global.name,
           target: getAclTargetStr(AclTarget.meter_p_consumption),
