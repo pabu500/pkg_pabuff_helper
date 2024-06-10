@@ -404,7 +404,7 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
                     _listKey = UniqueKey();
                     // _entityItems.addAll(itemList);
                     _totalItemCount = result['total_count'];
-                    _itemSelectQuery = result['id_select_query'];
+                    _itemSelectQuery = result['id_select_query'] ?? '';
                     _queryMap = result['query_map'];
                     _maxRowsPerPage =
                         int.parse(_queryMap['max_rows_per_page'] ?? '20');
