@@ -60,6 +60,7 @@ class _WgtBillLcStatusUpdateState extends State<WgtBillLcStatusUpdate> {
         ],
         SvcClaim(
           username: widget.loggedInUser.username,
+          userId: widget.loggedInUser.id,
           scope: widget.scopeProfile.getEffectiveScopeStr(),
           target: getAclTargetStr(AclTarget.bill_p_info),
           operation: AclOperation.update.name,
