@@ -374,6 +374,18 @@ class EmsTypeUsageCalcReleased {
       }
     }
 
+    //line items
+    if (_lineItemList != null) {
+      for (var item in _lineItemList) {
+        String amtStr = item['amount'] ?? '';
+        double? amt = double.tryParse(amtStr);
+        if (amt != null) {
+          subTotalCost ??= 0;
+          subTotalCost = subTotalCost + amt;
+        }
+      }
+    }
+
     if (_billedGst != null) {
       gstAmount = subTotalCost! * _billedGst / 100;
     } else {
