@@ -110,6 +110,33 @@ Future<Evs2User> doCreateUser(
   }
 }
 
+Future<Evs2User> doCreateUser2(
+  PaGridAppConfig appConfig,
+  Map<String, String> queryMap,
+  SvcClaim svcClaim,
+) async {
+  try {
+    final response = await http.post(
+      Uri.parse(UrlController(appConfig)
+          .getUrl(SvcType.usersvc, UrlBase.eptUsersvcRegister)),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(SvcQuery(svcClaim, queryMap).toJson()),
+    );
+
+    if (response.statusCode == 201) {
+      // If the server did return a 201 CREATED response, parse the JSON.
+      return Evs2User.fromJson(jsonDecode(response.body));
+    } else {
+      Map<String, dynamic> responseBody = jsonDecode(response.body);
+      throw Exception(responseBody['err']);
+    }
+  } catch (err) {
+    throw Exception(err);
+  }
+}
+
 Future<dynamic> doBatchCreateUsers(
     PaGridAppConfig appConfig,
     List<Map<String, dynamic>> userList,

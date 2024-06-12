@@ -41,7 +41,7 @@ class xtTextField extends StatefulWidget {
   String? Function(String)? doValidate;
   Enum? tfKey;
   // FormProvider? formProvider;
-  xt_util_FormCorrdinator? formCoordinator;
+  xtFormCorrdinator? formCoordinator;
   TextEditingController? controller;
 
   final String? initialText;

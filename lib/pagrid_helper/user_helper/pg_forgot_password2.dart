@@ -20,7 +20,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   bool _wait = false;
   bool _email_sent_success = false;
 
-  xt_util_FormCorrdinator formCoordinator = xt_util_FormCorrdinator();
+  xtFormCorrdinator formCoordinator = xtFormCorrdinator();
 
   double _width = 500;
 

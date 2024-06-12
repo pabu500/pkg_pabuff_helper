@@ -42,7 +42,7 @@ class xtButton extends StatefulWidget {
   final double? borderRadius;
   // String? errorText;
   btnKey? xtKey;
-  xt_util_FormCorrdinator? formCoordinator;
+  xtFormCorrdinator? formCoordinator;
   bool waiting = false;
   Widget? textSuffix;
 

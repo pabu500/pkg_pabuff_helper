@@ -1,6 +1,6 @@
 import 'package:buff_helper/pkg_buff_helper.dart';
 
-class xt_util_FormCorrdinator {
+class xtFormCorrdinator {
   Map<Enum, String> formData = {};
   Map<Enum, String?> formErrors = {};
   Map<Enum, Function> fieldValidators = {};
