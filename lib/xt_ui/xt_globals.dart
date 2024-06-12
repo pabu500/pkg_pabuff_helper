@@ -31,7 +31,8 @@ const String glb_reg_email =
     r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
 
 const String glb_email_callout = 'Please provide a valid email address';
-const String glb_regNG_email = r"[^a-zA-Z0-9@. ]+|([@\.])([@\.])";
+// const String glb_regNG_email = r"[^a-zA-Z0-9@. ]+|([@\.])([@\.])";
+const String glb_regNG_email = r"[^a-zA-Z0-9@. ]|([@\.])\1";
 
 /* for test https://regex101.com/
 95687951

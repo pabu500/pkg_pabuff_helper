@@ -15,6 +15,7 @@ class xtTextField extends StatefulWidget {
       this.onEditingComplete,
       this.obscureText,
       this.doValidate,
+      this.onValidate,
       this.requireUnique,
       this.doCommCheckUnique,
       this.tfKey,
@@ -34,11 +35,11 @@ class xtTextField extends StatefulWidget {
   bool? requireUnique;
   Future<String> Function(PaGridAppConfig, Enum, String)? doCommCheckUnique;
   bool? obscureText;
-
   void Function()? onTap;
   String? Function(String)? onChanged;
   void Function()? onEditingComplete;
   String? Function(String)? doValidate;
+  void Function(String?)? onValidate;
   Enum? tfKey;
   // FormProvider? formProvider;
   xtFormCorrdinator? formCoordinator;
@@ -59,11 +60,11 @@ class xtTextField extends StatefulWidget {
 
 class _xtTextFieldState extends State<xtTextField> {
   InputDecoration? decoration;
-  String? errorText;
+  String? _errorText;
   // Color? errorColor;
 
-  bool dbwaiting = false;
-  bool dbUnique = false;
+  bool _dbwaiting = false;
+  bool _dbUnique = false;
   String storedText = '';
 
   String? suffixType;
@@ -95,21 +96,25 @@ class _xtTextFieldState extends State<xtTextField> {
 
           if (widget.doValidate != null) {
             setState(() {
-              errorText = widget.doValidate!(_controller.text);
+              _errorText = widget.doValidate!(_controller.text);
+
+              widget.onValidate?.call(_errorText);
             });
             if (widget.formCoordinator != null && widget.tfKey != null) {
               widget.formCoordinator!.formErrors[widget.tfKey!] =
-                  errorText; //update error
+                  _errorText; //update error
             }
 
-            if (errorText == null && widget.tfKey != null) {
+            if (_errorText == null &&
+                widget.tfKey != null &&
+                widget.formCoordinator != null) {
               widget.formCoordinator!.formData[widget.tfKey!] =
                   _controller.text;
             }
             bool requireUnique = widget.requireUnique ?? false;
             if (requireUnique &&
                 _controller.text.isNotEmpty &&
-                errorText == null) {
+                _errorText == null) {
               //filled and validated and db check needed
 
               if (widget.tfKey != null && widget.doCommCheckUnique != null) {
@@ -135,10 +140,10 @@ class _xtTextFieldState extends State<xtTextField> {
 
     if (widget.decoration != null) {
       decoration =
-          widget.decoration!.copyWith(errorText: errorText, suffix: suffix);
+          widget.decoration!.copyWith(errorText: _errorText, suffix: suffix);
     } else {
       decoration = xtBuildInputDecoration(
-        errorText: errorText,
+        errorText: _errorText,
         suffix: suffix,
       );
     }
@@ -178,7 +183,7 @@ class _xtTextFieldState extends State<xtTextField> {
 
   void updateError(String? error) {
     setState(() {
-      errorText = error;
+      _errorText = error;
     });
   }
 
@@ -242,20 +247,20 @@ class _xtTextFieldState extends State<xtTextField> {
 
     setState(() {
       if (dbresult == 'available') {
-        dbUnique = true;
+        _dbUnique = true;
         suffix = txTextInputSuffix('available', xtLightGreen1);
-        errorText = null;
+        _errorText = null;
       } else {
-        dbUnique = false;
+        _dbUnique = false;
         suffix = null;
         if (dbresult.contains('taken')) {
-          errorText = '${field.name} already used';
+          _errorText = '${field.name} already used';
         } else {
-          errorText = 'Service Error';
+          _errorText = 'Service Error';
         }
       }
       if (widget.formCoordinator != null && widget.tfKey != null) {
-        widget.formCoordinator!.formErrors[widget.tfKey!] = errorText;
+        widget.formCoordinator!.formErrors[widget.tfKey!] = _errorText;
       }
     });
 
@@ -272,9 +277,9 @@ class _xtTextFieldState extends State<xtTextField> {
             if (_controller.text != storedText) {
               suffix = null;
             }
-            errorText = widget.onChanged!(_controller.text);
+            _errorText = widget.onChanged!(_controller.text);
             if (widget.formCoordinator != null && widget.tfKey != null) {
-              widget.formCoordinator!.formErrors[widget.tfKey!] = errorText;
+              widget.formCoordinator!.formErrors[widget.tfKey!] = _errorText;
             }
           });
         }
