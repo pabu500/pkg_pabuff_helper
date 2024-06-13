@@ -121,6 +121,7 @@ Future<Evs2User> doCreateUser2(
           .getUrl(SvcType.usersvc, UrlBase.eptUsersvcRegister)),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer ',
       },
       body: jsonEncode(SvcQuery(svcClaim, queryMap).toJson()),
     );

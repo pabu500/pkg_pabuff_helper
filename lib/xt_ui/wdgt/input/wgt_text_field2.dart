@@ -4,8 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class xtTextField2 extends StatefulWidget {
-  const xtTextField2({
+class WgtTextField extends StatefulWidget {
+  const WgtTextField({
     super.key,
     required this.appConfig,
     required this.onChanged,
@@ -18,7 +18,7 @@ class xtTextField2 extends StatefulWidget {
     this.validator,
     this.checkUnique,
     this.uniqueKey,
-    this.tableName,
+    this.itemTableName,
     this.maxLines = 1,
     this.maxLength,
     this.inputFormatters,
@@ -31,6 +31,8 @@ class xtTextField2 extends StatefulWidget {
     this.scanner,
     this.showClearButton = true,
     this.enabled = true,
+    this.obscureText = false,
+    this.decoration,
   });
 
   final PaGridAppConfig appConfig;
@@ -44,7 +46,7 @@ class xtTextField2 extends StatefulWidget {
   final Function? validator;
   final Function(PaGridAppConfig, String, String, String)? checkUnique;
   final String? uniqueKey;
-  final String? tableName;
+  final String? itemTableName;
   final int maxLines;
   final int? maxLength;
   final String? labelText;
@@ -57,14 +59,16 @@ class xtTextField2 extends StatefulWidget {
   final Widget? scanner;
   final bool showClearButton;
   final bool enabled;
+  final bool obscureText;
+  final InputDecoration? decoration;
 
   @override
-  _xtTextField2State createState() => _xtTextField2State();
+  _WgtTextFieldState createState() => _WgtTextFieldState();
 }
 
-class _xtTextField2State extends State<xtTextField2> {
+class _WgtTextFieldState extends State<WgtTextField> {
   final TextEditingController controller = TextEditingController();
-  late final _controller;
+  late final TextEditingController _controller;
   // late final FocusNode _focusNode;
 
   String _errorText = '';
@@ -145,16 +149,24 @@ class _xtTextField2State extends State<xtTextField2> {
           if (_controller.text.trim().isNotEmpty) {
             if (widget.checkUnique != null) {
               if (!_uniqueChecked && _isValidated) {
+                assert(widget.itemTableName != null);
+                assert(widget.uniqueKey != null);
+
                 checkUnique(widget.appConfig, widget.uniqueKey!,
-                    _controller.text, widget.tableName!);
+                    _controller.text, widget.itemTableName!);
               }
             }
           }
         }
       },
       child: TextField(
+        obscureText: widget.obscureText,
         enabled: widget.enabled,
         controller: _controller,
+        maxLines: widget.maxLines,
+        minLines: 1,
+        maxLength: widget.maxLength,
+        inputFormatters: widget.inputFormatters,
         onChanged: (value) {
           setState(() {
             _uniqueChecked = false;
@@ -205,90 +217,82 @@ class _xtTextField2State extends State<xtTextField2> {
 
           if (widget.checkUnique != null) {
             checkUnique(widget.appConfig, widget.uniqueKey!, _controller.text,
-                widget.tableName!);
+                widget.itemTableName!);
           }
         },
-        maxLines: widget.maxLines,
-        minLines: 1,
-        maxLength: widget.maxLength,
-        inputFormatters: widget.inputFormatters,
-        decoration: InputDecoration(
-          labelText: widget.labelText,
-          labelStyle: TextStyle(
-            fontSize: 16,
-            color: Theme.of(context).hintColor,
-          ),
-          hintText: widget.hintText,
-          errorText: _errorText.isEmpty ? null : _errorText,
-          hintStyle: TextStyle(
-            fontSize: 16,
-            color: Theme.of(context).hintColor.withOpacity(0.5),
-          ),
-          enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(
-              width: 1,
-              color: Theme.of(context).hintColor.withOpacity(0.3),
+        decoration: widget.decoration ??
+            InputDecoration(
+              labelText: widget.labelText,
+              labelStyle: TextStyle(
+                fontSize: 16,
+                color: Theme.of(context).hintColor,
+              ),
+              hintText: widget.hintText,
+              errorText: _errorText.isEmpty ? null : _errorText,
+              hintStyle: TextStyle(
+                fontSize: 16,
+                color: Theme.of(context).hintColor.withOpacity(0.5),
+              ),
+              enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(
+                  width: 1,
+                  color: Theme.of(context).hintColor.withOpacity(0.3),
+                ),
+              ),
+              suffix: getSuffix(),
             ),
-          ),
-          suffix: getSuffix(),
-        ),
       ),
     );
   }
 
   Widget getSuffix() {
-    if (_waiting) {
-      return xtWait(
-        color: Theme.of(context).colorScheme.primary,
-      );
-    }
-    if (_checkUniqueResult == 'available') {
-      return const Text(
-        'available',
-        style: TextStyle(
-          fontSize: 16,
-          color: Colors.green,
-        ),
-      );
-    }
-    if (_checkUniqueResult == 'taken') {
-      return const Text(
-        'taken',
-        style: TextStyle(
-          fontSize: 16,
-          color: Colors.red,
-        ),
-      );
-    }
-    if (_controller.text.isNotEmpty && widget.showClearButton) {
-      return Focus(
-        descendantsAreFocusable: false,
-        canRequestFocus: false,
-        child: InkWell(
-          child: Icon(
-            Icons.clear,
-            color: Theme.of(context).hintColor,
-          ),
-          onTap: () {
-            setState(() {
-              _controller.text = '';
-              _checkUniqueResult = '';
-              _uniqueChecked = false;
-              _errorText = '';
-              if (widget.onValidate != null) {
-                widget.onValidate!('');
-              }
-              if (widget.onClear != null) {
-                widget.onClear!();
-              }
-            });
-          },
-        ),
-      );
-    }
-    if (widget.scanner != null) {
-      return widget.scanner!;
-    }
-    return const SizedBox();
+    return _waiting
+        ? xtWait(
+            color: Theme.of(context).colorScheme.primary,
+          )
+        : Focus(
+            descendantsAreFocusable: false,
+            canRequestFocus: false,
+            child: _checkUniqueResult == 'available'
+                ? const Text(
+                    'available',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.green,
+                    ),
+                  )
+                : _checkUniqueResult == 'taken'
+                    ? const Text(
+                        'taken',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.red,
+                        ),
+                      )
+                    : (_controller.text.isNotEmpty && widget.showClearButton)
+                        ? InkWell(
+                            child: Icon(
+                              Icons.clear,
+                              color: Theme.of(context).hintColor,
+                            ),
+                            onTap: () {
+                              setState(() {
+                                _controller.text = '';
+                                _checkUniqueResult = '';
+                                _uniqueChecked = false;
+                                _errorText = '';
+                                if (widget.onValidate != null) {
+                                  widget.onValidate!('');
+                                }
+                                if (widget.onClear != null) {
+                                  widget.onClear!();
+                                }
+                              });
+                            },
+                          )
+                        : (widget.scanner != null)
+                            ? widget.scanner!
+                            : const SizedBox(),
+          );
   }
 }

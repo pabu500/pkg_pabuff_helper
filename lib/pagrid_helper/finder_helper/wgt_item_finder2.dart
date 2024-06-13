@@ -620,7 +620,7 @@ class _WgtItemFinder2State extends State<WgtItemFinder2> {
         SizedBox(
           width: width,
           // height: height,
-          child: xtTextField2(
+          child: WgtTextField(
               appConfig: widget.appConfig,
               labelText: labelText,
               hintText: hintText,

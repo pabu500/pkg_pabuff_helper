@@ -110,7 +110,7 @@ class _WgtFinderFieldInputState extends State<WgtFinderFieldInput> {
       children: [
         SizedBox(
           width: widget.width,
-          child: xtTextField2(
+          child: WgtTextField(
               appConfig: widget.appConfig,
               controller: _controller,
               labelText: widget.labelText,
