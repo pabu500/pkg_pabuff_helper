@@ -79,13 +79,6 @@ class _WgtTextFieldState extends State<WgtTextField> {
 
   UniqueKey? _resetKey;
 
-  @override
-  void initState() {
-    super.initState();
-    _controller = widget.controller ?? controller;
-    _controller.text = widget.initialValue ?? '';
-  }
-
   Future<void> checkUnique(
       PaGridAppConfig appConfig, String field, String val, String table) async {
     if (val.trim().isEmpty) {
@@ -120,6 +113,13 @@ class _WgtTextFieldState extends State<WgtTextField> {
         _waiting = false;
       });
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = widget.controller ?? controller;
+    _controller.text = widget.initialValue ?? '';
   }
 
   @override
