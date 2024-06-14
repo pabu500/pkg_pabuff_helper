@@ -2,8 +2,6 @@ import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../info/get_copy.dart';
-
 class WgtViewEditField extends StatefulWidget {
   const WgtViewEditField({
     super.key,
@@ -266,9 +264,29 @@ class _WgtViewEditFieldState extends State<WgtViewEditField> {
                                   Map<String, dynamic> result =
                                       await widget.onSetValue(_controller.text);
                                   // if (result['error'] != null) {
-                                  if ((result['error'] ?? []).isNotEmpty) {
+                                  if ((result['error'] ?? {}) != {}) {
                                     setState(() {
-                                      _errorText = result['error'];
+                                      if (result['error'] is String) {
+                                        _errorText = result['error'];
+                                      } else if (result['error']
+                                          is Map<String, dynamic>) {
+                                        _errorText = result['error']
+                                                ['status'] ??
+                                            result['error']['message'];
+                                      }
+
+                                      if (_errorText.isNotEmpty) {
+                                        _errorText = _errorText.replaceAll(
+                                            'Exception: ', '');
+                                        if (_errorText.contains('OQG')) {
+                                          if (_errorText
+                                              .contains('duplicate key')) {
+                                            _errorText = 'Duplicated value';
+                                          } else {
+                                            _errorText = 'error updating value';
+                                          }
+                                        }
+                                      }
                                     });
                                   } else {
                                     setState(() {

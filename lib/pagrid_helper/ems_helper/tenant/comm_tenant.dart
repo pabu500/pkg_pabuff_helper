@@ -241,3 +241,108 @@ Future<dynamic> checkMainTenant(
     throw Exception(jsonDecode(response.body)['error']);
   }
 }
+
+Future<dynamic> doGetUserTenantList(
+  PaGridAppConfig appConfig,
+  Map<String, dynamic> reqMap,
+  SvcClaim svcClaim,
+) async {
+  svcClaim.svcName = SvcType.oresvc.name;
+  svcClaim.endpoint = UrlBase.eptGetUserTenantList;
+
+  String svcToken = '';
+  // try {
+  //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
+  // } catch (err) {
+  //   throw Exception(err);
+  // }
+
+  // List<Map<String, dynamic>> meterList = [];
+  // for (var item in reqMap['meter_group_info']) {
+  //   meterList.add(item);
+  // }
+
+  try {
+    final response = await http.post(
+      Uri.parse(
+          UrlController(appConfig).getUrl(SvcType.oresvc, svcClaim.endpoint!)),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $svcToken',
+      },
+      body: jsonEncode(SvcQuery(svcClaim, reqMap).toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      final responseBody = jsonDecode(response.body);
+      if (responseBody['info'] != null) {
+        return responseBody;
+      }
+      final itemInfoListJson = responseBody['item_info_list'];
+      List<Map<String, dynamic>> itemInfoList = [];
+      for (var item in itemInfoListJson) {
+        itemInfoList.add({'item_index': item['id'], ...item});
+      }
+      return {
+        'item_group_id': responseBody['item_group_id'],
+        'item_list': itemInfoList
+      };
+    } else {
+      throw Exception('Failed to get rate rows');
+    }
+  } catch (err) {
+    throw Exception(err);
+  }
+}
+
+Future<dynamic> doUpdateUserTenantList(
+  PaGridAppConfig appConfig,
+  Map<String, dynamic> reqMap,
+  SvcClaim svcClaim,
+) async {
+  svcClaim.svcName = SvcType.oresvc.name;
+  svcClaim.endpoint = UrlBase.eptUpdateUserTenantList;
+
+  String svcToken = '';
+  // try {
+  //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
+  // } catch (err) {
+  //   throw Exception(err);
+  // }
+
+  // List<Map<String, dynamic>> meterList = [];
+  // for (var item in reqMap['meter_group_info']) {
+  //   meterList.add(item);
+  // }
+
+  try {
+    final response = await http.post(
+      Uri.parse(
+          UrlController(appConfig).getUrl(SvcType.oresvc, svcClaim.endpoint!)),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $svcToken',
+      },
+      body: jsonEncode(SvcQuery(svcClaim, reqMap).toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      final responseBody = jsonDecode(response.body);
+      final groupMap = responseBody['result'];
+      if (groupMap['item_info_list'] == null) {
+        throw Exception('Failed to update tariff package rate rows');
+      } else {
+        for (var item in groupMap['item_info_list']) {
+          if (item['error'] != null) {
+            return {'code': -1, 'error': item['error']};
+          }
+        }
+        return {'code': 0};
+      }
+    } else {
+      throw Exception('Failed to update user tenant list');
+    }
+  } catch (err) {
+    throw Exception(err);
+  }
+}
