@@ -12,6 +12,7 @@ class WgtTopStatBox extends StatefulWidget {
     required this.scopeProfile,
     required this.loggedInUser,
     required this.getStat,
+    required this.tenantIdStr,
     this.statKey,
     this.title = '',
     this.iconSize = 25,
@@ -33,6 +34,7 @@ class WgtTopStatBox extends StatefulWidget {
       PaGridAppConfig, DestPortal, Map<String, dynamic>, SvcClaim) getStat;
   final ScopeProfile scopeProfile;
   final Evs2User loggedInUser;
+  final String tenantIdStr;
   final UniqueKey? statKey;
   final double width;
   final double height;
@@ -101,7 +103,7 @@ class _WgtTopStatBoxState extends State<WgtTopStatBox> {
           widget.appConfig,
           widget.destPortal,
           {
-            'tenant_id': widget.loggedInUser.tenantId,
+            'tenant_id': widget.tenantIdStr,
           },
           SvcClaim(
             userId: widget.loggedInUser.id,
@@ -133,7 +135,7 @@ class _WgtTopStatBoxState extends State<WgtTopStatBox> {
       _errorText = '';
     });
     Map<String, dynamic> queryMap = {
-      'tenant_index': widget.loggedInUser.tenantId,
+      'tenant_index': widget.tenantIdStr,
       'meter_type': getMeterTypeTag(widget.meterType),
       'lookback': widget.lookbackType.name,
       'project_scope':

@@ -223,7 +223,7 @@ Future<dynamic> getRecentUsage(
     // } else {
     //   throw Exception('ore_$explainedMessage');
     // }
-    throw Exception(err);
+    rethrow;
   }
 }
 

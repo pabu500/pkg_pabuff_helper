@@ -188,9 +188,10 @@ class Evs2User {
   String? resetPasswordToken;
   AuthProvider? authProvider;
   Map<String, dynamic>? authInfo;
-  String? tenantId;
-  String? tenantName;
-  String? tenantLabel;
+  // String? tenantId;
+  // String? tenantName;
+  // String? tenantLabel;
+  List<Map<String, dynamic>>? tenantList;
 
   Evs2User({
     this.id,
@@ -220,9 +221,10 @@ class Evs2User {
     this.resetPasswordToken,
     this.authProvider,
     this.authInfo,
-    this.tenantId,
-    this.tenantName,
-    this.tenantLabel,
+    // this.tenantId,
+    // this.tenantName,
+    // this.tenantLabel,
+    this.tenantList,
   });
 
   void logout() {
@@ -253,9 +255,10 @@ class Evs2User {
     resetPasswordToken = '';
     authProvider = null;
     authInfo = {};
-    tenantId = '';
-    tenantName = '';
-    tenantLabel = '';
+    // tenantId = '';
+    // tenantName = '';
+    // tenantLabel = '';
+    tenantList = [];
   }
 
   factory Evs2User.fromJson(Map<String, dynamic> respJson) {
@@ -264,8 +267,13 @@ class Evs2User {
 
       Map<String, dynamic> rolePermProfile = userJson['role_perm_profile'];
 
-      Map<String, dynamic>? _rolePermMap;
-      _rolePermMap = rolePermProfile['role_perm_map'];
+      Map<String, dynamic>? rolePermMap;
+      rolePermMap = rolePermProfile['role_perm_map'];
+
+      List<Map<String, dynamic>> tenantList = [];
+      if (userJson['tenant_list'] != null) {
+        tenantList = [...userJson['tenant_list']];
+      }
 
       return Evs2User(
         id: userJson['id'],
@@ -278,7 +286,7 @@ class Evs2User {
         // role: userJson['role'],
         enabled: userJson['enabled'],
         // prefDarkMode: userJson['prefDarkMode'],
-        rolePermMap: _rolePermMap?.map(
+        rolePermMap: rolePermMap?.map(
           (key, value) => MapEntry(
             key,
             Permission.fromJson(value),
@@ -289,10 +297,11 @@ class Evs2User {
         scopeStr: userJson['scope_str'] ?? '',
         // paySvcUrl: userJson['pay_svc_url'] ?? {},
         resetPasswordToken: userJson['reset_password_token'] ?? '',
-        tenantId: userJson['tenant_id'] ?? '',
-        tenantName: userJson['tenant_name'] ?? '',
-        tenantLabel: userJson['tenant_label'] ?? '',
+        // tenantId: userJson['tenant_id'] ?? '',
+        // tenantName: userJson['tenant_name'] ?? '',
+        // tenantLabel: userJson['tenant_label'] ?? '',
         authProvider: AuthProvider.values.byName(userJson['auth_provider']),
+        tenantList: tenantList,
       );
     } catch (e) {
       if (kDebugMode) {
@@ -322,6 +331,12 @@ class Evs2User {
       }
       AuthProvider? authProvider =
           AuthProvider.values.byName(userJson['auth_provider'] ?? 'local');
+
+      List<Map<String, dynamic>> tenantList = [];
+      if (userJson['tenant_list'] != null) {
+        tenantList = [...userJson['tenant_list']];
+      }
+
       return Evs2User(
         id: userJson['id'],
         username: userJson['username'],
@@ -343,9 +358,10 @@ class Evs2User {
         scopes: scopes,
         permission2s: permission2s,
         resetPasswordToken: userJson['reset_password_token'] ?? '',
-        tenantId: userJson['tenant_id'] ?? '',
-        tenantName: userJson['tenant_name'] ?? '',
-        tenantLabel: userJson['tenant_label'] ?? '',
+        // tenantId: userJson['tenant_id'] ?? '',
+        // tenantName: userJson['tenant_name'] ?? '',
+        // tenantLabel: userJson['tenant_label'] ?? '',
+        tenantList: tenantList,
         authProvider: authProvider,
       );
     } catch (e) {
@@ -399,9 +415,10 @@ class Evs2User {
       'reset_password_token': resetPasswordToken ?? '',
       'auth_provider': authProvider?.name ?? 'local',
       'auth_info': {},
-      'tenant_id': tenantId ?? '',
-      'tenant_name': tenantName ?? '',
-      'tenant_label': tenantLabel ?? '',
+      // 'tenant_id': tenantId ?? '',
+      // 'tenant_name': tenantName ?? '',
+      // 'tenant_label': tenantLabel ?? '',
+      'tenant_list': tenantList ?? [],
     };
   }
 
