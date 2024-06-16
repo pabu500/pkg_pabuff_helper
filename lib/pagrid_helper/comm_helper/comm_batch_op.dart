@@ -174,6 +174,9 @@ Future<dynamic> updateBatchOpProgress(
             updatedBatchList.add(updatedBatchItem);
           }
           return updatedBatchList;
+        } else {
+          // throw Exception("No updatedBatchList in response");
+          return [];
         }
       }
       var error = responseBody['error'];
@@ -186,6 +189,6 @@ Future<dynamic> updateBatchOpProgress(
       throw Exception(jsonDecode(response.body)['error']);
     }
   } catch (err) {
-    throw Exception(err);
+    rethrow;
   }
 }

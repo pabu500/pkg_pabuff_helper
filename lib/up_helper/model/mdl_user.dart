@@ -604,6 +604,6 @@ class Evs2User {
   }
 
   bool isEmpty() {
-    return username == '' || username == null;
+    return (username ?? '').isEmpty;
   }
 }
