@@ -278,7 +278,7 @@ Future<dynamic> doGetUserTenantList(
       if (responseBody['info'] != null) {
         return responseBody;
       }
-      final itemInfoListJson = responseBody['item_info_list'];
+      final itemInfoListJson = responseBody['group_item_list'];
       List<Map<String, dynamic>> itemInfoList = [];
       for (var item in itemInfoListJson) {
         itemInfoList.add({'item_index': item['id'], ...item});
@@ -330,7 +330,7 @@ Future<dynamic> doUpdateUserTenantList(
       final responseBody = jsonDecode(response.body);
       final groupMap = responseBody['result'];
       if (groupMap['item_info_list'] == null) {
-        throw Exception('Failed to update tariff package rate rows');
+        throw Exception('Failed to update user tenant list');
       } else {
         for (var item in groupMap['item_info_list']) {
           if (item['error'] != null) {
