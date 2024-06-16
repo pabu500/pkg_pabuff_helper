@@ -12,7 +12,7 @@ class WgtTopStatBox extends StatefulWidget {
     required this.scopeProfile,
     required this.loggedInUser,
     required this.getStat,
-    required this.tenantIdStr,
+    this.tenantIdStr = '',
     this.statKey,
     this.title = '',
     this.iconSize = 25,
