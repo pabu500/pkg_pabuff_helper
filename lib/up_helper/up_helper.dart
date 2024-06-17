@@ -37,5 +37,6 @@ export 'model/mdl_payment_mode_setting.dart';
 export 'model/mdl_tenant.dart';
 export 'model/mdl_meter_group.dart';
 export 'model/model_theme.dart';
+export 'model/mdl_project_provider.dart';
 
 export 'exceptions.dart';

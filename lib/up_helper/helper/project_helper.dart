@@ -342,7 +342,15 @@ final scopeProfiles = [
       MeterType.electricity3p: 1,
       MeterType.gas: 1,
       MeterType.water: 1,
-    }
+    },
+    'firebase_options': {
+      'apiKey': 'AIzaSyB5DxSfMVNZ2xI1hTOUP42GIEcvpGZ4nms',
+      'authDomain': 'ems-cw-nus.firebaseapp.com',
+      'projectId': 'ems-cw-nus',
+      'storageBucket': 'ems-cw-nus.appspot.com',
+      'messagingSenderId': '949621989494',
+      'appId': '1:949621989494:web:2e67a89ce429494f043f57',
+    },
   }
 ];
 

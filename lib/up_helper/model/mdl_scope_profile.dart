@@ -1,7 +1,10 @@
+import 'package:buff_helper/pagrid_helper/project_helper/project_setting.dart';
+
 import '../up_helper.dart';
 
 class ScopeProfile /*extends ChangeNotifier*/ {
   ProjectScope projectScope;
+  PagProjectScope pagProjectScope;
   List<SiteScope> projectSites = [];
   List<Map<String, dynamic>> projectSitesMap = [];
   int timezone;
@@ -12,26 +15,17 @@ class ScopeProfile /*extends ChangeNotifier*/ {
   List<PaymentModeSetting>? paymentSetting = [];
   List<String> meterPhases = ['1p', '3p'];
   ItemType? meterType;
+  Map<String, dynamic>? firebaseOptions;
 
   ProjectScope? _selectedProjectScope;
   SiteScope? _selectedSiteScope;
   void setScope(ProjectScope? projectScope, SiteScope? siteScope) {
     _selectedProjectScope = projectScope;
     _selectedSiteScope = siteScope;
-    // notifyListeners();
   }
 
   ProjectScope? get selectedProjectScope => _selectedProjectScope;
-  // set selectedProjectScope(ProjectScope? projectScope) {
-  //   _selectedProjectScope = projectScope;
-  //   notifyListeners();
-  // }
-
   SiteScope? get selectedSiteScope => _selectedSiteScope;
-  // set selectedSiteScope(SiteScope? siteScope) {
-  //   _selectedSiteScope = siteScope;
-  //   notifyListeners();
-  // }
 
   String getEffectiveScopeStr() {
     if (_selectedSiteScope != null) {
@@ -59,6 +53,7 @@ class ScopeProfile /*extends ChangeNotifier*/ {
 
   ScopeProfile({
     required this.projectScope,
+    required this.pagProjectScope,
     required this.timezone,
     this.currency,
     this.validateEntityName,
@@ -69,6 +64,7 @@ class ScopeProfile /*extends ChangeNotifier*/ {
     this.projectSitesMap = const [],
     this.meterPhases = const ['1p', '3p'],
     this.meterType,
+    this.firebaseOptions,
   });
 
   factory ScopeProfile.fromJson(Map<String, dynamic> json) {
@@ -101,7 +97,12 @@ class ScopeProfile /*extends ChangeNotifier*/ {
     }
 
     return ScopeProfile(
-      projectScope: json['project_scope'],
+      projectScope: json['project_scope'] is ProjectScope
+          ? json['project_scope']
+          : ProjectScope.NONE,
+      pagProjectScope: json['project_scope'] is PagProjectScope
+          ? json['project_scope']
+          : PagProjectScope.NONE,
       timezone: json['timezone'],
       currency: json['currency'],
       validateEntityName: json['validate_entity_displayname'],
@@ -112,6 +113,7 @@ class ScopeProfile /*extends ChangeNotifier*/ {
       projectSitesMap: projectSitesMap,
       meterPhases: json['meter_phases'] ?? ['1p', '3p'],
       meterType: json['meter_type'] ?? ItemType.meter,
+      firebaseOptions: json['firebase_options'],
     );
   }
 

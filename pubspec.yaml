@@ -1,10 +1,10 @@
 name: buff_helper
 description: "Buff Helper package project"
-version: 2.6.1
+version: 2.7.0
 homepage:
 
 environment:
-  sdk: '>=3.4.1 <4.0.0'
+  sdk: '>=3.4.3 <4.0.0'
   # flutter: ">=1.17.0"
 
 dependencies:
@@ -20,7 +20,7 @@ dependencies:
   file_picker: ^8.0.3
   fl_chart: ^0.68.0
   material_symbols_icons: ^4.2719.3
-  firebase_auth: ^4.19.4
+  firebase_auth: ^5.1.0
   # month_year_picker: ^0.3.0+1
   month_picker_dialog: ^3.0.0
   calendar_date_picker2: ^1.0.2
