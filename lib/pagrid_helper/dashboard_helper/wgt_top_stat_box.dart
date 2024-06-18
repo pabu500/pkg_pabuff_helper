@@ -52,7 +52,7 @@ class WgtTopStatBox extends StatefulWidget {
   final TopStatType? statType;
 
   @override
-  _WgtTopStatBoxState createState() => _WgtTopStatBoxState();
+  State<WgtTopStatBox> createState() => _WgtTopStatBoxState();
 }
 
 class _WgtTopStatBoxState extends State<WgtTopStatBox> {

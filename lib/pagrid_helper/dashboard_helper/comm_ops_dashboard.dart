@@ -6,8 +6,8 @@ import 'package:http/http.dart' as http;
 
 import '../comm_helper/be_api_base.dart';
 
-Future<dynamic> getMmsStatus(
-    PaGridAppConfig appConfig, SvcClaim svcClaim) async {
+Future<dynamic> getMmsStatus(PaGridAppConfig appConfig, DestPortal destPortal,
+    Map<String, dynamic> queryMap, SvcClaim svcClaim) async {
   svcClaim.svcName = SvcType.oresvc.name;
   svcClaim.endpoint = UrlBase.eptGetMmsSatus;
 
@@ -59,7 +59,10 @@ Future<dynamic> getMmsStatus(
 }
 
 Future<dynamic> getActiveMeterCount(
-    PaGridAppConfig appConfig, SvcClaim svcClaim) async {
+    PaGridAppConfig appConfig,
+    DestPortal destPortal,
+    Map<String, dynamic> queryMap,
+    SvcClaim svcClaim) async {
   svcClaim.svcName = SvcType.oresvc.name;
   svcClaim.endpoint = UrlBase.eptGetActiveMeterCount;
 
@@ -290,11 +293,10 @@ Future<dynamic> pullActiveUsageHistory(
 }
 
 Future<dynamic> getRecentTopupTotal(
-  PaGridAppConfig appConfig,
-  SvcClaim svcClaim,
-  ProjectScope? projectScope,
-  SiteScope? siteScope,
-) async {
+    PaGridAppConfig appConfig,
+    DestPortal destPortal,
+    Map<String, dynamic> queryMap,
+    SvcClaim svcClaim) async {
   svcClaim.svcName = SvcType.oresvc.name;
   svcClaim.endpoint = UrlBase.eptGetRecentTotalTopup;
 
@@ -309,15 +311,19 @@ Future<dynamic> getRecentTopupTotal(
 
   try {
     final response = await http.post(
-      Uri.parse(UrlController(appConfig)
-          .getUrl(SvcType.oresvc, UrlBase.eptGetRecentTotalTopup)),
+      Uri.parse(
+          UrlController(appConfig).getUrl(SvcType.oresvc, svcClaim.endpoint!)),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $svcToken',
       },
       body: jsonEncode(SvcQuery(svcClaim, <String, String>{
-        'project_scope': projectScope == null ? '' : projectScope.name,
-        'site_scope': siteScope == null ? '' : siteScope.name,
+        'project_scope': queryMap['project_scope'] == null
+            ? ''
+            : (queryMap['project_scope'] as ProjectScope).name,
+        'site_scope': queryMap['site_scope'] == null
+            ? ''
+            : (queryMap['site_scope'] as ProjectScope).name,
       }).toJson()),
     );
     if (response.statusCode == 200) {
@@ -415,7 +421,10 @@ Future<dynamic> pullTotalTopupHistory(
 }
 
 Future<dynamic> getRecentCommDataUsage(
-    PaGridAppConfig appConfig, SvcClaim svcClaim) async {
+    PaGridAppConfig appConfig,
+    DestPortal destPortal,
+    Map<String, dynamic> queryMap,
+    SvcClaim svcClaim) async {
   svcClaim.svcName = SvcType.oresvc.name;
   svcClaim.endpoint = UrlBase.eptCommDataGetRecentComsumption;
 
