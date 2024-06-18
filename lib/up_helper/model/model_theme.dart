@@ -6,12 +6,12 @@ class ThemeModel extends ChangeNotifier {
   late MyThemePreferences _preferences;
   bool get isDark => _isDark;
 
-  ThemeModel() {
-    _isDark = false;
+  ThemeModel({bool isDark = false}) {
+    _isDark = isDark;
     _preferences = MyThemePreferences();
     getPreferences();
   }
-//Switching the themes
+  //Switching the themes
   set isDark(bool value) {
     _isDark = value;
     _preferences.setTheme(value);
