@@ -3,8 +3,8 @@ import 'package:intl/intl.dart';
 // import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 class xtDatePicker extends StatefulWidget {
-  xtDatePicker(
-      {Key? key,
+  const xtDatePicker(
+      {super.key,
       this.prefix,
       this.suffix,
       this.boarderColor,
@@ -13,8 +13,7 @@ class xtDatePicker extends StatefulWidget {
       this.minDays,
       this.maxDays,
       this.onDateChanged,
-      this.onDateCleared})
-      : super(key: key);
+      this.onDateCleared});
 
   final Icon? prefix;
   final Icon? suffix;
@@ -27,7 +26,7 @@ class xtDatePicker extends StatefulWidget {
   final Function()? onDateCleared;
 
   @override
-  _xtDatePickerState createState() => _xtDatePickerState();
+  State<xtDatePicker> createState() => _xtDatePickerState();
 }
 
 class _xtDatePickerState extends State<xtDatePicker> {
