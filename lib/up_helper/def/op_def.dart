@@ -42,24 +42,36 @@ enum ItemOpLifecycleStatus {
   bypassed,
 }
 
+ItemOpLifecycleStatus getItemOpLifecycleStatus(String? statusStr) {
+  if (statusStr == null || statusStr.isEmpty) {
+    return ItemOpLifecycleStatus.normal;
+  }
+  if (statusStr == '-') {
+    return ItemOpLifecycleStatus.normal;
+  }
+  switch (statusStr) {
+    case 'cip' || 'commission in progress':
+      return ItemOpLifecycleStatus.cip;
+    case 'normal':
+      return ItemOpLifecycleStatus.normal;
+    case 'maint' || 'maintenance':
+      return ItemOpLifecycleStatus.maint;
+    case 'dc' || 'decommissioned':
+      return ItemOpLifecycleStatus.decommissioned;
+    case 'byp' || 'bypassed':
+      return ItemOpLifecycleStatus.bypassed;
+    default:
+      return ItemOpLifecycleStatus.normal;
+  }
+}
+
 String? getLcStatusTagStr(String? statusStr) {
   if ((statusStr ?? '').isEmpty) {
     return null;
   }
-  ItemOpLifecycleStatus? status =
-      ItemOpLifecycleStatus.values.byName(statusStr!);
-  switch (status) {
-    case ItemOpLifecycleStatus.cip:
-      return 'CIP';
-    case ItemOpLifecycleStatus.normal:
-      return 'Normal';
-    case ItemOpLifecycleStatus.maint:
-      return 'Maint.';
-    case ItemOpLifecycleStatus.decommissioned:
-      return 'DC';
-    case ItemOpLifecycleStatus.bypassed:
-      return 'Byp';
-  }
+  ItemOpLifecycleStatus? status = getItemOpLifecycleStatus(statusStr);
+
+  return lcStatusInfo[status]!['tag'];
 }
 
 String getOpLifecycleStatusMessage(String? statusStr) {
@@ -69,20 +81,7 @@ String getOpLifecycleStatusMessage(String? statusStr) {
   ItemOpLifecycleStatus? status =
       ItemOpLifecycleStatus.values.byName(statusStr);
 
-  switch (status) {
-    case ItemOpLifecycleStatus.cip:
-      return 'Commission in Progress';
-    case ItemOpLifecycleStatus.normal:
-      return 'Normal';
-    case ItemOpLifecycleStatus.maint:
-      return 'Under Maintenance';
-    case ItemOpLifecycleStatus.decommissioned:
-      return 'Decommissioned';
-    case ItemOpLifecycleStatus.bypassed:
-      return 'Bypassed';
-    default:
-      return 'N/A';
-  }
+  return lcStatusInfo[status]!['tooltip'];
 }
 
 Color getOpLifecycleStatusColor(String? statusStr) {
@@ -92,20 +91,7 @@ Color getOpLifecycleStatusColor(String? statusStr) {
   ItemOpLifecycleStatus? status =
       ItemOpLifecycleStatus.values.byName(statusStr);
 
-  switch (status) {
-    case ItemOpLifecycleStatus.cip:
-      return Colors.lime.shade800;
-    case ItemOpLifecycleStatus.normal:
-      return Colors.green;
-    case ItemOpLifecycleStatus.maint:
-      return Colors.orangeAccent.withOpacity(0.5);
-    case ItemOpLifecycleStatus.decommissioned:
-      return Colors.brown;
-    case ItemOpLifecycleStatus.bypassed:
-      return Colors.grey.shade500;
-    default:
-      return Colors.transparent;
-  }
+  return lcStatusInfo[status]!['color'];
 }
 
 final Map<ItemOpLifecycleStatus, dynamic> lcStatusInfo = {
@@ -144,7 +130,7 @@ Map<String, dynamic> getLcStatusTag(row, fieldKey) {
     return {};
   }
   String valueStr = row['lc_status'].toString().toLowerCase();
-  ItemOpLifecycleStatus? status = ItemOpLifecycleStatus.values.byName(valueStr);
+  ItemOpLifecycleStatus? status = getItemOpLifecycleStatus(valueStr);
   if (status == ItemOpLifecycleStatus.normal) {
     return {};
   }
