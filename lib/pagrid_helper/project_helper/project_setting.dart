@@ -320,6 +320,88 @@ ScopeProfile? getScopeProfile(PagProjectScope activePortalPagProjectScope) {
   return null;
 }
 
+ScopeProfile? getUserScopeProfile(Evs2User user) {
+  String scopeStr = user.scopeStr ?? '';
+  if (scopeStr.isEmpty) {
+    return null;
+  }
+  String projectScopeStr = getProjectScopeStrFromScopeStr(scopeStr);
+  if (projectScopeStr.isEmpty) {
+    return null;
+  }
+  for (var scopeProfile in projectProfileRepo) {
+    if ((scopeProfile['project_scope'] as ProjectScope).name.toLowerCase() ==
+        projectScopeStr.toLowerCase()) {
+      return ScopeProfile.fromJson(scopeProfile);
+    }
+  }
+  return null;
+}
+
+Map<String, dynamic> getPayProfile(Evs2User user) {
+  String scopeStr = user.scopeStr ?? '';
+  if (scopeStr.isEmpty) {
+    return {};
+  }
+  String projectScopeStr = getProjectScopeStrFromScopeStr(scopeStr);
+  if (projectScopeStr.isEmpty) {
+    return {};
+  }
+  Map<String, dynamic> payProfile = {};
+
+  for (var projectProfile in projectProfileRepo) {
+    if (projectProfile['project_scope'] == projectScopeStr) {
+      payProfile =
+          projectProfile['payment_mode_setting'] as Map<String, dynamic>;
+      break;
+    }
+  }
+
+  return payProfile;
+}
+
+Map<String, dynamic> getProjctPaymentModes(String scopeStr) {
+  Map<String, dynamic> paymentModes = {};
+
+  late Map<String, dynamic> paymentProfile;
+
+  for (var projectProfile in projectProfileRepo) {
+    if (projectProfile['project_scope'] == scopeStr) {
+      paymentProfile =
+          projectProfile['payment_mode_setting'] as Map<String, dynamic>;
+      break;
+    }
+  }
+
+  for (var key in paymentProfile.keys) {
+    paymentModes[key] = {
+      'active': paymentProfile[key]['active'],
+      'show': paymentProfile[key]['show']
+    };
+  }
+
+  return paymentModes;
+}
+
+Function getDisplaynameValidator(String scopeStr) {
+  Map<String, dynamic>? cp;
+
+  for (var projectProfile in projectProfileRepo) {
+    if (projectProfile['project_scope'] == scopeStr) {
+      cp = projectProfile;
+      break;
+    }
+  }
+  if (cp == null) {
+    return (displayname) {
+      return 'Invalid displayname';
+    };
+  }
+
+  Function validator = cp['validate_meter_displayname'];
+  return validator;
+}
+
 String? mmsSnValidator(value) {
   //12 digits, start with '202', all digits
   RegExp exp = RegExp(r'^202\d{9}$');
