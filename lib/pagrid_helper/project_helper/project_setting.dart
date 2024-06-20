@@ -74,6 +74,25 @@ final projectProfileRepo = [
       'messagingSenderId': '559367262112',
       'measurementId': 'G-KWBCXHSFM5',
     },
+    'payment_mode_setting': {
+      {
+        'payment_mode': PaymentMode.stripe,
+        'active': false,
+        'show': true,
+      },
+      {
+        'payment_mode': PaymentMode.netsQR,
+        'active': false,
+        'show': true,
+        'pub_key': 'd877185d-af96-43a5-9f53-48a3c543c3d5',
+      },
+      {
+        'payment_mode': PaymentMode.enets,
+        'active': true,
+        'show': true,
+        'pub_key': '154eb31c-0f72-45bb-9249-84a1036fd1ca',
+      },
+    },
   },
   {
     'project_scope': PagProjectScope.PAG_GI_DE,
@@ -331,6 +350,24 @@ ScopeProfile? getUserScopeProfile(Evs2User user) {
   }
   for (var scopeProfile in projectProfileRepo) {
     if ((scopeProfile['project_scope'] as ProjectScope).name.toLowerCase() ==
+        projectScopeStr.toLowerCase()) {
+      return ScopeProfile.fromJson(scopeProfile);
+    }
+  }
+  return null;
+}
+
+ScopeProfile? getUserScopeProfilePag(Evs2User user) {
+  String scopeStr = user.scopeStr ?? '';
+  if (scopeStr.isEmpty) {
+    return null;
+  }
+  String projectScopeStr = getProjectScopeStrFromScopeStr(scopeStr);
+  if (projectScopeStr.isEmpty) {
+    return null;
+  }
+  for (var scopeProfile in projectProfileRepo) {
+    if ((scopeProfile['project_scope'] as PagProjectScope).name.toLowerCase() ==
         projectScopeStr.toLowerCase()) {
       return ScopeProfile.fromJson(scopeProfile);
     }
