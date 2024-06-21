@@ -7,12 +7,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../show_model_bottom_sheet.dart';
-// import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-// import 'package:provider/provider.dart';
 
 class WgtDateRangePicker2 extends StatefulWidget {
   const WgtDateRangePicker2({
-    Key? key,
+    super.key,
     required this.timezone,
     required this.onSet,
     required this.scopeProfile,
@@ -28,7 +26,7 @@ class WgtDateRangePicker2 extends StatefulWidget {
     this.maxDuration = const Duration(days: 180),
     this.onMaxDurationExceeded,
     // this.allowSameDay = false,
-  }) : super(key: key);
+  });
 
   final int timezone;
   final ScopeProfile scopeProfile;
@@ -50,7 +48,7 @@ class WgtDateRangePicker2 extends StatefulWidget {
   // final bool allowSameDay;
 
   @override
-  _WgtDateRangePicker2State createState() => _WgtDateRangePicker2State();
+  State<WgtDateRangePicker2> createState() => _WgtDateRangePicker2State();
 }
 
 //boilerplate code only

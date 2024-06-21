@@ -408,6 +408,15 @@ class EmsTypeUsageCalcReleased {
       double? billedTotalUsageN = item['billed_total_usage_n'];
       double? billedTotalUsageG = item['billed_total_usage_g'];
 
+      if (item['billed_time_label'] != null) {
+        if (item['billed_time_label'].toString().contains('2024-01') ||
+            item['billed_time_label'].toString().contains('2024-02') ||
+            item['billed_time_label'].toString().contains('2024-03') ||
+            item['billed_time_label'].toString().contains('2024-04')) {
+          continue;
+        }
+      }
+
       if (billedTotalUsageE != null) {
         _trendingE.add({
           'time': item['billed_time_label'],

@@ -805,7 +805,7 @@ class Bill {
 
     List<Map<String, dynamic>>? trendingLastMonthSuper = [];
     for (int i = 0; i < trending.length; i++) {
-      trending[i]['label'] = trending[i]['label'] + '  ';
+      trending[i]['label'] = trending[i]['label'] + '   ';
       var item = trending[i];
       if (i == trending.length - 1) {
         trendingLastMonthSuper.add({
