@@ -662,7 +662,7 @@ class Bill {
               waterIcon, 'Water', 'CuM', typeRateW!, typeUsageW!, typeCostW!,
               trending: trendingW),
         if (typeCostN != null)
-          _getTypeRow(waterDropIcon, 'NewWater', 'CuM', typeRateN!, typeUsageN!,
+          _getTypeRow(waterDropIcon, 'NeWater', 'CuM', typeRateN!, typeUsageN!,
               typeCostN!,
               trending: trendingN),
         if (typeCostG != null)
