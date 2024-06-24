@@ -97,7 +97,7 @@ class WgtItemHistoryPresenter extends StatefulWidget {
   final bool genMeta;
 
   @override
-  _WgtItemHistoryPresenterState createState() =>
+  State<WgtItemHistoryPresenter> createState() =>
       _WgtItemHistoryPresenterState();
 }
 
