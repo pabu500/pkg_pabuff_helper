@@ -1,6 +1,7 @@
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import '../../app_helper/pagrid_app_config.dart';
 import '../../finder_helper/wgt_item_finder2.dart';
@@ -57,7 +58,7 @@ class WgtBillingRecFinder extends StatefulWidget {
   final EdgeInsets sidePadding;
 
   @override
-  _WgtBillingRecFinderState createState() => _WgtBillingRecFinderState();
+  State<WgtBillingRecFinder> createState() => _WgtBillingRecFinderState();
 }
 
 class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
@@ -71,6 +72,7 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
   DateTime? _startDateFrom;
   DateTime? _endDateFrom;
   // bool _isMonthly = false;
+  UniqueKey? _timePickerKey;
 
   String? _selectedGenType;
   late final List<String> _genTypeList = [];
@@ -133,12 +135,15 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
     };
   }
 
-  void _reset() {
+  void _reset({bool resetDateRange = false}) {
     setState(() {
-      _startDateCreated = null;
-      _endDateCreated = null;
-      _startDateFrom = null;
-      _endDateFrom = null;
+      if (resetDateRange) {
+        _startDateCreated = null;
+        _endDateCreated = null;
+        _startDateFrom = null;
+        _endDateFrom = null;
+        _timePickerKey = UniqueKey();
+      }
       _additionalPropQueryMap.clear();
       _additionalTypeQueryMap.clear();
       _additionalTypeQueryMap2.clear();
@@ -199,7 +204,7 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
       // itemTypeList: _tenantTypeList,
       onResult: widget.onResult,
       onClearSearch: () {
-        _reset();
+        _reset(resetDateRange: true);
 
         widget.onClearSearch?.call();
       },
@@ -224,9 +229,11 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
                   style: TextStyle(color: Theme.of(context).hintColor)),
             ),
             WgtDateRangePickerMonthly(
+              // key: _finderKey,
+              key: _timePickerKey,
               scopeProfile: widget.scopeProfile,
+              populateDefaultRange: false,
               showMonthly: false,
-              key: _finderKey,
               iniStartDateTime: _startDateCreated,
               iniEndDateTime: _endDateCreated,
               onRangeSet: (DateTime start, DateTime end) {
@@ -255,7 +262,9 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
                     style: TextStyle(color: Theme.of(context).hintColor))),
             WgtDateRangePickerMonthly(
               // key: _finderKey,
+              key: _timePickerKey,
               scopeProfile: widget.scopeProfile,
+              populateDefaultRange: false,
               iniStartDateTime: _startDateFrom,
               iniEndDateTime: _endDateFrom,
               // monthPicked: _monthPicked,

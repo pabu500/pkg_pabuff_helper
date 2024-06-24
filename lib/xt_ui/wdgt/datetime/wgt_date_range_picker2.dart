@@ -14,10 +14,11 @@ class WgtDateRangePicker2 extends StatefulWidget {
     required this.timezone,
     required this.onSet,
     required this.scopeProfile,
+    required this.populateDefaultRange,
     this.startDateTime,
     this.endDateTime,
     this.lastDate,
-    this.history,
+    this.history = true,
     this.useEdgeTime = true,
     this.showHHmm = false,
     this.singleDate = false,
@@ -30,10 +31,11 @@ class WgtDateRangePicker2 extends StatefulWidget {
 
   final int timezone;
   final ScopeProfile scopeProfile;
+  final bool populateDefaultRange;
   final DateTime? startDateTime;
   final DateTime? endDateTime;
   final DateTime? lastDate;
-  final bool? history;
+  final bool history;
   final bool useEdgeTime;
   final bool showHHmm;
   final void Function(
@@ -56,8 +58,8 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
   // late ScopeProfile _scopeProfile;
   DateTime? _selectedStartDate;
   DateTime? _selectedEndDate;
-  late DateTime _defaultEndDate;
-  late DateTime _defaultStartDate;
+  DateTime? _defaultEndDate;
+  DateTime? _defaultStartDate;
 
   late List<DateTime?> _rangeDatePickerValueWithDefaultValue;
   // bool _maxDurationExceeded = false;
@@ -107,48 +109,50 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
     // _scopeProfile = Provider.of<AppModel>(context, listen: false).portalScopeProfile!;
     // final activeProjectTimezone = _scopeProfile.timezone;
     final activeProjectTimezone = widget.timezone;
+    if (widget.populateDefaultRange) {
+      _defaultEndDate = (widget.history
+          ? getTargetLocalDatetimeNow(activeProjectTimezone)
+          : getTargetLocalDatetimeNow(activeProjectTimezone)
+              .add(const Duration(hours: 48)));
 
-    _defaultEndDate = /* widget.endDateTime ??*/
-        (widget.history ?? true
-            ? getTargetLocalDatetimeNow(activeProjectTimezone)
-            : getTargetLocalDatetimeNow(activeProjectTimezone)
-                .add(const Duration(hours: 48)));
-    _defaultStartDate = /*widget.startDateTime ??*/
-        (widget.history ?? true
-            ? _defaultEndDate.subtract(const Duration(hours: 48))
-            : getTargetLocalDatetimeNow(activeProjectTimezone));
-    if (widget.useEdgeTime) {
-      _defaultEndDate = getTargetLocalDatetime(
-          activeProjectTimezone, 23, 59, 59, 999,
-          refLocalDatetime: _defaultEndDate); //get the end of the day
+      _defaultStartDate = /*widget.startDateTime ??*/
+          (widget.history
+              ? _defaultEndDate!.subtract(const Duration(hours: 48))
+              : getTargetLocalDatetimeNow(activeProjectTimezone));
 
-      _defaultStartDate = getTargetLocalDatetime(
-          activeProjectTimezone, 0, 0, 0, 0,
-          refLocalDatetime: _defaultStartDate); //get the start of the day
-    }
-    if (widget.useEdgeTime) {
-      _defaultEndDate = getTargetLocalDatetime(
-          activeProjectTimezone, 23, 59, 59, 999,
-          refLocalDatetime: _defaultEndDate); //get the end of the day
-      _defaultStartDate = getTargetLocalDatetime(
-          activeProjectTimezone, 0, 0, 0, 0,
-          refLocalDatetime: _defaultStartDate); //get the start of the day
-      _selectedStartDate = getTargetLocalDatetime(
-          activeProjectTimezone, 0, 0, 0, 0,
-          refLocalDatetime: _defaultStartDate); //get the start of the day
-      _selectedEndDate = getTargetLocalDatetime(
-          activeProjectTimezone, 23, 59, 59, 999,
-          refLocalDatetime: _defaultEndDate); //get the end of the day
-    }
-    _rangeDatePickerValueWithDefaultValue = [
-      _defaultStartDate,
-      _defaultEndDate,
-    ];
-    if (widget.singleDate) {
+      if (widget.useEdgeTime) {
+        _defaultEndDate = getTargetLocalDatetime(
+            activeProjectTimezone, 23, 59, 59, 999,
+            refLocalDatetime: _defaultEndDate); //get the end of the day
+
+        _defaultStartDate = getTargetLocalDatetime(
+            activeProjectTimezone, 0, 0, 0, 0,
+            refLocalDatetime: _defaultStartDate); //get the start of the day
+      }
+      if (widget.useEdgeTime) {
+        _defaultEndDate = getTargetLocalDatetime(
+            activeProjectTimezone, 23, 59, 59, 999,
+            refLocalDatetime: _defaultEndDate); //get the end of the day
+        _defaultStartDate = getTargetLocalDatetime(
+            activeProjectTimezone, 0, 0, 0, 0,
+            refLocalDatetime: _defaultStartDate); //get the start of the day
+        _selectedStartDate = getTargetLocalDatetime(
+            activeProjectTimezone, 0, 0, 0, 0,
+            refLocalDatetime: _defaultStartDate); //get the start of the day
+        _selectedEndDate = getTargetLocalDatetime(
+            activeProjectTimezone, 23, 59, 59, 999,
+            refLocalDatetime: _defaultEndDate); //get the end of the day
+      }
       _rangeDatePickerValueWithDefaultValue = [
-        _defaultEndDate,
+        _defaultStartDate,
         _defaultEndDate,
       ];
+      if (widget.singleDate) {
+        _rangeDatePickerValueWithDefaultValue = [
+          _defaultEndDate,
+          _defaultEndDate,
+        ];
+      }
     }
   }
 
@@ -156,15 +160,16 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
   Widget build(BuildContext context) {
     if (widget.updateRangeByParent) {
       DateTime selectedEndDate = widget.endDateTime ??
-          (widget.history ?? true
+          (widget.history
               ? getTargetLocalDatetimeNow(widget.scopeProfile.timezone)
               : getTargetLocalDatetimeNow(widget.scopeProfile.timezone)
                   .add(const Duration(hours: 48)));
       DateTime selectedStartDate = widget.startDateTime ??
-          (widget.history ?? true
-              ? _defaultEndDate.subtract(const Duration(hours: 48))
+          (widget.history && _defaultEndDate != null
+              ? _defaultEndDate!.subtract(const Duration(hours: 48))
               : getTargetLocalDatetimeNow(widget.scopeProfile.timezone));
       Duration duration = selectedEndDate.difference(selectedStartDate);
+
       if (duration > widget.maxDuration) {
         if (widget.onMaxDurationExceeded != null) {
           widget.onMaxDurationExceeded!();
@@ -178,6 +183,21 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
         ];
       }
     }
+
+    String fromText = 'Select';
+    String toText = 'Select';
+    if (_selectedEndDate != _selectedStartDate) {
+      if (_selectedStartDate != null) {
+        fromText =
+            DateFormat(widget.showHHmm ? 'yyyy-MM-dd HH:mm' : 'yyyy-MM-dd')
+                .format(_selectedStartDate!);
+      }
+      if (_selectedEndDate != null) {
+        toText = DateFormat(widget.showHHmm ? 'yyyy-MM-dd HH:mm' : 'yyyy-MM-dd')
+            .format(_selectedEndDate!);
+      }
+    }
+
     return SizedBox(
       width: widget.width,
       child: Row(
@@ -186,26 +206,22 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
         children: [
           xtKeyValueText(
             keyText: 'From',
-            valueText:
-                DateFormat(widget.showHHmm ? 'yyyy-MM-dd HH:mm' : 'yyyy-MM-dd')
-                    .format(_selectedStartDate == null
-                        ? _defaultStartDate
-                        : _selectedStartDate!),
+            valueText: fromText,
             valueStyle: TextStyle(
-                fontSize: 15, color: Theme.of(context).colorScheme.primary),
+                fontSize: 15,
+                color: fromText == 'Select'
+                    ? Theme.of(context).hintColor.withOpacity(0.34)
+                    : Theme.of(context).colorScheme.primary),
           ),
           horizontalSpaceTiny,
           xtKeyValueText(
             keyText: 'To',
-            valueText:
-                DateFormat(widget.showHHmm ? 'yyyy-MM-dd HH:mm' : 'yyyy-MM-dd')
-                    .format(_selectedEndDate == null
-                        ? _defaultEndDate
-                        : _selectedEndDate!),
-            // valueText: DateFormat('yyyy-MM-dd').format(
-            //     _selectedEndDate == null ? _defaultEndDate : _selectedEndDate!),
+            valueText: toText,
             valueStyle: TextStyle(
-                fontSize: 15, color: Theme.of(context).colorScheme.primary),
+                fontSize: 15,
+                color: toText == 'Select'
+                    ? Theme.of(context).hintColor.withOpacity(0.34)
+                    : Theme.of(context).colorScheme.primary),
           ),
           horizontalSpaceSmall,
           getDateRangePickerPopupButton(),
@@ -215,16 +231,19 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
   }
 
   Widget _buildDefaultRangeDatePickerWithValue() {
+    DateTime startDate = _defaultStartDate ?? DateTime.now();
+    DateTime endDate = _defaultEndDate ?? DateTime.now();
+
     final config = CalendarDatePicker2Config(
       // controlsHeight: 45,
       calendarType: CalendarDatePicker2Type.range,
       lastDate: widget.lastDate ??
-          (widget.history ?? true
-              ? _defaultEndDate.add(const Duration(days: 1))
-              : _defaultEndDate.add(const Duration(days: 180))),
-      firstDate: widget.history ?? true
-          ? _defaultStartDate.subtract(const Duration(days: 180))
-          : _defaultStartDate.subtract(const Duration(days: 1)),
+          (widget.history
+              ? endDate.add(const Duration(days: 1))
+              : endDate.add(const Duration(days: 180))),
+      firstDate: widget.history
+          ? startDate.subtract(const Duration(days: 180))
+          : startDate.subtract(const Duration(days: 1)),
       firstDayOfWeek: 1,
       selectedDayHighlightColor: Theme.of(context).colorScheme.primary,
       weekdayLabelTextStyle: const TextStyle(

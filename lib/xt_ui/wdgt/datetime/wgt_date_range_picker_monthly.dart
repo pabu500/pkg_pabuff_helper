@@ -1,9 +1,6 @@
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
-// import 'package:month_year_picker/month_year_picker.dart';
-
-import 'wgt_date_range_picker2.dart';
 
 class WgtDateRangePickerMonthly extends StatefulWidget {
   const WgtDateRangePickerMonthly({
@@ -11,6 +8,7 @@ class WgtDateRangePickerMonthly extends StatefulWidget {
     // required this.context,
     required this.onRangeSet,
     required this.scopeProfile,
+    required this.populateDefaultRange,
     this.onMonthPicked,
     this.timeZone = 8,
     this.iniStartDateTime,
@@ -26,6 +24,7 @@ class WgtDateRangePickerMonthly extends StatefulWidget {
   // final BuildContext context;
   final ScopeProfile scopeProfile;
   final Function? onMonthPicked;
+  final bool populateDefaultRange;
   final Function onRangeSet;
   final int timeZone;
   final DateTime? iniStartDateTime;
@@ -138,6 +137,7 @@ class _WgtDateRangePickerMonthlyState extends State<WgtDateRangePickerMonthly> {
           child: WgtDateRangePicker2(
             timezone: widget.timeZone,
             scopeProfile: widget.scopeProfile,
+            populateDefaultRange: widget.populateDefaultRange,
             width: 290,
             updateRangeByParent: true,
             startDateTime: _selectedStartDate,

@@ -4,8 +4,6 @@ import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_popup_button.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
-import '../../../xt_ui/wdgt/datetime/wgt_date_range_picker2.dart';
 import '../../app_helper/pagrid_app_config.dart';
 
 class WgtItemHistoryGetter extends StatefulWidget {
@@ -831,6 +829,7 @@ class _WgtItemHistoryGetterState extends State<WgtItemHistoryGetter> {
                     child: WgtDateRangePicker2(
                       scopeProfile: widget.scopeProfile,
                       timezone: widget.scopeProfile.timezone,
+                      populateDefaultRange: false,
                       width: 290,
                       updateRangeByParent: true,
                       startDateTime: _startDate,
