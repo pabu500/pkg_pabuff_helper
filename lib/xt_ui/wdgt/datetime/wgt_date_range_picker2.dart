@@ -143,16 +143,17 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
             activeProjectTimezone, 23, 59, 59, 999,
             refLocalDatetime: _defaultEndDate); //get the end of the day
       }
+    }
+
+    _rangeDatePickerValueWithDefaultValue = [
+      _defaultStartDate,
+      _defaultEndDate,
+    ];
+    if (widget.singleDate) {
       _rangeDatePickerValueWithDefaultValue = [
-        _defaultStartDate,
+        _defaultEndDate,
         _defaultEndDate,
       ];
-      if (widget.singleDate) {
-        _rangeDatePickerValueWithDefaultValue = [
-          _defaultEndDate,
-          _defaultEndDate,
-        ];
-      }
     }
   }
 

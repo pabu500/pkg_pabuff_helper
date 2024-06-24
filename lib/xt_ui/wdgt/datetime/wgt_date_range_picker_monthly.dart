@@ -16,7 +16,7 @@ class WgtDateRangePickerMonthly extends StatefulWidget {
     this.lastDate,
     // this.selectedStartDate,
     // this.selectedEndDate,
-    // this.isCustomRange = false,
+    this.customRangeSelected = false,
     this.showMonthly = true,
     this.monthPicked,
   });
@@ -33,7 +33,7 @@ class WgtDateRangePickerMonthly extends StatefulWidget {
   final DateTime? monthPicked;
   // final DateTime? selectedStartDate;
   // final DateTime? selectedEndDate;
-  // final bool isCustomRange;
+  final bool customRangeSelected;
   final bool showMonthly;
 
   @override
@@ -89,6 +89,7 @@ class _WgtDateRangePickerMonthlyState extends State<WgtDateRangePickerMonthly> {
     _monthPicked = widget.monthPicked;
     _selectedStartDate = widget.iniStartDateTime;
     _selectedEndDate = widget.iniEndDateTime;
+    _isCustomRange = widget.customRangeSelected;
   }
 
   @override

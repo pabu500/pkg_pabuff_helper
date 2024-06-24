@@ -1,7 +1,6 @@
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 import '../../app_helper/pagrid_app_config.dart';
 import '../../finder_helper/wgt_item_finder2.dart';
@@ -72,7 +71,10 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
   DateTime? _startDateFrom;
   DateTime? _endDateFrom;
   // bool _isMonthly = false;
-  UniqueKey? _timePickerKey;
+  UniqueKey? _timePickerKeyCreated;
+  UniqueKey? _timePickerKeyFrom;
+  bool _customDateRangeSelectedCreated = false;
+  bool _customDateRangeSelectedFrom = false;
 
   String? _selectedGenType;
   late final List<String> _genTypeList = [];
@@ -142,7 +144,10 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
         _endDateCreated = null;
         _startDateFrom = null;
         _endDateFrom = null;
-        _timePickerKey = UniqueKey();
+        _customDateRangeSelectedCreated = false;
+        _customDateRangeSelectedFrom = false;
+        _timePickerKeyFrom = UniqueKey();
+        _timePickerKeyCreated = UniqueKey();
       }
       _additionalPropQueryMap.clear();
       _additionalTypeQueryMap.clear();
@@ -230,16 +235,19 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
             ),
             WgtDateRangePickerMonthly(
               // key: _finderKey,
-              key: _timePickerKey,
+              key: _timePickerKeyCreated,
+              iniStartDateTime: _startDateCreated,
+              iniEndDateTime: _endDateCreated,
+              customRangeSelected: _customDateRangeSelectedCreated,
               scopeProfile: widget.scopeProfile,
               populateDefaultRange: false,
               showMonthly: false,
-              iniStartDateTime: _startDateCreated,
-              iniEndDateTime: _endDateCreated,
               onRangeSet: (DateTime start, DateTime end) {
                 setState(() {
                   _startDateCreated = start;
                   _endDateCreated = end;
+                  _customDateRangeSelectedCreated = true;
+
                   _additionalPropQueryMap.putIfAbsent('time_range', () => {});
                   _additionalPropQueryMap['time_range']['created_timestamp'] = {
                     'start_datetime': start.toIso8601String(),
@@ -262,11 +270,12 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
                     style: TextStyle(color: Theme.of(context).hintColor))),
             WgtDateRangePickerMonthly(
               // key: _finderKey,
-              key: _timePickerKey,
-              scopeProfile: widget.scopeProfile,
-              populateDefaultRange: false,
+              key: _timePickerKeyFrom,
               iniStartDateTime: _startDateFrom,
               iniEndDateTime: _endDateFrom,
+              customRangeSelected: _customDateRangeSelectedFrom,
+              scopeProfile: widget.scopeProfile,
+              populateDefaultRange: false,
               // monthPicked: _monthPicked,
               onRangeSet: (startDate, endDate) async {
                 if (startDate == null || endDate == null) return;
@@ -274,7 +283,7 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
                 setState(() {
                   _startDateFrom = startDate;
                   _endDateFrom = endDate;
-
+                  _customDateRangeSelectedFrom = true;
                   // _isMTD = false;
                   // _monthPicked = null;
 

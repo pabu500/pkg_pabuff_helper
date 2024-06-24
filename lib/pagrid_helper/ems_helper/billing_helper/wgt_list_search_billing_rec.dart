@@ -52,7 +52,7 @@ class WgtListSearchBillingRec extends StatefulWidget {
   final EdgeInsets finderSidePadding;
 
   @override
-  _WgtListSearchBillingRecState createState() =>
+  State<WgtListSearchBillingRec> createState() =>
       _WgtListSearchBillingRecState();
 }
 
