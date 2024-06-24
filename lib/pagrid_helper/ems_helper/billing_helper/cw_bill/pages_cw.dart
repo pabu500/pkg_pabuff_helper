@@ -710,7 +710,7 @@ class Bill {
       {List<Map<String, dynamic>>? trending}) {
     pw.TextStyle textStyle = const pw.TextStyle(
       color: _darkColor,
-      fontSize: 11,
+      fontSize: 10.5,
     );
     return pw.Container(
         height: 90,
@@ -726,7 +726,7 @@ class Bill {
           crossAxisAlignment: pw.CrossAxisAlignment.center,
           children: [
             pw.SizedBox(
-              width: 90,
+              width: 80,
               child: pw.Column(
                 mainAxisAlignment: pw.MainAxisAlignment.center,
                 children: [
@@ -751,10 +751,11 @@ class Bill {
                       pw.Row(
                         mainAxisAlignment: pw.MainAxisAlignment.start,
                         children: [
-                          pw.Text(
-                            ' Usage: ',
-                            style: textStyle,
-                          ),
+                          pw.SizedBox(width: 3),
+                          // pw.Text(
+                          //   ' Usage: ',
+                          //   style: textStyle,
+                          // ),
                           pw.Text(
                             '${usage.toStringAsFixed(usageDecimals)} $typeUnit',
                             style: textStyle,
@@ -781,11 +782,20 @@ class Bill {
             ),
             pw.Padding(
               padding: const pw.EdgeInsets.only(top: 10),
-              child: _getTrending(trending),
+              child: pw.SizedBox(
+                width: 300,
+                child: _getTrending(trending),
+              ),
             ),
-            pw.Text(
-              _formatCurrency(cost),
-              style: const pw.TextStyle(color: _darkColor),
+            pw.SizedBox(
+              width: 80,
+              child: pw.Align(
+                alignment: pw.Alignment.centerRight,
+                child: pw.Text(
+                  _formatCurrency(cost),
+                  style: const pw.TextStyle(color: _darkColor),
+                ),
+              ),
             ),
           ],
         ));
@@ -803,7 +813,7 @@ class Bill {
       trending = trending.reversed.toList();
     }
 
-    List<Map<String, dynamic>>? trendingLastMonthSuper = [];
+    List<Map<String, dynamic>> trendingLastMonthSuper = [];
     for (int i = 0; i < trending.length; i++) {
       trending[i]['label'] = trending[i]['label'] + '   ';
       var item = trending[i];
@@ -823,11 +833,11 @@ class Bill {
     //if length less then 6, add empty data
     if (trending.length < 6) {
       for (int i = 0; i < 6 - trending.length; i++) {
-        trending.add({
+        trending.insert(0, {
           'label': '',
           'value': 0,
         });
-        trendingLastMonthSuper.add({
+        trendingLastMonthSuper.insert(0, {
           'label': '',
           'value': 0,
         });

@@ -71,7 +71,7 @@ class _WgtBillRenderPdfState extends State<WgtBillRenderPdf> {
   Widget build(BuildContext context) {
     return ConstrainedBox(
       constraints: const BoxConstraints(
-        maxHeight: 950,
+        maxHeight: 1000,
       ),
       child: PdfPreview(
         maxPageWidth: 700,
