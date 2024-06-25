@@ -41,7 +41,7 @@ class WgtUpdatePassword extends StatefulWidget {
   final Function updatePassword;
 
   @override
-  _WgtUpdatePasswordState createState() => _WgtUpdatePasswordState();
+  State<WgtUpdatePassword> createState() => _WgtUpdatePasswordState();
 }
 
 class _WgtUpdatePasswordState extends State<WgtUpdatePassword> {
