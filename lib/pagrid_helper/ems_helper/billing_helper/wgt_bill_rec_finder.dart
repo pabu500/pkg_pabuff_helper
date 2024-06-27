@@ -70,7 +70,7 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
   DateTime? _endDateCreated;
   DateTime? _startDateFrom;
   DateTime? _endDateFrom;
-  // bool _isMonthly = false;
+  bool _isMonthly = false;
   UniqueKey? _timePickerKeyCreated;
   UniqueKey? _timePickerKeyFrom;
   bool _customDateRangeSelectedCreated = false;
@@ -155,12 +155,20 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
       _finderKey = UniqueKey();
       // _isMonthly = false;
       _selectedGenType = null;
+      if (_genTypeList.length == 1) {
+        if (kDebugMode) {
+          print('genTypeList: $_genTypeList');
+        }
+        _selectedGenType = _genTypeList[0];
+        _additionalTypeQueryMap['gen_type'] = _selectedGenType ?? '';
+      }
       _selectedLcStatus = null;
       if (_lcStatusList.length == 1) {
         if (kDebugMode) {
           print('lcStatusList: $_lcStatusList');
         }
         _selectedLcStatus = _lcStatusList[0];
+        _additionalTypeQueryMap2['lc_status'] = _selectedLcStatus ?? '';
       }
     });
   }
@@ -247,6 +255,7 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
                   _startDateCreated = start;
                   _endDateCreated = end;
                   _customDateRangeSelectedCreated = true;
+                  _isMonthly = false;
 
                   _additionalPropQueryMap.putIfAbsent('time_range', () => {});
                   _additionalPropQueryMap['time_range']['created_timestamp'] = {
@@ -284,7 +293,7 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
                   _startDateFrom = startDate;
                   _endDateFrom = endDate;
                   _customDateRangeSelectedFrom = true;
-                  // _isMTD = false;
+                  _isMonthly = false;
                   // _monthPicked = null;
 
                   _additionalPropQueryMap.putIfAbsent('time_range', () => {});

@@ -17,7 +17,7 @@ class AuthenticationLayout extends StatelessWidget {
   final bool busy;
 
   const AuthenticationLayout({
-    Key? key,
+    super.key,
     this.title,
     this.subtitle,
     this.mainButtonTitle,
@@ -31,7 +31,7 @@ class AuthenticationLayout extends StatelessWidget {
     this.validationMessage,
     this.showTermsText = false,
     this.busy = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

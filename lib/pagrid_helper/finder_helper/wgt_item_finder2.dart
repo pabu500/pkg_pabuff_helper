@@ -83,7 +83,7 @@ class WgtItemFinder2 extends StatefulWidget {
   final EdgeInsets sidePadding;
 
   @override
-  _WgtItemFinder2State createState() => _WgtItemFinder2State();
+  State<WgtItemFinder2> createState() => _WgtItemFinder2State();
 }
 
 class _WgtItemFinder2State extends State<WgtItemFinder2> {

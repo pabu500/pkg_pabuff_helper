@@ -150,6 +150,7 @@ class _WgtDateRangePickerMonthlyState extends State<WgtDateRangePickerMonthly> {
                 _selectedEndDate = end;
                 _isCustomRange = true;
                 _isMTD = false;
+                _monthPicked = null;
               });
               widget.onRangeSet.call(start, end);
             },
