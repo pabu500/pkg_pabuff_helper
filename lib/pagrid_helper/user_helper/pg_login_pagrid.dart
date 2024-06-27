@@ -28,7 +28,7 @@ class LoginPagePagrid extends StatefulWidget {
   final Function onAssignUserToProvider;
 
   @override
-  _LoginPagePagridState createState() => _LoginPagePagridState();
+  State<LoginPagePagrid> createState() => _LoginPagePagridState();
 }
 
 class _LoginPagePagridState extends State<LoginPagePagrid> {
