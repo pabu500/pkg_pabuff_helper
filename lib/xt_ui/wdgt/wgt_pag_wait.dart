@@ -19,7 +19,7 @@ class WgtPagWait extends StatefulWidget {
   final bool showCenterSquare;
 
   @override
-  _WgtPagWaitState createState() => _WgtPagWaitState();
+  State<WgtPagWait> createState() => _WgtPagWaitState();
 }
 
 class _WgtPagWaitState extends State<WgtPagWait> {

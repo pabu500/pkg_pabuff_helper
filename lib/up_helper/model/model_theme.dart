@@ -34,6 +34,7 @@ class MyThemePreferences {
 
   getTheme() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    return sharedPreferences.getBool(THEME_KEY) ?? false;
+    //true for dark and false for light
+    return sharedPreferences.getBool(THEME_KEY) ?? true;
   }
 }
