@@ -63,7 +63,7 @@ class WgtTextField extends StatefulWidget {
   final InputDecoration? decoration;
 
   @override
-  _WgtTextFieldState createState() => _WgtTextFieldState();
+  State<WgtTextField> createState() => _WgtTextFieldState();
 }
 
 class _WgtTextFieldState extends State<WgtTextField> {
