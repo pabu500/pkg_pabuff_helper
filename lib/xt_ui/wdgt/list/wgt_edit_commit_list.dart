@@ -98,7 +98,7 @@ class WgtEditCommitList extends StatefulWidget {
   }
 
   @override
-  _WgtEditCommitListState createState() => _WgtEditCommitListState();
+  State<WgtEditCommitList> createState() => _WgtEditCommitListState();
 }
 
 class _WgtEditCommitListState extends State<WgtEditCommitList> {

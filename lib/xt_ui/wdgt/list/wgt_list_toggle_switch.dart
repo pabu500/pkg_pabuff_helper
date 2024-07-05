@@ -5,7 +5,7 @@ import 'wgt_edit_commit_list.dart';
 
 class WgtListToggleSwith extends StatefulWidget {
   WgtListToggleSwith({
-    Key? key,
+    super.key,
     this.width,
     this.parentListWgt,
     this.modifiedRow,
@@ -14,7 +14,7 @@ class WgtListToggleSwith extends StatefulWidget {
     required this.initialLabelIndex,
     // this.onToggle,
     this.disabled,
-  }) : super(key: key);
+  });
 
   final double? width;
   final String? fieldKey;

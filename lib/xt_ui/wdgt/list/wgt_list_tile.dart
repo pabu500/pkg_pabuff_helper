@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 
 class WgtListTile extends StatefulWidget {
   const WgtListTile({
-    Key? key,
+    super.key,
     required this.index,
     // this.globalKey,
     required this.listItem,
     // required this.builder,
     // this.onUpdate,
     this.regFresh,
-  }) : super(key: key);
+  });
 
   final int index;
   final List<Widget> listItem;

@@ -4,13 +4,14 @@ import 'package:flutter/material.dart';
 // import 'package:cupertino_icons/cupertino_icons.dart';
 
 class WgtListPaneIcon extends StatefulWidget {
-  WgtListPaneIcon({this.mode = 'list', required this.onToggleMode});
+  const WgtListPaneIcon(
+      {super.key, this.mode = 'list', required this.onToggleMode});
 
   final String mode;
   final void Function(String) onToggleMode;
 
   @override
-  _WgtListPaneIconState createState() => _WgtListPaneIconState();
+  State<WgtListPaneIcon> createState() => _WgtListPaneIconState();
 }
 
 class _WgtListPaneIconState extends State<WgtListPaneIcon> {

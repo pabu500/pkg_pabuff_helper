@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class WgtListSortIcon extends StatefulWidget {
-  WgtListSortIcon({
-    Key? key,
+  const WgtListSortIcon({
+    super.key,
     this.labelWidget,
     this.sortOrder,
     required this.onSort,
@@ -15,7 +15,7 @@ class WgtListSortIcon extends StatefulWidget {
   final UniqueKey? parentRefreshKey;
 
   @override
-  _WgtListSortIconState createState() => _WgtListSortIconState();
+  State<WgtListSortIcon> createState() => _WgtListSortIconState();
 }
 
 class _WgtListSortIconState extends State<WgtListSortIcon> {

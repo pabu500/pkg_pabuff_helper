@@ -7,7 +7,7 @@ import 'wgt_popup_button.dart';
 class xtKeyValueText extends StatefulWidget {
   //boilerplate
   const xtKeyValueText({
-    Key? key,
+    super.key,
     required this.keyText,
     required this.valueText,
     this.valueStyle,
@@ -18,7 +18,7 @@ class xtKeyValueText extends StatefulWidget {
     this.spaceInBetween = 5,
     this.selectable = true,
     this.clickCopy = false,
-  }) : super(key: key);
+  });
 
   final String keyText;
   final String valueText;

@@ -8,7 +8,7 @@ import 'wgt_edit_commit_list.dart';
 //my custom selectable text widget
 class Evs2ListText extends StatefulWidget {
   const Evs2ListText({
-    Key? key,
+    super.key,
     required this.originalFullText,
     this.parentListWgt,
     this.style,
@@ -42,7 +42,7 @@ class Evs2ListText extends StatefulWidget {
     this.nonSelectable = false,
     this.clickCopy = false,
     this.forceShowTooltip = false,
-  }) : super(key: key);
+  });
 
   final String originalFullText;
   final TextStyle? style;
