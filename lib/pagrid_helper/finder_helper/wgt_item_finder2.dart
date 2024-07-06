@@ -243,10 +243,13 @@ class _WgtItemFinder2State extends State<WgtItemFinder2> {
     if (widget.identifySingleItem) {
       return (_itemLabel ?? '').isNotEmpty || (_itemName ?? '').isNotEmpty;
     }
+
+    if (widget.loggedInUser.isFullOpsAndUp()) {
+      return true;
+    }
+
     return _selectedProjectScope != null ||
         _selectedSiteScope != null ||
-        // _tenantLabelController.text.trim().isNotEmpty ||
-        // _tenantNameController.text.trim().isNotEmpty ||
         _selectedItemType != null ||
         (_itemLabel != null && _itemLabel!.isNotEmpty) ||
         (_itemName != null && _itemName!.isNotEmpty);

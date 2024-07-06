@@ -26,6 +26,7 @@ enum ItemFinderType {
   user,
   meter_group,
   tariff_package,
+  concentrator,
 }
 
 enum ItemIdType {

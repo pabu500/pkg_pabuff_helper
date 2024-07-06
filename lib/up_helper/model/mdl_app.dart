@@ -28,6 +28,7 @@ enum PortalPage {
   tariffManager,
   billingManager,
   jobManager,
+  concManager,
 }
 
 //page titles
@@ -97,6 +98,9 @@ const billingRecordInfo = 'Billing View';
 const listSearchBillingReord = 'List/Search Billing Record';
 const createNewBill = 'Create New Bill';
 const billRelease = 'Billing Ops';
+const concManager = 'Concentrator Manager';
+const createConc = 'Create Concentrator';
+const concListSearch = 'List/Search Concentrator';
 
 class AppModel extends ChangeNotifier {
   String? subDomain;

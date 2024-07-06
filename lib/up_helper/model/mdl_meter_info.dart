@@ -15,6 +15,13 @@ enum MeterCommStatus {
   ERR9,
 }
 
+enum PingStatus {
+  yes,
+  no,
+  timeout,
+  unknown,
+}
+
 class MeterInfoModel {
   String? meterSn;
   String? meterDisplayname;
