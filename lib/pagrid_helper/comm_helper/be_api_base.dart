@@ -89,8 +89,8 @@ class UrlController {
         return kDebugMode
             ? UrlBase.dOresvcUrl
             : useDevOresvc
-                ? UrlBase.rDevOresvcUrlNTU
-                : UrlBase.rProdOresvcUrlNTU;
+                ? UrlBase.rOresvcUrl
+                : UrlBase.rOresvcUrl;
     }
   }
 
