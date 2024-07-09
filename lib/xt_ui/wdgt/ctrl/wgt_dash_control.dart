@@ -7,21 +7,24 @@ import 'wgt_meter_type_selector.dart';
 
 class WgtDashControl extends StatefulWidget {
   const WgtDashControl({
-    Key? key,
+    super.key,
     required this.onUpdateLookbackType,
     required this.onUpdateMeterType,
+    this.onUpdateMainMetersOnly,
     this.iniLookbackType = LookbackType.last_24h,
     this.iniMeterType = MeterType.electricity1p,
+    this.mainMetersOnly = true,
     required this.lookbackTyps,
     required this.meterTypes,
     this.marginWhenShrinked =
         EdgeInsets.zero, // const EdgeInsets.only(top: 10, right: 10),
     this.offsetWhenShrinked = 0,
     this.panelTitle = '',
-  }) : super(key: key);
+  });
 
   final Function(LookbackType) onUpdateLookbackType;
   final Function(MeterType) onUpdateMeterType;
+  final Function(bool)? onUpdateMainMetersOnly;
   final LookbackType iniLookbackType;
   final MeterType iniMeterType;
   final List<LookbackType> lookbackTyps;
@@ -30,8 +33,10 @@ class WgtDashControl extends StatefulWidget {
   final double offsetWhenShrinked;
   final String panelTitle;
 
+  final bool mainMetersOnly;
+
   @override
-  _WgtDashControlState createState() => _WgtDashControlState();
+  State<WgtDashControl> createState() => _WgtDashControlState();
 }
 
 class _WgtDashControlState extends State<WgtDashControl> {
@@ -39,12 +44,14 @@ class _WgtDashControlState extends State<WgtDashControl> {
   bool _pinned = false;
   late LookbackType _selectedLookbackType;
   late MeterType _selectedMeterType;
+  late bool _mainMetersOnly;
 
   @override
   void initState() {
     super.initState();
     _selectedLookbackType = widget.iniLookbackType;
     _selectedMeterType = widget.iniMeterType;
+    _mainMetersOnly = widget.mainMetersOnly;
   }
 
   @override
@@ -148,6 +155,10 @@ class _WgtDashControlState extends State<WgtDashControl> {
                           if (meterType == _selectedMeterType) return;
                           setState(() {
                             _selectedMeterType = meterType;
+                            if (_selectedMeterType != MeterType.electricity1p &&
+                                _selectedMeterType != MeterType.btu) {
+                              _mainMetersOnly = false;
+                            }
                           });
                           widget.onUpdateMeterType(_selectedMeterType);
                         },
@@ -166,6 +177,65 @@ class _WgtDashControlState extends State<WgtDashControl> {
                     //   ),
                     // ),
                     horizontalSpaceTiny,
+                    //onUpdateMainMetersOnly
+                    if (widget.onUpdateMainMetersOnly != null)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 5),
+                        decoration: BoxDecoration(
+                          color: _mainMetersOnly
+                              ? Theme.of(context)
+                                  .colorScheme
+                                  .primary
+                                  .withOpacity(0.7)
+                              : Theme.of(context).hintColor.withOpacity(0.35),
+                          borderRadius: BorderRadius.circular(5),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              spreadRadius: 3,
+                              blurRadius: 5,
+                              offset: const Offset(1, 3),
+                            ),
+                          ],
+                        ),
+                        child: InkWell(
+                          onTap:
+                              (_selectedMeterType != MeterType.electricity1p &&
+                                      _selectedMeterType != MeterType.btu)
+                                  ? null
+                                  : () {
+                                      widget.onUpdateMainMetersOnly
+                                          ?.call(!_mainMetersOnly);
+                                      setState(() {
+                                        _mainMetersOnly = !_mainMetersOnly;
+                                      });
+                                    },
+                          child: const Text(
+                            'Main',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    // if (widget.onUpdateMainMetersOnly != null)
+                    //   InkWell(
+                    //     onTap: () {
+                    //       widget.onUpdateMainMetersOnly!(!_pinned);
+                    //       setState(() {
+                    //         _pinned = !_pinned;
+                    //       });
+                    //     },
+                    //     child: Icon(
+                    //       _pinned ? Icons.push_pin : Icons.push_pin_outlined,
+                    //       color: _pinned
+                    //           ? Theme.of(context)
+                    //               .colorScheme
+                    //               .primary
+                    //               .withOpacity(0.7)
+                    //           : Theme.of(context).hintColor.withOpacity(0.3),
+                    //       size: 25,
+                    //     ),
+                    //   ),
+                    horizontalSpaceSmall,
                   ],
                 ),
               ),

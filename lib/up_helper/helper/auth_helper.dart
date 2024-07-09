@@ -2,6 +2,32 @@ import 'package:flutter/material.dart';
 
 enum comm_tasks { login, register, forgotPassword }
 
+enum AllowServiceEmail { yes, no }
+
+String? getAllowServiceEmailValueStr(String? statusStr) {
+  if ((statusStr ?? '').isEmpty) {
+    return null;
+  }
+  AllowServiceEmail? status = getAllowServiceEmail(statusStr);
+
+  return status.name;
+}
+
+AllowServiceEmail getAllowServiceEmail(String? statusStr) {
+  if (statusStr == null || statusStr.isEmpty) {
+    return AllowServiceEmail.no;
+  }
+  if (statusStr == '-') {
+    return AllowServiceEmail.no;
+  }
+  switch (statusStr) {
+    case 'yes':
+      return AllowServiceEmail.yes;
+    default:
+      return AllowServiceEmail.no;
+  }
+}
+
 String? errorFilter(String? err, comm_tasks task) {
   if (err == null) return null;
 

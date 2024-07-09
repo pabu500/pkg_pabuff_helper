@@ -291,3 +291,55 @@ Future<dynamic> doReleaseBills(
     rethrow;
   }
 }
+
+Future<dynamic> doBlast(
+  PaGridAppConfig appConfig,
+  Map<String, dynamic> reqMap,
+  SvcClaim svcClaim,
+) async {
+  svcClaim.svcName = SvcType.oresvc.name;
+  svcClaim.endpoint = UrlBase.eptBlastBillingNotification;
+
+  String svcToken = '';
+  // try {
+  //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
+  // } catch (err) {
+  //   throw Exception(err);
+  // }
+
+  // List<Map<String, dynamic>> meterList = [];
+  // for (var item in reqMap['meter_group_info']) {
+  //   meterList.add(item);
+  // }
+
+  try {
+    final response = await http.post(
+      Uri.parse(
+          UrlController(appConfig).getUrl(SvcType.oresvc, svcClaim.endpoint!)),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $svcToken',
+      },
+      body: jsonEncode(SvcQuery(svcClaim, reqMap).toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      final responseBody = jsonDecode(response.body);
+      if (responseBody['info'] != null) {
+        throw ItemNotFoundException('No items found');
+      }
+      if (responseBody['error'] != null) {
+        throw Exception(responseBody['error']);
+      }
+      final resultMap = responseBody['result'];
+
+      return {
+        'result': resultMap,
+      };
+    } else {
+      throw Exception('Failed to release bills');
+    }
+  } catch (err) {
+    rethrow;
+  }
+}

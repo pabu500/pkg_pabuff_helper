@@ -3,18 +3,18 @@ import 'package:flutter/material.dart';
 
 class WgtLoookbackTypeSelector extends StatefulWidget {
   const WgtLoookbackTypeSelector({
-    Key? key,
+    super.key,
     required this.lookbackTyps,
     required this.iniSelection,
     required this.onUpdateSelection,
-  }) : super(key: key);
+  });
 
   final List<LookbackType> lookbackTyps;
   final LookbackType iniSelection;
   final Function(LookbackType lookbackType) onUpdateSelection;
 
   @override
-  _WgtLoookbackTypeSelectorState createState() =>
+  State<WgtLoookbackTypeSelector> createState() =>
       _WgtLoookbackTypeSelectorState();
 }
 

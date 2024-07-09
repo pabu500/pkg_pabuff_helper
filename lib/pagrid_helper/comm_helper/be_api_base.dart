@@ -416,4 +416,6 @@ class UrlBase {
   static const String eptGetReleaseCandidate = '/billing/get_rc';
   static const String eptReleaseBills = '/billing/release_bills';
   static const String eptGetUsageFactor = '/billing/get_usage_factor';
+  static const String eptBlastBillingNotification =
+      '/billing/blast_billing_notification';
 }

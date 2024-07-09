@@ -155,12 +155,12 @@ Map<String, dynamic> getLcStatusTag(row, fieldKey) {
 
 final Map<ItemIsMain, dynamic> isMainInfo = {
   ItemIsMain.yes: {
-    'tag': 'yes',
+    'tag': 'Main',
     'color': Colors.orangeAccent.withOpacity(0.5),
     'tooltip': 'Main Meter',
   },
   ItemIsMain.no: {
-    'tag': 'no',
+    'tag': 'Sub',
     'color': Colors.green,
     'tooltip': 'Sub Meter',
   },
@@ -172,6 +172,15 @@ String? getIsMainTagStr(String? statusStr) {
   ItemIsMain? status = getItemIsMain(statusStr);
 
   return isMainInfo[status]!['tag'];
+}
+
+String? getIsMainValueStr(String? statusStr) {
+  if ((statusStr ?? '').isEmpty) {
+    return null;
+  }
+  ItemIsMain? status = getItemIsMain(statusStr);
+
+  return status.name;
 }
 
 String getItemIsMainMessage(String? statusStr) {
@@ -205,6 +214,34 @@ ItemIsMain getItemIsMain(String? statusStr) {
     default:
       return ItemIsMain.no;
   }
+}
+
+Map<String, dynamic> getIsMainTag(row, fieldKey) {
+  if ((row['is_main'] ?? '').isEmpty) {
+    return {};
+  }
+  if (row['is_main'] == '-') {
+    return {};
+  }
+  String valueStr = row['is_main'].toString().toLowerCase();
+  ItemIsMain? status = getItemIsMain(valueStr);
+  if (status == ItemIsMain.no) {
+    return {};
+  }
+
+  if (fieldKey == 'first_reading_val' || fieldKey == 'last_reading_val') {
+    return {
+      'tag': '-',
+      'color': Colors.transparent,
+      'tooltip': '',
+    };
+  }
+
+  return {
+    'tag': getIsMainTagStr(valueStr),
+    'color': getItemIsMainColor(valueStr),
+    'tooltip': getItemIsMainMessage(valueStr),
+  };
 }
 
 const topUpMax = 100;

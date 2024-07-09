@@ -26,6 +26,7 @@ enum UserKey {
   siteScope,
   authProvider,
   resetPasswordOnFirstLogin,
+  allowServiceEmail,
 }
 
 enum AclRole {
@@ -192,6 +193,7 @@ class Evs2User {
   // String? tenantName;
   // String? tenantLabel;
   List<Map<String, dynamic>>? tenantList;
+  String? allowServiceEmail;
 
   Evs2User({
     this.id,
@@ -225,6 +227,7 @@ class Evs2User {
     // this.tenantName,
     // this.tenantLabel,
     this.tenantList,
+    this.allowServiceEmail,
   });
 
   void logout() {
@@ -259,6 +262,7 @@ class Evs2User {
     // tenantName = '';
     // tenantLabel = '';
     tenantList = [];
+    allowServiceEmail = '';
   }
 
   factory Evs2User.fromJson(Map<String, dynamic> respJson) {
@@ -363,6 +367,7 @@ class Evs2User {
         // tenantLabel: userJson['tenant_label'] ?? '',
         tenantList: tenantList,
         authProvider: authProvider,
+        allowServiceEmail: userJson['allow_service_email'] ?? '',
       );
     } catch (e) {
       if (kDebugMode) {
@@ -390,6 +395,7 @@ class Evs2User {
       'scope_str': scopeStr,
       'dest_portal': destPortal,
       'auth_provider': authProvider?.name ?? 'local',
+      'allow_service_email': allowServiceEmail,
       'auth_info': {},
     };
   }
@@ -419,6 +425,7 @@ class Evs2User {
       // 'tenant_name': tenantName ?? '',
       // 'tenant_label': tenantLabel ?? '',
       'tenant_list': tenantList ?? [],
+      'allow_service_email': allowServiceEmail ?? '',
     };
   }
 
