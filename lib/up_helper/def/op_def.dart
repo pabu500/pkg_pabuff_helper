@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 enum MeterOps {
@@ -40,6 +38,11 @@ enum ItemOpLifecycleStatus {
   maint,
   decommissioned,
   bypassed,
+}
+
+enum ItemIsMain {
+  yes,
+  no,
 }
 
 ItemOpLifecycleStatus getItemOpLifecycleStatus(String? statusStr) {
@@ -148,6 +151,60 @@ Map<String, dynamic> getLcStatusTag(row, fieldKey) {
     'color': getOpLifecycleStatusColor(status.name),
     'tooltip': getOpLifecycleStatusMessage(status.name),
   };
+}
+
+final Map<ItemIsMain, dynamic> isMainInfo = {
+  ItemIsMain.yes: {
+    'tag': 'yes',
+    'color': Colors.orangeAccent.withOpacity(0.5),
+    'tooltip': 'Main Meter',
+  },
+  ItemIsMain.no: {
+    'tag': 'no',
+    'color': Colors.green,
+    'tooltip': 'Sub Meter',
+  },
+};
+String? getIsMainTagStr(String? statusStr) {
+  // if ((statusStr ?? '').isEmpty) {
+  //   return null;
+  // }
+  ItemIsMain? status = getItemIsMain(statusStr);
+
+  return isMainInfo[status]!['tag'];
+}
+
+String getItemIsMainMessage(String? statusStr) {
+  if (statusStr == null) {
+    return 'N/A';
+  }
+  ItemIsMain? status = ItemIsMain.values.byName(statusStr);
+
+  return isMainInfo[status]!['tooltip'];
+}
+
+Color getItemIsMainColor(String? statusStr) {
+  if (statusStr == null || statusStr.isEmpty) {
+    return Colors.transparent;
+  }
+  ItemIsMain? status = ItemIsMain.values.byName(statusStr);
+
+  return isMainInfo[status]!['color'];
+}
+
+ItemIsMain getItemIsMain(String? statusStr) {
+  if (statusStr == null || statusStr.isEmpty) {
+    return ItemIsMain.no;
+  }
+  if (statusStr == '-') {
+    return ItemIsMain.no;
+  }
+  switch (statusStr) {
+    case 'yes':
+      return ItemIsMain.yes;
+    default:
+      return ItemIsMain.no;
+  }
 }
 
 const topUpMax = 100;
