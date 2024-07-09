@@ -362,7 +362,7 @@ Future<Evs2User> doLogin(DestPortal destPortal, PaGridAppConfig appConfig,
 
     Evs2User user = Evs2User.fromJson2(jsonDecode(response.body));
     if (kDebugMode) {
-      print(user);
+      // print(user);
     }
     if (user.scopes != null && user.scopes!.isNotEmpty) {
     } else {

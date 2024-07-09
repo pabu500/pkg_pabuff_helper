@@ -8,12 +8,14 @@ enum ProjectScope {
   EVS2_SMU,
   EVS2_SIT,
   EVS2_SUSS,
+  EVS2_ZSP,
   NONE,
   SG_ALL,
   GLOBAL,
   EMS_SMRT,
   EMS_CW_NUS,
   MMC_GI_DE,
+  // ZSP,
 }
 
 enum SiteScope {
@@ -38,6 +40,8 @@ enum SiteScope {
   CW_NUS_UTOWN,
 
   GI_DE_DEMO,
+
+  ZSP,
 }
 
 const evs2Projects = [
@@ -45,6 +49,7 @@ const evs2Projects = [
   ProjectScope.EVS2_SUTD,
   ProjectScope.EVS2_NTU,
   ProjectScope.EVS2_PA,
+  ProjectScope.EVS2_ZSP,
   ProjectScope.SG_ALL,
   ProjectScope.NONE,
 ];
@@ -63,6 +68,7 @@ const evs2Sites = [
   SiteScope.NTU_MR,
   SiteScope.SG_ALL,
   SiteScope.PA_ATP,
+  SiteScope.ZSP,
   SiteScope.NONE,
 ];
 
@@ -351,6 +357,19 @@ final scopeProfiles = [
       'messagingSenderId': '949621989494',
       'appId': '1:949621989494:web:2e67a89ce429494f043f57',
     },
+  },
+  {
+    'project_scope': ProjectScope.EVS2_ZSP,
+    'meter_type': ItemType.meter,
+    'project_sites': [
+      {
+        'key': SiteScope.ZSP,
+        'name': 'ZSP',
+        'color': AppColors.contentColorCyan,
+      },
+    ],
+    'timezone': 8,
+    'currency': 'SGD',
   }
 ];
 
@@ -507,6 +526,9 @@ String getProjectScopeStrFromScopeStr(String scopeStr) {
   if (scopeStr.contains('pa')) {
     return 'evs2_pa';
   }
+  if (scopeStr.contains('zsp')) {
+    return 'zsp';
+  }
   return 'none';
 }
 
@@ -543,6 +565,8 @@ String? getSiteDisplayString(SiteScope? site) {
       return 'BTC';
     case SiteScope.CW_NUS_UTOWN:
       return 'UTown';
+    case SiteScope.ZSP:
+      return 'ZSP';
     default:
       return 'NONE';
   }
@@ -619,6 +643,8 @@ String getProjectDisplayString(ProjectScope project) {
       return 'EMS_CW_NUS';
     case ProjectScope.MMC_GI_DE:
       return 'MC_GI_DE';
+    case ProjectScope.EVS2_ZSP:
+      return 'ZSP';
   }
 }
 
@@ -650,6 +676,8 @@ ItemType getProjectMeterType(ProjectScope project) {
       return ItemType.meter_iwow;
     case ProjectScope.MMC_GI_DE:
       return ItemType.meter;
+    case ProjectScope.EVS2_ZSP:
+      return ItemType.meter;
   }
 }
 
@@ -669,6 +697,8 @@ AclScope getAclProjectScope(ProjectScope? evs2project) {
       return AclScope.project_ems_smrt;
     case ProjectScope.EMS_CW_NUS:
       return AclScope.project_ems_cw_nus;
+    case ProjectScope.EVS2_ZSP:
+      return AclScope.project_evs2_zsp;
     default:
       return AclScope.self;
   }

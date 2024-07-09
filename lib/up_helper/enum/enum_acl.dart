@@ -13,6 +13,8 @@ enum AclScope {
 
   project_ems_cw_nus,
 
+  project_evs2_zsp,
+
   site_pa_atp,
 
   site_nus_pgpr,
