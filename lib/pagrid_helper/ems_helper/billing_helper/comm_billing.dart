@@ -325,17 +325,11 @@ Future<dynamic> doBlast(
 
     if (response.statusCode == 200) {
       final responseBody = jsonDecode(response.body);
-      if (responseBody['info'] != null) {
-        throw ItemNotFoundException('No items found');
-      }
       if (responseBody['error'] != null) {
         throw Exception(responseBody['error']);
       }
-      final resultMap = responseBody['result'];
 
-      return {
-        'result': resultMap,
-      };
+      return responseBody;
     } else {
       throw Exception('Failed to release bills');
     }

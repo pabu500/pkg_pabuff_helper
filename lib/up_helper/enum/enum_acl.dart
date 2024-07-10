@@ -142,6 +142,8 @@ enum AclTarget {
 
   bill_p_entity,
   bill_p_info,
+
+  email_blast_p_entity,
 }
 
 enum AclOperation {
