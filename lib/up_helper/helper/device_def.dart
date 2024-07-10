@@ -157,7 +157,7 @@ IconData getSensorIconData(SensorType sensorType) {
   }
 }
 
-String getDeivceTypeUnit(dynamic deviceSubType) {
+String getDeivceTypeUnit(dynamic deviceSubType, {String? displayContextStr}) {
   switch (deviceSubType) {
     case MeterType.electricity1p:
       return 'kWh';
@@ -170,6 +170,9 @@ String getDeivceTypeUnit(dynamic deviceSubType) {
     case MeterType.newater:
       return 'm³';
     case MeterType.btu:
+      if ((displayContextStr ?? '') == 'meter_usage_summary') {
+        return 'TonHr';
+      }
       return 'kWh';
     case SensorType.temperature:
       return '°C';

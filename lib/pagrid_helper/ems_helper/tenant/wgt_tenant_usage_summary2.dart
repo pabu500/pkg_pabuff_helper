@@ -21,6 +21,7 @@ class WgtTenantUsageSummary2 extends StatefulWidget {
     required this.tenantName,
     required this.tenantType,
     required this.excludeAutoUsage,
+    required this.displayContextStr,
     this.usageCalc,
     this.showFactoredUsage = true,
     // required this.usageFactor,
@@ -46,6 +47,7 @@ class WgtTenantUsageSummary2 extends StatefulWidget {
   final PaGridAppConfig appConfig;
   final ScopeProfile scopeProfile;
   final Evs2User loggedInUser;
+  final String displayContextStr;
   final EmsTypeUsageCalc? usageCalc;
   final bool showFactoredUsage;
   final ItemType itemType;
@@ -281,6 +283,7 @@ class _WgtTenantUsageSummary2State extends State<WgtTenantUsageSummary2> {
               loggedInUser: widget.loggedInUser,
               scopeProfile: widget.scopeProfile,
               appConfig: widget.appConfig,
+              displayContextStr: widget.displayContextStr,
               statColor:
                   Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
               itemType: widget.itemType,
@@ -312,6 +315,7 @@ class _WgtTenantUsageSummary2State extends State<WgtTenantUsageSummary2> {
       child: WgtUsageStatCore(
         loggedInUser: widget.loggedInUser,
         scopeProfile: widget.scopeProfile,
+        displayContextStr: widget.displayContextStr,
         showFactoredUsage: widget.showFactoredUsage,
         calcUsageFromReadings: calcUsageFromReadings,
         appConfig: widget.appConfig,
@@ -354,6 +358,7 @@ class _WgtTenantUsageSummary2State extends State<WgtTenantUsageSummary2> {
                 loggedInUser: widget.loggedInUser,
                 scopeProfile: widget.scopeProfile,
                 appConfig: widget.appConfig,
+                displayContextStr: widget.displayContextStr,
                 isBillMode: widget.isBillMode,
                 rate: widget.typeRates?[meterTypeTag] ?? 0,
                 statColor:

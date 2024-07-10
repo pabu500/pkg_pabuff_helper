@@ -12,6 +12,7 @@ class WgtUsageStatCore extends StatefulWidget {
     required this.scopeProfile,
     required this.loggedInUser,
     required this.appConfig,
+    required this.displayContextStr,
     this.noData = false,
     required this.meterType,
     required this.meterId,
@@ -39,6 +40,7 @@ class WgtUsageStatCore extends StatefulWidget {
   final ScopeProfile scopeProfile;
   final Evs2User loggedInUser;
   final PaGridAppConfig appConfig;
+  final String displayContextStr;
   final bool noData;
   final MeterType meterType;
   final String meterId;
@@ -216,7 +218,8 @@ class _WgtUsageStatCoreState extends State<WgtUsageStatCore> {
               ),
               getStatWithUnit(
                   getCommaNumberStr(usage, decimal: widget.usageDecimals),
-                  getDeivceTypeUnit(widget.meterType),
+                  getDeivceTypeUnit(widget.meterType,
+                      displayContextStr: widget.displayContextStr),
                   statStrStyle: widget.statColor == null
                       ? defStatStyleLarge
                       : defStatStyleLarge.copyWith(color: widget.statColor),
@@ -239,7 +242,7 @@ class _WgtUsageStatCoreState extends State<WgtUsageStatCore> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Total ${getDeivceTypeUnit(widget.meterType)}',
+                      'Total ${getDeivceTypeUnit(widget.meterType, displayContextStr: widget.displayContextStr)}',
                       style: defStatStyleSmall,
                     ),
                     getStatWithUnit(
@@ -247,7 +250,8 @@ class _WgtUsageStatCoreState extends State<WgtUsageStatCore> {
                           ? '(${getCommaNumberStr(usage, decimal: widget.usageDecimals)})'
                           : getCommaNumberStr(usage,
                               decimal: widget.usageDecimals),
-                      getDeivceTypeUnit(widget.meterType),
+                      getDeivceTypeUnit(widget.meterType,
+                          displayContextStr: widget.displayContextStr),
                       statStrStyle: widget.statColor == null
                           ? defStatStyleLarge
                           : defStatStyleLarge.copyWith(color: widget.statColor),
@@ -399,7 +403,8 @@ class _WgtUsageStatCoreState extends State<WgtUsageStatCore> {
               ),
               getStatWithUnit(
                   getCommaNumberStr(usage, decimal: widget.usageDecimals),
-                  getDeivceTypeUnit(widget.meterType),
+                  getDeivceTypeUnit(widget.meterType,
+                      displayContextStr: widget.displayContextStr),
                   statStrStyle: widget.statColor == null
                       ? defStatStyleLarge
                       : defStatStyleLarge.copyWith(color: widget.statColor),
@@ -416,7 +421,8 @@ class _WgtUsageStatCoreState extends State<WgtUsageStatCore> {
                 getStatWithUnit(
                   getCommaNumberStr(lastReadingValue,
                       decimal: widget.usageDecimals),
-                  getDeivceTypeUnit(widget.meterType),
+                  getDeivceTypeUnit(widget.meterType,
+                      displayContextStr: widget.displayContextStr),
                 ),
               if (showReading)
                 Text(
@@ -427,7 +433,8 @@ class _WgtUsageStatCoreState extends State<WgtUsageStatCore> {
                 getStatWithUnit(
                   getCommaNumberStr(firstReadingValue,
                       decimal: widget.usageDecimals),
-                  getDeivceTypeUnit(widget.meterType),
+                  getDeivceTypeUnit(widget.meterType,
+                      displayContextStr: widget.displayContextStr),
                 ),
             ],
           )
@@ -444,7 +451,8 @@ class _WgtUsageStatCoreState extends State<WgtUsageStatCore> {
                     ),
                     getStatWithUnit(
                       getCommaNumberStr(usage, decimal: widget.usageDecimals),
-                      getDeivceTypeUnit(widget.meterType),
+                      getDeivceTypeUnit(widget.meterType,
+                          displayContextStr: widget.displayContextStr),
                       statStrStyle: widget.statColor == null
                           ? defStatStyleLarge
                           : defStatStyleLarge.copyWith(color: widget.statColor),
@@ -476,7 +484,8 @@ class _WgtUsageStatCoreState extends State<WgtUsageStatCore> {
                       getStatWithUnit(
                         getCommaNumberStr(lastReadingValue,
                             decimal: widget.usageDecimals),
-                        getDeivceTypeUnit(widget.meterType),
+                        getDeivceTypeUnit(widget.meterType,
+                            displayContextStr: widget.displayContextStr),
                       ),
                       Text(
                         'first reading: $firstReadingTime',
@@ -485,7 +494,8 @@ class _WgtUsageStatCoreState extends State<WgtUsageStatCore> {
                       getStatWithUnit(
                         getCommaNumberStr(firstReadingValue,
                             decimal: widget.usageDecimals),
-                        getDeivceTypeUnit(widget.meterType),
+                        getDeivceTypeUnit(widget.meterType,
+                            displayContextStr: widget.displayContextStr),
                       ),
                     ],
                   ),

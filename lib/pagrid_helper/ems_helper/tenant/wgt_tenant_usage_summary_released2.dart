@@ -22,6 +22,7 @@ class WgtTenantUsageSummaryReleased2 extends StatefulWidget {
     required this.tenantName,
     required this.tenantType,
     required this.excludeAutoUsage,
+    required this.displayContextStr,
     this.renderMode = 'wgt', // wgt, pdf
     this.showRenderModeSwitch = false,
     this.tenantLabel,
@@ -43,6 +44,7 @@ class WgtTenantUsageSummaryReleased2 extends StatefulWidget {
   final PaGridAppConfig appConfig;
   final ScopeProfile scopeProfile;
   final Evs2User loggedInUser;
+  final String displayContextStr;
   final EmsTypeUsageCalcReleased usageCalc;
   final ItemType itemType;
   final bool isMonthly;
@@ -211,6 +213,7 @@ class _WgtTenantUsageSummaryReleased2State
               loggedInUser: widget.loggedInUser,
               scopeProfile: widget.scopeProfile,
               appConfig: widget.appConfig,
+              displayContextStr: widget.displayContextStr,
               isBillMode: widget.isBillMode,
               rate: widget.meterTypeRates[meterTypeTag],
               statColor:
@@ -281,6 +284,7 @@ class _WgtTenantUsageSummaryReleased2State
                 loggedInUser: widget.loggedInUser,
                 scopeProfile: widget.scopeProfile,
                 appConfig: widget.appConfig,
+                displayContextStr: widget.displayContextStr,
                 isBillMode: widget.isBillMode,
                 rate: widget.meterTypeRates[meterTypeTag],
                 statColor:
@@ -353,6 +357,7 @@ class _WgtTenantUsageSummaryReleased2State
                 loggedInUser: widget.loggedInUser,
                 scopeProfile: widget.scopeProfile,
                 appConfig: widget.appConfig,
+                displayContextStr: widget.displayContextStr,
                 isBillMode: widget.isBillMode,
                 rate: widget.meterTypeRates[meterTypeTag],
                 statColor:

@@ -20,6 +20,7 @@ class WgtTenantUsageSummaryReleased extends StatefulWidget {
     required this.tenantName,
     required this.tenantType,
     required this.excludeAutoUsage,
+    required this.displayContextStr,
     this.renderMode = 'wgt', // wgt, pdf
     this.showRenderModeSwitch = false,
     this.tenantLabel,
@@ -41,6 +42,7 @@ class WgtTenantUsageSummaryReleased extends StatefulWidget {
   final ScopeProfile scopeProfile;
   final Evs2User loggedInUser;
   final PaGridAppConfig appConfig;
+  final String displayContextStr;
   final ItemType itemType;
   final bool isMonthly;
   final DateTime fromDatetime;
@@ -426,6 +428,7 @@ class _WgtTenantUsageSummaryReleasedState
                 loggedInUser: widget.loggedInUser,
                 scopeProfile: widget.scopeProfile,
                 appConfig: widget.appConfig,
+                displayContextStr: widget.displayContextStr,
                 isBillMode: widget.isBillMode,
                 rate: meterType == MeterType.electricity1p
                     ? _rateE
@@ -505,6 +508,7 @@ class _WgtTenantUsageSummaryReleasedState
                 loggedInUser: widget.loggedInUser,
                 scopeProfile: widget.scopeProfile,
                 appConfig: widget.appConfig,
+                displayContextStr: widget.displayContextStr,
                 isBillMode: widget.isBillMode,
                 rate: meterType == MeterType.electricity1p
                     ? _rateE
@@ -585,6 +589,7 @@ class _WgtTenantUsageSummaryReleasedState
                 loggedInUser: widget.loggedInUser,
                 scopeProfile: widget.scopeProfile,
                 appConfig: widget.appConfig,
+                displayContextStr: widget.displayContextStr,
                 isBillMode: widget.isBillMode,
                 rate: meterType == MeterType.electricity1p
                     ? _rateE

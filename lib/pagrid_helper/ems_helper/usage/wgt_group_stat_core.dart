@@ -12,6 +12,7 @@ class WgtMeterGroupStatCore extends StatefulWidget {
     required this.scopeProfile,
     required this.loggedInUser,
     required this.appConfig,
+    required this.displayContextStr,
     this.noData = false,
     this.chartKey,
     required this.itemType,
@@ -33,6 +34,7 @@ class WgtMeterGroupStatCore extends StatefulWidget {
   final ScopeProfile scopeProfile;
   final Evs2User loggedInUser;
   final PaGridAppConfig appConfig;
+  final String displayContextStr;
   final bool noData;
   final UniqueKey? chartKey;
   final ItemType itemType;
@@ -304,13 +306,15 @@ class _WgtMeterGroupStatCoreState extends State<WgtMeterGroupStatCore> {
             ],
           ),
           getStatWithUnit(
-              getCommaNumberStr(_groupTotalUsage, decimal: widget.decimals),
-              statStrStyle: widget.statColor == null
-                  ? defStatStyleLarge
-                  : defStatStyleLarge.copyWith(color: widget.statColor),
-              unitStyle: defStatStyleSmall.copyWith(
-                  color: widget.statColor ?? Colors.grey.shade800),
-              getDeivceTypeUnit(widget.meterType)),
+            getCommaNumberStr(_groupTotalUsage, decimal: widget.decimals),
+            statStrStyle: widget.statColor == null
+                ? defStatStyleLarge
+                : defStatStyleLarge.copyWith(color: widget.statColor),
+            unitStyle: defStatStyleSmall.copyWith(
+                color: widget.statColor ?? Colors.grey.shade800),
+            getDeivceTypeUnit(widget.meterType,
+                displayContextStr: widget.displayContextStr),
+          ),
           Expanded(
             child: Container(),
           )
@@ -416,7 +420,8 @@ class _WgtMeterGroupStatCoreState extends State<WgtMeterGroupStatCore> {
       sectionRadius: 34,
       chartData: _pieStat,
       showIndicator: false,
-      valueUnit: getDeivceTypeUnit(widget.meterType),
+      valueUnit: getDeivceTypeUnit(widget.meterType,
+          displayContextStr: widget.displayContextStr),
       getColorList: AppColors.getColorListGreys,
       minLabelSize: 13,
       maxLabelSize: 15,
@@ -437,7 +442,7 @@ class _WgtMeterGroupStatCoreState extends State<WgtMeterGroupStatCore> {
             // ),
             // verticalSpaceTiny,
             Text(
-              '${getCommaNumberStr(_groupTotalUsage)}${getDeivceTypeUnit(widget.meterType)}',
+              '${getCommaNumberStr(_groupTotalUsage)}${getDeivceTypeUnit(widget.meterType, displayContextStr: widget.displayContextStr)}',
               style: TextStyle(
                 color: statColorDark,
                 // widget.centerTopicColor ??Theme.of(context).colorScheme.primary,

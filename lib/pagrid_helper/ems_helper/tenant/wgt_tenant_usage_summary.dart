@@ -20,6 +20,7 @@ class WgtTenantUsageSummary extends StatefulWidget {
     required this.tenantName,
     required this.tenantType,
     required this.excludeAutoUsage,
+    required this.displayContextStr,
     this.renderMode = 'wgt', // wgt, pdf
     this.showRenderModeSwitch = false,
     this.tenantLabel,
@@ -41,6 +42,7 @@ class WgtTenantUsageSummary extends StatefulWidget {
   final ScopeProfile scopeProfile;
   final Evs2User loggedInUser;
   final PaGridAppConfig appConfig;
+  final String displayContextStr;
   final ItemType itemType;
   final bool isMonthly;
   final DateTime fromDatetime;
@@ -675,6 +677,7 @@ class _WgtTenantUsageSummaryState extends State<WgtTenantUsageSummary> {
               loggedInUser: widget.loggedInUser,
               scopeProfile: widget.scopeProfile,
               appConfig: widget.appConfig,
+              displayContextStr: widget.displayContextStr,
               statColor:
                   Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
               itemType: widget.itemType,
@@ -708,6 +711,7 @@ class _WgtTenantUsageSummaryState extends State<WgtTenantUsageSummary> {
         scopeProfile: widget.scopeProfile,
         calcUsageFromReadings: calcUsageFromReadings,
         appConfig: widget.appConfig,
+        displayContextStr: widget.displayContextStr,
         isBillMode: widget.isBillMode,
         rate: meterType == MeterType.electricity1p
             ? _rateE
@@ -754,6 +758,7 @@ class _WgtTenantUsageSummaryState extends State<WgtTenantUsageSummary> {
                 loggedInUser: widget.loggedInUser,
                 scopeProfile: widget.scopeProfile,
                 appConfig: widget.appConfig,
+                displayContextStr: widget.displayContextStr,
                 isBillMode: widget.isBillMode,
                 rate: meterType == MeterType.electricity1p
                     ? _rateE
@@ -765,7 +770,7 @@ class _WgtTenantUsageSummaryState extends State<WgtTenantUsageSummary> {
                                 ? _rateN
                                 : _rateG,
                 statColor:
-                    Theme.of(context).colorScheme.onBackground.withOpacity(0.7),
+                    Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                 showTrending: false,
                 statVirticalStack: false,
                 height: 110,

@@ -31,7 +31,7 @@ class WgtBillView extends StatefulWidget {
   final String defaultBillLcStatus;
 
   @override
-  _WgtBillViewState createState() => _WgtBillViewState();
+  State<WgtBillView> createState() => _WgtBillViewState();
 }
 
 class _WgtBillViewState extends State<WgtBillView> {
@@ -383,6 +383,7 @@ class _WgtBillViewState extends State<WgtBillView> {
             appConfig: widget.appConfig,
             loggedInUser: widget.loggedInUser,
             scopeProfile: widget.scopeProfile,
+            displayContextStr: '',
             usageCalc: emsTypeUsageCalc,
             isBillMode: true,
             showRenderModeSwitch: true,
@@ -584,6 +585,7 @@ class _WgtBillViewState extends State<WgtBillView> {
             appConfig: widget.appConfig,
             loggedInUser: widget.loggedInUser,
             scopeProfile: widget.scopeProfile,
+            displayContextStr: '',
             isBillMode: true,
             usageCalc: emsTypeUsageCalcReleased,
             showRenderModeSwitch: true,
