@@ -50,7 +50,7 @@ class WgtViewEditField extends StatefulWidget {
   final bool useDatePicker;
 
   @override
-  _WgtViewEditFieldState createState() => _WgtViewEditFieldState();
+  State<WgtViewEditField> createState() => _WgtViewEditFieldState();
 }
 
 class _WgtViewEditFieldState extends State<WgtViewEditField> {
@@ -263,8 +263,12 @@ class _WgtViewEditFieldState extends State<WgtViewEditField> {
 
                                   Map<String, dynamic> result =
                                       await widget.onSetValue(_controller.text);
-                                  // if (result['error'] != null) {
-                                  if ((result['error'] ?? {}) != {}) {
+
+                                  bool hasError = false;
+                                  if (result['error'] != null) {
+                                    hasError = true;
+                                  }
+                                  if (hasError) {
                                     setState(() {
                                       if (result['error'] is String) {
                                         _errorText = result['error'];
