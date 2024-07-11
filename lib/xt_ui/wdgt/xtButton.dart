@@ -1,3 +1,4 @@
+import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
 
 import '../style/xt_colors.dart';
@@ -9,7 +10,7 @@ enum btnKey { none, mainbutton }
 
 class xtButton extends StatefulWidget {
   xtButton({
-    Key? key,
+    super.key,
     required this.text,
     required this.onPressed,
     this.xtKey,
@@ -27,7 +28,7 @@ class xtButton extends StatefulWidget {
     this.formCoordinator,
     this.waiting = false,
     this.textSuffix,
-  }) : super(key: key);
+  });
 
   final String text;
   final VoidCallback? onPressed;
@@ -127,15 +128,8 @@ class _xtButtonState extends State<xtButton> {
                 color: Colors.white,
               ),
             ),
-          if (_errorText != null)
-            Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Text(_errorText!,
-                  style: const TextStyle(
-                      color: Colors.red,
-                      fontSize: 17,
-                      fontStyle: FontStyle.italic)),
-            ),
+          if ((_errorText ?? '').isNotEmpty)
+            getErrorTextPrompt(context: context, errorText: _errorText!),
         ],
       ),
     );
