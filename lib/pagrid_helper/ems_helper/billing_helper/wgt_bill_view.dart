@@ -213,29 +213,30 @@ class _WgtBillViewState extends State<WgtBillView> {
     DateTime fromDatetime = getTargetDatetimeFromTargetStr(fromTimestampStr);
     String toTimestampStr = _bill['to_timestamp'];
     DateTime toDatetime = getTargetDatetimeFromTargetStr(toTimestampStr);
+    String billBarFromMonth = _bill['bill_bar_from_timestamp'] ?? '';
 
     if (_lcStatusDisplay == 'released') {
       return getReleaseRender(
-        tenantName,
-        tenantLabel,
-        accountId,
-        tenantType,
-        fromTimestampStr,
-        toTimestampStr,
-        fromDatetime,
-        toDatetime,
-      );
+          tenantName,
+          tenantLabel,
+          accountId,
+          tenantType,
+          fromTimestampStr,
+          toTimestampStr,
+          fromDatetime,
+          toDatetime,
+          billBarFromMonth);
     } else {
       return getGeneratedRender(
-        tenantName,
-        tenantLabel,
-        accountId,
-        tenantType,
-        fromTimestampStr,
-        toTimestampStr,
-        fromDatetime,
-        toDatetime,
-      );
+          tenantName,
+          tenantLabel,
+          accountId,
+          tenantType,
+          fromTimestampStr,
+          toTimestampStr,
+          fromDatetime,
+          toDatetime,
+          billBarFromMonth);
     }
   }
 
@@ -248,6 +249,7 @@ class _WgtBillViewState extends State<WgtBillView> {
     String toTimestampStr,
     DateTime fromDatetime,
     DateTime toDatetime,
+    String billBarFromMonth,
   ) {
     // sort time
     bool isMonthly = _bill['is_monthly'] == 'true' ? true : false;
@@ -335,6 +337,7 @@ class _WgtBillViewState extends State<WgtBillView> {
       subTenantUsageSummary: subTenantListUsageSummary,
       manualUsageList: manualUsage,
       lineItemList: lineItems,
+      billBarFromMonth: billBarFromMonth,
     );
     emsTypeUsageCalc.doCalc();
 
@@ -414,6 +417,7 @@ class _WgtBillViewState extends State<WgtBillView> {
     String toTimestampStr,
     DateTime fromDatetime,
     DateTime toDatetime,
+    String billBarFromMonth,
   ) {
     bool isMonthly = _bill['is_monthly'] == 'true' ? true : false;
     String billTimeRangeStr = getTimeRangeStr(
@@ -535,6 +539,7 @@ class _WgtBillViewState extends State<WgtBillView> {
       billedGst: billedGst,
       lineItemList: [lineItem],
       billedTrendingSnapShot: billedTrendingSnapShot,
+      billBarFromMonth: billBarFromMonth,
     );
     emsTypeUsageCalcReleased.doCalc();
 

@@ -33,6 +33,8 @@ class EmsTypeUsageCalc {
   double? _gstAmount;
   double? _totalCost;
 
+  String? _billBarFromMonth;
+
   EmsTypeUsage? get typeUsageE => _typeUsageE;
   EmsTypeUsage? get typeUsageW => _typeUsageW;
   EmsTypeUsage? get typeUsageB => _typeUsageB;
@@ -54,6 +56,8 @@ class EmsTypeUsageCalc {
   double? get gstAmount => _gstAmount;
   double? get totalCost => _totalCost;
 
+  String? get billBarFromMonth => _billBarFromMonth;
+
   EmsTypeUsageCalc({
     double? gst,
     Map<String, dynamic> typeRates = const {},
@@ -62,6 +66,7 @@ class EmsTypeUsageCalc {
     List<Map<String, dynamic>> subTenantUsageSummary = const [],
     List<Map<String, dynamic>> manualUsageList = const [],
     List<Map<String, dynamic>> lineItemList = const [],
+    billBarFromMonth,
   }) {
     if (usageFactor.isEmpty) {
       throw Exception('usageFactor is empty');
@@ -75,6 +80,7 @@ class EmsTypeUsageCalc {
     _subTenantUsageSummary = subTenantUsageSummary;
     _manualUsageList = manualUsageList;
     _lineItemList = lineItemList;
+    _billBarFromMonth = billBarFromMonth;
   }
 
   void doCalc() {
@@ -370,6 +376,13 @@ class EmsTypeUsageCalc {
 
         for (var history in meterHistory['meter_usage_history']) {
           String consolidatedTimeLabel = history['consolidated_time_label'];
+
+          if ((_billBarFromMonth ?? '').isNotEmpty) {
+            if (!takeMonth(consolidatedTimeLabel, _billBarFromMonth!)) {
+              continue;
+            }
+          }
+
           double? usage = double.tryParse(history['usage']);
           usage = usage == null ? 0 : usage * (percentage / 100);
 
@@ -415,5 +428,21 @@ class EmsTypeUsageCalc {
         _trendingG.addAll(conlidatedHistoryList);
       }
     }
+  }
+
+  bool takeMonth(String monthLabel, String billBarFrom) {
+    //label is YYYY-MM
+    //if monthLabel is greater than or equal to billBarFrom, return true
+    List<String> monthLabelList = monthLabel.split('-');
+    List<String> billBarFromList = billBarFrom.split('-');
+
+    if (int.parse(monthLabelList[0]) > int.parse(billBarFromList[0])) {
+      return true;
+    } else if (int.parse(monthLabelList[0]) == int.parse(billBarFromList[0])) {
+      if (int.parse(monthLabelList[1]) >= int.parse(billBarFromList[1])) {
+        return true;
+      }
+    }
+    return false;
   }
 }

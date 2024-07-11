@@ -41,6 +41,8 @@ class EmsTypeUsageCalcReleased {
 
   late final List<Map<String, dynamic>>? _billedTrendingSnapShot;
 
+  late final String? _billBarFromMonth;
+
   //output
   EmsTypeUsage? _typeUsageE;
   EmsTypeUsage? _typeUsageW;
@@ -75,6 +77,8 @@ class EmsTypeUsageCalcReleased {
   double? get gstAmount => _gstAmount;
   double? get totalCost => _totalCost;
 
+  String? get billBarFromMonth => _billBarFromMonth;
+
   EmsTypeUsageCalcReleased({
     double? billedAutoUsageE,
     double? billedAutoUsageW,
@@ -104,6 +108,7 @@ class EmsTypeUsageCalcReleased {
     double? billedGst,
     required List<Map<String, dynamic>>? lineItemList,
     List<Map<String, dynamic>>? billedTrendingSnapShot,
+    String? billBarFromMonth,
   }) {
     _billedAutoUsageE = billedAutoUsageE;
     _billedAutoUsageW = billedAutoUsageW;
@@ -134,6 +139,8 @@ class EmsTypeUsageCalcReleased {
     _billedTrendingSnapShot = billedTrendingSnapShot;
 
     _lineItemList = lineItemList;
+
+    _billBarFromMonth = billBarFromMonth;
   }
 
   void doCalc() {
@@ -413,6 +420,13 @@ class EmsTypeUsageCalcReleased {
             item['billed_time_label'].toString().contains('2024-02') ||
             item['billed_time_label'].toString().contains('2024-03') ||
             item['billed_time_label'].toString().contains('2024-04')) {
+          continue;
+        }
+      }
+
+      if ((_billBarFromMonth ?? '').isNotEmpty) {
+        String monthLabel = _billBarFromMonth!.substring(0, 7);
+        if (item['billed_time_label'].toString().contains(monthLabel)) {
           continue;
         }
       }
