@@ -57,6 +57,7 @@ class _WgtBillViewState extends State<WgtBillView> {
     Map<String, String> queryMap = {
       'billing_rec_index': widget.billingRecIndexStr,
       'is_released_mode': _lcStatusDisplay == 'released' ? 'true' : 'false',
+      'show_release_in_pv_mode': 'true',
     };
 
     try {

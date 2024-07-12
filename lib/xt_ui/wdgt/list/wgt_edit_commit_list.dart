@@ -946,7 +946,7 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
       width: 35,
       height: 20,
       popupWidth: 170,
-      popupHeight: 160,
+      popupHeight: 190,
       direction: 'left',
       popupChild: WgtBillLcStatusUpdate(
         appConfig: widget.appConfig,

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 enum BillGenType { manual, auto }
 
-enum BillingLcStatus { generated, released, mfd }
+enum BillingLcStatus { generated, released, mfd, pv }
 
 String? getGenTypeTagStr(String? statusStr) {
   if ((statusStr ?? '').isEmpty) {
@@ -125,6 +125,11 @@ final Map<BillingLcStatus, dynamic> billingLcStatusInfo = {
     'tag': 'Rl',
     'color': Colors.orangeAccent.withOpacity(0.7),
     'tooltip': 'Released',
+  },
+  BillingLcStatus.pv: {
+    'tag': 'Pv',
+    'color': Colors.blue.withOpacity(0.7),
+    'tooltip': 'Pending Verification',
   },
   BillingLcStatus.mfd: {
     'tag': 'Dl',

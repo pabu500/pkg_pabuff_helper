@@ -315,7 +315,8 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
                       billingRecIndexStr: item['id'],
                       defaultBillLcStatus: item['lc_status'], //'generated',
                       modes: const ['widget', 'pdf'],
-                      genTypes: item['lc_status'] == 'released'
+                      genTypes: item['lc_status'] == 'released' ||
+                              item['lc_status'] == 'pv'
                           ? const ['generated', 'released']
                           : const ['generated'],
                     ),
