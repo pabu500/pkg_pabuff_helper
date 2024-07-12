@@ -142,6 +142,7 @@ enum AclTarget {
 
   bill_p_entity,
   bill_p_info,
+  bill_p_lc_status,
 
   email_blast_p_entity,
 }

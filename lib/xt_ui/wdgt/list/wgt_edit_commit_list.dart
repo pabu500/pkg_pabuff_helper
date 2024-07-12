@@ -943,7 +943,7 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
     required double width,
   }) {
     return WgtPopupButton(
-      width: 35,
+      width: width,
       height: 20,
       popupWidth: 170,
       popupHeight: 190,

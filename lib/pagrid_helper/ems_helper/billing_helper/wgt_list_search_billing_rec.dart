@@ -257,7 +257,7 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
         {
           'title': 'LC',
           'fieldKey': 'lc_status',
-          'width': 60.0,
+          'width': 50.0,
           'showSort': true,
           'getTag': getBillingLcStatusTag,
           'useWidget':
