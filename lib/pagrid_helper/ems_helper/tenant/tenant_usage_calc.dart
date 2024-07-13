@@ -429,20 +429,20 @@ class EmsTypeUsageCalc {
       }
     }
   }
+}
 
-  bool takeMonth(String monthLabel, String billBarFrom) {
-    //label is YYYY-MM
-    //if monthLabel is greater than or equal to billBarFrom, return true
-    List<String> monthLabelList = monthLabel.split('-');
-    List<String> billBarFromList = billBarFrom.split('-');
+bool takeMonth(String monthLabel, String billBarFrom) {
+  //label is YYYY-MM
+  //if monthLabel is greater than or equal to billBarFrom, return true
+  List<String> monthLabelList = monthLabel.split('-');
+  List<String> billBarFromList = billBarFrom.split('-');
 
-    if (int.parse(monthLabelList[0]) > int.parse(billBarFromList[0])) {
+  if (int.parse(monthLabelList[0]) > int.parse(billBarFromList[0])) {
+    return true;
+  } else if (int.parse(monthLabelList[0]) == int.parse(billBarFromList[0])) {
+    if (int.parse(monthLabelList[1]) >= int.parse(billBarFromList[1])) {
       return true;
-    } else if (int.parse(monthLabelList[0]) == int.parse(billBarFromList[0])) {
-      if (int.parse(monthLabelList[1]) >= int.parse(billBarFromList[1])) {
-        return true;
-      }
     }
-    return false;
   }
+  return false;
 }

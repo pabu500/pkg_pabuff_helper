@@ -423,6 +423,12 @@ class EmsTypeUsageCalcReleased {
           continue;
         }
       }
+      if ((_billBarFromMonth ?? '').isNotEmpty) {
+        String timeLabel = item['billed_time_label'];
+        if (!takeMonth(timeLabel, _billBarFromMonth!)) {
+          continue;
+        }
+      }
 
       if ((_billBarFromMonth ?? '').isNotEmpty) {
         String monthLabel = _billBarFromMonth!.substring(0, 7);
