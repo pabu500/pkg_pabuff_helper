@@ -409,6 +409,9 @@ class EmsTypeUsageCalcReleased {
       return;
     }
     for (var item in _billedTrendingSnapShot) {
+      if (item['billed_time_label'] == null) {
+        continue;
+      }
       double? billedTotalUsageE = item['billed_total_usage_e'];
       double? billedTotalUsageW = item['billed_total_usage_w'];
       double? billedTotalUsageB = item['billed_total_usage_b'];
