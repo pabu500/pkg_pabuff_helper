@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../wgt_pag_wait.dart';
+
 class WgtTextField extends StatefulWidget {
   const WgtTextField({
     super.key,
@@ -33,6 +35,8 @@ class WgtTextField extends StatefulWidget {
     this.enabled = true,
     this.obscureText = false,
     this.decoration,
+    this.isPag = false,
+    this.suffix,
   });
 
   final PaGridAppConfig appConfig;
@@ -61,6 +65,8 @@ class WgtTextField extends StatefulWidget {
   final bool enabled;
   final bool obscureText;
   final InputDecoration? decoration;
+  final bool isPag;
+  final Widget? suffix;
 
   @override
   State<WgtTextField> createState() => _WgtTextFieldState();
@@ -159,97 +165,109 @@ class _WgtTextFieldState extends State<WgtTextField> {
           }
         }
       },
-      child: TextField(
-        obscureText: widget.obscureText,
-        enabled: widget.enabled,
-        controller: _controller,
-        maxLines: widget.maxLines,
-        minLines: 1,
-        maxLength: widget.maxLength,
-        inputFormatters: widget.inputFormatters,
-        onChanged: (value) {
-          setState(() {
-            _uniqueChecked = false;
-          });
-          if (_checkUniqueResult.isNotEmpty) {
-            setState(() {
-              _checkUniqueResult = '';
-            });
-          }
-          if (value.isEmpty) {
-            if (widget.required) {
+      child: Stack(
+        alignment: Alignment.centerRight,
+        children: [
+          TextField(
+            obscureText: widget.obscureText,
+            enabled: widget.enabled,
+            controller: _controller,
+            maxLines: widget.maxLines,
+            minLines: 1,
+            maxLength: widget.maxLength,
+            inputFormatters: widget.inputFormatters,
+            onChanged: (value) {
               setState(() {
-                _isValidated = false;
-                _errorText = 'required';
+                _uniqueChecked = false;
               });
-              return;
-            }
-          }
-          String? result;
-          if (widget.validator != null) {
-            _isValidated = false;
-            result = widget.validator!(
-              value,
-              // widget.minLength,
-              // widget.required,
-            );
-            widget.onValidate?.call(result);
-          }
-          if (result != null) {
-            setState(() {
-              _isValidated = false;
-              _errorText = result!;
-            });
-            return;
-          } else {
-            setState(() {
-              _isValidated = true;
-              _errorText = '';
-            });
-          }
-          widget.onChanged(value);
-        },
-        onEditingComplete: () {
-          if (!_isValidated) {
-            return;
-          }
-          widget.onEditingComplete?.call();
+              if (_checkUniqueResult.isNotEmpty) {
+                setState(() {
+                  _checkUniqueResult = '';
+                });
+              }
+              if (value.isEmpty) {
+                if (widget.required) {
+                  setState(() {
+                    _isValidated = false;
+                    _errorText = 'required';
+                  });
+                  return;
+                }
+              }
+              String? result;
+              if (widget.validator != null) {
+                _isValidated = false;
+                result = widget.validator!(
+                  value,
+                  // widget.minLength,
+                  // widget.required,
+                );
+                widget.onValidate?.call(result);
+              }
+              if (result != null) {
+                setState(() {
+                  _isValidated = false;
+                  _errorText = result!;
+                });
+                return;
+              } else {
+                setState(() {
+                  _isValidated = true;
+                  _errorText = '';
+                });
+              }
+              widget.onChanged(value);
+            },
+            onEditingComplete: () {
+              if (!_isValidated) {
+                return;
+              }
+              widget.onEditingComplete?.call();
 
-          if (widget.checkUnique != null) {
-            checkUnique(widget.appConfig, widget.uniqueKey!, _controller.text,
-                widget.itemTableName!);
-          }
-        },
-        decoration: widget.decoration ??
-            InputDecoration(
-              labelText: widget.labelText,
-              labelStyle: TextStyle(
-                fontSize: 16,
-                color: Theme.of(context).hintColor,
-              ),
-              hintText: widget.hintText,
-              errorText: _errorText.isEmpty ? null : _errorText,
-              hintStyle: TextStyle(
-                fontSize: 16,
-                color: Theme.of(context).hintColor.withOpacity(0.5),
-              ),
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  width: 1,
-                  color: Theme.of(context).hintColor.withOpacity(0.3),
+              if (widget.checkUnique != null) {
+                checkUnique(widget.appConfig, widget.uniqueKey!,
+                    _controller.text, widget.itemTableName!);
+              }
+            },
+            decoration: widget.decoration ??
+                InputDecoration(
+                  labelText: widget.labelText,
+                  labelStyle: TextStyle(
+                    fontSize: 16,
+                    color: Theme.of(context).hintColor,
+                  ),
+                  hintText: widget.hintText,
+                  errorText: _errorText.isEmpty ? null : _errorText,
+                  hintStyle: TextStyle(
+                    fontSize: 16,
+                    color: Theme.of(context).hintColor.withOpacity(0.5),
+                  ),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(
+                      width: 1,
+                      color: Theme.of(context).hintColor.withOpacity(0.3),
+                    ),
+                  ),
+                  suffix: getSuffix(),
                 ),
-              ),
-              suffix: getSuffix(),
-            ),
+          ),
+          widget.suffix ?? const SizedBox(),
+        ],
       ),
     );
   }
 
   Widget getSuffix() {
     return _waiting
-        ? xtWait(
-            color: Theme.of(context).colorScheme.primary,
-          )
+        ? widget.isPag
+            ? WgtPagWait(
+                size: 20,
+                showCenterSquare: false,
+                colorA: Theme.of(context).colorScheme.primary,
+              )
+            : xtWait(
+                color: Theme.of(context).colorScheme.primary,
+              )
         : Focus(
             descendantsAreFocusable: false,
             canRequestFocus: false,

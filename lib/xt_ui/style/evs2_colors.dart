@@ -10,7 +10,10 @@ const Color evs2SUTDwhite = Color(0xffffffff);
 
 final Color commitColor = Colors.amber.shade900.withOpacity(0.95);
 
-const Color pagNeo = Color.fromARGB(255, 160, 220, 235);
+final Color pagCallToAction = Colors.amber.shade700.withOpacity(0.95);
+
+const Color pagNeo2 = Color.fromARGB(255, 160, 220, 235);
+const Color pagNeo = Color.fromARGB(255, 150, 210, 220);
 const Color sgGreenLight = Color.fromARGB(255, 0, 203, 203);
 const Color spGreen1 = Color(0xff00abb5);
 const Color spGreen2 = Color(0xff2184a1);
