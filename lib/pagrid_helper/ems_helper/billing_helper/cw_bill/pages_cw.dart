@@ -983,7 +983,11 @@ class Bill {
     if (amount == null) {
       return '-';
     }
-    return '\$${isRoundUp ? getRoundUp(amount, 2) : amount.toStringAsFixed(2)}';
+    double value = isRoundUp ? getRoundUp(amount, 2) : getRound(amount, 2);
+    String commaText = getCommaNumberStr(value, decimal: 2);
+    return '\$$commaText';
+
+    // return '\$${isRoundUp ? getRoundUp(amount, 2) : amount.toStringAsFixed(2)}';
   }
 
   String _formatDate(DateTime date) {
