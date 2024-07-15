@@ -11,7 +11,7 @@ class ForgotPassword extends StatefulWidget {
   final PaGridAppConfig appConfig;
 
   @override
-  _ForgotPasswordState createState() => _ForgotPasswordState();
+  State<ForgotPassword> createState() => _ForgotPasswordState();
 }
 
 class _ForgotPasswordState extends State<ForgotPassword> {
