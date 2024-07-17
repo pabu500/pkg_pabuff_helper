@@ -123,7 +123,7 @@ class PagUrlBase {
   static const String _rDestPortalEvs2cp = 'https://cp2.evs.com.sg';
 
   static const String _dOresvcUrl = 'http://localhost:8018';
-  static const String _rOresvc = 'https://oresvc2.evs.com.sg';
+  static const String _rOresvc = 'https://dev-oresvc2.evs.com.sg';
   static const String _rDevOresvcNTU = _rOresvc;
   static const String _rProdOresvcUrlNTU = 'https://ore-ntu.evs.com.sg';
   static const String _rDevOresvcUrlSMRT = _rOresvc;
@@ -135,7 +135,7 @@ class PagUrlBase {
   static const String _dUsersvcUrl =
       // 'http://13.228.16.206:8081';
       'http://3.1.141.233:8081';
-  static const String _rDevUsersvcUrl = 'https://pag-u.evs.com.sg';
+  static const String _rDevUsersvcUrl = 'https://dev-pag-u.evs.com.sg';
   static const String _rProdUsersvcUrl = 'https://pag-u.evs.com.sg';
 
   static get dDestPortalEvs2cp => _dDestPortalEvs2cp;
