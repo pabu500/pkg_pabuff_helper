@@ -89,8 +89,8 @@ class PagUrlController {
         return kDebugMode
             ? PagUrlBase.dOresvcUrl
             : useDevOresvc
-                ? PagUrlBase.rOresvcUrl
-                : PagUrlBase.rOresvcUrl;
+                ? PagUrlBase.rDevOresvcUrl
+                : PagUrlBase.rProdOresvcUrl;
     }
   }
 
@@ -123,14 +123,15 @@ class PagUrlBase {
   static const String _rDestPortalEvs2cp = 'https://cp2.evs.com.sg';
 
   static const String _dOresvcUrl = 'http://localhost:8018';
-  static const String _rOresvc = 'https://dev-oresvc2.evs.com.sg';
-  static const String _rDevOresvcNTU = _rOresvc;
+  static const String _rProdOresvc = 'https://oresvc2.evs.com.sg';
+  static const String _rDevOresvc = 'https://dev-oresvc2.evs.com.sg';
+  static const String _rDevOresvcNTU = _rDevOresvc;
   static const String _rProdOresvcUrlNTU = 'https://ore-ntu.evs.com.sg';
-  static const String _rDevOresvcUrlSMRT = _rOresvc;
+  static const String _rDevOresvcUrlSMRT = _rDevOresvc;
   static const String _rProdOresvcUrlSMRT = 'https://ore-smrt.web-ems.com';
   static const String _rProdOresvcUrlCwNus =
       'https://oresvc-cw-nus.web-ems.com';
-  static const String _rDevOresvcUrlCwNus = _rOresvc;
+  static const String _rDevOresvcUrlCwNus = _rDevOresvc;
 
   static const String _dUsersvcUrl =
       // 'http://13.228.16.206:8081';
@@ -146,7 +147,8 @@ class PagUrlBase {
   static get rProdUsersvcUrl => _rProdUsersvcUrl;
 
   static get dOresvcUrl => _dOresvcUrl;
-  static get rOresvcUrl => _rOresvc;
+  static get rProdOresvcUrl => _rProdOresvc;
+  static get rDevOresvcUrl => _rDevOresvc;
   static get rProdOresvcUrlNTU => _rProdOresvcUrlNTU;
   static get rDevOresvcUrlNTU => _rDevOresvcNTU;
   static get rProdOresvcUrlSMRT => _rProdOresvcUrlSMRT;
