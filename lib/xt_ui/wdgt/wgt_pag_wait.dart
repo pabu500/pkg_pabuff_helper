@@ -10,6 +10,7 @@ class WgtPagWait extends StatefulWidget {
     this.colorB,
     this.colorC,
     this.showCenterSquare = false,
+    this.centerOpacity = 0.67,
   });
 
   final double size;
@@ -17,6 +18,7 @@ class WgtPagWait extends StatefulWidget {
   final Color? colorB;
   final Color? colorC;
   final bool showCenterSquare;
+  final double centerOpacity;
 
   @override
   State<WgtPagWait> createState() => _WgtPagWaitState();
@@ -64,7 +66,8 @@ class _WgtPagWaitState extends State<WgtPagWait> {
               return _buildSquare(4,
                   colorSq: widget.colorC ??
                       widget.colorA ??
-                      Theme.of(context).colorScheme.secondary);
+                      Theme.of(context).colorScheme.secondary,
+                  opacity: widget.centerOpacity);
             } else {
               return Container();
             }
@@ -76,10 +79,10 @@ class _WgtPagWaitState extends State<WgtPagWait> {
     );
   }
 
-  Widget _buildSquare(int index, {Color? colorSq}) {
+  Widget _buildSquare(int index, {Color? colorSq, double opacity = 0.21}) {
     Color colorA =
         colorSq ?? widget.colorA ?? Theme.of(context).colorScheme.primary;
-    Color colorB = colorA.withOpacity(0.21);
+    Color colorB = colorA.withOpacity(opacity);
     Color color = index == _squareOrder[_currentBlackIndex] ? colorA : colorB;
     double margin = widget.size / 34.0;
     double borderRad = widget.size / 34;
