@@ -353,7 +353,8 @@ class _WgtBillViewState extends State<WgtBillView> {
               'billingRecName': _bill['billing_rec_name'],
               'billFrom': fromTimestampStr,
               'billTo': toTimestampStr,
-              'billDate': _bill['created_timestamp'],
+              'billDate': _bill['released_bill_timestamp'] ??
+                  _bill['created_timestamp'],
               'billTimeRangeStr': billTimeRangeStr,
               'tenantUsageSummary': usageSummary,
               'subTotalAmount': emsTypeUsageCalc.subTotalCost,
@@ -555,7 +556,8 @@ class _WgtBillViewState extends State<WgtBillView> {
               'billingRecName': _bill['billing_rec_name'],
               'billFrom': fromTimestampStr,
               'billTo': toTimestampStr,
-              'billDate': _bill['created_timestamp'],
+              'billDate': _bill['released_bill_timestamp'] ??
+                  _bill['created_timestamp'],
               'billTimeRangeStr': billTimeRangeStr,
               'tenantUsageSummary': const [],
               'subTotalAmount': emsTypeUsageCalcReleased.subTotalCost,
