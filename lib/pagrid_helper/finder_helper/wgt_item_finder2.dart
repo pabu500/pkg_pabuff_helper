@@ -44,6 +44,9 @@ class WgtItemFinder2 extends StatefulWidget {
     this.showProjectScopeSelector = true,
     this.showSiteScopeSelector = true,
     this.sidePadding = EdgeInsets.zero,
+    this.useItemLabelDropdownSelector = false,
+    this.lableList = const [],
+    this.onLabelSelected,
   });
 
   final ScopeProfile scopeProfile;
@@ -81,6 +84,9 @@ class WgtItemFinder2 extends StatefulWidget {
   final bool showProjectScopeSelector;
   final bool showSiteScopeSelector;
   final EdgeInsets sidePadding;
+  final bool useItemLabelDropdownSelector;
+  final List<String> lableList;
+  final void Function(String)? onLabelSelected;
 
   @override
   State<WgtItemFinder2> createState() => _WgtItemFinder2State();
@@ -97,6 +103,9 @@ class _WgtItemFinder2State extends State<WgtItemFinder2> {
   bool _showPanel = false;
 
   String? _itemLabel;
+  String? _selectedLabel;
+  final TextEditingController _labelController = TextEditingController();
+
   UniqueKey? _resetKeyItemLabel;
   String? _itemName;
   UniqueKey? _resetKeyItemName;
@@ -281,6 +290,9 @@ class _WgtItemFinder2State extends State<WgtItemFinder2> {
 
     _additionalPropQueryMap.clear();
     _additionalTypeQueryMap.clear();
+
+    _labelController.clear();
+    _selectedLabel = null;
 
     if (setState) {
       widget.onClearSearch?.call();
@@ -518,42 +530,75 @@ class _WgtItemFinder2State extends State<WgtItemFinder2> {
         SizedBox(
           width: width,
           // height: height,
-          child: WgtFinderFieldInput(
-            appConfig: widget.appConfig,
-            width: 220,
-            labelText: widget.itemLabelText,
-            hintText: widget.itemLabelText,
-            initialValue: widget.fixedItemLabel ?? _itemLabel,
-            isInitialValueMutable: widget.fixedItemLabel == null,
-            resetKey: _resetKeyItemLabel,
-            onChanged: (value) {
-              _itemLabel = value;
-              if (value.isNotEmpty && !_enableSearch) {
-                setState(() {
-                  _enableSearch = _enableSearchButton();
-                });
-              }
-            },
-            onEditingComplete: () async {
-              widget.onModified?.call();
+          child: widget.useItemLabelDropdownSelector
+              ? WgtDropdownSelector(
+                  hint: widget.itemLabelText,
+                  items: widget.lableList,
+                  controller: _labelController,
+                  initialValue: _selectedLabel,
+                  height: 50,
+                  width: 280,
+                  onSelected: (String? value) async {
+                    // if (value != null) {
+                    if (value == _selectedLabel) {
+                      return;
+                    }
+                    // }
+                    setState(() {
+                      _selectedLabel = value;
+                      _enableSearch = _enableSearchButton();
+                    });
+                    widget.onModified?.call();
 
-              if (_itemLabel == null) {
-                return null;
-              }
-              if (_itemLabel!.trim().isEmpty) {
-                return null;
-              }
-              Map<String, dynamic> itemFindResult = await _getItemList();
+                    widget.onLabelSelected?.call(_selectedLabel!);
 
-              widget.onResult({'itemFindResult': itemFindResult});
-            },
-            onClear: () {
-              _itemLabel = null;
-              widget.onModified?.call();
-            },
-            onModified: widget.onModified,
-            onUpdateEnableSearchButton: _enableSearchButton,
-          ),
+                    _selectedLabel = null;
+                  },
+                  onClear: () {
+                    setState(() {
+                      _selectedLabel = null;
+                      _enableSearch = _enableSearchButton();
+                    });
+                    widget.onModified?.call();
+                    widget.onLabelSelected?.call(_selectedLabel!);
+                  },
+                )
+              : WgtFinderFieldInput(
+                  appConfig: widget.appConfig,
+                  width: 220,
+                  labelText: widget.itemLabelText,
+                  hintText: widget.itemLabelText,
+                  initialValue: widget.fixedItemLabel ?? _itemLabel,
+                  isInitialValueMutable: widget.fixedItemLabel == null,
+                  resetKey: _resetKeyItemLabel,
+                  onChanged: (value) {
+                    _itemLabel = value;
+                    if (value.isNotEmpty && !_enableSearch) {
+                      setState(() {
+                        _enableSearch = _enableSearchButton();
+                      });
+                    }
+                  },
+                  onEditingComplete: () async {
+                    widget.onModified?.call();
+
+                    if (_itemLabel == null) {
+                      return null;
+                    }
+                    if (_itemLabel!.trim().isEmpty) {
+                      return null;
+                    }
+                    Map<String, dynamic> itemFindResult = await _getItemList();
+
+                    widget.onResult({'itemFindResult': itemFindResult});
+                  },
+                  onClear: () {
+                    _itemLabel = null;
+                    widget.onModified?.call();
+                  },
+                  onModified: widget.onModified,
+                  onUpdateEnableSearchButton: _enableSearchButton,
+                ),
         ),
         SizedBox(
           width: width,

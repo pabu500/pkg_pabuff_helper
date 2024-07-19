@@ -36,4 +36,6 @@ export 'wdgt/input/wgt_finder_field_input.dart';
 export 'wdgt/input/wgt_view_edit_field.dart';
 export 'wdgt/datetime/datetime_helper.dart';
 export 'wdgt/form/wgt_update_password.dart';
+export 'wdgt/dropdown/wgt_dropdown_selector.dart';
+export 'wdgt/dropdown/wgt_view_edit_dropdown.dart';
 export 'painter/painter_helper.dart';

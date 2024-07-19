@@ -351,6 +351,7 @@ class UrlBase {
   static const String eptGetSysVar = '/get_sys_var';
 
   //Tenant manager
+  static const String eptGetAllTenantList = '/tenant/get_all_tenant_list';
   static const String eptCreateTenant = '/tenant/create_tenant';
   static const String eptUpdateTenantMeterGroups = '/tenant/update_items';
   static const String eptGetTenantMeterGroups = '/tenant/get_meter_groups';

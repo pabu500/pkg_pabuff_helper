@@ -89,9 +89,53 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
   late TextStyle dropDownListHintStyle;
   late Widget dropDownUnderline;
 
+  final List<Map<String, dynamic>> _tenantInfoList = [];
+  final List<String> _tenantLabelList = [];
+  int _pullFails = 0;
+  bool _loadingTenantInfoList = false;
+
+  Future<List<Map<String, dynamic>>> _getTenantLabelList() async {
+    List<Map<String, dynamic>> tenantInfoList = [];
+    try {
+      setState(() {
+        _loadingTenantInfoList = true;
+      });
+      List<Map<String, dynamic>> result = await doGetAllTenantList(
+        widget.appConfig,
+        {},
+        SvcClaim(
+          userId: widget.loggedInUser.id,
+          username: widget.loggedInUser.username,
+          scope: widget.scopeProfile.getEffectiveScopeStr(),
+          target: getAclTargetStr(AclTarget.tenant_p_info),
+          operation: AclOperation.list.name,
+        ),
+      );
+      if (result.isNotEmpty) {
+        tenantInfoList.addAll(result);
+      }
+      return tenantInfoList;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error: $e');
+      }
+      _pullFails++;
+    } finally {
+      // if (kDebugMode) {
+      //   print('tenantLabelList: $tenantLabelList');
+      // }
+      setState(() {
+        _loadingTenantInfoList = false;
+      });
+    }
+    return tenantInfoList;
+  }
+
   @override
   void initState() {
     super.initState();
+
+    _pullFails = 0;
 
     _genTypeList.clear();
     if (widget.appConfig.activePortalProjectScope == ProjectScope.EMS_CW_NUS) {
@@ -182,11 +226,56 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
     dropDownUnderline = Container(
         height: 1, color: Theme.of(context).hintColor.withOpacity(0.3));
 
+    bool pullData = _tenantInfoList.isEmpty && !_loadingTenantInfoList;
+    if (_pullFails >= 3) {
+      if (kDebugMode) {
+        print('billing release: pull fails more than $_pullFails times');
+      }
+      pullData = false;
+      return SizedBox(
+          height: 60,
+          child: Center(
+              child: getErrorTextPrompt(
+                  context: context, errorText: 'Error getting data')));
+    }
+
+    return pullData
+        ? FutureBuilder<List<Map<String, dynamic>>>(
+            future: _getTenantLabelList(),
+            builder: (BuildContext context,
+                AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: xtWait());
+              }
+              if (snapshot.hasError) {
+                return Center(
+                    child: getErrorTextPrompt(
+                        context: context, errorText: 'Error getting data'));
+              }
+              if (snapshot.hasData) {
+                _tenantInfoList.clear();
+                _tenantInfoList.addAll(snapshot.data!);
+                _tenantLabelList.clear();
+                _tenantLabelList
+                    .addAll(_tenantInfoList.map((e) => e['label'] as String));
+                return buildFinder();
+              }
+              return Center(
+                  child: getErrorTextPrompt(
+                      context: context, errorText: 'Error getting data'));
+            },
+          )
+        : buildFinder();
+  }
+
+  Widget buildFinder() {
     return WgtItemFinder2(
       appConfig: widget.appConfig,
       loggedInUser: widget.loggedInUser,
       scopeProfile: widget.scopeProfile,
       showSiteScopeSelector: false,
+      useItemLabelDropdownSelector: true,
+      lableList: _tenantLabelList,
       sidePadding: widget.sidePadding,
       sectionName: widget.sectionName,
       panelTitle: panelTitle,

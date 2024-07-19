@@ -5,6 +5,43 @@ import 'dart:convert';
 
 import '../../comm_helper/be_api_base.dart';
 
+Future<dynamic> doGetAllTenantList(
+  PaGridAppConfig appConfig,
+  Map<String, String> reqMap,
+  SvcClaim svcClaim,
+) async {
+  svcClaim.svcName = SvcType.oresvc.name;
+  svcClaim.endpoint = UrlBase.eptGetAllTenantList;
+
+  String svcToken = '';
+  // try {
+  //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
+  // } catch (err) {
+  //   throw Exception(err);
+  // }
+
+  try {
+    final response = await http.post(
+      Uri.parse(
+          UrlController(appConfig).getUrl(SvcType.oresvc, svcClaim.endpoint!)),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $svcToken',
+      },
+      body: jsonEncode(SvcQuery(svcClaim, reqMap).toJson()),
+    );
+
+    if (response.statusCode == 201) {
+      // If the server did return a 201 CREATED response, parse the JSON.
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to create tenant');
+    }
+  } catch (err) {
+    throw Exception(err);
+  }
+}
+
 Future<dynamic> doCreateTenant(
   PaGridAppConfig appConfig,
   Map<String, String> reqMap,
