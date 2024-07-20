@@ -45,7 +45,7 @@ class WgtItemFinder2 extends StatefulWidget {
     this.showSiteScopeSelector = true,
     this.sidePadding = EdgeInsets.zero,
     this.useItemLabelDropdownSelector = false,
-    this.lableList = const [],
+    this.itemLableList = const [],
     this.onLabelSelected,
   });
 
@@ -85,7 +85,7 @@ class WgtItemFinder2 extends StatefulWidget {
   final bool showSiteScopeSelector;
   final EdgeInsets sidePadding;
   final bool useItemLabelDropdownSelector;
-  final List<String> lableList;
+  final List<String> itemLableList;
   final void Function(String)? onLabelSelected;
 
   @override
@@ -103,7 +103,7 @@ class _WgtItemFinder2State extends State<WgtItemFinder2> {
   bool _showPanel = false;
 
   String? _itemLabel;
-  String? _selectedLabel;
+  // String? _selectedLabel;
   final TextEditingController _labelController = TextEditingController();
 
   UniqueKey? _resetKeyItemLabel;
@@ -292,7 +292,7 @@ class _WgtItemFinder2State extends State<WgtItemFinder2> {
     _additionalTypeQueryMap.clear();
 
     _labelController.clear();
-    _selectedLabel = null;
+    // _selectedLabel = null;
 
     if (setState) {
       widget.onClearSearch?.call();
@@ -533,34 +533,31 @@ class _WgtItemFinder2State extends State<WgtItemFinder2> {
           child: widget.useItemLabelDropdownSelector
               ? WgtDropdownSelector(
                   hint: widget.itemLabelText,
-                  items: widget.lableList,
+                  items: widget.itemLableList,
                   controller: _labelController,
-                  initialValue: _selectedLabel,
+                  initialValue: _itemLabel,
                   height: 50,
                   width: 280,
                   onSelected: (String? value) async {
                     // if (value != null) {
-                    if (value == _selectedLabel) {
+                    if (value == _itemLabel) {
                       return;
                     }
                     // }
                     setState(() {
-                      _selectedLabel = value;
+                      _itemLabel = value;
                       _enableSearch = _enableSearchButton();
                     });
                     widget.onModified?.call();
-
-                    widget.onLabelSelected?.call(_selectedLabel!);
-
-                    _selectedLabel = null;
+                    widget.onLabelSelected?.call(_itemLabel!);
                   },
                   onClear: () {
                     setState(() {
-                      _selectedLabel = null;
+                      _itemLabel = null;
                       _enableSearch = _enableSearchButton();
                     });
                     widget.onModified?.call();
-                    widget.onLabelSelected?.call(_selectedLabel!);
+                    widget.onLabelSelected?.call(_itemLabel!);
                   },
                 )
               : WgtFinderFieldInput(

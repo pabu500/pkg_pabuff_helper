@@ -377,8 +377,6 @@ class UrlBase {
   //meter group
   static const String eptCreateMeterGroup = '/meter_group/create_meter_group';
   static const String eptGetGroupMeters = '/meter_group/get_group_meters';
-  // static const String eptGetMeterPercentage =
-  //     '/meter_group/get_meter_percentage';
   static const String eptUpdateGroupItems = '/meter_group/update_items';
   static const String eptGetMeterGroupListUsageSummary =
       '/meter_group/get_meter_group_list_usage_summary';
@@ -409,6 +407,9 @@ class UrlBase {
   static const String eptGetJobTypeSubs = '/job/get_job_type_subs';
   static const String eptAddJobTypeSub = '/job/add_job_type_sub';
   static const String eptDeleteJobTypeSub = '/job/delete_job_type_sub';
+  static const String getLastLastManualTrigger = '/job/get_last_manual_trigger';
+  static const String eptUpdateLastManualTrigger =
+      '/job/update_last_manual_trigger';
 
   //Billing Manager
   static const String eptGetBill = '/billing/get_bill';

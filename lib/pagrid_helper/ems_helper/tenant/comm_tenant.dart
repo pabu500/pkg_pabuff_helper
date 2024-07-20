@@ -31,9 +31,22 @@ Future<dynamic> doGetAllTenantList(
       body: jsonEncode(SvcQuery(svcClaim, reqMap).toJson()),
     );
 
-    if (response.statusCode == 201) {
-      // If the server did return a 201 CREATED response, parse the JSON.
-      return jsonDecode(response.body);
+    if (response.statusCode == 200) {
+      final respBody = jsonDecode(response.body);
+      if (respBody['error'] != null) {
+        throw Exception(respBody['error']);
+      }
+      final tenantList = respBody['all_tenant_list'];
+
+      List<Map<String, dynamic>> tenantListMap = [];
+      for (var item in tenantList) {
+        tenantListMap.add({
+          'item_index': item['tenant_id'],
+          'tenant_name': item['tenant_name'],
+          'tenant_label': item['tenant_label'],
+        });
+      }
+      return tenantListMap;
     } else {
       throw Exception('Failed to create tenant');
     }

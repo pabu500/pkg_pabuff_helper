@@ -196,3 +196,101 @@ Future<dynamic> doRemoveSub(
     throw Exception(err);
   }
 }
+
+Future<dynamic> getLastJobLastTriggerTime(
+  PaGridAppConfig appConfig,
+  Map<String, dynamic> reqMap,
+  SvcClaim svcClaim,
+) async {
+  svcClaim.svcName = SvcType.oresvc.name;
+  svcClaim.endpoint = UrlBase.getLastLastManualTrigger;
+
+  String svcToken = '';
+  // try {
+  //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
+  // } catch (err) {
+  //   throw Exception(err);
+  // }
+
+  // List<Map<String, dynamic>> meterList = [];
+  // for (var item in reqMap['meter_group_info']) {
+  //   meterList.add(item);
+  // }
+
+  try {
+    final response = await http.post(
+      Uri.parse(
+          UrlController(appConfig).getUrl(SvcType.oresvc, svcClaim.endpoint!)),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $svcToken',
+      },
+      body: jsonEncode(SvcQuery(svcClaim, reqMap).toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      final responseBody = jsonDecode(response.body);
+      if (responseBody['info'] != null) {
+        return responseBody;
+      }
+      if (responseBody['error'] != null) {
+        throw Exception(responseBody['error']);
+      }
+      final result = responseBody['result'];
+      return result;
+    } else {
+      throw Exception('Failed to get job last trigger info');
+    }
+  } catch (err) {
+    throw Exception(err);
+  }
+}
+
+Future<dynamic> doUpdateLastManualTriggerTime(
+  PaGridAppConfig appConfig,
+  Map<String, dynamic> reqMap,
+  SvcClaim svcClaim,
+) async {
+  svcClaim.svcName = SvcType.oresvc.name;
+  svcClaim.endpoint = UrlBase.eptUpdateLastManualTrigger;
+
+  String svcToken = '';
+  // try {
+  //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
+  // } catch (err) {
+  //   throw Exception(err);
+  // }
+
+  // List<Map<String, dynamic>> meterList = [];
+  // for (var item in reqMap['meter_group_info']) {
+  //   meterList.add(item);
+  // }
+
+  try {
+    final response = await http.post(
+      Uri.parse(
+          UrlController(appConfig).getUrl(SvcType.oresvc, svcClaim.endpoint!)),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $svcToken',
+      },
+      body: jsonEncode(SvcQuery(svcClaim, reqMap).toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      final responseBody = jsonDecode(response.body);
+      if (responseBody['info'] != null) {
+        return responseBody;
+      }
+      if (responseBody['error'] != null) {
+        throw Exception(responseBody['error']);
+      }
+      final result = responseBody['result'];
+      return result;
+    } else {
+      throw Exception('Failed to get job last trigger info');
+    }
+  } catch (err) {
+    throw Exception(err);
+  }
+}

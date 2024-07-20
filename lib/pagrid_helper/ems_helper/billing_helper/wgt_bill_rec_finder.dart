@@ -94,8 +94,8 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
   int _pullFails = 0;
   bool _loadingTenantInfoList = false;
 
-  Future<List<Map<String, dynamic>>> _getTenantLabelList() async {
-    List<Map<String, dynamic>> tenantInfoList = [];
+  Future<dynamic> _getTenantInfoList() async {
+    // List<Map<String, dynamic>> tenantInfoList = [];
     try {
       setState(() {
         _loadingTenantInfoList = true;
@@ -112,9 +112,10 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
         ),
       );
       if (result.isNotEmpty) {
-        tenantInfoList.addAll(result);
+        _tenantInfoList.addAll(result);
+        _tenantLabelList.addAll(result.map((e) => e['tenant_label'] as String));
       }
-      return tenantInfoList;
+      _pullFails = 0;
     } catch (e) {
       if (kDebugMode) {
         print('Error: $e');
@@ -128,7 +129,6 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
         _loadingTenantInfoList = false;
       });
     }
-    return tenantInfoList;
   }
 
   @override
@@ -240,29 +240,25 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
     }
 
     return pullData
-        ? FutureBuilder<List<Map<String, dynamic>>>(
-            future: _getTenantLabelList(),
-            builder: (BuildContext context,
-                AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: xtWait());
+        ? FutureBuilder<void>(
+            future: _getTenantInfoList(),
+            builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+              switch (snapshot.connectionState) {
+                case ConnectionState.waiting:
+                  return Center(
+                      child: xtWait(
+                    color: Theme.of(context).colorScheme.primary,
+                  ));
+
+                default:
+                  if (snapshot.hasError) {
+                    return Center(
+                        child: getErrorTextPrompt(
+                            context: context, errorText: 'Error getting data'));
+                  } else {
+                    return buildFinder();
+                  }
               }
-              if (snapshot.hasError) {
-                return Center(
-                    child: getErrorTextPrompt(
-                        context: context, errorText: 'Error getting data'));
-              }
-              if (snapshot.hasData) {
-                _tenantInfoList.clear();
-                _tenantInfoList.addAll(snapshot.data!);
-                _tenantLabelList.clear();
-                _tenantLabelList
-                    .addAll(_tenantInfoList.map((e) => e['label'] as String));
-                return buildFinder();
-              }
-              return Center(
-                  child: getErrorTextPrompt(
-                      context: context, errorText: 'Error getting data'));
             },
           )
         : buildFinder();
@@ -275,7 +271,7 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
       scopeProfile: widget.scopeProfile,
       showSiteScopeSelector: false,
       useItemLabelDropdownSelector: true,
-      lableList: _tenantLabelList,
+      itemLableList: _tenantLabelList,
       sidePadding: widget.sidePadding,
       sectionName: widget.sectionName,
       panelTitle: panelTitle,
@@ -295,15 +291,7 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
       getAdditionalTypeWidget2: getAdditionalTypeWidget2,
       additionalPropQueryMap: _additionalPropQueryMap,
       additionalTypeQueryMap2: _additionalTypeQueryMap2,
-      // {
-      //   'location_tag': _locationTag,
-      //   'sap_wbs': _sapWbs,
-      // },
       additionalTypeQueryMap: _additionalTypeQueryMap,
-      // {
-      //   'tenant_type': _selectedTenantType ?? '',
-      // },
-      // itemTypeList: _tenantTypeList,
       onResult: widget.onResult,
       onClearSearch: () {
         _reset(resetDateRange: true);

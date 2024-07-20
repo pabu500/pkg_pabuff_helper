@@ -4,8 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-import 'comm_job.dart';
-
 class WgtPostJob extends StatefulWidget {
   const WgtPostJob({
     super.key,
@@ -43,10 +41,10 @@ class _WgtPostJobState extends State<WgtPostJob> {
     try {
       Map<String, String> jobRequest = widget.jobRequest;
 
-      if ((widget.loggedInUser!.emailVerified ?? false) &&
-          widget.loggedInUser!.email != null) {
-        jobRequest['recipient_email'] = widget.loggedInUser!.email!;
-        jobRequest['recipient_name'] = widget.loggedInUser!.username!;
+      if ((widget.loggedInUser.emailVerified ?? false) &&
+          widget.loggedInUser.email != null) {
+        jobRequest['recipient_email'] = widget.loggedInUser.email!;
+        jobRequest['recipient_name'] = widget.loggedInUser.username!;
       }
 
       Map<String, dynamic> result = await doPostJob(
