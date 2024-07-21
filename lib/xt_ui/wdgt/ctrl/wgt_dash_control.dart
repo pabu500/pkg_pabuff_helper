@@ -20,6 +20,7 @@ class WgtDashControl extends StatefulWidget {
         EdgeInsets.zero, // const EdgeInsets.only(top: 10, right: 10),
     this.offsetWhenShrinked = 0,
     this.panelTitle = '',
+    this.enableControl = true,
   });
 
   final Function(LookbackType) onUpdateLookbackType;
@@ -32,8 +33,8 @@ class WgtDashControl extends StatefulWidget {
   final EdgeInsets marginWhenShrinked;
   final double offsetWhenShrinked;
   final String panelTitle;
-
   final bool mainMetersOnly;
+  final bool enableControl;
 
   @override
   State<WgtDashControl> createState() => _WgtDashControlState();
@@ -136,6 +137,7 @@ class _WgtDashControlState extends State<WgtDashControl> {
                     // ),
                     // horizontalSpaceSmall,
                     WgtLoookbackTypeSelector(
+                      enableControl: widget.enableControl,
                       lookbackTyps: widget.lookbackTyps,
                       iniSelection: _selectedLookbackType,
                       onUpdateSelection: (lookbackType) {
@@ -149,6 +151,7 @@ class _WgtDashControlState extends State<WgtDashControl> {
                     if (widget.meterTypes.isNotEmpty) horizontalSpaceSmall,
                     if (widget.meterTypes.isNotEmpty)
                       WgtMeterTypeSelector(
+                        enableControl: widget.enableControl,
                         meterTypes: widget.meterTypes,
                         iniMeterType: _selectedMeterType,
                         onUpdateSelection: (MeterType meterType) {
@@ -199,8 +202,10 @@ class _WgtDashControlState extends State<WgtDashControl> {
                           ],
                         ),
                         child: InkWell(
-                          onTap:
-                              (_selectedMeterType != MeterType.electricity1p &&
+                          onTap: !widget.enableControl
+                              ? null
+                              : (_selectedMeterType !=
+                                          MeterType.electricity1p &&
                                       _selectedMeterType != MeterType.btu)
                                   ? null
                                   : () {

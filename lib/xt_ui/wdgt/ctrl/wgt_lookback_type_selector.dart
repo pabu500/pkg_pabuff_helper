@@ -7,11 +7,13 @@ class WgtLoookbackTypeSelector extends StatefulWidget {
     required this.lookbackTyps,
     required this.iniSelection,
     required this.onUpdateSelection,
+    this.enableControl = true,
   });
 
   final List<LookbackType> lookbackTyps;
   final LookbackType iniSelection;
   final Function(LookbackType lookbackType) onUpdateSelection;
+  final bool enableControl;
 
   @override
   State<WgtLoookbackTypeSelector> createState() =>
@@ -47,14 +49,16 @@ class _WgtLoookbackTypeSelectorState extends State<WgtLoookbackTypeSelector> {
         height: _currentHovering == lookbackType ? 25 : 21,
         width: _currentHovering == lookbackType ? 60 : 55,
         child: TextButton(
-          onPressed: _currentSelection == lookbackType
+          onPressed: !widget.enableControl
               ? null
-              : () {
-                  setState(() {
-                    _currentSelection = lookbackType;
-                  });
-                  widget.onUpdateSelection(_currentSelection);
-                },
+              : _currentSelection == lookbackType
+                  ? null
+                  : () {
+                      setState(() {
+                        _currentSelection = lookbackType;
+                      });
+                      widget.onUpdateSelection(_currentSelection);
+                    },
           style: TextButton.styleFrom(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(5),
@@ -64,7 +68,6 @@ class _WgtLoookbackTypeSelectorState extends State<WgtLoookbackTypeSelector> {
                 : Theme.of(context).hintColor.withOpacity(0.35),
           ),
           onHover: (value) {
-            // if (_currentSelection == lookbackType) return;
             if (value) {
               setState(() {
                 _currentHovering = lookbackType;

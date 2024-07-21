@@ -4,18 +4,20 @@ import 'package:flutter/material.dart';
 
 class WgtMeterTypeSelector extends StatefulWidget {
   const WgtMeterTypeSelector({
-    Key? key,
+    super.key,
     required this.meterTypes,
     this.iniMeterType = MeterType.electricity1p,
     required this.onUpdateSelection,
-  }) : super(key: key);
+    this.enableControl = true,
+  });
 
   final List<MeterType> meterTypes;
   final Function(MeterType) onUpdateSelection;
   final MeterType iniMeterType;
+  final bool enableControl;
 
   @override
-  _WgtMeterTypeSelectorState createState() => _WgtMeterTypeSelectorState();
+  State<WgtMeterTypeSelector> createState() => _WgtMeterTypeSelectorState();
 }
 
 class _WgtMeterTypeSelectorState extends State<WgtMeterTypeSelector> {
@@ -53,14 +55,16 @@ class _WgtMeterTypeSelectorState extends State<WgtMeterTypeSelector> {
           borderRadius: BorderRadius.circular(3),
         ),
         child: InkWell(
-          onTap: _selectedMeterType == meterType
+          onTap: !widget.enableControl
               ? null
-              : () {
-                  setState(() {
-                    _selectedMeterType = meterType;
-                  });
-                  widget.onUpdateSelection(_selectedMeterType);
-                },
+              : _selectedMeterType == meterType
+                  ? null
+                  : () {
+                      setState(() {
+                        _selectedMeterType = meterType;
+                      });
+                      widget.onUpdateSelection(_selectedMeterType);
+                    },
           onHover: (value) {
             // if (_selectedMeterType == meterType) return;
             if (value) {
