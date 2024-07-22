@@ -104,23 +104,22 @@ class _WgtDropdownSelectorState extends State<WgtDropdownSelector> {
               contentPadding: const EdgeInsets.symmetric(vertical: 0.0),
             ),
           ),
-          widget.controller.text == ''
-              ? Container()
-              : Transform.translate(
-                  offset: const Offset(-34, 0),
-                  child: InkWell(
-                    onTap: () {
-                      widget.controller.clear();
-                      widget.onSelected(null);
-                      if (widget.onClear != null) {
-                        widget.onClear!();
-                      }
-                    },
-                    child: Icon(Icons.clear,
-                        size: 21,
-                        color: Theme.of(context).hintColor.withOpacity(0.3)),
-                  ),
-                ),
+          if (widget.controller.text.isNotEmpty)
+            Transform.translate(
+              offset: const Offset(-34, 0),
+              child: InkWell(
+                onTap: () {
+                  widget.controller.clear();
+                  widget.onSelected(null);
+                  if (widget.onClear != null) {
+                    widget.onClear!();
+                  }
+                },
+                child: Icon(Icons.clear,
+                    size: 21,
+                    color: Theme.of(context).hintColor.withOpacity(0.3)),
+              ),
+            ),
         ],
       ),
     );
