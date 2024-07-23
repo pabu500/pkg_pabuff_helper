@@ -3,7 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class PgForgotPassword extends StatelessWidget {
-  const PgForgotPassword({super.key});
+  const PgForgotPassword({
+    super.key,
+    required this.supportEmail,
+  });
+
+  final String supportEmail;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +35,7 @@ class PgForgotPassword extends StatelessWidget {
               verticalSpaceSmall,
               const Text('Please email to'),
               verticalSpaceTiny,
-              const Text('evs_operator@yahoo.com.sg'),
+              Text(supportEmail),
               verticalSpaceTiny,
               const Text('for assistance.'),
               verticalSpaceMedium,
