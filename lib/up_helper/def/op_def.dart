@@ -12,6 +12,7 @@ enum MeterOps {
   AttachSn,
   ReadingDataInsert,
   SetLcStatus,
+  Unbypass,
 }
 
 enum CreditOps {
