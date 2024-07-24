@@ -13,7 +13,8 @@ class WgtDashControl extends StatefulWidget {
     this.onUpdateMainMetersOnly,
     this.iniLookbackType = LookbackType.last_24h,
     this.iniMeterType = MeterType.electricity1p,
-    this.mainMetersOnly = true,
+    // this.mainMetersOnly = true,
+    this.mainOrSub = 'main',
     required this.lookbackTyps,
     required this.meterTypes,
     this.marginWhenShrinked =
@@ -25,7 +26,7 @@ class WgtDashControl extends StatefulWidget {
 
   final Function(LookbackType) onUpdateLookbackType;
   final Function(MeterType) onUpdateMeterType;
-  final Function(bool)? onUpdateMainMetersOnly;
+  final Function(String)? onUpdateMainMetersOnly;
   final LookbackType iniLookbackType;
   final MeterType iniMeterType;
   final List<LookbackType> lookbackTyps;
@@ -33,7 +34,8 @@ class WgtDashControl extends StatefulWidget {
   final EdgeInsets marginWhenShrinked;
   final double offsetWhenShrinked;
   final String panelTitle;
-  final bool mainMetersOnly;
+  // final bool mainMetersOnly;
+  final String mainOrSub;
   final bool enableControl;
 
   @override
@@ -45,14 +47,16 @@ class _WgtDashControlState extends State<WgtDashControl> {
   bool _pinned = false;
   late LookbackType _selectedLookbackType;
   late MeterType _selectedMeterType;
-  late bool _mainMetersOnly;
+  // late bool _mainMetersOnly;
+  late String _mainOrSub;
 
   @override
   void initState() {
     super.initState();
     _selectedLookbackType = widget.iniLookbackType;
     _selectedMeterType = widget.iniMeterType;
-    _mainMetersOnly = widget.mainMetersOnly;
+    // _mainMetersOnly = widget.mainMetersOnly;
+    _mainOrSub = widget.mainOrSub;
   }
 
   @override
@@ -160,7 +164,8 @@ class _WgtDashControlState extends State<WgtDashControl> {
                             _selectedMeterType = meterType;
                             if (_selectedMeterType != MeterType.electricity1p &&
                                 _selectedMeterType != MeterType.btu) {
-                              _mainMetersOnly = false;
+                              // _mainMetersOnly = false;
+                              _mainOrSub = 'sub';
                             }
                           });
                           widget.onUpdateMeterType(_selectedMeterType);
@@ -182,64 +187,93 @@ class _WgtDashControlState extends State<WgtDashControl> {
                     horizontalSpaceTiny,
                     //onUpdateMainMetersOnly
                     if (widget.onUpdateMainMetersOnly != null)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 5),
-                        decoration: BoxDecoration(
-                          color: _mainMetersOnly
-                              ? Theme.of(context)
+                      // Container(
+                      //   padding: const EdgeInsets.symmetric(horizontal: 5),
+                      //   decoration: BoxDecoration(
+                      //     color: Theme.of(context)
+                      //         .colorScheme
+                      //         .primary
+                      //         .withOpacity(0.7),
+                      //     borderRadius: BorderRadius.circular(5),
+                      //     boxShadow: [
+                      //       BoxShadow(
+                      //         color: Colors.black.withOpacity(0.1),
+                      //         spreadRadius: 3,
+                      //         blurRadius: 5,
+                      //         offset: const Offset(1, 3),
+                      //       ),
+                      //     ],
+                      //   ),
+                      //   child: InkWell(
+                      //     onTap: !widget.enableControl
+                      //         ? null
+                      //         : (_selectedMeterType !=
+                      //                     MeterType.electricity1p &&
+                      //                 _selectedMeterType != MeterType.btu)
+                      //             ? null
+                      //             : () {
+                      //                 widget.onUpdateMainMetersOnly
+                      //                     ?.call(!_mainMetersOnly);
+                      //                 setState(() {
+                      //                   _mainMetersOnly = !_mainMetersOnly;
+                      //                 });
+                      //               },
+                      //     child: const Text(
+                      //       'Main',
+                      //       style: TextStyle(color: Colors.white),
+                      //     ),
+                      //   ),
+                      // ),
+                      //toggle switch
+                      Row(
+                        children: [
+                          Text(
+                            'Sub',
+                            style: TextStyle(
+                              color:
+                                  Theme.of(context).hintColor.withOpacity(0.7),
+                              fontSize: 12,
+                            ),
+                          ),
+                          Transform.scale(
+                            scale: 0.8,
+                            child: Switch(
+                              value: _mainOrSub == 'main',
+                              onChanged: !widget.enableControl
+                                  ? null
+                                  : (_selectedMeterType !=
+                                              MeterType.electricity1p &&
+                                          _selectedMeterType != MeterType.btu)
+                                      ? null
+                                      : (value) {
+                                          String mainOrSub =
+                                              value ? 'main' : 'sub';
+                                          widget.onUpdateMainMetersOnly
+                                              ?.call(mainOrSub);
+                                          setState(() {
+                                            _mainOrSub = mainOrSub;
+                                          });
+                                        },
+                              activeColor: Colors.white,
+                              activeTrackColor: Theme.of(context)
                                   .colorScheme
                                   .primary
-                                  .withOpacity(0.7)
-                              : Theme.of(context).hintColor.withOpacity(0.35),
-                          borderRadius: BorderRadius.circular(5),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              spreadRadius: 3,
-                              blurRadius: 5,
-                              offset: const Offset(1, 3),
+                                  .withOpacity(0.7),
+                              inactiveThumbColor: Colors.white,
+                              inactiveTrackColor:
+                                  Theme.of(context).hintColor.withOpacity(0.35),
                             ),
-                          ],
-                        ),
-                        child: InkWell(
-                          onTap: !widget.enableControl
-                              ? null
-                              : (_selectedMeterType !=
-                                          MeterType.electricity1p &&
-                                      _selectedMeterType != MeterType.btu)
-                                  ? null
-                                  : () {
-                                      widget.onUpdateMainMetersOnly
-                                          ?.call(!_mainMetersOnly);
-                                      setState(() {
-                                        _mainMetersOnly = !_mainMetersOnly;
-                                      });
-                                    },
-                          child: const Text(
-                            'Main',
-                            style: TextStyle(color: Colors.white),
                           ),
-                        ),
+                          Text(
+                            'Main',
+                            style: TextStyle(
+                              color:
+                                  Theme.of(context).hintColor.withOpacity(0.7),
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
                       ),
-                    // if (widget.onUpdateMainMetersOnly != null)
-                    //   InkWell(
-                    //     onTap: () {
-                    //       widget.onUpdateMainMetersOnly!(!_pinned);
-                    //       setState(() {
-                    //         _pinned = !_pinned;
-                    //       });
-                    //     },
-                    //     child: Icon(
-                    //       _pinned ? Icons.push_pin : Icons.push_pin_outlined,
-                    //       color: _pinned
-                    //           ? Theme.of(context)
-                    //               .colorScheme
-                    //               .primary
-                    //               .withOpacity(0.7)
-                    //           : Theme.of(context).hintColor.withOpacity(0.3),
-                    //       size: 25,
-                    //     ),
-                    //   ),
                     horizontalSpaceSmall,
                   ],
                 ),
