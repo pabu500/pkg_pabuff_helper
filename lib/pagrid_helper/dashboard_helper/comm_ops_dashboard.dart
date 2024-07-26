@@ -323,7 +323,7 @@ Future<dynamic> getRecentTopupTotal(
             : (queryMap['project_scope'] as ProjectScope).name,
         'site_scope': queryMap['site_scope'] == null
             ? ''
-            : (queryMap['site_scope'] as ProjectScope).name,
+            : (queryMap['site_scope'] as SiteScope).name,
       }).toJson()),
     );
     if (response.statusCode == 200) {
