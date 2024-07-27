@@ -120,15 +120,15 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
               ? _defaultEndDate!.subtract(const Duration(hours: 48))
               : getTargetLocalDatetimeNow(activeProjectTimezone));
 
-      if (widget.useEdgeTime) {
-        _defaultEndDate = getTargetLocalDatetime(
-            activeProjectTimezone, 23, 59, 59, 999,
-            refLocalDatetime: _defaultEndDate); //get the end of the day
+      // if (widget.useEdgeTime) {
+      //   _defaultEndDate = getTargetLocalDatetime(
+      //       activeProjectTimezone, 23, 59, 59, 999,
+      //       refLocalDatetime: _defaultEndDate); //get the end of the day
 
-        _defaultStartDate = getTargetLocalDatetime(
-            activeProjectTimezone, 0, 0, 0, 0,
-            refLocalDatetime: _defaultStartDate); //get the start of the day
-      }
+      //   _defaultStartDate = getTargetLocalDatetime(
+      //       activeProjectTimezone, 0, 0, 0, 0,
+      //       refLocalDatetime: _defaultStartDate); //get the start of the day
+      // }
       if (widget.useEdgeTime) {
         _defaultEndDate = getTargetLocalDatetime(
             activeProjectTimezone, 23, 59, 59, 999,
@@ -143,6 +143,10 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
             activeProjectTimezone, 23, 59, 59, 999,
             refLocalDatetime: _defaultEndDate); //get the end of the day
       }
+    }
+    if (kDebugMode) {
+      print('ini defaultStartDate: $_defaultStartDate');
+      print('ini defaultEndDate: $_defaultEndDate');
     }
 
     _rangeDatePickerValueWithDefaultValue = [
@@ -182,6 +186,10 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
           _selectedStartDate,
           _selectedEndDate,
         ];
+        if (kDebugMode) {
+          print('defaultStartDate: $_defaultStartDate');
+          print('defaultEndDate: $_defaultEndDate');
+        }
       }
     }
 

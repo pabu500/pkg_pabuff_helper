@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'dart:typed_data';
+import 'dart:ui';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/up_helper/helper/tenant_def.dart';
 import 'package:flutter/material.dart' as mt;
@@ -710,10 +711,10 @@ class Bill {
       {List<Map<String, dynamic>>? trending}) {
     pw.TextStyle textStyle = const pw.TextStyle(
       color: _darkColor,
-      fontSize: 10.5,
+      fontSize: 10,
     );
     return pw.Container(
-        height: 90,
+        height: 95,
         padding: const pw.EdgeInsets.symmetric(vertical: 5, horizontal: 10),
         decoration: pw.BoxDecoration(
           border: pw.Border.all(
@@ -725,8 +726,16 @@ class Bill {
           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
           crossAxisAlignment: pw.CrossAxisAlignment.center,
           children: [
+            pw.Padding(
+              padding: const pw.EdgeInsets.only(top: 10),
+              child: pw.SizedBox(
+                width: 350,
+                height: 95,
+                child: _getTrending(trending),
+              ),
+            ),
             pw.SizedBox(
-              width: 80,
+              width: 100,
               child: pw.Column(
                 mainAxisAlignment: pw.MainAxisAlignment.center,
                 children: [
@@ -775,26 +784,28 @@ class Bill {
                           ),
                         ],
                       ),
+                      pw.Row(
+                        mainAxisAlignment: pw.MainAxisAlignment.start,
+                        children: [
+                          pw.Text(
+                            ' Cost: ${_formatCurrency(cost)}',
+                            style: textStyle,
+                          ),
+                        ],
+                      ),
                     ],
                   ),
+                  // pw.SizedBox(
+                  //   width: 80,
+                  //   child: pw.Align(
+                  //     alignment: pw.Alignment.centerRight,
+                  //     child: pw.Text(
+                  //       _formatCurrency(cost),
+                  //       style: const pw.TextStyle(color: _darkColor),
+                  //     ),
+                  //   ),
+                  // ),
                 ],
-              ),
-            ),
-            pw.Padding(
-              padding: const pw.EdgeInsets.only(top: 10),
-              child: pw.SizedBox(
-                width: 300,
-                child: _getTrending(trending),
-              ),
-            ),
-            pw.SizedBox(
-              width: 80,
-              child: pw.Align(
-                alignment: pw.Alignment.centerRight,
-                child: pw.Text(
-                  _formatCurrency(cost),
-                  style: const pw.TextStyle(color: _darkColor),
-                ),
               ),
             ),
           ],
@@ -815,17 +826,22 @@ class Bill {
 
     List<Map<String, dynamic>> trendingLastMonthSuper = [];
     for (int i = 0; i < trending.length; i++) {
-      trending[i]['label'] = trending[i]['label'] + '   ';
+      trending[i]['label'] = trending[i]['label'] + '';
+      String valueStr = getBarNumberStr(trending[i]['value'] as double);
+      trending[i]['valueStr'] = valueStr;
+
       var item = trending[i];
       if (i == trending.length - 1) {
         trendingLastMonthSuper.add({
           'label': item['label'],
           'value': item['value'],
+          'valueStr': '',
         });
       } else {
         trendingLastMonthSuper.add({
           'label': item['label'],
           'value': 0,
+          'valueStr': '',
         });
       }
     }
@@ -836,17 +852,23 @@ class Bill {
         trending.insert(0, {
           'label': '',
           'value': 0,
+          'valueStr': '',
         });
         trendingLastMonthSuper.insert(0, {
           'label': '',
           'value': 0,
+          'valueStr': '',
         });
       }
     }
 
+    pw.TextStyle labelStyle = const pw.TextStyle(
+      color: _darkColor,
+      fontSize: 9,
+    );
     return pw.Container(
-      height: 80,
-      width: 280,
+      height: 100,
+      width: 350,
       child: trending.isEmpty
           ? pw.SizedBox()
           : pw.Stack(
@@ -860,6 +882,11 @@ class Bill {
                       child: pw.Text(''),
                     ),
                   ),
+                  // bottom: pw.Container(
+                  //   alignment: pw.Alignment.bottomCenter,
+                  //   margin: const pw.EdgeInsets.only(top: 5),
+                  //   child: pw.Text('xxx'),
+                  // ),
                   // overlay: pw.ChartLegend(
                   //   position: const pw.Alignment(-.7, 1),
                   //   decoration: pw.BoxDecoration(
@@ -875,7 +902,10 @@ class Bill {
                       color: PdfColors.white,
                       List<String>.generate(
                         trending.length,
-                        (index) => trending?[index]['label'] as String,
+                        (index) =>
+                            // '${trending?[index]['label']}\n ${trending?[index]['value']}',
+                            // '${trending?[index]['label']}',
+                            '',
                       ),
                       marginStart: 30,
                       marginEnd: 30,
@@ -884,6 +914,22 @@ class Bill {
                         color: PdfColors.grey,
                         fontSize: 9,
                       ),
+                      buildLabel: (num i) {
+                        int index = i.toInt();
+                        return pw.Transform.translate(
+                          offset: const PdfPoint(-10, 0),
+                          child: pw.Column(
+                            children: [
+                              pw.Text('_',
+                                  style: labelStyle.copyWith(
+                                      color: PdfColors.white)),
+                              pw.Text('_',
+                                  style: labelStyle.copyWith(
+                                      color: PdfColors.white)),
+                            ],
+                          ),
+                        );
+                      },
                     ),
                     yAxis: _getTrendingAxis(trending),
                   ),
@@ -918,7 +964,9 @@ class Bill {
                       color: PdfColors.grey300,
                       List<String>.generate(
                         trending.length,
-                        (index) => trending?[index]['label'] as String,
+                        (index) =>
+                            // trending?[index]['label'] as String,
+                            '',
                       ),
                       marginStart: 30,
                       marginEnd: 30,
@@ -927,6 +975,20 @@ class Bill {
                         color: PdfColors.grey,
                         fontSize: 9,
                       ),
+                      buildLabel: (num i) {
+                        int index = i.toInt();
+                        return pw.Transform.translate(
+                          offset: const PdfPoint(-10, 0),
+                          child: pw.Column(
+                            children: [
+                              pw.Text(trending?[index]['label'] as String,
+                                  style: labelStyle),
+                              pw.Text((trending?[index]['valueStr'] ?? ''),
+                                  style: labelStyle),
+                            ],
+                          ),
+                        );
+                      },
                     ),
                     yAxis: _getTrendingAxis(trending),
                   ),
@@ -993,5 +1055,29 @@ class Bill {
   String _formatDate(DateTime date) {
     final format = DateFormat.yMMMd('en_US');
     return format.format(date);
+  }
+
+  String getBarNumberStr(double value) {
+    bool useG = false;
+    bool useM = false;
+    bool useK = false;
+    if (value >= 10000000000) {
+      value = value / 1000000000;
+      useG = true;
+    } else if (value >= 10000000) {
+      value = value / 1000000;
+      useM = true;
+    } else if (value >= 10000) {
+      value = value / 1000;
+      useK = true;
+    }
+    return value.toStringAsFixed(1) +
+        (useG
+            ? 'G'
+            : useM
+                ? 'M'
+                : useK
+                    ? 'K'
+                    : '');
   }
 }

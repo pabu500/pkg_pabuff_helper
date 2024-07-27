@@ -30,6 +30,7 @@ class WgtBillingRecFinder extends StatefulWidget {
     this.iniShowPanel = true,
     this.onShowPanel,
     this.sidePadding = EdgeInsets.zero,
+    this.includeTestItems = false,
   });
   // final bool showMeterSn;
 
@@ -55,6 +56,7 @@ class WgtBillingRecFinder extends StatefulWidget {
   final bool iniShowPanel;
   final Function? onShowPanel;
   final EdgeInsets sidePadding;
+  final bool includeTestItems;
 
   @override
   State<WgtBillingRecFinder> createState() => _WgtBillingRecFinderState();
@@ -112,6 +114,17 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
         ),
       );
       if (result.isNotEmpty) {
+        //drop all labels start with 'test'
+        if (!widget.includeTestItems) {
+          result.removeWhere((element) => element['tenant_label']
+              .toString()
+              .toLowerCase()
+              .startsWith('test'));
+          result.removeWhere((element) => element['tenant_label']
+              .toString()
+              .toLowerCase()
+              .contains('delete'));
+        }
         _tenantInfoList.addAll(result);
         _tenantLabelList.addAll(result.map((e) => e['tenant_label'] as String));
       }

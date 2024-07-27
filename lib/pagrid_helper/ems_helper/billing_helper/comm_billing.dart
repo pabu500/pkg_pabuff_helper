@@ -237,13 +237,13 @@ Future<dynamic> doGetReleaseCandidate(
   }
 }
 
-Future<dynamic> doReleaseBills(
+Future<dynamic> doBatchOpBill(
   PaGridAppConfig appConfig,
   Map<String, dynamic> reqMap,
   SvcClaim svcClaim,
 ) async {
   svcClaim.svcName = SvcType.oresvc.name;
-  svcClaim.endpoint = UrlBase.eptReleaseBills;
+  svcClaim.endpoint = UrlBase.eptBatchOpBill;
 
   String svcToken = '';
   // try {
@@ -260,7 +260,7 @@ Future<dynamic> doReleaseBills(
   try {
     final response = await http.post(
       Uri.parse(UrlController(appConfig)
-          .getUrl(SvcType.oresvc, UrlBase.eptReleaseBills)),
+          .getUrl(SvcType.oresvc, UrlBase.eptBatchOpBill)),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $svcToken',

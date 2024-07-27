@@ -24,12 +24,14 @@ class WgtListSearchBillingRec extends StatefulWidget {
     this.initialType,
     this.iniShowPanel = true,
     this.onShowPanel,
+    this.onSearching,
     this.onListPopulated,
     this.listConfig,
     this.tenantName,
     this.tenantLabel,
     this.lcStatusList,
     this.finderSidePadding = EdgeInsets.zero,
+    this.includeTestItems = false,
   });
 
   final ScopeProfile scopeProfile;
@@ -44,12 +46,14 @@ class WgtListSearchBillingRec extends StatefulWidget {
   final String? initialType;
   final bool iniShowPanel;
   final Function? onShowPanel;
+  final Function? onSearching;
   final Function? onListPopulated;
   final List<Map<String, dynamic>>? listConfig;
   final String? tenantName;
   final String? tenantLabel;
   final List<BillingLcStatus>? lcStatusList;
   final EdgeInsets finderSidePadding;
+  final bool includeTestItems;
 
   @override
   State<WgtListSearchBillingRec> createState() =>
@@ -186,7 +190,7 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
         {
           'title': 'Created',
           'fieldKey': 'created_timestamp',
-          'width': 150.0,
+          'width': 90.0,
           'showSort': true,
         },
         {
@@ -217,7 +221,7 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
           'title': 'From',
           'fieldKey': 'from_timestamp',
           'editable': widget.loggedInUser.isAdminAndUp(),
-          'width': 150.0,
+          'width': 90.0,
           'showSort': true,
           // 'clickCopy': true,
         },
@@ -225,7 +229,7 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
           'title': 'To',
           'fieldKey': 'to_timestamp',
           'editable': widget.loggedInUser.isAdminAndUp(),
-          'width': 150.0,
+          'width': 90.0,
           // 'showSort': true,
           // 'clickCopy': true,
         },
@@ -253,6 +257,12 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
           'title': 'Rate G',
           'fieldKey': 'tariff_package_rate_id_g_rate',
           'width': 60.0,
+        },
+        {
+          'title': 'Bill Date',
+          'fieldKey': 'released_bill_timestamp',
+          'editable': widget.loggedInUser.isAdminAndUp(),
+          'width': 90.0,
         },
         {
           'title': 'LC',
@@ -361,6 +371,7 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
               appConfig: widget.appConfig,
               loggedInUser: widget.loggedInUser,
               scopeProfile: widget.scopeProfile,
+              includeTestItems: widget.includeTestItems,
               tenantName: widget.tenantName,
               tenantLabel: widget.tenantLabel,
               lcStatusList: widget.lcStatusList,
@@ -374,6 +385,7 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
                 setState(() {
                   _isItemListLoading = true;
                 });
+                widget.onSearching?.call();
               },
               onResult: (itemFindResult) {
                 if (itemFindResult['error'] != null) {
@@ -400,6 +412,31 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
                   for (var item in itemList) {
                     // Tenant tenant = Tenant.fromJson(item);
                     // _entityItems.add(tenant.toJson());
+                    String? createdTimestamp = item['created_timestamp'];
+                    String? fromTimestamp = item['from_timestamp'];
+                    String? toTimestamp = item['to_timestamp'];
+                    String? releasedBillTimestamp =
+                        item['released_bill_timestamp'];
+                    if (createdTimestamp != null) {
+                      item['created_timestamp_tooltip'] = createdTimestamp;
+                      item['created_timestamp'] =
+                          createdTimestamp.substring(0, 10);
+                    }
+                    if (fromTimestamp != null) {
+                      item['from_timestamp_tooltip'] = fromTimestamp;
+                      item['from_timestamp'] = fromTimestamp.substring(0, 10);
+                    }
+                    if (toTimestamp != null) {
+                      item['to_timestamp_tooltip'] = toTimestamp;
+                      item['to_timestamp'] = toTimestamp.substring(0, 10);
+                    }
+                    if (releasedBillTimestamp != null) {
+                      item['released_bill_timestamp_tooltip'] =
+                          releasedBillTimestamp;
+                      item['released_bill_timestamp'] =
+                          releasedBillTimestamp.substring(0, 10);
+                    }
+
                     _entityItems.add(item);
                   }
                   setState(() {

@@ -41,9 +41,10 @@ Future<dynamic> doGetAllTenantList(
       List<Map<String, dynamic>> tenantListMap = [];
       for (var item in tenantList) {
         tenantListMap.add({
-          'item_index': item['tenant_id'],
+          'item_index': item['id'],
           'tenant_name': item['tenant_name'],
           'tenant_label': item['tenant_label'],
+          'type': item['type'],
         });
       }
       return tenantListMap;
