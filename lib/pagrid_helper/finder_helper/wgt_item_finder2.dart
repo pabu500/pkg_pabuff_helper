@@ -155,6 +155,7 @@ class _WgtItemFinder2State extends State<WgtItemFinder2> {
     setState(() {
       _isSearching = true;
       _errorText = '';
+      _enableSearch = false;
     });
     widget.onSearching?.call();
 
@@ -243,7 +244,7 @@ class _WgtItemFinder2State extends State<WgtItemFinder2> {
       setState(() {
         // _isItemListLoading = false;
         _isSearching = false;
-        // if (widget.onSearching != null) widget.onSearching!();
+        _enableSearch = _enableSearchButton();
       });
     }
   }
@@ -255,6 +256,10 @@ class _WgtItemFinder2State extends State<WgtItemFinder2> {
 
     if (widget.loggedInUser.isFullOpsAndUp()) {
       return true;
+    }
+
+    if (_isSearching) {
+      return false;
     }
 
     return _selectedProjectScope != null ||
