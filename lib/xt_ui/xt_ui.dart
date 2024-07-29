@@ -28,6 +28,7 @@ export 'wdgt/chart/wgt_line_chart.dart';
 export 'wdgt/chart/wgt_dot_chart.dart';
 export 'wdgt/chart/wgt_pie_chart.dart';
 export 'wdgt/list/wgt_edit_commit_list.dart';
+export 'wdgt/list/wgt_dashboard_list.dart';
 export 'painter/pattern_painter.dart';
 export 'wdgt/scope/get_effective_scope_tag.dart';
 export 'wdgt/ctrl/wgt_dash_control.dart';
