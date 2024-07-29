@@ -191,6 +191,11 @@ class PagUrlBase {
   //keysvc
   static const String eptGetOaxLink = '/key/get_oax_link';
 
+  //ct_lab
+  static const String eptCtLabGetAccessToken = '/ct_lab/get_access_token';
+  static const String eptCtLabGetTrending = '/ct_lab/get_trending';
+  static const String eptCtLabGetEventList = '/ct_lab/get_event_list';
+
   //m3
   static const String eptGetMmsSatus = '/m3/get_mms_status';
   static const String eptGetMeterRLS = '/m3/get_meter_rls';
