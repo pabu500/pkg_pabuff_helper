@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
@@ -8,7 +9,7 @@ import '../../style/app_colors.dart';
 
 class WgtHistoryLineChart extends StatefulWidget {
   WgtHistoryLineChart({
-    Key? key,
+    super.key,
     this.chartKey,
     this.isCurved = false,
     this.titleWidget,
@@ -134,13 +135,18 @@ class _WgtHistoryLineChartState extends State<WgtHistoryLineChart> {
     bool isDouble = firstData[valKey] is double;
     // _maxY = 0;
     _minY = double.infinity;
+
     for (var historyDataItem in historyData) {
       int timestamp =
           DateTime.parse(historyDataItem[timeKey]).millisecondsSinceEpoch;
-      double value = isDouble
+      double? value = isDouble
           ? historyDataItem[valKey]
-          : double.parse(historyDataItem[valKey]);
-      if (value > _maxY) {
+          : double.tryParse(historyDataItem[valKey]);
+
+      if (value == null) {
+        if (kDebugMode) {}
+      }
+      if (value! > _maxY) {
         _maxY = value;
       }
       if (value < _minY) {
