@@ -152,7 +152,13 @@ class EmsTypeUsageCalcReleased {
 
     _calcTotalCost();
 
-    _getUsageTrendingReleased();
+    _getUsageTrendingReleased({
+      'E': _billedUsageFactorE,
+      'W': _billedUsageFactorW,
+      'B': _billedUsageFactorB,
+      'N': _billedUsageFactorN,
+      'G': _billedUsageFactorG,
+    });
   }
 
   EmsTypeUsage getTypeUsage(String usageType) {
@@ -404,7 +410,7 @@ class EmsTypeUsageCalcReleased {
     _totalCost = _subTotalCost! + _gstAmount!;
   }
 
-  void _getUsageTrendingReleased() {
+  void _getUsageTrendingReleased(Map<String, dynamic> usageFactor) {
     if (_billedTrendingSnapShot == null) {
       return;
     }
@@ -417,6 +423,38 @@ class EmsTypeUsageCalcReleased {
       double? billedTotalUsageB = item['billed_total_usage_b'];
       double? billedTotalUsageN = item['billed_total_usage_n'];
       double? billedTotalUsageG = item['billed_total_usage_g'];
+
+      double? usageFactorE = usageFactor['E'];
+      double? usageFactorW = usageFactor['W'];
+      double? usageFactorB = usageFactor['B'];
+      double? usageFactorN = usageFactor['N'];
+      double? usageFactorG = usageFactor['G'];
+
+      double? billedTotalUsageFactoredE;
+      double? billedTotalUsageFactoredW;
+      double? billedTotalUsageFactoredB;
+      double? billedTotalUsageFactoredN;
+      double? billedTotalUsageFactoredG;
+
+      if (billedTotalUsageE != null && usageFactorE != null) {
+        billedTotalUsageFactoredE = billedTotalUsageE * usageFactorE;
+      }
+
+      if (billedTotalUsageW != null && usageFactorW != null) {
+        billedTotalUsageFactoredW = billedTotalUsageW * usageFactorW;
+      }
+
+      if (billedTotalUsageB != null && usageFactorB != null) {
+        billedTotalUsageFactoredB = billedTotalUsageB * usageFactorB;
+      }
+
+      if (billedTotalUsageN != null && usageFactorN != null) {
+        billedTotalUsageFactoredN = billedTotalUsageN * usageFactorN;
+      }
+
+      if (billedTotalUsageG != null && usageFactorG != null) {
+        billedTotalUsageFactoredG = billedTotalUsageG * usageFactorG;
+      }
 
       if (item['billed_time_label'] != null) {
         if (item['billed_time_label'].toString().contains('2024-01') ||
@@ -444,35 +482,35 @@ class EmsTypeUsageCalcReleased {
         _trendingE.add({
           'time': item['billed_time_label'],
           'label': item['billed_time_label'],
-          'value': billedTotalUsageE,
+          'value': billedTotalUsageFactoredE,
         });
       }
       if (billedTotalUsageW != null) {
         _trendingW.add({
           'time': item['billed_time_label'],
           'label': item['billed_time_label'],
-          'value': billedTotalUsageW,
+          'value': billedTotalUsageFactoredW,
         });
       }
       if (billedTotalUsageB != null) {
         _trendingB.add({
           'time': item['billed_time_label'],
           'label': item['billed_time_label'],
-          'value': billedTotalUsageB,
+          'value': billedTotalUsageFactoredB,
         });
       }
       if (billedTotalUsageN != null) {
         _trendingN.add({
           'time': item['billed_time_label'],
           'label': item['billed_time_label'],
-          'value': billedTotalUsageN,
+          'value': billedTotalUsageFactoredN,
         });
       }
       if (billedTotalUsageG != null) {
         _trendingG.add({
           'time': item['billed_time_label'],
           'label': item['billed_time_label'],
-          'value': billedTotalUsageG,
+          'value': billedTotalUsageFactoredG,
         });
       }
     }

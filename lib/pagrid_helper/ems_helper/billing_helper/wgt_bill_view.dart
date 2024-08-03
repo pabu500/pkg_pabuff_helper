@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../app_helper/pagrid_app_config.dart';
 import '../tenant/wgt_tenant_usage_summary_released2.dart';
-import 'bill_calc.dart';
+import '_dep/bill_calc.dart';
 
 class WgtBillView extends StatefulWidget {
   const WgtBillView({
@@ -102,11 +102,16 @@ class _WgtBillViewState extends State<WgtBillView> {
 
     _pullFails = 0;
     _lcStatusDisplay = widget.defaultBillLcStatus;
+    if (_lcStatusDisplay == 'pv') {
+      _lcStatusDisplay = 'released';
+    }
 
-    _showGenTypeSwitch = /*_lcStatusDisplay == 'released'*/
-        widget.genTypes.length > 1;
+    _showGenTypeSwitch = widget.genTypes.length > 1;
     _showRenderModeSwitch = widget.modes.length > 1;
     _renderMode = widget.modes[0];
+    if (_lcStatusDisplay == 'released') {
+      _renderMode = 'pdf';
+    }
   }
 
   @override
@@ -330,6 +335,14 @@ class _WgtBillViewState extends State<WgtBillView> {
       throw Exception('gst is null');
     }
 
+    //use billed trending snapshot
+    List<Map<String, dynamic>> billedTrendingSnapShot = [];
+    if (_bill['billed_trending_snapshot'] != null) {
+      for (var item in _bill['billed_trending_snapshot']) {
+        billedTrendingSnapShot.add(item);
+      }
+    }
+
     EmsTypeUsageCalc emsTypeUsageCalc = EmsTypeUsageCalc(
       gst: gst,
       typeRates: typeRates,
@@ -339,6 +352,8 @@ class _WgtBillViewState extends State<WgtBillView> {
       manualUsageList: manualUsage,
       lineItemList: lineItems,
       billBarFromMonth: billBarFromMonth,
+      //use billed trending snapshot
+      billedTrendingSnapShot: billedTrendingSnapShot,
     );
     emsTypeUsageCalc.doCalc();
 

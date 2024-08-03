@@ -2,6 +2,8 @@ enum ItemType {
   meter,
   meter_3p,
   meter_iwow,
+  // meter_iwow_3p,
+  // meter_iwow_btu,
   sensor,
   tenant,
   building,

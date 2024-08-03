@@ -537,9 +537,11 @@ class _WgtHistoryLineChartState extends State<WgtHistoryLineChart> {
                       LineChartData(
                         minY: widget.historyDataSets.isEmpty
                             ? 0
-                            : _minY - 0.5 * _range > 0
+                            : _minY < 0
                                 ? _minY - 0.5 * _range
-                                : 0,
+                                : _minY - 0.5 * _range > 0
+                                    ? _minY - 0.5 * _range
+                                    : 0,
                         maxY: widget.historyDataSets.isEmpty
                             ? 0
                             : _maxY + 0.34 * _range,

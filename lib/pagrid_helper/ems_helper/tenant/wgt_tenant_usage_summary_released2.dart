@@ -273,41 +273,57 @@ class _WgtTenantUsageSummaryReleased2State
     for (var key in widget.billedSubTenantUsages.keys) {
       // String usageStr = widget.billedSubTenantUsages[key] ?? '';
       double? usageVal = widget.billedSubTenantUsages[key];
+      if (usageVal == null) {
+        continue;
+      }
+
       String meterTypeTag = key.split('_').last;
-      if (usageVal != null) {
-        MeterType? meterType = getMeterType(meterTypeTag);
-        if (meterType != null) {
-          subTenantUsageList.add(
-            Padding(
-              padding: const EdgeInsets.only(top: 10),
-              child: WgtUsageStatCore(
-                loggedInUser: widget.loggedInUser,
-                scopeProfile: widget.scopeProfile,
-                appConfig: widget.appConfig,
-                displayContextStr: widget.displayContextStr,
-                isBillMode: widget.isBillMode,
-                rate: widget.meterTypeRates[meterTypeTag],
-                statColor:
-                    Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-                showTrending: false,
-                statVirticalStack: false,
-                height: 110,
-                usageDecimals: widget.usageDecimals,
-                rateDecimals: widget.rateDecimals,
-                costDecimals: widget.costDecimals,
-                meterType: meterType,
-                meterId: meterTypeTag.toUpperCase(),
-                meterIdType: ItemIdType.name,
-                itemType: widget.itemType,
-                historyType: Evs2HistoryType.meter_list_usage_summary,
-                isStaticUsageStat: true,
-                isSubstractUsage: true,
-                meterStat: {'usage': usageVal},
-                showRate: false,
-              ),
+
+      double? factor = widget
+          .billedUsageFactor['billed_usage_factor_$meterTypeTag'.toLowerCase()];
+      if (factor == null) {
+        throw Exception('usageFactored is null');
+      }
+      double? usageFactored = usageVal * factor;
+
+      Map<String, dynamic> meterStat = {
+        'usage': usageVal,
+        'usage_factored': usageFactored,
+        'factor': factor,
+      };
+
+      MeterType? meterType = getMeterType(meterTypeTag);
+      if (meterType != null) {
+        subTenantUsageList.add(
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: WgtUsageStatCore(
+              loggedInUser: widget.loggedInUser,
+              scopeProfile: widget.scopeProfile,
+              appConfig: widget.appConfig,
+              displayContextStr: widget.displayContextStr,
+              isBillMode: widget.isBillMode,
+              rate: widget.meterTypeRates[meterTypeTag],
+              statColor:
+                  Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+              showTrending: false,
+              statVirticalStack: false,
+              height: 110,
+              usageDecimals: widget.usageDecimals,
+              rateDecimals: widget.rateDecimals,
+              costDecimals: widget.costDecimals,
+              meterType: meterType,
+              meterId: meterTypeTag.toUpperCase(),
+              meterIdType: ItemIdType.name,
+              itemType: widget.itemType,
+              historyType: Evs2HistoryType.meter_list_usage_summary,
+              isStaticUsageStat: true,
+              isSubstractUsage: true,
+              meterStat: meterStat, //{'usage': usageVal},
+              showRate: false,
             ),
-          );
-        }
+          ),
+        );
       }
     }
     return SizedBox(

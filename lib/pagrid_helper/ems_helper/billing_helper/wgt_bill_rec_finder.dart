@@ -161,7 +161,9 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
         _lcStatusList.addAll([
           '   ',
           BillingLcStatus.generated.name,
+          BillingLcStatus.pv.name,
           BillingLcStatus.released.name,
+          BillingLcStatus.mfd.name,
         ]);
       } else {
         _lcStatusList.addAll(widget.lcStatusList!.map((e) => e.name));

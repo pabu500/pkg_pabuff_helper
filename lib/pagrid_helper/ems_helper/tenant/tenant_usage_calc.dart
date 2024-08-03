@@ -51,6 +51,8 @@ class EmsTypeUsageCalc {
   List<Map<String, dynamic>> get trendingN => _trendingN;
   List<Map<String, dynamic>> get trendingG => _trendingG;
 
+  late final List<Map<String, dynamic>>? _billedTrendingSnapShot;
+
   double? get gst => _gst;
   double? get subTotalCost => _subTotalCost;
   double? get gstAmount => _gstAmount;
@@ -67,6 +69,7 @@ class EmsTypeUsageCalc {
     List<Map<String, dynamic>> manualUsageList = const [],
     List<Map<String, dynamic>> lineItemList = const [],
     billBarFromMonth,
+    List<Map<String, dynamic>>? billedTrendingSnapShot,
   }) {
     if (usageFactor.isEmpty) {
       throw Exception('usageFactor is empty');
@@ -81,6 +84,8 @@ class EmsTypeUsageCalc {
     _manualUsageList = manualUsageList;
     _lineItemList = lineItemList;
     _billBarFromMonth = billBarFromMonth;
+
+    _billedTrendingSnapShot = billedTrendingSnapShot;
   }
 
   void doCalc() {
@@ -353,79 +358,187 @@ class EmsTypeUsageCalc {
   }
 
   void _getUsageTrending() {
-    for (var item in _autoUsageSummary) {
-      List<Map<String, dynamic>> conlidatedHistoryList = [];
-      String meterType = item['meter_type'] ?? '';
-      final mgTrendingSnapShot = item['meter_group_trending_snapshot'] ?? [];
-      if (mgTrendingSnapShot.isEmpty) {
+    _getUsageTrendingReleased(_usageFactor);
+    //   for (var item in _autoUsageSummary) {
+    //     List<Map<String, dynamic>> conlidatedHistoryList = [];
+    //     String meterType = item['meter_type'] ?? '';
+    //     final mgTrendingSnapShot = item['meter_group_trending_snapshot'] ?? [];
+    //     if (mgTrendingSnapShot.isEmpty) {
+    //       continue;
+    //     }
+    //     final mgConsolidatedUsageHistory =
+    //         mgTrendingSnapShot['meter_list_consolidated_usage_history'] ?? [];
+
+    //     for (var meterHistory in mgConsolidatedUsageHistory) {
+    //       String meterId = meterHistory['meter_id'];
+    //       double percentage = meterHistory['percentage'];
+
+    //       if (meterHistory['meter_usage_history'].isEmpty) {
+    //         if (kDebugMode) {
+    //           print('No history for meter $meterId');
+    //         }
+    //         continue;
+    //       }
+
+    //       for (var history in meterHistory['meter_usage_history']) {
+    //         String consolidatedTimeLabel = history['consolidated_time_label'];
+
+    //         if ((_billBarFromMonth ?? '').isNotEmpty) {
+    //           if (!takeMonth(consolidatedTimeLabel, _billBarFromMonth!)) {
+    //             continue;
+    //           }
+    //         }
+
+    //         double? usage = double.tryParse(history['usage']);
+    //         usage = usage == null ? 0 : usage * (percentage / 100);
+
+    //         //check if the time label is already in the list
+    //         bool isExist = false;
+    //         for (var item in conlidatedHistoryList) {
+    //           if (item['time'] == consolidatedTimeLabel) {
+    //             isExist = true;
+    //             break;
+    //           }
+    //         }
+    //         if (!isExist) {
+    //           conlidatedHistoryList.add({
+    //             'time': consolidatedTimeLabel,
+    //             'label': consolidatedTimeLabel,
+    //             'value': usage,
+    //           });
+    //         } else {
+    //           //add the consumption to the existing time label
+    //           for (var item in conlidatedHistoryList) {
+    //             if (item['time'] == consolidatedTimeLabel) {
+    //               item['value'] += usage;
+    //               break;
+    //             }
+    //           }
+    //         }
+    //       }
+    //     }
+    //     if (meterType == 'E') {
+    //       _trendingE.clear();
+    //       _trendingE.addAll(conlidatedHistoryList);
+    //     } else if (meterType == 'W') {
+    //       _trendingW.clear();
+    //       _trendingW.addAll(conlidatedHistoryList);
+    //     } else if (meterType == 'B') {
+    //       _trendingB.clear();
+    //       _trendingB.addAll(conlidatedHistoryList);
+    //     } else if (meterType == 'N') {
+    //       _trendingN.clear();
+    //       _trendingN.addAll(conlidatedHistoryList);
+    //     } else if (meterType == 'G') {
+    //       _trendingG.clear();
+    //       _trendingG.addAll(conlidatedHistoryList);
+    //     }
+    //   }
+    // }
+  }
+
+  void _getUsageTrendingReleased(Map<String, dynamic> usageFactor) {
+    if (_billedTrendingSnapShot == null) {
+      return;
+    }
+    for (var item in _billedTrendingSnapShot) {
+      if (item['billed_time_label'] == null) {
         continue;
       }
-      final mgConsolidatedUsageHistory =
-          mgTrendingSnapShot['meter_list_consolidated_usage_history'] ?? [];
+      double? billedTotalUsageE = item['billed_total_usage_e'];
+      double? billedTotalUsageW = item['billed_total_usage_w'];
+      double? billedTotalUsageB = item['billed_total_usage_b'];
+      double? billedTotalUsageN = item['billed_total_usage_n'];
+      double? billedTotalUsageG = item['billed_total_usage_g'];
 
-      for (var meterHistory in mgConsolidatedUsageHistory) {
-        String meterId = meterHistory['meter_id'];
-        double percentage = meterHistory['percentage'];
+      double? usageFactorE = usageFactor['E'];
+      double? usageFactorW = usageFactor['W'];
+      double? usageFactorB = usageFactor['B'];
+      double? usageFactorN = usageFactor['N'];
+      double? usageFactorG = usageFactor['G'];
 
-        if (meterHistory['meter_usage_history'].isEmpty) {
-          if (kDebugMode) {
-            print('No history for meter $meterId');
-          }
+      double? billedTotalUsageFactoredE;
+      double? billedTotalUsageFactoredW;
+      double? billedTotalUsageFactoredB;
+      double? billedTotalUsageFactoredN;
+      double? billedTotalUsageFactoredG;
+
+      if (billedTotalUsageE != null && usageFactorE != null) {
+        billedTotalUsageFactoredE = billedTotalUsageE * usageFactorE;
+      }
+
+      if (billedTotalUsageW != null && usageFactorW != null) {
+        billedTotalUsageFactoredW = billedTotalUsageW * usageFactorW;
+      }
+
+      if (billedTotalUsageB != null && usageFactorB != null) {
+        billedTotalUsageFactoredB = billedTotalUsageB * usageFactorB;
+      }
+
+      if (billedTotalUsageN != null && usageFactorN != null) {
+        billedTotalUsageFactoredN = billedTotalUsageN * usageFactorN;
+      }
+
+      if (billedTotalUsageG != null && usageFactorG != null) {
+        billedTotalUsageFactoredG = billedTotalUsageG * usageFactorG;
+      }
+
+      if (item['billed_time_label'] != null) {
+        if (item['billed_time_label'].toString().contains('2024-01') ||
+            item['billed_time_label'].toString().contains('2024-02') ||
+            item['billed_time_label'].toString().contains('2024-03') ||
+            item['billed_time_label'].toString().contains('2024-04')) {
           continue;
         }
-
-        for (var history in meterHistory['meter_usage_history']) {
-          String consolidatedTimeLabel = history['consolidated_time_label'];
-
-          if ((_billBarFromMonth ?? '').isNotEmpty) {
-            if (!takeMonth(consolidatedTimeLabel, _billBarFromMonth!)) {
-              continue;
-            }
-          }
-
-          double? usage = double.tryParse(history['usage']);
-          usage = usage == null ? 0 : usage * (percentage / 100);
-
-          //check if the time label is already in the list
-          bool isExist = false;
-          for (var item in conlidatedHistoryList) {
-            if (item['time'] == consolidatedTimeLabel) {
-              isExist = true;
-              break;
-            }
-          }
-          if (!isExist) {
-            conlidatedHistoryList.add({
-              'time': consolidatedTimeLabel,
-              'label': consolidatedTimeLabel,
-              'value': usage,
-            });
-          } else {
-            //add the consumption to the existing time label
-            for (var item in conlidatedHistoryList) {
-              if (item['time'] == consolidatedTimeLabel) {
-                item['value'] += usage;
-                break;
-              }
-            }
-          }
+      }
+      if ((_billBarFromMonth ?? '').isNotEmpty) {
+        String timeLabel = item['billed_time_label'];
+        if (!takeMonth(timeLabel, _billBarFromMonth!)) {
+          continue;
         }
       }
-      if (meterType == 'E') {
-        _trendingE.clear();
-        _trendingE.addAll(conlidatedHistoryList);
-      } else if (meterType == 'W') {
-        _trendingW.clear();
-        _trendingW.addAll(conlidatedHistoryList);
-      } else if (meterType == 'B') {
-        _trendingB.clear();
-        _trendingB.addAll(conlidatedHistoryList);
-      } else if (meterType == 'N') {
-        _trendingN.clear();
-        _trendingN.addAll(conlidatedHistoryList);
-      } else if (meterType == 'G') {
-        _trendingG.clear();
-        _trendingG.addAll(conlidatedHistoryList);
+
+      if ((_billBarFromMonth ?? '').isNotEmpty) {
+        String monthLabel = _billBarFromMonth!.substring(0, 7);
+        if (item['billed_time_label'].toString().contains(monthLabel)) {
+          continue;
+        }
+      }
+
+      if (billedTotalUsageE != null) {
+        _trendingE.add({
+          'time': item['billed_time_label'],
+          'label': item['billed_time_label'],
+          'value': billedTotalUsageFactoredE,
+        });
+      }
+      if (billedTotalUsageW != null) {
+        _trendingW.add({
+          'time': item['billed_time_label'],
+          'label': item['billed_time_label'],
+          'value': billedTotalUsageFactoredW,
+        });
+      }
+      if (billedTotalUsageB != null) {
+        _trendingB.add({
+          'time': item['billed_time_label'],
+          'label': item['billed_time_label'],
+          'value': billedTotalUsageFactoredB,
+        });
+      }
+      if (billedTotalUsageN != null) {
+        _trendingN.add({
+          'time': item['billed_time_label'],
+          'label': item['billed_time_label'],
+          'value': billedTotalUsageFactoredN,
+        });
+      }
+      if (billedTotalUsageG != null) {
+        _trendingG.add({
+          'time': item['billed_time_label'],
+          'label': item['billed_time_label'],
+          'value': billedTotalUsageFactoredG,
+        });
       }
     }
   }

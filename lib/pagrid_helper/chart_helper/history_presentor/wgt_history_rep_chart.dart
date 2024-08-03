@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class WgtHistoryRepChart extends StatefulWidget {
-  WgtHistoryRepChart({
-    Key? key,
+  const WgtHistoryRepChart({
+    super.key,
     required this.readingTypeConfig,
     required this.chartReadingTypeKey,
     required this.selectedHistoryDataSets,
@@ -26,7 +26,7 @@ class WgtHistoryRepChart extends StatefulWidget {
     this.showYTitles = true,
     this.reserveTooltipSpace = true,
     this.fullCol = false,
-  }) : super(key: key);
+  });
 
   final Map<String, dynamic> readingTypeConfig;
   final String chartReadingTypeKey;
@@ -50,7 +50,7 @@ class WgtHistoryRepChart extends StatefulWidget {
   final bool fullCol;
 
   @override
-  _WgtHistoryRepChartState createState() => _WgtHistoryRepChartState();
+  State<WgtHistoryRepChart> createState() => _WgtHistoryRepChartState();
 }
 
 class _WgtHistoryRepChartState extends State<WgtHistoryRepChart> {

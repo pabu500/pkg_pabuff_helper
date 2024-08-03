@@ -111,8 +111,8 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
   bool _isHistoryLoaded = false;
 
   int _dominantIntervalMinutes = 1;
-  UniqueKey _intRefreshKey = UniqueKey();
-  UniqueKey _chartKeyExt = UniqueKey();
+  UniqueKey? _intRefreshKey; // = UniqueKey();
+  UniqueKey? _chartKeyExt; // = UniqueKey();
   UniqueKey _optionChangeRefreshKey = UniqueKey();
   // bool _externalKeyReshfreshed = false;
   // bool _dataFieldPull = false;
@@ -292,7 +292,8 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
           'width': 150,
         }
       });
-    } else if (widget.itemType == ItemType.meter_iwow) {
+    } else if (widget.itemType == ItemType.meter_iwow &&
+        widget.meterType != MeterType.btu) {
       _readingTypeConfig.clear();
       _readingTypeConfig.addAll({
         'val_meter': {
@@ -311,6 +312,84 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
           'color': Colors.blue.withOpacity(0.7),
           'width': 150,
         }
+      });
+    } else if (widget.itemType == ItemType.meter_iwow &&
+        widget.meterType == MeterType.btu) {
+      _readingTypeConfig.clear();
+      _readingTypeConfig.addAll({
+        'val_meter': {
+          'title': 'kWh',
+          'dataFields': [
+            {
+              'field': 'val',
+            }
+          ],
+          'unit': 'kWh',
+          'chartType': ChartType.bar,
+          'dataType': DataType.diff,
+          'color': Colors.blue.withOpacity(0.7),
+        },
+        'flow': {
+          'title': 'Flow (m3/h)',
+          'dataFields': [
+            {
+              'field': 'flow',
+            }
+          ],
+          'unit': '',
+          // 'decimals': 1,
+          'chartType': ChartType.line,
+          'dataType': DataType.total,
+          'color': Colors.blueGrey.withOpacity(0.7),
+        },
+        'power': {
+          'title': 'Power (kW)',
+          'dataFields': [
+            {
+              'field': 'power',
+            }
+          ],
+          'unit': 'kW',
+          'chartType': ChartType.line,
+          'dataType': DataType.total,
+          'color': Colors.green.withOpacity(0.7),
+        },
+        'volume': {
+          'title': 'Volume (m3)',
+          'dataFields': [
+            {
+              'field': 'volume',
+            },
+          ],
+          'unit': 'm3',
+          'chartType': ChartType.bar,
+          'dataType': DataType.diff,
+          'color': Colors.green.withOpacity(0.7),
+        },
+        'forward_temp': {
+          'title': 'Forward Temp (°C)',
+          'dataFields': [
+            {
+              'field': 'forward_temp',
+            },
+          ],
+          'unit': '°C',
+          'chartType': ChartType.line,
+          'dataType': DataType.total,
+          'color': Colors.green,
+        },
+        'return_temp': {
+          'title': 'Return Temp (°C)',
+          'dataFields': [
+            {
+              'field': 'return_temp',
+            }
+          ],
+          'unit': '°C',
+          'chartType': ChartType.line,
+          'dataType': DataType.total,
+          'color': Colors.blueGrey.withOpacity(0.7),
+        },
       });
     } else if (widget.itemType == ItemType.meter) {
       _readingTypeConfig.clear();
@@ -448,7 +527,7 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
         widget.config.isEmpty || widget.config.contains('history_getter');
     _showMeta = widget.config.isEmpty || widget.config.contains('meta');
 
-    _chartKeyExt = widget.chartKey ?? UniqueKey();
+    _chartKeyExt = widget.chartKey /* ?? UniqueKey()*/;
     _isHistoryLoading = true;
 
     _selectedTimeRangeMinutes = widget.lookBackMinutes[0];
@@ -771,6 +850,8 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
   }
 
   Widget getTitleRow() {
+    bool useMultiFields = _readingTypeConfig.length > 1;
+
     return SizedBox(
       height: 40,
       child: Row(
@@ -892,8 +973,8 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
                 )
               : Container(),
           Expanded(child: Container()),
-          (widget.itemType == ItemType.meter_3p ||
-                  widget.itemType == ItemType.fleet_health)
+          // (widget.itemType == ItemType.meter_3p || widget.itemType == ItemType.fleet_health)
+          useMultiFields
               ? Row(
                   children: [
                     Text(
@@ -904,9 +985,8 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
                           color: Theme.of(context).hintColor),
                     ),
                     horizontalSpaceSmall,
-                    (widget.itemType == ItemType.meter_3p ||
-                                widget.itemType == ItemType.fleet_health) &&
-                            _displayType == HistroyDisplayType.table
+                    // (widget.itemType == ItemType.meter_3p ||widget.itemType == ItemType.fleet_health)
+                    useMultiFields && _displayType == HistroyDisplayType.table
                         ? getFieldSelector()
                         : getChartReadingTypeSelector(),
                   ],
@@ -1001,7 +1081,15 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
           _selectedChartReadingTypeKey = newValue!;
           // _iniHistorySetting();
 
-          _chartKeyExt = UniqueKey();
+          _selectedMultiFields.clear();
+          _selectedMultiFields.add(ValueItem(
+              label: _readingTypeConfig[_selectedChartReadingTypeKey]['title'],
+              value: _selectedChartReadingTypeKey));
+
+          // _chartKeyExt = UniqueKey();
+          // _intRefreshKey = UniqueKey();
+          // _optionChangeRefreshKey = UniqueKey();
+          _isHistoryLoaded = false;
         });
       },
       items: items.keys.map<DropdownMenuItem<String>>((String value) {
