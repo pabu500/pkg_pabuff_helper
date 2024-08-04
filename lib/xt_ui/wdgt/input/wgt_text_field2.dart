@@ -1,4 +1,3 @@
-import 'package:buff_helper/pagrid_helper/pagrid_helper.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -39,7 +38,7 @@ class WgtTextField extends StatefulWidget {
     this.suffix,
   });
 
-  final PaGridAppConfig appConfig;
+  final dynamic appConfig;
   final Function onChanged;
   final TextEditingController? controller;
   final String? initialValue;
@@ -48,7 +47,7 @@ class WgtTextField extends StatefulWidget {
   final Function? onEditingComplete;
   final Function? onTap;
   final Function? validator;
-  final Function(PaGridAppConfig, String, String, String)? checkUnique;
+  final Function(dynamic, String, String, String)? checkUnique;
   final String? uniqueKey;
   final String? itemTableName;
   final int maxLines;
@@ -86,7 +85,7 @@ class _WgtTextFieldState extends State<WgtTextField> {
   UniqueKey? _resetKey;
 
   Future<void> checkUnique(
-      PaGridAppConfig appConfig, String field, String val, String table) async {
+      dynamic appConfig, String field, String val, String table) async {
     if (val.trim().isEmpty) {
       return;
     }

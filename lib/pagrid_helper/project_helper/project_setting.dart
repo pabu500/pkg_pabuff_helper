@@ -44,6 +44,29 @@ enum PagSiteScope {
 
 final projectProfileRepo = [
   {
+    'project_scope': PagProjectScope.PAG_GI_DE,
+    'project_sites': [
+      SiteScope.GI_DE_DEMO,
+    ],
+    'timezone': 8,
+    'currency': 'SGD',
+    'validate_entity_sn': mmsSnValidator,
+    'validate_entity_displayname': (displayname) {
+      //8 digits, start with '1'
+      RegExp exp1 = RegExp(r'^1\d{7}$');
+      RegExp exp2 = RegExp(r'^2\d{7}$');
+      RegExp exp3 = RegExp(r'^3\d{7}$');
+      if (exp1.hasMatch(displayname) ||
+          exp2.hasMatch(displayname) ||
+          exp3.hasMatch(displayname)) {
+        return null;
+      } else {
+        return 'Invalid displayname';
+      }
+    },
+    'meter_phases': ['1p'],
+  },
+  {
     'project_scope': PagProjectScope.EVS2_PA,
     'project_sites': [
       SiteScope.PA_ATP,
@@ -93,29 +116,6 @@ final projectProfileRepo = [
         'pub_key': '154eb31c-0f72-45bb-9249-84a1036fd1ca',
       },
     },
-  },
-  {
-    'project_scope': PagProjectScope.PAG_GI_DE,
-    'project_sites': [
-      SiteScope.GI_DE_DEMO,
-    ],
-    'timezone': 8,
-    'currency': 'SGD',
-    'validate_entity_sn': mmsSnValidator,
-    'validate_entity_displayname': (displayname) {
-      //8 digits, start with '1'
-      RegExp exp1 = RegExp(r'^1\d{7}$');
-      RegExp exp2 = RegExp(r'^2\d{7}$');
-      RegExp exp3 = RegExp(r'^3\d{7}$');
-      if (exp1.hasMatch(displayname) ||
-          exp2.hasMatch(displayname) ||
-          exp3.hasMatch(displayname)) {
-        return null;
-      } else {
-        return 'Invalid displayname';
-      }
-    },
-    'meter_phases': ['1p'],
   },
   {
     'project_scope': PagProjectScope.SG_ALL,

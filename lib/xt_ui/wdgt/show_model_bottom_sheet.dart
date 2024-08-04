@@ -7,6 +7,8 @@ void xtShowModelBottomSheet(BuildContext context, Widget child,
     constraints: BoxConstraints(
       maxWidth: MediaQuery.of(context).size.width,
     ),
+    showDragHandle: true,
+    enableDrag: false,
     isScrollControlled: true,
     shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(10))),
