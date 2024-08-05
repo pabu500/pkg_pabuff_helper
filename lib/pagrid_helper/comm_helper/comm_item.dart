@@ -6,7 +6,11 @@ import '../app_helper/pagrid_app_config.dart';
 import 'be_api_base.dart';
 
 Future<dynamic> doCheckUnique(
-    PaGridAppConfig appConfig, String field, String val, String table) async {
+    // PaGridAppConfig appConfig,
+    dynamic appConfig,
+    String field,
+    String val,
+    String table) async {
   try {
     //use query string instead of path
     UrlController urlController = UrlController(appConfig);

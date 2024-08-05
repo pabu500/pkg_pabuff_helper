@@ -126,7 +126,12 @@ Future<dynamic> genBill(
       throw Exception(responseBody['info']);
     }
     if (responseBody['error'] != null) {
-      throw Exception(responseBody['error']);
+      String errMsg = responseBody['error'];
+      if (responseBody['reason'] != null) {
+        String reason = responseBody['reason'];
+        errMsg = '$errMsg, $reason';
+      }
+      throw Exception(errMsg);
     }
     return responseBody['result'];
   } else if (response.statusCode == 403) {
