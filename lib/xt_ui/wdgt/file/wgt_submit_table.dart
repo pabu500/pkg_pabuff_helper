@@ -10,13 +10,13 @@ import '../info/empty_result.dart';
 
 class WgtSubmitTable extends StatefulWidget {
   const WgtSubmitTable({
-    Key? key,
+    super.key,
     this.tooltip,
     this.fileExtensions,
     this.color,
     required this.getList,
     this.onGetFileInfo,
-  }) : super(key: key);
+  });
 
   final String? tooltip;
   final Color? color;
@@ -25,7 +25,7 @@ class WgtSubmitTable extends StatefulWidget {
   final Function? onGetFileInfo;
 
   @override
-  _WgtSubmitTableState createState() => _WgtSubmitTableState();
+  State<WgtSubmitTable> createState() => _WgtSubmitTableState();
 }
 
 class _WgtSubmitTableState extends State<WgtSubmitTable> {
