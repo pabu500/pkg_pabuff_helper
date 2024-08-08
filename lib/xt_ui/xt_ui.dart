@@ -21,6 +21,7 @@ export 'util/xt_util_InputFieldValidator.dart';
 export 'tmpl/xt_pg_info.dart';
 export 'wdgt/get_collapsed_bar.dart';
 export 'wdgt/file/wgt_submit_table.dart';
+export 'wdgt/file/wgt_submit_files.dart';
 export 'wdgt/info/empty_result.dart';
 export 'wdgt/info/get_error_text_prompt.dart';
 export 'wdgt/info/get_copy.dart';
