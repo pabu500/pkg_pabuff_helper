@@ -977,12 +977,13 @@ class Bill {
                       ),
                       buildLabel: (num i) {
                         int index = i.toInt();
+                        String monthLabel =
+                            _getMonthLable(trending?[index]['label'] as String);
                         return pw.Transform.translate(
                           offset: const PdfPoint(-10, 0),
                           child: pw.Column(
                             children: [
-                              pw.Text(trending?[index]['label'] as String,
-                                  style: labelStyle),
+                              pw.Text(monthLabel, style: labelStyle),
                               pw.Text((trending?[index]['valueStr'] ?? ''),
                                   style: labelStyle),
                             ],
@@ -1055,6 +1056,33 @@ class Bill {
   String _formatDate(DateTime date) {
     final format = DateFormat.yMMMd('en_US');
     return format.format(date);
+  }
+
+  String _getMonthLable(String label) {
+    if (label.isEmpty) {
+      return '';
+    }
+    //change 2024-6 to Jun'24
+    List<String> monthList = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
+    List<String> dateList = label.split('-');
+    if (dateList.length != 2) {
+      return '';
+    }
+    int month = int.parse(dateList[1]);
+    return '${monthList[month - 1]}\'${dateList[0].substring(2)}';
   }
 
   String getBarNumberStr(double value) {

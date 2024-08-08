@@ -144,10 +144,10 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
             refLocalDatetime: _defaultEndDate); //get the end of the day
       }
     }
-    if (kDebugMode) {
-      print('ini defaultStartDate: $_defaultStartDate');
-      print('ini defaultEndDate: $_defaultEndDate');
-    }
+    // if (kDebugMode) {
+    //   print('ini defaultStartDate: $_defaultStartDate');
+    //   print('ini defaultEndDate: $_defaultEndDate');
+    // }
 
     _rangeDatePickerValueWithDefaultValue = [
       _defaultStartDate,
@@ -156,7 +156,8 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
     if (widget.singleDate) {
       _rangeDatePickerValueWithDefaultValue = [
         _defaultEndDate,
-        _defaultEndDate,
+        // will assert error if start and end date are the same
+        _defaultEndDate?.add(const Duration(seconds: 1)),
       ];
     }
   }
@@ -186,10 +187,10 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
           _selectedStartDate,
           _selectedEndDate,
         ];
-        if (kDebugMode) {
-          print('defaultStartDate: $_defaultStartDate');
-          print('defaultEndDate: $_defaultEndDate');
-        }
+        // if (kDebugMode) {
+        //   print('defaultStartDate: $_defaultStartDate');
+        //   print('defaultEndDate: $_defaultEndDate');
+        // }
       }
     }
 
@@ -265,6 +266,14 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
         fontWeight: FontWeight.bold,
       ),
     );
+
+    if (kDebugMode) {
+      print(
+          '_rangeDatePickerValueWithDefaultValue[0]:${_rangeDatePickerValueWithDefaultValue[0]}');
+      print(
+          '_rangeDatePickerValueWithDefaultValue[1]:${_rangeDatePickerValueWithDefaultValue[1]}');
+    }
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
