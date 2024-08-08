@@ -83,7 +83,7 @@ class WgtItemHistoryGetter extends StatefulWidget {
   final bool getByJob;
 
   @override
-  _WgtItemHistoryGetterState createState() => _WgtItemHistoryGetterState();
+  State<WgtItemHistoryGetter> createState() => _WgtItemHistoryGetterState();
 }
 
 class _WgtItemHistoryGetterState extends State<WgtItemHistoryGetter> {
