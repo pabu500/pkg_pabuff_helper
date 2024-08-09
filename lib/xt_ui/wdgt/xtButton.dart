@@ -1,11 +1,6 @@
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
 
-import '../style/xt_colors.dart';
-import '../util/xt_util_FormCoordinator.dart';
-import '../xt_helpers.dart';
-import 'xtWait.dart';
-
 enum btnKey { none, mainbutton }
 
 class xtButton extends StatefulWidget {
