@@ -8,7 +8,7 @@ import 'wgt_usage_bar.dart';
 class WgtDashboardList extends StatefulWidget {
   const WgtDashboardList({
     super.key,
-    required this.deviceList,
+    required this.itemList,
     this.title = '',
     this.reportNamePrefix,
     this.width = 200,
@@ -21,7 +21,7 @@ class WgtDashboardList extends StatefulWidget {
   final double height;
   final String? title;
   final String? reportNamePrefix;
-  final List<Map<String, dynamic>> deviceList;
+  final List<Map<String, dynamic>> itemList;
   final List<Map<String, dynamic>> listConfig;
   // final Offset offset;
 
@@ -51,7 +51,7 @@ class _WgtDashboardListState extends State<WgtDashboardList> {
   @override
   void initState() {
     super.initState();
-    _rows = widget.deviceList;
+    _rows = widget.itemList;
     _listConfig = widget.listConfig;
   }
 
@@ -225,7 +225,10 @@ class _WgtDashboardListState extends State<WgtDashboardList> {
                               ),
                             ),
                           )
-                    : Container(),
+                    : configItem['useWidget'] == 'custom'
+                        ? configItem['customWidget'](
+                            row, configItem['fieldKey'], configItem['width'])
+                        : Container(),
       );
     }
 
