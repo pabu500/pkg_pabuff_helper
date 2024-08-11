@@ -6,6 +6,7 @@ import 'package:fl_chart/fl_chart.dart';
 import '../../../util/date_time_util.dart';
 import '../../../util/string_util.dart';
 import '../../style/app_colors.dart';
+import '../xtInfoBox.dart';
 
 class WgtHistoryLineChart extends StatefulWidget {
   WgtHistoryLineChart({
@@ -52,6 +53,7 @@ class WgtHistoryLineChart extends StatefulWidget {
     this.leftPadding,
     this.rightPadding,
     this.getXTitle,
+    this.legendPadding,
   })  : bottomTextColor =
             bottomTextColor ?? AppColors.contentColorYellow.withOpacity(0.62),
         bottomTouchedTextColor =
@@ -102,6 +104,7 @@ class WgtHistoryLineChart extends StatefulWidget {
   final double? leftPadding;
   final double? rightPadding;
   final String Function(double)? getXTitle;
+  final EdgeInsets? legendPadding;
 
   @override
   State<WgtHistoryLineChart> createState() => _WgtHistoryLineChartState();
@@ -136,7 +139,7 @@ class _WgtHistoryLineChartState extends State<WgtHistoryLineChart> {
     Map<String, dynamic> firstData = historyData.first;
     bool isDouble = firstData[valKey] is double;
     // _maxY = 0;
-    _minY = double.infinity;
+    // _minY = double.infinity;
 
     for (var historyDataItem in historyData) {
       int timestamp =
@@ -193,7 +196,7 @@ class _WgtHistoryLineChartState extends State<WgtHistoryLineChart> {
           // text,
           // yTitles[index],
           (widget.showKonY ?? false)
-              ? getK(value, widget.yDecimalK)
+              ? getK(value, _yDecimal)
               : value.toStringAsFixed(_yDecimal),
           style: style,
           textAlign: TextAlign.center),
@@ -311,19 +314,6 @@ class _WgtHistoryLineChartState extends State<WgtHistoryLineChart> {
       bool singleTimestampLabel = true;
       // print('${barSpot.barIndex} ${touchedBarSpots.length}');
 
-      //find the barSpot.barIndex of barSpot with the smallest y value
-      // int minIndex = 0;
-      // double min = touchedBarSpots[0].y;
-      // for (var i = 1; i < touchedBarSpots.length; i++) {
-      //   if (touchedBarSpots[i].y < min) {
-      //     min = touchedBarSpots[i].y;
-      //     minIndex = i;
-      //   }
-      // }
-      // String yvalue = '';
-
-      // print('${barSpot.barIndex} $minIndex $yvalue');
-
       bool showTimestamp =
           (singleTimestampLabel && barSpot.y <= yMin) || !singleTimestampLabel;
       String text =
@@ -339,44 +329,18 @@ class _WgtHistoryLineChartState extends State<WgtHistoryLineChart> {
           color: textColor ?? widget.tooltipTextColor,
           fontWeight: FontWeight.bold,
         ),
-        children:
-            //  [
-            //   TextSpan(
-            //     text: getDateTimeStrFromTimestamp(flSpot.x.toInt(),
-            //         format: _timeFormat),
-            //     style: TextStyle(
-            //       color: widget.tooltipTextColor,
-            //       fontWeight: FontWeight.w300,
-            //     ),
-            //   )
-            // ],
-
-            // sapceSaveer
-            //     ? [
-            //         TextSpan(
-            //           text: getDateTimeStrFromTimestamp(flSpot.x.toInt(),
-            //               format: _timeFormat),
-            //           style: TextStyle(
-            //             color: widget.tooltipTextColor,
-            //             fontWeight: FontWeight.w300,
-            //           ),
-            //         )
-            //       ]
-            //     : [],
-
-            showTimestamp
-                ? [
-                    TextSpan(
-                      text: getDateTimeStrFromTimestamp(flSpot.x.toInt(),
-                          format: _timeFormat),
-                      style: TextStyle(
-                        color:
-                            widget.tooltipTimeColor ?? widget.tooltipTextColor,
-                        fontWeight: FontWeight.w300,
-                      ),
-                    )
-                  ]
-                : [],
+        children: showTimestamp
+            ? [
+                TextSpan(
+                  text: getDateTimeStrFromTimestamp(flSpot.x.toInt(),
+                      format: _timeFormat),
+                  style: TextStyle(
+                    color: widget.tooltipTimeColor ?? widget.tooltipTextColor,
+                    fontWeight: FontWeight.w300,
+                  ),
+                )
+              ]
+            : [],
         textAlign: textAlign,
       );
     }).toList();
@@ -407,7 +371,6 @@ class _WgtHistoryLineChartState extends State<WgtHistoryLineChart> {
         _numOfSpots = historyData.length;
         Color color = lineColor ??
             AppColors.tier1colorsAlt[i > 8 ? 8 : i].withOpacity(0.8);
-        // AppColors.getColorListBlueGreen()[i > 8 ? 8 : i].withOpacity(0.8);
 
         i++;
         List<FlSpot> chartData = genHistoryChartData(
@@ -489,6 +452,7 @@ class _WgtHistoryLineChartState extends State<WgtHistoryLineChart> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
+        getLegend(),
         AspectRatio(
           aspectRatio: widget.chartRatio,
           child: Padding(
@@ -714,5 +678,35 @@ class _WgtHistoryLineChartState extends State<WgtHistoryLineChart> {
     } else {
       return format;
     }
+  }
+
+  Widget getLegend() {
+    if (widget.legend == null) {
+      return Container();
+    }
+    return widget.legend!.length <= 1
+        ? Container()
+        : Padding(
+            padding: widget.legendPadding ??
+                const EdgeInsets.only(left: 3, right: 3, bottom: 10),
+            child: Row(
+              children: [
+                for (var item in widget.legend!)
+                  xtInfoBox(
+                    padding: const EdgeInsets.all(0.0),
+                    icon: Icon(
+                      Icons.square,
+                      color: item['color'],
+                      size: 13,
+                    ),
+                    text: item['name'],
+                    textStyle: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: Theme.of(context).hintColor),
+                  ),
+              ],
+            ),
+          );
   }
 }

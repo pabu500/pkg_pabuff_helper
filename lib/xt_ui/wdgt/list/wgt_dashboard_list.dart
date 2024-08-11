@@ -14,7 +14,7 @@ class WgtDashboardList extends StatefulWidget {
     this.width = 200,
     this.height = 250,
     required this.listConfig,
-    // this.offset = Offset.zero,
+    this.showSelected = false,
   });
 
   final double width;
@@ -23,7 +23,7 @@ class WgtDashboardList extends StatefulWidget {
   final String? reportNamePrefix;
   final List<Map<String, dynamic>> itemList;
   final List<Map<String, dynamic>> listConfig;
-  // final Offset offset;
+  final bool showSelected;
 
   @override
   State<WgtDashboardList> createState() => _WgtDashboardListState();
@@ -100,7 +100,7 @@ class _WgtDashboardListState extends State<WgtDashboardList> {
                 //   return _buildListItem(row);
                 // }
                 Map<String, dynamic> row = _rows[index];
-                return _buildListItem(row);
+                return _buildListItem(_rows, row);
               }),
         ),
       ]),
@@ -167,7 +167,8 @@ class _WgtDashboardListState extends State<WgtDashboardList> {
     );
   }
 
-  Widget _buildListItem(Map<String, dynamic> row) {
+  Widget _buildListItem(
+      List<Map<String, dynamic>> rows, Map<String, dynamic> row) {
     List<Widget> listItem = [];
     for (Map<String, dynamic> configItem in _listConfig) {
       if (!(configItem['show'] ?? true)) {
@@ -226,8 +227,8 @@ class _WgtDashboardListState extends State<WgtDashboardList> {
                             ),
                           )
                     : configItem['useWidget'] == 'custom'
-                        ? configItem['customWidget'](
-                            row, configItem['fieldKey'], configItem['width'])
+                        ? configItem['customWidget'](rows, row,
+                            configItem['fieldKey'], configItem['width'])
                         : Container(),
       );
     }
@@ -238,20 +239,22 @@ class _WgtDashboardListState extends State<WgtDashboardList> {
       visualDensity: const VisualDensity(vertical: -4),
       title: Container(
         decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: Theme.of(context).hintColor.withOpacity(0.34),
-              width: 0.5,
-            ),
-          ),
+          border: widget.showSelected && (row['selected'] ?? false)
+              ? Border.all(
+                  color: pag3,
+                  width: 1,
+                )
+              : Border(
+                  bottom: BorderSide(
+                    color: Theme.of(context).hintColor.withOpacity(0.34),
+                    width: 0.5,
+                  ),
+                ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: listItem,
-          // [
-          //   ...listItem,
-          // ],
         ),
       ),
     );
