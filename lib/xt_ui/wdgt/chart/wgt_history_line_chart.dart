@@ -51,6 +51,7 @@ class WgtHistoryLineChart extends StatefulWidget {
     this.yDecimalK = 0,
     this.leftPadding,
     this.rightPadding,
+    this.getXTitle,
   })  : bottomTextColor =
             bottomTextColor ?? AppColors.contentColorYellow.withOpacity(0.62),
         bottomTouchedTextColor =
@@ -100,6 +101,7 @@ class WgtHistoryLineChart extends StatefulWidget {
   final int yDecimalK;
   final double? leftPadding;
   final double? rightPadding;
+  final String Function(double)? getXTitle;
 
   @override
   State<WgtHistoryLineChart> createState() => _WgtHistoryLineChartState();
@@ -244,9 +246,11 @@ class _WgtHistoryLineChartState extends State<WgtHistoryLineChart> {
 
     // String xTitle = "";
     // xTitle = getDateTimeStrFromTimestamp(value.toInt(), format: _timeFormat);
-    String xTitle = getDateFromDateTimeStr(
-        DateTime.fromMillisecondsSinceEpoch(value.toInt()).toString(),
-        format: widget.xTimeFormat);
+    String xTitle = widget.getXTitle != null
+        ? widget.getXTitle!(value)
+        : getDateFromDateTimeStr(
+            DateTime.fromMillisecondsSinceEpoch(value.toInt()).toString(),
+            format: widget.xTimeFormat);
 
     return SideTitleWidget(
       space: 0,

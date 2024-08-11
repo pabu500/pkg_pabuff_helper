@@ -5,7 +5,7 @@ import '../../style/app_colors.dart';
 
 class WgtLineChart extends StatefulWidget {
   const WgtLineChart({
-    Key? key,
+    super.key,
     required this.xKey,
     required this.yKey,
     this.xAxisName,
@@ -28,7 +28,7 @@ class WgtLineChart extends StatefulWidget {
     this.reservedSizeBottom,
     this.xColor,
     this.yColor,
-  }) : super(key: key);
+  });
 
   final String xKey;
   final String yKey;
