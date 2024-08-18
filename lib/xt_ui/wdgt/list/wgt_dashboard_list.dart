@@ -226,10 +226,12 @@ class _WgtDashboardListState extends State<WgtDashboardList> {
                               ),
                             ),
                           )
-                    : configItem['useWidget'] == 'custom'
-                        ? configItem['customWidget'](rows, row,
-                            configItem['fieldKey'], configItem['width'])
-                        : Container(),
+                    : configItem['useWidget'] == 'deviceStatus'
+                        ? getDeviceStatus(row[configItem['fieldKey']])
+                        : configItem['useWidget'] == 'custom'
+                            ? configItem['customWidget'](rows, row,
+                                configItem['fieldKey'], configItem['width'])
+                            : Container(),
       );
     }
 
@@ -255,6 +257,26 @@ class _WgtDashboardListState extends State<WgtDashboardList> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: listItem,
+        ),
+      ),
+    );
+  }
+
+  Widget getDeviceStatus(String? status) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 5),
+      child: Container(
+        width: 13,
+        height: 13,
+        decoration: BoxDecoration(
+          color: status == null
+              ? Theme.of(context).hintColor
+              : status.toLowerCase() == 'active'
+                  ? Colors.green.shade200
+                  : status.toLowerCase() == 'inactive'
+                      ? Colors.redAccent.shade100
+                      : Theme.of(context).hintColor,
+          borderRadius: BorderRadius.circular(3),
         ),
       ),
     );
