@@ -271,11 +271,15 @@ class _WgtDashboardListState extends State<WgtDashboardList> {
         decoration: BoxDecoration(
           color: status == null
               ? Theme.of(context).hintColor
-              : status.toLowerCase() == 'active'
-                  ? Colors.green.shade200
-                  : status.toLowerCase() == 'inactive'
+              : status.toLowerCase() == 'active' ||
+                      status.toLowerCase() == 'online' ||
+                      status.toLowerCase() == 'normal'
+                  ? Colors.green.shade300
+                  : status.toLowerCase() == 'inactive' ||
+                          status.toLowerCase() == 'offline' ||
+                          status.toLowerCase() == 'error'
                       ? Colors.redAccent.shade100
-                      : Theme.of(context).hintColor,
+                      : Theme.of(context).hintColor.withOpacity(0.34),
           borderRadius: BorderRadius.circular(3),
         ),
       ),
