@@ -185,7 +185,8 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
         _selectedEndDate = selectedEndDate;
         _rangeDatePickerValueWithDefaultValue = [
           _selectedStartDate,
-          _selectedEndDate,
+          // will assert error if start and end date are the same
+          _selectedEndDate?.add(const Duration(milliseconds: 300)),
         ];
         // if (kDebugMode) {
         //   print('defaultStartDate: $_defaultStartDate');

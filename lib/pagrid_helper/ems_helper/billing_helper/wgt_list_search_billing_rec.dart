@@ -239,6 +239,12 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
           'width': 60.0,
         },
         {
+          'title': 'Usage E',
+          'fieldKey': 'billed_usage_e',
+          'width': 80.0,
+          'show': true
+        },
+        {
           'title': 'Rate W',
           'fieldKey': 'tariff_package_rate_id_w_rate',
           'width': 60.0,

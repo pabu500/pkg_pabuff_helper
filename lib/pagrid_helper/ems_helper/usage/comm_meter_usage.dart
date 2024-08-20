@@ -56,7 +56,8 @@ Future<dynamic> queryMeterUsageSummary(
             item['use_commissioned_datetime'] ?? false;
         if (useCommissionedDatetime) {
           item['first_reading_time_color'] =
-              getOpLifecycleStatusColor('normal');
+              // getOpLifecycleStatusColor('normal');
+              getOpLifecycleStatusColor('cip');
           item['first_reading_time_tooltip'] =
               'using commssion date: ${item['commissioned_timestamp']}';
         } else {
