@@ -69,7 +69,7 @@ class WgtFinderFieldInput extends StatefulWidget {
   final Widget? scanner;
 
   @override
-  _WgtFinderFieldInputState createState() => _WgtFinderFieldInputState();
+  State<WgtFinderFieldInput> createState() => _WgtFinderFieldInputState();
 }
 
 class _WgtFinderFieldInputState extends State<WgtFinderFieldInput> {

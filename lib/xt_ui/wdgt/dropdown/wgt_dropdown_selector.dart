@@ -6,6 +6,7 @@ class WgtDropdownSelector extends StatefulWidget {
     super.key,
     this.items = const [],
     this.initialValue,
+    this.isInitialValueMutable = true,
     required this.onSelected,
     required this.controller,
     this.onClear,
@@ -17,6 +18,7 @@ class WgtDropdownSelector extends StatefulWidget {
   final Function(String?) onSelected;
   final TextEditingController controller;
   final String? initialValue;
+  final bool isInitialValueMutable;
   final String hint;
   final double? width;
   final double? height;
@@ -39,6 +41,13 @@ class _WgtDropdownSelectorState extends State<WgtDropdownSelector> {
       color: Colors.black,
     );
 
+    bool enableEdit = true;
+    if (widget.initialValue != null) {
+      if (!widget.isInitialValueMutable) {
+        enableEdit = false;
+      }
+    }
+
     return SizedBox(
       width: widget.width,
       height: widget.height,
@@ -46,6 +55,7 @@ class _WgtDropdownSelectorState extends State<WgtDropdownSelector> {
         alignment: Alignment.centerRight,
         children: [
           DropdownMenu<String>(
+            enabled: enableEdit,
             width: widget.width,
             hintText: widget.hint,
             controller: widget.controller,
