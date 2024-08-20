@@ -9,6 +9,7 @@ enum TenantKey {
   tenant_label,
   sap_wbs,
   location_tag,
+  location_tag2,
   tenant_type,
   alt_name,
 }
