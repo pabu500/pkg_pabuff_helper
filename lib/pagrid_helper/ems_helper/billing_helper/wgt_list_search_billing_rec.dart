@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'dart:convert';
 import 'package:buff_helper/pagrid_helper/pagrid_helper.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
@@ -61,7 +61,7 @@ class WgtListSearchBillingRec extends StatefulWidget {
 }
 
 class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
-  // GlobalKey _testKey = GlobalKey();
+  final String sectionName = 'list_search_billing_rec';
 
   late final List<Map<String, dynamic>> _listConfig = [];
   Map<String, dynamic> _queryMap = {};
@@ -161,6 +161,17 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
     //clean up the list
     _modifiedEntityItems.removeWhere((element) => element.length <= 1);
     return _modifiedEntityItems;
+  }
+
+  void _updateCustomize() {
+    dynamic listCustmize = readFromSharedPref(sectionName);
+    Map<String, dynamic> colCustomize = json.decode(listCustmize ?? '{}');
+
+    for (var item in _listConfig) {
+      if (colCustomize.containsKey(item['fieldKey'])) {
+        item['show'] = colCustomize[item['fieldKey']];
+      }
+    }
   }
 
   @override
@@ -383,6 +394,8 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
         _listConfig.add(widget.opColConfig!);
       }
     }
+
+    _updateCustomize();
   }
 
   @override
@@ -528,6 +541,8 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
                           scrollDirection: Axis.horizontal,
                           child: WgtEditCommitList(
                             key: _listKey,
+                            selectShowColumn: true,
+                            sectionName: sectionName,
                             appConfig: widget.appConfig,
                             loggedInUser: widget.loggedInUser,
                             scopeProfile: widget.scopeProfile,

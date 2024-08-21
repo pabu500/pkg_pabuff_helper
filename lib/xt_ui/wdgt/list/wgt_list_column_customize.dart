@@ -1,3 +1,5 @@
+import 'package:buff_helper/pkg_buff_helper.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class WgtListColumnCustomize extends StatefulWidget {
@@ -5,12 +7,16 @@ class WgtListColumnCustomize extends StatefulWidget {
     super.key,
     required this.listConfig,
     required this.onChanged,
-    required this.onReset,
+    required this.onSet,
+    this.listHeight = 160,
+    this.sectionName = '',
   });
 
   final List<Map<String, dynamic>> listConfig;
   final Function(bool) onChanged;
-  final Function() onReset;
+  final Function() onSet;
+  final double? listHeight;
+  final String sectionName;
 
   @override
   State<WgtListColumnCustomize> createState() => _WgtListColumnCustomizeState();
@@ -19,7 +25,7 @@ class WgtListColumnCustomize extends StatefulWidget {
 class _WgtListColumnCustomizeState extends State<WgtListColumnCustomize> {
   late final List<Map<String, dynamic>> _listConfig;
 
-  UniqueKey? _listResetKey;
+  bool _isSet = false;
 
   @override
   void initState() {
@@ -79,10 +85,24 @@ class _WgtListColumnCustomizeState extends State<WgtListColumnCustomize> {
   //   return columnSelection;
   // }
 
+  void _saveCustomize() {
+    if (widget.sectionName.isEmpty) {
+      if (kDebugMode) {
+        print('sectionName is empty');
+      }
+      return;
+    }
+    Map<String, dynamic> colCustomize = {};
+    for (Map<String, dynamic> item in _listConfig) {
+      colCustomize[item['fieldKey']] = item['show'] ?? true;
+    }
+    saveToSharedPref(widget.sectionName, colCustomize);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
+    return SizedBox(
+      height: 160,
       child: getColumnSelection(),
     );
   }
@@ -105,7 +125,7 @@ class _WgtListColumnCustomizeState extends State<WgtListColumnCustomize> {
 
                   setState(() {
                     configItem['show'] = value;
-                    widget.onChanged(value);
+                    // widget.onChanged(value);
                   });
                 },
               ),
@@ -119,10 +139,53 @@ class _WgtListColumnCustomizeState extends State<WgtListColumnCustomize> {
         ),
       );
     }
-    return SingleChildScrollView(
-      child: Column(
-        children: columnSelection,
+    return Wrap(children: [
+      verticalSpaceSmall,
+      SizedBox(
+        height: widget.listHeight,
+        child: SingleChildScrollView(
+          child: Column(children: [
+            ...columnSelection,
+          ]),
+        ),
       ),
-    );
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            InkWell(
+              onTap: _isSet
+                  ? null
+                  : () {
+                      _saveCustomize();
+                      setState(() {
+                        _isSet = true;
+                      });
+                      widget.onSet();
+
+                      Navigator.of(context).pop();
+                    },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                decoration: BoxDecoration(
+                  color: _isSet
+                      ? Theme.of(context).hintColor
+                      : Theme.of(context).colorScheme.primary,
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: const Text(
+                  'Set',
+                  style: TextStyle(
+                    fontSize: 13.5,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      verticalSpaceSmall,
+    ]);
   }
 }

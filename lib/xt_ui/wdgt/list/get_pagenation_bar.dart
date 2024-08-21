@@ -4,8 +4,15 @@ import '../../../util/util.dart';
 import '../../xt_helpers.dart';
 import '../file/wgt_save_table.dart';
 
-Widget getPagenationBar(BuildContext context, int? rowsPerPage, int? totalRows,
-    int? currentPage, Function? onPrev, Function? onNext, Function? onClickPage,
+Widget getPagenationBar(
+    BuildContext context,
+    int? rowsThisPage,
+    int? rowsPerPage,
+    int? totalRows,
+    int? currentPage,
+    Function? onPrev,
+    Function? onNext,
+    Function? onClickPage,
     {bool narrow = false,
     List<Map<String, dynamic>>? rows,
     required Function getCsv,
@@ -71,7 +78,7 @@ Widget getPagenationBar(BuildContext context, int? rowsPerPage, int? totalRows,
               ),
               horizontalSpaceTiny,
               Text(
-                'Total: $totalRows',
+                '${rowsThisPage ?? ''} / $totalRows',
                 style: TextStyle(
                   fontSize: 15,
                   color: Theme.of(context).hintColor,

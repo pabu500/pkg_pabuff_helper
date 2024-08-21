@@ -54,6 +54,8 @@ Future<void> saveToSharedPref(String key, dynamic val) async {
     await prefs.setString(key, val);
   } else if (val is List<String>) {
     await prefs.setStringList(key, val);
+  } else if (val is Map<String, dynamic>) {
+    await prefs.setString(key, jsonEncode(val));
   } else {
     await prefs.setString(key, val.toString());
   }

@@ -20,12 +20,13 @@ class WgtEditCommitList extends StatefulWidget {
     super.key,
     this.width,
     this.height,
+    this.sectionName = '',
     required this.appConfig,
     required this.loggedInUser,
     required this.scopeProfile,
     required this.listConfig,
     required this.listItems,
-    this.selectShowColumn = true,
+    this.selectShowColumn = false,
     this.showCommit = true,
     this.doCommit,
     required this.listPrefix,
@@ -58,6 +59,7 @@ class WgtEditCommitList extends StatefulWidget {
   final String listPrefix;
   final double? width;
   final double? height;
+  final String sectionName;
   //list of field titles and field width
   final List<Map<String, dynamic>> listConfig;
   //list of items to be displayed
@@ -102,7 +104,7 @@ class WgtEditCommitList extends StatefulWidget {
 }
 
 class _WgtEditCommitListState extends State<WgtEditCommitList> {
-  final double _indexWidth = 28;
+  final double _indexWidth = 34;
 
   bool _modified = false;
   // late double _lastColWidth;
@@ -284,6 +286,7 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
                           padding: const EdgeInsets.only(top: 5),
                           child: getPagenationBar(
                             context,
+                            _rows.length,
                             widget.maxRowsPerPage, //_rows.length,
                             widget.totalCount,
                             widget.currentPage,
@@ -358,7 +361,7 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
             //         clearListModifiedFlag: clearModifiedFlag,
             //       )
             // :
-            getCustomize(),
+            widget.selectShowColumn ? getCustomize() : Container(),
       ),
     );
 
@@ -892,17 +895,24 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
             width: 15,
             height: 15,
             popupWidth: 130,
-            popupHeight: 210,
+            popupHeight: 255,
             direction: 'right',
             popupChild: WgtListColumnCustomize(
+              sectionName: widget.sectionName,
               listConfig: _listConfig,
+              listHeight: 220,
               onChanged: (bool selected) {
+                // setState(() {
+                // _headerRefreshKey = UniqueKey();
+                // _listKey = UniqueKey();
+                // });
+              },
+              onSet: () {
                 setState(() {
                   _headerRefreshKey = UniqueKey();
                   _listKey = UniqueKey();
                 });
               },
-              onReset: () {},
             ),
             // getColumnSelection(),
             child: Icon(
