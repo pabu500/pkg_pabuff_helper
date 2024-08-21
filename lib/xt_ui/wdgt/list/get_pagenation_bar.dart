@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 
+import '../../../util/util.dart';
 import '../../xt_helpers.dart';
+import '../file/wgt_save_table.dart';
 
 Widget getPagenationBar(BuildContext context, int? rowsPerPage, int? totalRows,
     int? currentPage, Function? onPrev, Function? onNext, Function? onClickPage,
-    {bool narrow = false}) {
+    {bool narrow = false,
+    List<Map<String, dynamic>>? rows,
+    required Function getCsv,
+    String listPrefix = ''}) {
   if (rowsPerPage == null || totalRows == null || currentPage == null) {
     return Container();
   }
@@ -57,7 +62,14 @@ Widget getPagenationBar(BuildContext context, int? rowsPerPage, int? totalRows,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              horizontalSpaceRegular,
+              // horizontalSpaceTiny,
+              SaveTable(
+                iconSize: 21,
+                tooltip: 'Download list to CSV file',
+                getList: getCsv,
+                fileName: makeReportName(listPrefix, null, null, null),
+              ),
+              horizontalSpaceTiny,
               Text(
                 'Total: $totalRows',
                 style: TextStyle(

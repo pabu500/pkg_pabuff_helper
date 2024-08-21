@@ -186,6 +186,7 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
           'show': false,
           'editable': false,
           'width': 0.0,
+          'hidden': true,
         },
         {
           'title': 'Created',

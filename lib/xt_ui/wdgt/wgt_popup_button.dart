@@ -49,14 +49,14 @@ class WgtPopupButton extends StatelessWidget {
                   buttonKey.currentContext?.findRenderObject() as RenderBox;
               final position = renderBox.localToGlobal(Offset.zero);
 
-              bool toCloseToBottom = false;
+              bool isTooCloseToBottom = false;
               //check if the popup is too close to the bottom of the screen
               if (position.dy + popupHeight >
                   MediaQuery.of(context).size.height) {
-                toCloseToBottom = true;
+                isTooCloseToBottom = true;
               }
               double vertialOffset = 0;
-              if (toCloseToBottom) {
+              if (isTooCloseToBottom) {
                 vertialOffset = popupHeight;
               }
 

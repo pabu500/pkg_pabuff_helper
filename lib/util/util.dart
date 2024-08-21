@@ -121,7 +121,7 @@ String makeReportName(
     String prefix, String? targetSpec, DateTime? start, DateTime? end) {
   String reportName = '';
   //suffix: get currrent datetime
-  String suffix = DateFormat('MMddHHmmss').format(DateTime.now());
+  String suffix = DateFormat('yyyyMMddHHmmss').format(DateTime.now());
   String targetSpecSec =
       targetSpec == null || targetSpec.isEmpty ? '' : '_$targetSpec';
   String startSec =

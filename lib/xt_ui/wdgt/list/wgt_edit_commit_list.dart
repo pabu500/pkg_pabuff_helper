@@ -1,5 +1,6 @@
 import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/wgt_bill_lc_status_update.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
+import 'package:buff_helper/xt_ui/wdgt/list/wgt_list_column_customize.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
@@ -24,10 +25,9 @@ class WgtEditCommitList extends StatefulWidget {
     required this.scopeProfile,
     required this.listConfig,
     required this.listItems,
+    this.selectShowColumn = true,
     this.showCommit = true,
     this.doCommit,
-    // required this.getCsvList,
-    // this.fieldUpdateModified
     required this.listPrefix,
     this.compareValue,
     this.altCompareValue,
@@ -48,7 +48,6 @@ class WgtEditCommitList extends StatefulWidget {
     this.onToggleListPaneMode,
     this.multiSelection = false,
     this.itemExt = 36,
-    // this.requestByUsername,
     this.aclScopeStr,
     this.onRequestRefresh,
   });
@@ -63,6 +62,7 @@ class WgtEditCommitList extends StatefulWidget {
   final List<Map<String, dynamic>> listConfig;
   //list of items to be displayed
   final List<Map<String, dynamic>> listItems;
+  final bool selectShowColumn;
   final Function? doCommit;
   final bool showCommit;
   final double? compareValue;
@@ -106,6 +106,7 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
 
   bool _modified = false;
   // late double _lastColWidth;
+  late List<Map<String, dynamic>> _listConfig;
   late List<Map<String, dynamic>> _rows;
   late List<Map<String, dynamic>> _postCommitRows = [];
   final List<Map<String, dynamic>> _modifiedRows = [];
@@ -113,6 +114,8 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
   late double _listHeight;
   UniqueKey? _listKey;
   late TextStyle _listItemStyle;
+
+  UniqueKey? _headerRefreshKey;
 
   int _widgetIndex = -1;
   final _modifiedColor = Colors.amber.shade900;
@@ -206,22 +209,26 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
   @override
   void initState() {
     super.initState();
-    // _scopeProfile =
-    //     Provider.of<AppModel>(context, listen: false).portalScopeProfile!;
-    // _loggedInUser =
-    //     Provider.of<UserProvider>(context, listen: false).currentUser;
-
-    // if (_loggedInUser == null) {
-    //   if (kDebugMode) {
-    //     print('User is null');
-    //   }
-    //   return;
-    // }
 
     _currentMode = widget.displayMode;
     _rows = widget.listItems;
     //copy the list to _postCommitRows
     _postCommitRows = List.from(_rows);
+
+    _listConfig = List.from(widget.listConfig);
+  }
+
+  double getListWidth() {
+    if (widget.width != null) {
+      return widget.width!;
+    }
+    double width = 120;
+    for (Map<String, dynamic> item in _listConfig) {
+      if (item['show'] ?? true) {
+        width += item['width'];
+      }
+    }
+    return width;
   }
 
   @override
@@ -234,9 +241,12 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
       fontSize: 13.5,
       color: Theme.of(context).hintColor,
     );
-    _width = widget.width ??
-        120 + widget.listConfig.fold(0, (a, b) => a + b['width']);
+    _width = widget.width ?? getListWidth();
     _listHeight = widget.height ?? widget.listItems.length * itemExt + itemExt;
+
+    if (kDebugMode) {
+      print('list width: $_width list height: $_listHeight');
+    }
 
     bool showPagination = widget.totalCount != null &&
         widget.currentPage != null &&
@@ -281,6 +291,9 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
                             widget.onNextPage,
                             widget.onClickPage,
                             narrow: widget.narrowPaginationBar,
+                            rows: _rows,
+                            getCsv: _getCsvList,
+                            listPrefix: widget.listPrefix,
                           ),
                         )
                       : Container());
@@ -319,6 +332,9 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
   }
 
   Widget _buildListHeader() {
+    if (kDebugMode) {
+      print('build list header');
+    }
     TextStyle listHeaderStyle = TextStyle(
       fontWeight: FontWeight.bold,
       fontSize: 15,
@@ -330,31 +346,23 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
     // if (widget.showIndex != null && widget.showIndex!) {
     // if (widget.showCommit || _modified) {
     listHeader.add(
-      Transform.translate(
-        offset: const Offset(-5, 0),
-        child: SizedBox(
-          width: _indexWidth,
-          child:
-              // widget.showCommit && _modified
-              //     ? CommitModifiedTable(
-              //         getList: getModifiedList,
-              //         doCommit: (list, byUser) async =>
-              //             await widget.doCommit(list, byUser),
-              //         updateItemModified: widget.fieldUpdateModified,
-              //         clearListModifiedFlag: clearModifiedFlag,
-              //       )
-              // :
-              SaveTable(
-            iconSize: 21,
-            tooltip: 'Download list to CSV file',
-            getList: _getCsvList,
-            fileName: makeReportName(widget.listPrefix, null, null, null),
-          ),
-        ),
+      SizedBox(
+        width: _indexWidth,
+        child:
+            // widget.showCommit && _modified
+            //     ? CommitModifiedTable(
+            //         getList: getModifiedList,
+            //         doCommit: (list, byUser) async =>
+            //             await widget.doCommit(list, byUser),
+            //         updateItemModified: widget.fieldUpdateModified,
+            //         clearListModifiedFlag: clearModifiedFlag,
+            //       )
+            // :
+            getCustomize(),
       ),
     );
 
-    for (Map<String, dynamic> configItem in widget.listConfig) {
+    for (Map<String, dynamic> configItem in _listConfig) {
       // if (item != widget.listConfig.last) {
       // the space for checkbox column title is taken by save table icon
       if (widget.multiSelection && configItem['useWidget'] == 'checkbox') {
@@ -369,7 +377,7 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
           WgtListSortIcon(
             sortOrder: configItem['sortOrder'] ?? '',
             onSort: (sortOrder) {
-              for (var rowConfig in widget.listConfig) {
+              for (var rowConfig in _listConfig) {
                 rowConfig['sortOrder'] = '';
               }
               configItem['sortOrder'] = sortOrder;
@@ -402,7 +410,11 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
       ));
     }
 
+    if (kDebugMode) {
+      print('header count ${listHeader.length}');
+    }
     return ListTile(
+      key: _headerRefreshKey,
       dense: true,
       // visualDensity: VisualDensity(vertical: -4),
       title: Container(
@@ -449,7 +461,7 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
             ),
           )
         : Container();
-    for (Map<String, dynamic> configItem in widget.listConfig) {
+    for (Map<String, dynamic> configItem in _listConfig) {
       if (!(configItem['show'] ?? true)) {
         continue;
       }
@@ -860,6 +872,80 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
           // crossAxisAlignment: CrossAxisAlignment.center,
           children: listItem,
         ),
+      ),
+    );
+  }
+
+  Widget getCustomize() {
+    // return
+    // WgtListColumnCustomize(
+    //   listConfig: _listConfig,
+    //   onChanged: () {},
+    //   onReset: () {},
+    // );
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Tooltip(
+        message: 'Customize columns',
+        waitDuration: const Duration(milliseconds: 500),
+        child: WgtPopupButton(
+            width: 15,
+            height: 15,
+            popupWidth: 130,
+            popupHeight: 210,
+            direction: 'right',
+            popupChild: WgtListColumnCustomize(
+              listConfig: _listConfig,
+              onChanged: (bool selected) {
+                setState(() {
+                  _headerRefreshKey = UniqueKey();
+                  _listKey = UniqueKey();
+                });
+              },
+              onReset: () {},
+            ),
+            // getColumnSelection(),
+            child: Icon(
+              Icons.settings,
+              size: 13,
+              color: Theme.of(context).hintColor,
+            )),
+      ),
+    );
+  }
+
+  Widget getColumnSelection() {
+    List<Widget> columnSelection = [];
+    for (Map<String, dynamic> configItem in _listConfig) {
+      // if (configItem['show'] == false) {
+      //   continue;
+      // }
+      columnSelection.add(
+        Row(
+          children: [
+            Transform.scale(
+              scale: 0.8,
+              child: Checkbox(
+                value: configItem['show'] ?? true,
+                onChanged: (value) {
+                  setState(() {
+                    configItem['show'] = value;
+                  });
+                },
+              ),
+            ),
+            Text(
+              configItem['title'],
+              style:
+                  TextStyle(fontSize: 13.5, color: Theme.of(context).hintColor),
+            ),
+          ],
+        ),
+      );
+    }
+    return SingleChildScrollView(
+      child: Column(
+        children: columnSelection,
       ),
     );
   }
