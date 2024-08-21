@@ -251,9 +251,9 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
       lastDate: widget.lastDate ??
           (widget.history
               ? endDate.add(const Duration(days: 1))
-              : endDate.add(const Duration(days: 180))),
+              : endDate.add(widget.maxDuration)),
       firstDate: widget.history
-          ? startDate.subtract(const Duration(days: 180))
+          ? startDate.subtract(widget.maxDuration)
           : startDate.subtract(const Duration(days: 1)),
       firstDayOfWeek: 1,
       selectedDayHighlightColor: Theme.of(context).colorScheme.primary,
