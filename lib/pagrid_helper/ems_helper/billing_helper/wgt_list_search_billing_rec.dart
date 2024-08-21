@@ -118,7 +118,7 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
         _queryMap,
         SvcClaim(
           userId: widget.loggedInUser.id,
-          username: widget.loggedInUser!.username,
+          username: widget.loggedInUser.username,
           scope: widget.loggedInUser.isAdminAndUp()
               ? AclScope.global.name
               : widget.scopeProfile.getEffectiveScopeStr(),
@@ -218,6 +218,24 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
           'clickCopy': true,
         },
         {
+          'title': 'Location',
+          'fieldKey': 'location_tag',
+          'width': 80.0,
+          // 'showSort': true,
+        },
+        {
+          'title': 'Location 2',
+          'fieldKey': 'location_tag2',
+          'width': 80.0,
+          // 'showSort': true,
+        },
+        {
+          'title': 'SAP WBS',
+          'fieldKey': 'sap_wbs',
+          'width': 130.0,
+          // 'showSort': true,
+        },
+        {
           'title': 'From',
           'fieldKey': 'from_timestamp',
           'editable': widget.loggedInUser.isAdminAndUp(),
@@ -240,8 +258,8 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
         },
         {
           'title': 'Usage E',
-          'fieldKey': 'billed_usage_e',
-          'width': 80.0,
+          'fieldKey': 'billed_total_usage_e',
+          'width': 90.0,
           'show': true
         },
         {
@@ -250,19 +268,39 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
           'width': 60.0,
         },
         {
+          'title': 'Usage W',
+          'fieldKey': 'billed_total_usage_w',
+          'width': 70.0,
+        },
+        {
           'title': 'Rate B',
           'fieldKey': 'tariff_package_rate_id_b_rate',
           'width': 60.0,
         },
         {
+          'title': 'Usage B',
+          'fieldKey': 'billed_total_usage_b',
+          'width': 100.0,
+        },
+        {
           'title': 'Rate N',
           'fieldKey': 'tariff_package_rate_id_n_rate',
-          'width': 60.0,
+          'width': 70.0,
+        },
+        {
+          'title': 'Usage N',
+          'fieldKey': 'billed_total_usage_n',
+          'width': 90.0,
         },
         {
           'title': 'Rate G',
           'fieldKey': 'tariff_package_rate_id_g_rate',
           'width': 60.0,
+        },
+        {
+          'title': 'Usage G',
+          'fieldKey': 'billed_total_usage_g',
+          'width': 90.0,
         },
         {
           'title': 'Bill Date',
