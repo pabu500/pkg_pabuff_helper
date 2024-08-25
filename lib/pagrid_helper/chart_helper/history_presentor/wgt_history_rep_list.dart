@@ -277,7 +277,7 @@ class _WgtHistoryRepListState extends State<WgtHistoryRepList> {
                         ),
                         verticalSpaceTiny,
                         widget.jobRequest.isEmpty
-                            ? SaveTable(
+                            ? WgtSaveTable(
                                 iconSize: 55,
                                 getList:
                                     _getCsvList, //widget.getCsvList, // _getCsvList,
@@ -341,7 +341,7 @@ class _WgtHistoryRepListState extends State<WgtHistoryRepList> {
     listHeader.add(
       Transform.translate(
         offset: const Offset(-5, 0),
-        child: SaveTable(
+        child: WgtSaveTable(
           enabled: _list.isNotEmpty,
           getList: _getCsvList,
           fileName: makeReportName(

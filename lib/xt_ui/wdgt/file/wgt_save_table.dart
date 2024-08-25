@@ -9,9 +9,9 @@ import '../info/empty_result.dart';
 
 // import 'package:evs2op/wgt/empty_result.dart';
 
-class SaveTable extends StatefulWidget {
-  const SaveTable({
-    Key? key,
+class WgtSaveTable extends StatefulWidget {
+  const WgtSaveTable({
+    super.key,
     // required this.table,
     // required this.list,
     required this.getList,
@@ -22,7 +22,7 @@ class SaveTable extends StatefulWidget {
     // this.showSnackBar = true,
     this.iconSize,
     this.enabled = true,
-  }) : super(key: key);
+  });
 
   // final List<List<dynamic>> table;
   // final List<dynamic> list;
@@ -36,10 +36,10 @@ class SaveTable extends StatefulWidget {
   // final bool showSnackBar;
 
   @override
-  State<SaveTable> createState() => _SaveTableState();
+  State<WgtSaveTable> createState() => _WgtSaveTableState();
 }
 
-class _SaveTableState extends State<SaveTable> {
+class _WgtSaveTableState extends State<WgtSaveTable> {
   // Future<void> downloadCSV(Stream<String> stream, String filename) async {
   //   final bytes = await stream.toList();
   //   final file = File(filename);

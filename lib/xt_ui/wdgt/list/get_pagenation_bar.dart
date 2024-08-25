@@ -70,7 +70,7 @@ Widget getPagenationBar(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // horizontalSpaceTiny,
-              SaveTable(
+              WgtSaveTable(
                 iconSize: 21,
                 tooltip: 'Download list to CSV file',
                 getList: getCsv,

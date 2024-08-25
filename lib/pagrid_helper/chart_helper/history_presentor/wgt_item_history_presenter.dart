@@ -1052,7 +1052,7 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
             ),
           ),
           if (_displayType == HistroyDisplayType.chart)
-            SaveTable(
+            WgtSaveTable(
               enabled: _selectedHistoryDataSetsForChart.isNotEmpty,
               getList: _getCsvList,
               fileName: makeReportName(

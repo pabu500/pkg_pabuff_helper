@@ -75,7 +75,7 @@ class _WgtDashboardListState extends State<WgtDashboardList> {
                 ),
               ),
               horizontalSpaceTiny,
-              SaveTable(
+              WgtSaveTable(
                 iconSize: 21,
                 // list: _tariffHistory!,
                 getList: _getCsvList,
@@ -132,7 +132,7 @@ class _WgtDashboardListState extends State<WgtDashboardList> {
             width: item['width'],
             style: listHeaderStyle,
             suffix: [
-              SaveTable(
+              WgtSaveTable(
                 // list: _tariffHistory!,
                 getList: _getCsvList,
                 fileName: makeReportName(
