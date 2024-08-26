@@ -42,13 +42,19 @@ class _WgtSubmitFilesState extends State<WgtSubmitFiles> {
               allowedExtensions: widget.fileExtensions)
           .then((result) {
         if (result == null || result.files.isEmpty) {
-          showSnackBar(context, 'Please select a file');
+          if (mounted) {
+            showSnackBar(context, 'Please select a file');
+          }
           return;
         }
         if (result.files.length > widget.maxFiles) {
-          showSnackBar(context, 'Please select up to ${widget.maxFiles} files');
+          if (mounted) {
+            showSnackBar(
+                context, 'Please select up to ${widget.maxFiles} files');
+          }
           return;
         }
+
         //check if the file is txt or csv
         bool getTextContent = true;
         for (var file in result.files) {

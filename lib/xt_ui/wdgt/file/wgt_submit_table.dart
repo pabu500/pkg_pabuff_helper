@@ -15,6 +15,7 @@ class WgtSubmitTable extends StatefulWidget {
     this.fileExtensions,
     this.color,
     required this.getList,
+    this.getHeader,
     this.onGetFileInfo,
   });
 
@@ -22,6 +23,7 @@ class WgtSubmitTable extends StatefulWidget {
   final Color? color;
   final List<String>? fileExtensions;
   final Function getList;
+  final Function(List<String>)? getHeader;
   final Function? onGetFileInfo;
 
   @override
@@ -47,7 +49,9 @@ class _WgtSubmitTableState extends State<WgtSubmitTable> {
       try {
         Uint8List? uploadfile = result.files.single.bytes;
         if (uploadfile == null) {
-          showSnackBar(context, 'Please select a csv file');
+          if (mounted) {
+            showSnackBar(context, 'Please select a csv file');
+          }
           return;
         }
 
@@ -55,12 +59,15 @@ class _WgtSubmitTableState extends State<WgtSubmitTable> {
         final csv = const CsvToListConverter(eol: "\r\n", fieldDelimiter: ",")
             .convert(bytes);
 
+        List<String> header = csv[0].map((e) => e.toString()).toList();
+
         // setState(() {
         _table = csv;
         // });
         filterEmptyRows(_table);
 
         widget.getList(_table);
+        widget.getHeader?.call(header);
         // String filename = result.files.first.name;
         // widget.onGetFileInfo?.call(filename);
         if (widget.onGetFileInfo != null) {
