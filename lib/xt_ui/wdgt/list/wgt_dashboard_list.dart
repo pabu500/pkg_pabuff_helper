@@ -15,6 +15,7 @@ class WgtDashboardList extends StatefulWidget {
     this.height = 250,
     required this.listConfig,
     this.showSelected = false,
+    this.padding = EdgeInsets.zero,
   });
 
   final double width;
@@ -24,6 +25,7 @@ class WgtDashboardList extends StatefulWidget {
   final List<Map<String, dynamic>> itemList;
   final List<Map<String, dynamic>> listConfig;
   final bool showSelected;
+  final EdgeInsets? padding;
 
   @override
   State<WgtDashboardList> createState() => _WgtDashboardListState();
@@ -203,9 +205,12 @@ class _WgtDashboardListState extends State<WgtDashboardList> {
                       borderRadius: BorderRadius.circular(3),
                     ),
                     padding: const EdgeInsets.only(left: 3),
-                    child: Text(
-                      displayText, //row[configItem['fieldKey']],
-                      style: TextStyle(fontSize: 13, color: color),
+                    child: Padding(
+                      padding: configItem['padding'] ?? EdgeInsets.zero,
+                      child: Text(
+                        displayText, //row[configItem['fieldKey']],
+                        style: TextStyle(fontSize: 13, color: color),
+                      ),
                     ),
                   )
                 : configItem['useWidget'] == 'WgtUsageBar'
@@ -240,6 +245,7 @@ class _WgtDashboardListState extends State<WgtDashboardList> {
       dense: true,
       visualDensity: const VisualDensity(vertical: -4),
       title: Container(
+        padding: widget.padding,
         decoration: BoxDecoration(
           border: widget.showSelected && (row['selected'] ?? false)
               ? Border.all(
@@ -264,7 +270,7 @@ class _WgtDashboardListState extends State<WgtDashboardList> {
 
   Widget getDeviceStatus(String? status) {
     return Padding(
-      padding: const EdgeInsets.only(left: 5),
+      padding: const EdgeInsets.only(left: 5, right: 2),
       child: Container(
         width: 13,
         height: 13,
