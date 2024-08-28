@@ -16,6 +16,7 @@ class WgtDashboardList extends StatefulWidget {
     required this.listConfig,
     this.showSelected = false,
     this.padding = EdgeInsets.zero,
+    this.contentPadding,
   });
 
   final double width;
@@ -26,6 +27,7 @@ class WgtDashboardList extends StatefulWidget {
   final List<Map<String, dynamic>> listConfig;
   final bool showSelected;
   final EdgeInsets? padding;
+  final EdgeInsets? contentPadding;
 
   @override
   State<WgtDashboardList> createState() => _WgtDashboardListState();
@@ -243,6 +245,7 @@ class _WgtDashboardListState extends State<WgtDashboardList> {
     return ListTile(
       // minVerticalPadding: -8,
       dense: true,
+      contentPadding: widget.contentPadding,
       visualDensity: const VisualDensity(vertical: -4),
       title: Container(
         padding: widget.padding,
@@ -260,6 +263,7 @@ class _WgtDashboardListState extends State<WgtDashboardList> {
                 ),
         ),
         child: Row(
+          // mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: listItem,
