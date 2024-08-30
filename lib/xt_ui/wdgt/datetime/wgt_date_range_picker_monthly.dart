@@ -50,13 +50,13 @@ class _WgtDateRangePickerMonthlyState extends State<WgtDateRangePickerMonthly> {
 
   Future<void> _onMonthlyPressed() async {
     String? locale = 'en';
-    final localeObj = locale != null ? Locale(locale) : null;
+    // final localeObj = locale != null ? Locale(locale) : null;
     final selected = await showMonthPicker(
       context: context,
       initialDate: _monthPicked ?? DateTime.now(),
       firstDate: DateTime(2020),
       lastDate: DateTime(2030),
-      locale: localeObj,
+      // locale: localeObj,
     );
 
     if (selected != null) {
