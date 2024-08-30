@@ -375,6 +375,8 @@ class UrlBase {
       '/tenant_dashboard/get_active_usage';
 
   //meter group
+  static const String eptGetAllMeterGroupList =
+      '/meter_group/get_all_meter_group_list';
   static const String eptCreateMeterGroup = '/meter_group/create_meter_group';
   static const String eptGetGroupMeters = '/meter_group/get_group_meters';
   static const String eptUpdateGroupItems = '/meter_group/update_items';
