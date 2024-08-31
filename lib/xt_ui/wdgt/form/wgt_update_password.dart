@@ -13,7 +13,7 @@ class WgtUpdatePassword extends StatefulWidget {
     super.key,
     required this.appConfig,
     required this.loggedInUser,
-    // required this.userId,
+    required this.changeTargetUserId,
     this.titleWidget,
     this.showUsername = true,
     this.showBorder = true,
@@ -29,7 +29,7 @@ class WgtUpdatePassword extends StatefulWidget {
   final PaGridAppConfig appConfig;
   final Widget? titleWidget;
   final Evs2User loggedInUser;
-  // final int userId;
+  final int changeTargetUserId;
   final bool showUsername;
   final bool showBorder;
   final bool requireOldPassword;
@@ -71,8 +71,7 @@ class _WgtUpdatePasswordState extends State<WgtUpdatePassword> {
     try {
       Map<String, dynamic> result = await widget.updatePassword(
         widget.appConfig,
-        // widget.userId,
-        widget.loggedInUser.id,
+        widget.changeTargetUserId,
         'password',
         _controllerNewPassword.text.trim(),
         checkOldPassword: widget.requireOldPassword ? 'true' : 'false',

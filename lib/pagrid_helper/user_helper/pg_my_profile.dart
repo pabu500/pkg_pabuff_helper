@@ -427,6 +427,7 @@ class _PgMyProfileState extends State<PgMyProfile> {
                 showBorder: false,
                 sideExpanded: false,
                 loggedInUser: widget.loggedInUser,
+                changeTargetUserId: widget.loggedInUser.id!,
                 // requestByUsername: widget.loggedInUser.username!,
                 // userId: widget.loggedInUser.id!,
                 updatePassword: doUpdateKeyValue,

@@ -979,7 +979,7 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
           appConfig: widget.appConfig,
           loggedInUser: widget.loggedInUser,
           aclScopeStr: item['aclScopeStr'] ?? widget.aclScopeStr!,
-          // userId: userId,
+          changeTargetUserId: userId,
           requireOldPassword: false,
           passwordLengthMin: 3,
           updatePassword: item['updatePassword'],
