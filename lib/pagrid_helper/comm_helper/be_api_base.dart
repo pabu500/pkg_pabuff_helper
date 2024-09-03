@@ -20,6 +20,7 @@ class UrlController {
   UrlController(PaGridAppConfig appConfig) {
     _usersvcURL = getProjectHostUser(appConfig);
     _oresvcURL = getProjectHostOre(appConfig);
+    // print('oresvcURL: $_oresvcURL');
     _destPortalURL = getProjectHostDestPortal(appConfig);
   }
 
