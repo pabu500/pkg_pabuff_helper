@@ -14,8 +14,10 @@ enum SensorType {
 }
 
 enum DeviceType {
-  meter,
-  sensor,
+  METER,
+  SENSOR,
+  LOCK,
+  CAMERA,
 }
 
 enum MeterType {
