@@ -132,6 +132,10 @@ Map<DeviceStatus, Color>
   DeviceStatus.unknown: Colors.white,
 };
 
+Color getSensorStatusColor(DeviceStatus deviceStatus) {
+  return sensorStatusColor[deviceStatus] ?? Colors.white;
+}
+
 Widget getSensorIcon(SensorType sensorType) {
   Color iconColor = Colors.white.withOpacity(0.9);
   double iconSize = 25;
@@ -286,6 +290,30 @@ Widget getDeviceTypeIcon(dynamic deviceSubType,
     print('theIconSize: $theIconSize');
   }
   switch (deviceSubType) {
+    case DeviceType.LOCK:
+      return Icon(
+        Icons.lock,
+        size: theIconSize,
+        color: iconColor,
+      );
+    case DeviceType.METER:
+      return Icon(
+        Symbols.speed,
+        size: theIconSize,
+        color: iconColor,
+      );
+    case DeviceType.SENSOR:
+      return Icon(
+        Symbols.sensors,
+        size: theIconSize,
+        color: iconColor,
+      );
+    case DeviceType.CAMERA:
+      return Icon(
+        Symbols.videocam,
+        size: theIconSize,
+        color: iconColor,
+      );
     case MeterType.electricity1p:
       return Icon(
         Icons.bolt, // Icons.electric_meter,
@@ -353,6 +381,7 @@ Widget getDeviceTypeIcon(dynamic deviceSubType,
         size: theIconSize,
         color: iconColor,
       );
+
     default:
       return Icon(
         Symbols.help,
