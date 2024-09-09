@@ -243,7 +243,7 @@ Map<String, dynamic> getValueUnitDisplayStr2(
   String? unit, {
   int decimal = 0,
   bool useK = false,
-  double kThreshold = 1000000,
+  double kThreshold = 100000,
   String kUnit = 'k',
   bool forceK = false,
 }) {
