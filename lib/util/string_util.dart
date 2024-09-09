@@ -238,6 +238,41 @@ String getValueUnitDisplayStr(
   return valueStr;
 }
 
+Map<String, dynamic> getValueUnitDisplayStr2(
+  double? value,
+  String? unit, {
+  int decimal = 0,
+  bool useK = false,
+  double kThreshold = 1000000,
+  String kUnit = 'k',
+  bool forceK = false,
+}) {
+  double? useValue = value;
+  bool isK = false;
+  if (value == null) {
+    return {'value': '-', 'isK': false};
+  }
+
+  if (useK && value >= kThreshold) {
+    useValue = value / 1000;
+    isK = true;
+  }
+  if (forceK) {
+    useValue = value / 1000;
+    isK = true;
+  }
+
+  String valueStr = getCommaNumberStr(useValue, decimal: decimal);
+  if (unit != null) {
+    if (isK) {
+      valueStr = '$valueStr$kUnit';
+    } else {
+      valueStr = '$valueStr $unit';
+    }
+  }
+  return {'value': valueStr, 'isK': isK};
+}
+
 final Color statColorDark = Colors.grey.shade800;
 final defStatStyleLarge = TextStyle(
   fontSize: 30,
