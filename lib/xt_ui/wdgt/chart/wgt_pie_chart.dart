@@ -50,6 +50,8 @@ class WgtPieChart extends StatefulWidget {
     this.getBorderSide,
     this.getGradient,
     this.enableTouch = true,
+    this.flipX = false,
+    this.titlePositionPercentageOffset,
   });
   final List<Map<String, dynamic>> chartData;
   final double? width;
@@ -92,6 +94,8 @@ class WgtPieChart extends StatefulWidget {
   final BorderSide? Function(int)? getBorderSide;
   final Gradient? Function(int)? getGradient;
   final bool enableTouch;
+  final bool flipX;
+  final double? titlePositionPercentageOffset;
 
   @override
   State<StatefulWidget> createState() => WgtPieChartState();
@@ -166,86 +170,91 @@ class WgtPieChartState extends State<WgtPieChart> {
                   aspectRatio: 1,
                   child: Stack(
                     children: [
-                      PieChart(
-                        PieChartData(
-                          startDegreeOffset: widget.startDegreeOffset ?? -90,
-                          pieTouchData: PieTouchData(
-                            enabled: widget.enableTouch,
-                            touchCallback: !widget.enableTouch
-                                ? null
-                                : (FlTouchEvent event, pieTouchResponse) {
-                                    setState(() {
-                                      // print('isInterestedForInteractions: ${event.isInterestedForInteractions}');
-                                      // print('pieTouchResponse == null: ${pieTouchResponse == null}');
-                                      // print('pieTouchResponse.touchedSection == null: ${pieTouchResponse?.touchedSection == null}');
-                                      if (!event.isInterestedForInteractions ||
-                                          pieTouchResponse == null ||
-                                          pieTouchResponse.touchedSection ==
-                                              null) {
-                                        // print('0 isInterestedForInteractions: ${event.isInterestedForInteractions}');
+                      Transform.flip(
+                        flipX: widget.flipX,
+                        child: PieChart(
+                          PieChartData(
+                            startDegreeOffset: widget.startDegreeOffset ?? -90,
+                            pieTouchData: PieTouchData(
+                              enabled: widget.enableTouch,
+                              touchCallback: !widget.enableTouch
+                                  ? null
+                                  : (FlTouchEvent event, pieTouchResponse) {
+                                      setState(() {
+                                        // print('isInterestedForInteractions: ${event.isInterestedForInteractions}');
+                                        // print('pieTouchResponse == null: ${pieTouchResponse == null}');
+                                        // print('pieTouchResponse.touchedSection == null: ${pieTouchResponse?.touchedSection == null}');
                                         if (!event
-                                                .isInterestedForInteractions &&
-                                            pieTouchResponse == null) {
-                                          //tested behavior: triggered with click
-                                          if (kDebugMode) {
-                                            print('click 0');
-                                          }
-                                          if (touchedIndex != -1) {
-                                            if (widget.onSectionTap != null) {
-                                              widget
-                                                  .onSectionTap!(touchedIndex);
+                                                .isInterestedForInteractions ||
+                                            pieTouchResponse == null ||
+                                            pieTouchResponse.touchedSection ==
+                                                null) {
+                                          // print('0 isInterestedForInteractions: ${event.isInterestedForInteractions}');
+                                          if (!event
+                                                  .isInterestedForInteractions &&
+                                              pieTouchResponse == null) {
+                                            //tested behavior: triggered with click
+                                            if (kDebugMode) {
+                                              print('click 0');
+                                            }
+                                            if (touchedIndex != -1) {
+                                              if (widget.onSectionTap != null) {
+                                                widget.onSectionTap!(
+                                                    touchedIndex);
+                                              }
                                             }
                                           }
+
+                                          if (kDebugMode) {
+                                            //tested behavior: triggered with click or moving out
+                                            print('click/moving out');
+                                          }
+
+                                          touchedIndex = -1;
+                                          return;
                                         }
+                                        touchedIndex = pieTouchResponse
+                                            .touchedSection!
+                                            .touchedSectionIndex;
+                                        // if (kDebugMode) {
+                                        //   print(
+                                        //       'touchedIndex: $touchedIndex');
+                                        // }
+                                        // if (touchedIndex == -1) return;
 
-                                        if (kDebugMode) {
-                                          //tested behavior: triggered with click or moving out
-                                          print('click/moving out');
-                                        }
+                                        // if (widget.hoverClick == 1) {
+                                        //   if (event
+                                        //       .isInterestedForInteractions) {
+                                        //     if (widget.onSectionTap != null) {
+                                        //       widget.onSectionTap!(
+                                        //           touchedIndex);
+                                        //     }
+                                        //   }
+                                        // }
 
-                                        touchedIndex = -1;
-                                        return;
-                                      }
-                                      touchedIndex = pieTouchResponse
-                                          .touchedSection!.touchedSectionIndex;
-                                      // if (kDebugMode) {
-                                      //   print(
-                                      //       'touchedIndex: $touchedIndex');
-                                      // }
-                                      // if (touchedIndex == -1) return;
+                                        // if (widget.onSectionTap != null) {
+                                        //   widget.onSectionTap!(touchedIndex);
+                                        // }
 
-                                      // if (widget.hoverClick == 1) {
-                                      //   if (event
-                                      //       .isInterestedForInteractions) {
-                                      //     if (widget.onSectionTap != null) {
-                                      //       widget.onSectionTap!(
-                                      //           touchedIndex);
-                                      //     }
-                                      //   }
-                                      // }
-
-                                      // if (widget.onSectionTap != null) {
-                                      //   widget.onSectionTap!(touchedIndex);
-                                      // }
-
-                                      // if (touchedIndex == -1) return;
-                                      // widget.onSectionTap == null
-                                      //     ? null
-                                      //     : widget.onSectionTap!(touchedIndex);
-                                      // print('touchedIndex: $touchedIndex');
-                                      // show popup label
-                                      // showPopupLabel(
-                                      //     widget.chartData[touchedIndex]['label'],
-                                      //     widget.chartData[touchedIndex]['value']);
-                                    });
-                                  },
+                                        // if (touchedIndex == -1) return;
+                                        // widget.onSectionTap == null
+                                        //     ? null
+                                        //     : widget.onSectionTap!(touchedIndex);
+                                        // print('touchedIndex: $touchedIndex');
+                                        // show popup label
+                                        // showPopupLabel(
+                                        //     widget.chartData[touchedIndex]['label'],
+                                        //     widget.chartData[touchedIndex]['value']);
+                                      });
+                                    },
+                            ),
+                            borderData: FlBorderData(
+                              show: false,
+                            ),
+                            sectionsSpace: 0.5,
+                            centerSpaceRadius: widget.centerSize,
+                            sections: showingSections(),
                           ),
-                          borderData: FlBorderData(
-                            show: false,
-                          ),
-                          sectionsSpace: 0.5,
-                          centerSpaceRadius: widget.centerSize,
-                          sections: showingSections(),
                         ),
                       ),
                       Center(
@@ -293,6 +302,7 @@ class WgtPieChartState extends State<WgtPieChart> {
         value: widget.chartData[i]['value'],
         showTitle: widget.showTouchedLabel,
         title: getSectionDisplayText(i, isTouched),
+        titlePositionPercentageOffset: widget.titlePositionPercentageOffset,
         radius: radius,
         titleStyle: getLabelStyle(
             widget.labelBaseColor ?? Theme.of(context).hintColor,
