@@ -176,7 +176,7 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
               : getTargetLocalDatetimeNow(widget.scopeProfile.timezone));
       Duration duration = selectedEndDate.difference(selectedStartDate);
 
-      if (duration > widget.maxDuration) {
+      if (duration.inSeconds > widget.maxDuration.inSeconds + 61) {
         if (widget.onMaxDurationExceeded != null) {
           widget.onMaxDurationExceeded!();
         }

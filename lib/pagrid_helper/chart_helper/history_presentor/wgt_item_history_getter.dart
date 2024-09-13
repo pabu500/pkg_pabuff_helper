@@ -684,237 +684,225 @@ class _WgtItemHistoryGetterState extends State<WgtItemHistoryGetter> {
   }
 
   Widget completedWidget() {
-    return widget.isInvisible
-        ? Container()
-        : Column(
-            children: [
-              Row(
+    if (widget.isInvisible) return Container();
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              height: 45,
+              decoration: BoxDecoration(
+                border: _isCustomRange
+                    ? Border.all(
+                        color: Theme.of(context).hintColor.withOpacity(0.2),
+                        width: 1,
+                      )
+                    : Border.all(
+                        color: Theme.of(context).colorScheme.primary,
+                        width: 2,
+                      ),
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Container(
-                    height: 45,
-                    decoration: BoxDecoration(
-                      border: _isCustomRange
-                          ? Border.all(
-                              color:
-                                  Theme.of(context).hintColor.withOpacity(0.2),
-                              width: 1,
-                            )
-                          : Border.all(
-                              color: Theme.of(context).colorScheme.primary,
-                              width: 2,
-                            ),
-                      borderRadius: BorderRadius.circular(5),
+                  SizedBox(
+                      height: 35,
+                      child: IconButton(
+                        tooltip:
+                            'previous ${getReadableDuration(Duration(minutes: _selectedTimeRangeMinutes))}',
+                        onPressed: _isPullingData ||
+                                _isCustomRange ||
+                                _startDate == null ||
+                                _earliestDate == null ||
+                                _startDate!.isBefore(_earliestDate!)
+                            ? null
+                            : () async {
+                                _endDate = _endDate!.subtract(Duration(
+                                    minutes: _selectedTimeRangeMinutes));
+                                _startDate = _startDate!.subtract(Duration(
+                                    minutes: _selectedTimeRangeMinutes));
+                                _isCustomRange = false;
+
+                                widget.onTimeRangeChanged(
+                                    _startDate!, _endDate!, _isCustomRange);
+                                await _getHistorys();
+                              },
+                        icon: const Icon(Icons.arrow_left),
+                      )),
+                  for (var item in widget.lookBackMinutes)
+                    InkWell(
+                      onTap: _isPullingData
+                          ? null
+                          : () async {
+                              if (item != _selectedTimeRangeMinutes) {
+                                setState(() {
+                                  _selectedTimeRangeMinutes = item;
+                                });
+                                _endDate = getTargetLocalDatetimeNow(
+                                    widget.scopeProfile.timezone);
+                                _startDate = _endDate!.subtract(Duration(
+                                    minutes: _selectedTimeRangeMinutes));
+                                _isCustomRange = false;
+                                widget.onTimeRangeChanged(
+                                  _startDate!,
+                                  _endDate!,
+                                  _isCustomRange,
+                                );
+
+                                await _getHistorys();
+                              }
+                            },
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                        color: _selectedTimeRangeMinutes == item
+                            ? Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withOpacity(0.5)
+                            : Theme.of(context).hintColor.withOpacity(0.1),
+                        child: Padding(
+                          padding:
+                              const EdgeInsets.fromLTRB(5.0, 6.0, 5.0, 5.0),
+                          child: Text(
+                              getReadableDuration(Duration(minutes: item)),
+                              // '${item ~/ 60} hours',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: Theme.of(context).hintColor,
+                                  fontWeight: FontWeight.w500)),
+                        ),
+                      ),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                            height: 35,
-                            child: IconButton(
-                              tooltip:
-                                  'previous ${getReadableDuration(Duration(minutes: _selectedTimeRangeMinutes))}',
-                              onPressed: _isPullingData ||
-                                      _isCustomRange ||
-                                      _startDate == null ||
-                                      _earliestDate == null ||
-                                      _startDate!.isBefore(_earliestDate!)
-                                  ? null
-                                  : () async {
-                                      _endDate = _endDate!.subtract(Duration(
-                                          minutes: _selectedTimeRangeMinutes));
-                                      _startDate = _startDate!.subtract(
-                                          Duration(
-                                              minutes:
-                                                  _selectedTimeRangeMinutes));
-                                      _isCustomRange = false;
+                  IconButton(
+                    tooltip:
+                        'next ${getReadableDuration(Duration(minutes: _selectedTimeRangeMinutes))}',
+                    onPressed: _isPullingData ||
+                            _isCustomRange ||
+                            _endDate == null ||
+                            _endDate!.isAfter(getTargetLocalDatetimeNow(
+                                    widget.scopeProfile.timezone)
+                                .subtract(const Duration(hours: 1)))
+                        ? null
+                        : () async {
+                            _endDate = _endDate!.add(
+                                Duration(minutes: _selectedTimeRangeMinutes));
+                            _startDate = _startDate!.add(
+                                Duration(minutes: _selectedTimeRangeMinutes));
+                            widget.onTimeRangeChanged(
+                                _startDate!, _endDate!, _isCustomRange);
 
-                                      widget.onTimeRangeChanged(_startDate!,
-                                          _endDate!, _isCustomRange);
-                                      await _getHistorys();
-                                    },
-                              icon: const Icon(Icons.arrow_left),
-                            )),
-                        for (var item in widget.lookBackMinutes)
-                          InkWell(
-                            onTap: _isPullingData
-                                ? null
-                                : () async {
-                                    if (item != _selectedTimeRangeMinutes) {
-                                      setState(() {
-                                        _selectedTimeRangeMinutes = item;
-                                      });
-                                      _endDate = getTargetLocalDatetimeNow(
-                                          widget.scopeProfile.timezone);
-                                      _startDate = _endDate!.subtract(Duration(
-                                          minutes: _selectedTimeRangeMinutes));
-                                      _isCustomRange = false;
-                                      widget.onTimeRangeChanged(
-                                        _startDate!,
-                                        _endDate!,
-                                        _isCustomRange,
-                                      );
-
-                                      await _getHistorys();
-                                    }
-                                  },
-                            child: Card(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(3),
-                              ),
-                              color: _selectedTimeRangeMinutes == item
-                                  ? Theme.of(context)
-                                      .colorScheme
-                                      .primary
-                                      .withOpacity(0.5)
-                                  : Theme.of(context)
-                                      .hintColor
-                                      .withOpacity(0.1),
-                              child: Padding(
-                                padding: const EdgeInsets.fromLTRB(
-                                    5.0, 6.0, 5.0, 5.0),
-                                child: Text(
-                                    getReadableDuration(
-                                        Duration(minutes: item)),
-                                    // '${item ~/ 60} hours',
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        color: Theme.of(context).hintColor,
-                                        fontWeight: FontWeight.w500)),
-                              ),
-                            ),
-                          ),
-                        IconButton(
-                          tooltip:
-                              'next ${getReadableDuration(Duration(minutes: _selectedTimeRangeMinutes))}',
-                          onPressed: _isPullingData ||
-                                  _isCustomRange ||
-                                  _endDate == null ||
-                                  _endDate!.isAfter(getTargetLocalDatetimeNow(
-                                          widget.scopeProfile.timezone)
-                                      .subtract(const Duration(hours: 1)))
-                              ? null
-                              : () async {
-                                  _endDate = _endDate!.add(Duration(
-                                      minutes: _selectedTimeRangeMinutes));
-                                  _startDate = _startDate!.add(Duration(
-                                      minutes: _selectedTimeRangeMinutes));
-                                  widget.onTimeRangeChanged(
-                                      _startDate!, _endDate!, _isCustomRange);
-
-                                  await _getHistorys();
-                                },
-                          icon: const Icon(Icons.arrow_right),
-                        )
-                      ],
-                    ),
-                  ),
-                  horizontalSpaceTiny,
-                  Container(
-                    height: 45,
-                    decoration: BoxDecoration(
-                      border: _isCustomRange
-                          ? Border.all(
-                              color: Theme.of(context).colorScheme.primary,
-                              width: 2,
-                            )
-                          : Border.all(
-                              color:
-                                  Theme.of(context).hintColor.withOpacity(0.2),
-                              width: 1,
-                            ),
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: WgtDateRangePicker2(
-                      scopeProfile: widget.scopeProfile,
-                      timezone: widget.scopeProfile.timezone,
-                      populateDefaultRange: false,
-                      width: 290,
-                      updateRangeByParent: true,
-                      startDateTime: _startDate,
-                      endDateTime: _endDate,
-                      onSet: (startDate, endDate) async {
-                        if (startDate == null || endDate == null) return;
-                        setState(() {
-                          _startDate = startDate;
-                          _endDate = endDate;
-                          _isCustomRange = true;
-                          _selectedTimeRangeMinutes =
-                              endDate.difference(startDate).inMinutes;
-                        });
-
-                        widget.onTimeRangeChanged(
-                            _startDate!, _endDate!, _isCustomRange);
-
-                        await _getHistorys();
-                      },
-                      maxDuration:
-                          widget.maxDuration, // const Duration(days: 7),
-                      onMaxDurationExceeded: () {
-                        // Timer(const Duration(milliseconds: 500), () {
-                        //   showSnackBar(
-                        //     context,
-                        //     'Maximum duration is ${getReadableDuration(const Duration(days: 3))}',
-                        //   );
-                        // });
-                      },
-                    ),
-                  ),
+                            await _getHistorys();
+                          },
+                    icon: const Icon(Icons.arrow_right),
+                  )
                 ],
               ),
-              verticalSpaceTiny,
-              widget.showNormalization &&
-                      widget.loggedInUser.hasPermmision2(
-                          widget.scopeProfile.getEffectiveScope(),
-                          AclTarget.meter_p_trending_est_option,
-                          AclOperation.read)
-                  ? false //activePortalProjectScope == ProjectScope.EMS_CW_NUS
-                      ? WgtPopupButton(
-                          direction: 'right',
-                          // buttonKey: buttonKey,
-                          width: 200,
-                          height: 21,
-                          popupWidth: 89,
-                          popupHeight: 50,
-                          popupChild: Container(
-                            decoration: BoxDecoration(
-                              color:
-                                  Theme.of(context).hintColor.withOpacity(0.2),
-                              border: Border.all(
-                                width: 1,
-                                color: Theme.of(context).hintColor,
-                              ),
-                              borderRadius: BorderRadius.circular(5),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Theme.of(context)
-                                      .shadowColor
-                                      .withOpacity(0.1),
-                                  spreadRadius: 0,
-                                  blurRadius: 5,
-                                  offset: const Offset(2, 5),
-                                ),
-                              ],
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                'Contact Us',
-                                style: TextStyle(
-                                    color: Theme.of(context).hintColor),
-                              ),
-                            ),
+            ),
+            horizontalSpaceTiny,
+            Container(
+              height: 45,
+              decoration: BoxDecoration(
+                border: _isCustomRange
+                    ? Border.all(
+                        color: Theme.of(context).colorScheme.primary,
+                        width: 2,
+                      )
+                    : Border.all(
+                        color: Theme.of(context).hintColor.withOpacity(0.2),
+                        width: 1,
+                      ),
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: WgtDateRangePicker2(
+                scopeProfile: widget.scopeProfile,
+                timezone: widget.scopeProfile.timezone,
+                populateDefaultRange: false,
+                width: 290,
+                updateRangeByParent: true,
+                startDateTime: _startDate,
+                endDateTime: _endDate,
+                onSet: (startDate, endDate) async {
+                  if (startDate == null || endDate == null) return;
+                  setState(() {
+                    _startDate = startDate;
+                    _endDate = endDate;
+                    _isCustomRange = true;
+                    _selectedTimeRangeMinutes =
+                        endDate.difference(startDate).inMinutes;
+                  });
+
+                  widget.onTimeRangeChanged(
+                      _startDate!, _endDate!, _isCustomRange);
+
+                  await _getHistorys();
+                },
+                maxDuration: widget.maxDuration, // const Duration(days: 7),
+                onMaxDurationExceeded: () {
+                  // Timer(const Duration(milliseconds: 500), () {
+                  //   showSnackBar(
+                  //     context,
+                  //     'Maximum duration is ${getReadableDuration(const Duration(days: 3))}',
+                  //   );
+                  // });
+                },
+              ),
+            ),
+          ],
+        ),
+        verticalSpaceTiny,
+        widget.showNormalization &&
+                widget.loggedInUser.hasPermmision2(
+                    widget.scopeProfile.getEffectiveScope(),
+                    AclTarget.meter_p_trending_est_option,
+                    AclOperation.read)
+            ? false //activePortalProjectScope == ProjectScope.EMS_CW_NUS
+                ? WgtPopupButton(
+                    direction: 'right',
+                    // buttonKey: buttonKey,
+                    width: 200,
+                    height: 21,
+                    popupWidth: 89,
+                    popupHeight: 50,
+                    popupChild: Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).hintColor.withOpacity(0.2),
+                        border: Border.all(
+                          width: 1,
+                          color: Theme.of(context).hintColor,
+                        ),
+                        borderRadius: BorderRadius.circular(5),
+                        boxShadow: [
+                          BoxShadow(
+                            color:
+                                Theme.of(context).shadowColor.withOpacity(0.1),
+                            spreadRadius: 0,
+                            blurRadius: 5,
+                            offset: const Offset(2, 5),
                           ),
-                          // disabled: disabled,
-                          child: getNormalization(disabled: true),
-                          onHover: (val) {},
-                        )
-                      : getNormalization()
-                  : Container(),
-              // getNormalization(),
-            ],
-          );
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          'Contact Us',
+                          style: TextStyle(color: Theme.of(context).hintColor),
+                        ),
+                      ),
+                    ),
+                    // disabled: disabled,
+                    child: getNormalization(disabled: true),
+                    onHover: (val) {},
+                  )
+                : getNormalization()
+            : Container(),
+        // getNormalization(),
+      ],
+    );
   }
 
   Widget getNormalization({bool disabled = false}) {
