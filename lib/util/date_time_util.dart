@@ -300,3 +300,27 @@ String getTimeRangeStr(DateTime from, DateTime to,
   String middleStr = getDateTimeStrFromDateTime(middleReading, format: format);
   return useMiddle ? middleStr : '$fromStr -- $toStr';
 }
+
+String getIntervalTag(int intervalMinutes) {
+  if (intervalMinutes < 60) {
+    return '${intervalMinutes}m';
+  } else if (intervalMinutes < 1440) {
+    String tag = '';
+    int hours = intervalMinutes ~/ 60;
+    if (hours > 1) {
+      tag = '${hours}H';
+    } else {
+      tag = 'H';
+    }
+    return tag;
+  } else {
+    String tag = '';
+    int days = intervalMinutes ~/ 1440;
+    if (days > 1) {
+      tag = '${days}D';
+    } else {
+      tag = 'D';
+    }
+    return tag;
+  }
+}

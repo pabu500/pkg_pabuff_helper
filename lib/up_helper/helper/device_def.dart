@@ -44,6 +44,7 @@ enum DeviceStatus {
   alarm,
   error,
   unknown,
+  INACTIVE,
 }
 
 enum DeivceGroupType {
@@ -123,13 +124,11 @@ Map<DeviceStatus, Color>
 // const
     sensorStatusColor = {
   DeviceStatus.ok: Colors.green.shade100,
-  // AppColors.contentColorLightGreen,
-  // Colors.cyanAccent,
-  // AppColors.contentColorLightTeal,
   DeviceStatus.warning: Colors.limeAccent.shade200,
   DeviceStatus.error: contentColorLightMagneta,
   DeviceStatus.alarm: contentColorLightRed,
   DeviceStatus.unknown: Colors.white,
+  DeviceStatus.INACTIVE: Colors.grey.shade100,
 };
 
 Color getSensorStatusColor(DeviceStatus deviceStatus) {
