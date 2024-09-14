@@ -186,10 +186,9 @@ class WgtPieChartState extends State<WgtPieChart> {
                                           pieTouchResponse == null ||
                                           pieTouchResponse.touchedSection ==
                                               null) {
-                                        if (kDebugMode) {
-                                          print(
-                                              '0 isInterestedForInteractions: ${event.isInterestedForInteractions}');
-                                        }
+                                        // if (kDebugMode) {
+                                        //   print('0 isInterestedForInteractions: ${event.isInterestedForInteractions}');
+                                        // }
                                         if (!event
                                                 .isInterestedForInteractions &&
                                             pieTouchResponse == null) {
@@ -217,9 +216,9 @@ class WgtPieChartState extends State<WgtPieChart> {
                                       }
                                       touchedIndex = pieTouchResponse
                                           .touchedSection!.touchedSectionIndex;
-                                      if (kDebugMode) {
-                                        print('touchedIndex 1: $touchedIndex');
-                                      }
+                                      // if (kDebugMode) {
+                                      //   print('touchedIndex 1: $touchedIndex');
+                                      // }
                                       // if (touchedIndex == -1) return;
 
                                       // if (widget.hoverClick == 1) {
@@ -287,9 +286,9 @@ class WgtPieChartState extends State<WgtPieChart> {
     return List.generate(widget.chartData.length, (i) {
       final isTouched = i == touchedIndex;
       // final fontSize = isTouched ? 25.0 : 16.0;
-      if (kDebugMode) {
-        print('i $i, touchedIndex $touchedIndex');
-      }
+      // if (kDebugMode) {
+      //   print('i $i, touchedIndex $touchedIndex');
+      // }
       final double radius = isTouched
           ? widget.sectionRadiusIfTouched ??
               (widget.centerSize == null ? 50 + 13 : widget.centerSize! + 13)
