@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ThemeModel extends ChangeNotifier {
+class ThemeProvider extends ChangeNotifier {
   late bool _isDark;
   late MyThemePreferences _preferences;
   bool get isDark => _isDark;
 
-  ThemeModel({bool isDark = false}) {
+  ThemeProvider({bool isDark = false}) {
     _isDark = isDark;
     _preferences = MyThemePreferences();
     getPreferences();
