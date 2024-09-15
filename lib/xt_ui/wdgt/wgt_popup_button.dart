@@ -17,6 +17,7 @@ class WgtPopupButton extends StatelessWidget {
     this.disabled,
     this.xOffset = 0,
     this.center = false,
+    this.showShadow = true,
   });
 
   // final GlobalKey buttonKey = GlobalKey();
@@ -33,6 +34,7 @@ class WgtPopupButton extends StatelessWidget {
   final bool? disabled;
   final double xOffset;
   final bool center;
+  final bool showShadow;
 
   @override
   Widget build(BuildContext context) {
@@ -109,16 +111,18 @@ class WgtPopupButton extends StatelessWidget {
                                       .scaffoldBackgroundColor
                                       .withOpacity(0.8),
                               borderRadius: BorderRadius.circular(5),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Theme.of(context)
-                                      .hintColor
-                                      .withOpacity(0.1),
-                                  spreadRadius: 0,
-                                  blurRadius: 2,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
+                              boxShadow: showShadow
+                                  ? [
+                                      BoxShadow(
+                                        color: Theme.of(context)
+                                            .hintColor
+                                            .withOpacity(0.1),
+                                        spreadRadius: 0,
+                                        blurRadius: 2,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ]
+                                  : [],
                             ),
                             child: popupChild,
                           ),
