@@ -345,9 +345,7 @@ class WgtPieChartState extends State<WgtPieChart> {
                   (Theme.of(context).brightness == Brightness.dark
                       ? Theme.of(context).hintColor.withOpacity(0.25)
                       : Colors.grey.shade400),
-          child:
-              // Text('${widget.chartData[i]['label']}'),
-              WgtPieChartItemIndicator(
+          child: WgtPieChartItemIndicator(
             color: widget.chartData[i]['color'] ?? getColor(_listColor, i),
             displayLabel: Text.rich(
               TextSpan(

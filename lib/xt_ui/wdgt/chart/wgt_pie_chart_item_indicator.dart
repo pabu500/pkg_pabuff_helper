@@ -41,6 +41,7 @@ class _WgtPieChartItemIndicatorState extends State<WgtPieChartItemIndicator> {
           width: 4,
         ),
         widget.displayLabel,
+        const Spacer(),
         widget.suffix ?? Container(),
       ],
     );
