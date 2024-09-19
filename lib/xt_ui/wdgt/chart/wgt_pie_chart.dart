@@ -33,7 +33,9 @@ class WgtPieChart extends StatefulWidget {
     this.currentIndicatorColor,
     this.currentIndicatorLabelColor,
     this.currentIndicatorValueColor,
+    this.currentIndicatorArrowColor,
     this.indicatorColor,
+    this.indicatorValueColor,
     this.leftPadding,
     this.middlePadding = 0,
     this.rightPadding,
@@ -77,7 +79,9 @@ class WgtPieChart extends StatefulWidget {
   final Color? currentIndicatorColor;
   final Color? currentIndicatorLabelColor;
   final Color? currentIndicatorValueColor;
+  final Color? currentIndicatorArrowColor;
   final Color? indicatorColor;
+  final Color? indicatorValueColor;
   final double? leftPadding;
   final double middlePadding;
   final double? rightPadding;
@@ -373,7 +377,8 @@ class WgtPieChartState extends State<WgtPieChart> {
                           : TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.normal,
-                              color: Colors.orange.shade200)),
+                              color: widget.indicatorValueColor ??
+                                  Colors.orange.shade200)),
                 ],
               ),
             ),
@@ -381,7 +386,7 @@ class WgtPieChartState extends State<WgtPieChart> {
             size: 8,
             suffix: widget.currentIndicatorIndex == i
                 ? Icon(Icons.arrow_right,
-                    color: widget.currentIndicatorLabelColor ??
+                    color: widget.currentIndicatorArrowColor ??
                         Colors.orangeAccent.withOpacity(0.8))
                 : null,
           ),
