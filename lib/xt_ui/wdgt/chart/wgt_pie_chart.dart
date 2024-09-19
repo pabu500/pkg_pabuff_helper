@@ -353,7 +353,7 @@ class WgtPieChartState extends State<WgtPieChart> {
                 style: widget.currentIndicatorIndex == i
                     ? TextStyle(
                         fontSize: 15,
-                        fontWeight: FontWeight.bold,
+                        // fontWeight: FontWeight.bold,
                         color: widget.currentIndicatorLabelColor != null
                             ? widget.currentIndicatorLabelColor!
                             : Colors.orange.withOpacity(0.8))
@@ -369,7 +369,7 @@ class WgtPieChartState extends State<WgtPieChart> {
                       style: widget.currentIndicatorIndex == i
                           ? TextStyle(
                               fontSize: 15,
-                              fontWeight: FontWeight.bold,
+                              // fontWeight: FontWeight.bold,
                               color: widget.currentIndicatorValueColor ??
                                   Colors.orange)
                           : TextStyle(
