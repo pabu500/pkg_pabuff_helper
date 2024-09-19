@@ -1,3 +1,4 @@
+import 'package:buff_helper/xt_ui/style/evs2_colors.dart';
 import 'package:flutter/material.dart';
 
 class AppColors {
@@ -182,6 +183,16 @@ class AppColors {
       // contentColorDarkAmber,
 
       contentColorCyan,
+      contentColorLightGrey,
+      contentColorLightTeal,
+    ];
+    return colorList;
+  }
+
+  static List<Color> getColorListPGB() {
+    List<Color> colorList = [];
+    colorList = [
+      pag1,
       contentColorLightGrey,
       contentColorLightTeal,
     ];
