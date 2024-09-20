@@ -59,6 +59,21 @@ Size getStringDisplaySize(String text, TextStyle style) {
   return textPainter.size;
 }
 
+Size getStringDisplaySize2(BuildContext context, String text, TextStyle style) {
+  final textSpan = TextSpan(
+    text: text,
+    style: style,
+  );
+  // and get the media query
+  final media = MediaQuery.of(context);
+  final tp = TextPainter(
+      text: textSpan,
+      textDirection: ui.TextDirection.ltr,
+      textScaler: media.textScaler);
+  tp.layout();
+  return tp.size;
+}
+
 int getDisplayLength(double width, TextStyle style) {
   int displayLength = (width / getStringDisplaySize('a', style).width).floor();
   if (displayLength < 3) {

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 class WgtPieChartItemIndicator extends StatefulWidget {
-  const WgtPieChartItemIndicator(
-      {super.key,
-      required this.displayLabel,
-      this.size,
-      this.color,
-      this.isSquare,
-      this.suffix});
-  // final Color color;
+  const WgtPieChartItemIndicator({
+    super.key,
+    required this.displayLabel,
+    this.size,
+    this.color,
+    this.isSquare,
+    this.suffix,
+  });
   final Widget displayLabel;
   final bool? isSquare;
   final double? size;
@@ -37,9 +37,7 @@ class _WgtPieChartItemIndicatorState extends State<WgtPieChartItemIndicator> {
             color: widget.color,
           ),
         ),
-        const SizedBox(
-          width: 4,
-        ),
+        const SizedBox(width: 4),
         widget.displayLabel,
         const Spacer(),
         widget.suffix ?? Container(),
