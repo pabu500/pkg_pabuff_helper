@@ -349,7 +349,7 @@ class WgtPieChartState extends State<WgtPieChart> {
             color: widget.chartData[i]['color'] ?? getColor(_listColor, i),
             displayLabel: Text.rich(
               TextSpan(
-                text: widget.chartData[i]['is_empty']
+                text: (widget.chartData[i]['is_empty'] ?? false)
                     ? ' '
                     : widget.chartData[i]['label'],
                 style: widget.currentIndicatorIndex == i
@@ -365,7 +365,7 @@ class WgtPieChartState extends State<WgtPieChart> {
                       ),
                 children: [
                   TextSpan(
-                      text: widget.chartData[i]['is_empty']
+                      text: (widget.chartData[i]['is_empty'] ?? false)
                           ? ' \n '
                           : '${widget.indicator2Lines ? '\n' : ' '}${getCommaNumberStr(widget.chartData[i]['value'], decimal: widget.valueDecimal ?? decideDisplayDecimal(widget.chartData[i]['value']))} ${widget.valueUnit ?? widget.valueUnit ?? ''}',
                       style: widget.currentIndicatorIndex == i
