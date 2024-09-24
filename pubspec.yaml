@@ -1,6 +1,6 @@
 name: buff_helper
 description: "Buff Helper package project"
-version: 2.11.0
+version: 2.12.0
 homepage:
 
 environment:
@@ -31,7 +31,7 @@ dependencies:
   multi_dropdown: ^2.1.4
   open_file: ^3.5.3
   http: ^1.2.1
-  shared_preferences: ^2.2.3
+  shared_preferences: ^2.3.2
   flutter_secure_storage: ^9.2.2
   flutter_signin_button: ^2.0.0
   go_router: ^14.1.2

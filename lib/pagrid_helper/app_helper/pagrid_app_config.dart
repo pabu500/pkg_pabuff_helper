@@ -8,6 +8,7 @@ class PaGridAppConfig {
   late final DestPortal destPortal;
   late final ProjectScope activePortalProjectScope;
   late final PagProjectScope activePortalPagProjectScope;
+  late final bool includeTestItems;
 
   PaGridAppConfig({
     required this.loadDashboard,
@@ -16,5 +17,6 @@ class PaGridAppConfig {
     required this.destPortal,
     required this.activePortalProjectScope,
     required this.activePortalPagProjectScope,
+    this.includeTestItems = false,
   });
 }
