@@ -73,6 +73,10 @@ class _WgtTenantUsageState extends State<WgtTenantUsage> {
   Future<void> _getTenantUsageSummary() async {
     if (_selectedEndDate == null || _selectedStartDate == null) return;
 
+    //align end date to end of day
+    _selectedEndDate = DateTime(_selectedEndDate!.year, _selectedEndDate!.month,
+        _selectedEndDate!.day, 23, 59, 59);
+
     setState(() {
       _isItemListLoading = true;
       _queryItemsComplete = false;
@@ -446,6 +450,7 @@ class _WgtTenantUsageState extends State<WgtTenantUsage> {
                 setState(() {
                   _selectedStartDate = startDate;
                   _selectedEndDate = endDate;
+
                   _customDateRangeSelected = true;
                   _isMTD = false;
                   _monthPicked = null;
@@ -616,6 +621,7 @@ class _WgtTenantUsageState extends State<WgtTenantUsage> {
         // _selectedStartDate = DateTime(_selectedStartDate.year, _selectedStartDate.month, _selectedStartDate.day, 0, 0, 0);
         _timePickerKey = UniqueKey();
         _customDateRangeSelected = false;
+        _monthPicked = null;
       }
       _totalItemCount = 0;
       _itemSelectQuery = '';
@@ -624,7 +630,7 @@ class _WgtTenantUsageState extends State<WgtTenantUsage> {
       _showEmptyResult = false;
       _currentPage = 1;
       _queryItemsComplete = false;
-      _monthPicked = null;
+      // _monthPicked = null;
       _showCount = false;
       _errorText = '';
     });
