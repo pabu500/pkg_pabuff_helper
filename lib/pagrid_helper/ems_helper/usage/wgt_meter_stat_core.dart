@@ -69,7 +69,7 @@ class WgtUsageStatCore extends StatefulWidget {
 }
 
 class _WgtUsageStatCoreState extends State<WgtUsageStatCore> {
-  final totalWidth = 170.0;
+  final totalWidth = 185.0;
 
   @override
   void initState() {
