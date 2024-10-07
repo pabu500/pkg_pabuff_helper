@@ -18,6 +18,7 @@ class WgtPopupButton extends StatelessWidget {
     this.xOffset = 0,
     this.center = false,
     this.showShadow = true,
+    this.buildContext,
   });
 
   // final GlobalKey buttonKey = GlobalKey();
@@ -35,6 +36,7 @@ class WgtPopupButton extends StatelessWidget {
   final double xOffset;
   final bool center;
   final bool showShadow;
+  final BuildContext? buildContext;
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +65,7 @@ class WgtPopupButton extends StatelessWidget {
               }
 
               showDialog(
-                context: context,
+                context: buildContext ?? context,
                 builder: (context) {
                   //offset between center of the screen and the button
                   late Offset offset;
