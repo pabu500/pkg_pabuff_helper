@@ -446,7 +446,7 @@ class _WgtUsageStatCoreState extends State<WgtUsageStatCore> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Total ${getDeivceTypeUnit(widget.meterType)}',
+                      'Total ${getDeivceTypeUnit(widget.meterType, displayContextStr: widget.displayContextStr)}',
                       style: defStatStyleSmall,
                     ),
                     getStatWithUnit(

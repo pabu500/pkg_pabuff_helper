@@ -177,6 +177,8 @@ String getDeivceTypeUnit(dynamic deviceSubType, {String? displayContextStr}) {
     case MeterType.btu:
       if ((displayContextStr ?? '') == 'meter_usage_summary') {
         return 'TonHr';
+      } else if ((displayContextStr ?? '') == 'tenant_usage_summary') {
+        return 'kWh(mech)';
       }
       return 'kWh';
     case SensorType.temperature:
