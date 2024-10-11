@@ -18,6 +18,7 @@ enum DeviceType {
   SENSOR,
   LOCK,
   CAMERA,
+  GATEWAY,
 }
 
 enum MeterType {
@@ -312,6 +313,12 @@ Widget getDeviceTypeIcon(dynamic deviceSubType,
     case DeviceType.CAMERA:
       return Icon(
         Symbols.videocam,
+        size: theIconSize,
+        color: iconColor,
+      );
+    case DeviceType.GATEWAY:
+      return Icon(
+        Symbols.switch_access,
         size: theIconSize,
         color: iconColor,
       );
