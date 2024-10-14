@@ -94,7 +94,7 @@ class _WgtListColumnCustomizeState extends State<WgtListColumnCustomize> {
     }
     Map<String, dynamic> colCustomize = {};
     for (Map<String, dynamic> item in _listConfig) {
-      colCustomize[item['fieldKey']] = item['show'] ?? true;
+      colCustomize[item['colKey'] ?? item['fieldKey']] = item['show'] ?? true;
     }
     saveToSharedPref(widget.sectionName, colCustomize);
   }
@@ -110,7 +110,12 @@ class _WgtListColumnCustomizeState extends State<WgtListColumnCustomize> {
   Widget getColumnSelection() {
     List<Widget> columnSelection = [];
     for (Map<String, dynamic> configItem in _listConfig) {
-      if (configItem['hidden'] == true) {
+      if (configItem['hidden'] ?? false) {
+        continue;
+      }
+
+      String title = configItem['title'] ?? configItem['colTitle'] ?? '';
+      if (title.isEmpty) {
         continue;
       }
       columnSelection.add(
@@ -131,7 +136,7 @@ class _WgtListColumnCustomizeState extends State<WgtListColumnCustomize> {
               ),
             ),
             Text(
-              configItem['title'],
+              title,
               style:
                   TextStyle(fontSize: 13.5, color: Theme.of(context).hintColor),
             ),
