@@ -5,7 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../xt_ui/style/app_colors.dart';
-// import 'dart:ui';
+
+// get the color from hex string e.g. #FF0000
+Color getColorFromHex(String hexColor) {
+  hexColor = hexColor.toUpperCase().replaceAll('#', '');
+  if (hexColor.length == 6) {
+    hexColor = 'FF$hexColor';
+  }
+  return Color(int.parse(hexColor, radix: 16));
+}
 
 Color getBalPercentageColor(double balPercentage) {
   return balPercentage < 0.01
