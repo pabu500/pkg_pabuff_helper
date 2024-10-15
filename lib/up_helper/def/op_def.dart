@@ -13,6 +13,7 @@ enum MeterOps {
   ReadingDataInsert,
   SetLcStatus,
   Unbypass,
+  ManualReadingInsert,
 }
 
 enum CreditOps {
