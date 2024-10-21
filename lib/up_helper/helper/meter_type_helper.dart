@@ -1,7 +1,8 @@
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
 
-Widget getMeterTypeWidget(MeterType meterType, BuildContext context) {
+Widget getMeterTypeWidget(MeterType meterType, BuildContext context,
+    {String? displayContextStr}) {
   Color iconColor = Theme.of(context).hintColor.withOpacity(0.5);
   return Row(
     children: [
@@ -14,7 +15,7 @@ Widget getMeterTypeWidget(MeterType meterType, BuildContext context) {
       ),
       getDeviceTypeIcon(meterType, iconSize: 34, iconColor: iconColor),
       Text(
-        getDeivceTypeUnit(meterType),
+        getDeivceTypeUnit(meterType, displayContextStr: displayContextStr),
         style: defStatStyle,
       ),
     ],

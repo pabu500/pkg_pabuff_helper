@@ -165,22 +165,22 @@ Widget getUsageTitle(
 }
 
 Widget getUsageTypeStat(
-  BuildContext context,
-  bool isBillMode,
-  double? netUsageE,
-  double? costE,
-  double? netUsageW,
-  double? costW,
-  double? netUsageB,
-  double? costB,
-  double? netUsageN,
-  double? costN,
-  double? netUsageG,
-  double? costG, {
-  int usageDecimals = 3,
-  int rateDecimals = 4,
-  int costDecimals = 3,
-}) {
+    BuildContext context,
+    bool isBillMode,
+    double? netUsageE,
+    double? costE,
+    double? netUsageW,
+    double? costW,
+    double? netUsageB,
+    double? costB,
+    double? netUsageN,
+    double? costN,
+    double? netUsageG,
+    double? costG,
+    {int usageDecimals = 3,
+    int rateDecimals = 4,
+    int costDecimals = 3,
+    String? displayContextStr}) {
   TextStyle valueStyle = TextStyle(
     fontWeight: FontWeight.bold,
     fontSize: 34,
@@ -211,14 +211,16 @@ Widget getUsageTypeStat(
           padding: const EdgeInsets.only(left: 13),
           child: Column(
             children: [
-              getMeterTypeWidget(MeterType.btu, context),
+              getMeterTypeWidget(MeterType.btu, context,
+                  displayContextStr: displayContextStr),
               isBillMode
                   ? getStatWithUnit(
                       getCommaNumberStr(costB, decimal: costDecimals), 'SGD',
                       statStrStyle: valueStyle)
                   : getStatWithUnit(
                       getCommaNumberStr(netUsageB, decimal: usageDecimals),
-                      getDeivceTypeUnit(MeterType.btu),
+                      getDeivceTypeUnit(MeterType.btu,
+                          displayContextStr: displayContextStr),
                       statStrStyle: valueStyle),
             ],
           ),
