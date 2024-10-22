@@ -28,6 +28,7 @@ enum MeterType {
   gas,
   newater,
   btu,
+  solar,
 }
 
 enum MeterTypeTag {
@@ -67,6 +68,8 @@ String getMeterTypeTag(MeterType meterType) {
       return 'N';
     case MeterType.btu:
       return 'B';
+    case MeterType.solar:
+      return 'SE';
     default:
       return '';
   }
@@ -86,6 +89,8 @@ MeterType? getMeterType(String meterTypeTag) {
       return MeterType.newater;
     case 'B':
       return MeterType.btu;
+    case 'SE':
+      return MeterType.solar;
     default:
       return null;
   }
@@ -182,6 +187,8 @@ String getDeivceTypeUnit(dynamic deviceSubType, {String? displayContextStr}) {
         return 'kWh(mech)';
       }
       return 'kWh';
+    case MeterType.solar:
+      return 'kWh';
     case SensorType.temperature:
       return '°C';
     case SensorType.humidity:
@@ -210,6 +217,8 @@ String getDeivceTypeUnitK(dynamic deviceSubType) {
     case MeterType.newater:
       return 'km³';
     case MeterType.btu:
+      return 'MWh';
+    case MeterType.solar:
       return 'MWh';
     case SensorType.temperature:
       return '-';
@@ -240,6 +249,8 @@ String getDeivceTypeLabel(dynamic deviceSubType) {
       return 'NeWater';
     case MeterType.btu:
       return 'BTU';
+    case MeterType.solar:
+      return 'Solar';
     case SensorType.temperature:
       return 'Temperature';
     case SensorType.humidity:
@@ -269,6 +280,8 @@ Color getDeivceTypeColor(dynamic deviceSubType) {
       return Colors.cyanAccent.shade200;
     case MeterType.btu:
       return Colors.yellow.shade600;
+    case MeterType.solar:
+      return Colors.yellowAccent.shade400;
     case SensorType.temperature:
       return Colors.blueAccent;
     case SensorType.humidity:
@@ -358,6 +371,12 @@ Widget getDeviceTypeIcon(dynamic deviceSubType,
         Icons.hvac,
         size: theIconSize,
         color: iconColor ?? Colors.yellow.shade600,
+      );
+    case MeterType.solar:
+      return Icon(
+        Icons.wb_sunny,
+        size: theIconSize,
+        color: iconColor ?? Colors.yellowAccent.shade400,
       );
     case SensorType.temperature:
       return Icon(

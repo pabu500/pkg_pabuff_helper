@@ -293,7 +293,8 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
         }
       });
     } else if (widget.itemType == ItemType.meter_iwow &&
-        widget.meterType != MeterType.btu) {
+        widget.meterType != MeterType.btu &&
+        widget.meterType != MeterType.solar) {
       _readingTypeConfig.clear();
       _readingTypeConfig.addAll({
         'val_meter': {
@@ -389,6 +390,35 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
           'chartType': ChartType.line,
           'dataType': DataType.total,
           'color': Colors.blueGrey.withOpacity(0.7),
+        },
+      });
+    } else if (widget.itemType == ItemType.meter_iwow &&
+        widget.meterType == MeterType.solar) {
+      _readingTypeConfig.clear();
+      _readingTypeConfig.addAll({
+        'delivered_total': {
+          'title': 'Delivered Energy (kWh)',
+          'dataFields': [
+            {
+              'field': 'delivered_total',
+            }
+          ],
+          'unit': 'kWh',
+          'chartType': ChartType.bar,
+          'dataType': DataType.diff,
+          'color': Colors.orange.withOpacity(0.7),
+        },
+        'received_total': {
+          'title': 'Received Energy (kWh)',
+          'dataFields': [
+            {
+              'field': 'received_total',
+            }
+          ],
+          'unit': 'kWh',
+          'chartType': ChartType.bar,
+          'dataType': DataType.diff,
+          'color': Colors.blue.withOpacity(0.7),
         },
       });
     } else if (widget.itemType == ItemType.meter) {
@@ -532,6 +562,11 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
 
     _selectedTimeRangeMinutes = widget.lookBackMinutes[0];
     _selectedChartReadingTypeKey = 'val_meter';
+
+    if (widget.itemType == ItemType.meter_iwow &&
+        widget.meterType == MeterType.solar) {
+      _selectedChartReadingTypeKey = 'delivered_total';
+    }
 
     if (widget.itemType == ItemType.meter_3p) {
       _selectedChartReadingTypeKey = 'a_imp';
