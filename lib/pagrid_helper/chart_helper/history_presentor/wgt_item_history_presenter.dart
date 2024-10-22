@@ -682,6 +682,7 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
             itemType: widget.itemType,
             itemId: widget.itemId,
             itemIdType: widget.itemIdType,
+            meterType: widget.meterType,
             historyType: widget.historyType,
             lookBackMinutes: widget.lookBackMinutes,
             dataFields: _displayType == HistroyDisplayType.chart

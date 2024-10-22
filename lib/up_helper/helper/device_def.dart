@@ -69,7 +69,7 @@ String getMeterTypeTag(MeterType meterType) {
     case MeterType.btu:
       return 'B';
     case MeterType.solar:
-      return 'SE';
+      return 'SE1';
     default:
       return '';
   }
@@ -89,7 +89,7 @@ MeterType? getMeterType(String meterTypeTag) {
       return MeterType.newater;
     case 'B':
       return MeterType.btu;
-    case 'SE':
+    case 'SE1':
       return MeterType.solar;
     default:
       return null;

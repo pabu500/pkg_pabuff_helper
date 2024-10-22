@@ -24,6 +24,7 @@ class WgtItemHistoryGetter extends StatefulWidget {
     required this.historyType,
     // required this.chartLabel,
     required this.dataFields,
+    this.meterType,
     this.showNormalization = true,
     this.allowNormalize = true,
     this.allowConsolidation = true,
@@ -59,6 +60,7 @@ class WgtItemHistoryGetter extends StatefulWidget {
   final ItemType itemType;
   final String itemId;
   final ItemIdType itemIdType;
+  final MeterType? meterType;
   final Evs2HistoryType historyType;
   final bool allowConsolidation;
   final bool showNormalization;
@@ -176,6 +178,9 @@ class _WgtItemHistoryGetterState extends State<WgtItemHistoryGetter> {
 
     _lastRequestTime = DateTime.now();
 
+    String meterTypeTag =
+        widget.meterType == null ? '' : getMeterTypeTag(widget.meterType!);
+
     try {
       //delay
       // await Future.delayed(const Duration(milliseconds: 1000));
@@ -189,6 +194,7 @@ class _WgtItemHistoryGetterState extends State<WgtItemHistoryGetter> {
           'item_type': widget.itemType.name,
           'item_id': widget.itemId,
           'item_id_type': widget.itemIdType.name,
+          'meter_type_tag': meterTypeTag,
           'history_type': widget.historyType.name,
           'start_datetime': _startDate.toString(),
           'end_datetime': _endDate.toString(),
@@ -223,6 +229,7 @@ class _WgtItemHistoryGetterState extends State<WgtItemHistoryGetter> {
               'item_type': widget.itemType.name,
               'item_id': widget.itemId,
               'item_id_type': widget.itemIdType.name,
+              'meter_type_tag': meterTypeTag,
               'data_fields': fields.join(','),
               'from_datetime': _startDate.toString(),
               'to_datetime': _endDate.toString(),
@@ -243,6 +250,7 @@ class _WgtItemHistoryGetterState extends State<WgtItemHistoryGetter> {
         'item_id': widget.itemId,
         'item_id_type': widget.itemIdType.name,
         'history_type': widget.historyType.name,
+        'meter_type_tag': meterTypeTag,
         'data_fields': fields.join(','),
         'normalization':
             _normalization && widget.allowNormalize ? 'v2' : 'v2_none',
