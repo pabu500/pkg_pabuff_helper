@@ -29,6 +29,7 @@ enum MeterType {
   newater,
   btu,
   solar,
+  // manualElectricity1p,
 }
 
 enum MeterTypeTag {
@@ -38,6 +39,8 @@ enum MeterTypeTag {
   B,
   N,
   G,
+  ME,
+  SE1,
 }
 
 enum DeviceStatus {
@@ -70,6 +73,8 @@ String getMeterTypeTag(MeterType meterType) {
       return 'B';
     case MeterType.solar:
       return 'SE1';
+    // case MeterType.manualElectricity1p:
+    //   return 'ME';
     default:
       return '';
   }
@@ -91,6 +96,8 @@ MeterType? getMeterType(String meterTypeTag) {
       return MeterType.btu;
     case 'SE1':
       return MeterType.solar;
+    // case 'ME':
+    //   return MeterType.manualElectricity1p;
     default:
       return null;
   }
@@ -189,6 +196,8 @@ String getDeivceTypeUnit(dynamic deviceSubType, {String? displayContextStr}) {
       return 'kWh';
     case MeterType.solar:
       return 'kWh';
+    // case MeterType.manualElectricity1p:
+    //   return 'kWh';
     case SensorType.temperature:
       return '°C';
     case SensorType.humidity:
@@ -220,6 +229,8 @@ String getDeivceTypeUnitK(dynamic deviceSubType) {
       return 'MWh';
     case MeterType.solar:
       return 'MWh';
+    // case MeterType.manualElectricity1p:
+    //   return 'MWh';
     case SensorType.temperature:
       return '-';
     case SensorType.humidity:
@@ -251,6 +262,8 @@ String getDeivceTypeLabel(dynamic deviceSubType) {
       return 'BTU';
     case MeterType.solar:
       return 'Solar';
+    // case MeterType.manualElectricity1p:
+    //   return 'Electricity (Manual)';
     case SensorType.temperature:
       return 'Temperature';
     case SensorType.humidity:
@@ -282,6 +295,8 @@ Color getDeivceTypeColor(dynamic deviceSubType) {
       return Colors.yellow.shade600;
     case MeterType.solar:
       return Colors.yellowAccent.shade400;
+    // case MeterType.manualElectricity1p:
+    //   return Colors.orangeAccent.shade200;
     case SensorType.temperature:
       return Colors.blueAccent;
     case SensorType.humidity:
@@ -378,6 +393,12 @@ Widget getDeviceTypeIcon(dynamic deviceSubType,
         size: theIconSize,
         color: iconColor ?? Colors.yellowAccent.shade400,
       );
+    // case MeterType.manualElectricity1p:
+    //   return Icon(
+    //     Icons.bolt, // Icons.electric_meter,
+    //     size: theIconSize,
+    //     color: iconColor ?? Colors.orangeAccent.shade200,
+    //   );
     case SensorType.temperature:
       return Icon(
         Symbols.thermostat,
