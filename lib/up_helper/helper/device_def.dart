@@ -192,6 +192,8 @@ String getDeivceTypeUnit(dynamic deviceSubType, {String? displayContextStr}) {
         return 'TonHr';
       } else if ((displayContextStr ?? '') == 'tenant_usage_summary') {
         return 'kWh(mech)';
+      } else if ((displayContextStr ?? '') == 'ems_top_stat') {
+        return 'TonHr';
       }
       return 'kWh';
     case MeterType.solar:
@@ -213,7 +215,7 @@ String getDeivceTypeUnit(dynamic deviceSubType, {String? displayContextStr}) {
   }
 }
 
-String getDeivceTypeUnitK(dynamic deviceSubType) {
+String getDeivceTypeUnitK(dynamic deviceSubType, {String? displayContextStr}) {
   switch (deviceSubType) {
     case MeterType.electricity1p:
       return 'MWh';
@@ -226,6 +228,13 @@ String getDeivceTypeUnitK(dynamic deviceSubType) {
     case MeterType.newater:
       return 'km³';
     case MeterType.btu:
+      if ((displayContextStr ?? '') == 'meter_usage_summary') {
+        return 'kTonHr';
+      } else if ((displayContextStr ?? '') == 'tenant_usage_summary') {
+        return 'MWh(mech)';
+      } else if ((displayContextStr ?? '') == 'ems_top_stat') {
+        return 'kTonHr';
+      }
       return 'MWh';
     case MeterType.solar:
       return 'MWh';

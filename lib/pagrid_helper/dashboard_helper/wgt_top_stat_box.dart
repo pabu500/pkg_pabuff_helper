@@ -313,9 +313,11 @@ class _WgtTopStatBoxState extends State<WgtTopStatBox> {
       _title = '$_lookbackLabel $deviceTypeLabel Usage';
       _iconTextSpacing = 8;
       if (_isK) {
-        _statUnit = getDeivceTypeUnitK(widget.meterType);
+        _statUnit = getDeivceTypeUnitK(widget.meterType,
+            displayContextStr: 'ems_top_stat');
       } else {
-        _statUnit = getDeivceTypeUnit(widget.meterType);
+        _statUnit = getDeivceTypeUnit(widget.meterType,
+            displayContextStr: 'ems_top_stat');
       }
     } else if (widget.statType == TopStatType.topup) {
       _title = '$_lookbackLabel Topup Total';
