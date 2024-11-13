@@ -282,7 +282,7 @@ Map<String, dynamic> getValueUnitDisplayStr2(
     if (isK) {
       valueStr = '$valueStr$kUnit';
     } else {
-      valueStr = '$valueStr $unit';
+      valueStr = '$valueStr$unit';
     }
   }
   return {'value': valueStr, 'isK': isK};
