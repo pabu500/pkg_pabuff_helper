@@ -14,6 +14,7 @@ class WgtHistoryBarChart extends StatefulWidget {
     required this.timeKey,
     required this.valKey,
     required this.historyData,
+    this.valueKeyList,
     this.chartData,
     this.chartKey,
     this.border,
@@ -66,6 +67,7 @@ class WgtHistoryBarChart extends StatefulWidget {
     this.bottomTouchedTextColor = AppColors.contentColorYellow,
     Color? bottomTextColor,
     Color? errorTooltipBackgroundColor,
+    this.isBiDirection = false,
   })  : errorTooltipBackgroundColor =
             errorTooltipBackgroundColor ?? Colors.redAccent.withOpacity(0.62),
         bottomTextColor =
@@ -75,6 +77,7 @@ class WgtHistoryBarChart extends StatefulWidget {
   final String timeKey;
   final String valKey;
   final List<FlSpot>? chartData;
+  final List<String>? valueKeyList;
   final int? dominantIntervalSecond;
   final int? yDecimal;
   final String yUnit;
@@ -127,9 +130,10 @@ class WgtHistoryBarChart extends StatefulWidget {
   final Function? getXText;
   final double? bottomTextAngle;
   final bool hightlightEmpty;
+  final bool isBiDirection;
 
   @override
-  _WgtHistoryBarChartState createState() => _WgtHistoryBarChartState();
+  State<WgtHistoryBarChart> createState() => _WgtHistoryBarChartState();
 }
 
 class _WgtHistoryBarChartState extends State<WgtHistoryBarChart> {
@@ -145,9 +149,8 @@ class _WgtHistoryBarChartState extends State<WgtHistoryBarChart> {
 
   List<Map<String, int>> _xTitles = [];
 
-  // int dataLength = 0;
-
   double _maxY = 0;
+  double _minY = 0;
   double _yGridFactor = 1;
 
   int yAxisTitleCount = 5;
@@ -159,6 +162,7 @@ class _WgtHistoryBarChartState extends State<WgtHistoryBarChart> {
   List<BarChartGroupData> _barGroups = [];
 
   final List<FlSpot> _chartData = [];
+  final List<FlSpot> _chartData2 = [];
   List<Map<String, dynamic>> _errorData = [];
   List<Map<String, dynamic>> _altBarTipData = [];
   bool _valueIsDouble = false;
@@ -263,22 +267,75 @@ class _WgtHistoryBarChartState extends State<WgtHistoryBarChart> {
         BarChartGroupData(
           x: _chartData[i].x.toInt(),
           // barsSpace: _rodSpace,
+          groupVertically: true,
           barRods: [
             BarChartRodData(
               toY: _chartData[i].y,
               width: _barWidth, //rodWidth,
               color: setBarColor(i, touchedValue),
               borderRadius: BorderRadius.circular(3),
-              backDrawRodData: BackgroundBarChartRodData(
-                show: true,
-                toY: _maxY,
-                color: Colors.transparent,
-              ),
+              // backDrawRodData: BackgroundBarChartRodData(
+              //   show: true,
+              //   toY: _maxY,
+              //   color: Colors.transparent,
+              // ),
             ),
+            if (widget.isBiDirection)
+              BarChartRodData(
+                toY: -1 * _chartData2[i].y,
+                width: _barWidth, //rodWidth,
+                color: setBarColor(i, touchedValue),
+                borderRadius: BorderRadius.circular(3),
+              ),
           ],
           // showingTooltipIndicators: [0],
         ),
     ];
+  }
+
+  List<Map<String, dynamic>> genHistoryChartDataBiDirection(
+      List<Map<String, dynamic>> historyData,
+      String timeKey,
+      List<String> valueKeyList,
+      {List<Map<String, dynamic>>? errorData,
+      List<Map<String, dynamic>>? altBarTipData}) {
+    assert(valueKeyList.length == 2);
+
+    List<Map<String, dynamic>> chartDataList = [];
+
+    for (String valueKey in valueKeyList) {
+      List<FlSpot> chartData = [];
+      for (var historyDataItem in historyData) {
+        int timestamp =
+            DateTime.parse(historyDataItem[timeKey]).millisecondsSinceEpoch;
+
+        chartData.add(FlSpot(
+            timestamp.toDouble(),
+            _valueIsDouble
+                ? historyDataItem[valueKey] ?? 0
+                : double.parse((historyDataItem[valueKey] == null ||
+                        historyDataItem[valueKey] == 'null')
+                    ? '0'
+                    : historyDataItem[valueKey])));
+        if (errorData != null) {
+          if (historyDataItem['error_data'] != null) {
+            errorData
+                .add({timestamp.toString(): historyDataItem['error_data']});
+          }
+        }
+        if (altBarTipData != null && widget.altBarTipKey != null) {
+          if (historyDataItem[widget.altBarTipKey] != null) {
+            altBarTipData.add(
+                {timestamp.toString(): historyDataItem[widget.altBarTipKey]});
+          }
+        }
+      }
+      chartDataList.add({
+        'value_key': valueKeyList,
+        'chart_data': chartData,
+      });
+    }
+    return chartDataList;
   }
 
   List<FlSpot> genHistoryChartData(
@@ -349,9 +406,24 @@ class _WgtHistoryBarChartState extends State<WgtHistoryBarChart> {
     }
     widget.historyData[0][widget.valKey] is double;
     _chartData.clear();
-    _chartData.addAll(widget.chartData ??
-        genHistoryChartData(widget.historyData, widget.timeKey, widget.valKey,
-            errorData: _errorData, altBarTipData: _altBarTipData));
+    if (widget.valKey.isNotEmpty) {
+      _chartData.addAll(widget.chartData ??
+          genHistoryChartData(widget.historyData, widget.timeKey, widget.valKey,
+              errorData: _errorData, altBarTipData: _altBarTipData));
+    } else {
+      if (widget.isBiDirection) {
+        var chartDataMap = genHistoryChartDataBiDirection(
+            widget.historyData, widget.timeKey, widget.valueKeyList!,
+            errorData: _errorData, altBarTipData: _altBarTipData);
+        List<FlSpot> chartData = chartDataMap[0]['chart_data'];
+        List<FlSpot> chartData2 = chartDataMap[1]['chart_data'];
+        _chartData.addAll(chartData);
+        _chartData2.addAll(chartData2);
+      }
+    }
+    // _chartData.addAll(widget.chartData ??
+    //     genHistoryChartData(widget.historyData, widget.timeKey, widget.valKey,
+    //         errorData: _errorData, altBarTipData: _altBarTipData));
 
     // _chartWidth = widget.width ?? 900; //0.8 * MediaQuery.of(context).size.width;
 
@@ -360,19 +432,26 @@ class _WgtHistoryBarChartState extends State<WgtHistoryBarChart> {
     List<double> yValues = [];
 
     for (var i = 0; i < _chartData.length; i++) {
-      if (useWidgetChartData) {
-        yValues.add(_chartData[i].y);
-      } else {
-        yValues.add(_valueIsDouble
-            ? widget.historyData[i][widget.valKey]
-            : double.parse((widget.historyData[i][widget.valKey] == null ||
-                    widget.historyData[i][widget.valKey] == 'null')
-                ? '0'
-                : widget.historyData[i][widget.valKey]));
-      }
+      yValues.add(_chartData[i].y);
+      // if (useWidgetChartData) {
+      //   yValues.add(_chartData[i].y);
+      // } else {
+      //   yValues.add(_valueIsDouble
+      //       ? widget.historyData[i][widget.valKey]
+      //       : double.parse((widget.historyData[i][widget.valKey] == null ||
+      //               widget.historyData[i][widget.valKey] == 'null')
+      //           ? '0'
+      //           : widget.historyData[i][widget.valKey]));
+      // }
+    }
+
+    // neg direction
+    if (_chartData2.isNotEmpty) {
+      yValues.addAll(_chartData2.map((e) => -1 * e.y));
     }
 
     _maxY = findMax(yValues);
+    _minY = findMin(yValues);
     _yDecimal = widget.yDecimal ?? decideDisplayDecimal(0.5 * _maxY);
     //_maxY = 0.3, _yGridFactor = 10, _maxY = 0.03, _yGridFactor = 100
     _yGridFactor = 1;
@@ -402,6 +481,8 @@ class _WgtHistoryBarChartState extends State<WgtHistoryBarChart> {
   @override
   void initState() {
     super.initState();
+
+    assert(widget.valKey.isNotEmpty || (widget.valueKeyList ?? []).isNotEmpty);
 
     _loadChartData();
     _chartKey = widget.chartKey;
@@ -495,6 +576,8 @@ class _WgtHistoryBarChartState extends State<WgtHistoryBarChart> {
                     ),
                   BarChart(
                     BarChartData(
+                      maxY: _maxY,
+                      minY: _minY,
                       alignment: BarChartAlignment.center,
                       groupsSpace: barsSpace, //_rodSpace,
                       barGroups: _barGroups,
@@ -692,7 +775,7 @@ class _WgtHistoryBarChartState extends State<WgtHistoryBarChart> {
                           ),
                         ),
                       ),
-                      minY: 0,
+
                       borderData: FlBorderData(
                         show: true,
                         border: widget.border ??

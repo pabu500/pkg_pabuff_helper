@@ -63,6 +63,16 @@ double findMax(List<double> list) {
   return max;
 }
 
+double findMin(List<double> list) {
+  double min = 0;
+  for (double item in list) {
+    if (item < min) {
+      min = item;
+    }
+  }
+  return min;
+}
+
 //random number between min and max
 double rand(double min, double max) {
   Random rand = Random();
