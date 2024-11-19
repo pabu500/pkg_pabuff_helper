@@ -467,6 +467,8 @@ class _WgtHistoryBarChartState extends State<WgtHistoryBarChart> {
       _yGridFactor = 100000;
     }
 
+    assert(_chartData.isNotEmpty);
+
     _timeStampEnd = _chartData[0].x.toInt();
     _timeStampStart = _chartData[_chartData.length - 1].x.toInt();
 
