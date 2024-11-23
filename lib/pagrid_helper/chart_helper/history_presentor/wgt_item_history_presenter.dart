@@ -294,7 +294,7 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
       });
     } else if (widget.itemType == ItemType.meter_iwow &&
         widget.meterType != MeterType.btu &&
-        widget.meterType != MeterType.solar) {
+        widget.meterType != MeterType.bidirection) {
       _readingTypeConfig.clear();
       _readingTypeConfig.addAll({
         'val_meter': {
@@ -393,7 +393,7 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
         },
       });
     } else if (widget.itemType == ItemType.meter_iwow &&
-        widget.meterType == MeterType.solar) {
+        widget.meterType == MeterType.bidirection) {
       _readingTypeConfig.clear();
       _readingTypeConfig.addAll({
         'delivered_total': {
@@ -564,7 +564,7 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
     _selectedChartReadingTypeKey = 'val_meter';
 
     if (widget.itemType == ItemType.meter_iwow &&
-        widget.meterType == MeterType.solar) {
+        widget.meterType == MeterType.bidirection) {
       _selectedChartReadingTypeKey = 'delivered_total';
     }
 

@@ -28,7 +28,7 @@ enum MeterType {
   gas,
   newater,
   btu,
-  solar,
+  bidirection,
   // manualElectricity1p,
 }
 
@@ -41,6 +41,7 @@ enum MeterTypeTag {
   G,
   ME,
   SE1,
+  BD,
 }
 
 enum DeviceStatus {
@@ -71,7 +72,7 @@ String getMeterTypeTag(MeterType meterType) {
       return 'N';
     case MeterType.btu:
       return 'B';
-    case MeterType.solar:
+    case MeterType.bidirection:
       return 'SE1';
     // case MeterType.manualElectricity1p:
     //   return 'ME';
@@ -95,7 +96,7 @@ MeterType? getMeterType(String meterTypeTag) {
     case 'B':
       return MeterType.btu;
     case 'SE1':
-      return MeterType.solar;
+      return MeterType.bidirection;
     // case 'ME':
     //   return MeterType.manualElectricity1p;
     default:
@@ -196,7 +197,7 @@ String getDeivceTypeUnit(dynamic deviceSubType, {String? displayContextStr}) {
         return 'TonHr';
       }
       return 'kWh';
-    case MeterType.solar:
+    case MeterType.bidirection:
       return 'kWh';
     // case MeterType.manualElectricity1p:
     //   return 'kWh';
@@ -236,7 +237,7 @@ String getDeivceTypeUnitK(dynamic deviceSubType, {String? displayContextStr}) {
         return 'kTonHr';
       }
       return 'MWh';
-    case MeterType.solar:
+    case MeterType.bidirection:
       return 'MWh';
     // case MeterType.manualElectricity1p:
     //   return 'MWh';
@@ -255,6 +256,97 @@ String getDeivceTypeUnitK(dynamic deviceSubType, {String? displayContextStr}) {
   }
 }
 
+Map<String, dynamic> getDeivceTypeUnitSet(dynamic deviceSubType,
+    {String? displayContextStr}) {
+  String unit = '';
+  String unitK = '';
+  String unitG = '';
+  switch (deviceSubType) {
+    case MeterType.electricity1p:
+      unit = 'kWh';
+      unitK = 'MWh';
+      unitG = 'GWh';
+      break;
+    case MeterType.electricity3p:
+      unit = 'kWh';
+      unitK = 'MWh';
+      unitG = 'GWh';
+      break;
+    case MeterType.water:
+      unit = 'm³';
+      unitK = 'km³';
+      unitG = 'Gm³';
+      break;
+    case MeterType.gas:
+      unit = 'm³';
+      unitK = 'km³';
+      unitG = 'Gm³';
+      break;
+    case MeterType.newater:
+      unit = 'm³';
+      unitK = 'km³';
+      unitG = 'Gm³';
+      break;
+    case MeterType.btu:
+      if ((displayContextStr ?? '') == 'meter_usage_summary') {
+        unit = 'TonHr';
+        unitK = 'kTonHr';
+        unitG = 'GTonHr';
+      } else if ((displayContextStr ?? '') == 'tenant_usage_summary') {
+        unit = 'kWh(mech)';
+        unitK = 'MWh(mech)';
+        unitG = 'GWh(mech)';
+      } else if ((displayContextStr ?? '') == 'ems_top_stat') {
+        unit = 'TonHr';
+        unitK = 'kTonHr';
+        unitG = 'GTonHr';
+      } else {
+        unit = 'kWh';
+        unitK = 'MWh';
+        unitG = 'GWh';
+      }
+    case MeterType.bidirection:
+      unit = 'kWh';
+      unitK = 'MWh';
+      unitG = 'GWh';
+      break;
+    case SensorType.temperature:
+      unit = '°C';
+      unitK = '-';
+      unitG = '-';
+      break;
+    case SensorType.humidity:
+      unit = '%';
+      unitK = '-';
+      unitG = '-';
+      break;
+    case SensorType.ir:
+      unit = '°C';
+      unitK = '-';
+      unitG = '-';
+      break;
+    case SensorType.smoke:
+      unit = 'ppm';
+      unitK = '-';
+      unitG = '-';
+      break;
+    case SensorType.water_leak:
+      unit = 'ppm';
+      unitK = '-';
+      unitG = '-';
+      break;
+    default:
+      unit = '';
+      unitK = '';
+      unitG = '';
+  }
+  return {
+    'unit': unit,
+    'unitK': unitK,
+    'unitG': unitG,
+  };
+}
+
 String getDeivceTypeLabel(dynamic deviceSubType) {
   switch (deviceSubType) {
     case MeterType.electricity1p:
@@ -269,7 +361,7 @@ String getDeivceTypeLabel(dynamic deviceSubType) {
       return 'NeWater';
     case MeterType.btu:
       return 'BTU';
-    case MeterType.solar:
+    case MeterType.bidirection:
       return 'Solar';
     // case MeterType.manualElectricity1p:
     //   return 'Electricity (Manual)';
@@ -302,7 +394,7 @@ Color getDeivceTypeColor(dynamic deviceSubType) {
       return Colors.cyanAccent.shade200;
     case MeterType.btu:
       return Colors.yellow.shade600;
-    case MeterType.solar:
+    case MeterType.bidirection:
       return Colors.yellowAccent.shade400;
     // case MeterType.manualElectricity1p:
     //   return Colors.orangeAccent.shade200;
@@ -396,7 +488,7 @@ Widget getDeviceTypeIcon(dynamic deviceSubType,
         size: theIconSize,
         color: iconColor ?? Colors.yellow.shade600,
       );
-    case MeterType.solar:
+    case MeterType.bidirection:
       return Icon(
         Icons.wb_sunny,
         size: theIconSize,
