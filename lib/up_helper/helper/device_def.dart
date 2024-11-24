@@ -260,89 +260,107 @@ Map<String, dynamic> getDeivceTypeUnitSet(dynamic deviceSubType,
     {String? displayContextStr}) {
   String unit = '';
   String unitK = '';
+  String unitM = '';
   String unitG = '';
   switch (deviceSubType) {
     case MeterType.electricity1p:
       unit = 'kWh';
       unitK = 'MWh';
-      unitG = 'GWh';
+      unitM = 'GWh';
+      unitG = 'TWh';
       break;
     case MeterType.electricity3p:
       unit = 'kWh';
       unitK = 'MWh';
-      unitG = 'GWh';
+      unitM = 'GWh';
+      unitG = 'TWh';
       break;
     case MeterType.water:
       unit = 'm³';
       unitK = 'km³';
-      unitG = 'Gm³';
+      unitM = 'Gm³';
+      unitG = 'Tm³';
       break;
     case MeterType.gas:
       unit = 'm³';
       unitK = 'km³';
-      unitG = 'Gm³';
+      unitM = 'Gm³';
+      unitG = 'Tm³';
       break;
     case MeterType.newater:
       unit = 'm³';
       unitK = 'km³';
-      unitG = 'Gm³';
+      unitM = 'Gm³';
+      unitG = 'Tm³';
       break;
     case MeterType.btu:
       if ((displayContextStr ?? '') == 'meter_usage_summary') {
         unit = 'TonHr';
         unitK = 'kTonHr';
-        unitG = 'GTonHr';
+        unitM = 'GTonHr';
+        unitG = 'TTonHr';
       } else if ((displayContextStr ?? '') == 'tenant_usage_summary') {
         unit = 'kWh(mech)';
         unitK = 'MWh(mech)';
-        unitG = 'GWh(mech)';
+        unitM = 'GWh(mech)';
+        unitG = 'TWh(mech)';
       } else if ((displayContextStr ?? '') == 'ems_top_stat') {
         unit = 'TonHr';
         unitK = 'kTonHr';
-        unitG = 'GTonHr';
+        unitM = 'GTonHr';
+        unitG = 'TTonHr';
       } else {
         unit = 'kWh';
         unitK = 'MWh';
-        unitG = 'GWh';
+        unitM = 'GWh';
+        unitG = 'TWh';
       }
     case MeterType.bidirection:
       unit = 'kWh';
       unitK = 'MWh';
-      unitG = 'GWh';
+      unitM = 'GWh';
+      unitG = 'TWh';
       break;
     case SensorType.temperature:
       unit = '°C';
       unitK = '-';
+      unitM = '-';
       unitG = '-';
       break;
     case SensorType.humidity:
       unit = '%';
       unitK = '-';
+      unitM = '-';
       unitG = '-';
       break;
     case SensorType.ir:
       unit = '°C';
       unitK = '-';
+      unitM = '-';
       unitG = '-';
       break;
     case SensorType.smoke:
       unit = 'ppm';
       unitK = '-';
+      unitM = '-';
       unitG = '-';
       break;
     case SensorType.water_leak:
       unit = 'ppm';
       unitK = '-';
+      unitM = '-';
       unitG = '-';
       break;
     default:
       unit = '';
       unitK = '';
+      unitM = '';
       unitG = '';
   }
   return {
     'unit': unit,
     'unitK': unitK,
+    'unitM': unitM,
     'unitG': unitG,
   };
 }

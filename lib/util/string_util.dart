@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:buff_helper/util/util.dart';
@@ -259,11 +260,25 @@ Map<String, dynamic> getValueUnitDisplayStr2(
   int decimal = 0,
   bool useK = false,
   double kThreshold = 100000,
+  double kDecimal = 1,
   String kUnit = 'k',
   bool forceK = false,
+  bool useM = false,
+  double mThreshold = 1000000,
+  int mDecimal = 1,
+  String mUnit = 'M',
+  bool forceM = false,
+  bool useG = false,
+  double gThreshold = 1000000000,
+  int gDecimal = 1,
+  String gUnit = 'G',
+  bool forceG = false,
 }) {
   double? useValue = value;
   bool isK = false;
+  bool isM = false;
+  bool isG = false;
+
   if (value == null) {
     return {'value': '-', 'isK': false};
   }
@@ -277,15 +292,43 @@ Map<String, dynamic> getValueUnitDisplayStr2(
     isK = true;
   }
 
+  if (useM && value >= mThreshold) {
+    useValue = value / 1000000;
+    isM = true;
+    isK = false;
+  }
+  if (forceM) {
+    useValue = value / 1000000;
+    isM = true;
+    isK = false;
+  }
+
+  if (useG && value >= gThreshold) {
+    useValue = value / 1000000000;
+    isG = true;
+    isK = false;
+    isM = false;
+  }
+  if (forceG) {
+    useValue = value / 1000000000;
+    isG = true;
+    isK = false;
+    isM = false;
+  }
+
   String valueStr = getCommaNumberStr(useValue, decimal: decimal);
   if (unit != null) {
     if (isK) {
       valueStr = '$valueStr$kUnit';
+    } else if (isM) {
+      valueStr = '$valueStr$mUnit';
+    } else if (isG) {
+      valueStr = '$valueStr$gUnit';
     } else {
       valueStr = '$valueStr$unit';
     }
   }
-  return {'value': valueStr, 'isK': isK};
+  return {'value': valueStr, 'isK': isK, 'isM': isM, 'isG': isG};
 }
 
 final Color statColorDark = Colors.grey.shade800;
