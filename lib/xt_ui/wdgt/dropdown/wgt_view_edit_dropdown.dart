@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 class WgtViewEditDropdown extends StatefulWidget {
   const WgtViewEditDropdown({
     super.key,
-    required this.dropdownValues,
+    this.dropdownValueListString,
+    this.dropdownValueListMap,
     this.originalValue,
     required this.onSetValue,
     required this.onFocus,
@@ -25,7 +26,8 @@ class WgtViewEditDropdown extends StatefulWidget {
     this.readOnly = false,
   });
 
-  final List<String> dropdownValues;
+  final List<String>? dropdownValueListString;
+  final List<Map<String, dynamic>>? dropdownValueListMap;
   final String? originalValue;
   final String hint;
   final double width;
@@ -61,6 +63,9 @@ class _WgtViewEditDropdownState extends State<WgtViewEditDropdown> {
     super.initState();
     _committedMessage = widget.committedMessage;
     _currentValue = widget.originalValue;
+
+    assert(widget.dropdownValueListString != null ||
+        widget.dropdownValueListMap != null);
   }
 
   @override
@@ -130,13 +135,22 @@ class _WgtViewEditDropdownState extends State<WgtViewEditDropdown> {
                     });
                     widget.onFocus(true);
                   },
-                  items: widget.dropdownValues
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
+                  items: widget.dropdownValueListMap != null
+                      ? widget.dropdownValueListMap!
+                          .map<DropdownMenuItem<String>>(
+                              (Map<String, dynamic> value) {
+                          return DropdownMenuItem<String>(
+                            value: value['value'],
+                            child: Text(value['label']),
+                          );
+                        }).toList()
+                      : widget.dropdownValueListString!
+                          .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
                 ),
               ),
               Expanded(child: Container()),
