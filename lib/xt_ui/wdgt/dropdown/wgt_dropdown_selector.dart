@@ -8,7 +8,7 @@ class WgtDropdownSelector extends StatefulWidget {
     this.initialValue,
     this.isInitialValueMutable = true,
     required this.onSelected,
-    required this.controller,
+    this.controller,
     this.onClear,
     this.hint = 'Select',
     this.width,
@@ -16,7 +16,7 @@ class WgtDropdownSelector extends StatefulWidget {
   });
   final List<String> items;
   final Function(String?) onSelected;
-  final TextEditingController controller;
+  final TextEditingController? controller;
   final String? initialValue;
   final bool isInitialValueMutable;
   final String hint;
@@ -29,9 +29,13 @@ class WgtDropdownSelector extends StatefulWidget {
 }
 
 class _WgtDropdownSelectorState extends State<WgtDropdownSelector> {
+  late TextEditingController _controller;
+
   @override
   void initState() {
     super.initState();
+
+    _controller = widget.controller ?? TextEditingController();
   }
 
   @override
@@ -93,9 +97,12 @@ class _WgtDropdownSelectorState extends State<WgtDropdownSelector> {
                   const WidgetStatePropertyAll(Colors.transparent),
             ),
             inputDecorationTheme: InputDecorationTheme(
+              hintStyle: TextStyle(
+                color: Theme.of(context).hintColor.withOpacity(0.5),
+              ),
               enabledBorder: UnderlineInputBorder(
                 borderSide: BorderSide(
-                  color: Theme.of(context).hintColor,
+                  color: Theme.of(context).hintColor.withOpacity(0.3),
                   width: 1,
                   style: BorderStyle.solid,
                 ),
@@ -114,12 +121,12 @@ class _WgtDropdownSelectorState extends State<WgtDropdownSelector> {
               contentPadding: const EdgeInsets.symmetric(vertical: 0.0),
             ),
           ),
-          if (widget.controller.text.isNotEmpty)
+          if (_controller.text.isNotEmpty)
             Transform.translate(
               offset: const Offset(-34, 0),
               child: InkWell(
                 onTap: () {
-                  widget.controller.clear();
+                  _controller.clear();
                   widget.onSelected(null);
                   if (widget.onClear != null) {
                     widget.onClear!();

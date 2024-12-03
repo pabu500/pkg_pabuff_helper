@@ -238,7 +238,7 @@ class _WgtTextFieldState extends State<WgtTextField> {
                   hintText: widget.hintText,
                   errorText: _errorText.isEmpty ? null : _errorText,
                   hintStyle: TextStyle(
-                    fontSize: 16,
+                    // fontSize: 16,
                     color: Theme.of(context).hintColor.withOpacity(0.5),
                   ),
                   enabledBorder: UnderlineInputBorder(
