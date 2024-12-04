@@ -62,7 +62,7 @@ class _WgtDropdownSelectorState extends State<WgtDropdownSelector> {
             enabled: enableEdit,
             width: widget.width,
             hintText: widget.hint,
-            controller: widget.controller,
+            controller: _controller,
             initialSelection: widget.initialValue,
             trailingIcon: Icon(
               Icons.arrow_drop_down,
