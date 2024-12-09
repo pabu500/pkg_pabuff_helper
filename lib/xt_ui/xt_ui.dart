@@ -41,4 +41,5 @@ export 'wdgt/datetime/datetime_helper.dart';
 export 'wdgt/form/wgt_update_password.dart';
 export 'wdgt/dropdown/wgt_dropdown_selector.dart';
 export 'wdgt/dropdown/wgt_view_edit_dropdown.dart';
+export 'wdgt/dropdown/wgt_view_edit_dropdown_old.dart';
 export 'painter/painter_helper.dart';

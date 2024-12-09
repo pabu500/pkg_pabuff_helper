@@ -25,6 +25,7 @@ enum CreditOps {
 enum UserOps {
   None,
   EnableDisable,
+  GetTenantMap,
 }
 
 enum ListItemType {
