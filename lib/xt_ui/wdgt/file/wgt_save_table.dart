@@ -15,6 +15,7 @@ class WgtSaveTable extends StatefulWidget {
     // required this.table,
     // required this.list,
     required this.getList,
+    this.getListAsync,
     required this.fileName,
     this.directory,
     this.extension,
@@ -27,6 +28,7 @@ class WgtSaveTable extends StatefulWidget {
   // final List<List<dynamic>> table;
   // final List<dynamic> list;
   final Function getList;
+  final Function? getListAsync;
   final String fileName;
   final Directory? directory;
   final String? extension;
@@ -76,7 +78,12 @@ class _WgtSaveTableState extends State<WgtSaveTable> {
     // }
     // print('path: ${path.path}');
     try {
-      List<List<dynamic>> table = widget.getList();
+      late List<List<dynamic>> table;
+      if (widget.getListAsync != null) {
+        table = await widget.getListAsync!();
+      } else {
+        table = widget.getList();
+      }
       // File file = File(path.path);
       if (kDebugMode) {
         print('convert to csv..');
