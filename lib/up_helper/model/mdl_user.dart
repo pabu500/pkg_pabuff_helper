@@ -541,12 +541,14 @@ class Evs2User {
 
   bool isAdminAndUp() {
     return hasRole2(AclRole.EVS2_Owner) ||
-        hasRole2(AclRole.Administrator) ||
-        hasRole2(AclRole.EVS2_Admin_Root) ||
-        hasRole2(AclRole.EVS2_Super_Admin) ||
-        hasRole2(AclRole.EVS2_Admin) ||
-        hasRole2(AclRole.EMS_Admin) ||
-        hasRole2(AclRole.EMS_Admin_Project_CW_NUS);
+            hasRole2(AclRole.Administrator) ||
+            hasRole2(AclRole.EVS2_Admin_Root) ||
+            hasRole2(AclRole.EVS2_Super_Admin) ||
+            hasRole2(AclRole.EVS2_Admin) ||
+            hasRole2(AclRole
+                .EMS_Admin) /*||
+        hasRole2(AclRole.EMS_Admin_Project_CW_NUS)*/
+        ;
   }
   // bool hasRole(AclRole role) {
   //   return rolePermMap!.containsKey(role.name);
