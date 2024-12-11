@@ -1,4 +1,4 @@
-import 'package:buff_helper/pkg_buff_helper.dart';
+import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -8,6 +8,7 @@ class WgtViewEditDropdown extends StatefulWidget {
     this.dropdownValueListString,
     this.dropdownValueListMap,
     this.originalValue,
+    this.originalValueMap,
     required this.onSetValue,
     required this.onFocus,
     required this.hint,
@@ -29,6 +30,7 @@ class WgtViewEditDropdown extends StatefulWidget {
   final List<String>? dropdownValueListString;
   final List<Map<String, dynamic>>? dropdownValueListMap;
   final String? originalValue;
+  final Map<String, dynamic>? originalValueMap;
   final String hint;
   final double width;
   final String? labelText;
@@ -57,12 +59,16 @@ class _WgtViewEditDropdownState extends State<WgtViewEditDropdown> {
   bool? _showCommitted;
   late String _committedMessage;
   String? _currentValue;
+  Map<String, dynamic>? _originalValueMap;
+
+  late final useMap = widget.dropdownValueListMap != null;
 
   @override
   void initState() {
     super.initState();
     _committedMessage = widget.committedMessage;
     _currentValue = widget.originalValue;
+    _originalValueMap = widget.originalValueMap;
 
     assert(widget.dropdownValueListString != null ||
         widget.dropdownValueListMap != null);
@@ -102,64 +108,108 @@ class _WgtViewEditDropdownState extends State<WgtViewEditDropdown> {
                 ),
               IgnorePointer(
                 ignoring: widget.readOnly,
-                child: DropdownButton<String>(
-                  alignment: AlignmentDirectional.centerStart,
-                  value: _currentValue,
-                  hint: Padding(
-                      padding: const EdgeInsets.only(bottom: 3.0),
-                      child: Text(widget.hint,
-                          style: TextStyle(
-                              fontSize: 15,
-                              color: Theme.of(context).hintColor))),
-                  icon: const Icon(Icons.arrow_drop_down),
-                  iconSize: 21,
-                  // elevation: 16,
-                  style: widget.readOnly
-                      ? TextStyle(color: Theme.of(context).hintColor)
-                      : TextStyle(color: Theme.of(context).colorScheme.primary),
-                  underline: Container(
-                      height: 1,
-                      color: Theme.of(context).hintColor.withOpacity(0.3)),
-                  onChanged: (String? newValue) {
-                    if (newValue == null) {
-                      return;
-                    }
-                    if (newValue == _currentValue) {
-                      return;
-                    }
-                    setState(() {
-                      _currentValue = newValue;
-                      _isEditing = true;
-                      _showCommitted = false;
-                      _errorText = '';
-                    });
-                    widget.onFocus(true);
-                  },
-                  items: widget.dropdownValueListMap != null
-                      ? widget.dropdownValueListMap!
-                          .map<DropdownMenuItem<String>>(
-                              (Map<String, dynamic> value) {
-                          return DropdownMenuItem<String>(
-                            value: value['value'],
-                            child: Text(value['label']),
-                          );
-                        }).toList()
-                      : widget.dropdownValueListString!
-                          .map<DropdownMenuItem<String>>((String value) {
-                          return DropdownMenuItem<String>(
+                child: useMap
+                    ? DropdownButton<Map<String, dynamic>>(
+                        alignment: AlignmentDirectional.centerStart,
+                        value: _originalValueMap,
+                        hint: Padding(
+                            padding: const EdgeInsets.only(bottom: 3.0),
+                            child: Text(widget.hint,
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    color: Theme.of(context).hintColor))),
+                        icon: const Icon(Icons.arrow_drop_down),
+                        iconSize: 21,
+                        // elevation: 16,
+                        style: widget.readOnly
+                            ? TextStyle(color: Theme.of(context).hintColor)
+                            : TextStyle(
+                                color: Theme.of(context).colorScheme.primary),
+                        underline: Container(
+                            height: 1,
+                            color:
+                                Theme.of(context).hintColor.withOpacity(0.3)),
+                        onChanged: (Map<String, dynamic>? newValue) {
+                          if (newValue == null) {
+                            return;
+                          }
+                          if (newValue == _originalValueMap) {
+                            return;
+                          }
+                          setState(() {
+                            _originalValueMap = newValue;
+                            _isEditing = true;
+                            _showCommitted = false;
+                            _errorText = '';
+                          });
+                          widget.onFocus(true);
+                        },
+                        items: widget.dropdownValueListMap!
+                            .map<DropdownMenuItem<Map<String, dynamic>>>(
+                                (Map<String, dynamic> value) {
+                          return DropdownMenuItem<Map<String, dynamic>>(
                             value: value,
-                            child: Text(value),
+                            child: Text(value['label'] ?? value['title']),
                           );
-                        }).toList(),
-                ),
+                        }).toList())
+                    : DropdownButton<String>(
+                        alignment: AlignmentDirectional.centerStart,
+                        value: _currentValue,
+                        hint: Padding(
+                            padding: const EdgeInsets.only(bottom: 3.0),
+                            child: Text(widget.hint,
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    color: Theme.of(context).hintColor))),
+                        icon: const Icon(Icons.arrow_drop_down),
+                        iconSize: 21,
+                        // elevation: 16,
+                        style: widget.readOnly
+                            ? TextStyle(color: Theme.of(context).hintColor)
+                            : TextStyle(
+                                color: Theme.of(context).colorScheme.primary),
+                        underline: Container(
+                            height: 1,
+                            color:
+                                Theme.of(context).hintColor.withOpacity(0.3)),
+                        onChanged: (String? newValue) {
+                          if (newValue == null) {
+                            return;
+                          }
+                          if (newValue == _currentValue) {
+                            return;
+                          }
+                          setState(() {
+                            _currentValue = newValue;
+                            _isEditing = true;
+                            _showCommitted = false;
+                            _errorText = '';
+                          });
+                          widget.onFocus(true);
+                        },
+                        items: widget.dropdownValueListMap != null
+                            ? widget.dropdownValueListMap!
+                                .map<DropdownMenuItem<String>>(
+                                    (Map<String, dynamic> value) {
+                                return DropdownMenuItem<String>(
+                                  value: value['value'] ?? value['val'],
+                                  child: Text(value['label'] ?? value['title']),
+                                );
+                              }).toList()
+                            : widget.dropdownValueListString!
+                                .map<DropdownMenuItem<String>>((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                      ),
               ),
               Expanded(child: Container()),
               _isSubmitting
-                  ? Padding(
-                      padding: const EdgeInsets.only(left: 13),
-                      child: xtWait(
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
+                  ? const Padding(
+                      padding: EdgeInsets.only(left: 13),
+                      child: WgtPagWait(size: 21),
                     )
                   : _isEditing /*&& widget.hasFocus*/
                       ? Tooltip(
@@ -192,7 +242,10 @@ class _WgtViewEditDropdownState extends State<WgtViewEditDropdown> {
                                 // }
 
                                 Map<String, dynamic> result =
-                                    await widget.onSetValue(_currentValue!);
+                                    await widget.onSetValue(useMap
+                                        ? _originalValueMap!['value'] ??
+                                            _originalValueMap!['val']
+                                        : _currentValue!);
                                 if (result['error'] != null) {
                                   setState(() {
                                     _errorText = result['error'];
@@ -220,8 +273,24 @@ class _WgtViewEditDropdownState extends State<WgtViewEditDropdown> {
                         )
                       : Container(),
               // horizontalSpaceSmall,
-              if (_currentValue != widget.originalValue &&
-                  _currentValue != null)
+              if (useMap &&
+                  (_originalValueMap != null &&
+                      _originalValueMap != widget.originalValueMap))
+                IconButton(
+                  icon: Icon(
+                    Icons.close,
+                    color: Theme.of(context).hintColor,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _isEditing = false;
+                      _originalValueMap = widget.originalValueMap;
+                    });
+                  },
+                ),
+              if (!useMap &&
+                  (_currentValue != widget.originalValue &&
+                      _currentValue != null))
                 IconButton(
                   icon: Icon(
                     Icons.close,

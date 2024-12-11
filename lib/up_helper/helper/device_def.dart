@@ -435,9 +435,9 @@ Widget getDeviceTypeIcon(dynamic deviceSubType,
     {Color? iconColor, double? iconSize}) {
   double defalutIconSize = 25;
   double theIconSize = iconSize ?? defalutIconSize;
-  if (kDebugMode) {
-    print('theIconSize: $theIconSize');
-  }
+  // if (kDebugMode) {
+  //   print('theIconSize: $theIconSize');
+  // }
   switch (deviceSubType) {
     case DeviceType.LOCK:
       return Icon(
