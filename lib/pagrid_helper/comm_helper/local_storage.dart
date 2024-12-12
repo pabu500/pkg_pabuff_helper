@@ -31,8 +31,15 @@ Future<void> removeFromSecuredStorage(String key) async {
   await storage.delete(key: key);
 }
 
-Future<void> saveToSharedPref(String key, dynamic val) async {
+Future<void> saveToSharedPref(String key, dynamic val,
+    {bool removeBeforeSave = false}) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  // if val is map, need to remove before save
+  // ohterwise, some key-value pairs may not be updated
+  if (removeBeforeSave) {
+    await prefs.remove(key);
+  }
 
 // // Save an integer value to 'counter' key.
 //   await prefs.setInt('counter', 10);
