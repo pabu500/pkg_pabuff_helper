@@ -355,6 +355,7 @@ class _WgtViewEditFieldState extends State<WgtViewEditField> {
                 InkWell(
                   child: Icon(
                     Icons.close,
+                    size: 35,
                     color: Theme.of(context).hintColor,
                   ),
                   onTap: () {
@@ -366,7 +367,7 @@ class _WgtViewEditFieldState extends State<WgtViewEditField> {
                 ),
               if (widget.showCopy)
                 SizedBox(
-                    width: 40,
+                    width: 35,
                     child: getCopyButton(context, widget.originalValue,
                         direction: 'left')),
             ],
@@ -397,9 +398,7 @@ class _WgtViewEditFieldState extends State<WgtViewEditField> {
     int i = 0;
     for (var suffix in widget.suffixes) {
       if (i++ > 0) {
-        suffixes.add(
-          horizontalSpaceTiny,
-        );
+        suffixes.add(horizontalSpaceTiny);
       }
       suffixes.add(
         InkWell(
