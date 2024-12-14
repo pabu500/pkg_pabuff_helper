@@ -35,7 +35,7 @@ class WgtViewEditDropdown extends StatefulWidget {
   final double width;
   final String? labelText;
   final TextStyle? textStyle;
-  final Function(String) onSetValue;
+  final Function(dynamic) onSetValue;
   final Function(bool) onFocus;
   // final Function? onSuffixTap;
   final bool hasFocus;
@@ -59,7 +59,7 @@ class _WgtViewEditDropdownState extends State<WgtViewEditDropdown> {
   bool? _showCommitted;
   late String _committedMessage;
   String? _currentValue;
-  Map<String, dynamic>? _originalValueMap;
+  Map<String, dynamic>? _currentValueMap;
 
   late final useMap = widget.dropdownValueListMap != null;
 
@@ -68,7 +68,7 @@ class _WgtViewEditDropdownState extends State<WgtViewEditDropdown> {
     super.initState();
     _committedMessage = widget.committedMessage;
     _currentValue = widget.originalValue;
-    _originalValueMap = widget.originalValueMap;
+    _currentValueMap = widget.originalValueMap;
 
     assert(widget.dropdownValueListString != null ||
         widget.dropdownValueListMap != null);
@@ -111,7 +111,7 @@ class _WgtViewEditDropdownState extends State<WgtViewEditDropdown> {
                 child: useMap
                     ? DropdownButton<Map<String, dynamic>>(
                         alignment: AlignmentDirectional.centerStart,
-                        value: _originalValueMap,
+                        value: _currentValueMap,
                         hint: Padding(
                             padding: const EdgeInsets.only(bottom: 3.0),
                             child: Text(widget.hint,
@@ -133,11 +133,11 @@ class _WgtViewEditDropdownState extends State<WgtViewEditDropdown> {
                           if (newValue == null) {
                             return;
                           }
-                          if (newValue == _originalValueMap) {
+                          if (newValue == _currentValueMap) {
                             return;
                           }
                           setState(() {
-                            _originalValueMap = newValue;
+                            _currentValueMap = newValue;
                             _isEditing = true;
                             _showCommitted = false;
                             _errorText = '';
@@ -243,8 +243,7 @@ class _WgtViewEditDropdownState extends State<WgtViewEditDropdown> {
 
                                 Map<String, dynamic> result =
                                     await widget.onSetValue(useMap
-                                        ? _originalValueMap!['value'] ??
-                                            _originalValueMap!['val']
+                                        ? _currentValueMap!
                                         : _currentValue!);
                                 if (result['error'] != null) {
                                   setState(() {
@@ -274,8 +273,8 @@ class _WgtViewEditDropdownState extends State<WgtViewEditDropdown> {
                       : Container(),
               // horizontalSpaceSmall,
               if (useMap &&
-                  (_originalValueMap != null &&
-                      _originalValueMap != widget.originalValueMap))
+                  (_currentValueMap != widget.originalValueMap &&
+                      _currentValueMap != null))
                 IconButton(
                   icon: Icon(
                     Icons.close,
@@ -284,7 +283,7 @@ class _WgtViewEditDropdownState extends State<WgtViewEditDropdown> {
                   onPressed: () {
                     setState(() {
                       _isEditing = false;
-                      _originalValueMap = widget.originalValueMap;
+                      _currentValueMap = widget.originalValueMap;
                     });
                   },
                 ),
