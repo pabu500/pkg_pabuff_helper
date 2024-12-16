@@ -155,7 +155,7 @@ final projectProfileRepo = [
     ],
     'timezone': 8,
     'currency': 'SGD',
-    'validate_meter_displayname': (displayname) {
+    'validate_entity_displayname': (displayname) {
       //8 digits, start with '1'
       RegExp exp = RegExp(r'^1\d{7}$');
       if (exp.hasMatch(displayname)) {
@@ -189,7 +189,7 @@ final projectProfileRepo = [
     'project_sites': [SiteScope.SUTD_CAMPUS],
     'timezone': 8,
     'currency': 'SGD',
-    'validate_meter_displayname': (displayname) {
+    'validate_entity_displayname': (displayname) {
       //8 digits, start with '2'
       RegExp exp = RegExp(r'^2\d{7}$');
       if (exp.hasMatch(displayname)) {
