@@ -155,7 +155,7 @@ final projectProfileRepo = [
     ],
     'timezone': 8,
     'currency': 'SGD',
-    'validate_entity_displayname': (displayname) {
+    'validate_meter_displayname': (displayname) {
       //8 digits, start with '1'
       RegExp exp = RegExp(r'^1\d{7}$');
       if (exp.hasMatch(displayname)) {
@@ -168,12 +168,12 @@ final projectProfileRepo = [
       {
         'payment_mode': PaymentMode.stripe,
         'active': false,
-        'show': true,
+        'show': false,
       },
       {
         'payment_mode': PaymentMode.netsQR,
         'active': false,
-        'show': true,
+        'show': false,
         'pub_key': 'd877185d-af96-43a5-9f53-48a3c543c3d5',
       },
       {
@@ -424,7 +424,9 @@ Function getDisplaynameValidator(String scopeStr) {
   Map<String, dynamic>? cp;
 
   for (var projectProfile in projectProfileRepo) {
-    if (projectProfile['project_scope'] == scopeStr) {
+    PagProjectScope projectScope =
+        projectProfile['project_scope'] as PagProjectScope;
+    if (projectScope.name == scopeStr) {
       cp = projectProfile;
       break;
     }
@@ -435,7 +437,7 @@ Function getDisplaynameValidator(String scopeStr) {
     };
   }
 
-  Function validator = cp['validate_meter_displayname'];
+  Function validator = cp['validate_entity_displayname'];
   return validator;
 }
 

@@ -198,12 +198,12 @@ final scopeProfiles = [
       {
         'payment_mode': PaymentMode.stripe,
         'active': false,
-        'show': true,
+        'show': false,
       },
       {
         'payment_mode': PaymentMode.netsQR,
         'active': false,
-        'show': true,
+        'show': false,
         'pub_key': 'd877185d-af96-43a5-9f53-48a3c543c3d5',
       },
       {
