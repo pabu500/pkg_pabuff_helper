@@ -164,9 +164,8 @@ final projectProfileRepo = [
             displaynameInt > 10003925 ||
             [10003963, 10003982, 10003985, 10009999].contains(displaynameInt)) {
           return 'Invalid displayname';
-        } else {
-          return null;
         }
+        return null;
       } else {
         return 'Invalid displayname';
       }
