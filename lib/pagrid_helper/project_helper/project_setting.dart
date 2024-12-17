@@ -42,6 +42,15 @@ enum PagSiteScope {
   GI_DE_DEMO,
 }
 
+bool yncMeterValidator(String displayname) {
+  int displaynameInt = int.parse(displayname);
+  if ((displaynameInt >= 10002801 && displaynameInt <= 10003925) ||
+      [10003963, 10003982, 10003985, 10009999].contains(displaynameInt)) {
+    return true;
+  }
+  return false;
+}
+
 final projectProfileRepo = [
   {
     'project_scope': PagProjectScope.PAG_GI_DE,
@@ -159,9 +168,8 @@ final projectProfileRepo = [
       //8 digits, start with '1'
       RegExp exp = RegExp(r'^1\d{7}$');
       if (exp.hasMatch(displayname)) {
-        int displaynameInt = int.parse(displayname);
-        if ((displaynameInt >= 10002801 && displaynameInt <= 10003925) ||
-            [10003963, 10003982, 10003985, 10009999].contains(displaynameInt)) {
+        bool isYnc = yncMeterValidator(displayname);
+        if (isYnc) {
           return 'Invalid displayname';
         }
         return null;
