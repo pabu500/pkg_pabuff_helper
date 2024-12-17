@@ -42,15 +42,6 @@ enum PagSiteScope {
   GI_DE_DEMO,
 }
 
-bool yncMeterValidator(String displayname) {
-  int displaynameInt = int.parse(displayname);
-  if ((displaynameInt >= 10002801 && displaynameInt <= 10003925) ||
-      [10003963, 10003982, 10003985, 10009999].contains(displaynameInt)) {
-    return true;
-  }
-  return false;
-}
-
 final projectProfileRepo = [
   {
     'project_scope': PagProjectScope.PAG_GI_DE,
@@ -166,16 +157,7 @@ final projectProfileRepo = [
     'currency': 'SGD',
     'validate_entity_displayname': (displayname) {
       //8 digits, start with '1'
-      RegExp exp = RegExp(r'^1\d{7}$');
-      if (exp.hasMatch(displayname)) {
-        bool isYnc = yncMeterValidator(displayname);
-        if (isYnc) {
-          return 'Invalid displayname';
-        }
-        return null;
-      } else {
-        return 'Invalid displayname';
-      }
+      nusSnValidator(displayname);
     },
     'payment_mode_setting': {
       {
@@ -461,5 +443,19 @@ String? mmsSnValidator(value) {
     return null;
   } else {
     return 'Invalid sn';
+  }
+}
+
+String? nusSnValidator(String displayname) {
+  RegExp exp = RegExp(r'^1\d{7}$');
+  int displaynameInt = int.parse(displayname);
+  if (exp.hasMatch(displayname)) {
+    if ((displaynameInt >= 10002801 && displaynameInt <= 10003925) ||
+        [10003963, 10003982, 10003985, 10009999].contains(displaynameInt)) {
+      return 'Invalid displayname';
+    }
+    return null;
+  } else {
+    return 'Invalid displayname';
   }
 }
