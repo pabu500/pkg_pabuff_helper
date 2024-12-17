@@ -450,6 +450,7 @@ String? nusSnValidator(String displayname) {
   RegExp exp = RegExp(r'^1\d{7}$');
   int displaynameInt = int.parse(displayname);
   if (exp.hasMatch(displayname)) {
+    //check if the meter is under YNC, if yes, return invalid displayname
     if ((displaynameInt >= 10002801 && displaynameInt <= 10003925) ||
         [10003963, 10003982, 10003985, 10009999].contains(displaynameInt)) {
       return 'Invalid displayname';
