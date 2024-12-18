@@ -157,7 +157,7 @@ final projectProfileRepo = [
     'currency': 'SGD',
     'validate_entity_displayname': (displayname) {
       //8 digits, start with '1'
-      nusSnValidator(displayname);
+      return nusSnValidator(displayname);
     },
     'payment_mode_setting': {
       {
