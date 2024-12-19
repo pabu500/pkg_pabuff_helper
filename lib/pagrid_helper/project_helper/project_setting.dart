@@ -450,52 +450,13 @@ String? nusSnValidator(String displayname) {
   RegExp exp = RegExp(r'^1\d{7}$');
   int displaynameInt = int.parse(displayname);
   if (exp.hasMatch(displayname)) {
-    return isRVRC(displayname);
     //check if the meter is under YNC, if yes, return invalid displayname
-    // if ((displaynameInt >= 10002801 && displaynameInt <= 10003925) ||
-    //     [10003963, 10003982, 10003985, 10009999].contains(displaynameInt)) {
-    //   return 'Invalid displayname';
-    // }
-    // return null;
+    if ((displaynameInt >= 10002801 && displaynameInt <= 10003925) ||
+        [10003963, 10003982, 10003985, 10009999].contains(displaynameInt)) {
+      return 'Invalid displayname';
+    }
+    return null;
   } else {
     return 'Invalid displayname';
   }
-}
-
-List<int> rvrc24List = [
-  10010001,
-  10010002,
-  10010003,
-  10010004,
-  10010005,
-  10010006,
-  10010007,
-  10010008,
-  10010009,
-  10010010,
-  10010011,
-  10010012,
-  10010013,
-  10010014,
-  10010015,
-  10010016,
-  10010017,
-  10010018,
-  10010019,
-  10010020,
-  10010021,
-  10010022,
-  10010023,
-  10010024
-];
-
-String? isRVRC(String displayname) {
-  int displaynameInt = int.parse(displayname);
-  if (((displaynameInt < 10013020 &&
-          displaynameInt != 10010016 &&
-          !rvrc24List.contains(displaynameInt)) ||
-      displaynameInt > 10013376)) {
-    return 'Invalid displayname';
-  }
-  return null;
 }
