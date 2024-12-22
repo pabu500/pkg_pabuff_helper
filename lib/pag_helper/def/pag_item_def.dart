@@ -1,0 +1,16 @@
+enum PagItemKind {
+  // LOCATION,
+  scope,
+  device,
+  user,
+  tenant,
+  // METER,
+  // CONCENTRATOR,
+  // GATEWAY,
+  // CAMERA,
+  // METER_GRROP,
+  // SENSOR,
+  // LOCK,
+  // USER_GROUP,
+  // TARIFF,
+}
