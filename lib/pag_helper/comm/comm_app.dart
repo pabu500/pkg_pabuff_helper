@@ -7,9 +7,8 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:buff_helper/up_helper/up_helper.dart';
 
-import '../../../../pag_console/lib/app_config.dart';
-
-Future<dynamic> getVersion2(String appName) async {
+Future<dynamic> getVersion2(
+    String appName, MdlPagAppConfig pagAppConfig) async {
   String projectScope = pagAppConfig.activePortalPagProjectScopeList[0].name;
 
   try {
@@ -31,7 +30,8 @@ Future<dynamic> getVersion2(String appName) async {
   }
 }
 
-Future<dynamic> getOreVersion2(MdlPagUser? loggedInUser) async {
+Future<dynamic> getOreVersion2(
+    MdlPagUser? loggedInUser, MdlPagAppConfig pagAppConfig) async {
   try {
     final response = await http.get(
       Uri.parse(PagUrlController(loggedInUser, pagAppConfig)
@@ -67,7 +67,7 @@ Future<dynamic> getOaxLink(
   // }
 
   final response = await http.post(
-    Uri.parse(PagUrlController(loggedInUser, pagAppConfig)
+    Uri.parse(PagUrlController(loggedInUser, appConfig)
         .getUrl(PagSvcType.oresvc2, svcClaim.endpoint!)),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
