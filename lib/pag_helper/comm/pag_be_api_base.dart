@@ -137,8 +137,8 @@ class PagUrlBase {
 
   static const String _dUsersvcUrl =
       // 'http://13.228.16.206:8081';
-      'http://3.1.141.233:8081';
-  // 'http://localhost:8081';
+      // 'http://3.1.141.233:8081';
+      'http://localhost:8081';
   static const String _rDevUsersvcUrl = 'https://dev-usersvc2.evs.com.sg';
   static const String _rProdUsersvcUrl = 'https://pag-u.evs.com.sg';
 

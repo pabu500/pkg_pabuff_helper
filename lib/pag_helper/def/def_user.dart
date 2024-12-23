@@ -1,6 +1,7 @@
 enum PagPortalType {
   pag('e@g'),
   emsTp('ems-tp'),
+  evsCp('evs-cp'),
   none('none'),
   ;
 
