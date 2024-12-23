@@ -363,10 +363,16 @@ InputDecoration xtBuildInputDecoration(
     String? errorText,
     Color? errorColor,
     Widget? prefixIcon,
-    Widget? suffix}) {
+    Widget? suffix,
+    BuildContext? context}) {
   return InputDecoration(
     prefixIcon: prefixIcon,
     hintText: hintText,
+    hintStyle: TextStyle(
+      color:
+          context == null ? null : Theme.of(context).hintColor.withAlpha(130),
+      fontSize: 15,
+    ),
     //suffixIcon: will be placed in front of suffix
     //if suffix is null, there will be a space
     suffix: Padding(
@@ -377,7 +383,14 @@ InputDecoration xtBuildInputDecoration(
     errorStyle: TextStyle(color: errorColor, fontSize: 15),
     errorMaxLines: 2,
     // contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-    border: UnderlineInputBorder(borderRadius: BorderRadius.circular(5.0)),
+    enabledBorder: UnderlineInputBorder(
+      borderSide: BorderSide(
+        width: 1,
+        color: context == null
+            ? Colors.grey
+            : Theme.of(context).hintColor.withAlpha(75),
+      ),
+    ),
   );
 }
 

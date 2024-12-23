@@ -239,12 +239,12 @@ class _WgtTextFieldState extends State<WgtTextField> {
                   errorText: _errorText.isEmpty ? null : _errorText,
                   hintStyle: TextStyle(
                     // fontSize: 16,
-                    color: Theme.of(context).hintColor.withOpacity(0.5),
+                    color: Theme.of(context).hintColor.withAlpha(130),
                   ),
                   enabledBorder: UnderlineInputBorder(
                     borderSide: BorderSide(
                       width: 1,
-                      color: Theme.of(context).hintColor.withOpacity(0.3),
+                      color: Theme.of(context).hintColor.withAlpha(75),
                     ),
                   ),
                   suffix: getSuffix(),

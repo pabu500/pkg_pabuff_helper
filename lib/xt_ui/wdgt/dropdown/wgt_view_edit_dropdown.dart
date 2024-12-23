@@ -127,8 +127,7 @@ class _WgtViewEditDropdownState extends State<WgtViewEditDropdown> {
                                 color: Theme.of(context).colorScheme.primary),
                         underline: Container(
                             height: 1,
-                            color:
-                                Theme.of(context).hintColor.withOpacity(0.3)),
+                            color: Theme.of(context).hintColor.withAlpha(75)),
                         onChanged: (Map<String, dynamic>? newValue) {
                           if (newValue == null) {
                             return;
@@ -170,8 +169,7 @@ class _WgtViewEditDropdownState extends State<WgtViewEditDropdown> {
                                 color: Theme.of(context).colorScheme.primary),
                         underline: Container(
                             height: 1,
-                            color:
-                                Theme.of(context).hintColor.withOpacity(0.3)),
+                            color: Theme.of(context).hintColor.withAlpha(75)),
                         onChanged: (String? newValue) {
                           if (newValue == null) {
                             return;
