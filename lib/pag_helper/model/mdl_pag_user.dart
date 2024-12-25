@@ -64,6 +64,9 @@ class MdlPagUser {
   // MdlPagLocationGroupProfile? selectedLocationGroupProfile;
   MdlPagScope2 selectedScope;
 
+  // mapping of role and its respective project list
+  Map<String, dynamic> rolePorjectInfo;
+
   MdlPagUser({
     this.id,
     this.username,
@@ -82,6 +85,7 @@ class MdlPagUser {
     this.tenantList,
     this.venderCredList,
     this.userScope = const [],
+    this.rolePorjectInfo = const {},
     required this.selectedScope,
   });
 
@@ -291,6 +295,7 @@ class MdlPagUser {
         userRoleScopeList = [...userJson['user_role_scope_list']];
       }
       List<MdlPagProjectProfile> projectProfileList = [];
+      Map<String, dynamic> rolePorjectInfo = {};
       for (Map<String, dynamic> userRoleScope in userRoleScopeList) {
         String roleIdStr = userRoleScope['id'];
         int roleId = int.tryParse(roleIdStr) ?? -1;
@@ -333,6 +338,7 @@ class MdlPagUser {
             }
           }
         }
+        rolePorjectInfo[roleName] = projectRoleScopeConfigList;
       }
 
       MdlPagProjectProfile? selectedProjectProfile = projectProfileList[0];
@@ -389,6 +395,7 @@ class MdlPagUser {
         // selectedSiteProfile: selectedSiteProfile,
         selectedScope: selectedScope,
         roleList: roleList,
+        rolePorjectInfo: rolePorjectInfo,
         tenantList: tenantList,
         authProvider: authProvider,
         venderCredList: [
