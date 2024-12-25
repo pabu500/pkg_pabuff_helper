@@ -297,7 +297,7 @@ class MdlPagUser {
 
         String roleName = userRoleScope['name'];
         String? roleLabel = userRoleScope['label'];
-        String roleRankStr = userRoleScope['rank'];
+        String roleRankStr = userRoleScope['rank'] ?? '';
         int roleRank = int.tryParse(roleRankStr) ?? -1;
 
         MdlPagRole role = MdlPagRole(
