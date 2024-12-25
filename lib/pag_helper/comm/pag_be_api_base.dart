@@ -164,6 +164,7 @@ class PagUrlBase {
   static const String eptUsersvcGetAclSetting = '/auth/get_acl_setting';
   static const String eptUsersvcGetPgk = '/auth/get_pgk';
   static const String eptUsersvcRegister = '/register';
+  static const String eptGetVisibleRoleList = '/get_visible_role_list';
   static const String eptUsersvcUpdateProfile = '/update_profile';
   static const String eptUsersvcUpdateKeyVal = '/update_key_val';
   static const String eptUsersvcCheckUnique = '/check_unique';
@@ -187,7 +188,6 @@ class PagUrlBase {
   static const String eptUsersvcPollingUserBatchOpProgress =
       '/ops/progress_update';
   static const String eptUsersvcGetUserKeyVal = '/ops/get_user_key_val';
-
   static const String eptUsersvcSsoVerifyEmailAddress = '/sso/verify_email';
 
   //oresvc2 endpoints

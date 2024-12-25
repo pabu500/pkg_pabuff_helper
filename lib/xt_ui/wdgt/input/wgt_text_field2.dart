@@ -78,7 +78,7 @@ class _WgtTextFieldState extends State<WgtTextField> {
 
   String _errorText = '';
   bool _waiting = false;
-  String _checkUniqueResult = '';
+  String _checkUniqueResultText = '';
   bool _isValidated = true;
   bool _uniqueChecked = false;
 
@@ -86,33 +86,37 @@ class _WgtTextFieldState extends State<WgtTextField> {
 
   Future<void> checkUnique(
       dynamic appConfig, String field, String val, String table) async {
+    if (widget.checkUnique == null) {
+      return;
+    }
     if (val.trim().isEmpty) {
       return;
     }
     setState(() {
-      _checkUniqueResult = '';
+      _checkUniqueResultText = '';
       _waiting = true;
     });
-    if (widget.checkUnique == null) {
-      return;
-    }
+
     try {
       Map<String, dynamic> result =
           await widget.checkUnique!(widget.appConfig, field, val, table);
       if (result['exists'] != null) {
         bool exists = result['exists'] == true;
         setState(() {
-          _checkUniqueResult = exists ? 'taken' : 'available';
+          _checkUniqueResultText = exists ? 'taken' : 'available';
           _uniqueChecked = true;
         });
-        if (widget.onUniqueCheck != null) {
-          widget.onUniqueCheck!(exists);
-        }
+
+        widget.onUniqueCheck?.call(exists);
       }
     } catch (e) {
       if (kDebugMode) {
         print(e);
       }
+      setState(() {
+        _checkUniqueResultText = 'error';
+      });
+      widget.onUniqueCheck?.call(_checkUniqueResultText);
     } finally {
       setState(() {
         _waiting = false;
@@ -140,7 +144,7 @@ class _WgtTextFieldState extends State<WgtTextField> {
       if (widget.resetKey != _resetKey) {
         _resetKey = widget.resetKey;
         _controller.text = widget.initialValue ?? '';
-        _checkUniqueResult = '';
+        _checkUniqueResultText = '';
         _uniqueChecked = false;
         _errorText = '';
       }
@@ -179,9 +183,9 @@ class _WgtTextFieldState extends State<WgtTextField> {
               setState(() {
                 _uniqueChecked = false;
               });
-              if (_checkUniqueResult.isNotEmpty) {
+              if (_checkUniqueResultText.isNotEmpty) {
                 setState(() {
-                  _checkUniqueResult = '';
+                  _checkUniqueResultText = '';
                 });
               }
               if (value.isEmpty) {
@@ -270,46 +274,48 @@ class _WgtTextFieldState extends State<WgtTextField> {
         : Focus(
             descendantsAreFocusable: false,
             canRequestFocus: false,
-            child: _checkUniqueResult == 'available'
+            child: _checkUniqueResultText == 'available'
                 ? const Text(
                     'available',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.green,
-                    ),
+                    style: TextStyle(color: Colors.green),
                   )
-                : _checkUniqueResult == 'taken'
-                    ? const Text(
+                : _checkUniqueResultText == 'taken'
+                    ? Text(
                         'taken',
                         style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.red,
-                        ),
+                            color: Theme.of(context).colorScheme.error),
                       )
-                    : (_controller.text.isNotEmpty && widget.showClearButton)
-                        ? InkWell(
-                            child: Icon(
-                              Icons.clear,
-                              color: Theme.of(context).hintColor,
-                            ),
-                            onTap: () {
-                              setState(() {
-                                _controller.text = '';
-                                _checkUniqueResult = '';
-                                _uniqueChecked = false;
-                                _errorText = '';
-                                if (widget.onValidate != null) {
-                                  widget.onValidate!('');
-                                }
-                                if (widget.onClear != null) {
-                                  widget.onClear!();
-                                }
-                              });
-                            },
+                    : _checkUniqueResultText == 'error'
+                        ? Text(
+                            'error',
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.error),
                           )
-                        : (widget.scanner != null)
-                            ? widget.scanner!
-                            : const SizedBox(),
+                        : (_controller.text.isNotEmpty &&
+                                widget.showClearButton)
+                            ? InkWell(
+                                child: Icon(
+                                  Icons.clear,
+                                  color: Theme.of(context).hintColor,
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                    _controller.text = '';
+                                    _checkUniqueResultText = '';
+                                    _uniqueChecked = false;
+                                    _errorText = '';
+                                    if (widget.onValidate != null) {
+                                      widget.onValidate!('');
+                                    }
+                                    if (widget.onClear != null) {
+                                      widget.onClear!();
+                                    }
+                                  });
+                                },
+                              )
+                            : (widget.scanner != null)
+                                ? widget.scanner!
+                                : const SizedBox(),
           );
   }
 }

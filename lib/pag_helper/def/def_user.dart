@@ -1,5 +1,5 @@
 enum PagPortalType {
-  pag('e@g'),
+  pagConsole('pag-console'),
   emsTp('ems-tp'),
   evsCp('evs-cp'),
   none('none'),
@@ -11,9 +11,7 @@ enum PagPortalType {
 
   final String label;
 
-  static PagPortalType byLabel(
-    String? label,
-  ) =>
+  static PagPortalType byLabel(String? label) =>
       enumByLabel(
         label,
         values,
@@ -21,9 +19,22 @@ enum PagPortalType {
       none;
 }
 
+// T? enumByLabel<T extends Enum>(
+//   String? label,
+//   List<T> values,
+// ) {
+//   return label == null ? null : values.asNameMap()[label];
+// }
+
 T? enumByLabel<T extends Enum>(
   String? label,
   List<T> values,
 ) {
-  return label == null ? null : values.asNameMap()[label];
+  if (label == null) return null;
+  for (var value in values) {
+    if (value is PagPortalType && value.label == label) {
+      return value as T;
+    }
+  }
+  return null;
 }
