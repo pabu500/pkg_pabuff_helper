@@ -165,6 +165,7 @@ class PagUrlBase {
   static const String eptUsersvcGetPgk = '/auth/get_pgk';
   static const String eptUsersvcRegister = '/register';
   static const String eptGetVisibleRoleList = '/get_visible_role_list';
+  static const String eptGetUserRoleList = '/get_user_role_list';
   static const String eptUsersvcUpdateProfile = '/update_profile';
   static const String eptUsersvcUpdateKeyVal = '/update_key_val';
   static const String eptUsersvcCheckUnique = '/check_unique';
