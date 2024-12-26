@@ -160,12 +160,6 @@ class MdlPagUser {
     return '';
   }
 
-  // int getSelectedProjectTimeZone() {
-  //   assert(selectedProjectProfile != null);
-
-  //   return selectedProjectProfile!.timezone;
-  // }
-
   PagPortalProjectScope getProjectScope({int index = 0}) {
     if (userScope == null) {
       return PagPortalProjectScope.none;
@@ -196,38 +190,6 @@ class MdlPagUser {
     }
     return projectScopes;
   }
-
-  // PagTreePartType getSelectedScopeTreePartType() {
-  //   if (selectedLocationGroupProfile != null) {
-  //     return PagTreePartType.locationGroup;
-  //   }
-  //   if (selectedBuildingProfile != null) {
-  //     return PagTreePartType.building;
-  //   }
-  //   if (selectedSiteProfile != null) {
-  //     return PagTreePartType.site;
-  //   }
-  //   if (selectedSiteGroupProfile != null) {
-  //     return PagTreePartType.siteGroup;
-  //   }
-  //   return PagTreePartType.project;
-  // }
-
-  // dynamic getSelectedScopeProfile() {
-  //   if (selectedLocationGroupProfile != null) {
-  //     return selectedLocationGroupProfile;
-  //   }
-  //   if (selectedBuildingProfile != null) {
-  //     return selectedBuildingProfile;
-  //   }
-  //   if (selectedSiteProfile != null) {
-  //     return selectedSiteProfile;
-  //   }
-  //   if (selectedSiteGroupProfile != null) {
-  //     return selectedSiteGroupProfile;
-  //   }
-  //   return selectedProjectProfile;
-  // }
 
   List<MdlPagProjectProfile> getProjectProfileList() {
     List<MdlPagProjectProfile> projectProfiles = [];
@@ -318,9 +280,9 @@ class MdlPagUser {
           projectRoleScopeConfigList = [
             ...userRoleScope['project_role_scope_config_list']
           ];
-          for (Map<String, dynamic> projectRoleScope
+          for (Map<String, dynamic> projectRoleScopeConfig
               in projectRoleScopeConfigList) {
-            if (projectRoleScope['role_scope'] == null) {
+            if (projectRoleScopeConfig['role_scope'] == null) {
               if (kDebugMode) {
                 print('projectRoleScope[role_scope] is null');
               }
@@ -329,7 +291,7 @@ class MdlPagUser {
 
             try {
               MdlPagProjectProfile? projectProfile =
-                  MdlPagProjectProfile.fromJson2(projectRoleScope);
+                  MdlPagProjectProfile.fromJson2(projectRoleScopeConfig);
               projectProfileList.add(projectProfile);
             } catch (e) {
               if (kDebugMode) {
@@ -390,9 +352,6 @@ class MdlPagUser {
         enabled: userJson['enabled'],
         resetPasswordToken: userJson['reset_password_token'] ?? '',
         userScope: projectProfileList,
-        // selectedProjectProfile: selectedProjectProfile,
-        // selectedSiteGroupProfile: selectSiteGroupProfile,
-        // selectedSiteProfile: selectedSiteProfile,
         selectedScope: selectedScope,
         roleList: roleList,
         rolePorjectInfo: rolePorjectInfo,

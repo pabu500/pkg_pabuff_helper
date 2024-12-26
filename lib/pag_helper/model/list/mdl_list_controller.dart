@@ -9,7 +9,8 @@ class MdlPagListController /*extends ChangeNotifier*/ {
   String? rootTableName;
   List<String> filterKeyEqualList;
   List<String> filterKeyLikeList;
-  List<Map<String, dynamic>> joinKeyList = [];
+  List<Map<String, dynamic>> joinKeyList;
+  bool enableGroupBy;
 
   MdlPagListController({
     // required this.pagItemKind,
@@ -19,6 +20,7 @@ class MdlPagListController /*extends ChangeNotifier*/ {
     this.filterKeyEqualList = const [],
     this.filterKeyLikeList = const [],
     this.joinKeyList = const [],
+    this.enableGroupBy = false,
   });
 
   // bool _disposed = false;
@@ -77,6 +79,8 @@ class MdlPagListController /*extends ChangeNotifier*/ {
       }
     }
 
+    bool enableGroupBy = json['enable_group_by'] == 'true';
+
     return MdlPagListController(
       itemType: json['item_type'],
       listColControllerList: listConfigItemList,
@@ -84,6 +88,7 @@ class MdlPagListController /*extends ChangeNotifier*/ {
       filterKeyEqualList: filterKeyEqualList,
       filterKeyLikeList: filterKeyLikeList,
       joinKeyList: joinKeyList,
+      enableGroupBy: enableGroupBy,
     );
   }
 
@@ -101,6 +106,7 @@ class MdlPagListController /*extends ChangeNotifier*/ {
     data['filter_key_equal_list'] = filterKeyEqualList;
     data['filter_key_like_list'] = filterKeyLikeList;
     data['join_key_list'] = joinKeyList;
+    data['enable_group_by'] = enableGroupBy.toString();
     return data;
   }
 

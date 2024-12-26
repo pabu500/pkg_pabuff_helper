@@ -12,11 +12,30 @@ class MdlPagRole {
   });
 
   factory MdlPagRole.fromJson(Map<String, dynamic> json) {
+    dynamic id = json['id'];
+    if (id is String) {
+      id = int.parse(id);
+    }
+
+    dynamic rank = json['rank'] ?? -1;
+    if (rank is String) {
+      rank = int.tryParse(rank);
+    }
+
     return MdlPagRole(
-      id: json['id'] ?? -1,
+      id: id,
       name: json['name'],
       label: json['label'],
-      rank: json['rank'] ?? -1,
+      rank: rank,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'label': label,
+      'rank': rank,
+    };
   }
 }

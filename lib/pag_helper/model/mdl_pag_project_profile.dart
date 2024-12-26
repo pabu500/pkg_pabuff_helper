@@ -1,4 +1,5 @@
 import 'package:buff_helper/pag_helper/def/def_page_route.dart';
+import 'package:buff_helper/pag_helper/model/acl/mdl_pag_role.dart';
 import 'package:buff_helper/pag_helper/model/app/mdl_app_context_config.dart';
 import 'package:buff_helper/pag_helper/model/app/mdl_page_config.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
@@ -31,6 +32,8 @@ class MdlPagProjectProfile {
   PagPageRoute homePageRoute;
   MdlListColController? siteGroupFilterColController;
 
+  List<MdlPagRole> visibleRoleList;
+
   MdlPagProjectProfile({
     required this.id,
     required this.name,
@@ -52,6 +55,7 @@ class MdlPagProjectProfile {
     this.isAllSites = false,
     this.homePageRoute = PagPageRoute.consoleHomeDashboard,
     this.deviceTypeInfoList = const [],
+    this.visibleRoleList = const [],
   });
 
   bool equals(MdlPagProjectProfile? projectProfile) {
@@ -202,104 +206,6 @@ class MdlPagProjectProfile {
     throw Exception('Page config not found');
   }
 
-  // factory MdlPagProjectProfile.fromJson(Map<String, dynamic> json) {
-  //   if (json['lat'] == null || json['lng'] == null) {
-  //     throw Exception('lat or lng is null');
-  //   }
-
-  //   List<PaymentModeSetting> paymentSetting = [];
-  //   if (json['payment_mode_setting'] != null) {
-  //     json['payment_mode_setting'].forEach((v) {
-  //       paymentSetting.add(PaymentModeSetting.fromJson(v));
-  //     });
-  //   }
-
-  //   // List<PagSiteProfile> siteProfileList = [];
-  //   // if (json['site_profile_list'] != null) {
-  //   //   for (PagSiteProfile siteProfile in json['site_profile_list']) {
-  //   //     siteProfileList.add(siteProfile);
-  //   //   }
-  //   // }
-  //   List<MdlPagSiteGroupProfile> siteGroupProfileList = [];
-  //   if (json['site_group_profile_list'] != null) {
-  //     for (MdlPagSiteGroupProfile siteGroupProfile
-  //         in json['site_group_profile_list']) {
-  //       siteGroupProfileList.add(siteGroupProfile);
-  //     }
-  //   }
-  //   if (json['meter_phases'] != null) {
-  //     List<String> meterPhases = [];
-  //     for (var phase in json['meter_phases']) {
-  //       meterPhases.add(phase);
-  //     }
-  //   }
-
-  //   Map<String, double>? mapCenter = {};
-  //   if (json['map_center'] != null) {
-  //     mapCenter = {
-  //       'lat': json['map_center'][0],
-  //       'lng': json['map_center'][1],
-  //     };
-  //   } else {
-  //     mapCenter = {
-  //       'lat': json['lat'],
-  //       'lng': json['lng'],
-  //     };
-  //   }
-
-  //   PagPageRoute homePageRoute = PagPageRoute.consoleHomeDashboard;
-  //   List<MdlPagAppContextConfig> appCtxConfigList = [];
-  //   if (json['app_info_list'] != null) {
-  //     for (Map<String, dynamic> appInfo in json['app_info_list']) {
-  //       MdlPagAppContextConfig appCtxConfig =
-  //           MdlPagAppContextConfig.fromJson(appInfo);
-  //       appCtxConfigList.add(appCtxConfig);
-
-  //       String homePageRouteStr = appInfo.values.first['home_page_route'] ?? '';
-  //       if (homePageRouteStr.isNotEmpty) {
-  //         try {
-  //           PagPageRoute route = PagPageRoute.values.byName(homePageRouteStr);
-  //           homePageRoute = route;
-  //         } catch (e) {
-  //           if (kDebugMode) {
-  //             print('getPageConfig: $e');
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-
-  //   List<Map<String, dynamic>> deviceTypeInfoList = [];
-  //   if (json['device_type_info_list'] != null) {
-  //     for (var deviceTypeInfo in json['device_type_info_list']) {
-  //       deviceTypeInfoList.add(deviceTypeInfo);
-  //     }
-  //   }
-
-  //   return MdlPagProjectProfile(
-  //     portalProjectScope: json['portal_project_scope'],
-  //     id: json['project_id'],
-  //     name: json['name'],
-  //     label: json['label'],
-  //     timezone: json['timezone'],
-  //     currency: json['currency'],
-  //     validateEntityName: json['validate_entity_displayname'],
-  //     validateMeterSn: json['validate_entity_sn'],
-  //     allowCustomAmount: json['allow_custom_amount'] ?? false,
-  //     paymentSetting: paymentSetting,
-  //     firebaseOptions: json['firebase_options'] ?? {},
-  //     assetFolder: json['asset_folder'],
-  //     initialMapZoom: json['map_zoom'] ?? 10.0,
-  //     mapCenter: mapCenter,
-  //     // siteProfileList: siteProfileList,
-  //     siteGroupProfileList: siteGroupProfileList,
-  //     isAllSites: json['all_sites'] ?? false,
-  //     appContextConfigList: appCtxConfigList,
-  //     deviceTypeInfoList: deviceTypeInfoList,
-  //     homePageRoute: homePageRoute,
-  //   );
-  // }
-
   PaymentModeSetting? getStripePaymentSetting() {
     for (var setting in paymentSetting!) {
       if (setting.paymentMode == PaymentMode.stripe) {
@@ -307,6 +213,14 @@ class MdlPagProjectProfile {
       }
     }
     return null;
+  }
+
+  List<Map<String, dynamic>> getVisibleRoleInfoList() {
+    List<Map<String, dynamic>> roleList = [];
+    for (var role in visibleRoleList) {
+      roleList.add(role.toJson());
+    }
+    return roleList;
   }
 
   factory MdlPagProjectProfile.fromJson2(Map<String, dynamic> json) {
@@ -435,6 +349,14 @@ class MdlPagProjectProfile {
       }
     }
 
+    List<MdlPagRole> visibleRoleList = [];
+    if (json['visible_role_list'] != null) {
+      for (Map<String, dynamic> visibleRole in json['visible_role_list']) {
+        MdlPagRole role = MdlPagRole.fromJson(visibleRole);
+        visibleRoleList.add(role);
+      }
+    }
+
     return MdlPagProjectProfile(
       portalProjectScope: portalProjectScope,
       id: projectId,
@@ -455,6 +377,7 @@ class MdlPagProjectProfile {
       appContextConfigList: appCtxConfigList,
       deviceTypeInfoList: deviceTypeInfoList,
       homePageRoute: homePageRoute,
+      visibleRoleList: visibleRoleList,
     );
   }
 }
