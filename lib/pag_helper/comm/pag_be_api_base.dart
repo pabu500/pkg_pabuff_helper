@@ -38,8 +38,10 @@ class PagUrlController {
       MdlPagUser? loggedInUser, MdlPagAppConfig pagAppConfig) {
     PagPortalProjectScope activeProjectScope = PagPortalProjectScope.none;
     if (loggedInUser != null) {
-      activeProjectScope =
-          loggedInUser.selectedScope.projectProfile!.portalProjectScope;
+      if (loggedInUser.selectedScope.projectProfile != null) {
+        activeProjectScope =
+            loggedInUser.selectedScope.projectProfile!.portalProjectScope;
+      }
     }
     bool useDevUsersvc = pagAppConfig.useDevUsersvc;
     switch (activeProjectScope) {
@@ -69,8 +71,10 @@ class PagUrlController {
     PagPortalProjectScope activeProjectScope = PagPortalProjectScope.none;
 
     if (loggedInUser != null) {
-      activeProjectScope =
-          loggedInUser.selectedScope.projectProfile!.portalProjectScope;
+      if (loggedInUser.selectedScope.projectProfile != null) {
+        activeProjectScope =
+            loggedInUser.selectedScope.projectProfile!.portalProjectScope;
+      }
     }
 
     bool useDevOresvc = pagAppConfig.useDevOresvc;
@@ -99,8 +103,10 @@ class PagUrlController {
   String getProjectHostDestPortal(MdlPagUser? loggedInUser) {
     PagPortalProjectScope activeProjectScope = PagPortalProjectScope.none;
     if (loggedInUser != null) {
-      activeProjectScope =
-          loggedInUser.selectedScope.projectProfile!.portalProjectScope;
+      if (loggedInUser.selectedScope.projectProfile != null) {
+        activeProjectScope =
+            loggedInUser.selectedScope.projectProfile!.portalProjectScope;
+      }
     }
     switch (activeProjectScope) {
       case PagPortalProjectScope.GI_DE:
@@ -194,6 +200,8 @@ class PagUrlBase {
 
   //oresvc2 endpoints
   //scope
+  static const String eptGetUserRoleScopeList =
+      '/scope/get_user_role_scope_list';
   static const String eptGetLocationGroupLocationList =
       '/scope/get_location_group_location_list';
 

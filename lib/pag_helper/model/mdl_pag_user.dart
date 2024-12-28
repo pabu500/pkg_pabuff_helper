@@ -62,7 +62,7 @@ class MdlPagUser {
   // MdlPagSiteProfile? selectedSiteProfile;
   // MdlPagBuildingProfile? selectedBuildingProfile;
   // MdlPagLocationGroupProfile? selectedLocationGroupProfile;
-  MdlPagScope2 selectedScope;
+  MdlPagScope2 selectedScope = MdlPagScope2();
 
   // mapping of role and its respective project list
   Map<String, dynamic> rolePorjectInfo;
@@ -86,7 +86,7 @@ class MdlPagUser {
     this.venderCredList,
     this.userScope = const [],
     this.rolePorjectInfo = const {},
-    required this.selectedScope,
+    // this.selectedScope,
   });
 
   void logout() {
@@ -107,12 +107,13 @@ class MdlPagUser {
     venderCredList = [];
     userScope = [];
     selectedScope.clear();
+    rolePorjectInfo = {};
   }
 
   get isEmpty => {username ?? ''}.isEmpty;
 
   bool hasScopeForPagProject(List<PagPortalProjectScope> projectScopeList) {
-    if (userScope == null) {
+    if (userScope == null || userScope!.isEmpty) {
       return false;
     }
     List<Map<String, bool>> userScopeList = [];
@@ -223,6 +224,13 @@ class MdlPagUser {
 
   void updateSelectedScopeByName(String projectName, String siteGroupName,
       String siteName, String buildingName, String locationGroupName) {
+    if (projectName.isEmpty &&
+        siteGroupName.isEmpty &&
+        siteName.isEmpty &&
+        buildingName.isEmpty &&
+        locationGroupName.isEmpty) {
+      return;
+    }
     selectedScope.updateScopeByName(userScope!, projectName, siteGroupName,
         siteName, buildingName, locationGroupName);
   }
@@ -246,97 +254,205 @@ class MdlPagUser {
     return true;
   }
 
-  factory MdlPagUser.fromJson2(Map<String, dynamic> respJson) {
-    try {
-      Map<String, dynamic> userJson = respJson['userInfo'];
+  void populateRoleScope(List<Map<String, dynamic>> userRoleScopeList) {
+    //role and scope
+    // List<Map<String, dynamic>> userRoleScopeList = [];
 
-      //role and scope
-      List<Map<String, dynamic>> userRoleScopeList = [];
-      List<MdlPagRole> roleList = [];
-      if (userJson['user_role_scope_list'] != null) {
-        userRoleScopeList = [...userJson['user_role_scope_list']];
-      }
-      List<MdlPagProjectProfile> projectProfileList = [];
-      Map<String, dynamic> rolePorjectInfo = {};
-      for (Map<String, dynamic> userRoleScope in userRoleScopeList) {
-        String roleIdStr = userRoleScope['id'];
-        int roleId = int.tryParse(roleIdStr) ?? -1;
+    // if (userJson['user_role_scope_list'] != null) {
+    //   userRoleScopeList = [...userJson['user_role_scope_list']];
+    // }
+    List<MdlPagProjectProfile> projectProfileList = [];
+    Map<String, dynamic> rolePorjectInfo = {};
+    for (Map<String, dynamic> userRoleScope in userRoleScopeList) {
+      String roleIdStr = userRoleScope['id'];
+      int roleId = int.tryParse(roleIdStr) ?? -1;
 
-        String roleName = userRoleScope['name'];
-        String? roleLabel = userRoleScope['label'];
-        String roleRankStr = userRoleScope['rank'] ?? '';
-        int roleRank = int.tryParse(roleRankStr) ?? -1;
+      String roleName = userRoleScope['name'];
+      String? roleLabel = userRoleScope['label'];
+      // String roleRankStr = userRoleScope['rank'] ?? '';
+      dynamic rank = userRoleScope['rank'] ?? -1;
+      int roleRank = int.tryParse(rank.toString()) ?? -1;
 
-        MdlPagRole role = MdlPagRole(
-          id: roleId,
-          name: roleName,
-          label: roleLabel,
-          rank: roleRank,
-        );
-        roleList.add(role);
+      MdlPagRole role = MdlPagRole(
+        id: roleId,
+        name: roleName,
+        label: roleLabel,
+        rank: roleRank,
+      );
+      roleList.add(role);
 
-        List<Map<String, dynamic>> projectRoleScopeConfigList = [];
-        if (userRoleScope['project_role_scope_config_list'] != null) {
-          projectRoleScopeConfigList = [
-            ...userRoleScope['project_role_scope_config_list']
-          ];
-          for (Map<String, dynamic> projectRoleScopeConfig
-              in projectRoleScopeConfigList) {
-            if (projectRoleScopeConfig['role_scope'] == null) {
-              if (kDebugMode) {
-                print('projectRoleScope[role_scope] is null');
-              }
-              continue;
+      List<Map<String, dynamic>> projectRoleScopeConfigList = [];
+      if (userRoleScope['project_role_scope_config_list'] != null) {
+        projectRoleScopeConfigList = [
+          ...userRoleScope['project_role_scope_config_list']
+        ];
+        for (Map<String, dynamic> projectRoleScopeConfig
+            in projectRoleScopeConfigList) {
+          if (projectRoleScopeConfig['role_scope'] == null) {
+            if (kDebugMode) {
+              print('projectRoleScope[role_scope] is null');
             }
+            continue;
+          }
 
-            try {
-              MdlPagProjectProfile? projectProfile =
-                  MdlPagProjectProfile.fromJson2(projectRoleScopeConfig);
-              projectProfileList.add(projectProfile);
-            } catch (e) {
-              if (kDebugMode) {
-                print({'exception in User.fromJson -> project fromJson2:$e'});
-              }
+          try {
+            MdlPagProjectProfile? projectProfile =
+                MdlPagProjectProfile.fromJson2(projectRoleScopeConfig);
+            projectProfileList.add(projectProfile);
+          } catch (e) {
+            if (kDebugMode) {
+              print({'exception in User.fromJson -> project fromJson2:$e'});
             }
           }
         }
-        rolePorjectInfo[roleName] = projectRoleScopeConfigList;
+      }
+      rolePorjectInfo[roleName] = projectRoleScopeConfigList;
+    }
+
+    MdlPagProjectProfile? selectedProjectProfile = projectProfileList[0];
+    assert(selectedProjectProfile.isNotEmpty);
+    MdlPagSiteGroupProfile? selectSiteGroupProfile;
+    if (selectedProjectProfile.getSiteGroupCount() == 1) {
+      selectSiteGroupProfile = selectedProjectProfile.siteGroupProfileList[0];
+      assert(selectSiteGroupProfile.isNotEmpty);
+    }
+    MdlPagSiteProfile? selectedSiteProfile;
+    if (selectSiteGroupProfile != null) {
+      if (selectSiteGroupProfile.getSiteProfileCount() == 1) {
+        selectedSiteProfile = selectSiteGroupProfile.siteProfileList[0];
+      }
+    }
+    MdlPagBuildingProfile? selectedBuildingProfile;
+    if (selectedSiteProfile != null) {
+      if (selectedSiteProfile.getBuildingCount() == 1) {
+        selectedBuildingProfile = selectedSiteProfile.buildingProfileList[0];
+      }
+    }
+    MdlPagLocationGroupProfile? selectedLocationGroupProfile;
+    if (selectedBuildingProfile != null) {
+      if (selectedBuildingProfile.getLocationGroupCount() == 1) {
+        selectedLocationGroupProfile =
+            selectedBuildingProfile.locationGroupProfileList[0];
+      }
+    }
+
+    MdlPagScope2 selectedScope = MdlPagScope2(
+      projectProfile: selectedProjectProfile,
+      siteGroupProfile: selectSiteGroupProfile,
+      siteProfile: selectedSiteProfile,
+      buildingProfile: selectedBuildingProfile,
+      locationGroupProfile: selectedLocationGroupProfile,
+    );
+
+    userScope = projectProfileList;
+    this.selectedScope = selectedScope;
+    this.rolePorjectInfo = rolePorjectInfo;
+  }
+
+  factory MdlPagUser.fromJson2(Map<String, dynamic> respJson) {
+    try {
+      Map<String, dynamic> userJson = respJson['userInfo'];
+      List<MdlPagRole> roleList = [];
+
+      if (userJson['role_list'] != null) {
+        for (Map<String, dynamic> roleJson in userJson['role_list']) {
+          MdlPagRole role = MdlPagRole.fromJson(roleJson);
+          roleList.add(role);
+        }
       }
 
-      MdlPagProjectProfile? selectedProjectProfile = projectProfileList[0];
-      assert(selectedProjectProfile.isNotEmpty);
-      MdlPagSiteGroupProfile? selectSiteGroupProfile;
-      if (selectedProjectProfile.getSiteGroupCount() == 1) {
-        selectSiteGroupProfile = selectedProjectProfile.siteGroupProfileList[0];
-        assert(selectSiteGroupProfile.isNotEmpty);
-      }
-      MdlPagSiteProfile? selectedSiteProfile;
-      if (selectSiteGroupProfile != null) {
-        if (selectSiteGroupProfile.getSiteProfileCount() == 1) {
-          selectedSiteProfile = selectSiteGroupProfile.siteProfileList[0];
-        }
-      }
-      MdlPagBuildingProfile? selectedBuildingProfile;
-      if (selectedSiteProfile != null) {
-        if (selectedSiteProfile.getBuildingCount() == 1) {
-          selectedBuildingProfile = selectedSiteProfile.buildingProfileList[0];
-        }
-      }
-      MdlPagLocationGroupProfile? selectedLocationGroupProfile;
-      if (selectedBuildingProfile != null) {
-        if (selectedBuildingProfile.getLocationGroupCount() == 1) {
-          selectedLocationGroupProfile =
-              selectedBuildingProfile.locationGroupProfileList[0];
-        }
-      }
+      bool skip = true;
+      if (!skip) {
+        //role and scope
+        List<Map<String, dynamic>> userRoleScopeList = [];
 
-      MdlPagScope2 selectedScope = MdlPagScope2(
-        projectProfile: selectedProjectProfile,
-        siteGroupProfile: selectSiteGroupProfile,
-        siteProfile: selectedSiteProfile,
-        buildingProfile: selectedBuildingProfile,
-        locationGroupProfile: selectedLocationGroupProfile,
-      );
+        if (userJson['user_role_scope_list'] != null) {
+          userRoleScopeList = [...userJson['user_role_scope_list']];
+        }
+        List<MdlPagProjectProfile> projectProfileList = [];
+        Map<String, dynamic> rolePorjectInfo = {};
+        for (Map<String, dynamic> userRoleScope in userRoleScopeList) {
+          String roleIdStr = userRoleScope['id'];
+          int roleId = int.tryParse(roleIdStr) ?? -1;
+
+          String roleName = userRoleScope['name'];
+          String? roleLabel = userRoleScope['label'];
+          String roleRankStr = userRoleScope['rank'] ?? '';
+          int roleRank = int.tryParse(roleRankStr) ?? -1;
+
+          MdlPagRole role = MdlPagRole(
+            id: roleId,
+            name: roleName,
+            label: roleLabel,
+            rank: roleRank,
+          );
+          roleList.add(role);
+
+          List<Map<String, dynamic>> projectRoleScopeConfigList = [];
+          if (userRoleScope['project_role_scope_config_list'] != null) {
+            projectRoleScopeConfigList = [
+              ...userRoleScope['project_role_scope_config_list']
+            ];
+            for (Map<String, dynamic> projectRoleScopeConfig
+                in projectRoleScopeConfigList) {
+              if (projectRoleScopeConfig['role_scope'] == null) {
+                if (kDebugMode) {
+                  print('projectRoleScope[role_scope] is null');
+                }
+                continue;
+              }
+
+              try {
+                MdlPagProjectProfile? projectProfile =
+                    MdlPagProjectProfile.fromJson2(projectRoleScopeConfig);
+                projectProfileList.add(projectProfile);
+              } catch (e) {
+                if (kDebugMode) {
+                  print({'exception in User.fromJson -> project fromJson2:$e'});
+                }
+              }
+            }
+          }
+          rolePorjectInfo[roleName] = projectRoleScopeConfigList;
+        }
+
+        MdlPagProjectProfile? selectedProjectProfile = projectProfileList[0];
+        assert(selectedProjectProfile.isNotEmpty);
+        MdlPagSiteGroupProfile? selectSiteGroupProfile;
+        if (selectedProjectProfile.getSiteGroupCount() == 1) {
+          selectSiteGroupProfile =
+              selectedProjectProfile.siteGroupProfileList[0];
+          assert(selectSiteGroupProfile.isNotEmpty);
+        }
+        MdlPagSiteProfile? selectedSiteProfile;
+        if (selectSiteGroupProfile != null) {
+          if (selectSiteGroupProfile.getSiteProfileCount() == 1) {
+            selectedSiteProfile = selectSiteGroupProfile.siteProfileList[0];
+          }
+        }
+        MdlPagBuildingProfile? selectedBuildingProfile;
+        if (selectedSiteProfile != null) {
+          if (selectedSiteProfile.getBuildingCount() == 1) {
+            selectedBuildingProfile =
+                selectedSiteProfile.buildingProfileList[0];
+          }
+        }
+        MdlPagLocationGroupProfile? selectedLocationGroupProfile;
+        if (selectedBuildingProfile != null) {
+          if (selectedBuildingProfile.getLocationGroupCount() == 1) {
+            selectedLocationGroupProfile =
+                selectedBuildingProfile.locationGroupProfileList[0];
+          }
+        }
+
+        MdlPagScope2 selectedScope = MdlPagScope2(
+          projectProfile: selectedProjectProfile,
+          siteGroupProfile: selectSiteGroupProfile,
+          siteProfile: selectedSiteProfile,
+          buildingProfile: selectedBuildingProfile,
+          locationGroupProfile: selectedLocationGroupProfile,
+        );
+      }
 
       List<Map<String, dynamic>> tenantList = [];
       String authProviderStr = userJson['auth_provider'] ?? 'local';
@@ -351,10 +467,10 @@ class MdlPagUser {
         phone: userJson['contact_number'] ?? '',
         enabled: userJson['enabled'],
         resetPasswordToken: userJson['reset_password_token'] ?? '',
-        userScope: projectProfileList,
-        selectedScope: selectedScope,
+        userScope: [], //projectProfileList,
+        // selectedScope: selectedScope,
         roleList: roleList,
-        rolePorjectInfo: rolePorjectInfo,
+        rolePorjectInfo: {}, //rolePorjectInfo,
         tenantList: tenantList,
         authProvider: authProvider,
         venderCredList: [
@@ -369,7 +485,7 @@ class MdlPagUser {
       if (kDebugMode) {
         print({'exception in User.fromJson:$e'});
       }
-      return MdlPagUser(selectedScope: MdlPagScope2());
+      return MdlPagUser(/*selectedScope: MdlPagScope2()*/);
     }
   }
 }
