@@ -7,6 +7,11 @@ enum PagPageRoute {
     'project_public_front',
     Symbols.flag_filled_rounded,
   ),
+  splash(
+    'Splash',
+    'splash',
+    Symbols.pending,
+  ),
   home(
     'Home',
     'home',

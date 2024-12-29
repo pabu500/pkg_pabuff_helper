@@ -248,6 +248,6 @@ void routeGuard(BuildContext context, MdlPagUser? loggedInUser,
     }
   }
   if (goHome == true) {
-    context.go(homeRouteStr);
+    context.push(homeRouteStr);
   }
 }

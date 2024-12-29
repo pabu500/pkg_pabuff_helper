@@ -67,6 +67,8 @@ class MdlPagUser {
   // mapping of role and its respective project list
   Map<String, dynamic> rolePorjectInfo;
 
+  bool isDoingPostLogin = false;
+
   MdlPagUser({
     this.id,
     this.username,
@@ -108,6 +110,8 @@ class MdlPagUser {
     userScope = [];
     selectedScope.clear();
     rolePorjectInfo = {};
+    roleList = [];
+    isDoingPostLogin = false;
   }
 
   get isEmpty => {username ?? ''}.isEmpty;
@@ -263,6 +267,7 @@ class MdlPagUser {
     // }
     List<MdlPagProjectProfile> projectProfileList = [];
     Map<String, dynamic> rolePorjectInfo = {};
+    // roleList = [];
     for (Map<String, dynamic> userRoleScope in userRoleScopeList) {
       String roleIdStr = userRoleScope['id'];
       int roleId = int.tryParse(roleIdStr) ?? -1;

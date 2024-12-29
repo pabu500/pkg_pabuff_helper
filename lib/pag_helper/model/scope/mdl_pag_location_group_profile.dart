@@ -125,7 +125,7 @@ class MdlPagLocationGroupProfile {
     dynamic lat = itemInfo['lat'];
     if (lat == null) {
       if (kDebugMode) {
-        print('lat is null for location group ${itemInfo['lat']}');
+        // print('lat is null for location group ${itemInfo['lat']}');
       }
     }
     if (lat is String) {
@@ -136,7 +136,7 @@ class MdlPagLocationGroupProfile {
     dynamic lng = itemInfo['lng'];
     if (lng == null) {
       if (kDebugMode) {
-        print('lng is null for location group ${itemInfo['lng']}');
+        // print('lng is null for location group ${itemInfo['lng']}');
       }
     }
     if (lng is String) {

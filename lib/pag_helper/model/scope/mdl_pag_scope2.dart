@@ -72,10 +72,10 @@ class MdlPagScope2 {
 
   //is empty getter
   bool get isEmpty {
-    return projectProfile == null ||
-        siteGroupProfile == null ||
-        siteProfile == null ||
-        buildingProfile == null ||
+    return projectProfile == null &&
+        siteGroupProfile == null &&
+        siteProfile == null &&
+        buildingProfile == null &&
         locationGroupProfile == null;
   }
 
