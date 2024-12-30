@@ -224,6 +224,9 @@ class MdlPagProjectProfile {
   }
 
   factory MdlPagProjectProfile.fromJson2(Map<String, dynamic> json) {
+    String portalTypeStr = json['portal_type'] ?? '';
+    assert(portalTypeStr.isNotEmpty);
+
     String projectIdStr = json['project_id'];
     int projectId = int.tryParse(projectIdStr) ?? -1;
     assert(projectId != -1);
@@ -295,12 +298,23 @@ class MdlPagProjectProfile {
       siteGroupProfileList.add(siteGroupProfile);
     }
 
-    Map<String, dynamic> configInfo = {};
+    List<Map<String, dynamic>> configInfoList = [];
     if (json['config_info'] != null) {
-      configInfo = json['config_info'];
+      // configInfo = json['config_info'];
+      for (var config in json['config_info']) {
+        configInfoList.add(config);
+      }
     }
     List<Map<String, dynamic>> appInfoList = [];
     List<Map<String, dynamic>> deviceTypeInfoList = [];
+    Map<String, dynamic> configInfo = {};
+    for (var config in configInfoList) {
+      if (config['portal_type'] == portalTypeStr) {
+        configInfo.addAll(config);
+      }
+    }
+    assert(configInfo.isNotEmpty);
+
     if (configInfo.isNotEmpty) {
       if (configInfo['device'] != null) {
         if (configInfo['app'] != null) {
