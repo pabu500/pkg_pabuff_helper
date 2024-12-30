@@ -11,8 +11,7 @@ class NeoDotPatternPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color =
-          color ?? Colors.grey.withOpacity(0.5) // Adjust color and opacity
+      ..color = color ?? Colors.grey.withAlpha(130) // Adjust color and opacity
       ..style = PaintingStyle.fill;
 
     const dotRadius = 1.0; // Adjust the dot size
