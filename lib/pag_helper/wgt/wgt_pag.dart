@@ -45,7 +45,7 @@ class _WgtPaGState extends State<WgtPaG> {
                 return _buildSquare(4,
                     colorSq: widget.colorC ??
                         widget.colorA ??
-                        Theme.of(context).colorScheme.primary.withOpacity(0.7));
+                        Theme.of(context).colorScheme.primary.withAlpha(180));
               } else {
                 return _buildSquare(index);
               }
@@ -61,7 +61,7 @@ class _WgtPaGState extends State<WgtPaG> {
               decoration: BoxDecoration(
                 border: Border.all(
                   color: widget.colorB ??
-                      Theme.of(context).hintColor.withOpacity(0.95),
+                      Theme.of(context).hintColor.withAlpha(240),
                   width: 1,
                 ),
                 borderRadius: BorderRadius.circular(5),
@@ -83,7 +83,7 @@ class _WgtPaGState extends State<WgtPaG> {
   Widget _buildSquare(int index, {Color? colorSq}) {
     Color color = colorSq ??
         widget.colorA ??
-        Theme.of(context).colorScheme.primary.withOpacity(0.21);
+        Theme.of(context).colorScheme.primary.withAlpha(50);
     double margin = widget.size / 21.0;
     double borderRad = widget.size / 34;
     return Container(
