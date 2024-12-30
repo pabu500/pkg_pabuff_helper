@@ -311,6 +311,7 @@ class MdlPagProjectProfile {
     for (var config in configInfoList) {
       if (config['portal_type'] == portalTypeStr) {
         configInfo.addAll(config);
+        break;
       }
     }
     assert(configInfo.isNotEmpty);
