@@ -244,7 +244,7 @@ void routeGuard(BuildContext context, MdlPagUser? loggedInUser,
   if (appContext != null) {
     if (!loggedInUser.selectedScope.projectProfile!
         .hasAppInfo(appContext.name)) {
-      context.go(homeRouteStr);
+      context.push(homeRouteStr);
     }
   }
   if (goHome == true) {
