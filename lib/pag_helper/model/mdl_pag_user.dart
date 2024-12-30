@@ -258,7 +258,10 @@ class MdlPagUser {
     return true;
   }
 
-  void populateRoleScope(List<Map<String, dynamic>> userRoleScopeList) {
+  void populateRoleScope(
+    List<Map<String, dynamic>> userRoleScopeList, {
+    String lazyLoadScope = '',
+  }) {
     //role and scope
     // List<Map<String, dynamic>> userRoleScopeList = [];
 
@@ -319,7 +322,9 @@ class MdlPagUser {
     MdlPagSiteGroupProfile? selectSiteGroupProfile;
     if (selectedProjectProfile.getSiteGroupCount() == 1) {
       selectSiteGroupProfile = selectedProjectProfile.siteGroupProfileList[0];
-      assert(selectSiteGroupProfile.isNotEmpty);
+      if (lazyLoadScope != 'site_group') {
+        assert(selectSiteGroupProfile.isNotEmpty);
+      }
     }
     MdlPagSiteProfile? selectedSiteProfile;
     if (selectSiteGroupProfile != null) {
