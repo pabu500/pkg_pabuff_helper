@@ -53,7 +53,8 @@ class _WgtLoginState extends State<WgtLogin> {
           PagUserKey.username.name: _username,
           PagUserKey.password.name: _password,
           PagUserKey.email.name: '',
-          'portal_type': PagPortalType.pagConsole.label,
+          'portal_type_name': widget.appConfig.portalType.name,
+          'portal_type_label': widget.appConfig.portalType.label,
         }),
       );
 

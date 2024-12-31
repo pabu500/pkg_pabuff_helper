@@ -2,6 +2,7 @@ import 'package:buff_helper/pag_helper/def/def_page_route.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_role.dart';
 import 'package:buff_helper/pag_helper/model/app/mdl_app_context_config.dart';
 import 'package:buff_helper/pag_helper/model/app/mdl_page_config.dart';
+import 'package:buff_helper/pag_helper/model/ems/mdl_pag_tenant.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
@@ -33,6 +34,7 @@ class MdlPagProjectProfile {
   MdlListColController? siteGroupFilterColController;
 
   List<MdlPagRole> visibleRoleList;
+  List<MdlPagTenant> tenantList;
 
   MdlPagProjectProfile({
     required this.id,
@@ -56,6 +58,7 @@ class MdlPagProjectProfile {
     this.homePageRoute = PagPageRoute.consoleHomeDashboard,
     this.deviceTypeInfoList = const [],
     this.visibleRoleList = const [],
+    this.tenantList = const [],
   });
 
   bool equals(MdlPagProjectProfile? projectProfile) {
@@ -150,7 +153,7 @@ class MdlPagProjectProfile {
     filterColController.valueList = [];
     if (defaultSiteGroupProfile != null && limitToDefault) {
       filterColController.valueList!.add({
-        'value': defaultSiteGroupProfile!.id.toString(),
+        'value': defaultSiteGroupProfile.id.toString(),
         'label': defaultSiteGroupProfile.label,
       });
     } else {
@@ -224,8 +227,10 @@ class MdlPagProjectProfile {
   }
 
   factory MdlPagProjectProfile.fromJson2(Map<String, dynamic> json) {
-    String portalTypeStr = json['portal_type'] ?? '';
-    assert(portalTypeStr.isNotEmpty);
+    // String portalTypeNameStr = json['portal_type_name'] ?? '';
+    String portalTypeLabelStr = json['portal_type_label'] ?? '';
+    assert(portalTypeLabelStr.isNotEmpty);
+    // assert(portalTypeNameStr.isNotEmpty);
 
     String projectIdStr = json['project_id'];
     int projectId = int.tryParse(projectIdStr) ?? -1;
@@ -309,7 +314,7 @@ class MdlPagProjectProfile {
     List<Map<String, dynamic>> deviceTypeInfoList = [];
     Map<String, dynamic> configInfo = {};
     for (var config in configInfoList) {
-      if (config['portal_type'] == portalTypeStr) {
+      if (config['portal_type'] == portalTypeLabelStr) {
         configInfo.addAll(config);
         break;
       }
@@ -374,6 +379,13 @@ class MdlPagProjectProfile {
       }
     }
 
+    List<MdlPagTenant> tenantList = [];
+    if (json['tenant_list'] != null) {
+      for (var tenant in json['tenant_list']) {
+        tenantList.add(MdlPagTenant.fromJson(tenant));
+      }
+    }
+
     return MdlPagProjectProfile(
       portalProjectScope: portalProjectScope,
       id: projectId,
@@ -395,6 +407,7 @@ class MdlPagProjectProfile {
       deviceTypeInfoList: deviceTypeInfoList,
       homePageRoute: homePageRoute,
       visibleRoleList: visibleRoleList,
+      tenantList: tenantList,
     );
   }
 }

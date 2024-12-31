@@ -1,6 +1,7 @@
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_operation.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_role.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_target.dart';
+import 'package:buff_helper/pag_helper/model/ems/mdl_pag_tenant.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_project_profile.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_building_profile.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_location_group_profile.dart';
@@ -357,6 +358,22 @@ class MdlPagUser {
     userScope = projectProfileList;
     this.selectedScope = selectedScope;
     this.rolePorjectInfo = rolePorjectInfo;
+  }
+
+  List<MdlPagTenant> getScopeTenantList() {
+    MdlPagProjectProfile? projectProfile = selectedScope.projectProfile;
+    MdlPagSiteGroupProfile? siteGroupProfile = selectedScope.siteGroupProfile;
+    if (siteGroupProfile == null) {
+      return projectProfile!.tenantList;
+    } else {
+      List<MdlPagTenant> tenantList = [];
+      for (MdlPagTenant tenant in projectProfile!.tenantList) {
+        if (tenant.siteGroupName == siteGroupProfile.name) {
+          tenantList.add(tenant);
+        }
+      }
+      return tenantList;
+    }
   }
 
   factory MdlPagUser.fromJson2(Map<String, dynamic> respJson) {
