@@ -317,12 +317,12 @@ class MdlPagProjectProfile {
     assert(configInfo.isNotEmpty);
 
     if (configInfo.isNotEmpty) {
-      if (configInfo['device'] != null) {
-        if (configInfo['app'] != null) {
-          for (var appInfo in configInfo['app']) {
-            appInfoList.add(appInfo);
-          }
+      if (configInfo['app'] != null) {
+        for (var appInfo in configInfo['app']) {
+          appInfoList.add(appInfo);
         }
+      }
+      if (configInfo['device'] != null) {
         for (var deviceTypeInfo in configInfo['device']) {
           deviceTypeInfoList.add(deviceTypeInfo);
         }
@@ -330,14 +330,16 @@ class MdlPagProjectProfile {
     }
 
     List<MdlPagAppContextConfig> appCtxConfigList = [];
-    PagPageRoute homePageRoute = PagPageRoute.consoleHomeDashboard;
+    PagPageRoute homePageRoute = PagPageRoute.none;
     if (appInfoList.isNotEmpty) {
       for (var appInfo in appInfoList) {
         MdlPagAppContextConfig appCtxConfig =
             MdlPagAppContextConfig.fromJson(appInfo);
         appCtxConfigList.add(appCtxConfig);
 
-        String homePageRouteStr = appInfo.values.first['home_page_route'] ?? '';
+        String homePageRouteStr = appInfo.values.first['home_page_route'] ??
+            appInfo.values.first['app_home_page_route'] ??
+            '';
         if (homePageRouteStr.isNotEmpty) {
           try {
             PagPageRoute route = PagPageRoute.values.byName(homePageRouteStr);

@@ -241,6 +241,11 @@ enum PagPageRoute {
     '',
     '',
     Symbols.error_outline,
+  ),
+  techIssue(
+    'techIssue',
+    'techIssue',
+    Symbols.assignment_late,
   );
 
   const PagPageRoute(

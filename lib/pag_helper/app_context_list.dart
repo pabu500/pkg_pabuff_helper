@@ -1,4 +1,5 @@
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_context.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'vendor_helper.dart';
@@ -238,16 +239,29 @@ void routeGuard(BuildContext context, MdlPagUser? loggedInUser,
   if (loggedInUser == null) {
     return;
   }
-  PagPageRoute homeRoute =
+  PagPageRoute pageRouteHome =
       loggedInUser.selectedScope.projectProfile!.homePageRoute;
-  String homeRouteStr = getRoute(homeRoute);
-  if (appContext != null) {
-    if (!loggedInUser.selectedScope.projectProfile!
-        .hasAppInfo(appContext.name)) {
+  String homeRouteStr = getRoute(pageRouteHome);
+  if (kDebugMode) {
+    print('homeRouteStr: $homeRouteStr');
+  }
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    if (appContext != null) {
+      if (!loggedInUser.selectedScope.projectProfile!
+          .hasAppInfo(appContext.name)) {
+        if (kDebugMode) {
+          print('routeGuard: appContext ${appContext.name} not found');
+        }
+        context.push(pageRouteHome == PagPageRoute.none
+            ? getRoute(PagPageRoute.techIssue)
+            : homeRouteStr);
+      }
+    }
+    if (goHome == true) {
+      if (kDebugMode) {
+        print('goHome: $homeRouteStr');
+      }
       context.push(homeRouteStr);
     }
-  }
-  if (goHome == true) {
-    context.push(homeRouteStr);
-  }
+  });
 }
