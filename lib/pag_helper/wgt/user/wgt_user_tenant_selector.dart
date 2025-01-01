@@ -16,7 +16,7 @@ class WgtUserTenantSelector extends StatefulWidget {
   final MdlPagAppConfig appConfig;
   final MdlPagUser loggedInUser;
   // final List<MdlPagRole> roleList;
-  final Function(MdlPagTenant) onTenantSelected;
+  final Function(MdlPagTenant?) onTenantSelected;
 
   @override
   State<WgtUserTenantSelector> createState() => _WgtUserTenantSelectorState();
@@ -44,8 +44,11 @@ class _WgtUserTenantSelectorState extends State<WgtUserTenantSelector> {
 
     if (tenantList.length == 1) {
       _selectedTenant = tenantList[0];
-      widget.onTenantSelected(_selectedTenant!);
     }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.onTenantSelected(_selectedTenant);
+    });
   }
 
   @override
