@@ -15,7 +15,7 @@ class PagUserProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void iniUser(MdlPagUser user) {
+  void setCurrentUser(MdlPagUser user) {
     _currentUser = user;
   }
 }

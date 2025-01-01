@@ -4,16 +4,37 @@ import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/pagrid_helper/user_helper/comm_sso.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
+import '../../model/acl/mdl_pag_role.dart';
+import '../../model/mdl_pag_app_config.dart';
+import 'wgt_role_selector.dart';
+
 class UserMenu extends StatefulWidget {
-  const UserMenu({super.key});
+  const UserMenu({
+    super.key,
+    required this.appConfig,
+    this.onRoleSelected,
+  });
+
+  final MdlPagAppConfig appConfig;
+  final Function(MdlPagRole)? onRoleSelected;
 
   @override
   State<UserMenu> createState() => _UserMenuState();
 }
 
 class _UserMenuState extends State<UserMenu> {
+  late MdlPagUser? _loggedInUser;
+
+  @override
+  void initState() {
+    super.initState();
+    _loggedInUser =
+        Provider.of<PagUserProvider>(context, listen: false).currentUser;
+  }
+
   @override
   Widget build(BuildContext context) {
     ThemeProvider themeNotifier = Provider.of<ThemeProvider>(context);
@@ -57,13 +78,36 @@ class _UserMenuState extends State<UserMenu> {
     ThemeProvider themeNotifier,
   ) {
     return PopupMenuButton<String>(
+      color: Theme.of(context).colorScheme.surface,
+      shadowColor: Theme.of(context).colorScheme.onSurface,
       icon: const Icon(Icons.person),
       onSelected: (item) => onSelected(context, item, themeNotifier),
       itemBuilder: (context) => [
-        const PopupMenuItem<String>(
-          value: 'dashboard',
-          child: Text('Dashboard'),
+        // const PopupMenuItem<String>(
+        //   value: 'dashboard',
+        //   child: Text('Dashboard'),
+        // ),
+        PopupMenuItem<String>(
+          value: 'roleSelector',
+          child: Row(
+            children: [
+              Icon(
+                Symbols.group,
+                color: Theme.of(context).hintColor,
+              ),
+              const SizedBox(width: 8),
+              WgtRoleSelector(
+                appConfig: widget.appConfig,
+                loggedInUser: _loggedInUser!,
+                // roleList: _loggedInUser!.getRoleList(widget.appConfig.portalType.label),
+                onRoleSelected: (role) {
+                  widget.onRoleSelected?.call(role);
+                },
+              ),
+            ],
+          ),
         ),
+        if (isLoggedIn) const PopupMenuDivider(),
         if (checkProfile)
           const PopupMenuItem<String>(
             value: 'myProfile',

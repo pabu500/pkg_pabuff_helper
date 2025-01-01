@@ -26,7 +26,7 @@ class MdlPagRole {
       rank = int.tryParse(rank);
     }
 
-    PagPortalType portalType = PagPortalType.byLabel(json['portal_type_label']);
+    PagPortalType portalType = PagPortalType.byLabel(json['portal_type']);
 
     return MdlPagRole(
       id: id,
