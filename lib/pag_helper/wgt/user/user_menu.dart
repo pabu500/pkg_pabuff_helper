@@ -15,11 +15,11 @@ class UserMenu extends StatefulWidget {
   const UserMenu({
     super.key,
     required this.appConfig,
-    this.onRoleSelected,
+    required this.onRoleSelected,
   });
 
   final MdlPagAppConfig appConfig;
-  final Function(MdlPagRole)? onRoleSelected;
+  final Function(MdlPagRole) onRoleSelected;
 
   @override
   State<UserMenu> createState() => _UserMenuState();
