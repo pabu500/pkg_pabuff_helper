@@ -287,3 +287,100 @@ Future<dynamic> commitUserRoleList(
     throw Exception(jsonDecode(response.body)['error']);
   }
 }
+
+Future<dynamic> doUpdateUserKeyValue(
+  MdlPagAppConfig appConfig,
+  MdlPagUser? loggedInUser,
+  Map<String, dynamic> queryMap,
+  MdlPagSvcClaim svcClaim,
+) async {
+  svcClaim.svcName = PagSvcType.usersvc2.name;
+  svcClaim.endpoint = PagUrlBase.eptUsersvcUpdateKeyVal;
+
+  String svcToken = '';
+  // try {
+  //   svcToken = await svcGate(appConfig, svcClaim /*, queryByUser*/);
+  // } catch (err) {
+  //   throw Exception(err);
+  // }
+
+  try {
+    final response = await http.post(
+      Uri.parse(PagUrlController(loggedInUser, appConfig)
+          .getUrl(PagSvcType.usersvc2, svcClaim.endpoint!)),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $svcToken',
+      },
+      body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
+      // body: jsonEncode(MdlPagSvcQuery(svcClaim, <String, dynamic>{
+      //   'id': id.toString(),
+      //   'key': key,
+      //   'value': value,
+      //   'old_value': oldVal ?? '',
+      // }).toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      String key = queryMap['key'];
+
+      final resp = jsonDecode(response.body);
+      if (resp['err'] != null) {
+        throw Exception(resp.err);
+      }
+      Map<String, dynamic> result = {};
+      result[key] = resp['userInfo'][key];
+      return result;
+    } else if (response.statusCode == 500) {
+      Map<String, dynamic> result = {};
+      result['error'] = jsonDecode(response.body)['err'];
+      return result;
+    } else {
+      throw Exception('Failed to update user.');
+    }
+  } catch (err) {
+    throw Exception(err);
+  }
+}
+
+Future<dynamic> doCheckKeyVal(
+  MdlPagAppConfig appConfig,
+  MdlPagUser? loggedInUser,
+  Map<String, dynamic> queryMap,
+  MdlPagSvcClaim svcClaim,
+) async {
+  svcClaim.svcName = PagSvcType.usersvc2.name;
+  svcClaim.endpoint = PagUrlBase.eptUsersvcGetUserKeyVal;
+
+  String svcToken = '';
+  // try {
+  //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
+  // } catch (err) {
+  //   throw Exception(err);
+  // }
+
+  final response = await http.post(
+    Uri.parse(PagUrlController(loggedInUser, appConfig)
+        .getUrl(PagSvcType.usersvc2, svcClaim.endpoint!)),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer $svcToken',
+    },
+    body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
+  );
+
+  if (response.statusCode == 200) {
+    // If the server did return a 200 OK response, parse the JSON.
+    // User.fromJson(jsonDecode(response.body));
+    final responseBody = jsonDecode(response.body);
+    if (responseBody['err'] != null) {
+      throw Exception(responseBody['err']);
+    }
+    if (responseBody['info'] != null) {
+      return responseBody['info'];
+    }
+    return responseBody;
+  } else {
+    throw Exception(jsonDecode(response.body)['err']);
+  }
+}

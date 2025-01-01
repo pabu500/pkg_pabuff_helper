@@ -252,7 +252,7 @@ void routeGuard(BuildContext context, MdlPagUser? loggedInUser,
         if (kDebugMode) {
           print('routeGuard: appContext ${appContext.name} not found');
         }
-        context.push(pageRouteHome == PagPageRoute.none
+        context.go(pageRouteHome == PagPageRoute.none
             ? getRoute(PagPageRoute.techIssue)
             : homeRouteStr);
       }
@@ -261,7 +261,7 @@ void routeGuard(BuildContext context, MdlPagUser? loggedInUser,
       if (kDebugMode) {
         print('goHome: $homeRouteStr');
       }
-      context.push(homeRouteStr);
+      context.go(homeRouteStr);
     }
   });
 }

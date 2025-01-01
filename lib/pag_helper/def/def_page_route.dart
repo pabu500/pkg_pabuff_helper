@@ -27,7 +27,7 @@ enum PagPageRoute {
     'register',
     Symbols.person_add,
   ),
-  profile(
+  myProfile(
     'Profile',
     'profile',
     Symbols.person,
