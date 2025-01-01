@@ -342,16 +342,18 @@ class MdlPagProjectProfile {
             MdlPagAppContextConfig.fromJson(appInfo);
         appCtxConfigList.add(appCtxConfig);
 
-        String homePageRouteStr = appInfo.values.first['home_page_route'] ??
-            appInfo.values.first['app_home_page_route'] ??
-            '';
-        if (homePageRouteStr.isNotEmpty) {
-          try {
-            PagPageRoute route = PagPageRoute.values.byName(homePageRouteStr);
-            homePageRoute = route;
-          } catch (e) {
-            if (kDebugMode) {
-              print('getPageConfig: $e');
+        if (homePageRoute == PagPageRoute.none) {
+          String homePageRouteStr = appInfo.values.first['home_page_route'] ??
+              appInfo.values.first['app_home_page_route'] ??
+              '';
+          if (homePageRouteStr.isNotEmpty) {
+            try {
+              PagPageRoute route = PagPageRoute.values.byName(homePageRouteStr);
+              homePageRoute = route;
+            } catch (e) {
+              if (kDebugMode) {
+                print('getPageConfig: $e');
+              }
             }
           }
         }
