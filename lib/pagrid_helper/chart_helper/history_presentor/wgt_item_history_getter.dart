@@ -40,6 +40,7 @@ class WgtItemHistoryGetter extends StatefulWidget {
     this.onPullingData,
     this.onToggleNormalization,
     this.maxDuration = const Duration(days: 7),
+    this.maxSelectionDuration = const Duration(days: 7),
     this.isInvisible = false,
     this.useWidgetStartEndDate = false,
     this.clearRepeatedReadingsOnly = false,
@@ -77,6 +78,7 @@ class WgtItemHistoryGetter extends StatefulWidget {
   final Function? onPullingData;
   final List<int> lookBackMinutes;
   final Duration maxDuration;
+  final Duration maxSelectionDuration;
   final Function? onToggleNormalization;
   final bool isInvisible;
   final bool useWidgetStartEndDate;
@@ -850,6 +852,7 @@ class _WgtItemHistoryGetterState extends State<WgtItemHistoryGetter> {
                   await _getHistorys();
                 },
                 maxDuration: widget.maxDuration, // const Duration(days: 7),
+                maxSelectionDuration: widget.maxSelectionDuration,
                 onMaxDurationExceeded: () {
                   // Timer(const Duration(milliseconds: 500), () {
                   //   showSnackBar(
