@@ -712,7 +712,7 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
                 _displayType == HistroyDisplayType.chart ? true : false,
             maxDuration: _displayType == HistroyDisplayType.chart
                 ? const Duration(days: 7)
-                : const Duration(days: 180),
+                : const Duration(days: /*180*/ 366),
             onTimeRangeChanged: (startDate, endDate, customRange) {
               _startDate = startDate;
               _endDate = endDate;

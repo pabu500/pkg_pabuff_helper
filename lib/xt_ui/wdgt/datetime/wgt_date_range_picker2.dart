@@ -25,6 +25,7 @@ class WgtDateRangePicker2 extends StatefulWidget {
     this.width = 350,
     this.updateRangeByParent = false,
     this.maxDuration = const Duration(days: 180),
+    this.maxSelectionDuration = const Duration(days: 180),
     this.onMaxDurationExceeded,
     // this.allowSameDay = false,
   });
@@ -46,6 +47,7 @@ class WgtDateRangePicker2 extends StatefulWidget {
   final double width;
   final bool updateRangeByParent;
   final Duration maxDuration;
+  final Duration maxSelectionDuration;
   final void Function()? onMaxDurationExceeded;
   // final bool allowSameDay;
 
@@ -293,8 +295,8 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
               }
               if (dates.length == 2) {
                 // _maxDurationExceeded = false;
-                Duration duration = dates[1]!.difference(dates[0]!);
-                if (duration > widget.maxDuration) {
+                Duration? duration = dates[1]!.difference(dates[0]!);
+                if (duration > widget.maxSelectionDuration) {
                   // setState(() {
                   //   _maxDurationExceeded = true;
                   // });
@@ -337,7 +339,7 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
         Transform.translate(
           offset: const Offset(0, -10),
           child: Text(
-            '* max duration: ${getReadableDuration(widget.maxDuration)}',
+            '* max history: ${getReadableDuration(widget.maxDuration)} \n* max selection range: ${getReadableDuration(widget.maxSelectionDuration)}',
             style: TextStyle(
               color: Theme.of(context).colorScheme.error,
               fontSize: 16,
