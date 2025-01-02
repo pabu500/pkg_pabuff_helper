@@ -101,7 +101,7 @@ class _UserMenuState extends State<UserMenu> {
                 loggedInUser: _loggedInUser!,
                 // roleList: _loggedInUser!.getRoleList(widget.appConfig.portalType.label),
                 onRoleSelected: (role) {
-                  widget.onRoleSelected?.call(role);
+                  widget.onRoleSelected(role);
                 },
               ),
             ],
@@ -181,9 +181,8 @@ void onSelected(
       storage.deleteAll();
       MdlPagUser? user =
           Provider.of<PagUserProvider>(context, listen: false).currentUser;
-      if (user != null) {
-        user.logout();
-      }
+      user?.logout();
+
       logoutSso(context);
 
       context.go('/project_public_front');

@@ -261,7 +261,7 @@ void routeGuard(BuildContext context, MdlPagUser? loggedInUser,
       if (kDebugMode) {
         print('goHome: $homeRouteStr');
       }
-      context.go(homeRouteStr);
+      GoRouter.of(context).go(homeRouteStr);
     }
   });
 }

@@ -1,7 +1,9 @@
+import 'package:buff_helper/pag_helper/def/def_role.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_operation.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_role.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_target.dart';
 import 'package:buff_helper/pag_helper/model/ems/mdl_pag_tenant.dart';
+import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_project_profile.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_building_profile.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_location_group_profile.dart';
@@ -291,9 +293,7 @@ class MdlPagUser {
   }
 
   void populateRoleScope(
-    List<Map<String, dynamic>> userRoleScopeList, {
-    String lazyLoadScope = '',
-  }) {
+      List<Map<String, dynamic>> userRoleScopeList, MdlPagAppConfig appConfig) {
     //role and scope
     // List<Map<String, dynamic>> userRoleScopeList = [];
 
@@ -316,6 +316,9 @@ class MdlPagUser {
       // MdlPagRole role = MdlPagRole.fromJson(userRoleScope);
       // roleList.add(role);
       selectedRole ??= getRoleRoleByName(roleName);
+      if (selectedRole?.portalType != appConfig.portalType) {
+        selectedRole = null;
+      }
 
       List<Map<String, dynamic>> projectRoleScopeConfigList = [];
       if (userRoleScope['project_role_scope_config_list'] != null) {
@@ -351,7 +354,7 @@ class MdlPagUser {
     List<MdlPagProjectProfile> selectedProjectProfileList =
         getSelectedRoleProjectProfileList();
     updateDefaultSelectedScope(selectedProjectProfileList,
-        lazyLoadScope: lazyLoadScope);
+        lazyLoadScope: appConfig.lazyLoadScope);
     // MdlPagProjectProfile? selectedProjectProfile = projectProfileList[0];
     // assert(selectedProjectProfile.isNotEmpty);
     // MdlPagSiteGroupProfile? selectSiteGroupProfile;

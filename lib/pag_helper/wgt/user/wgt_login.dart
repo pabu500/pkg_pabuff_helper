@@ -10,13 +10,15 @@ class WgtLogin extends StatefulWidget {
   const WgtLogin({
     super.key,
     required this.appConfig,
-    required this.onPostLogin,
-    this.postLoginThen,
+    this.onLoggedIn,
+    // required this.onPostLogin,
+    // this.postLoginThen,
   });
 
   final MdlPagAppConfig appConfig;
-  final Function(MdlPagUser loggedInUser) onPostLogin;
-  final Function(MdlPagUser)? postLoginThen;
+  final Function(MdlPagUser loggedInUser)? onLoggedIn;
+  // final Function(MdlPagUser loggedInUser) onPostLogin;
+  // final Function(MdlPagUser)? postLoginThen;
 
   @override
   State<WgtLogin> createState() => _WgtLoginState();
@@ -138,35 +140,35 @@ class _WgtLoginState extends State<WgtLogin> {
     }
   }
 
-  _logginThen(MdlPagUser? user) async {
-    if (user == null) {
-      return;
-    }
-    try {
-      await widget.onPostLogin(user).then((value) {
-        if (mounted) {
-          widget.postLoginThen?.call(user);
-          // Provider.of<PagUserProvider>(context, listen: false).iniUser(user);
-          // Provider.of<PagAppProvider>(context, listen: false)
-          //     .iniPageRoute(PagPageRoute.consoleHomeDashboard);
+  // _logginThen(MdlPagUser? user) async {
+  //   if (user == null) {
+  //     return;
+  //   }
+  //   try {
+  //     await widget.onPostLogin(user).then((value) {
+  //       if (mounted) {
+  //         widget.postLoginThen?.call(user);
+  //         // Provider.of<PagUserProvider>(context, listen: false).iniUser(user);
+  //         // Provider.of<PagAppProvider>(context, listen: false)
+  //         //     .iniPageRoute(PagPageRoute.consoleHomeDashboard);
 
-          // context.go(getRoute(PagPageRoute.splash));
-        }
-      });
-    } catch (e) {
-      if (kDebugMode) {
-        print('loginThen: $e');
-      }
-      setState(() {
-        _errorTextLocal = 'user scope error';
-      });
-    } finally {
-      setState(() {
-        _failedLogin = true;
-        _isLoggingIn = false;
-      });
-    }
-  }
+  //         // context.go(getRoute(PagPageRoute.splash));
+  //       }
+  //     });
+  //   } catch (e) {
+  //     if (kDebugMode) {
+  //       print('loginThen: $e');
+  //     }
+  //     setState(() {
+  //       _errorTextLocal = 'user scope error';
+  //     });
+  //   } finally {
+  //     setState(() {
+  //       _failedLogin = true;
+  //       _isLoggingIn = false;
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -242,7 +244,10 @@ class _WgtLoginState extends State<WgtLogin> {
                   }
 
                   await _login().then((user) {
-                    _logginThen(user);
+                    // _logginThen(user);
+                    if (user != null) {
+                      widget.onLoggedIn?.call(user);
+                    }
                   });
                 },
                 suffix: InkWell(
@@ -283,7 +288,10 @@ class _WgtLoginState extends State<WgtLogin> {
                     print('Login button pressed');
                   }
                   await _login().then((user) async {
-                    _logginThen(user);
+                    // _logginThen(user);
+                    if (user != null) {
+                      widget.onLoggedIn?.call(user);
+                    }
                   });
                 },
               ),
