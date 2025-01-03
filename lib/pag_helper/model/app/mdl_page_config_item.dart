@@ -42,13 +42,13 @@ class MdlPagPageConfigItem {
     if (gridLeft is String) {
       gridLeft = int.tryParse(gridLeft);
     }
-    dynamic gridX = json['grid_x'];
-    if (gridX is String) {
-      gridX = int.tryParse(gridX);
+    dynamic gridW = json['grid_width'];
+    if (gridW is String) {
+      gridW = int.tryParse(gridW);
     }
-    dynamic gridY = json['grid_y'];
-    if (gridY is String) {
-      gridY = int.tryParse(gridY);
+    dynamic gridH = json['grid_height'];
+    if (gridH is String) {
+      gridH = int.tryParse(gridH);
     }
 
     return MdlPagPageConfigItem(
@@ -59,8 +59,8 @@ class MdlPagPageConfigItem {
       colIndex: json['col_index'],
       gridTopLeftY: gridTop,
       gridTopLeftX: gridLeft,
-      gridWidth: gridX,
-      gridHeight: gridY,
+      gridWidth: gridW,
+      gridHeight: gridH,
       decorationStr: json['decoration_str'],
     );
   }
