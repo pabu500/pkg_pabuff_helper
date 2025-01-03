@@ -32,7 +32,14 @@ class PgSplash extends StatefulWidget {
   final MdlPagUser? loggedInUser;
   final BuildContext appCtxBoardContext;
   final Function? onSplashDone;
-  final Function? doPostLoginFunction;
+  final Future<void> Function(
+    MdlPagAppConfig,
+    BuildContext,
+    MdlPagUser, {
+    required String taskName,
+    PagPageRoute? prCur,
+    bool loadVendorCredential,
+  })? doPostLoginFunction;
 
   @override
   State<PgSplash> createState() => _PgSplashState();
@@ -75,6 +82,7 @@ class _PgSplashState extends State<PgSplash> {
       // await doPostLogin(
       await widget.doPostLoginFunction
           ?.call(
+        widget.appConfig,
         widget.appCtxBoardContext ?? context,
         loggedInUser!,
         taskName: taskName,
