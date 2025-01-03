@@ -14,7 +14,7 @@ void xtShowModelBottomSheet(BuildContext context, Widget child,
         borderRadius: BorderRadius.vertical(top: Radius.circular(10))),
     builder: (BuildContext context) {
       return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 21.0, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 21.0, vertical: 3),
         child: SizedBox(width: double.infinity, child: child),
       );
     },

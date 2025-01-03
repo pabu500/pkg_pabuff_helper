@@ -150,8 +150,16 @@ class MdlPagSiteGroupProfile {
       for (var siteProfileMap in itemInfo['site_list']) {
         Map<String, dynamic>? scopeInfo = siteProfileMap['scope_info'];
         assert(scopeInfo != null);
-        MdlPagSiteProfile siteProfile = MdlPagSiteProfile.fromJson(scopeInfo!);
-        siteProfileListX.add(siteProfile);
+        try {
+          MdlPagSiteProfile siteProfile =
+              MdlPagSiteProfile.fromJson(scopeInfo!);
+          siteProfileListX.add(siteProfile);
+        } catch (e) {
+          if (kDebugMode) {
+            print('fromJson site_list $e');
+          }
+          rethrow;
+        }
       }
     }
 

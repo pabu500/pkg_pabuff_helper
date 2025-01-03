@@ -122,6 +122,11 @@ class MdlPagLocationGroupProfile {
     }
     assert(id is int);
 
+    String? name = itemInfo['name'];
+    assert(name != null);
+    String label = itemInfo['label'] ?? '';
+    // assert(label != null);
+
     dynamic lat = itemInfo['lat'];
     if (lat == null) {
       if (kDebugMode) {
@@ -158,8 +163,8 @@ class MdlPagLocationGroupProfile {
 
     return MdlPagLocationGroupProfile(
       id: id,
-      name: itemInfo['name'],
-      label: itemInfo['label'] ?? '',
+      name: name!,
+      label: label,
       latitude: lat,
       longitude: lng,
       // currency: json['currency'],

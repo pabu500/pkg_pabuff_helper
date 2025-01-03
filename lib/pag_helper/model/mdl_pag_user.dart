@@ -363,7 +363,7 @@ class MdlPagUser {
           try {
             MdlPagProjectProfile? projectProfile =
                 MdlPagProjectProfile.fromJson2(projectRoleScopeConfig);
-            roleScopeProjectProfileList.add(projectProfile!);
+            roleScopeProjectProfileList.add(projectProfile);
             projectProfileList.add(projectProfile);
           } catch (e) {
             if (kDebugMode) {

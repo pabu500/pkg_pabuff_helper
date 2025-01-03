@@ -115,6 +115,11 @@ class MdlPagBuildingProfile {
     Map<String, dynamic> itemInfo = json['item_info'] ?? {};
     assert(itemInfo.isNotEmpty);
 
+    String? name = itemInfo['name'];
+    assert(name != null);
+    String label = itemInfo['label'] ?? '';
+    // assert(label != null);
+
     dynamic id = itemInfo['id'];
     if (id is String) {
       id = int.tryParse(id);
@@ -161,8 +166,8 @@ class MdlPagBuildingProfile {
 
     return MdlPagBuildingProfile(
       id: id,
-      name: itemInfo['name'],
-      label: itemInfo['label'] ?? '',
+      name: name!,
+      label: label,
       locationGroupProfileList: locationGroupProfileList,
       isAllLocationGroups: isAllLocationGroups,
       latitude: lat ?? defaultLat,

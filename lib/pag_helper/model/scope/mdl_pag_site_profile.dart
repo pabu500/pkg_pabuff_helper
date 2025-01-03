@@ -1,3 +1,4 @@
+import 'package:buff_helper/pag_helper/def/project_helper.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 import 'package:flutter/foundation.dart';
 import 'mdl_pag_building_profile.dart';
@@ -147,12 +148,24 @@ class MdlPagSiteProfile {
   }
 
   factory MdlPagSiteProfile.fromJson(Map<String, dynamic> json) {
-    String? isWildcard = json['is_wildcard'];
-    assert(isWildcard != null);
-    bool isAllBuildings = isWildcard == 'true';
+    if (kDebugMode) {
+      print('MdlPagSiteProfile.fromJson');
+    }
 
     Map<String, dynamic> itemInfo = json['item_info'] ?? {};
     assert(itemInfo.isNotEmpty);
+
+    String? name = itemInfo['name'];
+    assert(name != null);
+    String label = itemInfo['label'] ?? '';
+
+    // if (name == 'aims-test') {
+    //   print('aims-test');
+    // }
+
+    String? isWildcard = json['is_wildcard'];
+    assert(isWildcard != null);
+    bool isAllBuildings = isWildcard == 'true';
 
     dynamic id = itemInfo['id'];
     if (id is String) {
@@ -163,13 +176,13 @@ class MdlPagSiteProfile {
     dynamic lat = itemInfo['lat'];
     if (lat == null) {
       if (kDebugMode) {
-        print('lat is null for site ${json['name']}');
+        print('lat is null for site ${json['lat']}');
       }
     }
     if (lat is String) {
       lat = double.tryParse(lat);
     }
-    assert(lat is double);
+    // assert(lat is double);
 
     dynamic lng = itemInfo['lng'];
     if (lng == null) {
@@ -180,7 +193,7 @@ class MdlPagSiteProfile {
     if (lng is String) {
       lng = double.tryParse(lng);
     }
-    assert(lng is double);
+    // assert(lng is double);
 
     Map<String, dynamic>? mapCenter = {
       'lat': lat,
@@ -211,12 +224,12 @@ class MdlPagSiteProfile {
 
     return MdlPagSiteProfile(
       id: id,
-      name: itemInfo['name'],
-      label: itemInfo['label'],
-      latitude: lat,
-      longitude: lng,
+      name: name!,
+      label: label,
+      latitude: lat ?? defaultLat,
+      longitude: lng ?? defaultLng,
       timezone: timezone,
-      currency: itemInfo['currency'],
+      currency: itemInfo['currency'] ?? '',
       mapZoom: itemInfo['map_zoom'],
       mapCenter: mapCenter,
       buildingProfileList: buildingList,
