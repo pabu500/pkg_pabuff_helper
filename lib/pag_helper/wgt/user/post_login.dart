@@ -33,11 +33,12 @@ Future<void> doPostLogin(
       appConfig,
       loggedInUser,
       {
-        'portal_type_name': PagPortalType.pagConsole.name,
-        'portal_type_label': PagPortalType.pagConsole.label,
+        'portal_type_name': appConfig.portalType.name,
+        'portal_type_label': appConfig.portalType.label,
         'user_id': loggedInUser.id.toString(),
         'user_role_list': loggedInUser.roleList.map((e) => e.toJson()).toList(),
         'task_name': taskName,
+        'lazy_load_scope': appConfig.lazyLoadScope,
       },
       MdlPagSvcClaim(
         userId: loggedInUser.id,
