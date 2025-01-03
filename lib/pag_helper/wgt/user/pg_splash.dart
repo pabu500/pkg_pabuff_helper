@@ -18,7 +18,7 @@ class PgSplash extends StatefulWidget {
   const PgSplash({
     super.key,
     required this.appConfig,
-    required this.appCtxBoardContext,
+    // required this.appCtxBoardContext,
     this.loggedInUser,
     this.doPostLogin = true,
     this.showProgress = false,
@@ -30,7 +30,7 @@ class PgSplash extends StatefulWidget {
   final bool showProgress;
   final bool doPostLogin;
   final MdlPagUser? loggedInUser;
-  final BuildContext appCtxBoardContext;
+  // final BuildContext appCtxBoardContext;
   final Function? onSplashDone;
   final Future<void> Function(
     MdlPagAppConfig,
@@ -83,7 +83,7 @@ class _PgSplashState extends State<PgSplash> {
       await widget.doPostLoginFunction
           ?.call(
         widget.appConfig,
-        widget.appCtxBoardContext ?? context,
+        /*widget.appCtxBoardContext ?? */ context,
         loggedInUser!,
         taskName: taskName,
         prCur: Provider.of<PagAppProvider>(context, listen: false).prCur,
