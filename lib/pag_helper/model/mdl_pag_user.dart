@@ -15,6 +15,7 @@ import 'package:buff_helper/pag_helper/def/def_tree.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 
+import '../def/def_scope.dart';
 import 'scope/mdl_pag_scope2.dart';
 
 enum PagUserKey {
@@ -243,7 +244,32 @@ class MdlPagUser {
         siteName, buildingName, locationGroupName);
   }
 
-  void updateSelectedScopeByName2(
+  void updateSelectedScopeByNameAndType(
+      PagScopeType scopeType, String profileName) {
+    switch (scopeType) {
+      case PagScopeType.project:
+        updateSelectedScopeByNode(PagTreePartType.siteGroup, profileName);
+        break;
+      case PagScopeType.siteGroup:
+        updateSelectedScopeByNode(PagTreePartType.site, profileName);
+        break;
+      case PagScopeType.site:
+        updateSelectedScopeByNode(PagTreePartType.building, profileName);
+        break;
+      case PagScopeType.building:
+        updateSelectedScopeByNode(PagTreePartType.locationGroup, profileName);
+        break;
+      case PagScopeType.locationGroup:
+        updateSelectedScopeByNode(PagTreePartType.location, profileName);
+        break;
+      case PagScopeType.location:
+        break;
+      case PagScopeType.none:
+        break;
+    }
+  }
+
+  void updateSelectedScopeByNode(
       PagTreePartType scopeType, String profileName) {
     selectedScope.updateScopeByName2(userScope!, scopeType, profileName);
   }

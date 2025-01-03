@@ -6,8 +6,10 @@ import 'package:buff_helper/pag_helper/model/ems/mdl_pag_tenant.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
+import '../def/project_helper.dart';
 import 'scope/mdl_pag_site_group_profile.dart';
 import 'scope/mdl_pag_site_profile.dart';
+import 'package:latlong2/latlong.dart';
 
 class MdlPagProjectProfile {
   int id;
@@ -224,6 +226,14 @@ class MdlPagProjectProfile {
       roleList.add(role.toJson());
     }
     return roleList;
+  }
+
+  LatLng getMapCenterLatLng() {
+    if (mapCenter == null) {
+      return const LatLng(defaultLat, defaultLng);
+    }
+    return LatLng(
+        mapCenter!['lat'] ?? defaultLat, mapCenter!['lng'] ?? defaultLng);
   }
 
   factory MdlPagProjectProfile.fromJson2(Map<String, dynamic> json) {

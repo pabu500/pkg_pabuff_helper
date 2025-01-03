@@ -2,6 +2,7 @@ import 'package:buff_helper/pag_helper/def/def_tree.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_project_profile.dart';
 import 'package:buff_helper/pag_helper/wgt/tree/wgt_tree_element.dart';
 
+import '../../def/def_scope.dart';
 import 'mdl_pag_site_group_profile.dart';
 import 'mdl_pag_building_profile.dart';
 import 'mdl_pag_location_group_profile.dart';
@@ -109,6 +110,20 @@ class MdlPagScope2 {
     return projectProfile!.timezone;
   }
 
+  PagScopeType getScopeType() {
+    if (locationGroupProfile != null) {
+      return PagScopeType.locationGroup;
+    } else if (buildingProfile != null) {
+      return PagScopeType.building;
+    } else if (siteProfile != null) {
+      return PagScopeType.site;
+    } else if (siteGroupProfile != null) {
+      return PagScopeType.siteGroup;
+    } else {
+      return PagScopeType.project;
+    }
+  }
+
   PagTreePartType getScopeTreePartType() {
     if (locationGroupProfile != null) {
       return PagTreePartType.locationGroup;
@@ -135,6 +150,22 @@ class MdlPagScope2 {
     } else {
       return projectProfile;
     }
+  }
+
+  List<dynamic> getScopeProfileList() {
+    List<dynamic> scopeList = <dynamic>[];
+    if (locationGroupProfile != null) {
+      scopeList.addAll(locationGroupProfile!.locationList);
+    } else if (buildingProfile != null) {
+      scopeList.addAll(buildingProfile!.locationGroupProfileList);
+    } else if (siteProfile != null) {
+      scopeList.addAll(siteProfile!.buildingProfileList);
+    } else if (siteGroupProfile != null) {
+      scopeList.addAll(siteGroupProfile!.siteProfileList);
+    } else {
+      scopeList.addAll(projectProfile!.siteGroupProfileList);
+    }
+    return scopeList;
   }
 
   bool isSelectedNode(PagTreeNode node) {

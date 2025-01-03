@@ -1,4 +1,6 @@
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
+import 'package:flutter/foundation.dart';
+import '../../def/project_helper.dart';
 import 'mdl_pag_location_group_profile.dart';
 
 class MdlPagBuildingProfile {
@@ -8,6 +10,8 @@ class MdlPagBuildingProfile {
   List<MdlPagLocationGroupProfile> locationGroupProfileList;
   bool isAllLocationGroups;
   MdlListColController? locationGroupFilterColController;
+  double? latitude;
+  double? longitude;
 
   MdlPagBuildingProfile({
     required this.id,
@@ -15,6 +19,8 @@ class MdlPagBuildingProfile {
     required this.label,
     this.locationGroupProfileList = const [],
     this.isAllLocationGroups = false,
+    this.latitude,
+    this.longitude,
   });
 
   bool equals(MdlPagBuildingProfile? buildingProfile) {
@@ -126,12 +132,41 @@ class MdlPagBuildingProfile {
       }
     }
 
+    dynamic lat = itemInfo['lat'];
+    if (lat == null) {
+      if (kDebugMode) {
+        // print('lat is null for site ${json['name']}');
+      }
+    }
+    if (lat is String) {
+      lat = double.tryParse(lat);
+    }
+    // assert(lat is double);
+
+    dynamic lng = itemInfo['lng'];
+    if (lng == null) {
+      if (kDebugMode) {
+        // print('lng is null for site ${itemInfo['name']}');
+      }
+    }
+    if (lng is String) {
+      lng = double.tryParse(lng);
+    }
+    // assert(lng is double);
+
+    Map<String, dynamic>? mapCenter = {
+      'lat': lat,
+      'lng': lng,
+    };
+
     return MdlPagBuildingProfile(
       id: id,
       name: itemInfo['name'],
       label: itemInfo['label'] ?? '',
       locationGroupProfileList: locationGroupProfileList,
       isAllLocationGroups: isAllLocationGroups,
+      latitude: lat ?? defaultLat,
+      longitude: lng ?? defaultLng,
     );
   }
 

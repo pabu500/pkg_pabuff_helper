@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 enum PagScopeType {
+  project('Project', Symbols.flag),
   siteGroup('Site Group', Symbols.workspaces),
   site('Site', Symbols.home_pin),
   building('Building', Symbols.domain),

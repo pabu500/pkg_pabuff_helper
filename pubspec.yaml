@@ -39,6 +39,7 @@ dependencies:
   local_auth: ^2.2.0
   flutter_fancy_tree_view: ^1.6.0
   path_drawing: ^1.0.1
+  latlong2: ^0.9.1
 
 dev_dependencies:
   flutter_test:
