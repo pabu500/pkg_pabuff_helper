@@ -1,6 +1,7 @@
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 import 'package:flutter/foundation.dart';
 import '../../def/project_helper.dart';
+import '../fleet_health/mdl_pag_fleet_health.dart';
 import 'mdl_pag_building_profile.dart';
 
 import 'mdl_pag_site_profile.dart';
@@ -13,8 +14,9 @@ class MdlPagSiteGroupProfile {
   MdlListColController? siteFilterColController;
   double? latitude;
   double? longitude;
+  MdlPagFleetHealth? fleetHealth;
 
-  List<MdlPagSiteProfile> siteProfileList = [];
+  List<MdlPagSiteProfile> siteProfileList;
 
   MdlPagSiteGroupProfile({
     required this.id,
@@ -24,6 +26,7 @@ class MdlPagSiteGroupProfile {
     this.isAllSites = false,
     this.latitude,
     this.longitude,
+    this.fleetHealth,
   });
 
   get isEmpty => siteProfileList.isEmpty;

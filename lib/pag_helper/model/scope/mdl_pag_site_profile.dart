@@ -1,6 +1,7 @@
 import 'package:buff_helper/pag_helper/def/project_helper.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 import 'package:flutter/foundation.dart';
+import '../fleet_health/mdl_pag_fleet_health.dart';
 import 'mdl_pag_building_profile.dart';
 
 import 'mdl_pag_location_group_profile.dart';
@@ -15,7 +16,7 @@ class MdlPagSiteProfile {
   String? currency = 'SGD';
   double? mapZoom = 10;
   Map<String, dynamic> mapCenter;
-  Map<String, dynamic> fhStat;
+  MdlPagFleetHealth? fleetHealth;
   List<MdlPagBuildingProfile> buildingProfileList;
   bool isAllBuildings;
   MdlListColController? buildingFilterColController;
@@ -30,7 +31,7 @@ class MdlPagSiteProfile {
     this.currency,
     this.mapZoom = 10,
     this.mapCenter = const {},
-    this.fhStat = const {},
+    this.fleetHealth,
     this.buildingProfileList = const [],
     this.isAllBuildings = false,
   });
@@ -141,7 +142,7 @@ class MdlPagSiteProfile {
       'currency': currency,
       'map_zoom': mapZoom,
       'map_center': mapCenter,
-      'fhStat': fhStat,
+      'fhStat': fleetHealth,
       'building_list':
           buildingProfileList.map((building) => building.toJson()).toList(),
     };
@@ -233,7 +234,7 @@ class MdlPagSiteProfile {
       mapZoom: itemInfo['map_zoom'],
       mapCenter: mapCenter,
       buildingProfileList: buildingList,
-      fhStat: itemInfo['fh_stat'] ?? {},
+      // fleetHealth: itemInfo['fh_stat'] ?? {},
       isAllBuildings: isAllBuildings,
     );
   }

@@ -1,5 +1,6 @@
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 import 'package:flutter/foundation.dart';
+import '../fleet_health/mdl_pag_fleet_health.dart';
 import 'mdl_pag_location.dart';
 
 class MdlPagLocationGroupProfile {
@@ -12,7 +13,7 @@ class MdlPagLocationGroupProfile {
   // String? currency = 'SGD';
   double? mapZoom = 10;
   Map<String, dynamic> mapCenter;
-  Map<String, dynamic> fhStat;
+  MdlPagFleetHealth? fleetHealth;
   List<MdlPagLocation> locationList;
   bool isAllLocations;
   MdlListColController? filterColController;
@@ -27,7 +28,7 @@ class MdlPagLocationGroupProfile {
     // this.currency,
     this.mapZoom = 10,
     this.mapCenter = const {},
-    this.fhStat = const {},
+    this.fleetHealth,
     this.locationList = const [],
     this.isAllLocations = false,
   });
@@ -102,7 +103,7 @@ class MdlPagLocationGroupProfile {
       // 'currency': currency,
       'map_zoom': mapZoom,
       'map_center': mapCenter,
-      'fh_stat': fhStat,
+      'fh_stat': fleetHealth,
       'location_list':
           locationList.map((location) => location.toJson()).toList(),
     };
@@ -171,7 +172,7 @@ class MdlPagLocationGroupProfile {
       mapZoom: itemInfo['map_zoom'],
       mapCenter: mapCenter,
       locationList: locationList,
-      fhStat: itemInfo['fh_stat'] ?? {},
+      // fleetHealth: itemInfo['fh_stat'] ?? {},
       isAllLocations: isAllLocations,
     );
   }

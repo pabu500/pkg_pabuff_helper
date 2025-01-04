@@ -38,6 +38,8 @@ class MdlPagProjectProfile {
   List<MdlPagRole> visibleRoleList;
   List<MdlPagTenant> tenantList;
 
+  Map<String, dynamic> fhStat;
+
   MdlPagProjectProfile({
     required this.id,
     required this.name,
@@ -61,6 +63,7 @@ class MdlPagProjectProfile {
     this.deviceTypeInfoList = const [],
     this.visibleRoleList = const [],
     this.tenantList = const [],
+    this.fhStat = const {},
   });
 
   bool equals(MdlPagProjectProfile? projectProfile) {

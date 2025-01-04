@@ -1,6 +1,7 @@
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 import 'package:flutter/foundation.dart';
 import '../../def/project_helper.dart';
+import '../fleet_health/mdl_pag_fleet_health.dart';
 import 'mdl_pag_location_group_profile.dart';
 
 class MdlPagBuildingProfile {
@@ -12,6 +13,7 @@ class MdlPagBuildingProfile {
   MdlListColController? locationGroupFilterColController;
   double? latitude;
   double? longitude;
+  MdlPagFleetHealth? fleetHealth;
 
   MdlPagBuildingProfile({
     required this.id,
@@ -21,6 +23,7 @@ class MdlPagBuildingProfile {
     this.isAllLocationGroups = false,
     this.latitude,
     this.longitude,
+    this.fleetHealth,
   });
 
   bool equals(MdlPagBuildingProfile? buildingProfile) {
