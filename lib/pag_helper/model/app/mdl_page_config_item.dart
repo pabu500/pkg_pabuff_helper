@@ -1,7 +1,9 @@
+import 'package:buff_helper/pag_helper/def/def_panel.dart';
+
 class MdlPagPageConfigItem {
   String name;
   String label;
-  String type;
+  PagPanelType type;
   int? rowIndex;
   int? colIndex;
   int? gridTopLeftY;
@@ -34,6 +36,14 @@ class MdlPagPageConfigItem {
       throw Exception('Invalid type');
     }
 
+    PagPanelType type = PagPanelType.none;
+    try {
+      type = PagPanelType.byLabel(json['type']);
+    } catch (e) {
+      throw Exception(
+          'MdlPagPageConfigItem.fromJson: Invalid type: ${json['type']}');
+    }
+
     dynamic gridTop = json['grid_top'];
     if (gridTop is String) {
       gridTop = int.tryParse(gridTop);
@@ -54,7 +64,7 @@ class MdlPagPageConfigItem {
     return MdlPagPageConfigItem(
       name: json['name'],
       label: json['label'],
-      type: json['type'],
+      type: type,
       rowIndex: json['row_index'],
       colIndex: json['col_index'],
       gridTopLeftY: gridTop,

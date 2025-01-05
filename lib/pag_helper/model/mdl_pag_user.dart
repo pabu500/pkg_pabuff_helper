@@ -1,4 +1,3 @@
-import 'package:buff_helper/pag_helper/def/def_role.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_operation.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_role.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_target.dart';
@@ -15,7 +14,7 @@ import 'package:buff_helper/pag_helper/def/def_tree.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 
-import '../def/def_scope.dart';
+import '../def/scope_helper.dart';
 import 'scope/mdl_pag_scope2.dart';
 
 enum PagUserKey {

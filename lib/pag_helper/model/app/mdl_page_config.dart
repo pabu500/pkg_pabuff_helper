@@ -1,3 +1,5 @@
+import 'package:buff_helper/pag_helper/def/def_panel.dart';
+
 import 'mdl_page_config_item.dart';
 
 const int defaultPageGridWidth = 128;
@@ -64,7 +66,7 @@ class MdlPagPageConfig {
             MdlPagPageConfigItem.fromJson(panelConfigMap);
 
         // assign row and column index for top_stat type
-        if (panelConfig.type == 'top_stat') {
+        if (panelConfig.type == PagPanelType.topStat) {
           panelConfig.rowIndex = 0;
           panelConfig.colIndex = indexTopStat;
           indexTopStat++;
@@ -80,7 +82,7 @@ class MdlPagPageConfig {
       int totalTopStatWidth = 0;
       int topStatGridHeight = 0;
       for (MdlPagPageConfigItem panelConfig in panelConfigList) {
-        if (panelConfig.type != 'top_stat') {
+        if (panelConfig.type != PagPanelType.topStat) {
           continue;
         }
 
@@ -118,7 +120,7 @@ class MdlPagPageConfig {
         currentMainGridTopLeftY = topStatGridHeight;
       }
       for (MdlPagPageConfigItem panelConfig in panelConfigList) {
-        if (panelConfig.type == 'top_stat') {
+        if (panelConfig.type == PagPanelType.topStat) {
           continue;
         }
 

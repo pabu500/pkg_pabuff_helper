@@ -2,7 +2,7 @@ import 'package:buff_helper/pag_helper/def/def_tree.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_project_profile.dart';
 import 'package:buff_helper/pag_helper/wgt/tree/wgt_tree_element.dart';
 
-import '../../def/def_scope.dart';
+import '../../def/scope_helper.dart';
 import 'mdl_pag_site_group_profile.dart';
 import 'mdl_pag_building_profile.dart';
 import 'mdl_pag_location_group_profile.dart';
@@ -165,6 +165,83 @@ class MdlPagScope2 {
     } else {
       scopeList.addAll(projectProfile!.siteGroupProfileList);
     }
+    return scopeList;
+  }
+
+  List<dynamic> getScopeChildrenProfileList(PagScopeType scopeType) {
+    List<dynamic> scopeList = <dynamic>[];
+    switch (scopeType) {
+      case PagScopeType.project:
+        scopeList.addAll(projectProfile!.siteGroupProfileList);
+        break;
+      case PagScopeType.siteGroup:
+        if (siteGroupProfile != null) {
+          scopeList.addAll(siteGroupProfile!.siteProfileList);
+          break;
+        }
+      case PagScopeType.site:
+        if (siteProfile != null) {
+          scopeList.addAll(siteProfile!.buildingProfileList);
+          break;
+        }
+      case PagScopeType.building:
+        if (buildingProfile != null) {
+          scopeList.addAll(buildingProfile!.locationGroupProfileList);
+          break;
+        }
+      case PagScopeType.locationGroup:
+        if (locationGroupProfile != null) {
+          scopeList.addAll(locationGroupProfile!.locationList);
+          break;
+        }
+      default:
+        break;
+    }
+
+    return scopeList;
+  }
+
+  List<dynamic> getScopeChildrenProfileListByParentId(
+      String parentIdStr, PagScopeType parentScopeType) {
+    List<dynamic> scopeList = <dynamic>[];
+
+    switch (parentScopeType) {
+      case PagScopeType.project:
+        MdlPagSiteGroupProfile? siteGroupProfile =
+            projectProfile!.getSiteGroupProfileById(parentIdStr);
+        if (siteGroupProfile != null) {
+          scopeList.addAll(siteGroupProfile.siteProfileList);
+          break;
+        }
+        break;
+      case PagScopeType.siteGroup:
+        MdlPagSiteProfile? siteProfile =
+            siteGroupProfile!.getSiteProfileById(parentIdStr);
+        if (siteProfile != null) {
+          scopeList.addAll(siteProfile.buildingProfileList);
+          break;
+        }
+        break;
+      case PagScopeType.site:
+        MdlPagBuildingProfile? buildingProfile =
+            siteProfile!.getBuildingProfileById(parentIdStr);
+        if (buildingProfile != null) {
+          scopeList.addAll(buildingProfile.locationGroupProfileList);
+          break;
+        }
+        break;
+      case PagScopeType.building:
+        MdlPagLocationGroupProfile? locationGroupProfile =
+            buildingProfile!.getLocationGroupProfileById(parentIdStr);
+        if (locationGroupProfile != null) {
+          scopeList.addAll(locationGroupProfile.locationList);
+          break;
+        }
+        break;
+      default:
+        break;
+    }
+
     return scopeList;
   }
 

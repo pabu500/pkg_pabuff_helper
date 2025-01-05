@@ -25,3 +25,22 @@ enum PagScopeType {
 T? enumByLabel<T extends Enum>(String? label, List<T> values) {
   return label == null ? null : values.asNameMap()[label];
 }
+
+PagScopeType getChildScopeType(PagScopeType parentScopeType) {
+  switch (parentScopeType) {
+    case PagScopeType.project:
+      return PagScopeType.siteGroup;
+    case PagScopeType.siteGroup:
+      return PagScopeType.site;
+    case PagScopeType.site:
+      return PagScopeType.building;
+    case PagScopeType.building:
+      return PagScopeType.locationGroup;
+    case PagScopeType.locationGroup:
+      return PagScopeType.location;
+    case PagScopeType.location:
+      return PagScopeType.none;
+    case PagScopeType.none:
+      return PagScopeType.none;
+  }
+}
