@@ -11,6 +11,7 @@ class PagTreeNode {
     required this.child,
     required this.treePartType,
     required this.level,
+    this.bubbleInfo = const {},
     Iterable<PagTreeNode>? children,
   }) : children = <PagTreeNode>[...?children];
 
@@ -19,6 +20,7 @@ class PagTreeNode {
   final int level;
   final PagTreePartType treePartType;
   final dynamic child;
+  final Map<String, dynamic> bubbleInfo;
 
   final List<PagTreeNode> children;
 }

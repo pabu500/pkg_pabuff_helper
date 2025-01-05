@@ -204,6 +204,8 @@ class PagUrlBase {
       '/scope/get_user_role_scope_list';
   static const String eptGetLocationGroupLocationList =
       '/scope/get_location_group_location_list';
+  static const String eptGetScopeChildrenList =
+      '/scope/get_scope_children_list';
 
   //top stat
   static const String eptGetTopStat = '/dashboard/get_top_stat';

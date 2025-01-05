@@ -21,4 +21,19 @@ class MdlPagFleetHealth {
       fhStatList: fhStatList,
     );
   }
+
+  Map<String, dynamic> getBubbleInfo() {
+    if (isEmpty) {
+      return {};
+    }
+    Map<String, dynamic> bubbleInfo = {};
+    for (MdlPagFhStat fhStat in fhStatList) {
+      bubbleInfo[fhStat.type.name] = {
+        'type_issue_count': fhStat.typeIssueCount,
+        'unknown_count': fhStat.unknownCount,
+        'normal_count': fhStat.normalCount,
+      };
+    }
+    return bubbleInfo;
+  }
 }
