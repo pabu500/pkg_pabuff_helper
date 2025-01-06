@@ -20,7 +20,8 @@ class WgtPieChart extends StatefulWidget {
     this.sectionOpacity = 0.7,
     this.centerInfo,
     this.showIndicator = true,
-    this.indicatorWidth,
+    this.indicatorWidth = 100,
+    this.indicatorHeight,
     this.valueDecimal,
     this.valueUnit,
     this.maxIdicators,
@@ -67,7 +68,8 @@ class WgtPieChart extends StatefulWidget {
   final double sectionOpacity;
   final Widget? centerInfo;
   final bool showIndicator;
-  final double? indicatorWidth;
+  final double indicatorWidth;
+  final double? indicatorHeight;
   final int? valueDecimal;
   final String? valueUnit;
   final int? maxIdicators;
@@ -131,7 +133,7 @@ class WgtPieChartState extends State<WgtPieChart> {
   Widget build(BuildContext context) {
     double pieWidth = widget.pieSize ?? (widget.centerSize ?? 100) * 3.4;
     double middleWidth = widget.showIndicator ? widget.middlePadding : 0;
-    double rightWidth = widget.showIndicator ? widget.indicatorWidth ?? 100 : 0;
+    double rightWidth = widget.showIndicator ? widget.indicatorWidth : 0;
     double widgetWidth =
         pieWidth + middleWidth + rightWidth + widget.indicatorOffset;
     return Container(
@@ -268,11 +270,16 @@ class WgtPieChartState extends State<WgtPieChart> {
               ),
               widget.showIndicator
                   ? SizedBox(
-                      width: widget.indicatorWidth ?? 100,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: getIndicators(),
+                      width: widget.indicatorWidth,
+                      height: widget.indicatorHeight,
+                      child: Center(
+                        child: SingleChildScrollView(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: getIndicators(),
+                          ),
+                        ),
                       ),
                     )
                   : Container(),
@@ -330,38 +337,45 @@ class WgtPieChartState extends State<WgtPieChart> {
                 ? widget.maxIdicators!
                 : widget.chartData.length, (i) {
       return InkWell(
-        onTap: () {
-          widget.onIdicatorTap == null ? null : widget.onIdicatorTap!(i);
-          // print('tapped: $i');
-        },
-        child: Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(5),
+        onTap: widget.onIdicatorTap == null
+            ? null
+            : () {
+                widget.onIdicatorTap!(i);
+                // print('tapped: $i');
+              },
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.all(Radius.circular(5)),
+            color: widget.currentIndicatorIndex == i
+                ? widget.currentIndicatorColor ??
+                    Theme.of(context).colorScheme.error.withAlpha(80)
+                : widget.indicatorColor ??
+                    (Theme.of(context).brightness == Brightness.dark
+                        ? Theme.of(context).hintColor.withAlpha(60)
+                        : Colors.grey.shade400),
           ),
-          color: widget.currentIndicatorIndex == i
-              ? widget.currentIndicatorColor ??
-                  Theme.of(context).colorScheme.error.withOpacity(0.3)
-              : widget.indicatorColor ??
-                  (Theme.of(context).brightness == Brightness.dark
-                      ? Theme.of(context).hintColor.withOpacity(0.25)
-                      : Colors.grey.shade400),
+          padding: const EdgeInsets.only(left: 2, right: 2, top: 2, bottom: 2),
+          margin: const EdgeInsets.only(left: 0, right: 13, bottom: 3, top: 3),
           child: WgtPieChartItemIndicator(
+            size: 8,
+            isSquare: true,
             color: widget.chartData[i]['color'] ?? getColor(_listColor, i),
             displayLabel: Text.rich(
               TextSpan(
                 text: (widget.chartData[i]['is_empty'] ?? false)
                     ? ' '
-                    : widget.chartData[i]['label'],
+                    : convertToDisplayString(widget.chartData[i]['label'],
+                        widget.indicatorWidth, const TextStyle(fontSize: 15)),
                 style: widget.currentIndicatorIndex == i
                     ? TextStyle(
                         fontSize: 15,
                         // fontWeight: FontWeight.bold,
                         color: widget.currentIndicatorLabelColor != null
                             ? widget.currentIndicatorLabelColor!
-                            : Colors.orange.withOpacity(0.8))
+                            : Colors.orange.withAlpha(210))
                     : TextStyle(
                         fontSize: 13,
-                        color: Theme.of(context).hintColor.withOpacity(0.55),
+                        color: Theme.of(context).hintColor.withAlpha(130),
                       ),
                 children: [
                   TextSpan(
@@ -382,12 +396,10 @@ class WgtPieChartState extends State<WgtPieChart> {
                 ],
               ),
             ),
-            isSquare: true,
-            size: 8,
             suffix: widget.currentIndicatorIndex == i
                 ? Icon(Icons.arrow_right,
                     color: widget.currentIndicatorArrowColor ??
-                        Colors.orangeAccent.withOpacity(0.8))
+                        Colors.orangeAccent.withAlpha(210))
                 : null,
           ),
         ),
@@ -446,7 +458,7 @@ class WgtPieChartState extends State<WgtPieChart> {
                 Shadow(
                   blurRadius: blurRadius,
                   offset: const Offset(1, 2),
-                  color: Theme.of(context).hintColor.withOpacity(0.55),
+                  color: Theme.of(context).hintColor.withAlpha(130),
                 )
               ]
             : null);
@@ -469,15 +481,15 @@ class WgtPieChartState extends State<WgtPieChart> {
     double minOpacity = 0.55;
     double maxOpacity = 0.89;
 
-    if (isTouched) return baseColor.withOpacity(maxOpacity);
+    if (isTouched) return baseColor.withAlpha(255 * maxOpacity ~/ 1);
 
     //decrease opacity according to list index
     double opacity = maxOpacity - (maxOpacity - minOpacity) * (index / len);
 
     if (percent < (widget.percentageCap ?? 0.01)) {
-      return baseColor.withOpacity(0);
+      return baseColor.withAlpha(0);
     }
-    return baseColor.withOpacity(opacity);
+    return baseColor.withAlpha(opacity * 255 ~/ 1);
   }
 
   Color getColor(List<Color> listColor, int index, {double? withOpacity}) {
@@ -494,7 +506,8 @@ class WgtPieChartState extends State<WgtPieChart> {
         // print('color1: $color');
       }
     }
-    color = color.withOpacity(withOpacity ?? 1);
+    color = color
+        .withAlpha(withOpacity == null ? 255 : (withOpacity * 255).toInt());
 
     return color;
   }
@@ -507,7 +520,7 @@ class WgtPieChartState extends State<WgtPieChart> {
           style: TextStyle(
             fontWeight: FontWeight.w500,
             fontSize: 12,
-            color: Colors.black.withOpacity(0.6),
+            color: Colors.black.withAlpha(150),
           )),
     );
   }
