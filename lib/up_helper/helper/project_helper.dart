@@ -24,6 +24,7 @@ enum SiteScope {
   NUS_YNC,
   NUS_RVRC,
   NUS_UTOWN,
+  NUS_VH,
   SUTD_CAMPUS,
   NTU_MR,
   NONE,
@@ -64,6 +65,7 @@ const evs2Sites = [
   SiteScope.NUS_YNC,
   SiteScope.NUS_RVRC,
   SiteScope.NUS_UTOWN,
+  SiteScope.NUS_VH,
   SiteScope.SUTD_CAMPUS,
   SiteScope.NTU_MR,
   SiteScope.SG_ALL,
@@ -154,6 +156,7 @@ final scopeProfiles = [
       SiteScope.NUS_YNC,
       SiteScope.NUS_RVRC,
       SiteScope.NUS_UTOWN,
+      SiteScope.NUS_VH,
       SiteScope.SUTD_CAMPUS,
       SiteScope.NTU_MR,
     ],
@@ -182,6 +185,7 @@ final scopeProfiles = [
       SiteScope.NUS_YNC,
       SiteScope.NUS_RVRC,
       SiteScope.NUS_UTOWN,
+      SiteScope.NUS_VH,
     ],
     'timezone': 8,
     'currency': 'SGD',
@@ -545,6 +549,8 @@ String? getSiteDisplayString(SiteScope? site) {
       return 'RVRC';
     case SiteScope.NUS_UTOWN:
       return 'UTown';
+    case SiteScope.NUS_VH:
+      return 'VH';
     case SiteScope.SUTD_CAMPUS:
       return 'SUTD';
     case SiteScope.NTU_MR:
@@ -590,6 +596,8 @@ SiteScope? getSiteScopeFromStr(String? scopeStr) {
       return SiteScope.NUS_RVRC;
     case 'NUS_UTOWN':
       return SiteScope.NUS_UTOWN;
+    case 'NUS_VH':
+      return SiteScope.NUS_VH;
     case 'SUTD_CAMPUS':
       return SiteScope.SUTD_CAMPUS;
     case 'NTU_MR':
@@ -714,6 +722,10 @@ AclScope getAclSiteScope(SiteScope? siteScope) {
       return AclScope.site_nus_ync;
     case SiteScope.NUS_RVRC:
       return AclScope.site_nus_rvrc;
+    case SiteScope.NUS_UTOWN:
+      return AclScope.site_nus_utown;
+    case SiteScope.NUS_VH:
+      return AclScope.site_nus_vh;
     case SiteScope.SUTD_CAMPUS:
       return AclScope.site_sutd_campus;
     case SiteScope.NTU_MR:

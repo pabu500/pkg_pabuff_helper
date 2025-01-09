@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 enum MeterOps {
   None,
+  Commission,
   CPC,
   Bypass,
   SetConc,

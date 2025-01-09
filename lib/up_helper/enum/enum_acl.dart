@@ -21,6 +21,7 @@ enum AclScope {
   site_nus_ync,
   site_nus_rvrc,
   site_nus_utown,
+  site_nus_vh,
   site_sutd_campus,
   site_ntu_mr,
 
