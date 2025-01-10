@@ -52,6 +52,11 @@ enum PagPageRoute {
     'console_home_settings',
     Symbols.settings,
   ),
+  consoleHomeTaskManager(
+    'Task Manager',
+    'console_home_task_manager',
+    Symbols.assignment,
+  ),
   meterManager(
     'Meter Manager',
     'meter_manager',

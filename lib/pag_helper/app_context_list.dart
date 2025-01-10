@@ -23,6 +23,7 @@ MdlPagAppContext appCtxConsoleHome = MdlPagAppContext(
     PagPageRoute.consoleHomeDashboard,
     PagPageRoute.consoleHomeUserService,
     PagPageRoute.consoleHomeAcl,
+    PagPageRoute.consoleHomeTaskManager,
     PagPageRoute.consoleHomeSettings,
   ],
 );

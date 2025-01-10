@@ -4,6 +4,7 @@ enum PagItemKind {
   device,
   user,
   tenant,
+  jobType,
   // METER,
   // CONCENTRATOR,
   // GATEWAY,

@@ -215,7 +215,7 @@ class PagUrlBase {
 
   //list
   static const String eptGetListInfoList = '/list/get_list_info_list';
-  static const String eptGetFilterList = '/list/get_filter_list';
+  static const String eptGetFilterValueList = '/list/get_filter_value_list';
 
   //item
   static const String eptGetItemList = '/item/get_item_list';
