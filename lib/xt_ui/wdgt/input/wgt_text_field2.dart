@@ -292,7 +292,8 @@ class _WgtTextFieldState extends State<WgtTextField> {
                                 color: Theme.of(context).colorScheme.error),
                           )
                         : (_controller.text.isNotEmpty &&
-                                widget.showClearButton)
+                                widget.showClearButton &&
+                                widget.enabled)
                             ? InkWell(
                                 child: Icon(
                                   Icons.clear,

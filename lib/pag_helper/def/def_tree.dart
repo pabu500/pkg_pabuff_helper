@@ -10,6 +10,8 @@ enum PagTreePartType {
   location('Location', Symbols.location_on),
   user('User', Symbols.person),
   tenant('Tenant', Symbols.location_away),
+  jobType('Job Type', Symbols.assignment),
+  jobTypeSub('Job Type Sub', Symbols.group),
   addButton('Add Button', Symbols.add_circle),
   removeButton('Remove Button', Symbols.remove),
   none('None', Symbols.error_outline),

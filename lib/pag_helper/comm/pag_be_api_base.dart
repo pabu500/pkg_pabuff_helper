@@ -222,6 +222,11 @@ class PagUrlBase {
   static const String eptGetItemInfo = '/item/get_item_info';
   static const String eptCheckItemExists = '/item/check_item_exists';
 
+  //job
+  // static const String eptPostJob = '/job/post_job';
+  static const String eptGetJobTypeSubList = '/job/get_job_type_sub_list';
+  static const String eptSetJobTypeSubList = '/job/set_job_type_sub_list';
+
   //ems
   static const String eptGetUserTenantList = '/ems/get_user_tenant_list';
   static const String eptSetUserTenantList = '/ems/set_user_tenant_list';

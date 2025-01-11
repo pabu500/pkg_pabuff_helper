@@ -14,6 +14,7 @@ class WgtCommButton extends StatefulWidget {
     this.faceColor,
     this.labelStyle,
     this.onPressed,
+    this.onResult,
   });
 
   final String label;
@@ -24,6 +25,7 @@ class WgtCommButton extends StatefulWidget {
   final Color? faceColor;
   final TextStyle? labelStyle;
   final Function()? onPressed;
+  final Function(dynamic)? onResult;
 
   @override
   State<WgtCommButton> createState() => _WgtCommButtonState();
@@ -65,7 +67,13 @@ class _WgtCommButtonState extends State<WgtCommButton> {
                     _isWaiting = true;
                   });
                   try {
-                    await widget.onPressed?.call();
+                    var result = await widget.onPressed?.call();
+                    widget.onResult?.call(result);
+                  } catch (e) {
+                    if (kDebugMode) {
+                      print('WgtCommButton: onTap error: $e');
+                    }
+                    widget.onResult?.call(e.toString());
                   } finally {
                     setState(() {
                       _isWaiting = false;
@@ -79,8 +87,8 @@ class _WgtCommButtonState extends State<WgtCommButton> {
             decoration: BoxDecoration(
               color: widget.faceColor ??
                   (widget.enabled
-                      ? pagCallToActionFace.withOpacity(0.9)
-                      : pagCallToActionFace.withOpacity(0.34)),
+                      ? pagCallToActionFace.withAlpha(230)
+                      : pagCallToActionFace.withAlpha(80)),
               borderRadius: BorderRadius.circular(5),
             ),
             child: Row(

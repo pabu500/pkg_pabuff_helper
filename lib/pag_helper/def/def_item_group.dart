@@ -1,3 +1,4 @@
 enum PagItemGroupType {
   userTenant,
+  jobTypeSub,
 }
