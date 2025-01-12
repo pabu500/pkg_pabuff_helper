@@ -47,7 +47,7 @@ class MdlPagScope {
     );
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toScopeMap() {
     return {
       'project_name': projectName,
       'project_id': projectId,

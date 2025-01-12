@@ -8,14 +8,14 @@ import 'mdl_pag_building_profile.dart';
 import 'mdl_pag_location_group_profile.dart';
 import 'mdl_pag_site_profile.dart';
 
-class MdlPagScope2 {
+class MdlPagScopeProfile {
   MdlPagProjectProfile? projectProfile;
   MdlPagSiteGroupProfile? siteGroupProfile;
   MdlPagSiteProfile? siteProfile;
   MdlPagBuildingProfile? buildingProfile;
   MdlPagLocationGroupProfile? locationGroupProfile;
 
-  MdlPagScope2({
+  MdlPagScopeProfile({
     this.projectProfile,
     this.siteGroupProfile,
     this.siteProfile,
@@ -23,7 +23,7 @@ class MdlPagScope2 {
     this.locationGroupProfile,
   });
 
-  factory MdlPagScope2.fromJson(Map<String, dynamic> json) {
+  factory MdlPagScopeProfile.fromJson(Map<String, dynamic> json) {
     if (json.isEmpty) {
       throw Exception('Empty json');
     }
@@ -47,7 +47,7 @@ class MdlPagScope2 {
       locationGroupProfile =
           MdlPagLocationGroupProfile.fromJson(json['location_group_profile']);
     }
-    return MdlPagScope2(
+    return MdlPagScopeProfile(
       projectProfile: projectProfile,
       siteGroupProfile: siteGroupProfile,
       siteProfile: siteProfile,

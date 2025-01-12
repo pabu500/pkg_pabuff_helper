@@ -66,7 +66,7 @@ class MdlPagUser {
   // MdlPagSiteProfile? selectedSiteProfile;
   // MdlPagBuildingProfile? selectedBuildingProfile;
   // MdlPagLocationGroupProfile? selectedLocationGroupProfile;
-  MdlPagScope2 selectedScope = MdlPagScope2();
+  MdlPagScopeProfile selectedScope = MdlPagScopeProfile();
 
   // mapping of role and its respective project list
   Map<String, List<MdlPagProjectProfile>> roleProjectInfo;
@@ -454,7 +454,7 @@ class MdlPagUser {
       }
     }
 
-    MdlPagScope2 selectedScope = MdlPagScope2(
+    MdlPagScopeProfile selectedScope = MdlPagScopeProfile(
       projectProfile: selectedProjectProfile,
       siteGroupProfile: selectSiteGroupProfile,
       siteProfile: selectedSiteProfile,
@@ -604,7 +604,7 @@ class MdlPagUser {
           }
         }
 
-        MdlPagScope2 selectedScope = MdlPagScope2(
+        MdlPagScopeProfile selectedScope = MdlPagScopeProfile(
           projectProfile: selectedProjectProfile,
           siteGroupProfile: selectSiteGroupProfile,
           siteProfile: selectedSiteProfile,

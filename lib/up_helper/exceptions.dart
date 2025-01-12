@@ -22,3 +22,8 @@ class EmptyHistoryException implements Exception {
   final String message;
   EmptyHistoryException(this.message);
 }
+
+class TooManyRequestsException implements Exception {
+  final String message;
+  TooManyRequestsException(this.message);
+}

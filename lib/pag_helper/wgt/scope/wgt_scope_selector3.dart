@@ -28,7 +28,7 @@ class WgtPagScopeSelector3 extends StatefulWidget {
       MdlPagSiteProfile? pagSiteScope,
       MdlPagBuildingProfile? pagBuildingScope,
       MdlPagLocationGroupProfile? pagLocationGroupScope) onChange;
-  final MdlPagScope2 iniScope;
+  final MdlPagScopeProfile iniScope;
   final List<MdlPagProjectProfile> projectList;
 
   @override
