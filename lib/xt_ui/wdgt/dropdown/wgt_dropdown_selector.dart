@@ -98,11 +98,11 @@ class _WgtDropdownSelectorState extends State<WgtDropdownSelector> {
             ),
             inputDecorationTheme: InputDecorationTheme(
               hintStyle: TextStyle(
-                color: Theme.of(context).hintColor.withOpacity(0.5),
+                color: Theme.of(context).hintColor.withAlpha(130),
               ),
               enabledBorder: UnderlineInputBorder(
                 borderSide: BorderSide(
-                  color: Theme.of(context).hintColor.withOpacity(0.3),
+                  color: Theme.of(context).hintColor.withAlpha(80),
                   width: 1,
                   style: BorderStyle.solid,
                 ),
@@ -133,8 +133,7 @@ class _WgtDropdownSelectorState extends State<WgtDropdownSelector> {
                   }
                 },
                 child: Icon(Icons.clear,
-                    size: 21,
-                    color: Theme.of(context).hintColor.withOpacity(0.3)),
+                    size: 21, color: Theme.of(context).hintColor.withAlpha(80)),
               ),
             ),
         ],
