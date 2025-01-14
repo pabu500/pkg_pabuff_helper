@@ -212,9 +212,11 @@ class _WgtHistoryRepListState extends State<WgtHistoryRepList> {
     _getListSetting();
     _getHistory();
 
+    int maxCol = 3;
+
     bool showList = _list.isNotEmpty &&
         _list.length < 340 &&
-        _listConfig.length <= 8 &&
+        _listConfig.length <= maxCol &&
         widget.jobRequest.isEmpty;
 
     if (kDebugMode) {

@@ -22,6 +22,7 @@ class WgtItemHistoryPresenter extends StatefulWidget {
     required this.itemIdType,
     required this.historyType,
     this.meterType,
+    this.subType,
     // required this.chartLabel,
     // required this.dataFields,
     this.showTitle = true,
@@ -61,6 +62,7 @@ class WgtItemHistoryPresenter extends StatefulWidget {
 
   final ItemType itemType;
   final MeterType? meterType;
+  final String? subType;
   final String itemId;
   final ItemIdType itemIdType;
   final Evs2HistoryType historyType;
@@ -171,12 +173,66 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
 
   final MultiSelectController<String> _controller = MultiSelectController();
 
-  late final Map<String, dynamic> _readingTypeConfig;
+  // late final Map<String, dynamic> _readingTypeConfig;
+
+  final Map<String, dynamic> _selectedReadingTypeConfig = {};
 
   bool _getByJob = false;
   final Map<String, String> _jobRequest = {};
 
   // bool _forceAlignTimeRange = false;
+  final Map<String, dynamic> redingTypeConfigIwowE3p = {
+    'val_meter': {
+      'title': 'kWh',
+      'dataFields': [
+        {
+          'field': 'val',
+        }
+      ],
+      'unit': 'kWh',
+      'chartType': ChartType.bar,
+      'dataType': DataType.diff,
+      'color': Colors.blue.withOpacity(0.7),
+    },
+    'ptp_v': {
+      'title': 'Phase-to-Phase Voltage (kV)',
+      'unit': 'kV',
+      'factor': 0.001,
+      'decimals': 2,
+      'chartType': ChartType.line,
+      'dataType': DataType.total,
+      'dataFields': [
+        {
+          'field': 'voltage_l1',
+        },
+        {
+          'field': 'voltage_l2',
+        },
+        {
+          'field': 'voltage_l3',
+        }
+      ],
+      // 'color': Colors.blue.withOpacity(0.7),
+    },
+    'l_c': {
+      'title': 'Line Current (A)',
+      'unit': 'A',
+      'chartType': ChartType.line,
+      'dataType': DataType.total,
+      'dataFields': [
+        {
+          'field': 'current_l1',
+        },
+        {
+          'field': 'current_l2',
+        },
+        {
+          'field': 'current_l3',
+        }
+      ],
+      'ySpace': 80,
+    },
+  };
 
   List<List<dynamic>> _getCsvList() {
     List<List<dynamic>> table = [];
@@ -215,335 +271,352 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
   }
 
   void _iniHistorySetting() {
-    if (widget.itemType == ItemType.fleet_health) {
-      _readingTypeConfig.clear();
-      if (widget.appConfig.activePortalProjectScope == ProjectScope.SG_ALL) {
-        _readingTypeConfig.addAll({
-          'score1': {
-            'title': 'Last Reading Too Old',
+    _selectedReadingTypeConfig.clear();
+
+    if (widget.subType != null) {
+      if (widget.appConfig.activePortalProjectScope ==
+          ProjectScope.EMS_CW_NUS) {
+        if (widget.subType == 'E') {
+          _selectedReadingTypeConfig.clear();
+          _selectedReadingTypeConfig.addAll(redingTypeConfigIwowE3p);
+        }
+      }
+    }
+    if (_selectedReadingTypeConfig.isEmpty) {
+      Map<String, dynamic> readingTypeConfig = {};
+
+      if (widget.itemType == ItemType.fleet_health) {
+        readingTypeConfig.clear();
+        if (widget.appConfig.activePortalProjectScope == ProjectScope.SG_ALL) {
+          readingTypeConfig.addAll({
+            'score1': {
+              'title': 'Last Reading Too Old',
+              'dataFields': [
+                {
+                  'field': 'score1',
+                }
+              ],
+              'unit': '',
+              'chartType': ChartType.line,
+              'dataType': DataType.total,
+              'color': Colors.red.shade300,
+            },
+            'score2': {
+              'title': 'Credit Balance Out of Range',
+              'dataFields': [
+                {
+                  'field': 'score2',
+                },
+              ],
+              'unit': '',
+              'chartType': ChartType.line,
+              'dataType': DataType.total,
+              'color': Colors.orange.shade300,
+            },
+          });
+        } else if (widget.appConfig.activePortalProjectScope ==
+            ProjectScope.EMS_CW_NUS) {
+          readingTypeConfig.addAll({
+            'score1': {
+              'title': 'Last Reading Too Old',
+              'dataFields': [
+                {
+                  'field': 'score1',
+                }
+              ],
+              'unit': '',
+              'chartType': ChartType.line,
+              'dataType': DataType.total,
+              'color': Colors.red.shade300,
+            },
+            'score2': {
+              'title': 'Reading Out of Range',
+              'dataFields': [
+                {
+                  'field': 'score2',
+                },
+              ],
+              'unit': '',
+              'chartType': ChartType.line,
+              'dataType': DataType.total,
+              'color': Colors.orange.shade300,
+            },
+          });
+        }
+      } else if (widget.itemType == ItemType.sensor) {
+        readingTypeConfig.clear();
+        readingTypeConfig.addAll({
+          'val_sensor': {
+            'title': 'sensor value',
+            'dataFields': widget.dataFields ??
+                [
+                  {
+                    'field': 'val',
+                  }
+                ],
+            'timeKey': 'dt',
+            'unit': '',
+            'chartType': ChartType.line,
+            'dataType': DataType.total,
+            'color': Colors.blue.withOpacity(0.7),
+            'width': 150,
+          }
+        });
+      } else if (widget.itemType == ItemType.meter_iwow &&
+          widget.meterType != MeterType.btu &&
+          widget.meterType != MeterType.bidirection) {
+        readingTypeConfig.clear();
+        readingTypeConfig.addAll({
+          'val_meter': {
+            'title': 'kWh',
             'dataFields': [
               {
-                'field': 'score1',
+                'field': 'val',
+              }
+            ],
+            'timeKey': 'time',
+            'unit': widget.meterType == null
+                ? 'kWh'
+                : getDeivceTypeUnit(widget.meterType!),
+            'chartType': ChartType.bar,
+            'dataType': DataType.diff,
+            'color': Colors.blue.withOpacity(0.7),
+            'width': 150,
+          }
+        });
+      } else if (widget.itemType == ItemType.meter_iwow &&
+          widget.meterType == MeterType.btu) {
+        readingTypeConfig.clear();
+        readingTypeConfig.addAll({
+          'val_meter': {
+            'title': 'kWh',
+            'dataFields': [
+              {
+                'field': 'val',
+              }
+            ],
+            'unit': 'kWh',
+            'chartType': ChartType.bar,
+            'dataType': DataType.diff,
+            'color': Colors.blue.withOpacity(0.7),
+          },
+          'flow': {
+            'title': 'Flow (m3/h)',
+            'dataFields': [
+              {
+                'field': 'flow',
               }
             ],
             'unit': '',
+            // 'decimals': 1,
             'chartType': ChartType.line,
             'dataType': DataType.total,
-            'color': Colors.red.shade300,
+            'color': Colors.blueGrey.withOpacity(0.7),
           },
-          'score2': {
-            'title': 'Credit Balance Out of Range',
+          'power': {
+            'title': 'Power (kW)',
             'dataFields': [
               {
-                'field': 'score2',
-              },
+                'field': 'power',
+              }
             ],
-            'unit': '',
+            'unit': 'kW',
             'chartType': ChartType.line,
             'dataType': DataType.total,
-            'color': Colors.orange.shade300,
+            'color': Colors.green.withOpacity(0.7),
+          },
+          'volume': {
+            'title': 'Volume (m3)',
+            'dataFields': [
+              {
+                'field': 'volume',
+              },
+            ],
+            'unit': 'm3',
+            'chartType': ChartType.bar,
+            'dataType': DataType.diff,
+            'color': Colors.green.withOpacity(0.7),
+          },
+          'forward_temp': {
+            'title': 'Forward Temp (°C)',
+            'dataFields': [
+              {
+                'field': 'forward_temp',
+              },
+            ],
+            'unit': '°C',
+            'chartType': ChartType.line,
+            'dataType': DataType.total,
+            'color': Colors.green,
+          },
+          'return_temp': {
+            'title': 'Return Temp (°C)',
+            'dataFields': [
+              {
+                'field': 'return_temp',
+              }
+            ],
+            'unit': '°C',
+            'chartType': ChartType.line,
+            'dataType': DataType.total,
+            'color': Colors.blueGrey.withOpacity(0.7),
           },
         });
-      } else if (widget.appConfig.activePortalProjectScope ==
-          ProjectScope.EMS_CW_NUS) {
-        _readingTypeConfig.addAll({
-          'score1': {
-            'title': 'Last Reading Too Old',
+      } else if (widget.itemType == ItemType.meter_iwow &&
+          widget.meterType == MeterType.bidirection) {
+        readingTypeConfig.clear();
+        readingTypeConfig.addAll({
+          'delivered_total': {
+            'title': 'Delivered Energy (kWh)',
             'dataFields': [
               {
-                'field': 'score1',
+                'field': 'delivered_total',
+              }
+            ],
+            'unit': 'kWh',
+            'chartType': ChartType.bar,
+            'dataType': DataType.diff,
+            'color': Colors.orange.withOpacity(0.7),
+          },
+          'received_total': {
+            'title': 'Received Energy (kWh)',
+            'dataFields': [
+              {
+                'field': 'received_total',
+              }
+            ],
+            'unit': 'kWh',
+            'chartType': ChartType.bar,
+            'dataType': DataType.diff,
+            'color': Colors.blue.withOpacity(0.7),
+          },
+        });
+      } else if (widget.itemType == ItemType.meter) {
+        readingTypeConfig.clear();
+        readingTypeConfig.addAll({
+          'val_meter': {
+            'title': 'kWh',
+            'dataFields': [
+              {
+                'field': 'kwh_total',
+              }
+            ],
+            'timeKey': 'kwh_timestamp',
+            'unit': 'kWh',
+            'chartType': ChartType.bar,
+            'dataType': DataType.diff,
+            'color': Colors.blue.withOpacity(0.7),
+            'width': 150,
+            'decimals': 3,
+          }
+        });
+      } else if (widget.itemType == ItemType.meter_3p) {
+        readingTypeConfig.clear();
+        readingTypeConfig.addAll({
+          'a_imp': {
+            'title': 'Active Import (kWh)',
+            'dataFields': [
+              {
+                'field': 'a_imp',
+              }
+            ],
+            'unit': 'kWh',
+            'chartType': ChartType.bar,
+            'dataType': DataType.diff,
+            'color': Colors.blue.withOpacity(0.7),
+          },
+          'ap_a_p_t': {
+            'title': 'All Phase Active Power Total (kW)',
+            'dataFields': [
+              {
+                'field': 'ap_a_p_t',
+              },
+            ],
+            'unit': 'kW',
+            'chartType': ChartType.bar,
+            'dataType': DataType.total,
+            'color': Colors.green.withOpacity(0.7),
+          },
+          'ap_a_p': {
+            'title': 'All Phase Apparent Power (kVA)',
+            'dataFields': [
+              {
+                'field': 'ap_a_p',
+              },
+            ],
+            'unit': 'kVA',
+            'chartType': ChartType.bar,
+            'dataType': DataType.total,
+            'color': Colors.blueGrey.withOpacity(0.7)
+          },
+          'c_md_sb_a_imp': {
+            'title': 'Current Max Demand Since Billing (kW)',
+            'dataFields': [
+              {
+                'field': 'c_md_sb_a_imp',
+              }
+            ],
+            'unit': 'kW',
+            'chartType': ChartType.line,
+            'dataType': DataType.total,
+            'color': Colors.green,
+          },
+          'ap_pf': {
+            'title': 'All Phase Power Factor',
+            'dataFields': [
+              {
+                'field': 'ap_pf',
               }
             ],
             'unit': '',
+            'decimals': 3,
             'chartType': ChartType.line,
             'dataType': DataType.total,
-            'color': Colors.red.shade300,
+            'color': Colors.blueGrey.withOpacity(0.7),
           },
-          'score2': {
-            'title': 'Reading Out of Range',
+          'ptp_v': {
+            'title': 'Phase-to-Phase Voltage (kV)',
+            'unit': 'kV',
+            'factor': 0.001,
+            'decimals': 2,
+            'chartType': ChartType.line,
+            'dataType': DataType.total,
             'dataFields': [
               {
-                'field': 'score2',
+                'field': 'ptp_v_l1',
               },
+              {
+                'field': 'ptp_v_l2',
+              },
+              {
+                'field': 'ptp_v_l3',
+              }
             ],
-            'unit': '',
+            // 'color': Colors.blue.withOpacity(0.7),
+          },
+          'l_c': {
+            'title': 'Line Current (A)',
+            'unit': 'A',
             'chartType': ChartType.line,
             'dataType': DataType.total,
-            'color': Colors.orange.shade300,
+            'dataFields': [
+              {
+                'field': 'l_c_l1',
+              },
+              {
+                'field': 'l_c_l2',
+              },
+              {
+                'field': 'l_c_l3',
+              }
+            ],
+            'ySpace': 80,
+            // 'color': Colors.blueGrey.withOpacity(0.7),
           },
         });
       }
-    } else if (widget.itemType == ItemType.sensor) {
-      _readingTypeConfig.clear();
-      _readingTypeConfig.addAll({
-        'val_sensor': {
-          'title': 'sensor value',
-          'dataFields': widget.dataFields ??
-              [
-                {
-                  'field': 'val',
-                }
-              ],
-          'timeKey': 'dt',
-          'unit': '',
-          'chartType': ChartType.line,
-          'dataType': DataType.total,
-          'color': Colors.blue.withOpacity(0.7),
-          'width': 150,
-        }
-      });
-    } else if (widget.itemType == ItemType.meter_iwow &&
-        widget.meterType != MeterType.btu &&
-        widget.meterType != MeterType.bidirection) {
-      _readingTypeConfig.clear();
-      _readingTypeConfig.addAll({
-        'val_meter': {
-          'title': 'kWh',
-          'dataFields': [
-            {
-              'field': 'val',
-            }
-          ],
-          'timeKey': 'time',
-          'unit': widget.meterType == null
-              ? 'kWh'
-              : getDeivceTypeUnit(widget.meterType!),
-          'chartType': ChartType.bar,
-          'dataType': DataType.diff,
-          'color': Colors.blue.withOpacity(0.7),
-          'width': 150,
-        }
-      });
-    } else if (widget.itemType == ItemType.meter_iwow &&
-        widget.meterType == MeterType.btu) {
-      _readingTypeConfig.clear();
-      _readingTypeConfig.addAll({
-        'val_meter': {
-          'title': 'kWh',
-          'dataFields': [
-            {
-              'field': 'val',
-            }
-          ],
-          'unit': 'kWh',
-          'chartType': ChartType.bar,
-          'dataType': DataType.diff,
-          'color': Colors.blue.withOpacity(0.7),
-        },
-        'flow': {
-          'title': 'Flow (m3/h)',
-          'dataFields': [
-            {
-              'field': 'flow',
-            }
-          ],
-          'unit': '',
-          // 'decimals': 1,
-          'chartType': ChartType.line,
-          'dataType': DataType.total,
-          'color': Colors.blueGrey.withOpacity(0.7),
-        },
-        'power': {
-          'title': 'Power (kW)',
-          'dataFields': [
-            {
-              'field': 'power',
-            }
-          ],
-          'unit': 'kW',
-          'chartType': ChartType.line,
-          'dataType': DataType.total,
-          'color': Colors.green.withOpacity(0.7),
-        },
-        'volume': {
-          'title': 'Volume (m3)',
-          'dataFields': [
-            {
-              'field': 'volume',
-            },
-          ],
-          'unit': 'm3',
-          'chartType': ChartType.bar,
-          'dataType': DataType.diff,
-          'color': Colors.green.withOpacity(0.7),
-        },
-        'forward_temp': {
-          'title': 'Forward Temp (°C)',
-          'dataFields': [
-            {
-              'field': 'forward_temp',
-            },
-          ],
-          'unit': '°C',
-          'chartType': ChartType.line,
-          'dataType': DataType.total,
-          'color': Colors.green,
-        },
-        'return_temp': {
-          'title': 'Return Temp (°C)',
-          'dataFields': [
-            {
-              'field': 'return_temp',
-            }
-          ],
-          'unit': '°C',
-          'chartType': ChartType.line,
-          'dataType': DataType.total,
-          'color': Colors.blueGrey.withOpacity(0.7),
-        },
-      });
-    } else if (widget.itemType == ItemType.meter_iwow &&
-        widget.meterType == MeterType.bidirection) {
-      _readingTypeConfig.clear();
-      _readingTypeConfig.addAll({
-        'delivered_total': {
-          'title': 'Delivered Energy (kWh)',
-          'dataFields': [
-            {
-              'field': 'delivered_total',
-            }
-          ],
-          'unit': 'kWh',
-          'chartType': ChartType.bar,
-          'dataType': DataType.diff,
-          'color': Colors.orange.withOpacity(0.7),
-        },
-        'received_total': {
-          'title': 'Received Energy (kWh)',
-          'dataFields': [
-            {
-              'field': 'received_total',
-            }
-          ],
-          'unit': 'kWh',
-          'chartType': ChartType.bar,
-          'dataType': DataType.diff,
-          'color': Colors.blue.withOpacity(0.7),
-        },
-      });
-    } else if (widget.itemType == ItemType.meter) {
-      _readingTypeConfig.clear();
-      _readingTypeConfig.addAll({
-        'val_meter': {
-          'title': 'kWh',
-          'dataFields': [
-            {
-              'field': 'kwh_total',
-            }
-          ],
-          'timeKey': 'kwh_timestamp',
-          'unit': 'kWh',
-          'chartType': ChartType.bar,
-          'dataType': DataType.diff,
-          'color': Colors.blue.withOpacity(0.7),
-          'width': 150,
-          'decimals': 3,
-        }
-      });
-    } else if (widget.itemType == ItemType.meter_3p) {
-      _readingTypeConfig.clear();
-      _readingTypeConfig.addAll({
-        'a_imp': {
-          'title': 'Active Import (kWh)',
-          'dataFields': [
-            {
-              'field': 'a_imp',
-            }
-          ],
-          'unit': 'kWh',
-          'chartType': ChartType.bar,
-          'dataType': DataType.diff,
-          'color': Colors.blue.withOpacity(0.7),
-        },
-        'ap_a_p_t': {
-          'title': 'All Phase Active Power Total (kW)',
-          'dataFields': [
-            {
-              'field': 'ap_a_p_t',
-            },
-          ],
-          'unit': 'kW',
-          'chartType': ChartType.bar,
-          'dataType': DataType.total,
-          'color': Colors.green.withOpacity(0.7),
-        },
-        'ap_a_p': {
-          'title': 'All Phase Apparent Power (kVA)',
-          'dataFields': [
-            {
-              'field': 'ap_a_p',
-            },
-          ],
-          'unit': 'kVA',
-          'chartType': ChartType.bar,
-          'dataType': DataType.total,
-          'color': Colors.blueGrey.withOpacity(0.7)
-        },
-        'c_md_sb_a_imp': {
-          'title': 'Current Max Demand Since Billing (kW)',
-          'dataFields': [
-            {
-              'field': 'c_md_sb_a_imp',
-            }
-          ],
-          'unit': 'kW',
-          'chartType': ChartType.line,
-          'dataType': DataType.total,
-          'color': Colors.green,
-        },
-        'ap_pf': {
-          'title': 'All Phase Power Factor',
-          'dataFields': [
-            {
-              'field': 'ap_pf',
-            }
-          ],
-          'unit': '',
-          'decimals': 3,
-          'chartType': ChartType.line,
-          'dataType': DataType.total,
-          'color': Colors.blueGrey.withOpacity(0.7),
-        },
-        'ptp_v': {
-          'title': 'Phase-to-Phase Voltage (kV)',
-          'unit': 'kV',
-          'factor': 0.001,
-          'decimals': 2,
-          'chartType': ChartType.line,
-          'dataType': DataType.total,
-          'dataFields': [
-            {
-              'field': 'ptp_v_l1',
-            },
-            {
-              'field': 'ptp_v_l2',
-            },
-            {
-              'field': 'ptp_v_l3',
-            }
-          ],
-          // 'color': Colors.blue.withOpacity(0.7),
-        },
-        'l_c': {
-          'title': 'Line Current (A)',
-          'unit': 'A',
-          'chartType': ChartType.line,
-          'dataType': DataType.total,
-          'dataFields': [
-            {
-              'field': 'l_c_l1',
-            },
-            {
-              'field': 'l_c_l2',
-            },
-            {
-              'field': 'l_c_l3',
-            }
-          ],
-          'ySpace': 80,
-          // 'color': Colors.blueGrey.withOpacity(0.7),
-        },
-      });
+      _selectedReadingTypeConfig.clear();
+      _selectedReadingTypeConfig.addAll(readingTypeConfig);
     }
 
     _displayType = widget.displayType ?? HistroyDisplayType.chart;
@@ -581,18 +654,19 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
 
     _selectedMultiFields.clear();
     _selectedMultiFields.add(ValueItem(
-        label: _readingTypeConfig[_selectedChartReadingTypeKey]['title'],
+        label: _selectedReadingTypeConfig[_selectedChartReadingTypeKey]
+            ['title'],
         value: _selectedChartReadingTypeKey));
     _selectedDataFieldsForList.clear();
     _selectedDataFieldsForList.addAll(
-        _readingTypeConfig[_selectedChartReadingTypeKey]['dataFields']
+        _selectedReadingTypeConfig[_selectedChartReadingTypeKey]['dataFields']
             as List<Map<String, dynamic>>);
   }
 
   void _updateSelectedDataFieldsList() {
     _selectedDataFieldsForList.clear();
     for (var item in _selectedMultiFields) {
-      _selectedDataFieldsForList.addAll(_readingTypeConfig[item.value!]
+      _selectedDataFieldsForList.addAll(_selectedReadingTypeConfig[item.value!]
           ['dataFields'] as List<Map<String, dynamic>>);
     }
 
@@ -603,13 +677,13 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
   }
 
   dynamic _getReadingTypeConfig(String chartRedingTypeKey, String key) {
-    return _readingTypeConfig[chartRedingTypeKey][key];
+    return _selectedReadingTypeConfig[chartRedingTypeKey][key];
   }
 
   @override
   void initState() {
     super.initState();
-    _readingTypeConfig = {};
+    // _readingTypeConfig = {};
 
     _iniHistorySetting();
   }
@@ -889,7 +963,7 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
   }
 
   Widget getTitleRow() {
-    bool useMultiFields = _readingTypeConfig.length > 1;
+    bool useMultiFields = _selectedReadingTypeConfig.length > 1;
 
     return SizedBox(
       height: 40,
@@ -945,7 +1019,7 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
                             // _selectedMultiFields.clear();
                             // _selectedMultiFields.add(ValueItem(
                             //     label:
-                            //         _readingTypeConfig[_currentMainChartReading]
+                            //         _selectedReadingTypeConfig[_currentMainChartReading]
                             //             ['title'],
                             //     value: _currentMainChartReading));
                             // _selectedFieldsChanged = false;
@@ -995,7 +1069,7 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
                                     as List<Map<String, dynamic>>);
                             _selectedMultiFields.clear();
                             _selectedMultiFields.add(ValueItem(
-                                label: _readingTypeConfig[
+                                label: _selectedReadingTypeConfig[
                                     _selectedChartReadingTypeKey]['title'],
                                 value: _selectedChartReadingTypeKey));
                             _controller.selectedOptions.clear();
@@ -1108,9 +1182,9 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
   }
 
   Widget getChartReadingTypeSelector() {
-    //remove 'val' from _readingTypeConfig
+    //remove 'val' from _selectedReadingTypeConfig
     Map<String, dynamic> items = {};
-    items.addAll(_readingTypeConfig);
+    items.addAll(_selectedReadingTypeConfig);
     items.remove('val');
 
     return DropdownButton(
@@ -1122,7 +1196,8 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
 
           _selectedMultiFields.clear();
           _selectedMultiFields.add(ValueItem(
-              label: _readingTypeConfig[_selectedChartReadingTypeKey]['title'],
+              label: _selectedReadingTypeConfig[_selectedChartReadingTypeKey]
+                  ['title'],
               value: _selectedChartReadingTypeKey));
 
           // _chartKeyExt = UniqueKey();
@@ -1134,7 +1209,7 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
       items: items.keys.map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,
-          child: Text(_readingTypeConfig[value]['title'],
+          child: Text(_selectedReadingTypeConfig[value]['title'],
               style: TextStyle(
                 color: value == _selectedChartReadingTypeKey
                     ? Theme.of(context).colorScheme.primary
@@ -1146,15 +1221,15 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
   }
 
   Widget getFieldSelector() {
-    //remove 'val' from _readingTypeConfig
+    //remove 'val' from _selectedReadingTypeConfig
     Map<String, dynamic> items = {};
-    items.addAll(_readingTypeConfig);
+    items.addAll(_selectedReadingTypeConfig);
     items.remove('val');
 
     List<ValueItem<String>> options = [];
     for (var item in items.keys) {
       options.add(ValueItem(
-        label: _readingTypeConfig[item]['title'],
+        label: _selectedReadingTypeConfig[item]['title'],
         value: item,
       ));
     }
@@ -1320,7 +1395,7 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
 
   Widget getChartRepresentation() {
     return WgtHistoryRepChart(
-      readingTypeConfig: _readingTypeConfig,
+      readingTypeConfig: _selectedReadingTypeConfig,
       chartReadingTypeKey: _selectedChartReadingTypeKey,
       chartKey: _intRefreshKey,
       width: widget.width,
@@ -1345,7 +1420,7 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
       loggedInUser: widget.loggedInUser,
       scopeProfile: widget.scopeProfile,
       itemId: widget.itemId,
-      readingTypeConfig: _readingTypeConfig,
+      readingTypeConfig: _selectedReadingTypeConfig,
       readingTypes: _selectedMultiFields.map((e) => e.value!).toList(),
       listKey: _intRefreshKey,
       lookBackMinutes: _selectedTimeRangeMinutes,

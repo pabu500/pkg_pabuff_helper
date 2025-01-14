@@ -221,7 +221,7 @@ class _WgtHistoryRepChartState extends State<WgtHistoryRepChart> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          getLegend(),
+          // getLegend(),
           SizedBox(
             width: widget.width,
             height: widget.height - (widget.reserveTooltipSpace ? 145 : 3),
