@@ -203,7 +203,7 @@ class _WgtDashboardListState extends State<WgtDashboardList> {
                 ? Container(
                     width: width,
                     decoration: BoxDecoration(
-                      color: Theme.of(context).hintColor.withOpacity(0.34),
+                      color: Theme.of(context).hintColor.withAlpha(80),
                       borderRadius: BorderRadius.circular(3),
                     ),
                     padding: const EdgeInsets.only(left: 3),
