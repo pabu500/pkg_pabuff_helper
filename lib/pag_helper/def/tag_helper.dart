@@ -54,6 +54,10 @@ Widget getTag2({
     PagFleetHealthType issueType = PagFleetHealthType.values.byName(tagText);
     tagLabel = issueType.tag;
     tagColor = issueType.color;
+  } else if (configItem['col_key'] == 'health') {
+    PagFleetHealthStatus issueStatus = PagFleetHealthStatus.byLabel(tagText);
+    tagLabel = issueStatus.tag;
+    tagColor = issueStatus.color;
   } else {
     tagLabel = tagText;
     tagColor = tagColor ?? Colors.grey;

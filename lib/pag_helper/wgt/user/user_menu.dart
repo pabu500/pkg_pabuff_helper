@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 
 import '../../model/acl/mdl_pag_role.dart';
 import '../../model/mdl_pag_app_config.dart';
+import '../../model/provider/pag_data_provider.dart';
 import 'wgt_role_selector.dart';
 
 class UserMenu extends StatefulWidget {
@@ -179,6 +180,7 @@ void onSelected(
       break;
     case 'logout':
       storage.deleteAll();
+      Provider.of<PagDataProvider>(context, listen: false).clearData();
       MdlPagUser? user =
           Provider.of<PagUserProvider>(context, listen: false).currentUser;
       user?.logout();
