@@ -141,7 +141,7 @@ Future<Evs2User> doCreateUser2(
 Future<dynamic> doBatchCreateUsers(
     PaGridAppConfig appConfig,
     List<Map<String, dynamic>> userList,
-    AclScope userScope,
+    String userScope,
     SvcClaim svcClaim) async {
   svcClaim.svcName = SvcType.usersvc.name;
   svcClaim.endpoint = UrlBase.eptUsersvcBatchReg;
@@ -162,7 +162,7 @@ Future<dynamic> doBatchCreateUsers(
     },
     body: jsonEncode(SvcQuery(svcClaim, <String, dynamic>{
       'user_list': userList,
-      'scope': userScope.name,
+      'scope': userScope.toLowerCase(),
     }).toJson()),
   );
 
