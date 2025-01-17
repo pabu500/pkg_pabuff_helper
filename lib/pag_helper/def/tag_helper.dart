@@ -44,40 +44,46 @@ Widget getTag2({
   String? tagTooltip,
   required double width,
 }) {
-  String tagLabel = '';
-  Color tagColor = Colors.grey;
-  if (configItem['col_key'] == 'portal_type_str') {
-    PagPortalType portalType = PagPortalType.byLabel(tagText);
-    tagLabel = portalType.tag;
-    tagColor = portalType.color;
-  } else if (configItem['col_key'] == 'issue_type_name') {
-    PagFleetHealthType issueType = PagFleetHealthType.values.byName(tagText);
-    tagLabel = issueType.tag;
-    tagColor = issueType.color;
-  } else if (configItem['col_key'] == 'health') {
-    PagFleetHealthStatus issueStatus = PagFleetHealthStatus.byLabel(tagText);
-    tagLabel = issueStatus.tag;
-    tagColor = issueStatus.color;
-  } else {
-    tagLabel = tagText;
-    tagColor = tagColor ?? Colors.grey;
-  }
-  return Tooltip(
-    message: tagTooltip ??
-        configItem['getTooltip']?.call(row[configItem['fieldKey']]) ??
-        '',
-    waitDuration: const Duration(milliseconds: 300),
-    child: Container(
-      height: 23,
-      padding: const EdgeInsets.symmetric(horizontal: 3),
-      margin: const EdgeInsets.only(right: 1),
-      decoration: BoxDecoration(
-        color: tagColor,
-        borderRadius: BorderRadius.circular(3),
+  try {
+    String tagLabel = '';
+    Color tagColor = Colors.grey;
+    if (configItem['col_key'] == 'portal_type_str') {
+      PagPortalType portalType = PagPortalType.byLabel(tagText);
+      tagLabel = portalType.tag;
+      tagColor = portalType.color;
+    } else if (configItem['col_key'] == 'issue_type_name') {
+      PagFleetHealthType issueType = PagFleetHealthType.values.byName(tagText);
+      tagLabel = issueType.tag;
+      tagColor = issueType.color;
+    } else if (configItem['col_key'] == 'health') {
+      PagFleetHealthStatus issueStatus = PagFleetHealthStatus.byLabel(tagText);
+      tagLabel = issueStatus.tag;
+      tagColor = issueStatus.color;
+    } else {
+      tagLabel = tagText;
+      tagColor = tagColor ?? Colors.grey;
+    }
+    return Tooltip(
+      message: tagTooltip ??
+          configItem['getTooltip']?.call(row[configItem['fieldKey']]) ??
+          '',
+      waitDuration: const Duration(milliseconds: 300),
+      child: Container(
+        height: 23,
+        padding: const EdgeInsets.symmetric(horizontal: 3),
+        margin: const EdgeInsets.only(right: 1),
+        decoration: BoxDecoration(
+          color: tagColor,
+          borderRadius: BorderRadius.circular(3),
+        ),
+        child: Text(tagLabel,
+            style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontSize: 13.5)),
       ),
-      child: Text(tagLabel,
-          style: TextStyle(
-              color: Theme.of(context).colorScheme.onSurface, fontSize: 13.5)),
-    ),
-  );
+    );
+  } catch (e) {
+    print('Error in getTag2: $e');
+    return Container();
+  }
 }
