@@ -1,5 +1,11 @@
 import 'package:buff_helper/pkg_buff_helper.dart';
 
+enum PagListContextType {
+  info,
+  usage,
+  scada,
+}
+
 enum PagListTypeName {
   SITE_LIST,
   USER_LIST,
