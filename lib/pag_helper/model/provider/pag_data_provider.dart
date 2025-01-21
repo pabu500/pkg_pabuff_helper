@@ -164,6 +164,9 @@ class PagDataProvider extends ChangeNotifier {
       // to force the listeners to rebuild
       // _fhStat['stat_timestamp'] = DateTime.now().toIso8601String();
       if (refreshTriggerTime != null) {
+        if (kDebugMode) {
+          print('refreshTriggerTime: ${refreshTriggerTime.toIso8601String()}');
+        }
         _fhStat['refresh_trigger_time'] = refreshTriggerTime.toIso8601String();
       }
 

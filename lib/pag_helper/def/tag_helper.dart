@@ -1,5 +1,6 @@
 import 'package:buff_helper/pag_helper/def/def_fleet_health.dart';
 import 'package:buff_helper/pag_helper/def/def_role.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 Widget getTagList({
@@ -83,7 +84,9 @@ Widget getTag2({
       ),
     );
   } catch (e) {
-    print('Error in getTag2: $e');
+    if (kDebugMode) {
+      print('Error in getTag2: $e');
+    }
     return Container();
   }
 }
