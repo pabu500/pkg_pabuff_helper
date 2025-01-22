@@ -823,14 +823,20 @@ class Bill {
       trending = trending.reversed.toList();
     }
 
+    int lookBackMonthCap = 6;
+    int lookBackMonth = trending.length;
+    if (lookBackMonth > lookBackMonthCap) {
+      lookBackMonth = lookBackMonthCap;
+    }
+
     List<Map<String, dynamic>> trendingLastMonthSuper = [];
-    for (int i = 0; i < trending.length; i++) {
+    for (int i = 0; i < lookBackMonth; i++) {
       trending[i]['label'] = trending[i]['label'] + '';
       String valueStr = getBarNumberStr(trending[i]['value'] as double);
       trending[i]['valueStr'] = valueStr;
 
       var item = trending[i];
-      if (i == trending.length - 1) {
+      if (i == lookBackMonth - 1) {
         trendingLastMonthSuper.add({
           'label': item['label'],
           'value': item['value'],
@@ -845,9 +851,9 @@ class Bill {
       }
     }
 
-    //if length less then 6, add empty data
-    if (trending.length < 6) {
-      for (int i = 0; i < 6 - trending.length; i++) {
+    //if length less then lookBackMonth, add empty data
+    if (trending.length < lookBackMonth) {
+      for (int i = 0; i < lookBackMonth - trending.length; i++) {
         trending.insert(0, {
           'label': '',
           'value': 0,
@@ -900,7 +906,7 @@ class Bill {
                     xAxis: pw.FixedAxis.fromStrings(
                       color: PdfColors.white,
                       List<String>.generate(
-                        trending.length,
+                        lookBackMonth, // trending.length,
                         (index) =>
                             // '${trending?[index]['label']}\n ${trending?[index]['value']}',
                             // '${trending?[index]['label']}',
@@ -940,7 +946,7 @@ class Bill {
                       offset: -10,
                       borderColor: PdfColors.grey,
                       data: List<pw.PointChartValue>.generate(
-                        trending.length,
+                        lookBackMonth, // trending.length,
                         (i) {
                           final v = trending?[i]['value'] as num;
                           return pw.PointChartValue(i.toDouble(), v.toDouble());
@@ -962,7 +968,7 @@ class Bill {
                     xAxis: pw.FixedAxis.fromStrings(
                       color: PdfColors.grey300,
                       List<String>.generate(
-                        trending.length,
+                        lookBackMonth, //trending.length,
                         (index) =>
                             // trending?[index]['label'] as String,
                             '',
@@ -1000,7 +1006,7 @@ class Bill {
                       offset: -10,
                       borderColor: PdfColors.grey,
                       data: List<pw.PointChartValue>.generate(
-                        trending.length,
+                        lookBackMonth, //trending.length,
                         (i) {
                           final v = trendingLastMonthSuper[i]['value'] as num;
                           return pw.PointChartValue(i.toDouble(), v.toDouble());
