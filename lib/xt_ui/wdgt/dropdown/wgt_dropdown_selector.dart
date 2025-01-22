@@ -121,7 +121,7 @@ class _WgtDropdownSelectorState extends State<WgtDropdownSelector> {
               contentPadding: const EdgeInsets.symmetric(vertical: 0.0),
             ),
           ),
-          if (_controller.text.isNotEmpty)
+          if (_controller.text.isNotEmpty && enableEdit)
             Transform.translate(
               offset: const Offset(-34, 0),
               child: InkWell(
