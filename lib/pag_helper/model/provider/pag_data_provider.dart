@@ -169,6 +169,7 @@ class PagDataProvider extends ChangeNotifier {
         }
         _fhStat['refresh_trigger_time'] = refreshTriggerTime.toIso8601String();
       }
+      _fhStat['refresh_trigger_time'] = DateTime.now().toIso8601String();
 
       notifyListeners(); // Notify any listeners that data has changed
     } catch (e) {
@@ -235,9 +236,10 @@ class PagDataProvider extends ChangeNotifier {
     }
 
     if (scopeType == latestScopeType) {
-      if (DateTime.now().difference(lastScopeListUpdateTime).inSeconds < 5) {
+      if (DateTime.now().difference(lastScopeListUpdateTime).inSeconds < 1) {
         if (kDebugMode) {
-          print('updateScopeListFleetHealth: less than 5 seconds');
+          print(
+              'updateScopeListFleetHealth: less than 1 seconds, scopeType: $scopeType');
         }
         return;
       }
