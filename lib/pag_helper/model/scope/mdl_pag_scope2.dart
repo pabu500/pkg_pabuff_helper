@@ -105,6 +105,22 @@ class MdlPagScopeProfile {
     return effectiveScopeStr;
   }
 
+  String getLeafScopeLabel() {
+    if (locationGroupProfile != null) {
+      return locationGroupProfile!.label;
+    }
+    if (buildingProfile != null) {
+      return buildingProfile!.label;
+    }
+    if (siteProfile != null) {
+      return siteProfile!.label;
+    }
+    if (siteGroupProfile != null) {
+      return siteGroupProfile!.label;
+    }
+    return projectProfile!.label;
+  }
+
   int getProjectTtimezone() {
     assert(projectProfile != null);
     return projectProfile!.timezone;
