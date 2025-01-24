@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 enum PagTheme {
   pagNeo,
   pagNeoLight,
+  pagVividDark,
+  pagVididLight,
+  pagMinimalDark,
+  pagMinimalLight,
 }
 
 enum PagWgt {

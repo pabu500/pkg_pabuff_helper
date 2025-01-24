@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import '../../model/acl/mdl_pag_role.dart';
 import '../../model/mdl_pag_app_config.dart';
 import '../../model/provider/pag_data_provider.dart';
+import '../../model/provider/pag_theme_provider.dart';
 import 'wgt_role_selector.dart';
 
 class UserMenu extends StatefulWidget {
@@ -38,7 +39,7 @@ class _UserMenuState extends State<UserMenu> {
 
   @override
   Widget build(BuildContext context) {
-    ThemeProvider themeNotifier = Provider.of<ThemeProvider>(context);
+    PagThemeProvider themeNotifier = Provider.of<PagThemeProvider>(context);
 
     bool isLoggedIn = true;
     MdlPagUser? user = Provider.of<PagUserProvider>(context).currentUser;
@@ -76,7 +77,7 @@ class _UserMenuState extends State<UserMenu> {
   Widget getUserMenu(
     bool checkProfile,
     bool isLoggedIn,
-    ThemeProvider themeNotifier,
+    PagThemeProvider themeNotifier,
   ) {
     return PopupMenuButton<String>(
       color: Theme.of(context).colorScheme.surface,
@@ -159,7 +160,7 @@ class _UserMenuState extends State<UserMenu> {
 void onSelected(
   BuildContext context,
   String item,
-  ThemeProvider themeNotifier,
+  PagThemeProvider themeNotifier,
 ) {
   // ThemeModel themeNotifier = Provider.of<ThemeModel>(context);
   switch (item) {
