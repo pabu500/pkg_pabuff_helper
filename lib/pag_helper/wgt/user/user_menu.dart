@@ -18,10 +18,12 @@ class UserMenu extends StatefulWidget {
     super.key,
     required this.appConfig,
     required this.onRoleSelected,
+    this.showTheme = true,
   });
 
   final MdlPagAppConfig appConfig;
   final Function(MdlPagRole) onRoleSelected;
+  final bool showTheme;
 
   @override
   State<UserMenu> createState() => _UserMenuState();
@@ -119,24 +121,25 @@ class _UserMenuState extends State<UserMenu> {
         //   value: 'settings',
         //   child: Text('Settings'),
         // ),
-        PopupMenuItem<String>(
-          value: 'theme',
-          child: Row(
-            children: [
-              themeNotifier.isDark
-                  ? Icon(
-                      Icons.wb_sunny,
-                      color: Theme.of(context).primaryColorLight,
-                    )
-                  : Icon(
-                      Icons.nightlight_round,
-                      color: Theme.of(context).primaryColorDark,
-                    ),
-              const SizedBox(width: 8),
-              Text(themeNotifier.isDark ? "Light Mode" : "Dark Mode"),
-            ],
+        if (widget.showTheme)
+          PopupMenuItem<String>(
+            value: 'theme',
+            child: Row(
+              children: [
+                themeNotifier.isDark
+                    ? Icon(
+                        Icons.wb_sunny,
+                        color: Theme.of(context).primaryColorLight,
+                      )
+                    : Icon(
+                        Icons.nightlight_round,
+                        color: Theme.of(context).primaryColorDark,
+                      ),
+                const SizedBox(width: 8),
+                Text(themeNotifier.isDark ? "Light Mode" : "Dark Mode"),
+              ],
+            ),
           ),
-        ),
         if (isLoggedIn) const PopupMenuDivider(),
         if (isLoggedIn)
           PopupMenuItem<String>(

@@ -8,7 +8,7 @@ const int defaultTopStatCount = 6;
 const int defaultMainPanelRowCount = 3;
 
 const int defaultTopStatGridWidth = 21;
-const int defaultTopStatGridHeight = 9;
+const int defaultTopStatGridHeight = 11;
 
 const int defaultMainPanelGridWidth = 63;
 const int defaultMainPanelGridHeight = 16;

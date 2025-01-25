@@ -7,9 +7,8 @@ class PagThemeProvider extends ChangeNotifier {
   bool get isDark => _preferences.isDark;
 
   //setter for isDark
-  set isDark(bool value) {
-    _preferences.isDark = value;
-    _preferences.setTheme(value, _preferences.themeKey);
+  set isDark(bool isDark) {
+    _preferences.setThemeIsDark(isDark);
     notifyListeners();
   }
 
@@ -18,11 +17,22 @@ class PagThemeProvider extends ChangeNotifier {
       isDark: isDark,
       themeKey: themeKey,
     );
-    getPreferences();
+    // getPref();
   }
 
-  getPreferences() async {
-    _preferences = await _preferences.getPref();
+  String getThemeKey() {
+    _preferences.getPref();
+
+    return _preferences.themeKey;
+  }
+
+  setPrefThemeKey({required String themeKey}) {
+    _preferences.setThemeKey(themeKey);
+    notifyListeners();
+  }
+
+  setPrefIsDark({required bool isDark}) {
+    _preferences.setThemeIsDark(isDark);
     notifyListeners();
   }
 }
@@ -36,9 +46,14 @@ class MdlThemePref {
     required this.themeKey,
   });
 
-  setTheme(bool value, String themeKey) async {
-    prefs.setBool("theme_is_dark", value);
+  setThemeKey(String themeKey) async {
+    this.themeKey = themeKey;
     prefs.setString("theme_key", themeKey);
+  }
+
+  setThemeIsDark(bool isDark) async {
+    this.isDark = isDark;
+    prefs.setBool("theme_is_dark", isDark);
   }
 
   Future<MdlThemePref> getPref() async {
