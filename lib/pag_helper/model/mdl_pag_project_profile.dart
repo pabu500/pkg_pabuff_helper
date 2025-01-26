@@ -197,7 +197,7 @@ class MdlPagProjectProfile {
     return false;
   }
 
-  MdlPagPageConfig getPageConfig(String appContextName, String pageName) {
+  MdlPagPageConfig? getPageConfig(String appContextName, String pageName) {
     if (kDebugMode) {
       print(
           'getPageConfig: looking for pageConfig: appCtx:$appContextName, pr:$pageName');
@@ -211,7 +211,8 @@ class MdlPagProjectProfile {
         }
       }
     }
-    throw Exception('Page config not found');
+    // throw Exception('Page config not found');
+    return null;
   }
 
   PaymentModeSetting? getStripePaymentSetting() {

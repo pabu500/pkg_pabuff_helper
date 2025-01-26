@@ -52,6 +52,7 @@ class MdlListColController {
   bool isDetailKey;
   bool isUnique;
   bool isClickCopy;
+  bool isPaneKey;
   Color? colColor;
   Color? successColor;
   Color? errorColor;
@@ -87,6 +88,7 @@ class MdlListColController {
     this.isUnique = false,
     this.isDetailKey = false,
     this.isClickCopy = false,
+    this.isPaneKey = false,
     this.colColor,
     this.successColor,
     this.errorColor,
@@ -293,6 +295,16 @@ class MdlListColController {
       }
     }
 
+    bool isPaneKey = false;
+    if (json['is_pane_key'] != null) {
+      dynamic isPaneKeyValue = json['is_pane_key'];
+      if (isPaneKeyValue is bool) {
+        isPaneKey = isPaneKeyValue;
+      } else if (isPaneKeyValue is String) {
+        isPaneKey = isPaneKeyValue.toLowerCase() == 'true';
+      }
+    }
+
     return MdlListColController(
       colKey: colKey,
       joinKey: json['join_key'],
@@ -318,6 +330,7 @@ class MdlListColController {
       isClickCopy: isClickCopy,
       valueList: valueList,
       getCustomWidget: getCustomWidget,
+      isPaneKey: isPaneKey,
     );
   }
 
