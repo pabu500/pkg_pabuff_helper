@@ -451,14 +451,12 @@ class WgtMultiParaBarChartState extends State<WgtMultiParaBarChart> {
         offset: widget.xOffset ?? Offset(0, widget.xSpace),
         child: Transform.rotate(
           angle: widget.bottomTextAngle ?? 4 * pi / 12,
-          child: SizedBox(
+          child: Container(
             width: widget.xLabelWidth,
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                xTitle, // xTitles[value.toInt()],
-                style: style,
-              ),
+            alignment: Alignment.centerLeft,
+            child: Text(
+              xTitle, // xTitles[value.toInt()],
+              style: style,
             ),
           ),
         ),

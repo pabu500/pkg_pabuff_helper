@@ -58,7 +58,7 @@ class MdlThemePref {
 
   Future<MdlThemePref> getPref() async {
     isDark = prefs.getBool("theme_is_dark") ?? true;
-    themeKey = prefs.getString("theme_key") ?? "theme";
+    themeKey = prefs.getString("theme_key") ?? "minimal";
     return this;
   }
 }

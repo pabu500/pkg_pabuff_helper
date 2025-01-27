@@ -39,14 +39,14 @@ MdlPagAppContext appCtxEms = MdlPagAppContext(
     getMenueItem(PagPageRoute.meterManager),
     getMenueItem(PagPageRoute.tenantManager),
     getMenueItem(PagPageRoute.billingManager),
-    getMenueItem(PagPageRoute.emsTaskReportManager),
+    // getMenueItem(PagPageRoute.emsTaskReportManager),
   ],
   routeList: [
     PagPageRoute.emsDashboard,
     PagPageRoute.meterManager,
     PagPageRoute.tenantManager,
     PagPageRoute.billingManager,
-    PagPageRoute.emsTaskReportManager,
+    // PagPageRoute.emsTaskReportManager,
   ],
 );
 MdlPagAppContext appCtxEvs = MdlPagAppContext(
