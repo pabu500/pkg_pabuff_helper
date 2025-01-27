@@ -7,6 +7,8 @@ enum PagTopStatType {
   CONSOLE_HOME_TOTAL_SITE_COUNT,
   CONSOLE_HOME_PROJECT_SITE_COUNT,
   EMS_USAGE_TOTAL_E,
+  EMS_USAGE_TOTAL_E_MAIN,
+  EMS_USAGE_TOTAL_E_SUB,
   EMS_USAGE_TOTAL_W,
   EMS_USAGE_TOTAL_B,
   EMS_USAGE_TOTAL_G,
@@ -78,6 +80,12 @@ String getTopStatLabel(PagTopStatType topStatType, {String suffix = ''}) {
       break;
     case PagTopStatType.EMS_USAGE_TOTAL_E:
       label = 'E Usage';
+      break;
+    case PagTopStatType.EMS_USAGE_TOTAL_E_MAIN:
+      label = 'E Usage Main';
+      break;
+    case PagTopStatType.EMS_USAGE_TOTAL_E_SUB:
+      label = 'E Usage Sub';
       break;
     case PagTopStatType.EMS_USAGE_TOTAL_W:
       label = 'W Usage';
