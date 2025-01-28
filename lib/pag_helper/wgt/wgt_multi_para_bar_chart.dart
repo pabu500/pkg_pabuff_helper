@@ -10,6 +10,7 @@ class WgtMultiParaBarChart extends StatefulWidget {
     super.key,
     this.chartKey,
     required this.chartData,
+    this.groupType = 'group', // 'group' or 'stack'
     this.ratio = 2.1,
     this.maxY,
     this.skipOddXTitle = false,
@@ -62,6 +63,7 @@ class WgtMultiParaBarChart extends StatefulWidget {
 
   final UniqueKey? chartKey;
   final double ratio;
+  final String groupType;
   final Color barColor;
   final Color tooltipTextColor;
   final Color tooltipTimeColor;
@@ -126,7 +128,9 @@ class WgtMultiParaBarChartState extends State<WgtMultiParaBarChart> {
     for (Map<String, dynamic> groupBars in widget.chartData) {
       int x = groupBars['x'];
       List<Map<String, dynamic>> groupBarList = groupBars['groupBarList'];
-      final barGroup = _makeGropData(x, groupBarList);
+      final barGroup = widget.groupType == 'group'
+          ? _makeGroupData(x, groupBarList)
+          : _makeStackGroupData(x, groupBarList);
       _rawBarGroups.add(barGroup);
     }
 
@@ -158,7 +162,7 @@ class WgtMultiParaBarChartState extends State<WgtMultiParaBarChart> {
     }
   }
 
-  BarChartGroupData _makeGropData(
+  BarChartGroupData _makeGroupData(
       int x, List<Map<String, dynamic>> groupBarList) {
     List<BarChartRodData> barRods = [];
     for (Map<String, dynamic> groupBars in groupBarList) {
@@ -171,6 +175,37 @@ class WgtMultiParaBarChartState extends State<WgtMultiParaBarChart> {
     return BarChartGroupData(
       barsSpace: widget.barSpace,
       x: x,
+      barRods: barRods,
+    );
+  }
+
+  BarChartGroupData _makeStackGroupData(
+      int x, List<Map<String, dynamic>> groupBarList) {
+    List<BarChartRodData> barRods = [];
+    double toY = 0;
+    for (Map<String, dynamic> groupBars in groupBarList) {
+      if (groupBars['y'] as double > toY) {
+        toY = groupBars['y'] as double;
+      }
+    }
+    List<BarChartRodStackItem> rodStackItems = [];
+    for (Map<String, dynamic> groupBars in groupBarList) {
+      BarChartRodStackItem rodStackItem = BarChartRodStackItem(
+          0, groupBars['y'] as double, groupBars['color'] as Color);
+
+      rodStackItems.add(rodStackItem);
+    }
+
+    BarChartRodData barData = BarChartRodData(
+      toY: toY,
+      width: widget.barWidth,
+      rodStackItems: rodStackItems,
+    );
+    barRods.add(barData);
+
+    return BarChartGroupData(
+      x: x,
+      barsSpace: widget.barSpace,
       barRods: barRods,
     );
   }
@@ -203,29 +238,6 @@ class WgtMultiParaBarChartState extends State<WgtMultiParaBarChart> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             verticalSpaceTiny,
-            // Row(
-            //   mainAxisSize: MainAxisSize.min,
-            //   children: <Widget>[
-            //     makeTransactionsIcon(),
-            //     const SizedBox(
-            //       width: 38,
-            //     ),
-            //     const Text(
-            //       'Transactions',
-            //       style: TextStyle(color: Colors.white, fontSize: 22),
-            //     ),
-            //     const SizedBox(
-            //       width: 4,
-            //     ),
-            //     const Text(
-            //       'state',
-            //       style: TextStyle(color: Color(0xff77839a), fontSize: 16),
-            //     ),
-            //   ],
-            // ),
-            // const SizedBox(
-            //   height: 38,
-            // ),
             Expanded(
               child: BarChart(
                 BarChartData(
