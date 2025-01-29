@@ -13,6 +13,7 @@ class WgtDashControl extends StatefulWidget {
     this.onUpdateMainMetersOnly,
     this.iniLookbackType = LookbackType.last_24h,
     this.iniMeterType = MeterType.electricity1p,
+    this.iniMainSubMeterSel = const {'main': true, 'sub': true},
     // this.mainMetersOnly = true,
     this.mainOrSub = 'main',
     required this.lookbackTyps,
@@ -22,6 +23,8 @@ class WgtDashControl extends StatefulWidget {
     this.offsetWhenShrinked = 0,
     this.panelTitle = '',
     this.enableControl = true,
+    this.showMainMetersSwitch = false,
+    this.onUpdateMainSubMeterSel,
   });
 
   final Function(LookbackType) onUpdateLookbackType;
@@ -29,6 +32,7 @@ class WgtDashControl extends StatefulWidget {
   final Function(String)? onUpdateMainMetersOnly;
   final LookbackType iniLookbackType;
   final MeterType iniMeterType;
+  final Map<String, bool> iniMainSubMeterSel;
   final List<LookbackType> lookbackTyps;
   final List<MeterType> meterTypes;
   final EdgeInsets marginWhenShrinked;
@@ -37,6 +41,8 @@ class WgtDashControl extends StatefulWidget {
   // final bool mainMetersOnly;
   final String mainOrSub;
   final bool enableControl;
+  final bool showMainMetersSwitch;
+  final Function(Map<String, bool>)? onUpdateMainSubMeterSel;
 
   @override
   State<WgtDashControl> createState() => _WgtDashControlState();
@@ -49,6 +55,9 @@ class _WgtDashControlState extends State<WgtDashControl> {
   late MeterType _selectedMeterType;
   // late bool _mainMetersOnly;
   late String _mainOrSub;
+
+  late bool _mainMeterSelected = widget.iniMainSubMeterSel['main'] ?? true;
+  late bool _subMeterSelected = widget.iniMainSubMeterSel['sub'] ?? true;
 
   @override
   void initState() {
@@ -85,7 +94,7 @@ class _WgtDashControlState extends State<WgtDashControl> {
                         child: Icon(
                           // CupertinoIcons.gear_solid,
                           Symbols.more_horiz,
-                          color: Theme.of(context).hintColor.withOpacity(0.35),
+                          color: Theme.of(context).hintColor.withAlpha(80),
                           size: 25,
                         ),
                       ),
@@ -110,7 +119,7 @@ class _WgtDashControlState extends State<WgtDashControl> {
                   borderRadius: BorderRadius.circular(8),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withAlpha(30),
                       spreadRadius: 3,
                       blurRadius: 5,
                       offset: const Offset(1, 3), // changes position of shadow
@@ -230,8 +239,7 @@ class _WgtDashControlState extends State<WgtDashControl> {
                           Text(
                             'Sub',
                             style: TextStyle(
-                              color:
-                                  Theme.of(context).hintColor.withOpacity(0.7),
+                              color: Theme.of(context).hintColor.withAlpha(180),
                               fontSize: 12,
                             ),
                           ),
@@ -258,22 +266,22 @@ class _WgtDashControlState extends State<WgtDashControl> {
                               activeTrackColor: Theme.of(context)
                                   .colorScheme
                                   .primary
-                                  .withOpacity(0.7),
+                                  .withAlpha(180),
                               inactiveThumbColor: Colors.white,
                               inactiveTrackColor:
-                                  Theme.of(context).hintColor.withOpacity(0.35),
+                                  Theme.of(context).hintColor.withAlpha(80),
                             ),
                           ),
                           Text(
                             'Main',
                             style: TextStyle(
-                              color:
-                                  Theme.of(context).hintColor.withOpacity(0.7),
+                              color: Theme.of(context).hintColor.withAlpha(180),
                               fontSize: 12,
                             ),
                           ),
                         ],
                       ),
+                    if (widget.showMainMetersSwitch) getMainMeterSwitcher(),
                     horizontalSpaceSmall,
                   ],
                 ),
@@ -287,11 +295,94 @@ class _WgtDashControlState extends State<WgtDashControl> {
                 },
                 child: Icon(
                   Icons.cancel,
-                  color: Theme.of(context).hintColor.withOpacity(0.21),
+                  color: Theme.of(context).hintColor.withAlpha(50),
                   size: 25,
                 ),
               ),
             ],
           );
+  }
+
+  Widget getMainMeterSwitcher() {
+    bool enableMainMeterSelect = true;
+    if (!_subMeterSelected && _mainMeterSelected) {
+      enableMainMeterSelect = false;
+    }
+    bool enableSubMeterSelect = true;
+    if (!_mainMeterSelected && _subMeterSelected) {
+      enableSubMeterSelect = false;
+    }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primary.withAlpha(180),
+        borderRadius: BorderRadius.circular(5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(30),
+            spreadRadius: 3,
+            blurRadius: 5,
+            offset: const Offset(1, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // check box
+          Row(
+            children: [
+              Checkbox(
+                value: _mainMeterSelected,
+                onChanged: !enableMainMeterSelect
+                    ? null
+                    : (value) {
+                        setState(() {
+                          _mainMeterSelected = value!;
+                        });
+                        widget.onUpdateMainSubMeterSel?.call({
+                          'main': value!,
+                          'sub': _subMeterSelected,
+                        });
+                      },
+              ),
+              Text('Main',
+                  style: TextStyle(
+                      color: enableMainMeterSelect
+                          ? Theme.of(context).colorScheme.onPrimary
+                          : Theme.of(context)
+                              .colorScheme
+                              .onPrimary
+                              .withAlpha(130))),
+            ],
+          ),
+          Row(
+            children: [
+              Checkbox(
+                value: _subMeterSelected,
+                onChanged: !enableSubMeterSelect
+                    ? null
+                    : (value) {
+                        setState(() {
+                          _subMeterSelected = value!;
+                        });
+                        widget.onUpdateMainSubMeterSel?.call({
+                          'main': _mainMeterSelected,
+                          'sub': value!,
+                        });
+                      },
+              ),
+              Text('Sub',
+                  style: TextStyle(
+                      color: enableSubMeterSelect
+                          ? Theme.of(context).colorScheme.onPrimary
+                          : Theme.of(context)
+                              .colorScheme
+                              .onPrimary
+                              .withAlpha(130))),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }
