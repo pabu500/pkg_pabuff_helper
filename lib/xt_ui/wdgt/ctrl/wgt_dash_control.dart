@@ -1,4 +1,5 @@
 import 'package:buff_helper/pkg_buff_helper.dart';
+import 'package:buff_helper/xt_ui/wdgt/file/wgt_save_table.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -24,7 +25,9 @@ class WgtDashControl extends StatefulWidget {
     this.panelTitle = '',
     this.enableControl = true,
     this.showMainMetersSwitch = false,
+    this.showDownload = false,
     this.onUpdateMainSubMeterSel,
+    this.getList,
   });
 
   final Function(LookbackType) onUpdateLookbackType;
@@ -42,7 +45,9 @@ class WgtDashControl extends StatefulWidget {
   final String mainOrSub;
   final bool enableControl;
   final bool showMainMetersSwitch;
+  final bool showDownload;
   final Function(Map<String, bool>)? onUpdateMainSubMeterSel;
+  final List<List<dynamic>> Function()? getList;
 
   @override
   State<WgtDashControl> createState() => _WgtDashControlState();
@@ -161,7 +166,7 @@ class _WgtDashControlState extends State<WgtDashControl> {
                         widget.onUpdateLookbackType(_selectedLookbackType);
                       },
                     ),
-                    if (widget.meterTypes.isNotEmpty) horizontalSpaceSmall,
+                    if (widget.meterTypes.isNotEmpty) horizontalSpaceTiny,
                     if (widget.meterTypes.isNotEmpty)
                       WgtMeterTypeSelector(
                         enableControl: widget.enableControl,
@@ -282,6 +287,7 @@ class _WgtDashControlState extends State<WgtDashControl> {
                         ],
                       ),
                     if (widget.showMainMetersSwitch) getMainMeterSwitcher(),
+                    if (widget.showDownload) getDownload(),
                     horizontalSpaceSmall,
                   ],
                 ),
@@ -328,7 +334,6 @@ class _WgtDashControlState extends State<WgtDashControl> {
       ),
       child: Row(
         children: [
-          // check box
           Row(
             children: [
               Checkbox(
@@ -382,6 +387,31 @@ class _WgtDashControlState extends State<WgtDashControl> {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget getDownload() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5),
+      margin: const EdgeInsets.only(left: 8),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primary.withAlpha(180),
+        borderRadius: BorderRadius.circular(5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(30),
+            spreadRadius: 3,
+            blurRadius: 5,
+            offset: const Offset(1, 3),
+          ),
+        ],
+      ),
+      child: WgtSaveTable(
+        iconSize: 20,
+        color: Theme.of(context).colorScheme.onPrimary.withAlpha(210),
+        getList: widget.getList ?? () => null,
+        fileName: makeReportName('trending_stat', null, null, null),
       ),
     );
   }

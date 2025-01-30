@@ -1,4 +1,3 @@
-// import 'package:evs2op/ext/fl_chart/resources/app_resources.dart';
 import 'dart:math';
 
 import 'package:buff_helper/pkg_buff_helper.dart';
@@ -28,8 +27,8 @@ class WgtMultiParaBarChart extends StatefulWidget {
     this.commaSeparated = false,
     this.maxVal,
     this.showKonY,
-    this.barWidth = 5,
-    this.barSpace = 3,
+    this.barWidth,
+    this.barSpace,
     this.yDecimal = 0,
     this.showMaxYValue = false,
     this.showXTitle = true,
@@ -40,6 +39,8 @@ class WgtMultiParaBarChart extends StatefulWidget {
     this.hideEdgeXTitle = true,
     this.xLabelWidth,
     this.xOffset,
+    this.padding = const EdgeInsets.all(0),
+    this.barColorList,
     Color? barColor,
     Color? tooltipTextColor,
     Color? tooltipTimeColor,
@@ -74,8 +75,8 @@ class WgtMultiParaBarChart extends StatefulWidget {
   final Color bottomTouchedTextColor;
   final String? tooltipTimeFormat;
   final List<Map<String, dynamic>> chartData;
-  final double barWidth;
-  final double barSpace;
+  final double? barWidth;
+  final double? barSpace;
   final double? maxY;
   final String xTimeFormat;
   final double xSpace;
@@ -101,6 +102,8 @@ class WgtMultiParaBarChart extends StatefulWidget {
   final bool timestampOnSecondLine;
   final double? xLabelWidth;
   final Offset? xOffset;
+  final EdgeInsets padding;
+  final List<Color>? barColorList;
 
   final Color avgColor = Colors.orange;
   @override
@@ -111,8 +114,10 @@ class WgtMultiParaBarChartState extends State<WgtMultiParaBarChart> {
   UniqueKey? _chartKey;
   final double width = 7;
 
-  late final List<BarChartGroupData> _rawBarGroups;
-  late List<BarChartGroupData> _showingBarGroups;
+  double? _chartWidth;
+
+  final List<BarChartGroupData> _rawBarGroups = [];
+  List<BarChartGroupData> _showingBarGroups = [];
 
   int _touchedGroupIndex = -1;
 
@@ -123,14 +128,25 @@ class WgtMultiParaBarChartState extends State<WgtMultiParaBarChart> {
   final bool _fitInsideBottomTitle = false;
   final bool _fitInsideLeftTitle = false;
 
+  late double _barWidth = widget.barWidth ?? 5;
+
   void _loadChartData() {
     _rawBarGroups.clear();
+
     for (Map<String, dynamic> groupBars in widget.chartData) {
       int x = groupBars['x'];
       List<Map<String, dynamic>> groupBarList = groupBars['groupBarList'];
+
+      bool useColorList = false;
+      if (widget.barColorList != null) {
+        if (widget.barColorList!.length == groupBarList.length) {
+          useColorList = true;
+        }
+      }
+
       final barGroup = widget.groupType == 'group'
           ? _makeGroupData(x, groupBarList)
-          : _makeStackGroupData(x, groupBarList);
+          : _makeStackGroupData(x, groupBarList, useColorList);
       _rawBarGroups.add(barGroup);
     }
 
@@ -146,7 +162,8 @@ class WgtMultiParaBarChartState extends State<WgtMultiParaBarChart> {
       }
     }
     _maxY = maxY;
-    _showingBarGroups = _rawBarGroups;
+    _showingBarGroups.clear();
+    _showingBarGroups.addAll(_rawBarGroups);
 
     //building xTitles
     _xTitles = [];
@@ -169,7 +186,7 @@ class WgtMultiParaBarChartState extends State<WgtMultiParaBarChart> {
       barRods.add(BarChartRodData(
         toY: groupBars['y'] as double,
         color: groupBars['color'] as Color,
-        width: widget.barWidth,
+        width: widget.barWidth ?? 5,
       ));
     }
     return BarChartGroupData(
@@ -180,7 +197,7 @@ class WgtMultiParaBarChartState extends State<WgtMultiParaBarChart> {
   }
 
   BarChartGroupData _makeStackGroupData(
-      int x, List<Map<String, dynamic>> groupBarList) {
+      int x, List<Map<String, dynamic>> groupBarList, bool useColorList) {
     List<BarChartRodData> barRods = [];
     double toY = 0;
     for (Map<String, dynamic> groupBars in groupBarList) {
@@ -188,18 +205,28 @@ class WgtMultiParaBarChartState extends State<WgtMultiParaBarChart> {
         toY = groupBars['y'] as double;
       }
     }
+
     List<BarChartRodStackItem> rodStackItems = [];
     for (Map<String, dynamic> groupBars in groupBarList) {
       BarChartRodStackItem rodStackItem = BarChartRodStackItem(
-          0, groupBars['y'] as double, groupBars['color'] as Color);
+        0,
+        groupBars['y'] as double,
+        useColorList
+            ? widget.barColorList![groupBarList.indexOf(groupBars)]
+            : groupBars['color'] as Color,
+      );
 
       rodStackItems.add(rodStackItem);
     }
 
     BarChartRodData barData = BarChartRodData(
       toY: toY,
-      width: widget.barWidth,
+      width: _barWidth,
       rodStackItems: rodStackItems,
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(3),
+        topRight: Radius.circular(3),
+      ),
     );
     barRods.add(barData);
 
@@ -214,12 +241,11 @@ class WgtMultiParaBarChartState extends State<WgtMultiParaBarChart> {
   void initState() {
     super.initState();
 
-    _rawBarGroups = [];
-    _showingBarGroups = [];
-    _loadChartData();
+    // _rawBarGroups = [];
+    // _showingBarGroups = [];
+    // _loadChartData();
     _chartKey = widget.chartKey;
-
-    _showingBarGroups = _rawBarGroups;
+    // _showingBarGroups = _rawBarGroups;
   }
 
   @override
@@ -228,138 +254,168 @@ class WgtMultiParaBarChartState extends State<WgtMultiParaBarChart> {
       if (_chartKey != widget.chartKey) {
         _chartKey = widget.chartKey;
         _loadChartData();
+        // Timer(const Duration(milliseconds: 100), () {
+        //   setState(() {});
+        // });
       }
     }
+
     return AspectRatio(
       aspectRatio: widget.ratio,
       child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            verticalSpaceTiny,
-            Expanded(
-              child: BarChart(
-                BarChartData(
-                  maxY: widget.maxY ?? _maxY,
-                  barTouchData: BarTouchData(
-                    touchTooltipData: BarTouchTooltipData(
-                      // tooltipBgColor: Colors.grey,
-                      // getTooltipItem: (a, b, c, d) => null,
-                      getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                        String yValue =
-                            rod.toY.toStringAsFixed(widget.yDecimal);
+        padding: widget.padding,
+        child: LayoutBuilder(builder: (context, constraints) {
+          if (_chartWidth == null && constraints.maxWidth > 0) {
+            int barCount = widget.chartData.length;
+            _chartWidth = constraints.maxWidth;
+            final barsSpace = widget.barSpace ?? 0.08 * _chartWidth! / barCount;
+            final wAdj = widget.reservedSizeLeft ?? 0.0;
+            _barWidth = ((_chartWidth! - wAdj) / barCount) - barsSpace;
 
-                        final timeText = getDateFromDateTimeStr(
-                            DateTime.fromMicrosecondsSinceEpoch(
-                                    group.x.toInt() * 1000)
-                                .toString(),
-                            format: widget.tooltipTimeFormat ?? 'MM-dd HH:mm');
+            _loadChartData();
+          }
 
-                        return BarTooltipItem(
-                          yValue + widget.yUnit,
-                          TextStyle(
-                            color: widget.tooltipTextColor,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          children: [
-                            TextSpan(
-                              text: widget.timestampOnSecondLine
-                                  ? '\n$timeText'
-                                  : ' $timeText',
-                              style: TextStyle(
-                                color: widget.tooltipTimeColor,
-                                fontWeight: FontWeight.normal,
-                                fontSize: 13,
-                                // fontWeight: FontWeight.w900,
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-                    touchCallback: (FlTouchEvent event, response) {
-                      if (response == null || response.spot == null) {
-                        setState(() {
-                          _touchedGroupIndex = -1;
-                          _showingBarGroups = List.of(_rawBarGroups);
-                        });
-                        return;
-                      }
-
-                      _touchedGroupIndex = response.spot!.touchedBarGroupIndex;
-
-                      setState(() {
-                        if (!event.isInterestedForInteractions) {
-                          _touchedGroupIndex = -1;
-                          _showingBarGroups = List.of(_rawBarGroups);
+          // barGroups = getBars(_touchedGroupIndex.toInt(), barWidth: barsWidth);
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              verticalSpaceTiny,
+              Expanded(
+                child: BarChart(
+                  BarChartData(
+                    barGroups: _showingBarGroups,
+                    maxY: widget.maxY ?? _maxY,
+                    borderData: FlBorderData(show: false),
+                    gridData: const FlGridData(show: false),
+                    barTouchData: BarTouchData(
+                      touchCallback: (FlTouchEvent event, response) {
+                        if (response == null || response.spot == null) {
+                          setState(() {
+                            _touchedGroupIndex = -1;
+                            _showingBarGroups = List.of(_rawBarGroups);
+                          });
                           return;
                         }
-                        _showingBarGroups = List.of(_rawBarGroups);
-                        if (_touchedGroupIndex != -1) {
-                          var sum = 0.0;
-                          for (final rod
-                              in _showingBarGroups[_touchedGroupIndex]
-                                  .barRods) {
-                            sum += rod.toY;
-                          }
-                          final avg = sum /
-                              _showingBarGroups[_touchedGroupIndex]
-                                  .barRods
-                                  .length;
 
-                          _showingBarGroups[_touchedGroupIndex] =
-                              _showingBarGroups[_touchedGroupIndex].copyWith(
-                            barRods: _showingBarGroups[_touchedGroupIndex]
-                                .barRods
-                                .map((rod) {
-                              return rod.copyWith(
-                                  toY: avg, color: widget.avgColor);
-                            }).toList(),
+                        _touchedGroupIndex =
+                            response.spot!.touchedBarGroupIndex;
+
+                        setState(() {
+                          if (!event.isInterestedForInteractions) {
+                            _touchedGroupIndex = -1;
+                            _showingBarGroups = List.of(_rawBarGroups);
+                            return;
+                          }
+                          _showingBarGroups = List.of(_rawBarGroups);
+                          if (_touchedGroupIndex != -1) {
+                            var sum = 0.0;
+                            for (final rod
+                                in _showingBarGroups[_touchedGroupIndex]
+                                    .barRods) {
+                              sum += rod.toY;
+                            }
+                            final avg = sum /
+                                _showingBarGroups[_touchedGroupIndex]
+                                    .barRods
+                                    .length;
+
+                            _showingBarGroups[_touchedGroupIndex] =
+                                _showingBarGroups[_touchedGroupIndex].copyWith(
+                              barRods: _showingBarGroups[_touchedGroupIndex]
+                                  .barRods
+                                  .map((rod) {
+                                return rod.copyWith(
+                                  toY: widget.groupType == 'group'
+                                      ? avg
+                                      : rod.toY,
+                                  color: widget.groupType == 'group'
+                                      ? widget.avgColor
+                                      : rod.color,
+                                  borderSide: BorderSide(
+                                    color: widget.avgColor,
+                                    width: 1.5,
+                                  ),
+                                  // width: _barWidth + 5,
+                                );
+                              }).toList(),
+                            );
+
+                            int a = 1;
+                          }
+                        });
+                      },
+                      touchTooltipData: BarTouchTooltipData(
+                        // tooltipBgColor: Colors.grey,
+                        // getTooltipItem: (a, b, c, d) => null,
+                        getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                          String yValue =
+                              rod.toY.toStringAsFixed(widget.yDecimal);
+
+                          final timeText = getDateFromDateTimeStr(
+                              DateTime.fromMicrosecondsSinceEpoch(
+                                      group.x.toInt() * 1000)
+                                  .toString(),
+                              format:
+                                  widget.tooltipTimeFormat ?? 'MM-dd HH:mm');
+
+                          return BarTooltipItem(
+                            yValue + widget.yUnit,
+                            TextStyle(
+                              color: widget.tooltipTextColor,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: widget.timestampOnSecondLine
+                                    ? '\n$timeText'
+                                    : ' $timeText',
+                                style: TextStyle(
+                                  color: widget.tooltipTimeColor,
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 13,
+                                  // fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                            ],
                           );
-                        }
-                      });
-                    },
-                  ),
-                  titlesData: FlTitlesData(
-                    show: true,
-                    rightTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    topTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: widget.showXTitle,
-                        getTitlesWidget: bottomTitles,
-                        reservedSize: widget.showXTitle
-                            ? widget.rereservedSizeBottom ?? 22
-                            : 0,
-                        // interval: 1,
+                        },
                       ),
                     ),
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: widget.showYTitle,
-                        reservedSize: widget.showYTitle
-                            ? widget.reservedSizeLeft ?? 40
-                            : 0,
-                        interval: widget.showYTitle ? null : 100000000,
-                        getTitlesWidget: leftTitles,
+                    titlesData: FlTitlesData(
+                      show: true,
+                      rightTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      topTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      bottomTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: widget.showXTitle,
+                          getTitlesWidget: bottomTitles,
+                          reservedSize: widget.showXTitle
+                              ? widget.rereservedSizeBottom ?? 22
+                              : 0,
+                          // interval: 1,
+                        ),
+                      ),
+                      leftTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: widget.showYTitle,
+                          reservedSize: widget.showYTitle
+                              ? widget.reservedSizeLeft ?? 40
+                              : 0,
+                          interval: widget.showYTitle ? null : 100000000,
+                          getTitlesWidget: leftTitles,
+                        ),
                       ),
                     ),
                   ),
-                  borderData: FlBorderData(
-                    show: false,
-                  ),
-                  barGroups: _showingBarGroups,
-                  gridData: const FlGridData(show: false),
                 ),
               ),
-            ),
-          ],
-        ),
+            ],
+          );
+        }),
       ),
     );
   }
