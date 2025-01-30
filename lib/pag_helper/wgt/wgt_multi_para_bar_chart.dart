@@ -35,12 +35,15 @@ class WgtMultiParaBarChart extends StatefulWidget {
     this.showYTitle = true,
     this.reservedSizeLeft,
     this.rereservedSizeBottom,
+    this.reservedSizeRight,
     this.bottomTextAngle,
     this.hideEdgeXTitle = true,
     this.xLabelWidth,
     this.xOffset,
     this.padding = const EdgeInsets.all(0),
     this.barColorList,
+    this.showBorder = false,
+    this.borderColor,
     Color? barColor,
     Color? tooltipTextColor,
     Color? tooltipTimeColor,
@@ -97,6 +100,7 @@ class WgtMultiParaBarChart extends StatefulWidget {
   final bool showYTitle;
   final double? reservedSizeLeft;
   final double? rereservedSizeBottom;
+  final double? reservedSizeRight;
   final double? bottomTextAngle;
   final bool hideEdgeXTitle;
   final bool timestampOnSecondLine;
@@ -104,7 +108,8 @@ class WgtMultiParaBarChart extends StatefulWidget {
   final Offset? xOffset;
   final EdgeInsets padding;
   final List<Color>? barColorList;
-
+  final bool showBorder;
+  final Color? borderColor;
   final Color avgColor = Colors.orange;
   @override
   State<StatefulWidget> createState() => WgtMultiParaBarChartState();
@@ -285,7 +290,14 @@ class WgtMultiParaBarChartState extends State<WgtMultiParaBarChart> {
                   BarChartData(
                     barGroups: _showingBarGroups,
                     maxY: widget.maxY ?? _maxY,
-                    borderData: FlBorderData(show: false),
+                    borderData: FlBorderData(
+                      show: widget.showBorder,
+                      border: Border.all(
+                        color:
+                            widget.borderColor ?? Theme.of(context).hintColor,
+                        width: 1,
+                      ),
+                    ),
                     gridData: const FlGridData(show: false),
                     barTouchData: BarTouchData(
                       touchCallback: (FlTouchEvent event, response) {
@@ -383,11 +395,17 @@ class WgtMultiParaBarChartState extends State<WgtMultiParaBarChart> {
                     ),
                     titlesData: FlTitlesData(
                       show: true,
-                      rightTitles: const AxisTitles(
-                        sideTitles: SideTitles(showTitles: false),
+                      rightTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          reservedSize: widget.reservedSizeRight ?? 0,
+                          getTitlesWidget: rightTitles,
+                        ),
                       ),
                       topTitles: const AxisTitles(
-                        sideTitles: SideTitles(showTitles: false),
+                        sideTitles: SideTitles(
+                          showTitles: false,
+                        ),
                       ),
                       bottomTitles: AxisTitles(
                         sideTitles: SideTitles(
@@ -448,6 +466,21 @@ class WgtMultiParaBarChartState extends State<WgtMultiParaBarChart> {
               : value.toStringAsFixed(widget.yDecimal),
           style: style,
           textAlign: TextAlign.center),
+    );
+  }
+
+  Widget rightTitles(double value, TitleMeta meta) {
+    final style = TextStyle(
+      color: widget.bottomTextColor,
+      fontSize: 13,
+    );
+    return SideTitleWidget(
+      axisSide: meta.axisSide,
+      space: 6,
+      fitInside: _fitInsideLeftTitle
+          ? SideTitleFitInsideData.fromTitleMeta(meta)
+          : SideTitleFitInsideData.disable(),
+      child: Text(' ', style: style, textAlign: TextAlign.center),
     );
   }
 

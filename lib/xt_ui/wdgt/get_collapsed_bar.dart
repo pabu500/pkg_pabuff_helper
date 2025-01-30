@@ -28,7 +28,7 @@ Widget getCollapsedBar({
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withAlpha(30),
             spreadRadius: 3,
             blurRadius: 5,
             offset: const Offset(1, 3), // changes position of shadow
@@ -48,7 +48,7 @@ Widget getCollapsedBar({
                 },
                 child: Icon(
                   Symbols.expand_circle_down,
-                  color: Theme.of(context).colorScheme.onPrimary,
+                  color: Theme.of(context).colorScheme.onPrimary.withAlpha(130),
                 ),
               ),
             ),

@@ -142,7 +142,7 @@ Map<DeviceStatus, Color>
   DeviceStatus.error: contentColorLightMagneta,
   DeviceStatus.alarm: contentColorLightRed,
   DeviceStatus.unknown: Colors.white,
-  DeviceStatus.INACTIVE: Colors.grey.shade100,
+  DeviceStatus.INACTIVE: Colors.grey.shade300,
 };
 
 Color getSensorStatusColor(DeviceStatus deviceStatus) {
@@ -150,7 +150,7 @@ Color getSensorStatusColor(DeviceStatus deviceStatus) {
 }
 
 Widget getSensorIcon(SensorType sensorType) {
-  Color iconColor = Colors.white.withOpacity(0.9);
+  Color iconColor = Colors.white.withAlpha(210);
   double iconSize = 25;
   return Icon(
     getSensorIconData(sensorType),

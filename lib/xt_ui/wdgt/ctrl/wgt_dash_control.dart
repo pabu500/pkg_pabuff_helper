@@ -26,6 +26,7 @@ class WgtDashControl extends StatefulWidget {
     this.enableControl = true,
     this.showMainMetersSwitch = false,
     this.showDownload = false,
+    this.showHidePanel = false,
     this.onUpdateMainSubMeterSel,
     this.getList,
   });
@@ -46,6 +47,7 @@ class WgtDashControl extends StatefulWidget {
   final bool enableControl;
   final bool showMainMetersSwitch;
   final bool showDownload;
+  final bool showHidePanel;
   final Function(Map<String, bool>)? onUpdateMainSubMeterSel;
   final List<List<dynamic>> Function()? getList;
 
@@ -136,6 +138,7 @@ class _WgtDashControlState extends State<WgtDashControl> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     horizontalSpaceTiny,
+                    // if (widget.showHidePanel) getHidePanelButton(),
                     // InkWell(
                     //   onTap: () {
                     //     setState(() {
@@ -307,6 +310,37 @@ class _WgtDashControlState extends State<WgtDashControl> {
               ),
             ],
           );
+  }
+
+  Widget getHidePanelButton() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5),
+      // margin: const EdgeInsets.only(right: 8),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primary.withAlpha(180),
+        borderRadius: BorderRadius.circular(5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(30),
+            spreadRadius: 3,
+            blurRadius: 5,
+            offset: const Offset(1, 3),
+          ),
+        ],
+      ),
+      child: InkWell(
+        onTap: () {
+          setState(() {
+            _shrinked = true;
+          });
+        },
+        child: Icon(
+          Icons.unfold_less,
+          color: Theme.of(context).colorScheme.onPrimary.withAlpha(210),
+          size: 20,
+        ),
+      ),
+    );
   }
 
   Widget getMainMeterSwitcher() {

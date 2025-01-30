@@ -268,6 +268,7 @@ class WgtPieChartState extends State<WgtPieChart> {
                   ),
                 ),
               ),
+              SizedBox(width: widget.middlePadding),
               widget.showIndicator
                   ? SizedBox(
                       width: widget.indicatorWidth,
