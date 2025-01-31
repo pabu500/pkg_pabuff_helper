@@ -166,10 +166,7 @@ class WgtPieChartState extends State<WgtPieChart> {
             // NOTE: the below line wil break the touch behavior
             // mainAxisSize: MainAxisSize.min,
             children: [
-              SizedBox(
-                width: widget.leftPadding ?? 0,
-                // height: 300,
-              ),
+              SizedBox(width: widget.leftPadding ?? 0),
               Expanded(
                 // fit: FlexFit.loose,
                 child: AspectRatio(
@@ -178,6 +175,9 @@ class WgtPieChartState extends State<WgtPieChart> {
                     children: [
                       PieChart(
                         PieChartData(
+                          centerSpaceRadius: widget.centerSize,
+                          sectionsSpace: 0.5,
+                          sections: showingSections(),
                           startDegreeOffset: widget.startDegreeOffset ?? -90,
                           pieTouchData: PieTouchData(
                             enabled: widget.enableTouch,
@@ -256,9 +256,6 @@ class WgtPieChartState extends State<WgtPieChart> {
                           borderData: FlBorderData(
                             show: false,
                           ),
-                          sectionsSpace: 0.5,
-                          centerSpaceRadius: widget.centerSize,
-                          sections: showingSections(),
                         ),
                       ),
                       Center(

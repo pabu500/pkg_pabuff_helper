@@ -35,6 +35,10 @@ class PagThemeProvider extends ChangeNotifier {
     _preferences.setThemeIsDark(isDark);
     notifyListeners();
   }
+
+  // Color getOnSurface(BuildContext context) {
+  //   return isDark ? Colors.white.withAlpha(230) : Colors.black.withAlpha(230);
+  // }
 }
 
 class MdlThemePref {
