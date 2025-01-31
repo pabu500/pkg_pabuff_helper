@@ -44,6 +44,8 @@ class WgtMultiParaBarChart extends StatefulWidget {
     this.barColorList,
     this.showBorder = false,
     this.borderColor,
+    this.border,
+    this.showGrid = false,
     Color? barColor,
     Color? tooltipTextColor,
     Color? tooltipTimeColor,
@@ -109,7 +111,9 @@ class WgtMultiParaBarChart extends StatefulWidget {
   final EdgeInsets padding;
   final List<Color>? barColorList;
   final bool showBorder;
+  final Border? border;
   final Color? borderColor;
+  final bool showGrid;
   final Color avgColor = Colors.orange;
   @override
   State<StatefulWidget> createState() => WgtMultiParaBarChartState();
@@ -292,13 +296,18 @@ class WgtMultiParaBarChartState extends State<WgtMultiParaBarChart> {
                     maxY: widget.maxY ?? _maxY,
                     borderData: FlBorderData(
                       show: widget.showBorder,
-                      border: Border.all(
-                        color:
-                            widget.borderColor ?? Theme.of(context).hintColor,
-                        width: 1,
-                      ),
+                      border: widget.border ??
+                          Border.all(
+                            color: widget.borderColor ??
+                                Theme.of(context).hintColor,
+                            width: 1,
+                          ),
                     ),
-                    gridData: const FlGridData(show: false),
+                    gridData: FlGridData(
+                      show: widget.showGrid,
+                      drawHorizontalLine: true,
+                      drawVerticalLine: false,
+                    ),
                     barTouchData: BarTouchData(
                       touchCallback: (FlTouchEvent event, response) {
                         if (response == null || response.spot == null) {
