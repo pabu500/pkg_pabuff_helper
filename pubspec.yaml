@@ -18,7 +18,7 @@ dependencies:
   flutter_svg: ^2.0.10+1
   toggle_switch: ^2.3.0
   file_picker: ^8.0.3
-  fl_chart: ^0.69.0
+  fl_chart: ^0.70.2
   material_symbols_icons: ^4.2801.0
   firebase_auth: ^5.1.0
   month_picker_dialog: ^5.1.3

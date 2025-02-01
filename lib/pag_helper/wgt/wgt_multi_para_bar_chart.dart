@@ -459,7 +459,8 @@ class WgtMultiParaBarChartState extends State<WgtMultiParaBarChart> {
       fontSize: 13,
     );
     return SideTitleWidget(
-      axisSide: meta.axisSide,
+      // axisSide: meta.axisSide,
+      meta: meta,
       space: 6,
       fitInside: _fitInsideLeftTitle
           ? SideTitleFitInsideData.fromTitleMeta(meta)
@@ -484,7 +485,8 @@ class WgtMultiParaBarChartState extends State<WgtMultiParaBarChart> {
       fontSize: 13,
     );
     return SideTitleWidget(
-      axisSide: meta.axisSide,
+      // axisSide: meta.axisSide,
+      meta: meta,
       space: 6,
       fitInside: _fitInsideLeftTitle
           ? SideTitleFitInsideData.fromTitleMeta(meta)
@@ -552,7 +554,8 @@ class WgtMultiParaBarChartState extends State<WgtMultiParaBarChart> {
 
     return SideTitleWidget(
       space: 0,
-      axisSide: meta.axisSide,
+      // axisSide: meta.axisSide,
+      meta: meta,
       fitInside: _fitInsideBottomTitle
           ? SideTitleFitInsideData.fromTitleMeta(meta, distanceFromEdge: 0)
           : SideTitleFitInsideData.disable(),

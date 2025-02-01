@@ -181,7 +181,8 @@ class _WgtHistoryBarChartState extends State<WgtHistoryBarChart> {
       fontSize: 13,
     );
     return SideTitleWidget(
-      axisSide: meta.axisSide,
+      meta: meta,
+      // axisSide: meta.axisSide,
       space: 6,
       fitInside: _fitInsideLeftTitle
           ? SideTitleFitInsideData.fromTitleMeta(meta)
@@ -240,7 +241,8 @@ class _WgtHistoryBarChartState extends State<WgtHistoryBarChart> {
 
     return SideTitleWidget(
       space: 0,
-      axisSide: meta.axisSide,
+      meta: meta,
+      // axisSide: meta.axisSide,
       fitInside: _fitInsideBottomTitle
           ? SideTitleFitInsideData.fromTitleMeta(meta, distanceFromEdge: 0)
           : SideTitleFitInsideData.disable(),
