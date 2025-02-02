@@ -9,6 +9,7 @@ const int msPerWeek = 7 * msPerDay;
 const int msPerMonth = 30 * msPerDay;
 
 DateFormat dateFormat = DateFormat("yyyy-MM-dd HH:mm:ss");
+DateFormat dateFormatMs = DateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
 String getReadableDuration(Duration duration) {
   if (duration.inHours > 1) {
@@ -323,4 +324,26 @@ String getIntervalTag(int intervalMinutes) {
     }
     return tag;
   }
+}
+
+String getFilenameSafeDateTimeStr(DateTime dateTime) {
+  return DateFormat('yyyyMMdd_HHmmss').format(dateTime);
+}
+
+String getFilenameSafeDateTimeStrFromTimestamp(int timestamp) {
+  return DateFormat('yyyyMMdd_HHmmss')
+      .format(DateTime.fromMillisecondsSinceEpoch(timestamp));
+}
+
+String getFilenameSafeDateTimeStrFromDateTimeStr(String dateTimeStr) {
+  int length = dateTimeStr.length;
+  if (length < 19) {
+    return '';
+  }
+  if (length > 19) {
+    dateTimeStr = dateTimeStr.substring(0, 19);
+  }
+  dateTimeStr = dateTimeStr.replaceFirst('T', ' ');
+
+  return DateFormat('yyyyMMdd_HHmmss').format(dateFormat.parse(dateTimeStr));
 }
