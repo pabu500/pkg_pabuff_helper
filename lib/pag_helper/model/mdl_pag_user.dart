@@ -15,7 +15,7 @@ import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 
 import '../def/scope_helper.dart';
-import 'scope/mdl_pag_scope2.dart';
+import 'scope/mdl_pag_scope_profile.dart';
 
 enum PagUserKey {
   none,

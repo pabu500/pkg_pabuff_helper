@@ -140,6 +140,10 @@ class MdlPagScopeProfile {
     }
   }
 
+  bool isAtScopeType(PagScopeType scopeType) {
+    return getScopeType() == scopeType;
+  }
+
   PagTreePartType getScopeTreePartType() {
     if (locationGroupProfile != null) {
       return PagTreePartType.locationGroup;
