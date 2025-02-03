@@ -1,6 +1,10 @@
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
 
+const String defaultThemeKey = "vivid";
+const bool defaultIsDark = false;
+const String defaultLayoutKey = "list";
+
 class PagThemeProvider extends ChangeNotifier {
   late MdlThemePref _preferences;
 
@@ -61,8 +65,8 @@ class MdlThemePref {
   }
 
   Future<MdlThemePref> getPref() async {
-    isDark = prefs.getBool("theme_is_dark") ?? true;
-    themeKey = prefs.getString("theme_key") ?? "minimal";
+    isDark = prefs.getBool("theme_is_dark") ?? defaultIsDark;
+    themeKey = prefs.getString("theme_key") ?? defaultThemeKey;
     return this;
   }
 }
