@@ -354,6 +354,7 @@ class MdlListColController {
     data['col_widget_type'] = colWidgetType.name;
     data['filter_widget_type'] = filterWidgetType.name;
     // data['editorWidgetType'] = editorWidgetType.name;
+    data['filter_group_type'] = filterGroupType.name;
 
     return data;
   }

@@ -107,6 +107,7 @@ class MdlPagListController /*extends ChangeNotifier*/ {
     data['filter_key_like_list'] = filterKeyLikeList;
     data['join_key_list'] = joinKeyList;
     data['enable_group_by'] = enableGroupBy.toString();
+    // data['item_kind'] = PagItemKind.values.byValue(itemType).name;
     return data;
   }
 
