@@ -144,6 +144,10 @@ class MdlPagScopeProfile {
     return getScopeType() == scopeType;
   }
 
+  bool isSmallerScope(PagScopeType scopeType) {
+    return scopeType.index > getScopeType().index;
+  }
+
   PagTreePartType getScopeTreePartType() {
     if (locationGroupProfile != null) {
       return PagTreePartType.locationGroup;
@@ -464,6 +468,22 @@ class MdlPagScopeProfile {
       return siteGroupProfile;
     }
     return projectProfile;
+  }
+
+  PagTreePartType getLeafTreePartType() {
+    if (locationGroupProfile != null) {
+      return PagTreePartType.locationGroup;
+    }
+    if (buildingProfile != null) {
+      return PagTreePartType.building;
+    }
+    if (siteProfile != null) {
+      return PagTreePartType.site;
+    }
+    if (siteGroupProfile != null) {
+      return PagTreePartType.siteGroup;
+    }
+    return PagTreePartType.project;
   }
 
   PagTreePartType getRootTreePartType() {
