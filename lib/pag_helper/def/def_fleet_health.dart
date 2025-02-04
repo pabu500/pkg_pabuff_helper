@@ -1,8 +1,8 @@
 import 'package:buff_helper/xt_ui/style/evs2_colors.dart';
 import 'package:flutter/material.dart';
 
-enum PagFleetHealthType {
-  lrt('lrt_too_old', 'LRT', pag2),
+enum PagFleetHealthIssueType {
+  lrt('lrt_too_old', 'LRT', Colors.orangeAccent),
   unknown('unknown', '?', Colors.grey),
   ;
 
@@ -10,9 +10,9 @@ enum PagFleetHealthType {
   final String tag;
   final Color color;
 
-  const PagFleetHealthType(this.label, this.tag, this.color);
+  const PagFleetHealthIssueType(this.label, this.tag, this.color);
 
-  static PagFleetHealthType byLabel(String? label) =>
+  static PagFleetHealthIssueType byLabel(String? label) =>
       enumByLabel(label, values, (e) => (e).label) ?? unknown;
 
   // static PagFleetHealthType byLabel(String? label) =>

@@ -1,4 +1,5 @@
 import 'package:buff_helper/pag_helper/def/pag_item_helper.dart';
+import 'package:buff_helper/pag_helper/def/scope_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 
@@ -140,7 +141,39 @@ class MdlPagListController /*extends ChangeNotifier*/ {
       {/*filterValueKey = 'label'*/
       String Function(MdlListColController)? getFilterValueKey}) {
     Map<String, dynamic> filterMap = {};
+
+    // colapse location filter to leaf scope
+    List<MdlListColController> listColControllerListLocation = [];
+    List<MdlListColController> listColControllerListNonLocation = [];
+    MdlListColController? colControllerLocationLeaf;
+
     for (var colController in listColControllerList) {
+      if (colController.filterValue == null) {
+        continue;
+      }
+      if (colController.filterGroupType == PagFilterGroupType.LOCATION) {
+        listColControllerListLocation.add(colController);
+      } else {
+        listColControllerListNonLocation.add(colController);
+      }
+    }
+    for (var colController in listColControllerListLocation) {
+      colControllerLocationLeaf ??= colController;
+
+      PagScopeType? leafScopeType = colControllerLocationLeaf.scopeType;
+      PagScopeType? currentScopeType = colController.scopeType;
+      if (isSmallerScope(currentScopeType!, leafScopeType!)) {
+        colControllerLocationLeaf = colController;
+      }
+    }
+
+    List<MdlListColController> listColControllerListFlitered = [];
+    listColControllerListFlitered.addAll(listColControllerListNonLocation);
+    if (colControllerLocationLeaf != null) {
+      listColControllerListFlitered.add(colControllerLocationLeaf);
+    }
+
+    for (var colController in listColControllerListFlitered) {
       if (colController.filterValue != null) {
         if (colController.joinKey != null) {
           filterMap[colController.joinKey!] = colController

@@ -53,7 +53,8 @@ Widget getTag2({
       tagLabel = portalType.tag;
       tagColor = portalType.color;
     } else if (configItem['col_key'] == 'issue_type_name') {
-      PagFleetHealthType issueType = PagFleetHealthType.values.byName(tagText);
+      PagFleetHealthIssueType issueType =
+          PagFleetHealthIssueType.values.byName(tagText);
       tagLabel = issueType.tag;
       tagColor = issueType.color;
     } else if (configItem['col_key'] == 'health') {

@@ -1,7 +1,7 @@
 import 'package:buff_helper/pag_helper/def/def_fleet_health.dart';
 
 class MdlPagFhStat {
-  PagFleetHealthType type;
+  PagFleetHealthIssueType type;
   List<Map<String, dynamic>> fhList = [];
   int unknownCount = 0;
   int normalCount = 0;
@@ -19,7 +19,8 @@ class MdlPagFhStat {
   //factory constructor
   factory MdlPagFhStat.fromJson(Map<String, dynamic> json) {
     String fhTypeStr = json['fh_type'] ?? 'unknown';
-    PagFleetHealthType fhType = PagFleetHealthType.values.byName(fhTypeStr);
+    PagFleetHealthIssueType fhType =
+        PagFleetHealthIssueType.values.byName(fhTypeStr);
 
     List<Map<String, dynamic>> fhList = [];
     int unknownCount = 0;

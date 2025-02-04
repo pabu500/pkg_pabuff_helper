@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../../def/scope_helper.dart';
+
 enum PagFilterWidgetType {
   INPUT,
   SELECT,
@@ -63,6 +65,7 @@ class MdlListColController {
           Map<String, dynamic> row, List<Map<String, dynamic>> fullList)?
       getCustomWidget;
   TextEditingController? filterWidgetController;
+  PagScopeType? scopeType;
 
   MdlListColController({
     required this.colKey,
@@ -96,6 +99,7 @@ class MdlListColController {
     this.getTag,
     bool? pinned,
     this.getCustomWidget,
+    this.scopeType,
   }) {
     pinned = pinned ?? false;
   }
@@ -305,6 +309,12 @@ class MdlListColController {
       }
     }
 
+    PagScopeType? scopeType;
+    if (filterGroupType == PagFilterGroupType.LOCATION) {
+      String scopeKey = colKey.replaceFirst('_label', '');
+      scopeType = PagScopeType.byKey(scopeKey);
+    }
+
     return MdlListColController(
       colKey: colKey,
       joinKey: json['join_key'],
@@ -331,6 +341,7 @@ class MdlListColController {
       valueList: valueList,
       getCustomWidget: getCustomWidget,
       isPaneKey: isPaneKey,
+      scopeType: scopeType,
     );
   }
 

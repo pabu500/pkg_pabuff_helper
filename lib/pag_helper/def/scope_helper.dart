@@ -2,28 +2,51 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 enum PagScopeType {
-  project('Project', Symbols.flag),
-  siteGroup('Site Group', Symbols.workspaces),
-  site('Site', Symbols.home_pin),
-  building('Building', Symbols.domain),
-  locationGroup('Location Group', Symbols.group_work),
-  location('Location', Symbols.location_on),
-  none('None', Symbols.help);
+  project('Project', 'project', Symbols.flag),
+  siteGroup('Site Group', 'site_group', Symbols.workspaces),
+  site('Site', 'site', Symbols.home_pin),
+  building('Building', 'building', Symbols.domain),
+  locationGroup('Location Group', 'location_group', Symbols.group_work),
+  location('Location', 'location', Symbols.location_on),
+  none('None', 'none', Symbols.help);
 
   const PagScopeType(
     this.label,
+    this.key,
     this.iconData,
   );
 
   final String label;
+  final String key;
   final IconData iconData;
 
   static PagScopeType byLabel(String? label) =>
       enumByLabel(label, values) ?? none;
+
+  static PagScopeType byKey(String? key) => enumByKey(key, values) ?? none;
 }
 
-T? enumByLabel<T extends Enum>(String? label, List<T> values) {
-  return label == null ? null : values.asNameMap()[label];
+T? enumByLabel<T extends Enum>(
+  String? label,
+  List<T> values,
+) {
+  if (label == null) return null;
+  for (var value in values) {
+    if (value is PagScopeType && value.label == label) {
+      return value as T;
+    }
+  }
+  return null;
+}
+
+T? enumByKey<T extends Enum>(String? key, List<T> values) {
+  if (key == null) return null;
+  for (var value in values) {
+    if (value is PagScopeType && value.key == key) {
+      return value as T;
+    }
+  }
+  return null;
 }
 
 PagScopeType getChildScopeType(PagScopeType parentScopeType) {
@@ -43,4 +66,8 @@ PagScopeType getChildScopeType(PagScopeType parentScopeType) {
     case PagScopeType.none:
       return PagScopeType.none;
   }
+}
+
+bool isSmallerScope(PagScopeType scopeType1, PagScopeType scopeType2) {
+  return scopeType1.index > scopeType2.index;
 }
