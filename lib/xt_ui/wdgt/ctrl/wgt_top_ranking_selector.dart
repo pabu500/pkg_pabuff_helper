@@ -1,28 +1,29 @@
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
 
-class WgtLookbackTypeSelector extends StatefulWidget {
-  const WgtLookbackTypeSelector({
+class WgtTopRankingSelector extends StatefulWidget {
+  const WgtTopRankingSelector({
     super.key,
-    required this.lookbackTyps,
+    required this.topSelectorValues,
     required this.iniSelection,
     required this.onUpdateSelection,
     this.enableControl = true,
+    this.showRightDivider = false,
   });
 
-  final List<LookbackType> lookbackTyps;
-  final LookbackType iniSelection;
-  final Function(LookbackType lookbackType) onUpdateSelection;
+  final List<String> topSelectorValues;
+  final String iniSelection;
+  final Function(String top) onUpdateSelection;
   final bool enableControl;
+  final bool showRightDivider;
 
   @override
-  State<WgtLookbackTypeSelector> createState() =>
-      _WgtLookbackTypeSelectorState();
+  State<WgtTopRankingSelector> createState() => _WgtTopRankingSelectorState();
 }
 
-class _WgtLookbackTypeSelectorState extends State<WgtLookbackTypeSelector> {
-  late LookbackType _currentSelection;
-  LookbackType? _currentHovering;
+class _WgtTopRankingSelectorState extends State<WgtTopRankingSelector> {
+  late String _currentSelection;
+  String? _currentHovering;
 
   @override
   void initState() {
@@ -35,27 +36,38 @@ class _WgtLookbackTypeSelectorState extends State<WgtLookbackTypeSelector> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        ...widget.lookbackTyps.map(
+        ...widget.topSelectorValues.map(
           (e) => _buildButton(e),
         ),
+        if (widget.showRightDivider)
+          Container(
+            margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+            decoration: BoxDecoration(
+              border: Border(
+                right: BorderSide(
+                  color: Theme.of(context).hintColor.withAlpha(50),
+                ),
+              ),
+            ),
+          ),
       ],
     );
   }
 
-  Widget _buildButton(LookbackType lookbackType) {
+  Widget _buildButton(String top) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 0),
       child: SizedBox(
-        height: _currentHovering == lookbackType ? 25 : 21,
-        width: _currentHovering == lookbackType ? 55 : 50,
+        height: _currentHovering == top ? 25 : 21,
+        width: _currentHovering == top ? 45 : 39,
         child: TextButton(
           onPressed: !widget.enableControl
               ? null
-              : _currentSelection == lookbackType
+              : _currentSelection == top
                   ? null
                   : () {
                       setState(() {
-                        _currentSelection = lookbackType;
+                        _currentSelection = top;
                       });
                       widget.onUpdateSelection(_currentSelection);
                     },
@@ -63,14 +75,14 @@ class _WgtLookbackTypeSelectorState extends State<WgtLookbackTypeSelector> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(5),
             ),
-            backgroundColor: _currentSelection == lookbackType
+            backgroundColor: _currentSelection == top
                 ? Theme.of(context).colorScheme.primary.withAlpha(210)
                 : Theme.of(context).hintColor.withAlpha(80),
           ),
           onHover: (value) {
             if (value) {
               setState(() {
-                _currentHovering = lookbackType;
+                _currentHovering = top;
               });
             } else {
               setState(() {
@@ -79,12 +91,12 @@ class _WgtLookbackTypeSelectorState extends State<WgtLookbackTypeSelector> {
             }
           },
           child: Text(
-            getLookbackTypeLabel(lookbackType),
+            getTopLabel(top),
             style: TextStyle(
-              color: _currentSelection == lookbackType
+              color: _currentSelection == top
                   ? Colors.white
                   : Theme.of(context).colorScheme.onPrimary.withAlpha(210),
-              fontSize: _currentHovering == lookbackType ? 16 : 13,
+              fontSize: _currentHovering == top ? 16 : 13,
               fontWeight: FontWeight.bold,
             ),
           ),

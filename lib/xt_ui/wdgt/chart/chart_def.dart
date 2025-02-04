@@ -56,7 +56,7 @@ String getLookbackTypeLabel(LookbackType lookbackType) {
     case LookbackType.last_7d:
       return '7d';
     case LookbackType.last_14d:
-      return '14d';
+      return '2w';
     case LookbackType.mtd:
       return 'MTD';
     case LookbackType.all:
@@ -79,4 +79,8 @@ String getLookbackTypeTimeFormat(LookbackType lookbackType) {
     default:
       return '';
   }
+}
+
+String getTopLabel(String top) {
+  return top;
 }

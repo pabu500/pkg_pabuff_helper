@@ -97,8 +97,9 @@ class _WgtCommButtonState extends State<WgtCommButton> {
                 Text(
                   widget.label,
                   style: widget.labelStyle ??
-                      const TextStyle(
-                        color: pagCallToActionText,
+                      TextStyle(
+                        color: pagCallToActionText ??
+                            Theme.of(context).colorScheme.onSecondary,
                         fontSize: 16,
                       ),
                 ),

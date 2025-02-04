@@ -1,4 +1,5 @@
 import 'package:buff_helper/pkg_buff_helper.dart';
+import 'package:buff_helper/xt_ui/wdgt/ctrl/wgt_top_ranking_selector.dart';
 import 'package:buff_helper/xt_ui/wdgt/file/wgt_save_table.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -14,7 +15,8 @@ class WgtDashControl extends StatefulWidget {
     this.onUpdateMainMetersOnly,
     this.iniLookbackType = LookbackType.last_24h,
     this.iniMeterType = MeterType.electricity1p,
-    this.iniMainSubMeterSel = const {'main': true, 'sub': true},
+    this.iniMainSubMeterSelList = const ['main', 'sub'],
+    this.iniTopSelectorValue = '10',
     // this.mainMetersOnly = true,
     this.mainOrSub = 'main',
     required this.lookbackTyps,
@@ -24,10 +26,14 @@ class WgtDashControl extends StatefulWidget {
     this.offsetWhenShrinked = 0,
     this.panelTitle = '',
     this.enableControl = true,
-    this.showMainMetersSwitch = false,
+    this.showMainMeterSwitch = false,
+    this.showMainMeterToggle = false,
     this.showDownload = false,
     this.showHidePanel = false,
+    this.showTopSelector = false,
+    this.topSelectorValues = const ['10'],
     this.onUpdateMainSubMeterSel,
+    this.onUpdateTop,
     this.getList,
   });
 
@@ -36,7 +42,8 @@ class WgtDashControl extends StatefulWidget {
   final Function(String)? onUpdateMainMetersOnly;
   final LookbackType iniLookbackType;
   final MeterType iniMeterType;
-  final Map<String, bool> iniMainSubMeterSel;
+  final List<String> iniMainSubMeterSelList;
+  final String iniTopSelectorValue;
   final List<LookbackType> lookbackTyps;
   final List<MeterType> meterTypes;
   final EdgeInsets marginWhenShrinked;
@@ -45,10 +52,14 @@ class WgtDashControl extends StatefulWidget {
   // final bool mainMetersOnly;
   final String mainOrSub;
   final bool enableControl;
-  final bool showMainMetersSwitch;
+  final bool showMainMeterSwitch;
+  final bool showMainMeterToggle;
   final bool showDownload;
   final bool showHidePanel;
+  final bool showTopSelector;
+  final List<String> topSelectorValues;
   final Function(Map<String, bool>)? onUpdateMainSubMeterSel;
+  final Function(String)? onUpdateTop;
   final List<List<dynamic>> Function()? getList;
 
   @override
@@ -63,8 +74,10 @@ class _WgtDashControlState extends State<WgtDashControl> {
   // late bool _mainMetersOnly;
   late String _mainOrSub;
 
-  late bool _mainMeterSelected = widget.iniMainSubMeterSel['main'] ?? true;
-  late bool _subMeterSelected = widget.iniMainSubMeterSel['sub'] ?? true;
+  late bool _mainMeterSelected = widget.iniMainSubMeterSelList.contains('main');
+  late bool _subMeterSelected = widget.iniMainSubMeterSelList.contains('sub');
+
+  late String _selectedTopValue;
 
   @override
   void initState() {
@@ -73,6 +86,7 @@ class _WgtDashControlState extends State<WgtDashControl> {
     _selectedMeterType = widget.iniMeterType;
     // _mainMetersOnly = widget.mainMetersOnly;
     _mainOrSub = widget.mainOrSub;
+    _selectedTopValue = widget.iniTopSelectorValue;
   }
 
   @override
@@ -157,7 +171,20 @@ class _WgtDashControlState extends State<WgtDashControl> {
                     //   ),
                     // ),
                     // horizontalSpaceSmall,
-                    WgtLoookbackTypeSelector(
+                    if (widget.showTopSelector)
+                      WgtTopRankingSelector(
+                        topSelectorValues: widget.topSelectorValues,
+                        iniSelection: widget.iniTopSelectorValue,
+                        showRightDivider: true,
+                        onUpdateSelection: (top) {
+                          if (top == _selectedTopValue) return;
+                          setState(() {
+                            _selectedTopValue = top;
+                          });
+                          widget.onUpdateTop?.call(_selectedTopValue);
+                        },
+                      ),
+                    WgtLookbackTypeSelector(
                       enableControl: widget.enableControl,
                       lookbackTyps: widget.lookbackTyps,
                       iniSelection: _selectedLookbackType,
@@ -203,7 +230,8 @@ class _WgtDashControlState extends State<WgtDashControl> {
                     // ),
                     horizontalSpaceTiny,
                     //onUpdateMainMetersOnly
-                    if (widget.onUpdateMainMetersOnly != null)
+                    if (widget.showMainMeterToggle &&
+                        widget.onUpdateMainMetersOnly != null)
                       // Container(
                       //   padding: const EdgeInsets.symmetric(horizontal: 5),
                       //   decoration: BoxDecoration(
@@ -289,7 +317,7 @@ class _WgtDashControlState extends State<WgtDashControl> {
                           ),
                         ],
                       ),
-                    if (widget.showMainMetersSwitch) getMainMeterSwitcher(),
+                    if (widget.showMainMeterSwitch) getMainMeterSwitcher(),
                     if (widget.showDownload) getDownload(),
                     horizontalSpaceSmall,
                   ],

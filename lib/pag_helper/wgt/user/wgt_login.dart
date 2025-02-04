@@ -302,8 +302,7 @@ class _WgtLoginState extends State<WgtLogin> {
                   errorText: _errorTextLocal,
                   // textColor: Theme.of(context).colorScheme.error,
                   // borderColor: Theme.of(context).colorScheme.error,
-                  bgColor:
-                      Theme.of(context).colorScheme.onSurface.withAlpha(130),
+                  bgColor: Theme.of(context).colorScheme.onPrimary,
                 ),
               verticalSpaceRegular,
             ],
