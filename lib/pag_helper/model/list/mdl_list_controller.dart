@@ -1,5 +1,4 @@
 import 'package:buff_helper/pag_helper/def/pag_item_helper.dart';
-import 'package:buff_helper/pag_helper/def/scope_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 
@@ -141,7 +140,8 @@ class MdlPagListController /*extends ChangeNotifier*/ {
       {/*filterValueKey = 'label'*/
       String Function(MdlListColController)? getFilterValueKey}) {
     Map<String, dynamic> filterMap = {};
-
+/* NOTE: not collapse location filter to leaf scope
+// reason: if leaf is location label, the label is not unique
     // colapse location filter to leaf scope
     List<MdlListColController> listColControllerListLocation = [];
     List<MdlListColController> listColControllerListNonLocation = [];
@@ -172,7 +172,9 @@ class MdlPagListController /*extends ChangeNotifier*/ {
     if (colControllerLocationLeaf != null) {
       listColControllerListFlitered.add(colControllerLocationLeaf);
     }
-
+*/
+    List<MdlListColController> listColControllerListFlitered =
+        listColControllerList;
     for (var colController in listColControllerListFlitered) {
       if (colController.filterValue != null) {
         if (colController.joinKey != null) {
