@@ -226,22 +226,23 @@ class PagDataProvider extends ChangeNotifier {
     }
   }
 
-  void updateScopeListFleetHealth(
+  // return true if the scope list is updated
+  bool updateScopeListFleetHealth(
     PagScopeType scopeType,
     Map<String, dynamic> fhStat,
     List<dynamic> scopeProfileList,
   ) {
     if (fhStat.isEmpty) {
-      return;
+      return false;
     }
 
     if (scopeType == latestScopeType) {
       if (DateTime.now().difference(lastScopeListUpdateTime).inSeconds < 1) {
         if (kDebugMode) {
           print(
-              'updateScopeListFleetHealth: less than 1 seconds, scopeType: $scopeType');
+              'updateScopeListFleetHealth: less than 1 seconds, scopeType: $scopeType, $lastScopeListUpdateTime');
         }
-        return;
+        return false;
       }
     }
 
@@ -276,5 +277,7 @@ class PagDataProvider extends ChangeNotifier {
         }
       }
     }
+
+    return true;
   }
 }
