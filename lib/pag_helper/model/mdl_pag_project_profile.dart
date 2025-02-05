@@ -7,6 +7,8 @@ import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 import '../def/project_helper.dart';
+import '../def/scope_helper.dart';
+import 'mdl_pag_app_context.dart';
 import 'scope/mdl_pag_site_group_profile.dart';
 import 'scope/mdl_pag_site_profile.dart';
 import 'package:latlong2/latlong.dart';
@@ -239,6 +241,17 @@ class MdlPagProjectProfile {
     return LatLng(
         mapCenter!['lat'] ?? defaultLat, mapCenter!['lng'] ?? defaultLng);
   }
+
+  // bool isAppContextVisibleAtScope(MdlPagAppContext appContext, PagScopeType scopeType) {
+  //   for (MdlPagAppContextConfig appConfig in appContextConfigList) {
+  //     if (appConfig.appContextName == appContext.name) {
+  //       if (appConfig.visibleScopeList.contains(scopeType)) {
+  //         return true;
+  //       }
+  //     }
+  //   }
+  //   return false;
+  // }
 
   factory MdlPagProjectProfile.fromJson2(Map<String, dynamic> json) {
     // String portalTypeNameStr = json['portal_type_name'] ?? '';
