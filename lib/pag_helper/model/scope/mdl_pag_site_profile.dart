@@ -81,6 +81,8 @@ class MdlPagSiteProfile {
     return null;
   }
 
+  // bind filter col controllers with loc profile
+  // during wich value list will be populated with children loc profiles
   void bindFilterColController(MdlListColController? filterColController,
       {MdlPagBuildingProfile? defaultBuildingProfile,
       bool limitToDefault = false}) {
