@@ -234,7 +234,7 @@ final projectProfileRepo = [
         'pub_key':
             'pk_live_51MokvvAzcY0NKTCHoedkapOh9Tl9VEwT3Nz2bRn0vcGugAmFJBoOrH0GprHSj99GLhaDByJyciLVOmsoSiuHuY7F00N9f88BqB',
         'merchant_identifier': 'merchant.com.evs2.ntu',
-        'pay_svc_host_url': 'https://p3.evs.com.sg'
+        'pay_svc_host_url': 'https://p-3.evs.com.sg'
       },
       {
         'payment_mode': PaymentMode.netsQR,
@@ -344,8 +344,14 @@ ScopeProfile? getUserScopeProfile(Evs2User user) {
     return null;
   }
   for (var scopeProfile in projectProfileRepo) {
-    if ((scopeProfile['project_scope'] as ProjectScope).name.toLowerCase() ==
-        projectScopeStr.toLowerCase()) {
+    String projectScopeName = '';
+    if (scopeProfile['project_scope'] is PagProjectScope) {
+      projectScopeName =
+          (scopeProfile['project_scope'] as PagProjectScope).name;
+    } else {
+      projectScopeName = (scopeProfile['project_scope'] as ProjectScope).name;
+    }
+    if (projectScopeName.toLowerCase() == projectScopeStr.toLowerCase()) {
       return ScopeProfile.fromJson(scopeProfile);
     }
   }
