@@ -37,6 +37,13 @@ class PagDataProvider extends ChangeNotifier {
   DateTime lastScopeListUpdateTime = DateTime.now();
   PagScopeType latestScopeType = PagScopeType.none;
 
+  bool isScopeUpdated = false;
+
+  void onUpdateScope() {
+    isScopeUpdated = true;
+    clearData();
+  }
+
   void clearData() {
     _fhStatTimeStr = "";
     _fhStat = {};
