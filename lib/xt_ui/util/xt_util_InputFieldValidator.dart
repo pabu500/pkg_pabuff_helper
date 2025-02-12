@@ -228,3 +228,36 @@ String? validateDateTime(String? value,
 
   return result;
 }
+
+String? validateSalutation(String? value,
+    {Map<Enum, String?>? formErrors,
+    Enum? filedKey,
+    Function? additonalValidator}) {
+  RegExp regex = RegExp(glb_reg_salutation);
+
+  String? result;
+
+  if (value == null) {
+    result = 'Please enter your salutation';
+  } else {
+    if (value.isEmpty) {
+      result = 'Please enter your salutation';
+    } else {
+      if (!regex.hasMatch(value)) {
+        result = glb_salutation_callout;
+      } else {
+        result = null;
+      }
+    }
+  }
+  if (result == null) {
+    if (additonalValidator != null) {
+      result = additonalValidator(value);
+    }
+  }
+
+  if (formErrors != null && filedKey != null) {
+    formErrors[filedKey] = result;
+  }
+  return result;
+}
