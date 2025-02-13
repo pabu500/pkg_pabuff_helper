@@ -43,26 +43,38 @@ class PagUrlController {
             loggedInUser.selectedScope.projectProfile!.portalProjectScope;
       }
     }
-    bool useDevUsersvc = pagAppConfig.useDevUsersvc;
-    switch (activeProjectScope) {
-      case PagPortalProjectScope.GI_DE:
-        return kDebugMode
-            ? PagUrlBase.dUsersvcUrl
-            : useDevUsersvc
-                ? PagUrlBase.rDevUsersvcUrl
-                : PagUrlBase.rProdUsersvcUrl;
-      case PagPortalProjectScope.PA_EMS:
-        return kDebugMode
-            ? PagUrlBase.dUsersvcUrl
-            : useDevUsersvc
-                ? PagUrlBase.rDevUsersvcUrl
-                : PagUrlBase.rProdUsersvcUrl;
+    // bool useDevUsersvc = pagAppConfig.useDevUsersvc;
+    // switch (activeProjectScope) {
+    //   case PagPortalProjectScope.GI_DE:
+    //     return kDebugMode
+    //         ? PagUrlBase.dUsersvcUrl
+    //         : useDevUsersvc
+    //             ? PagUrlBase.rDevUsersvcUrl
+    //             : PagUrlBase.rProdUsersvcUrl;
+    //   case PagPortalProjectScope.PA_EMS:
+    //     return kDebugMode
+    //         ? PagUrlBase.dUsersvcUrl
+    //         : useDevUsersvc
+    //             ? PagUrlBase.rDevUsersvcUrl
+    //             : PagUrlBase.rProdUsersvcUrl;
+    //   default:
+    //     return kDebugMode
+    //         ? PagUrlBase.dUsersvcUrl
+    //         : useDevUsersvc
+    //             ? PagUrlBase.rDevUsersvcUrl
+    //             : PagUrlBase.rProdUsersvcUrl;
+    // }
+
+    String userEnv = pagAppConfig.userSvcEnv;
+    switch (userEnv) {
+      case 'prod':
+        return kDebugMode ? PagUrlBase.dUsersvcUrl : PagUrlBase.rProdUsersvcUrl;
+      case 'test':
+        return kDebugMode ? PagUrlBase.dUsersvcUrl : PagUrlBase.rTestUsersvcUrl;
+      case 'dev':
+        return kDebugMode ? PagUrlBase.dUsersvcUrl : PagUrlBase.rDevUsersvcUrl;
       default:
-        return kDebugMode
-            ? PagUrlBase.dUsersvcUrl
-            : useDevUsersvc
-                ? PagUrlBase.rDevUsersvcUrl
-                : PagUrlBase.rProdUsersvcUrl;
+        return kDebugMode ? PagUrlBase.dUsersvcUrl : PagUrlBase.rDevUsersvcUrl;
     }
   }
 
@@ -77,26 +89,38 @@ class PagUrlController {
       }
     }
 
-    bool useDevOresvc = pagAppConfig.useDevOresvc;
-    switch (activeProjectScope) {
-      case PagPortalProjectScope.GI_DE:
-        return kDebugMode
-            ? PagUrlBase.dOresvcUrl
-            : useDevOresvc
-                ? PagUrlBase.rDevOresvcUrl
-                : PagUrlBase.rProdOresvcUrl;
-      case PagPortalProjectScope.PA_EMS:
-        return kDebugMode
-            ? PagUrlBase.dOresvcUrl
-            : useDevOresvc
-                ? PagUrlBase.rDevOresvcUrl
-                : PagUrlBase.rProdOresvcUrl;
+    // bool useDevOresvc = pagAppConfig.useDevOresvc;
+    String oreEnv = pagAppConfig.oreSvcEnv;
+    // switch (activeProjectScope) {
+    //   case PagPortalProjectScope.GI_DE:
+    //     return kDebugMode
+    //         ? PagUrlBase.dOresvcUrl
+    //         : oreEnv == 'prod'
+    //             ? PagUrlBase.rProdOresvcUrl
+    //             : PagUrlBase.rProdOresvcUrl;
+    //   case PagPortalProjectScope.PA_EMS:
+    //     return kDebugMode
+    //         ? PagUrlBase.dOresvcUrl
+    //         : useDevOresvc
+    //             ? PagUrlBase.rDevOresvcUrl
+    //             : PagUrlBase.rProdOresvcUrl;
+    //   default:
+    //     return kDebugMode
+    //         ? PagUrlBase.dOresvcUrl
+    //         : useDevOresvc
+    //             ? PagUrlBase.rDevOresvcUrl
+    //             : PagUrlBase.rProdOresvcUrl;
+    // }
+
+    switch (oreEnv) {
+      case 'prod':
+        return kDebugMode ? PagUrlBase.dOresvcUrl : PagUrlBase.rProdOresvcUrl;
+      case 'test':
+        return kDebugMode ? PagUrlBase.dOresvcUrl : PagUrlBase.rTestOresvcUrl;
+      case 'dev':
+        return kDebugMode ? PagUrlBase.dOresvcUrl : PagUrlBase.rDevOresvcUrl;
       default:
-        return kDebugMode
-            ? PagUrlBase.dOresvcUrl
-            : useDevOresvc
-                ? PagUrlBase.rDevOresvcUrl
-                : PagUrlBase.rProdOresvcUrl;
+        return kDebugMode ? PagUrlBase.dOresvcUrl : PagUrlBase.rDevOresvcUrl;
     }
   }
 
@@ -131,7 +155,8 @@ class PagUrlBase {
   static const String _rDestPortalEvs2cp = 'https://cp2.evs.com.sg';
 
   static const String _dOresvcUrl = 'http://localhost:8018';
-  static const String _rProdOresvc = 'https://oresvc2.evs.com.sg';
+  static const String _rProdOresvc = 'https://oresvc2.web-ems.com';
+  static const String _rTestOresvc = 'https://test-oresvc2.web-ems.com';
   static const String _rDevOresvc = 'https://dev-oresvc2.evs.com.sg';
   static const String _rDevOresvcNTU = _rDevOresvc;
   static const String _rProdOresvcUrlNTU = 'https://ore-ntu.evs.com.sg';
@@ -145,18 +170,22 @@ class PagUrlBase {
       // 'http://13.228.16.206:8081';
       // 'http://3.1.141.233:8081';
       'http://localhost:8081';
-  static const String _rDevUsersvcUrl = 'https://dev-usersvc2.evs.com.sg';
+
   static const String _rProdUsersvcUrl = 'https://pag-u.evs.com.sg';
+  static const String _rTestUsersvcUrl = 'https://test-usersvc2.web-ems.com';
+  static const String _rDevUsersvcUrl = 'https://dev-usersvc2.evs.com.sg';
 
   static get dDestPortalEvs2cp => _dDestPortalEvs2cp;
   static get rDestPortalEvs2cp => _rDestPortalEvs2cp;
 
   static get dUsersvcUrl => _dUsersvcUrl;
-  static get rDevUsersvcUrl => _rDevUsersvcUrl;
   static get rProdUsersvcUrl => _rProdUsersvcUrl;
+  static get rTestUsersvcUrl => _rTestUsersvcUrl;
+  static get rDevUsersvcUrl => _rDevUsersvcUrl;
 
   static get dOresvcUrl => _dOresvcUrl;
   static get rProdOresvcUrl => _rProdOresvc;
+  static get rTestOresvcUrl => _rTestOresvc;
   static get rDevOresvcUrl => _rDevOresvc;
   static get rProdOresvcUrlNTU => _rProdOresvcUrlNTU;
   static get rDevOresvcUrlNTU => _rDevOresvcNTU;

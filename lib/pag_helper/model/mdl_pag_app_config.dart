@@ -5,16 +5,20 @@ class MdlPagAppConfig {
   late final PagPortalType portalType;
   late final String lazyLoadScope;
   late final bool loadDashboard;
-  late final bool useDevOresvc;
-  late final bool useDevUsersvc;
+  // late final bool useDevOresvc;
+  late final String oreSvcEnv;
+  // late final bool useDevUsersvc;
+  late final String userSvcEnv;
   late final List<PagPortalProjectScope> activePortalPagProjectScopeList;
 
   MdlPagAppConfig({
     required this.portalType,
     required this.lazyLoadScope,
     required this.loadDashboard,
-    required this.useDevOresvc,
-    required this.useDevUsersvc,
+    // required this.useDevOresvc,
+    required this.oreSvcEnv,
+    // required this.useDevUsersvc,
+    required this.userSvcEnv,
     required this.activePortalPagProjectScopeList,
   });
 }
