@@ -7,8 +7,6 @@ import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 import '../def/project_helper.dart';
-import '../def/scope_helper.dart';
-import 'mdl_pag_app_context.dart';
 import 'scope/mdl_pag_site_group_profile.dart';
 import 'scope/mdl_pag_site_profile.dart';
 import 'package:latlong2/latlong.dart';
@@ -29,7 +27,7 @@ class MdlPagProjectProfile {
   String? assetFolder;
   double initialMapZoom = 10.0;
   Map<String, double>? mapCenter;
-  bool isAllSites = false;
+  // bool isAllSites = false;
   // List<PagSiteProfile> siteProfileList;
   List<MdlPagSiteGroupProfile> siteGroupProfileList;
   List<MdlPagAppContextConfig> appContextConfigList;
@@ -60,7 +58,7 @@ class MdlPagProjectProfile {
     // this.siteProfileList = const [],
     this.siteGroupProfileList = const [],
     this.mapCenter,
-    this.isAllSites = false,
+    // this.isAllSites = false,
     this.homePageRoute = PagPageRoute.consoleHomeDashboard,
     this.deviceTypeInfoList = const [],
     this.visibleRoleList = const [],
@@ -305,7 +303,7 @@ class MdlPagProjectProfile {
 
     Map<String, dynamic> roleScope = json['role_scope'];
 
-    bool isAllSites = (roleScope['is_all_sites'] ?? 'false') == 'true';
+    // bool isAllSites = (roleScope['is_all_sites'] ?? 'false') == 'true';
 
     // scope list arranged by a list of site groups
     List<Map<String, dynamic>> scopeList = [];
@@ -431,7 +429,7 @@ class MdlPagProjectProfile {
       initialMapZoom: projectMapZoom,
       mapCenter: mapCenter,
       siteGroupProfileList: siteGroupProfileList,
-      isAllSites: isAllSites,
+      // isAllSites: isAllSites,
       appContextConfigList: appCtxConfigList,
       deviceTypeInfoList: deviceTypeInfoList,
       homePageRoute: homePageRoute,

@@ -13,7 +13,7 @@ class MdlPagSiteProfile {
   double? latitude;
   double? longitude;
   int timezone;
-  String? currency = 'SGD';
+  String? currency;
   double? mapZoom = 10;
   Map<String, dynamic> mapCenter;
   MdlPagFleetHealth? fleetHealth;
@@ -141,7 +141,7 @@ class MdlPagSiteProfile {
       'latitude': latitude,
       'longitude': longitude,
       'timezone': timezone,
-      'currency': currency,
+      'currency': currency ?? '',
       'map_zoom': mapZoom,
       'map_center': mapCenter,
       'fhStat': fleetHealth,
