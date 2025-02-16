@@ -136,6 +136,16 @@ class MdlPagListController /*extends ChangeNotifier*/ {
     return '';
   }
 
+  // String? getLabelKey() {
+  //   for (var colController in listColControllerList) {
+  //     if (colController.colKey.toLowerCase().contains('label')) {
+  //       return colController.colKey;
+  //     }
+  //   }
+  //   // return '';
+  //   return null;
+  // }
+
   Map<String, dynamic> getFilterMap(
       {/*filterValueKey = 'label'*/
       String Function(MdlListColController)? getFilterValueKey}) {
