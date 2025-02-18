@@ -349,28 +349,14 @@ class MdlPagUser {
       if (userRoleScope['role_project_scope_list'] != null) {
         roleProjectScopeList = [...userRoleScope['role_project_scope_list']];
         for (Map<String, dynamic> roleProjectScope in roleProjectScopeList) {
-          if (roleProjectScope['project_scope_list'] != null) {
-            List<Map<String, dynamic>> projectScopeList = [
-              ...roleProjectScope['project_scope_list']
-            ];
-            for (Map<String, dynamic> projectScope in projectScopeList) {
-              if (projectScope['role_scope'] == null) {
-                if (kDebugMode) {
-                  print('projectRoleScope[role_scope] is null');
-                }
-                continue;
-              }
-
-              try {
-                MdlPagProjectProfile? projectProfile =
-                    MdlPagProjectProfile.fromJson2(projectScope);
-                roleScopeProjectProfileList.add(projectProfile);
-                projectProfileList.add(projectProfile);
-              } catch (e) {
-                if (kDebugMode) {
-                  print({'exception in User.fromJson -> project fromJson2:$e'});
-                }
-              }
+          try {
+            MdlPagProjectProfile? projectProfile =
+                MdlPagProjectProfile.fromJson2(roleProjectScope);
+            roleScopeProjectProfileList.add(projectProfile);
+            projectProfileList.add(projectProfile);
+          } catch (e) {
+            if (kDebugMode) {
+              print({'exception in User.fromJson -> project fromJson2:$e'});
             }
           }
         }

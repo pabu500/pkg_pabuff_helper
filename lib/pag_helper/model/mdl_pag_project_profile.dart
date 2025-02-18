@@ -66,6 +66,18 @@ class MdlPagProjectProfile {
     this.fhStat = const {},
   });
 
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is MdlPagProjectProfile &&
+        id == other.id &&
+        name == other.name &&
+        label == other.label; // Compare relevant properties
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name, label);
+
   bool equals(MdlPagProjectProfile? projectProfile) {
     if (projectProfile == null) {
       return false;
@@ -301,14 +313,14 @@ class MdlPagProjectProfile {
     String projectAssetFolder = json['project_asset_folder'] ?? 'MISSING';
     assert(projectAssetFolder != 'MISSING');
 
-    Map<String, dynamic> roleScope = json['role_scope'];
+    // Map<String, dynamic> roleScope = json['role_scope'];
 
     // bool isAllSites = (roleScope['is_all_sites'] ?? 'false') == 'true';
 
     // scope list arranged by a list of site groups
     List<Map<String, dynamic>> scopeList = [];
-    if (roleScope['scope_list'] != null) {
-      scopeList = [...roleScope['scope_list']];
+    if (json['project_scope_list'] != null) {
+      scopeList = [...json['project_scope_list']];
     }
     List<MdlPagSiteGroupProfile> siteGroupProfileList = [];
     for (Map<String, dynamic> siteGroup in scopeList) {
