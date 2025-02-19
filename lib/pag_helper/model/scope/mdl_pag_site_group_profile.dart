@@ -163,6 +163,7 @@ class MdlPagSiteGroupProfile {
           }
           rethrow;
         }
+        siteProfileListX.sort((a, b) => a.name.compareTo(b.name));
       }
     }
 

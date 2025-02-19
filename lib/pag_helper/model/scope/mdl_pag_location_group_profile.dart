@@ -160,6 +160,8 @@ class MdlPagLocationGroupProfile {
       locationList = (json['location_list'] as List)
           .map((lg) => MdlPagLocation.fromJson(lg))
           .toList();
+      //sort by name
+      // locationList.sort((a, b) => a.label.compareTo(b.label));
     }
 
     return MdlPagLocationGroupProfile(

@@ -138,6 +138,7 @@ class MdlPagBuildingProfile {
             MdlPagLocationGroupProfile.fromJson(scopeInfo!);
         locationGroupProfileList.add(locationGroup);
       }
+      locationGroupProfileList.sort((a, b) => a.name.compareTo(b.name));
     }
 
     dynamic lat = itemInfo['lat'];

@@ -223,6 +223,7 @@ class MdlPagSiteProfile {
             MdlPagBuildingProfile.fromJson(scopeInfo!);
         buildingList.add(building);
       }
+      buildingList.sort((a, b) => a.name.compareTo(b.name));
     }
 
     return MdlPagSiteProfile(
