@@ -8,12 +8,17 @@ import 'package:buff_helper/pag_helper/model/app/mdl_page_config.dart';
 class MdlPagAppContextConfig {
   late final String appContextName;
   List<MdlPagPageConfig> pageConfigList;
+
+  // list of scope that this app context is visible
   List<PagScopeType> visibleScopeList;
+  // list of scope that context menu item is visible
+  List<Map<String, dynamic>> ctxMenuVisibleScopeList;
 
   MdlPagAppContextConfig({
     required this.appContextName,
     this.pageConfigList = const [],
     this.visibleScopeList = PagScopeType.values,
+    this.ctxMenuVisibleScopeList = const [],
   });
 
   //isEmpty
@@ -23,6 +28,7 @@ class MdlPagAppContextConfig {
     String appCtxName = json.keys.first;
 
     List<MdlPagPageConfig> pageConfigList = [];
+    List<Map<String, dynamic>> ctxMenuVisibleScopeList = [];
     List<PagScopeType> scopeList = PagScopeType.values;
     Map<String, dynamic> appCtxConfig = json[appCtxName];
     for (String key in appCtxConfig.keys) {
@@ -60,6 +66,34 @@ class MdlPagAppContextConfig {
         continue;
       }
 
+      if (key == 'ctx_menu') {
+        Map<String, dynamic> ctxMenu = appCtxConfig[key];
+        for (String pageRouteKey in ctxMenu.keys) {
+          try {
+            PagPageRoute route = PagPageRoute.values.byName(pageRouteKey);
+            Map<String, dynamic>? ctxMenuConfig = ctxMenu[route.name];
+            if (ctxMenuConfig != null) {
+              if (ctxMenuConfig['visible_at_scope'] != null) {
+                List<String> scopeKeyList =
+                    ctxMenuConfig['visible_at_scope'].split(',');
+                List<PagScopeType> scopeList =
+                    scopeKeyList.map((e) => PagScopeType.byKey(e)).toList();
+                ctxMenuConfig['visible_at_scope'] = scopeList;
+              }
+            }
+            ctxMenuVisibleScopeList.add({
+              'route': route,
+              'config': ctxMenuConfig,
+            });
+          } catch (e) {
+            if (kDebugMode) {
+              print('getPageConfig: $e');
+            }
+          }
+        }
+        continue;
+      }
+
       String page = key;
 
       Map<String, dynamic> pageConfig = appCtxConfig[page];
@@ -73,6 +107,7 @@ class MdlPagAppContextConfig {
       appContextName: appCtxName,
       pageConfigList: pageConfigList,
       visibleScopeList: scopeList,
+      ctxMenuVisibleScopeList: ctxMenuVisibleScopeList,
     );
   }
 }
