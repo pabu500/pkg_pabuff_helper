@@ -32,6 +32,7 @@ Future<void> doPostLogin(
       appConfig,
       loggedInUser,
       {
+        // 'scope': loggedInUser.selectedScope.toScopeMap(),
         'portal_type_name': appConfig.portalType.name,
         'portal_type_label': appConfig.portalType.label,
         'user_id': loggedInUser.id.toString(),

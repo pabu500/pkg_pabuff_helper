@@ -1,8 +1,12 @@
 import 'package:buff_helper/pag_helper/comm/comm_user_service.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
+import 'package:buff_helper/pag_helper/wgt/user/comm_sso.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_signin_button/button_list.dart';
+import 'package:flutter_signin_button/button_view.dart';
 import 'package:go_router/go_router.dart';
 import '../../wgt/wgt_comm_button.dart';
 
@@ -37,7 +41,12 @@ class _WgtLoginState extends State<WgtLogin> {
   String _errorTextLocal = '';
   String _errorTextSso = '';
 
-  Future<MdlPagUser?> _login() async {
+  bool showMicrosoftButton = true;
+
+  Future<MdlPagUser?> _login({
+    String authProvider = 'local',
+    String email = '',
+  }) async {
     if (_isLoggingIn) {
       return null;
     }
@@ -53,7 +62,8 @@ class _WgtLoginState extends State<WgtLogin> {
         Map.of({
           PagUserKey.username.name: _username,
           PagUserKey.password.name: _password,
-          PagUserKey.email.name: '',
+          PagUserKey.email.name: email,
+          PagUserKey.authProvider.name: authProvider,
           'portal_type_name': widget.appConfig.portalType.name,
           'portal_type_label': widget.appConfig.portalType.label,
         }),
@@ -169,6 +179,105 @@ class _WgtLoginState extends State<WgtLogin> {
   //     });
   //   }
   // }
+  void loginWithMicrosoft(BuildContext context) async {
+    try {
+      Map<String, dynamic> microsoftAuthInfo = {};
+
+      final OAuthProvider authProvider = OAuthProvider('microsoft.com');
+
+      authProvider.setCustomParameters({
+        'tenant': '4c4e8b31-4a28-4d6a-ba59-49a718162e33',
+      });
+
+      // await Future.delayed(const Duration(seconds: 1));
+      if (kDebugMode) {
+        print('Microsoft login started');
+      }
+
+      final UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithPopup(authProvider);
+
+      if (kDebugMode) {
+        print('Microsoft login completed');
+      }
+
+      if (userCredential.credential != null) {
+        microsoftAuthInfo['accessToken'] =
+            userCredential.credential!.accessToken;
+      }
+
+      final String? idToken =
+          await FirebaseAuth.instance.currentUser!.getIdToken();
+
+      if (idToken != null) {
+        microsoftAuthInfo['credentialUid'] = userCredential.user!.uid;
+        Map<String, dynamic> result = await _validateAccessToken();
+        if (result['error'] != null) {
+          if (kDebugMode) {
+            print('Microsoft login failed: ${result['error']}');
+          }
+        } else {
+          _login(authProvider: 'microsoft', email: result['email']);
+        }
+      } else {
+        if (kDebugMode) {
+          print(idToken ?? "No Id token");
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Microsoft login failed: $e');
+      }
+      // Handle login failure
+    }
+  }
+
+  Future<Map<String, dynamic>> _validateAccessToken() async {
+    try {
+      final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+      final IdTokenResult tokenResult =
+          await firebaseAuth.currentUser!.getIdTokenResult();
+
+      if (tokenResult.token != null) {
+        // UserSession.idToken = tokenResult.token;
+        // UserSession.firebaseUid = firebaseAuth.currentUser!.uid;
+        String email =
+            decodeEmailAddress(FirebaseAuth.instance.currentUser!.email!);
+        Map<String, dynamic> result = await verifyEmailAddress(
+          null,
+          widget.appConfig,
+          {
+            'email': email,
+            'auth_provider': 'microsoft',
+          },
+        );
+        if (result['is_sso_email_valid'] == true) {
+          result['email'] = email;
+          return result;
+        }
+        if (result['is_sso_email_valid'] != null) {
+          setState(() {
+            _errorTextSso = 'Email is not valid';
+          });
+          return {'error': 'Email is not valid'};
+        }
+      }
+      return {'error': 'Token validation failed'};
+    } catch (e) {
+      // Token validation failed
+      if (kDebugMode) {
+        print('Token validation failed: $e');
+      }
+      return {'error': 'Token validation failed'};
+    }
+  }
+
+  String decodeEmailAddress(String rawEmail) {
+    List<String> emailList = rawEmail.split('#ext#');
+    String email = emailList[0].replaceAll('_', '@');
+
+    return email;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -304,7 +413,29 @@ class _WgtLoginState extends State<WgtLogin> {
                   // borderColor: Theme.of(context).colorScheme.error,
                   bgColor: Theme.of(context).colorScheme.onPrimary,
                 ),
-              verticalSpaceRegular,
+              verticalSpaceSmall,
+              if (showMicrosoftButton)
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border(
+                      top: BorderSide(
+                        color: Theme.of(context).hintColor.withAlpha(89),
+                        width: 1,
+                      ),
+                    ),
+                  ),
+                  padding: const EdgeInsets.only(top: 13),
+                  child: SignInButton(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    Buttons.Microsoft,
+                    onPressed: () {
+                      loginWithMicrosoft(context);
+                    },
+                  ),
+                ),
+              if (_errorTextSso.isNotEmpty)
+                getErrorTextPrompt(context: context, errorText: _errorTextSso),
+              if (showMicrosoftButton) verticalSpaceRegular,
             ],
           ),
         ),

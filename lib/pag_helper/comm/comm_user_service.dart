@@ -54,35 +54,6 @@ Future<MdlPagUser> doLoginPag(
 
     MdlPagUser user = MdlPagUser.fromJson2(jsonDecode(response.body));
 
-    // if (user.userScope == null) {
-    //   throw Exception('failed to get user scope');
-    // }
-
-    // if (!user.hasScopeForPagProject(activePortalPagProjectScopeList)) {
-    //   throw Exception('no access to this project portal');
-    // }
-
-    // dynamic scopePref = readFromSharedPref('scope_pref');
-    // if (kDebugMode) {
-    //   print('scopePref: $scopePref');
-    // }
-    // Map<String, dynamic> scopePrefMap = json.decode(scopePref ?? '{}');
-    // String selectedProjectName = scopePrefMap['selected_project_name'] ?? '';
-    // String selectedSiteGroupName =
-    //     scopePrefMap['selected_site_group_name'] ?? '';
-    // String selectedSiteName = scopePrefMap['selected_site_name'] ?? '';
-    // String selectedBuildingName = scopePrefMap['selected_building_name'] ?? '';
-    // String selectedLocationGroupName =
-    //     scopePrefMap['selected_location_group_name'] ?? '';
-
-    // user.updateSelectedScopeByName(
-    //   selectedProjectName,
-    //   selectedSiteGroupName,
-    //   selectedSiteName,
-    //   selectedBuildingName,
-    //   selectedLocationGroupName,
-    // );
-
     return user;
   } else {
     if (kDebugMode) {
