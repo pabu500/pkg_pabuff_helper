@@ -88,34 +88,26 @@ class _WgtLoginState extends State<WgtLogin> {
         print(e);
       }
       String message = e.toString();
+      String errorText = 'login error';
       if (message.toLowerCase().contains('bad credentials')) {
-        setState(() {
-          _errorTextLocal = 'invalid username or password';
-        });
+        errorText = 'invalid username or password';
       } else if (message.toLowerCase().contains('xmlhttprequest error')) {
-        setState(() {
-          _errorTextLocal = 'service connection error';
-        });
+        errorText = 'service connection error';
       } else if (message.toLowerCase().contains('oqg')) {
-        setState(() {
-          _errorTextLocal = 'service error';
-        });
+        errorText = 'service error';
       } else if (message.toLowerCase().contains('failed to get user scope')) {
-        setState(() {
-          _errorTextLocal = 'failed to get user scope';
-        });
+        errorText = 'failed to get user scope';
       } else if (message
           .toLowerCase()
           .contains('no access to this project portal')) {
-        setState(() {
-          _errorTextLocal = 'no access to this project portal';
-        });
-      } else {
-        setState(() {
-          _errorTextLocal = 'login failed';
-        });
+        errorText = 'no access to this project portal';
       }
       setState(() {
+        if (authProvider == 'microsoft') {
+          _errorTextSso = errorText;
+        } else {
+          _errorTextLocal = errorText;
+        }
         _failedLogin = true;
         _isLoggingIn = false;
       });
@@ -217,7 +209,13 @@ class _WgtLoginState extends State<WgtLogin> {
             print('Microsoft login failed: ${result['error']}');
           }
         } else {
-          _login(authProvider: 'microsoft', email: result['email']);
+          _login(authProvider: 'microsoft', email: result['email']).then(
+            (user) {
+              if (user != null) {
+                widget.onLoggedIn?.call(user);
+              }
+            },
+          );
         }
       } else {
         if (kDebugMode) {
@@ -243,7 +241,7 @@ class _WgtLoginState extends State<WgtLogin> {
         // UserSession.firebaseUid = firebaseAuth.currentUser!.uid;
         String email =
             decodeEmailAddress(FirebaseAuth.instance.currentUser!.email!);
-        Map<String, dynamic> result = await verifyEmailAddress(
+        dynamic data = await verifyEmailAddress(
           null,
           widget.appConfig,
           {
@@ -251,11 +249,19 @@ class _WgtLoginState extends State<WgtLogin> {
             'auth_provider': 'microsoft',
           },
         );
-        if (result['is_sso_email_valid'] == true) {
-          result['email'] = email;
-          return result;
+        if (data == null) {
+          return {'error': 'verifyEmailAddress failed'};
         }
-        if (result['is_sso_email_valid'] != null) {
+        dynamic verifyResult = data['verify_result'];
+        if (verifyResult == null) {
+          return {'error': 'verify_result is null'};
+        }
+        String? isSsoEmailValid = verifyResult['is_sso_email_valid'];
+        if (isSsoEmailValid == "true") {
+          verifyResult['email'] = email;
+          return verifyResult;
+        }
+        if (isSsoEmailValid != null) {
           setState(() {
             _errorTextSso = 'Email is not valid';
           });

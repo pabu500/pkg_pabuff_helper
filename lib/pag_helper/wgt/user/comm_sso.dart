@@ -25,11 +25,15 @@ Future<dynamic> verifyEmailAddress(
 
   if (response.statusCode == 200) {
     final responseBody = jsonDecode(response.body);
-    final error = responseBody['error'];
-    if (error != null) {
-      throw Exception(error);
+    // final error = responseBody['error'];
+    // if (error != null) {
+    //   throw Exception(error);
+    // }
+    if (responseBody['data'] != null) {
+      return responseBody['data'];
+    } else {
+      throw Exception('Failed to verify sso email address');
     }
-    return responseBody;
   } else {
     throw Exception('Failed to verify sso email address');
   }
@@ -43,7 +47,7 @@ Future<void> logoutSso(BuildContext context) async {
   try {
     auth.signOut();
     var logoutUrl =
-        'https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=https://cwnustest.evs.com.sg';
+        'https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=https://test-pag.web-ems.com';
 
     // Redirect the user to the logout URL
     // window.location.href = logoutUrl;

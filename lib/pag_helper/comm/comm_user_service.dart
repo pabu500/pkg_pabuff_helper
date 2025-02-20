@@ -24,8 +24,9 @@ Future<MdlPagUser> doLoginPag(
     body: jsonEncode(<String, String>{
       PagUserKey.username.name: formData[PagUserKey.username.name] ?? '',
       PagUserKey.password.name: formData[PagUserKey.password.name] ?? '',
-      // PagUserKey.email.name: formData[PagUserKey.email]!,
-      // PagUserKey.authProvider.name: formData[PagUserKey.authProvider] ?? '',
+      PagUserKey.email.name: formData[PagUserKey.email.name] ?? '',
+      PagUserKey.authProvider.name:
+          formData[PagUserKey.authProvider.name] ?? '',
       // PagUserKey.destPortal.name: 'pag_console',
       'portal_type_name': formData['portal_type_name'] ?? '',
       'portal_type_label': formData['portal_type_label'] ?? '',
