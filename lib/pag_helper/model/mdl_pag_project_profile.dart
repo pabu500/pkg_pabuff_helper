@@ -1,6 +1,6 @@
 import 'package:buff_helper/pag_helper/def/def_page_route.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_role.dart';
-import 'package:buff_helper/pag_helper/model/app/mdl_app_context_config.dart';
+import 'package:buff_helper/pag_helper/model/app/mdl_project_config.dart';
 import 'package:buff_helper/pag_helper/model/app/mdl_page_config.dart';
 import 'package:buff_helper/pag_helper/model/ems/mdl_pag_tenant.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
@@ -30,7 +30,7 @@ class MdlPagProjectProfile {
   // bool isAllSites = false;
   // List<PagSiteProfile> siteProfileList;
   List<MdlPagSiteGroupProfile> siteGroupProfileList;
-  List<MdlPagAppContextConfig> appContextConfigList;
+  List<MdlPagProjectConfig> appContextConfigList;
   List<Map<String, dynamic>> deviceTypeInfoList;
   PagPageRoute homePageRoute;
   MdlListColController? siteGroupFilterColController;
@@ -371,12 +371,12 @@ class MdlPagProjectProfile {
       }
     }
 
-    List<MdlPagAppContextConfig> appCtxConfigList = [];
+    List<MdlPagProjectConfig> appCtxConfigList = [];
     PagPageRoute homePageRoute = PagPageRoute.none;
     if (appInfoList.isNotEmpty) {
       for (var appInfo in appInfoList) {
-        MdlPagAppContextConfig appCtxConfig =
-            MdlPagAppContextConfig.fromJson(appInfo);
+        MdlPagProjectConfig appCtxConfig =
+            MdlPagProjectConfig.fromJson(appInfo);
         appCtxConfigList.add(appCtxConfig);
 
         if (homePageRoute == PagPageRoute.none) {

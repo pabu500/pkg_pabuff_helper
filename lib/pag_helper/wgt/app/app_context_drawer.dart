@@ -1,4 +1,4 @@
-import 'package:buff_helper/pag_helper/model/app/mdl_app_context_config.dart';
+import 'package:buff_helper/pag_helper/model/app/mdl_project_config.dart';
 import 'package:buff_helper/pag_helper/model/app/mdl_page_config.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_context.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
@@ -71,10 +71,10 @@ class _WgtAppContextDrawerState extends State<WgtAppContextDrawer> {
   }
 
   List<Widget> _buildDrawerTiles(PagAppProvider appModel) {
-    List<MdlPagAppContextConfig> appCtxConfigList =
+    List<MdlPagProjectConfig> appCtxConfigList =
         widget.loggedInUser.selectedScope.projectProfile!.appContextConfigList;
-    MdlPagAppContextConfig? appCtxConfigCurAppCtx;
-    for (MdlPagAppContextConfig appCtxConfig in appCtxConfigList) {
+    MdlPagProjectConfig? appCtxConfigCurAppCtx;
+    for (MdlPagProjectConfig appCtxConfig in appCtxConfigList) {
       if (appCtxConfig.appContextName == widget.appContext.name) {
         appCtxConfigCurAppCtx = appCtxConfig;
         break;

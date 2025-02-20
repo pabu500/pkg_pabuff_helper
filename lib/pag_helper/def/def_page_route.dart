@@ -251,7 +251,13 @@ enum PagPageRoute {
     'techIssue',
     'techIssue',
     Symbols.assignment_late,
-  );
+  ),
+  forgotPassword(
+    'Forgot Password',
+    'forgot_password',
+    Symbols.lock,
+  ),
+  ;
 
   const PagPageRoute(
     this.label,

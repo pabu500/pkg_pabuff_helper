@@ -3,7 +3,7 @@ import 'package:buff_helper/pag_helper/model/mdl_pag_project_profile.dart';
 import 'package:buff_helper/pag_helper/wgt/tree/wgt_tree_element.dart';
 
 import '../../def/scope_helper.dart';
-import '../app/mdl_app_context_config.dart';
+import '../app/mdl_project_config.dart';
 import '../mdl_pag_app_context.dart';
 import 'mdl_pag_site_group_profile.dart';
 import 'mdl_pag_building_profile.dart';
@@ -538,7 +538,7 @@ class MdlPagScopeProfile {
 
   bool isAppContextVisibleAtScope(MdlPagAppContext appContext,
       {PagScopeType? scopeType}) {
-    for (MdlPagAppContextConfig appConfig
+    for (MdlPagProjectConfig appConfig
         in projectProfile!.appContextConfigList) {
       if (appConfig.appContextName == appContext.name) {
         return appConfig.visibleScopeList.contains(scopeType ?? getScopeType());

@@ -567,7 +567,7 @@ class _LoginPagePagridState extends State<LoginPagePagrid> {
                                         child: InkWell(
                                             //GestureDetector(
                                             onTap: () =>
-                                                context.go('/forgot_Password'),
+                                                context.go('/forgot_password'),
                                             child: xtText.body(
                                               'Forget Password?',
                                             )),

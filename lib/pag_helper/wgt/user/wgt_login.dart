@@ -374,7 +374,7 @@ class _WgtLoginState extends State<WgtLogin> {
                           color: Theme.of(context).hintColor, fontSize: 13.5),
                     ),
                   ),
-                  onTap: () => context.go('/forgot_Password'),
+                  onTap: () => context.go('/forgot_password'),
                 ),
               ),
               verticalSpaceSmall,
