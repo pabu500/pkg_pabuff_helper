@@ -15,6 +15,7 @@ enum PagPortalProjectScope {
   CW_P2,
   CW_P2_PLQ,
   CW_P2_AMIS,
+  FARM,
 }
 
 // enum PagSiteScope {
