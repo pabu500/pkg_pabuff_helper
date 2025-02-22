@@ -241,7 +241,10 @@ class _WgtLoginState extends State<WgtLogin> {
       final IdTokenResult tokenResult =
           await firebaseAuth.currentUser!.getIdTokenResult();
 
-      if (tokenResult.token != null) {
+      if (tokenResult.token == null) {
+        print('Token is null');
+        return {'error': 'Token is null'};
+      } else {
         // UserSession.idToken = tokenResult.token;
         // UserSession.firebaseUid = firebaseAuth.currentUser!.uid;
         String email =
@@ -255,22 +258,22 @@ class _WgtLoginState extends State<WgtLogin> {
           },
         );
         if (data == null) {
-          print('data is null');
+          // print('data is null');
           return {'error': 'verifyEmailAddress failed'};
         }
         dynamic verifyResult = data['verify_result'];
         if (verifyResult == null) {
-          print('verify_result is null');
+          // print('verify_result is null');
           return {'error': 'verify_result is null'};
         }
         String? isSsoEmailValid = verifyResult['is_sso_email_valid'];
         if (isSsoEmailValid == "true") {
-          print('Email is valid');
+          // print('Email is valid');
           verifyResult['email'] = email;
           return verifyResult;
         }
         if (isSsoEmailValid != null) {
-          print('Email is not valid');
+          // print('Email is not valid');
           setState(() {
             _errorTextSso = 'Email is not valid';
           });
