@@ -189,30 +189,30 @@ class _WgtLoginState extends State<WgtLogin> {
       final UserCredential userCredential =
           await FirebaseAuth.instance.signInWithPopup(authProvider);
 
-      // if (kDebugMode) {
-      print('Microsoft login completed');
-      // }
+      if (kDebugMode) {
+        // print('Microsoft login completed');
+      }
 
       if (userCredential.credential != null) {
         microsoftAuthInfo['accessToken'] =
             userCredential.credential!.accessToken;
-        print('accessToken: ${userCredential.credential!.accessToken}');
+        // print('accessToken: ${userCredential.credential!.accessToken}');
       }
 
       final String? idToken =
           await FirebaseAuth.instance.currentUser!.getIdToken();
 
-      print('idToken: $idToken');
+      // print('idToken: $idToken');
 
       if (idToken != null) {
         microsoftAuthInfo['credentialUid'] = userCredential.user!.uid;
-        print('credentialUid: ${userCredential.user!.uid}');
+        // print('credentialUid: ${userCredential.user!.uid}');
 
         Map<String, dynamic> result = await _validateAccessToken();
         if (result['error'] != null) {
-          if (kDebugMode) {
-            print('Microsoft login failed: ${result['error']}');
-          }
+          // if (kDebugMode) {
+          print('Microsoft login failed: ${result['error']}');
+          // }
         } else {
           _login(authProvider: 'microsoft', email: result['email']).then(
             (user) {
