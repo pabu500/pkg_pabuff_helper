@@ -210,9 +210,9 @@ class _WgtLoginState extends State<WgtLogin> {
 
         Map<String, dynamic> result = await _validateAccessToken();
         if (result['error'] != null) {
-          // if (kDebugMode) {
-          print('Microsoft login failed: ${result['error']}');
-          // }
+          if (kDebugMode) {
+            print('Microsoft login failed: ${result['error']}');
+          }
         } else {
           _login(authProvider: 'microsoft', email: result['email']).then(
             (user) {
@@ -222,16 +222,15 @@ class _WgtLoginState extends State<WgtLogin> {
             },
           );
         }
-        print('result: $result');
       } else {
-        // if (kDebugMode) {
-        print(idToken ?? "No Id token");
-        // }
+        if (kDebugMode) {
+          print(idToken ?? "No Id token");
+        }
       }
     } catch (e) {
-      // if (kDebugMode) {
-      print('Microsoft login failed: $e');
-      // }
+      if (kDebugMode) {
+        print('Microsoft login failed: $e');
+      }
       // Handle login failure
     }
   }
@@ -256,10 +255,12 @@ class _WgtLoginState extends State<WgtLogin> {
           },
         );
         if (data == null) {
+          print('data is null');
           return {'error': 'verifyEmailAddress failed'};
         }
         dynamic verifyResult = data['verify_result'];
         if (verifyResult == null) {
+          print('verify_result is null');
           return {'error': 'verify_result is null'};
         }
         String? isSsoEmailValid = verifyResult['is_sso_email_valid'];
