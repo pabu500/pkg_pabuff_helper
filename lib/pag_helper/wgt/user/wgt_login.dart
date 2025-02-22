@@ -172,6 +172,8 @@ class _WgtLoginState extends State<WgtLogin> {
   //   }
   // }
   void loginWithMicrosoft(BuildContext context) async {
+    String? accessToken;
+
     try {
       Map<String, dynamic> microsoftAuthInfo = {};
 
@@ -194,8 +196,8 @@ class _WgtLoginState extends State<WgtLogin> {
       }
 
       if (userCredential.credential != null) {
-        microsoftAuthInfo['accessToken'] =
-            userCredential.credential!.accessToken;
+        accessToken = userCredential.credential!.accessToken;
+        microsoftAuthInfo['accessToken'] = accessToken;
         // print('accessToken: ${userCredential.credential!.accessToken}');
       }
 
@@ -204,7 +206,12 @@ class _WgtLoginState extends State<WgtLogin> {
 
       // print('idToken: $idToken');
 
-      if (idToken != null) {
+      if (idToken == null) {
+        if (kDebugMode) {
+          print(idToken ?? "No Id token");
+        }
+        throw Exception('INT:Id token not found');
+      } else {
         microsoftAuthInfo['credentialUid'] = userCredential.user!.uid;
         // print('credentialUid: ${userCredential.user!.uid}');
 
@@ -213,6 +220,10 @@ class _WgtLoginState extends State<WgtLogin> {
           if (kDebugMode) {
             print('Microsoft login failed: ${result['error']}');
           }
+          // setState(() {
+          //   _errorTextSso = result['error'] ?? 'Microsoft login failed';
+          // });
+          throw Exception('INT:${result['error']}');
         } else {
           _login(authProvider: 'microsoft', email: result['email']).then(
             (user) {
@@ -222,16 +233,26 @@ class _WgtLoginState extends State<WgtLogin> {
             },
           );
         }
-      } else {
-        if (kDebugMode) {
-          print(idToken ?? "No Id token");
-        }
       }
     } catch (e) {
       if (kDebugMode) {
         print('Microsoft login failed: $e');
       }
-      // Handle login failure
+
+      // clear login
+      if (accessToken != null) {
+        FirebaseAuth.instance.signOut();
+      }
+
+      String error = e.toString();
+
+      setState(() {
+        if (error.contains('INT:')) {
+          _errorTextSso = error.substring(4);
+        } else {
+          _errorTextSso = 'Microsoft login failed';
+        }
+      });
     }
   }
 
@@ -242,8 +263,8 @@ class _WgtLoginState extends State<WgtLogin> {
           await firebaseAuth.currentUser!.getIdTokenResult();
 
       if (tokenResult.token == null) {
-        print('Token is null');
-        return {'error': 'Token is null'};
+        // print('Token is null');
+        return {'error': 'SSO token error'};
       } else {
         // UserSession.idToken = tokenResult.token;
         // UserSession.firebaseUid = firebaseAuth.currentUser!.uid;
@@ -258,34 +279,32 @@ class _WgtLoginState extends State<WgtLogin> {
           },
         );
         if (data == null) {
-          print('data is null');
-          return {'error': 'verifyEmailAddress failed'};
+          // print('data is null');
+          return {'error': 'Email verification failed'};
         }
         dynamic verifyResult = data['verify_result'];
         if (verifyResult == null) {
-          print('verify_result is null');
-          return {'error': 'verify_result is null'};
+          // print('verify_result is null');
+          return {'error': 'Failed to obtain verification result'};
         }
         String? isSsoEmailValid = verifyResult['is_sso_email_valid'];
         if (isSsoEmailValid == "true") {
-          print('Email is valid');
+          // print('Email is valid');
           verifyResult['email'] = email;
           return verifyResult;
         }
-        if (isSsoEmailValid != null) {
-          print('Email is not valid');
-          setState(() {
-            _errorTextSso = 'Email is not valid';
-          });
-          return {'error': 'Email is not valid'};
-        }
+
+        return {'error': 'Email is not valid'};
       }
-      return {'error': 'Token validation failed'};
     } catch (e) {
+      String error = e.toString();
       // Token validation failed
-      // if (kDebugMode) {
-      print('Token validation failed: $e');
-      // }
+      if (kDebugMode) {
+        print('Token validation failed: $e');
+      }
+      if (error.contains('verify sso email address')) {
+        return {'error': 'Failed to verify sso email address'};
+      }
       return {'error': 'Token validation failed'};
     }
   }
