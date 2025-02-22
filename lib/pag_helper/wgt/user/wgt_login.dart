@@ -198,7 +198,7 @@ class _WgtLoginState extends State<WgtLogin> {
       if (userCredential.credential != null) {
         accessToken = userCredential.credential!.accessToken;
         microsoftAuthInfo['accessToken'] = accessToken;
-        print('accessToken: ${userCredential.credential!.accessToken}');
+        // print('accessToken: ${userCredential.credential!.accessToken}');
       }
 
       final String? idToken =
@@ -241,7 +241,7 @@ class _WgtLoginState extends State<WgtLogin> {
 
       // clear login after failed login
       if (accessToken != null) {
-        print('Clearing login');
+        // print('Clearing login');
         FirebaseAuth.instance.signOut();
       }
 
