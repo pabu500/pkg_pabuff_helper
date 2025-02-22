@@ -241,14 +241,15 @@ class _WgtLoginState extends State<WgtLogin> {
 
       // clear login after failed login
       if (accessToken != null) {
+        print('Clearing login');
         FirebaseAuth.instance.signOut();
       }
 
       String error = e.toString();
 
       setState(() {
-        if (error.contains('INT:')) {
-          _errorTextSso = error.substring(4);
+        if (error.contains('Exception: INT:')) {
+          _errorTextSso = error.substring(11);
         } else {
           _errorTextSso = 'Microsoft login failed';
         }
