@@ -265,10 +265,12 @@ class _WgtLoginState extends State<WgtLogin> {
         }
         String? isSsoEmailValid = verifyResult['is_sso_email_valid'];
         if (isSsoEmailValid == "true") {
+          print('Email is valid');
           verifyResult['email'] = email;
           return verifyResult;
         }
         if (isSsoEmailValid != null) {
+          print('Email is not valid');
           setState(() {
             _errorTextSso = 'Email is not valid';
           });
