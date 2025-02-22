@@ -258,22 +258,22 @@ class _WgtLoginState extends State<WgtLogin> {
           },
         );
         if (data == null) {
-          // print('data is null');
+          print('data is null');
           return {'error': 'verifyEmailAddress failed'};
         }
         dynamic verifyResult = data['verify_result'];
         if (verifyResult == null) {
-          // print('verify_result is null');
+          print('verify_result is null');
           return {'error': 'verify_result is null'};
         }
         String? isSsoEmailValid = verifyResult['is_sso_email_valid'];
         if (isSsoEmailValid == "true") {
-          // print('Email is valid');
+          print('Email is valid');
           verifyResult['email'] = email;
           return verifyResult;
         }
         if (isSsoEmailValid != null) {
-          // print('Email is not valid');
+          print('Email is not valid');
           setState(() {
             _errorTextSso = 'Email is not valid';
           });
@@ -283,9 +283,9 @@ class _WgtLoginState extends State<WgtLogin> {
       return {'error': 'Token validation failed'};
     } catch (e) {
       // Token validation failed
-      if (kDebugMode) {
-        print('Token validation failed: $e');
-      }
+      // if (kDebugMode) {
+      print('Token validation failed: $e');
+      // }
       return {'error': 'Token validation failed'};
     }
   }
