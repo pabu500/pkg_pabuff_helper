@@ -239,7 +239,7 @@ class _WgtLoginState extends State<WgtLogin> {
         print('Microsoft login failed: $e');
       }
 
-      // clear login
+      // clear login after failed login
       if (accessToken != null) {
         FirebaseAuth.instance.signOut();
       }
