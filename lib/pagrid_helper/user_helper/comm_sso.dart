@@ -38,12 +38,11 @@ Future<void> logoutSso(BuildContext context) async {
   }
   try {
     auth.signOut();
-    var logoutUrl =
-        'https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=https://cwnustest.evs.com.sg';
+    // var logoutUrl = 'https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=$redirectUri';
 
     // Redirect the user to the logout URL
     // window.location.href = logoutUrl;
-    launchUrl(Uri.parse(logoutUrl), webOnlyWindowName: '_self');
+    // launchUrl(Uri.parse(logoutUrl), webOnlyWindowName: '_self');
   } catch (e) {
     if (kDebugMode) {
       print('Error logging out: $e');
