@@ -198,7 +198,7 @@ class _WgtLoginState extends State<WgtLogin> {
       if (userCredential.credential != null) {
         accessToken = userCredential.credential!.accessToken;
         microsoftAuthInfo['accessToken'] = accessToken;
-        // print('accessToken: ${userCredential.credential!.accessToken}');
+        print('accessToken: ${userCredential.credential!.accessToken}');
       }
 
       final String? idToken =
@@ -249,7 +249,7 @@ class _WgtLoginState extends State<WgtLogin> {
 
       setState(() {
         if (error.contains('Exception: INT:')) {
-          _errorTextSso = error.substring(11);
+          _errorTextSso = error.substring(15);
         } else {
           _errorTextSso = 'Microsoft login failed';
         }
