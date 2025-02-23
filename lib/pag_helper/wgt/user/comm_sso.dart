@@ -9,7 +9,7 @@ import 'dart:convert';
 
 import '../../comm/pag_be_api_base.dart';
 
-Future<dynamic> verifyEmailAddress(
+Future<dynamic> pagVerifyEmailAddress(
   MdlPagUser? loggedInUsr,
   MdlPagAppConfig appConfig,
   Map<String, dynamic> reqMap,
@@ -32,26 +32,26 @@ Future<dynamic> verifyEmailAddress(
     if (responseBody['data'] != null) {
       return responseBody['data'];
     } else {
-      throw Exception('Failed to verify sso email address');
+      // throw Exception('Failed to verify sso email address');
+      throw Exception(responseBody['error']);
     }
   } else {
     throw Exception('Failed to verify sso email address');
   }
 }
 
-Future<void> logoutSso(BuildContext context) async {
+Future<void> pagLogoutSso(BuildContext context) async {
   final FirebaseAuth auth = FirebaseAuth.instance;
   if (auth.currentUser == null) {
     return;
   }
   try {
     auth.signOut();
-    var logoutUrl =
-        'https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=https://test-pag.web-ems.com';
+    // var logoutUrl = 'https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=https://test-pag.web-ems.com';
 
     // Redirect the user to the logout URL
     // window.location.href = logoutUrl;
-    launchUrl(Uri.parse(logoutUrl), webOnlyWindowName: '_self');
+    // launchUrl(Uri.parse(logoutUrl), webOnlyWindowName: '_self');
   } catch (e) {
     if (kDebugMode) {
       print('Error logging out: $e');

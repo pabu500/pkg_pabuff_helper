@@ -1,7 +1,6 @@
 import 'package:buff_helper/pag_helper/def/def_page_route.dart';
 import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
-import 'package:buff_helper/pagrid_helper/user_helper/comm_sso.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -11,6 +10,7 @@ import '../../model/acl/mdl_pag_role.dart';
 import '../../model/mdl_pag_app_config.dart';
 import '../../model/provider/pag_data_provider.dart';
 import '../../model/provider/pag_theme_provider.dart';
+import 'comm_sso.dart';
 import 'wgt_role_selector.dart';
 
 class UserMenu extends StatefulWidget {
@@ -189,7 +189,7 @@ void onSelected(
           Provider.of<PagUserProvider>(context, listen: false).currentUser;
       user?.logout();
 
-      logoutSso(context);
+      pagLogoutSso(context);
 
       context.go('/project_public_front');
       break;

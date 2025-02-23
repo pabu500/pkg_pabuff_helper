@@ -89,6 +89,9 @@ class _WgtLoginState extends State<WgtLogin> {
       }
       String message = e.toString();
       String errorText = 'login error';
+      if (message.toLowerCase().contains('auth provider mismatch')) {
+        errorText = 'auth provider mismatch';
+      }
       if (message.toLowerCase().contains('bad credentials')) {
         errorText = 'invalid username or password';
       } else if (message.toLowerCase().contains('xmlhttprequest error')) {
@@ -210,7 +213,7 @@ class _WgtLoginState extends State<WgtLogin> {
         if (kDebugMode) {
           print(idToken ?? "No Id token");
         }
-        throw Exception('INT:Id token not found');
+        throw Exception('INT:id token not found');
       } else {
         microsoftAuthInfo['credentialUid'] = userCredential.user!.uid;
         // print('credentialUid: ${userCredential.user!.uid}');
@@ -271,7 +274,7 @@ class _WgtLoginState extends State<WgtLogin> {
         // UserSession.firebaseUid = firebaseAuth.currentUser!.uid;
         String email =
             decodeEmailAddress(FirebaseAuth.instance.currentUser!.email!);
-        dynamic data = await verifyEmailAddress(
+        dynamic data = await pagVerifyEmailAddress(
           null,
           widget.appConfig,
           {
@@ -281,12 +284,12 @@ class _WgtLoginState extends State<WgtLogin> {
         );
         if (data == null) {
           // print('data is null');
-          return {'error': 'Email verification failed'};
+          return {'error': 'email verification failed'};
         }
         dynamic verifyResult = data['verify_result'];
         if (verifyResult == null) {
           // print('verify_result is null');
-          return {'error': 'Failed to obtain verification result'};
+          return {'error': 'failed to obtain verification result'};
         }
         String? isSsoEmailValid = verifyResult['is_sso_email_valid'];
         if (isSsoEmailValid == "true") {
@@ -295,7 +298,7 @@ class _WgtLoginState extends State<WgtLogin> {
           return verifyResult;
         }
 
-        return {'error': 'Email is not valid'};
+        return {'error': 'email is not valid'};
       }
     } catch (e) {
       String error = e.toString();
@@ -303,10 +306,13 @@ class _WgtLoginState extends State<WgtLogin> {
       if (kDebugMode) {
         print('Token validation failed: $e');
       }
-      if (error.contains('verify sso email address')) {
-        return {'error': 'Failed to verify sso email address'};
+      if (error.toLowerCase().contains('auth provider mismatch')) {
+        return {'error': 'auth provider mismatch'};
       }
-      return {'error': 'Token validation failed'};
+      if (error.toLowerCase().contains('verify sso email address')) {
+        return {'error': 'failed to verify sso email address'};
+      }
+      return {'error': 'token validation failed'};
     }
   }
 
