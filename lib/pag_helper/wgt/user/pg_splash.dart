@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:buff_helper/pag_helper/def/def_page_route.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
 import 'package:buff_helper/pag_helper/model/provider/pag_app_provider.dart';
@@ -131,6 +133,11 @@ class _PgSplashState extends State<PgSplash> {
           });
         }
       } else {
+        // if (loggedInUser?.resetPasswordToken == 'flag_reset') {
+        //   Timer(const Duration(milliseconds: 100), () {
+        //     context.go('/reset_password');
+        //   });
+        // }
         widget.onSplashDone?.call(loggedInUser);
       }
     }

@@ -81,7 +81,7 @@ Future<dynamic> doOpSingleKeyValUpdate(
   }
 }
 
-Future<dynamic> doOpMultiKeyValUpdate(
+Future<dynamic> doPagOpMultiKeyValUpdate(
   MdlPagAppConfig appConfig,
   MdlPagUser? loggedInUser,
   Map<String, dynamic> queryMap,

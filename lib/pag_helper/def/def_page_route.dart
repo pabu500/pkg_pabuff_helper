@@ -257,7 +257,11 @@ enum PagPageRoute {
     'forgot_password',
     Symbols.lock,
   ),
-  ;
+  resetPassword(
+    'Reset Password',
+    'reset_password',
+    Symbols.restart_alt,
+  );
 
   const PagPageRoute(
     this.label,

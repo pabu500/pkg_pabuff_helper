@@ -294,19 +294,16 @@ Future<dynamic> doUpdateUserKeyValue(
     );
 
     if (response.statusCode == 200) {
-      String key = queryMap['key'];
+      // String key = queryMap['key'];
 
-      final resp = jsonDecode(response.body);
-      if (resp['err'] != null) {
-        throw Exception(resp.err);
+      final respJson = jsonDecode(response.body);
+      if (respJson['error'] != null) {
+        throw Exception(respJson['error']);
       }
-      Map<String, dynamic> result = {};
-      result[key] = resp['userInfo'][key];
-      return result;
-    } else if (response.statusCode == 500) {
-      Map<String, dynamic> result = {};
-      result['error'] = jsonDecode(response.body)['err'];
-      return result;
+      if (respJson['data'] == null) {
+        throw Exception('Failed to update user key value');
+      }
+      return respJson['data'];
     } else {
       throw Exception('Failed to update user.');
     }

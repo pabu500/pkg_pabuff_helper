@@ -13,6 +13,7 @@ class WgtViewEditField extends StatefulWidget {
     this.editable = true,
     // this.errorText,
     this.labelText,
+    this.hintText,
     this.width = 200,
     this.textStyle,
     this.hasFocus = false,
@@ -31,6 +32,7 @@ class WgtViewEditField extends StatefulWidget {
   final String originalValue;
   final double width;
   final String? labelText;
+  final String? hintText;
   final TextStyle? textStyle;
   final Function(String) onSetValue;
   final Function(bool) onFocus;
@@ -164,6 +166,7 @@ class _WgtViewEditFieldState extends State<WgtViewEditField> {
                         autofocus: true,
                         decoration: InputDecoration(
                           contentPadding: padding,
+                          labelText: widget.labelText ?? '',
                           border: const OutlineInputBorder(
                             borderSide: BorderSide(),
                           ),
@@ -177,8 +180,6 @@ class _WgtViewEditFieldState extends State<WgtViewEditField> {
                           errorStyle: const TextStyle(
                             fontSize: 13,
                           ),
-                          labelText: widget.labelText ?? '',
-                          // hintText: widget.originalValue,
                         ),
                         onChanged: (newValue) {
                           setState(() {
@@ -207,7 +208,9 @@ class _WgtViewEditFieldState extends State<WgtViewEditField> {
                           children: [
                             Expanded(
                               child: Text(
-                                widget.originalValue,
+                                widget.originalValue.isEmpty
+                                    ? widget.hintText ?? ''
+                                    : widget.originalValue,
                                 style: widget.textStyle ??
                                     TextStyle(
                                       fontSize: 16,
@@ -314,10 +317,11 @@ class _WgtViewEditFieldState extends State<WgtViewEditField> {
                             ),
                           ),
                         )
-                      : (widget.editable)
-                          ? SizedBox(
-                              width: 40,
-                              child: widget.useDatePicker
+                      : SizedBox(
+                          width: 40,
+                          child: !widget.editable
+                              ? null
+                              : widget.useDatePicker
                                   ? InkWell(
                                       child: const Icon(Icons.calendar_today),
                                       onTap: () {
@@ -348,8 +352,7 @@ class _WgtViewEditFieldState extends State<WgtViewEditField> {
                                       child: Icon(Icons.edit,
                                           color: Theme.of(context).hintColor),
                                     ),
-                            )
-                          : Container(),
+                        ),
               // horizontalSpaceSmall,
               if (widget.originalValue != _controller.text)
                 InkWell(

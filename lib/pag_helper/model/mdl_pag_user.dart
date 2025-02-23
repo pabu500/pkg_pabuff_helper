@@ -118,7 +118,7 @@ class MdlPagUser {
     isDoingPostLogin = false;
   }
 
-  get isEmpty => {username ?? ''}.isEmpty;
+  get isEmpty => username == '';
 
   bool hasScopeForPagProject(List<PagPortalProjectScope> projectScopeList) {
     if (userScope == null || userScope!.isEmpty) {

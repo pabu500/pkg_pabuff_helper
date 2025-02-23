@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:buff_helper/pag_helper/comm/comm_user_service.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pag_helper/wgt/user/comm_sso.dart';
@@ -8,7 +10,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_signin_button/button_list.dart';
 import 'package:flutter_signin_button/button_view.dart';
 import 'package:go_router/go_router.dart';
+import '../../model/provider/pag_user_provider.dart';
 import '../../wgt/wgt_comm_button.dart';
+import 'package:provider/provider.dart';
 
 class WgtLogin extends StatefulWidget {
   const WgtLogin({
@@ -68,6 +72,17 @@ class _WgtLoginState extends State<WgtLogin> {
           'portal_type_label': widget.appConfig.portalType.label,
         }),
       );
+
+      // user.flatReset
+      // if (user.resetPasswordToken == 'flag_reset') {
+      //   Timer(const Duration(milliseconds: 100), () {
+      //     Provider.of<PagUserProvider>(
+      //       context,
+      //       listen: false,
+      //     ).setCurrentUser(user);
+      //     context.go('/reset_password');
+      //   });
+      // }
 
       // moved to comm_user_service.dart
       // if (!user.hasScopeForPagProject(activePortalPagProjectScopeList)) {

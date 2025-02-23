@@ -203,7 +203,7 @@ class PagUrlBase {
   static const String eptGetUserRoleList = '/get_user_role_list';
   static const String eptSetUserRoleList = '/set_user_role_list';
   static const String eptUsersvcUpdateProfile = '/update_profile';
-  static const String eptUsersvcUpdateKeyVal = '/update_key_val';
+  static const String eptUsersvcUpdateKeyVal = '/ops/update_key_val';
   static const String eptUsersvcCheckUnique = '/check_unique';
   static const String eptUsersvcLogin = '/login';
   static const String eptUsersvcListUsers = '/ops/list_users';

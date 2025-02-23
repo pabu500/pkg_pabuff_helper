@@ -1,16 +1,18 @@
+import 'package:buff_helper/pag_helper/def/pag_item_helper.dart';
 import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../../pkg_buff_helper.dart';
+import '../../comm/comm_batch_op.dart';
 import '../../comm/comm_user_service.dart';
 import '../../model/acl/mdl_pag_svc_claim.dart';
 import '../../model/mdl_pag_app_config.dart';
 import 'wgt_update_password.dart';
 import 'package:provider/provider.dart';
 
-class PgMyProfile extends StatefulWidget {
-  const PgMyProfile({
+class PagPgMyProfile extends StatefulWidget {
+  const PagPgMyProfile({
     super.key,
     required this.appConfig,
   });
@@ -18,10 +20,10 @@ class PgMyProfile extends StatefulWidget {
   final MdlPagAppConfig appConfig;
 
   @override
-  State<PgMyProfile> createState() => _PgMyProfileState();
+  State<PagPgMyProfile> createState() => _PagPgMyProfileState();
 }
 
-class _PgMyProfileState extends State<PgMyProfile> {
+class _PagPgMyProfileState extends State<PagPgMyProfile> {
   late MdlPagUser? loggedInUser;
 
   final double _width = 360;
@@ -46,27 +48,78 @@ class _PgMyProfileState extends State<PgMyProfile> {
 
   String _currentField = '';
 
-  Future<dynamic> _updateProfile(String key, String value,
+  // Future<dynamic> _updateProfile(String key, String value,
+  //     {String? oldVal}) async {
+  //   // if (key == 'username') _usernameErrorText = '';
+  //   // if (key == 'email') _emailErrorText = '';
+
+  //   Map<String, dynamic> queryMap = {
+  //     'user_id': loggedInUser!.id!.toString(),
+  //     'key': key,
+  //     'value': value,
+  //     'old_val': oldVal ?? '',
+  //     'check_old_password': 'true',
+  //   };
+
+  //   try {
+  //     Map<String, dynamic> result = await doUpdateUserKeyValue(
+  //       widget.appConfig,
+  //       loggedInUser!,
+  //       queryMap,
+  //       MdlPagSvcClaim(
+  //         userId: loggedInUser!.id,
+  //         username: loggedInUser!.username,
+  //         scope: '',
+  //         target: '',
+  //         operation: '',
+  //       ),
+  //     );
+
+  //     return result;
+  //   } catch (e) {
+  //     if (kDebugMode) {
+  //       print(e);
+  //     }
+  //     //return a Map
+  //     Map<String, dynamic> result = {};
+  //     result['error'] = explainException(e);
+
+  //     return result;
+  //   }
+  // }
+
+  Future<List<Map<String, dynamic>>> _updateProfile(String key, String value,
       {String? oldVal}) async {
-    // if (key == 'username') _usernameErrorText = '';
-    // if (key == 'email') _emailErrorText = '';
-
-    Map<String, dynamic> queryMap = {
-      'user_id': loggedInUser!.id!.toString(),
-      'key': key,
-      'value': value,
-      'old_val': oldVal ?? '',
-      'check_old_password': 'true',
-    };
-
     try {
-      Map<String, dynamic> result = await doUpdateUserKeyValue(
+      String idStr = loggedInUser!.id!.toString();
+      Map<String, dynamic> queryMap = {
+        'id': idStr,
+        'item_kind': PagItemKind.user.name,
+        'item_id_type': ItemIdType.id.name,
+        'item_id_key': 'id',
+        'item_id': idStr,
+        // 'key1, key2, key3, ...'
+        'update_key_str': key,
+        'op_name': 'multi_key_val_update',
+        'op_list': [
+          {
+            'id': idStr,
+            key: value,
+            'checked': true,
+          }
+        ],
+      };
+      // if (widget.listController != null) {
+      queryMap['item_table_name'] = 'pag.pag_user';
+      // }
+
+      List<Map<String, dynamic>> result = await doPagOpMultiKeyValUpdate(
         widget.appConfig,
-        loggedInUser!,
+        loggedInUser,
         queryMap,
         MdlPagSvcClaim(
-          userId: loggedInUser!.id,
           username: loggedInUser!.username,
+          userId: loggedInUser!.id,
           scope: '',
           target: '',
           operation: '',
@@ -80,9 +133,10 @@ class _PgMyProfileState extends State<PgMyProfile> {
       }
       //return a Map
       Map<String, dynamic> result = {};
-      result['error'] = explainException(e);
+      result['error'] = explainException(e, defaultMsg: 'Error updating field');
 
-      return result;
+      //result is a List
+      return [result];
     }
   }
 
@@ -205,12 +259,26 @@ class _PgMyProfileState extends State<PgMyProfile> {
                 if (validated != null) {
                   return {'error': 'Invalid email'};
                 }
-                Map<String, dynamic> result = await _updateProfile(
-                  'email',
-                  emailToVerify,
+                List<Map<String, dynamic>> result = await doUpdateUserKeyValue(
+                  widget.appConfig,
+                  loggedInUser!,
+                  {
+                    'id': loggedInUser!.id!.toString(),
+                    'key': 'email',
+                    'value': emailToVerify,
+                    'send_verification_email': 'true',
+                  },
+                  MdlPagSvcClaim(
+                    userId: loggedInUser!.id,
+                    username: loggedInUser!.username,
+                    scope: '',
+                    target: '',
+                    operation: '',
+                  ),
                 );
-                if (result['error'] == null) {
-                  result['message'] = 'Verification email sent';
+                Map<String, dynamic> resultMap = result[0];
+                if (resultMap['error'] == null) {
+                  resultMap['message'] = 'Verification email sent';
                   setState(() {
                     _originalEmail = emailToVerify;
                     loggedInUser!.email = emailToVerify;
@@ -292,6 +360,8 @@ class _PgMyProfileState extends State<PgMyProfile> {
                 ),
                 verticalSpaceRegular,
                 WgtViewEditField(
+                  width: _width,
+                  editable: false,
                   labelText: 'Username',
                   originalValue: _originalUsername ?? '',
                   onFocus: (hasFocus) {
@@ -301,18 +371,19 @@ class _PgMyProfileState extends State<PgMyProfile> {
                   },
                   hasFocus: _currentField == 'username',
                   onSetValue: (newValue) async {
-                    Map<String, dynamic> result = await _updateProfile(
+                    List<Map<String, dynamic>> result = await _updateProfile(
                       'username',
                       newValue,
                     );
-                    if (result['error'] == null) {
+                    Map<String, dynamic> resultMap = result[0];
+                    if (resultMap['error'] == null) {
                       setState(() {
                         // _usernameErrorText = '';
                         _originalUsername = newValue;
                         loggedInUser!.username = newValue;
                       });
                     }
-                    return result;
+                    return resultMap;
                   },
                   // errorText: _usernameErrorText,
                   validator: (String? value) {
@@ -336,8 +407,6 @@ class _PgMyProfileState extends State<PgMyProfile> {
 
                     return null;
                   },
-                  width: _width,
-                  textStyle: null,
                 ),
                 verticalSpaceSmall,
                 WgtViewEditField(
@@ -350,17 +419,18 @@ class _PgMyProfileState extends State<PgMyProfile> {
                   },
                   hasFocus: _currentField == 'fullname',
                   onSetValue: (newValue) async {
-                    Map<String, dynamic> result = await _updateProfile(
+                    List<Map<String, dynamic>> result = await _updateProfile(
                       'fullname',
                       newValue,
                     );
-                    if (result['error'] == null) {
+                    Map<String, dynamic> resultMap = result[0];
+                    if (resultMap['error'] == null) {
                       setState(() {
                         _originalFullname = newValue;
                         loggedInUser!.fullName = newValue;
                       });
                     }
-                    return result;
+                    return resultMap;
                   },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -375,27 +445,49 @@ class _PgMyProfileState extends State<PgMyProfile> {
                 WgtViewEditField(
                   labelText: 'Email',
                   originalValue: _originalEmail ?? '',
+                  width: _width,
+                  textStyle: null,
+                  suffixes: _emailSuffixes,
+                  hasFocus: _currentField == 'email',
                   onFocus: (hasFocus) {
                     setState(() {
                       _currentField = 'email';
                     });
                   },
-                  hasFocus: _currentField == 'email',
                   onSetValue: (newValue) async {
-                    Map<String, dynamic> result = await _updateProfile(
-                      'email',
-                      newValue,
+                    // List<Map<String, dynamic>> result = await _updateProfile(
+                    //   'email',
+                    //   newValue,
+                    // );
+                    // Map<String, dynamic> resultMap = result[0];
+                    // if (resultMap['error'] == null) {
+                    //   setState(() {
+                    //     _originalEmail = newValue;
+                    //     loggedInUser!.email = newValue;
+                    //     loggedInUser!.emailVerified = false;
+                    //   });
+                    // }
+                    Map<String, dynamic> resultMap = await doUpdateUserKeyValue(
+                      widget.appConfig,
+                      loggedInUser!,
+                      {
+                        'user_id': loggedInUser!.id!.toString(),
+                        'key': 'email',
+                        'value': newValue,
+                        'old_val': _originalEmail ?? '',
+                        'check_old_password': 'true',
+                      },
+                      MdlPagSvcClaim(
+                        userId: loggedInUser!.id,
+                        username: loggedInUser!.username,
+                        scope: '',
+                        target: '',
+                        operation: '',
+                      ),
                     );
-                    if (result['error'] == null) {
-                      setState(() {
-                        _originalEmail = newValue;
-                        loggedInUser!.email = newValue;
-                        loggedInUser!.emailVerified = false;
-                      });
-                    }
-                    result['message'] =
+                    resultMap['message'] =
                         'Change committed. Verification email sent';
-                    return result;
+                    return resultMap;
                   },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -403,13 +495,11 @@ class _PgMyProfileState extends State<PgMyProfile> {
                     }
                     return validateEmail(value);
                   },
-                  width: _width,
-                  textStyle: null,
-                  suffixes: _emailSuffixes,
                 ),
                 verticalSpaceSmall,
                 WgtViewEditField(
                   labelText: 'Contact Number',
+                  hintText: 'Contact Number',
                   originalValue: _originalContactNumber ?? '',
                   onFocus: (hasFocus) {
                     setState(() {
@@ -418,17 +508,18 @@ class _PgMyProfileState extends State<PgMyProfile> {
                   },
                   hasFocus: _currentField == 'contact_number',
                   onSetValue: (newValue) async {
-                    Map<String, dynamic> result = await _updateProfile(
+                    List<Map<String, dynamic>> result = await _updateProfile(
                       'contact_number',
                       newValue,
                     );
-                    if (result['error'] == null) {
+                    Map<String, dynamic> resultMap = result[0];
+                    if (resultMap['error'] == null) {
                       setState(() {
                         _originalContactNumber = newValue;
                         loggedInUser!.phone = newValue;
                       });
                     }
-                    return result;
+                    return resultMap;
                   },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -440,33 +531,41 @@ class _PgMyProfileState extends State<PgMyProfile> {
                   textStyle: null,
                 ),
                 verticalSpaceMedium,
-                Padding(
-                  padding: const EdgeInsets.only(left: 5.0),
-                  child: Text(
-                    'Change Password',
-                    style: TextStyle(
-                      color: Theme.of(context).hintColor,
-                    ),
+                if (loggedInUser!.authProvider == AuthProvider.local)
+                  Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 5.0),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Change Password',
+                            style: TextStyle(
+                              color: Theme.of(context).hintColor,
+                            ),
+                          ),
+                        ),
+                      ),
+                      verticalSpaceSmall,
+                      Container(
+                        height: 330,
+                        padding: const EdgeInsets.only(right: 40),
+                        child: WgtPagUpdatePassword(
+                          appConfig: widget.appConfig,
+                          width: _width,
+                          padding: EdgeInsets.zero,
+                          showUsername: false,
+                          showBorder: false,
+                          sideExpanded: false,
+                          loggedInUser: loggedInUser!,
+                          changeTargetUserId: loggedInUser!.id!,
+                          // requestByUsername:loggedInUser!.username!,
+                          // userId:loggedInUser!.id!,
+                          updatePassword: doUpdateUserKeyValue,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                verticalSpaceSmall,
-                Container(
-                  height: 330,
-                  padding: const EdgeInsets.only(right: 40),
-                  child: WgtPagUpdatePassword(
-                    appConfig: widget.appConfig,
-                    width: _width,
-                    padding: EdgeInsets.zero,
-                    showUsername: false,
-                    showBorder: false,
-                    sideExpanded: false,
-                    loggedInUser: loggedInUser!,
-                    changeTargetUserId: loggedInUser!.id!,
-                    // requestByUsername:loggedInUser!.username!,
-                    // userId:loggedInUser!.id!,
-                    updatePassword: doUpdateUserKeyValue,
-                  ),
-                ),
               ],
             ),
           ),

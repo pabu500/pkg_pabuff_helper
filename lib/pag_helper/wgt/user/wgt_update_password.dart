@@ -1,10 +1,17 @@
+import 'dart:async';
+
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pag_helper/wgt/wgt_comm_button.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../model/acl/mdl_pag_svc_claim.dart';
+import '../../model/provider/pag_data_provider.dart';
+import '../../model/provider/pag_user_provider.dart';
+import 'comm_sso.dart';
+import 'package:provider/provider.dart';
 
 class WgtPagUpdatePassword extends StatefulWidget {
   const WgtPagUpdatePassword({
@@ -43,6 +50,8 @@ class WgtPagUpdatePassword extends StatefulWidget {
 }
 
 class _WgtPagUpdatePasswordState extends State<WgtPagUpdatePassword> {
+  late final TextStyle inputLabelStyle =
+      TextStyle(color: Theme.of(context).hintColor.withAlpha(130));
   // String? _newPassword;
   late double _width;
   final double _height = 180;
@@ -68,15 +77,16 @@ class _WgtPagUpdatePasswordState extends State<WgtPagUpdatePassword> {
     });
 
     Map<String, dynamic> queryMap = {
+      'id': widget.changeTargetUserId.toString(),
       'key': 'password',
       'value': _controllerNewPassword.text.trim(),
       'check_old_password': widget.requireOldPassword ? 'true' : 'false',
-      'old_val': _controllerOldPassword.text.trim(),
+      'old_value': _controllerOldPassword.text.trim(),
     };
     try {
-      Map<String, dynamic> result = await widget.updatePassword(
+      dynamic data = await widget.updatePassword(
         widget.appConfig,
-        widget.changeTargetUserId,
+        null,
         queryMap,
         MdlPagSvcClaim(
           userId: widget.loggedInUser.id,
@@ -87,7 +97,10 @@ class _WgtPagUpdatePasswordState extends State<WgtPagUpdatePassword> {
         ),
       );
 
-      return result;
+      if (data == null) {
+        throw Exception('Failed to update password');
+      }
+      return data;
     } catch (e) {
       if (kDebugMode) {
         print(e);
@@ -95,6 +108,16 @@ class _WgtPagUpdatePasswordState extends State<WgtPagUpdatePassword> {
       //return a Map
       Map<String, dynamic> result = {};
       result['error'] = explainException(e);
+
+      if (result['error'].isEmpty) {
+        String error = e.toString();
+        if (error.toLowerCase().contains('old password is incorrect')) {
+          result['error'] = 'Old password is incorrect';
+        }
+      }
+      if (result['error'].isEmpty) {
+        result['error'] = 'Failed to update password';
+      }
 
       return result;
     } finally {
@@ -142,7 +165,14 @@ class _WgtPagUpdatePasswordState extends State<WgtPagUpdatePassword> {
     // if (_showUpdatePasswordButton) {
     //   _height += 20;
     // }
+    if (widget.loggedInUser.isEmpty) {
+      Timer(const Duration(milliseconds: 100), () {
+        context.go('/login');
+      });
+    }
+
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Container(
           // height: _height,
@@ -158,26 +188,33 @@ class _WgtPagUpdatePasswordState extends State<WgtPagUpdatePassword> {
             width: _width,
             // height: _height,
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 widget.titleWidget ?? Container(),
-                widget.showUsername
-                    ? Padding(
-                        padding: const EdgeInsets.only(top: 8, bottom: 5),
-                        child: Text(
-                          widget.loggedInUser.username ?? '',
-                          style: TextStyle(
-                              fontSize: 18,
-                              color:
-                                  Theme.of(context).hintColor.withAlpha(200)),
-                        ),
-                      )
-                    : Container(),
+                if (widget.showUsername)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8, bottom: 5),
+                    child: Text(
+                      widget.loggedInUser.username ?? '',
+                      style: TextStyle(
+                          fontSize: 18,
+                          color: Theme.of(context).hintColor.withAlpha(200)),
+                    ),
+                  ),
                 widget.requireOldPassword
                     ? TextField(
                         controller: _controllerOldPassword,
                         obscureText: true,
                         decoration: InputDecoration(
+                          labelText: 'Old Password',
+                          hintText: 'Old Password',
+                          labelStyle: inputLabelStyle,
+                          hintStyle: TextStyle(
+                            color: _errorTextOldPassword.isEmpty
+                                ? Theme.of(context).hintColor
+                                : _okToSubmitColor,
+                          ),
                           // focusColor: Colors.red,
                           isDense: true,
                           // contentPadding: _padding,
@@ -207,15 +244,12 @@ class _WgtPagUpdatePasswordState extends State<WgtPagUpdatePassword> {
                               Radius.circular(5),
                             ),
                           ),
-
                           errorText: _errorTextOldPassword.isEmpty
                               ? null
                               : _errorTextOldPassword,
                           errorStyle: const TextStyle(
                             fontSize: 13,
                           ),
-                          labelText: 'Old Password',
-                          hintText: 'Old Password',
                         ),
                         onChanged: (value) {
                           setState(() {
@@ -234,6 +268,14 @@ class _WgtPagUpdatePasswordState extends State<WgtPagUpdatePassword> {
                   decoration: InputDecoration(
                     isDense: true,
                     // contentPadding: _padding,
+                    labelText: 'New Password',
+                    hintText: 'New Password',
+                    hintStyle: TextStyle(
+                      color: _errorTextNewPassword.isEmpty
+                          ? Theme.of(context).hintColor
+                          : _okToSubmitColor,
+                    ),
+                    labelStyle: inputLabelStyle,
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(
                         color: Theme.of(context).hintColor,
@@ -258,13 +300,6 @@ class _WgtPagUpdatePasswordState extends State<WgtPagUpdatePassword> {
                         : _errorTextNewPassword,
                     errorStyle: const TextStyle(
                       fontSize: 13,
-                    ),
-                    labelText: 'New Password',
-                    hintText: 'New Password',
-                    hintStyle: TextStyle(
-                      color: _errorTextNewPassword.isEmpty
-                          ? Theme.of(context).hintColor
-                          : _okToSubmitColor,
                     ),
                   ),
                   onChanged: (value) {
@@ -305,6 +340,14 @@ class _WgtPagUpdatePasswordState extends State<WgtPagUpdatePassword> {
                   decoration: InputDecoration(
                     // contentPadding: _padding,
                     isDense: true,
+                    labelText: 'Confirm Password',
+                    hintText: 'Confirm Password',
+                    hintStyle: TextStyle(
+                      color: _errorTextConfirmPassword.isEmpty
+                          ? Theme.of(context).hintColor
+                          : _okToSubmitColor,
+                    ),
+                    labelStyle: inputLabelStyle,
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(
                         color: Theme.of(context).hintColor,
@@ -330,8 +373,6 @@ class _WgtPagUpdatePasswordState extends State<WgtPagUpdatePassword> {
                     errorStyle: const TextStyle(
                       fontSize: 13,
                     ),
-                    labelText: 'Confirm Password',
-                    hintText: 'Confirm Password',
                   ),
                   onChanged: (newValue) {
                     setState(() {
@@ -389,7 +430,7 @@ class _WgtPagUpdatePasswordState extends State<WgtPagUpdatePassword> {
                       WgtCommButton(
                         label: 'Update Password',
                         onPressed: () async {
-                          Map<String, dynamic> result = await _updatePassword();
+                          dynamic result = await _updatePassword();
                           if (result['error'] == null) {
                             setState(() {
                               _passwordUpdated = true;
@@ -407,6 +448,24 @@ class _WgtPagUpdatePasswordState extends State<WgtPagUpdatePassword> {
                               _errorTextOldPassword = result['error'];
                             });
                           }
+
+                          await Future.delayed(
+                              const Duration(milliseconds: 500));
+                          // logout
+                          storage.deleteAll();
+
+                          Timer(const Duration(milliseconds: 100), () {
+                            Provider.of<PagDataProvider>(context, listen: false)
+                                .clearData();
+
+                            MdlPagUser? user = Provider.of<PagUserProvider>(
+                                    context,
+                                    listen: false)
+                                .currentUser;
+                            user?.logout();
+                            pagLogoutSso(context);
+                            context.go('/login');
+                          });
                         },
                       ),
                     ],
