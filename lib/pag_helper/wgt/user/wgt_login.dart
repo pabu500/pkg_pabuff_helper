@@ -115,6 +115,8 @@ class _WgtLoginState extends State<WgtLogin> {
         errorText = 'service error';
       } else if (message.toLowerCase().contains('failed to get user scope')) {
         errorText = 'failed to get user scope';
+      } else if (message.toLowerCase().contains('auth/get_login_token')) {
+        errorText = 'auth service error';
       } else if (message
           .toLowerCase()
           .contains('no access to this project portal')) {

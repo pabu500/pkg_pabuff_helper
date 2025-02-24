@@ -4,6 +4,7 @@ class MdlPagRole {
   int id;
   String name;
   String? label;
+  String? tag;
   int rank;
   PagPortalType portalType;
 
@@ -11,6 +12,7 @@ class MdlPagRole {
     required this.id,
     required this.name,
     this.label,
+    this.tag,
     this.rank = -1,
     this.portalType = PagPortalType.none,
   });
@@ -32,6 +34,7 @@ class MdlPagRole {
       id: id,
       name: json['name'],
       label: json['label'],
+      tag: json['tag'],
       rank: rank,
       portalType: portalType,
     );
@@ -42,6 +45,7 @@ class MdlPagRole {
       'id': id.toString(),
       'name': name,
       'label': label,
+      'tag': tag,
       'rank': rank,
       'portal_type_label': portalType.label,
     };
