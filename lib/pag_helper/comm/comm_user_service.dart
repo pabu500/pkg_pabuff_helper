@@ -341,14 +341,14 @@ Future<dynamic> doCheckKeyVal(
   if (response.statusCode == 200) {
     // If the server did return a 200 OK response, parse the JSON.
     // User.fromJson(jsonDecode(response.body));
-    final responseBody = jsonDecode(response.body);
-    if (responseBody['err'] != null) {
-      throw Exception(responseBody['err']);
+    final respJson = jsonDecode(response.body);
+    if (respJson['error'] != null) {
+      throw Exception(respJson['error']);
     }
-    if (responseBody['info'] != null) {
-      return responseBody['info'];
+    if (respJson['data'] == null) {
+      throw Exception('Failed to update user key value');
     }
-    return responseBody;
+    return respJson['data'];
   } else {
     throw Exception(jsonDecode(response.body)['err']);
   }

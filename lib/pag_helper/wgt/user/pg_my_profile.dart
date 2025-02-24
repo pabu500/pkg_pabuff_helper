@@ -48,46 +48,6 @@ class _PagPgMyProfileState extends State<PagPgMyProfile> {
 
   String _currentField = '';
 
-  // Future<dynamic> _updateProfile(String key, String value,
-  //     {String? oldVal}) async {
-  //   // if (key == 'username') _usernameErrorText = '';
-  //   // if (key == 'email') _emailErrorText = '';
-
-  //   Map<String, dynamic> queryMap = {
-  //     'user_id': loggedInUser!.id!.toString(),
-  //     'key': key,
-  //     'value': value,
-  //     'old_val': oldVal ?? '',
-  //     'check_old_password': 'true',
-  //   };
-
-  //   try {
-  //     Map<String, dynamic> result = await doUpdateUserKeyValue(
-  //       widget.appConfig,
-  //       loggedInUser!,
-  //       queryMap,
-  //       MdlPagSvcClaim(
-  //         userId: loggedInUser!.id,
-  //         username: loggedInUser!.username,
-  //         scope: '',
-  //         target: '',
-  //         operation: '',
-  //       ),
-  //     );
-
-  //     return result;
-  //   } catch (e) {
-  //     if (kDebugMode) {
-  //       print(e);
-  //     }
-  //     //return a Map
-  //     Map<String, dynamic> result = {};
-  //     result['error'] = explainException(e);
-
-  //     return result;
-  //   }
-  // }
-
   Future<List<Map<String, dynamic>>> _updateProfile(String key, String value,
       {String? oldVal}) async {
     try {
@@ -142,11 +102,11 @@ class _PagPgMyProfileState extends State<PagPgMyProfile> {
 
   Future<dynamic> _checkValue(String key) async {
     Map<String, dynamic> queryMap = {
-      'user_id': loggedInUser!.id!.toString(),
+      'id': loggedInUser!.id!.toString(),
       'key': key,
     };
     try {
-      Map<String, dynamic> result = await doCheckKeyVal(
+      dynamic data = await doCheckKeyVal(
         widget.appConfig,
         loggedInUser!,
         queryMap,
@@ -158,12 +118,16 @@ class _PagPgMyProfileState extends State<PagPgMyProfile> {
           operation: '',
         ),
       );
-      if (result['value'] == 'verified') {
+      if (data == null) {
+        throw Exception('Error checking value');
+      }
+
+      if (data[key] == 'verified') {
         setState(() {
           loggedInUser!.emailVerified = true;
         });
       }
-      return result;
+      return data;
     } catch (e) {
       if (kDebugMode) {
         print(e);
@@ -306,7 +270,7 @@ class _PagPgMyProfileState extends State<PagPgMyProfile> {
             return {'error': 'Invalid email'};
           }
           //check if email is verified
-          Map<String, dynamic> result = await _checkValue('verification_code');
+          dynamic result = await _checkValue('verification_code');
           if (result['error'] == null) {
             return {
               'show_committed': false,
@@ -454,6 +418,12 @@ class _PagPgMyProfileState extends State<PagPgMyProfile> {
                       _currentField = 'email';
                     });
                   },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter email';
+                    }
+                    return validateEmail(value);
+                  },
                   onSetValue: (newValue) async {
                     // List<Map<String, dynamic>> result = await _updateProfile(
                     //   'email',
@@ -471,11 +441,10 @@ class _PagPgMyProfileState extends State<PagPgMyProfile> {
                       widget.appConfig,
                       loggedInUser!,
                       {
-                        'user_id': loggedInUser!.id!.toString(),
+                        'id': loggedInUser!.id!.toString(),
                         'key': 'email',
                         'value': newValue,
-                        'old_val': _originalEmail ?? '',
-                        'check_old_password': 'true',
+                        'send_verification_email': 'true',
                       },
                       MdlPagSvcClaim(
                         userId: loggedInUser!.id,
@@ -485,15 +454,18 @@ class _PagPgMyProfileState extends State<PagPgMyProfile> {
                         operation: '',
                       ),
                     );
+
+                    if (resultMap['error'] == null) {
+                      setState(() {
+                        _originalEmail = newValue;
+                        loggedInUser!.email = newValue;
+                        loggedInUser!.emailVerified = false;
+                      });
+                    }
+
                     resultMap['message'] =
                         'Change committed. Verification email sent';
                     return resultMap;
-                  },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter email';
-                    }
-                    return validateEmail(value);
                   },
                 ),
                 verticalSpaceSmall,
