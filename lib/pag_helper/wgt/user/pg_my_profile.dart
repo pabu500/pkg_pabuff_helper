@@ -48,6 +48,9 @@ class _PagPgMyProfileState extends State<PagPgMyProfile> {
 
   String _currentField = '';
 
+  bool _isCoolingDownSendVerify = false;
+  bool _isCoolingDownCheckVerify = false;
+
   Future<List<Map<String, dynamic>>> _updateProfile(String key, String value,
       {String? oldVal}) async {
     try {
@@ -196,10 +199,15 @@ class _PagPgMyProfileState extends State<PagPgMyProfile> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 2),
             decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(3),
-                color: (loggedInUser!.emailVerified ?? false)
-                    ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context).colorScheme.error.withAlpha(180)),
+              borderRadius: BorderRadius.circular(3),
+              color: (loggedInUser!.emailVerified ?? false)
+                  ? (_isCoolingDownSendVerify
+                      ? Theme.of(context).colorScheme.primary.withAlpha(130)
+                      : Theme.of(context).colorScheme.primary)
+                  : (_isCoolingDownSendVerify
+                      ? Theme.of(context).colorScheme.error.withAlpha(130)
+                      : Theme.of(context).colorScheme.error.withAlpha(210)),
+            ),
             child: Text(
               (loggedInUser!.emailVerified ?? false)
                   ? 'Verified'
@@ -211,7 +219,74 @@ class _PagPgMyProfileState extends State<PagPgMyProfile> {
             ),
           ),
         ),
-        'onTap': (loggedInUser!.emailVerified ?? false)
+        'onTap':
+            _isCoolingDownSendVerify || (loggedInUser!.emailVerified ?? false)
+                ? null
+                : () async {
+                    String emailToVerify = _originalEmail ?? '';
+                    if (emailToVerify.isEmpty) {
+                      return {'error': 'Email is empty'};
+                    }
+                    //validate email
+                    String? validated = validateEmail(emailToVerify);
+                    if (validated != null) {
+                      return {'error': 'Invalid email'};
+                    }
+
+                    setState(() {
+                      _isCoolingDownSendVerify = true;
+                    });
+
+                    dynamic data = await doUpdateUserKeyValue(
+                      widget.appConfig,
+                      loggedInUser!,
+                      {
+                        'id': loggedInUser!.id!.toString(),
+                        'key': 'email',
+                        'value': emailToVerify,
+                        'send_verification_email': 'true',
+                      },
+                      MdlPagSvcClaim(
+                        userId: loggedInUser!.id,
+                        username: loggedInUser!.username,
+                        scope: '',
+                        target: '',
+                        operation: '',
+                      ),
+                    );
+                    if (data == null) {
+                      return {'error': 'Error sending verification email'};
+                    }
+                    Map<String, dynamic> resultMap = data;
+                    if (resultMap['error'] == null) {
+                      resultMap['message'] = 'Verification email sent';
+                      setState(() {
+                        _originalEmail = emailToVerify;
+                        loggedInUser!.email = emailToVerify;
+                        loggedInUser!.emailVerified = false;
+                      });
+                    }
+
+                    //Timer
+                    Future.delayed(const Duration(milliseconds: 2500), () {
+                      setState(() {
+                        _isCoolingDownSendVerify = false;
+                      });
+                    });
+
+                    return data;
+                  },
+      },
+      {
+        'key': 'refresh',
+        'widget': Icon(
+          Icons.refresh,
+          color: _isCoolingDownCheckVerify
+              ? Theme.of(context).colorScheme.primary.withAlpha(130)
+              : Theme.of(context).colorScheme.primary,
+          size: 21,
+        ),
+        'onTap': _isCoolingDownCheckVerify
             ? null
             : () async {
                 String emailToVerify = _originalEmail ?? '';
@@ -223,60 +298,25 @@ class _PagPgMyProfileState extends State<PagPgMyProfile> {
                 if (validated != null) {
                   return {'error': 'Invalid email'};
                 }
-                List<Map<String, dynamic>> result = await doUpdateUserKeyValue(
-                  widget.appConfig,
-                  loggedInUser!,
-                  {
-                    'id': loggedInUser!.id!.toString(),
-                    'key': 'email',
-                    'value': emailToVerify,
-                    'send_verification_email': 'true',
-                  },
-                  MdlPagSvcClaim(
-                    userId: loggedInUser!.id,
-                    username: loggedInUser!.username,
-                    scope: '',
-                    target: '',
-                    operation: '',
-                  ),
-                );
-                Map<String, dynamic> resultMap = result[0];
-                if (resultMap['error'] == null) {
-                  resultMap['message'] = 'Verification email sent';
+                setState(() {
+                  _isCoolingDownCheckVerify = true;
+                });
+                //check if email is verified
+                dynamic result = await _checkValue('verification_code');
+
+                //Timer
+                Future.delayed(const Duration(milliseconds: 2500), () {
                   setState(() {
-                    _originalEmail = emailToVerify;
-                    loggedInUser!.email = emailToVerify;
-                    loggedInUser!.emailVerified = false;
+                    _isCoolingDownCheckVerify = false;
                   });
-                  return result;
+                });
+
+                if (result['error'] == null) {
+                  return {
+                    'show_committed': false,
+                  };
                 }
               },
-      },
-      {
-        'key': 'refresh',
-        'widget': Icon(
-          Icons.refresh,
-          color: Theme.of(context).colorScheme.primary,
-          size: 21,
-        ),
-        'onTap': () async {
-          String emailToVerify = _originalEmail ?? '';
-          if (emailToVerify.isEmpty) {
-            return {'error': 'Email is empty'};
-          }
-          //validate email
-          String? validated = validateEmail(emailToVerify);
-          if (validated != null) {
-            return {'error': 'Invalid email'};
-          }
-          //check if email is verified
-          dynamic result = await _checkValue('verification_code');
-          if (result['error'] == null) {
-            return {
-              'show_committed': false,
-            };
-          }
-        },
       },
     ];
 

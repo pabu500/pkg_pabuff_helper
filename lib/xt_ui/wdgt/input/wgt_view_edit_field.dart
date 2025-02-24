@@ -414,7 +414,7 @@ class _WgtViewEditFieldState extends State<WgtViewEditField> {
               if (suffix['onTap'] == null) {
                 return;
               }
-              await Future.delayed(const Duration(milliseconds: 500));
+              // await Future.delayed(const Duration(milliseconds: 500));
               dynamic result = await suffix['onTap']?.call();
               if (result == null) {
                 return;
