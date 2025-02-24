@@ -568,11 +568,14 @@ class MdlPagUser {
       String authProviderStr = userJson['auth_provider'] ?? 'local';
       AuthProvider? authProvider = AuthProvider.values.byName(authProviderStr);
 
+      bool emailVerified =
+          userJson['email_verified'] ?? (authProvider != AuthProvider.local);
+
       return MdlPagUser(
         id: userJson['id'],
         username: userJson['username'],
         email: userJson['email'] ?? '',
-        emailVerified: userJson['email_verified'] ?? false,
+        emailVerified: emailVerified, //userJson['email_verified'] ?? false,
         fullName: userJson['fullname'] ?? '',
         phone: userJson['contact_number'] ?? '',
         enabled: userJson['enabled'],

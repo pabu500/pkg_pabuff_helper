@@ -408,6 +408,7 @@ class _PagPgMyProfileState extends State<PagPgMyProfile> {
                 verticalSpaceSmall,
                 WgtViewEditField(
                   labelText: 'Email',
+                  editable: loggedInUser!.authProvider == AuthProvider.local,
                   originalValue: _originalEmail ?? '',
                   width: _width,
                   textStyle: null,
