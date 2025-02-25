@@ -71,7 +71,7 @@ T? enumByTag<T extends Enum>(
 ) {
   if (tag == null) return null;
   for (var value in values) {
-    if (value is PagDeviceLsStatus && value.tag == tag) {
+    if (value is PagDeviceLsStatus && value.tag.replaceAll('.', '') == tag) {
       return value as T;
     }
   }
