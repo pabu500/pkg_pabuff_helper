@@ -42,6 +42,7 @@ class Evs2ListText extends StatefulWidget {
     this.nonSelectable = false,
     this.clickCopy = false,
     this.forceShowTooltip = false,
+    this.mainAixsAlignment,
   });
 
   final String originalFullText;
@@ -80,6 +81,7 @@ class Evs2ListText extends StatefulWidget {
   final EdgeInsets? contentPadding;
   final bool nonSelectable;
   final bool clickCopy;
+  final MainAxisAlignment? mainAixsAlignment;
 
   @override
   State<Evs2ListText> createState() => _Evs2ListTextState();
@@ -199,7 +201,7 @@ class _Evs2ListTextState extends State<Evs2ListText> {
       width: widget.width,
       // height: widget.height,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisAlignment: widget.mainAixsAlignment ?? MainAxisAlignment.start,
         children: [
           widget.nonSelectable
               ? widget.clickCopy

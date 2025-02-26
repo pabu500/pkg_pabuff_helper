@@ -588,6 +588,10 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
         originalFullText =
             configItem['getDisplayString'](row[configItem['fieldKey']]) ?? '';
       }
+      if (configItem['useThousandSeparator'] == true) {
+        originalFullText =
+            getCommaNumberStr(double.tryParse(originalFullText), decimal: 2);
+      }
 
       bool showTag = false;
       String tagText = '';
@@ -624,6 +628,7 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
                   colValidator: configItem['uniqueValidator'],
                   unique: unique,
                   listValues: listValues,
+                  mainAixsAlignment: configItem['align'],
                   nonSelectable:
                       (configItem['clickCopy'] ?? false) ? true : false,
                   clickCopy: configItem['clickCopy'] ?? false,
