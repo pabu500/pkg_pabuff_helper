@@ -17,6 +17,10 @@ class MdlPagRole {
     this.portalType = PagPortalType.none,
   });
 
+  bool isAdmin() {
+    return label?.toLowerCase().contains('admin') ?? false;
+  }
+
   factory MdlPagRole.fromJson(Map<String, dynamic> json) {
     dynamic id = json['id'];
     if (id is String) {

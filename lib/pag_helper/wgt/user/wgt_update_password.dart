@@ -452,7 +452,7 @@ class _WgtPagUpdatePasswordState extends State<WgtPagUpdatePassword> {
                           await Future.delayed(
                               const Duration(milliseconds: 500));
                           // logout
-                          storage.deleteAll();
+                          secStorage.deleteAll();
 
                           Timer(const Duration(milliseconds: 100), () {
                             Provider.of<PagDataProvider>(context, listen: false)

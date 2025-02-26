@@ -183,7 +183,7 @@ void onSelected(
       themeNotifier.isDark = !themeNotifier.isDark;
       break;
     case 'logout':
-      storage.deleteAll();
+      secStorage.deleteAll();
       Provider.of<PagDataProvider>(context, listen: false).clearData();
       MdlPagUser? user =
           Provider.of<PagUserProvider>(context, listen: false).currentUser;

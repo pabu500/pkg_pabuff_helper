@@ -39,21 +39,26 @@ Future<MdlPagUser> doLoginPag(
     }
     String token = jsonDecode(response.body)['token'];
 
-    if (kDebugMode) {
-      print('usersvc comm: writing token to secure storage');
-    }
-    try {
-      await storage.write(key: 'pag_user_token', value: token);
-    } catch (err) {
-      if (kDebugMode) {
-        print('usersvc comm: error writing token to secure storage: $err');
-      }
-    }
-    if (kDebugMode) {
-      print('usersvc comm: getting user from token');
-    }
+    // try {
+    //   await storage.write(key: 'pag_user_token', value: token);
+    // } catch (err) {
+    //   if (kDebugMode) {
+    //     print('usersvc comm: error writing token to secure storage: $err');
+    //   }
+    // }
 
     MdlPagUser user = MdlPagUser.fromJson2(jsonDecode(response.body));
+
+    // Do not write token to secure storage if resetPasswordToken is 'flag_reset'
+    if (user.resetPasswordToken != 'flag_reset') {
+      try {
+        await secStorage.write(key: 'pag_user_token', value: token);
+      } catch (err) {
+        if (kDebugMode) {
+          print('usersvc comm: error writing token to secure storage: $err');
+        }
+      }
+    }
 
     return user;
   } else {

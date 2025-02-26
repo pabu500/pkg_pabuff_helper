@@ -3,23 +3,23 @@ import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-const storage = FlutterSecureStorage();
+const secStorage = FlutterSecureStorage();
 
 void saveToSecuredStorage(String key, String val) async {
-  await storage.write(key: key, value: val);
+  await secStorage.write(key: key, value: val);
 }
 
 void saveToSecuredStorage2(String key, Map<String, dynamic> val) async {
-  await storage.write(key: key, value: jsonEncode(val));
+  await secStorage.write(key: key, value: jsonEncode(val));
 }
 
 Future<String> readFromSecuredStorage(String key) async {
-  String? val = await storage.read(key: key);
+  String? val = await secStorage.read(key: key);
   return val ?? '';
 }
 
 Future<Map<String, dynamic>> readFromSecuredStorage2(String key) async {
-  String? val = await storage.read(key: key);
+  String? val = await secStorage.read(key: key);
   try {
     return jsonDecode(val ?? '{}');
   } catch (err) {
@@ -28,7 +28,7 @@ Future<Map<String, dynamic>> readFromSecuredStorage2(String key) async {
 }
 
 Future<void> removeFromSecuredStorage(String key) async {
-  await storage.delete(key: key);
+  await secStorage.delete(key: key);
 }
 
 Future<void> saveToSharedPref(String key, dynamic val,

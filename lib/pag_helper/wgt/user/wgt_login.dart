@@ -142,11 +142,11 @@ class _WgtLoginState extends State<WgtLogin> {
   _saveToStorage() async {
     if (_savePassword) {
       // reset fingerprint auth values. Only for demo purpose
-      await storage.write(key: keyLocalAuthEnabled, value: "false");
+      await secStorage.write(key: keyLocalAuthEnabled, value: "false");
 
-      await storage.write(
+      await secStorage.write(
           key: PagUserKey.identifier.toString(), value: _username);
-      await storage.write(
+      await secStorage.write(
           key: PagUserKey.password.toString(), value: _password);
 
       // check if biometric auth is supported
