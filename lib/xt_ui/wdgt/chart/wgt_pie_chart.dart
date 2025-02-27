@@ -138,7 +138,7 @@ class WgtPieChartState extends State<WgtPieChart> {
         pieWidth + middleWidth + rightWidth + widget.indicatorOffset;
     return Container(
       width: widget.width ?? widgetWidth,
-      height: widget.height ?? widgetWidth,
+      height: widget.height ?? pieWidth + 20,
       color: widget.backgoundColor ?? Colors.transparent,
       child: widget.chartData.isEmpty
           ? const Center(
