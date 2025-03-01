@@ -8,6 +8,7 @@ import 'package:material_symbols_icons/material_symbols_icons.dart';
 
 import '../../../xt_ui/wdgt/show_model_bottom_sheet.dart';
 import 'wgt_bill_rec_finder.dart';
+import 'wgt_bill_view_r2.dart';
 
 class WgtListSearchBillingRec extends StatefulWidget {
   const WgtListSearchBillingRec({
@@ -62,6 +63,7 @@ class WgtListSearchBillingRec extends StatefulWidget {
 
 class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
   final String sectionName = 'list_search_billing_rec';
+  final int constDecimals = 2;
 
   late final List<Map<String, dynamic>> _listConfig = [];
   Map<String, dynamic> _queryMap = {};
@@ -374,7 +376,8 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
 
                   xtShowModelBottomSheet(
                     context,
-                    WgtBillView(
+                    WgtBillViewR2(
+                      costDecimals: constDecimals,
                       appConfig: widget.appConfig,
                       loggedInUser: widget.loggedInUser,
                       scopeProfile: widget.scopeProfile,

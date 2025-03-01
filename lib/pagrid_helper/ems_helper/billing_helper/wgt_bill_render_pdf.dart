@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:js_interop';
 
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
@@ -9,7 +10,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
 import 'dart:io';
 
-import 'dart:html' as html;
+// import 'dart:html' as html;
+import 'package:web/web.dart' as web;
 
 class WgtBillRenderPdf extends StatefulWidget {
   const WgtBillRenderPdf({
@@ -104,11 +106,18 @@ Future<void> generateAndSavePdfWeb(
 ) async {
   final bytes = await build(pageFormat);
   List<int> fileInts = List.from(bytes);
-  html.AnchorElement(
-      href:
-          "data:application/octet-stream;charset=utf-16le;base64,${base64.encode(fileInts)}")
-    ..setAttribute("download", '$fileName.pdf')
+  final base64String = base64.encode(fileInts);
+
+  web.HTMLAnchorElement()
+    ..href = 'data:application/pdf;base64,$base64String'
+    ..download = '$fileName.pdf'
     ..click();
+
+  // html.AnchorElement(
+  //     href:
+  //         "data:application/octet-stream;charset=utf-16le;base64,${base64.encode(fileInts)}")
+  //   ..setAttribute("download", '$fileName.pdf')
+  //   ..click();
 }
 
 Future<void> generateAndSavePdfMobile(
