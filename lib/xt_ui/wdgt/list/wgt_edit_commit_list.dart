@@ -407,6 +407,7 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
       listHeader.add(Evs2ListText(
         originalFullText: configItem['title'],
         width: configItem['width'].toDouble(),
+        mainAixsAlignment: configItem['align'],
         style: listHeaderStyle,
         suffix: suffix,
       ));
