@@ -66,6 +66,8 @@ class MdlListColController {
       getCustomWidget;
   TextEditingController? filterWidgetController;
   PagScopeType? scopeType;
+  String? align;
+  bool useComma;
 
   MdlListColController({
     required this.colKey,
@@ -100,6 +102,8 @@ class MdlListColController {
     bool? pinned,
     this.getCustomWidget,
     this.scopeType,
+    this.align,
+    this.useComma = false,
   }) {
     pinned = pinned ?? false;
   }
