@@ -32,7 +32,7 @@ class WgtDashControl extends StatefulWidget {
     this.showHidePanel = false,
     this.showTopSelector = false,
     this.topSelectorValues = const ['10'],
-    this.onUpdateMainSubMeterSel,
+    this.onUpdateMainSubDeltaMeterSel,
     this.onUpdateTop,
     this.getList,
   });
@@ -58,7 +58,7 @@ class WgtDashControl extends StatefulWidget {
   final bool showHidePanel;
   final bool showTopSelector;
   final List<String> topSelectorValues;
-  final Function(Map<String, bool>)? onUpdateMainSubMeterSel;
+  final Function(Map<String, bool>)? onUpdateMainSubDeltaMeterSel;
   final Function(String)? onUpdateTop;
   final List<List<dynamic>> Function()? getList;
 
@@ -232,43 +232,6 @@ class _WgtDashControlState extends State<WgtDashControl> {
                     //onUpdateMainMetersOnly
                     if (widget.showMainMeterToggle &&
                         widget.onUpdateMainMetersOnly != null)
-                      // Container(
-                      //   padding: const EdgeInsets.symmetric(horizontal: 5),
-                      //   decoration: BoxDecoration(
-                      //     color: Theme.of(context)
-                      //         .colorScheme
-                      //         .primary
-                      //         .withOpacity(0.7),
-                      //     borderRadius: BorderRadius.circular(5),
-                      //     boxShadow: [
-                      //       BoxShadow(
-                      //         color: Colors.black.withOpacity(0.1),
-                      //         spreadRadius: 3,
-                      //         blurRadius: 5,
-                      //         offset: const Offset(1, 3),
-                      //       ),
-                      //     ],
-                      //   ),
-                      //   child: InkWell(
-                      //     onTap: !widget.enableControl
-                      //         ? null
-                      //         : (_selectedMeterType !=
-                      //                     MeterType.electricity1p &&
-                      //                 _selectedMeterType != MeterType.btu)
-                      //             ? null
-                      //             : () {
-                      //                 widget.onUpdateMainMetersOnly
-                      //                     ?.call(!_mainMetersOnly);
-                      //                 setState(() {
-                      //                   _mainMetersOnly = !_mainMetersOnly;
-                      //                 });
-                      //               },
-                      //     child: const Text(
-                      //       'Main',
-                      //       style: TextStyle(color: Colors.white),
-                      //     ),
-                      //   ),
-                      // ),
                       //toggle switch
                       Row(
                         children: [
@@ -317,7 +280,7 @@ class _WgtDashControlState extends State<WgtDashControl> {
                           ),
                         ],
                       ),
-                    if (widget.showMainMeterSwitch) getMainMeterSwitcher(),
+                    if (widget.showMainMeterSwitch) getMainMeterDeltaSelector(),
                     if (widget.showDownload) getDownload(),
                     horizontalSpaceSmall,
                   ],
@@ -371,15 +334,15 @@ class _WgtDashControlState extends State<WgtDashControl> {
     );
   }
 
-  Widget getMainMeterSwitcher() {
+  Widget getMainMeterDeltaSelector() {
     bool enableMainMeterSelect = true;
-    if (!_subMeterSelected && _mainMeterSelected) {
-      enableMainMeterSelect = false;
-    }
+    // if (!_subMeterSelected && _mainMeterSelected) {
+    // enableMainMeterSelect = false;
+    // }
     bool enableSubMeterSelect = true;
-    if (!_mainMeterSelected && _subMeterSelected) {
-      enableSubMeterSelect = false;
-    }
+    // if (!_mainMeterSelected && _subMeterSelected) {
+    //   enableSubMeterSelect = false;
+    // }
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 5),
       decoration: BoxDecoration(
@@ -406,7 +369,7 @@ class _WgtDashControlState extends State<WgtDashControl> {
                         setState(() {
                           _mainMeterSelected = value!;
                         });
-                        widget.onUpdateMainSubMeterSel?.call({
+                        widget.onUpdateMainSubDeltaMeterSel?.call({
                           'main': value!,
                           'sub': _subMeterSelected,
                         });
@@ -432,7 +395,7 @@ class _WgtDashControlState extends State<WgtDashControl> {
                         setState(() {
                           _subMeterSelected = value!;
                         });
-                        widget.onUpdateMainSubMeterSel?.call({
+                        widget.onUpdateMainSubDeltaMeterSel?.call({
                           'main': _mainMeterSelected,
                           'sub': value!,
                         });
