@@ -217,12 +217,14 @@ class WgtMultiParaBarChartState extends State<WgtMultiParaBarChart> {
 
     List<BarChartRodStackItem> rodStackItems = [];
     for (Map<String, dynamic> groupBars in groupBarList) {
+      int alpha = groupBars['alpha'] ?? 255;
       BarChartRodStackItem rodStackItem = BarChartRodStackItem(
         0,
         groupBars['y'] as double,
         useColorList
             ? widget.barColorList![groupBarList.indexOf(groupBars)]
-            : groupBars['color'] as Color,
+                .withAlpha(alpha)
+            : (groupBars['color'] as Color),
       );
 
       rodStackItems.add(rodStackItem);
