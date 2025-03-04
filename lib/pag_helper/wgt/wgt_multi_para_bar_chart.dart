@@ -229,6 +229,7 @@ class WgtMultiParaBarChartState extends State<WgtMultiParaBarChart> {
     }
 
     BarChartRodData barData = BarChartRodData(
+      color: Colors.transparent,
       toY: toY,
       width: _barWidth,
       rodStackItems: rodStackItems,
