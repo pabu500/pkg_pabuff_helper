@@ -2,6 +2,7 @@ import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 
 import 'mdl_ems_type_usage.dart';
+import 'mdl_ems_type_usage_r2.dart';
 
 class EmsTypeUsageCalcReleasedR2 {
   late final int _costDecimals;
@@ -45,11 +46,11 @@ class EmsTypeUsageCalcReleasedR2 {
   late final String? _billBarFromMonth;
 
   //output
-  EmsTypeUsage? _typeUsageE;
-  EmsTypeUsage? _typeUsageW;
-  EmsTypeUsage? _typeUsageB;
-  EmsTypeUsage? _typeUsageN;
-  EmsTypeUsage? _typeUsageG;
+  EmsTypeUsageR2? _typeUsageE;
+  EmsTypeUsageR2? _typeUsageW;
+  EmsTypeUsageR2? _typeUsageB;
+  EmsTypeUsageR2? _typeUsageN;
+  EmsTypeUsageR2? _typeUsageG;
 
   final List<Map<String, dynamic>> _trendingE = [];
   final List<Map<String, dynamic>> _trendingW = [];
@@ -61,11 +62,11 @@ class EmsTypeUsageCalcReleasedR2 {
   double? _gstAmount;
   double? _totalCost;
 
-  EmsTypeUsage? get typeUsageE => _typeUsageE;
-  EmsTypeUsage? get typeUsageW => _typeUsageW;
-  EmsTypeUsage? get typeUsageB => _typeUsageB;
-  EmsTypeUsage? get typeUsageN => _typeUsageN;
-  EmsTypeUsage? get typeUsageG => _typeUsageG;
+  EmsTypeUsageR2? get typeUsageE => _typeUsageE;
+  EmsTypeUsageR2? get typeUsageW => _typeUsageW;
+  EmsTypeUsageR2? get typeUsageB => _typeUsageB;
+  EmsTypeUsageR2? get typeUsageN => _typeUsageN;
+  EmsTypeUsageR2? get typeUsageG => _typeUsageG;
 
   List<Map<String, dynamic>> get trendingE => _trendingE;
   List<Map<String, dynamic>> get trendingW => _trendingW;
@@ -165,7 +166,7 @@ class EmsTypeUsageCalcReleasedR2 {
     });
   }
 
-  EmsTypeUsage getTypeUsage(String usageType) {
+  EmsTypeUsageR2 getTypeUsage(String usageType) {
     switch (usageType) {
       case 'E':
         return _typeUsageE!;
@@ -326,15 +327,16 @@ class EmsTypeUsageCalcReleasedR2 {
       typeUsageFactored = typeUsageFactored + billedManualUsage;
     }
 
-    final typeUsage = EmsTypeUsage(
+    final typeUsage = EmsTypeUsageR2(
       typeTag: typeTag,
       usage: typeUsageTotal,
       usageFactored: typeUsageFactored,
       factor: billedUsageFactor,
       rate: billedRate,
-      cost: typeUsageFactored != null && billedRate != null
-          ? typeUsageFactored * billedRate
-          : null,
+      // cost: typeUsageFactored != null && billedRate != null
+      //     ? typeUsageFactored * billedRate
+      //     : null,
+      costDecimals: _costDecimals,
     );
 
     switch (typeTag) {
