@@ -8,6 +8,7 @@ enum PagItemKind {
   tenant,
   jobType,
   jobTypeSub,
+  tariffPackage,
   // METER,
   // CONCENTRATOR,
   // GATEWAY,

@@ -72,6 +72,11 @@ enum PagPageRoute {
     'tenant_manager',
     Symbols.location_away,
   ),
+  tariffManager(
+    'Tariff Manager',
+    'tariff_manager',
+    Symbols.price_change,
+  ),
   billingManager(
     'Billing Manager',
     'billing_manager',
