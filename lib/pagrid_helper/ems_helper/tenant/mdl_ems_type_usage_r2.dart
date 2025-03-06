@@ -32,13 +32,13 @@ class EmsTypeUsageR2 {
         _rate = rate,
         // _cost = cost,
         _costDecimals = costDecimals {
-    if (rate != null && usage != null) {
-      _cost = rate * usage;
+    if (rate != null && usage != null && factor != null) {
+      _cost = rate * usage * factor;
       // round to _costDecimals
       if (_costDecimals != null) {
         _cost =
             double.parse((_cost! * pow(10, _costDecimals)).toStringAsFixed(0)) /
-                pow(10, _costDecimals!);
+                pow(10, _costDecimals);
       }
     }
   }
