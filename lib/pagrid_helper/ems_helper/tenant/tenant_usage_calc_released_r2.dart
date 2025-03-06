@@ -303,6 +303,11 @@ class EmsTypeUsageCalcReleasedR2 {
     final billedUsageFactor = _getBilledUsageFactor(typeTag);
     final billedRate = _getBilledRate(typeTag);
 
+    double? billedManualUsagePrefactored;
+    if (billedManualUsage != null && billedUsageFactor != null) {
+      billedManualUsagePrefactored = billedManualUsage / billedUsageFactor;
+    }
+
     double? typeUsageTotal;
     double? typeUsageFactored;
 
@@ -314,17 +319,16 @@ class EmsTypeUsageCalcReleasedR2 {
       typeUsageTotal = typeUsageTotal - billedSubTenantUsage;
     }
 
-    if (billedUsageFactor != null && typeUsageTotal != null) {
-      typeUsageFactored = typeUsageTotal * billedUsageFactor;
-    }
-
-    // NOTE: manual usage is not factored
-    if (billedManualUsage != null) {
+    if (billedManualUsagePrefactored != null) {
       typeUsageTotal ??= 0;
-      typeUsageTotal = typeUsageTotal + billedManualUsage;
+      typeUsageTotal = typeUsageTotal + billedManualUsagePrefactored;
 
       typeUsageFactored ??= 0;
-      typeUsageFactored = typeUsageFactored + billedManualUsage;
+      typeUsageFactored = typeUsageFactored + billedManualUsagePrefactored;
+    }
+
+    if (billedUsageFactor != null && typeUsageTotal != null) {
+      typeUsageFactored = typeUsageTotal * billedUsageFactor;
     }
 
     final typeUsage = EmsTypeUsageR2(

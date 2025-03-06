@@ -32,8 +32,9 @@ class EmsTypeUsageR2 {
         _rate = rate,
         // _cost = cost,
         _costDecimals = costDecimals {
-    if (rate != null && usage != null && factor != null) {
-      _cost = rate * usage * factor;
+    if (rate != null && usageFactored != null /*&& factor != null*/) {
+      // auto usage has already been factored
+      _cost = rate * usageFactored /* * factor*/;
       // round to _costDecimals
       if (_costDecimals != null) {
         _cost =
