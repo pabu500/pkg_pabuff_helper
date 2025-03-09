@@ -12,6 +12,8 @@ enum PagTreePartType {
   tenant('Tenant', Symbols.location_away),
   jobType('Job Type', Symbols.assignment),
   jobTypeSub('Job Type Sub', Symbols.group),
+  tariffPackage('Tariff Package', Symbols.price_change),
+  tariffRate('Tariff Rate', Symbols.sell),
   addButton('Add Button', Symbols.add_circle),
   removeButton('Remove Button', Symbols.remove),
   none('None', Symbols.error_outline),

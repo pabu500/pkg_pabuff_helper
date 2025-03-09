@@ -1,23 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
+
+import 'enum_helper.dart';
 
 enum PagItemKind {
-  // LOCATION,
-  scope,
-  device,
-  user,
-  tenant,
-  jobType,
-  jobTypeSub,
-  tariffPackage,
-  // METER,
-  // CONCENTRATOR,
-  // GATEWAY,
-  // CAMERA,
-  // METER_GRROP,
-  // SENSOR,
-  // LOCK,
-  // USER_GROUP,
-  // TARIFF,
+  scope('Scope', Symbols.file_map_stack),
+  device('Device', Symbols.home_iot_device),
+  user('User', Symbols.person),
+  tenant('Tenant', Symbols.location_away),
+  jobType('Job Type', Symbols.energy_program_time_used),
+  jobTypeSub('Job Type Sub', Symbols.group),
+  tariffPackage('Tariff Package', Symbols.price_change),
+  ;
+
+  const PagItemKind(
+    this.label,
+    this.iconData,
+  );
+
+  final String label;
+  final IconData iconData;
+
+  static PagItemKind? byLabel(String? label) =>
+      enumByLabel(label, values, (e) => (e).label);
 }
 
 enum PagDeviceLsStatus {
@@ -42,6 +47,7 @@ enum PagDeviceLsStatus {
       enumByLabel(
         label,
         values,
+        (e) => (e).label,
       ) ??
       normal;
 
@@ -53,18 +59,18 @@ enum PagDeviceLsStatus {
       normal;
 }
 
-T? enumByLabel<T extends Enum>(
-  String? label,
-  List<T> values,
-) {
-  if (label == null) return null;
-  for (var value in values) {
-    if (value is PagDeviceLsStatus && value.label == label) {
-      return value as T;
-    }
-  }
-  return null;
-}
+// T? enumByLabel<T extends Enum>(
+//   String? label,
+//   List<T> values,
+// ) {
+//   if (label == null) return null;
+//   for (var value in values) {
+//     if (value is PagDeviceLsStatus && value.label == label) {
+//       return value as T;
+//     }
+//   }
+//   return null;
+// }
 
 T? enumByTag<T extends Enum>(
   String? tag,
