@@ -261,6 +261,14 @@ class PagUrlBase {
   //ems
   static const String eptGetUserTenantList = '/ems/get_user_tenant_list';
   static const String eptSetUserTenantList = '/ems/set_user_tenant_list';
+  static const String eptGetTariffPackageTariffRateList =
+      '/ems/get_tariff_package_tariff_rate_list';
+  static const String eptSetTariffPackageTariffRateList =
+      '/ems/set_tariff_package_tariff_rate_list';
+  static const String eptAddTariffPackageTariffRate =
+      '/ems/add_tariff_package_tariff_rate';
+  static const String eptDeleteTariffPackageTariffRate =
+      '/ems/delete_tariff_package_tariff_rate';
 
   //meter_ops
   static const String eptMeterOpGetManualMeterList =

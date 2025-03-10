@@ -1,7 +1,5 @@
-import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
-import 'package:provider/provider.dart';
 
 class WgtMonthPicker extends StatefulWidget {
   const WgtMonthPicker({
@@ -22,9 +20,6 @@ class WgtMonthPicker extends StatefulWidget {
 }
 
 class _WgtMonthPickerState extends State<WgtMonthPicker> {
-  late ScopeProfile _scopeProfile;
-  late Evs2User? _loggedInUser;
-
   DateTime? _selectedStartDate;
   DateTime? _selectedEndDate;
 
@@ -59,10 +54,6 @@ class _WgtMonthPickerState extends State<WgtMonthPicker> {
   @override
   void initState() {
     super.initState();
-    _scopeProfile =
-        Provider.of<AppModel>(context, listen: false).portalScopeProfile;
-    _loggedInUser =
-        Provider.of<UserProvider>(context, listen: false).currentUser;
 
     _selectedStartDate =
         widget.initialDate ?? (widget.useDefault ? DateTime.now() : null);
