@@ -6,6 +6,7 @@ import 'package:path_drawing/path_drawing.dart';
 
 class PagTreeNode {
   PagTreeNode({
+    required this.parent,
     required this.name,
     required this.label,
     required this.child,
@@ -15,6 +16,7 @@ class PagTreeNode {
     Iterable<PagTreeNode>? children,
   }) : children = <PagTreeNode>[...?children];
 
+  final PagTreeNode? parent;
   final String name;
   final String label;
   final int level;

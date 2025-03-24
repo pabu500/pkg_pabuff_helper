@@ -123,7 +123,7 @@ class MdlPagScopeProfile {
     return projectProfile!.label;
   }
 
-  int getProjectTtimezone() {
+  int getProjectTimezone() {
     assert(projectProfile != null);
     return projectProfile!.timezone;
   }
