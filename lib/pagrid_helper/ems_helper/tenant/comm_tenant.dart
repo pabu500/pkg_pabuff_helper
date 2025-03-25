@@ -293,6 +293,52 @@ Future<dynamic> checkMainTenant(
   }
 }
 
+Future<dynamic> checkCoupledTenant(
+  PaGridAppConfig appConfig,
+  Map<String, String> queryMap,
+  SvcClaim svcClaim,
+) async {
+  svcClaim.svcName = SvcType.oresvc.name;
+  svcClaim.endpoint = UrlBase.eptCheckCoupledTenant;
+
+  String svcToken = '';
+  // try {
+  //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
+  // } catch (err) {
+  //   throw Exception(err);
+  // }
+
+  UrlController urlController = UrlController(appConfig);
+
+  final response = await http.post(
+    Uri.parse(urlController.getUrl(SvcType.oresvc, svcClaim.endpoint!)),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer $svcToken',
+    },
+    body: jsonEncode(SvcQuery(svcClaim, queryMap).toJson()),
+  );
+
+  if (response.statusCode == 200) {
+    // If the server did return a 200 OK response, parse the JSON.
+    final responseBody = jsonDecode(response.body);
+    final info = responseBody['info'];
+    if (info != null) {
+      if (info.contains("Empty")) {
+        throw Exception("No item record found");
+      }
+    }
+    if (responseBody['error'] != null) {
+      throw Exception(responseBody['error']);
+    }
+    return responseBody['item_info'];
+  } else if (response.statusCode == 403) {
+    throw Exception("You are not authorized to perform this operation");
+  } else {
+    throw Exception(jsonDecode(response.body)['error']);
+  }
+}
+
 Future<dynamic> doGetUserTenantList(
   PaGridAppConfig appConfig,
   Map<String, dynamic> reqMap,
