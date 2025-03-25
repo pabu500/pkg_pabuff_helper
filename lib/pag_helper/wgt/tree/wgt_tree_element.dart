@@ -18,7 +18,7 @@ class PagTreeNode {
 
   final PagTreeNode? parent;
   final String name;
-  final String label;
+  String label;
   final int level;
   final PagTreePartType treePartType;
   final dynamic child;
