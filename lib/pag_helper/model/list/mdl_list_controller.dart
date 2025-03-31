@@ -1,4 +1,5 @@
 import 'package:buff_helper/pag_helper/def/pag_item_helper.dart';
+import 'package:buff_helper/up_helper/helper/device_def.dart';
 import 'package:flutter/foundation.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 
@@ -81,8 +82,25 @@ class MdlPagListController /*extends ChangeNotifier*/ {
 
     bool enableGroupBy = json['enable_group_by'] == 'true';
 
+    String? itemTypeStr = json['item_type'];
+    dynamic itemType;
+    if (itemTypeStr != null) {
+      switch (itemTypeStr) {
+        case 'meter':
+          itemType = DeviceCat.METER;
+          break;
+        case 'sensor':
+          itemType = DeviceCat.SENSOR;
+          break;
+        case 'lock':
+          itemType = DeviceCat.LOCK;
+        default:
+          itemType = null;
+      }
+    }
+
     return MdlPagListController(
-      itemType: json['item_type'],
+      itemType: itemType,
       listColControllerList: listConfigItemList,
       rootTableName: json['root_table_name'],
       filterKeyEqualList: filterKeyEqualList,
@@ -100,7 +118,24 @@ class MdlPagListController /*extends ChangeNotifier*/ {
       listConfig.add(listConfigItem.toJson());
     }
 
-    data['item_type'] = itemType;
+    String itemTypeStr = 'unknown_item_type';
+    if (itemType is DeviceCat) {
+      switch (itemType) {
+        case DeviceCat.METER:
+          itemTypeStr = 'meter';
+          break;
+        case DeviceCat.SENSOR:
+          itemTypeStr = 'sensor';
+          break;
+        case DeviceCat.LOCK:
+          itemTypeStr = 'lock';
+          break;
+        default:
+          itemTypeStr = '';
+      }
+    }
+
+    data['item_type'] = itemTypeStr;
     data['list_config'] = listConfig;
     data['root_table_name'] = rootTableName;
     data['filter_key_equal_list'] = filterKeyEqualList;

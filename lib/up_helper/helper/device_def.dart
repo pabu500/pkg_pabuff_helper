@@ -13,7 +13,7 @@ enum SensorType {
   unknown,
 }
 
-enum DeviceType {
+enum DeviceCat {
   METER,
   SENSOR,
   LOCK,
@@ -439,31 +439,31 @@ Widget getDeviceTypeIcon(dynamic deviceSubType,
   //   print('theIconSize: $theIconSize');
   // }
   switch (deviceSubType) {
-    case DeviceType.LOCK:
+    case DeviceCat.LOCK:
       return Icon(
         Icons.lock,
         size: theIconSize,
         color: iconColor,
       );
-    case DeviceType.METER:
+    case DeviceCat.METER:
       return Icon(
         Symbols.speed,
         size: theIconSize,
         color: iconColor,
       );
-    case DeviceType.SENSOR:
+    case DeviceCat.SENSOR:
       return Icon(
         Symbols.sensors,
         size: theIconSize,
         color: iconColor,
       );
-    case DeviceType.CAMERA:
+    case DeviceCat.CAMERA:
       return Icon(
         Symbols.videocam,
         size: theIconSize,
         color: iconColor,
       );
-    case DeviceType.GATEWAY:
+    case DeviceCat.GATEWAY:
       return Icon(
         Symbols.switch_access,
         size: theIconSize,
