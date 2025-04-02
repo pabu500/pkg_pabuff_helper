@@ -13,7 +13,7 @@ const String glb_reg_allkeyboard =
 // [a-zA-Z]{2,} matches 2 or more consecutive letters (lowercase or uppercase)
 // [a-zA-Z\s]* matches zero or more consecutive letters (lowercase or uppercase) or whitespace characters
 // [a-zA-Z]{2,}$ matches 2 or more consecutive letters (lowercase or uppercase) and matches the end of the string
-const String glb_reg_fullName = r"^[a-zA-Z]{2,}[a-zA-Z\s]*[a-zA-Z]{2,}$";
+const String glb_reg_fullName = r"^[a-zA-Z]{2,}[a-zA-Z-\s]*[a-zA-Z]{2,}$";
 const String glb_fullName_callout = 'Please provide a valid full name';
 const String glb_regNG_fullName = r"[^a-zA-Z '\.]|([.']| )(\.|')|(\s)(\s)";
 // r"^
@@ -23,7 +23,7 @@ const String glb_regNG_fullName = r"[^a-zA-Z '\.]|([.']| )(\.|')|(\s)(\s)";
 const String glb_reg_loginName = r"^[a-zA-Z0-9-]{6,}$";
 const String glb_loginName_callout =
     'Please provide a valid username (alphabets, numbers and - only, at least 6 characters)';
-const String glb_reg_salutation = r"^[a-zA-Z-]{3,}$";
+const String glb_reg_salutation = r"^[a-zA-Z-\s]{3,}$";
 const String glb_salutation_callout =
     'Please provide a valid salutation (alphabets only, at least 3 characters)';
 const String glb_regNG_loginName = r"[^a-zA-Z0-9-]+";
