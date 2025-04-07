@@ -270,6 +270,9 @@ class PagUrlBase {
   static const String eptDeleteTariffPackageTariffRate =
       '/ems/delete_tariff_package_tariff_rate';
 
+  static const String eptPagCreateTariffPackage =
+      '/ems/tariff_package/create_tariff_package';
+
   //meter_ops
   static const String eptMeterOpGetManualMeterList =
       '/meter_ops/get_manual_meter_list';
