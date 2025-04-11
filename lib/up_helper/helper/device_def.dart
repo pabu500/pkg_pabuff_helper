@@ -58,6 +58,23 @@ enum DeivceGroupType {
   tenant,
 }
 
+String getPagItemTypeStr(dynamic itemType) {
+  switch (itemType) {
+    case DeviceCat.METER:
+      return 'meter';
+    case DeviceCat.SENSOR:
+      return 'sensor';
+    case DeviceCat.LOCK:
+      return 'lock';
+    case DeviceCat.CAMERA:
+      return 'camera';
+    case DeviceCat.GATEWAY:
+      return 'gateway';
+    default:
+      return '';
+  }
+}
+
 String getMeterTypeTag(MeterType meterType) {
   switch (meterType) {
     case MeterType.electricity1p:
