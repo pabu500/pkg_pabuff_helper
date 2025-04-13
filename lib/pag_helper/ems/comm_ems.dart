@@ -299,14 +299,14 @@ Future<dynamic> doGetTariffPackageTenants(
   }
 }
 
-Future<dynamic> getTariffPackageTariffRateList(
+Future<dynamic> getTariffPackageTariffRateInfo(
   MdlPagAppConfig appConfig,
   MdlPagUser? loggedInUser,
   Map<String, dynamic> queryMap,
   MdlPagSvcClaim svcClaim,
 ) async {
   svcClaim.svcName = PagSvcType.oresvc2.name;
-  svcClaim.endpoint = PagUrlBase.eptGetTariffPackageTariffRateList;
+  svcClaim.endpoint = PagUrlBase.eptGetTariffPackageTariffRateInfo;
 
   String svcToken = '';
   // try {
@@ -331,12 +331,12 @@ Future<dynamic> getTariffPackageTariffRateList(
       throw Exception(respJson['error']);
     }
     if (respJson['data'] == null) {
-      throw Exception('Failed to get job type sub list');
+      throw Exception('Failed to get tariff rate list');
     }
 
     var data = respJson['data'];
-    if (data['job_type_sub_list'] == null) {
-      throw Exception('Failed to get job type sub list');
+    if (data['tariff_package_tariff_rate_info'] == null) {
+      throw Exception('Failed to get tariff rate info');
     }
 
     return data;
@@ -362,7 +362,7 @@ Future<dynamic> commitTariffPackageTariffRateList(
   MdlPagSvcClaim svcClaim,
 ) async {
   svcClaim.svcName = PagSvcType.oresvc2.name;
-  svcClaim.endpoint = PagUrlBase.eptSetTariffPackageTariffRateList;
+  svcClaim.endpoint = PagUrlBase.eptSetTariffPackageTariffRateInfo;
 
   String svcToken = '';
   // try {
