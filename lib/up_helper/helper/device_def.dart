@@ -104,12 +104,12 @@ String getMeterSubTypeTag(MeterType meterType) {
       return 'E1';
     case MeterType.electricity3p:
       return 'E';
-    // case MeterType.water:
-    //   return 'W';
-    // case MeterType.gas:
-    //   return 'G';
-    // case MeterType.newater:
-    //   return 'N';
+    case MeterType.water:
+      return 'W1';
+    case MeterType.gas:
+      return 'G';
+    case MeterType.newater:
+      return 'N';
     case MeterType.btu:
       return 'B';
     case MeterType.bidirection:
