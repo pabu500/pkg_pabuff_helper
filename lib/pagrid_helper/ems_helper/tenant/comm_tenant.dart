@@ -443,3 +443,48 @@ Future<dynamic> doUpdateUserTenantList(
     throw Exception(err);
   }
 }
+
+Future<dynamic> getTenantUserList(
+  PaGridAppConfig appConfig,
+  Map<String, dynamic> queryMap,
+  SvcClaim svcClaim,
+) async {
+  svcClaim.svcName = SvcType.oresvc.name;
+  svcClaim.endpoint = UrlBase.eptGetUserList;
+
+  String svcToken = '';
+  // try {
+  //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
+  // } catch (err) {
+  //   throw Exception(err);
+  // }
+
+  final response = await http.post(
+    Uri.parse(
+        UrlController(appConfig).getUrl(SvcType.oresvc, svcClaim.endpoint!)),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer $svcToken',
+    },
+    body: jsonEncode(SvcQuery(svcClaim, queryMap).toJson()),
+  );
+
+  if (response.statusCode == 200) {
+    // If the server did return a 200 OK response, parse the JSON.
+    final responseBody = jsonDecode(response.body);
+    final info = responseBody['info'];
+    if (info != null) {
+      if (info.contains("Empty")) {
+        throw Exception("No record found");
+      }
+    }
+    if (responseBody['error'] != null) {
+      throw Exception(responseBody['error']);
+    }
+    return responseBody;
+  } else if (response.statusCode == 403) {
+    throw Exception("You are not authorized to perform this operation");
+  } else {
+    throw Exception(jsonDecode(response.body)['error']);
+  }
+}
