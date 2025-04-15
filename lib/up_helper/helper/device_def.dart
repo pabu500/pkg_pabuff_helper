@@ -98,6 +98,29 @@ String getMeterTypeTag(MeterType meterType) {
   }
 }
 
+String getMeterSubTypeTag(MeterType meterType) {
+  switch (meterType) {
+    case MeterType.electricity1p:
+      return 'E1';
+    case MeterType.electricity3p:
+      return 'E';
+    // case MeterType.water:
+    //   return 'W';
+    // case MeterType.gas:
+    //   return 'G';
+    // case MeterType.newater:
+    //   return 'N';
+    case MeterType.btu:
+      return 'B';
+    case MeterType.bidirection:
+      return 'E1';
+    // case MeterType.manualElectricity1p:
+    //   return 'ME';
+    default:
+      return '';
+  }
+}
+
 MeterType? getMeterType(String meterTypeTag) {
   switch (meterTypeTag.toUpperCase()) {
     case 'E':

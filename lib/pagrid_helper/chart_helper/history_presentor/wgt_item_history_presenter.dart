@@ -438,7 +438,7 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
             'color': Colors.green.withOpacity(0.7),
           },
           'forward_temp': {
-            'title': 'Forward Temp (°C)',
+            'title': 'Supply Temp (°C)',
             'dataFields': [
               {
                 'field': 'forward_temp',
