@@ -244,65 +244,6 @@ Future<dynamic> doAssignTenantsToTariffPackage(
   }
 }
 
-Future<dynamic> doGetTariffPackageTenantList(
-  MdlPagAppConfig appConfig,
-  Map<String, dynamic> queryMap,
-  MdlPagSvcClaim svcClaim,
-) async {
-  svcClaim.svcName = PagSvcType.oresvc2.name;
-  svcClaim.endpoint = PagUrlBase.eptGetTariffPackageTenants;
-
-  String svcToken = '';
-  // try {
-  //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
-  // } catch (err) {
-  //   throw Exception(err);
-  // }
-
-  // List<Map<String, dynamic>> meterList = [];
-  // for (var item in reqMap['meter_group_info']) {
-  //   meterList.add(item);
-  // }
-
-  try {
-    final response = await http.post(
-      Uri.parse(PagUrlController(null, appConfig)
-          .getUrl(PagSvcType.oresvc2, svcClaim.endpoint!)),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $svcToken',
-      },
-      body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
-    );
-
-    if (response.statusCode == 200) {
-      final respJson = jsonDecode(response.body);
-      if (respJson['error'] != null) {
-        throw Exception(respJson['error']);
-      }
-      if (respJson['data'] == null) {
-        throw Exception('Failed to get tariff rate list');
-      }
-
-      var data = respJson['data'];
-      // final itemInfoListJson = resultMap['item_info_list'];
-      // List<Map<String, dynamic>> itemInfoList = [];
-      // for (var item in itemInfoListJson) {
-      //   itemInfoList.add(item);
-      // }
-      // return {
-      //   'item_group_id': resultMap['item_group_id'],
-      //   'item_info_list': itemInfoList
-      // };
-      return data;
-    } else {
-      throw Exception('Failed to get tariff package tenants');
-    }
-  } catch (err) {
-    rethrow;
-  }
-}
-
 Future<dynamic> getTariffPackageTariffRateInfo(
   MdlPagAppConfig appConfig,
   MdlPagUser? loggedInUser,

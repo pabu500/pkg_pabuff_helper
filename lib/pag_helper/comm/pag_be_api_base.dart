@@ -272,6 +272,10 @@ class PagUrlBase {
 
   static const String eptPagCreateTariffPackage =
       '/ems/tariff_package/create_tariff_package';
+  static const String eptPagGetTariffPackageTenantList =
+      '/ems/tariff_package/get_tariff_package_tenant_list';
+  static const String eptUpdateTariffPackageTenantList =
+      '/ems/tariff_package/update_tariff_package_tenant_list';
 
   //meter_ops
   static const String eptMeterOpGetManualMeterList =
@@ -476,8 +480,8 @@ class PagUrlBase {
       '/tariff_package/update_package_rate_row_list';
   static const String eptUpdateTariffPackageTenants =
       '/tariff_package/update_tariff_package_tenants';
-  static const String eptGetTariffPackageTenants =
-      '/tariff_package/get_tariff_package_tenants';
+  static const String eptGetTariffPackageTenantList =
+      '/tariff_package/get_tariff_package_tenant_list';
 
   //alarm
   static const String eptGetAlarmStreamItem = '/alarm/get_alarm_stream_item';
