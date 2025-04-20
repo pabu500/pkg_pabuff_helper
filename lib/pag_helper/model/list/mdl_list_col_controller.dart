@@ -32,6 +32,7 @@ enum PagFilterGroupType {
 class MdlListColController {
   late final String colKey;
   String? joinKey;
+  String? asIsKey;
   bool includeColKeyAsFilter;
   bool includeColKeyAsGroupBy;
   String stringAgg;
@@ -72,6 +73,7 @@ class MdlListColController {
   MdlListColController({
     required this.colKey,
     this.joinKey,
+    this.asIsKey,
     this.includeColKeyAsFilter = true,
     this.includeColKeyAsGroupBy = true,
     this.stringAgg = '',
@@ -134,7 +136,7 @@ class MdlListColController {
   factory MdlListColController.fromJson(Map<String, dynamic> json) {
     String? colKey = json['colKey'] ?? json['col_key'] ?? json['fieldKey'];
     if (colKey == null) {
-      throw Exception('col_key not found');
+      throw Exception('col_key is missing');
     }
 
     dynamic isIncludeColKeyAsFilter =
@@ -322,6 +324,7 @@ class MdlListColController {
     return MdlListColController(
       colKey: colKey,
       joinKey: json['join_key'],
+      asIsKey: json['as_is_key'],
       colTitle: colTitle,
       includeColKeyAsFilter: isIncludeColKeyAsFilter,
       includeColKeyAsGroupBy: isIncludeColKeyAsGroupBy,
@@ -353,6 +356,7 @@ class MdlListColController {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['col_key'] = colKey;
     data['join_key'] = joinKey;
+    data['as_is_key'] = asIsKey;
     // need be to handle both bool and string
     data['include_col_key_as_filter'] = includeColKeyAsFilter.toString();
     data['include_col_key_as_group_by'] = includeColKeyAsGroupBy.toString();

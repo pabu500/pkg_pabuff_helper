@@ -3,4 +3,5 @@ enum PagItemGroupType {
   jobTypeSub,
   tariffPackageTariffRate,
   tenantTariffPackage,
+  tariffPackageTenant,
 }

@@ -244,10 +244,10 @@ Future<dynamic> doAssignTenantsToTariffPackage(
   }
 }
 
-Future<dynamic> doGetTariffPackageTenants(
+Future<dynamic> doGetTariffPackageTenantList(
   MdlPagAppConfig appConfig,
-  Map<String, dynamic> reqMap,
-  SvcClaim svcClaim,
+  Map<String, dynamic> queryMap,
+  MdlPagSvcClaim svcClaim,
 ) async {
   svcClaim.svcName = PagSvcType.oresvc2.name;
   svcClaim.endpoint = PagUrlBase.eptGetTariffPackageTenants;
@@ -272,25 +272,29 @@ Future<dynamic> doGetTariffPackageTenants(
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $svcToken',
       },
-      body: jsonEncode(SvcQuery(svcClaim, reqMap).toJson()),
+      body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
     );
 
     if (response.statusCode == 200) {
-      final responseBody = jsonDecode(response.body);
-      if (responseBody['info'] != null) {
-        // throw ItemNotFoundException('No tenants found');
-        throw ItemNotFoundException('No tenants found');
+      final respJson = jsonDecode(response.body);
+      if (respJson['error'] != null) {
+        throw Exception(respJson['error']);
       }
-      final resultMap = responseBody['result'];
-      final itemInfoListJson = resultMap['item_info_list'];
-      List<Map<String, dynamic>> itemInfoList = [];
-      for (var item in itemInfoListJson) {
-        itemInfoList.add(item);
+      if (respJson['data'] == null) {
+        throw Exception('Failed to get tariff rate list');
       }
-      return {
-        'item_group_id': resultMap['item_group_id'],
-        'item_info_list': itemInfoList
-      };
+
+      var data = respJson['data'];
+      // final itemInfoListJson = resultMap['item_info_list'];
+      // List<Map<String, dynamic>> itemInfoList = [];
+      // for (var item in itemInfoListJson) {
+      //   itemInfoList.add(item);
+      // }
+      // return {
+      //   'item_group_id': resultMap['item_group_id'],
+      //   'item_info_list': itemInfoList
+      // };
+      return data;
     } else {
       throw Exception('Failed to get tariff package tenants');
     }
