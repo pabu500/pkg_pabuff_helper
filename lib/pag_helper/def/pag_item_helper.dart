@@ -7,6 +7,7 @@ enum PagItemKind {
   scope('Scope', Symbols.file_map_stack),
   device('Device', Symbols.home_iot_device),
   user('User', Symbols.person),
+  role('Role', Symbols.badge),
   tenant('Tenant', Symbols.location_away),
   jobType('Job Type', Symbols.energy_program_time_used),
   jobTypeSub('Job Type Sub', Symbols.group),

@@ -52,6 +52,7 @@ class MdlPagRole {
       'tag': tag,
       'rank': rank,
       'portal_type_label': portalType.label,
+      'portal_type_name': portalType.name,
     };
   }
 }
