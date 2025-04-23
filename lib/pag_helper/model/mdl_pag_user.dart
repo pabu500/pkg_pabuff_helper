@@ -273,13 +273,18 @@ class MdlPagUser {
     selectedScope.updateScopeByName2(userScope!, scopeType, profileName);
   }
 
-  void updateSelectedRoleByName(String? roleName) {
+  void updateSelectedRoleByName(String? roleName, MdlPagAppConfig appConfig) {
     if (roleName == null) {
       return;
     }
     for (MdlPagRole role in roleList) {
       if (role.name == roleName) {
         selectedRole = role;
+        // update selected scope based on selected role scope map
+        List<MdlPagProjectProfile> selectedProjectProfileList =
+            getSelectedRoleProjectProfileList();
+        updateDefaultSelectedScope(selectedProjectProfileList,
+            lazyLoadScope: appConfig.lazyLoadScope);
         return;
       }
     }

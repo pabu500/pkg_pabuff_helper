@@ -73,7 +73,7 @@ Future<void> doPostLogin(
 
   // only update scope when selectedRoleName is not empty
   if (selectedRoleName.isNotEmpty) {
-    loggedInUser.updateSelectedRoleByName(selectedRoleName);
+    loggedInUser.updateSelectedRoleByName(selectedRoleName, appConfig);
 
     dynamic scopePref = readFromSharedPref('scope_pref');
     if (kDebugMode) {
