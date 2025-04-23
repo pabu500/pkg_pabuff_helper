@@ -69,7 +69,7 @@ Future<MdlPagUser> doLoginPag(
   }
 }
 
-Future<MdlPagUser> doCreateUser(
+Future<dynamic> doCreateUser(
   MdlPagUser loggedInUser,
   MdlPagAppConfig appConfig,
   Map<String, dynamic> queryMap,
@@ -88,7 +88,9 @@ Future<MdlPagUser> doCreateUser(
 
     if (response.statusCode == 201) {
       // If the server did return a 201 CREATED response, parse the JSON.
-      return MdlPagUser.fromJson2(jsonDecode(response.body));
+      final respJson = jsonDecode(response.body);
+      // return MdlPagUser.fromJson2(respJson);
+      return 'success';
     } else {
       Map<String, dynamic> responseBody = jsonDecode(response.body);
       throw Exception(responseBody['err']);
