@@ -213,8 +213,12 @@ class _WgtViewEditFieldState extends State<WgtViewEditField> {
                                     : widget.originalValue,
                                 style: widget.textStyle ??
                                     TextStyle(
-                                      fontSize: 16,
-                                      color: Theme.of(context).hintColor,
+                                      // fontSize: 16,
+                                      color: widget.originalValue.isEmpty
+                                          ? Theme.of(context)
+                                              .hintColor
+                                              .withAlpha(80)
+                                          : Theme.of(context).hintColor,
                                     ),
                               ),
                             ),
