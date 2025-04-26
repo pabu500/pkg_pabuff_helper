@@ -277,6 +277,8 @@ class PagUrlBase {
   static const String eptUpdateTariffPackageTenantList =
       '/ems/tariff_package/update_tariff_package_tenant_list';
 
+  static const String eptPagCreateTenant = '/ems/tenant/create_tenant';
+
   //meter_ops
   static const String eptMeterOpGetManualMeterList =
       '/meter_ops/get_manual_meter_list';
