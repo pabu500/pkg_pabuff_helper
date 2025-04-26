@@ -1,4 +1,5 @@
 import 'package:buff_helper/pag_helper/def/pag_item_helper.dart';
+import 'package:buff_helper/pag_helper/def/scope_helper.dart';
 import 'package:buff_helper/up_helper/helper/device_def.dart';
 import 'package:flutter/foundation.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
@@ -94,8 +95,31 @@ class MdlPagListController /*extends ChangeNotifier*/ {
           break;
         case 'lock':
           itemType = DeviceCat.LOCK;
+          break;
+        case 'project':
+          itemType = PagScopeType.project;
+          break;
+        case 'site_group':
+          itemType = PagScopeType.siteGroup;
+          break;
+        case 'site':
+          itemType = PagScopeType.site;
+          break;
+        case 'building':
+          itemType = PagScopeType.building;
+          break;
+        case 'location_group':
+          itemType = PagScopeType.locationGroup;
+          break;
+        case 'location':
+          itemType = PagScopeType.location;
+          break;
+
         default:
           itemType = null;
+          if (kDebugMode) {
+            print('Unknown item type: $itemTypeStr');
+          }
       }
     }
 
