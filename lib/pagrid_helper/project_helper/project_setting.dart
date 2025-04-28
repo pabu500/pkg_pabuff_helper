@@ -159,6 +159,7 @@ final projectProfileRepo = [
       //8 digits, start with '1'
       return nusSnValidator(displayname);
     },
+    'allow_custom_amount': true,
     'payment_mode_setting': {
       {
         'payment_mode': PaymentMode.stripe,

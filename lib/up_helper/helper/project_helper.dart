@@ -198,6 +198,7 @@ final scopeProfiles = [
         return 'Invalid displayname';
       }
     },
+    'allow_custom_amount': true,
     'payment_mode_setting': {
       {
         'payment_mode': PaymentMode.stripe,
