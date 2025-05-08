@@ -20,9 +20,9 @@ const String glb_regNG_fullName = r"[^a-zA-Z '\.]|([.']| )(\.|')|(\s)(\s)";
 // [a-zA-Z0-9-]  //mmatches any character from the alphabet (lowercase or uppercase), digits, or the hyphen symbol
 // {6,} //matches the preceding expression (a character from the alphabet or a hyphen symbol) at least 6 times
 // $
-const String glb_reg_loginName = r"^[a-zA-Z0-9-]{6,}$";
+const String glb_reg_loginName = r"^[a-zA-Z0-9-]{5,}$";
 const String glb_loginName_callout =
-    'Please provide a valid username (alphabets, numbers and - only, at least 6 characters)';
+    'Please provide a valid username (alphabets, numbers and - only, at least 5 characters)';
 const String glb_reg_salutation = r"^[a-zA-Z-\s]{3,}$";
 const String glb_salutation_callout =
     'Please provide a valid salutation (alphabets only, at least 3 characters)';
