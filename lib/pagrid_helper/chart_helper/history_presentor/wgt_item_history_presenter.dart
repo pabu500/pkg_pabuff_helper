@@ -442,6 +442,7 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
             'dataFields': [
               {
                 'field': 'forward_temp',
+                'display_header': 'supply_temp',
               },
             ],
             'unit': '°C',

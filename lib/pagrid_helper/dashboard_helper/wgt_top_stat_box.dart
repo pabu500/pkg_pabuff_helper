@@ -370,6 +370,13 @@ class _WgtTopStatBoxState extends State<WgtTopStatBox> {
         }
       }
       valueStr = getCommaNumberStr(value);
+
+      if (widget.statType == TopStatType.meterUsage ||
+          widget.statType == TopStatType.topup) {
+        if (valueStr == '-1') {
+          valueStr = '-';
+        }
+      }
     }
 
     if (widget.statKey != null) {

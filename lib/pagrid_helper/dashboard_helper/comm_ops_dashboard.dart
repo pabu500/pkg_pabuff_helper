@@ -206,7 +206,8 @@ Future<dynamic> getRecentUsage(
       final responseBody = jsonDecode(response.body);
       final info = responseBody['info'];
       if (info != null) {
-        throw Exception(info);
+        // throw Exception(info);
+        return -1;
       }
       final error = responseBody['error'];
       if (error != null) {
@@ -275,13 +276,22 @@ Future<dynamic> pullActiveUsageHistory(
     final meterReadingHistoryJson =
         responseBody[Evs2HistoryType.active_kwh_consumption_history.name];
     List<Map<String, dynamic>> meterReadingHistory = [];
+    bool allNull = true;
     for (var meterReading in meterReadingHistoryJson) {
-      double kwh = double.parse(meterReading['total_kwh']);
-      bool errorData = kwh < 0 || kwh > /*200*/ 2000;
+      double? kwh = double.tryParse(meterReading['total_kwh'] ?? '');
+      if (kwh != null) {
+        allNull = false;
+      }
+      bool errorData = kwh == null || (kwh < 0 || kwh > /*200*/ 2000);
       meterReadingHistory.add({
         'timestamp': meterReading['timestamp'],
         'total_kwh': errorData ? '0' : meterReading['total_kwh'].toString(),
-        'error_data': errorData ? kwh.toString() : '',
+        'error_data': errorData
+            ? kwh == null
+                ? 'no data'
+                : kwh.toString()
+            : '',
+        'all_null': allNull,
       });
     }
     return meterReadingHistory;
@@ -331,7 +341,8 @@ Future<dynamic> getRecentTopupTotal(
       final responseBody = jsonDecode(response.body);
       final info = responseBody['info'];
       if (info != null) {
-        throw Exception(info);
+        // throw Exception(info);
+        return -1;
       }
       final error = responseBody['error'];
       if (error != null) {

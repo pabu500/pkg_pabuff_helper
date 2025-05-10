@@ -105,7 +105,7 @@ class _WgtHistoryRepListState extends State<WgtHistoryRepList> {
         // }
         _listConfig.add({
           'fieldKey': keyName,
-          'title': fieldKey['field'],
+          'title': fieldKey['display_header'] ?? fieldKey['field'],
           'width': fieldKey['width'] ?? 150,
         });
         if (keyName == 'a_imp') {
