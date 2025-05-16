@@ -1000,8 +1000,8 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
   }
 
   Widget getTag({
-    required Map<String, dynamic> row,
-    required Map<String, dynamic> configItem,
+    required Map<String, dynamic>? row,
+    required Map<String, dynamic>? configItem,
     required String tagText,
     Color? tagColor,
     String? tagTooltip,
@@ -1009,7 +1009,7 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
   }) {
     return Tooltip(
       message: tagTooltip ??
-          configItem['getTooltip']?.call(row[configItem['fieldKey']]) ??
+          configItem?['getTooltip']?.call(row?[configItem['fieldKey']]) ??
           '',
       waitDuration: const Duration(milliseconds: 300),
       child: SizedBox(
@@ -1021,7 +1021,7 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
               padding: const EdgeInsets.symmetric(horizontal: 5),
               decoration: BoxDecoration(
                 color: tagColor ??
-                    configItem['getColor']?.call(row[configItem['fieldKey']]),
+                    configItem?['getColor']?.call(row?[configItem['fieldKey']]),
                 borderRadius: BorderRadius.circular(5),
               ),
               child: Text(tagText,

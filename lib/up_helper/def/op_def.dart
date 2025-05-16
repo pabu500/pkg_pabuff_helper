@@ -91,6 +91,20 @@ String getOpLifecycleStatusMessage(String? statusStr) {
   return lcStatusInfo[status]!['tooltip'];
 }
 
+String getOpStatusMessage(String? statusStr, String? snapshotTimestamp) {
+  if (statusStr == null) {
+    return 'N/A';
+  }
+  ItemOpLifecycleStatus? status =
+      ItemOpLifecycleStatus.values.byName(statusStr);
+
+  String tooltip = lcStatusInfo[status]!['tooltip'];
+  if (snapshotTimestamp != null) {
+    tooltip = 'refreshed at: $snapshotTimestamp';
+  }
+  return tooltip;
+}
+
 Color getOpLifecycleStatusColor(String? statusStr) {
   if (statusStr == null || statusStr.isEmpty) {
     return Colors.transparent;
@@ -129,6 +143,19 @@ final Map<ItemOpLifecycleStatus, dynamic> lcStatusInfo = {
   },
 };
 
+final Map<ItemOpLifecycleStatus, dynamic> opStatusInfo = {
+  ItemOpLifecycleStatus.normal: {
+    'tag': 'Normal',
+    'color': Colors.green,
+    'tooltip': 'Normal',
+  },
+  ItemOpLifecycleStatus.bypassed: {
+    'tag': 'Byp',
+    'color': Colors.grey.shade500,
+    'tooltip': 'Bypassed',
+  },
+};
+
 Map<String, dynamic> getLcStatusTag(row, fieldKey) {
   if ((row['lc_status'] ?? '').isEmpty) {
     return {};
@@ -154,6 +181,35 @@ Map<String, dynamic> getLcStatusTag(row, fieldKey) {
     'tag': getLcStatusTagStr(valueStr),
     'color': getOpLifecycleStatusColor(status.name),
     'tooltip': getOpLifecycleStatusMessage(status.name),
+  };
+}
+
+Map<String, dynamic> getOpStatusTag(Map<String, dynamic>? row, fieldKey) {
+  if ((row?['op_status'] ?? '').isEmpty) {
+    return {};
+  }
+  if (row?['op_status'] == '-') {
+    return {};
+  }
+  String? valueStr = row?['op_status'].toString().toLowerCase();
+  ItemOpLifecycleStatus? status = getItemOpLifecycleStatus(valueStr);
+  if (status == ItemOpLifecycleStatus.normal) {
+    return {};
+  }
+
+  if (fieldKey == 'first_reading_val' || fieldKey == 'last_reading_val') {
+    return {
+      'tag': '-',
+      'color': Colors.transparent,
+      'tooltip': '',
+    };
+  }
+
+  return {
+    'tag': getLcStatusTagStr(valueStr),
+    'color': getOpLifecycleStatusColor(status.name),
+    'tooltip':
+        getOpStatusMessage(status.name, row?['op_status_snapshot_timestamp']),
   };
 }
 
