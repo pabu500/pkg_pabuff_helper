@@ -1035,6 +1035,33 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
     );
   }
 
+  Widget getOpStatusView({
+    required Map<String, dynamic> row,
+    required Map<String, dynamic> configItem,
+    required String tagText,
+    Color? tagColor,
+    String? tagTooltip,
+    required double width,
+  }) {
+    return WgtPopupButton(
+      width: width,
+      height: 20,
+      popupWidth: 170,
+      popupHeight: 190,
+      direction: 'left',
+      popupChild: getBypassInfo(row['meter_sn'], row['username'] ?? '',
+          configItem['fetchBypassInfo']),
+      child: getTag(
+        row: row,
+        configItem: configItem,
+        tagText: tagText,
+        tagColor: tagColor,
+        tagTooltip: tagTooltip,
+        width: width,
+      ),
+    );
+  }
+
   Widget getBillingLcStatusControl({
     required Map<String, dynamic> row,
     required Map<String, dynamic> configItem,
@@ -1069,4 +1096,55 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
       ),
     );
   }
+}
+
+Widget getBypassInfo(
+    String meterSn, String username, Function? fetchBypassInfo) {
+  if (meterSn.isEmpty) {
+    return const Text('No meter sn');
+  }
+  if (fetchBypassInfo == null) {
+    return const Text('No fetchBypassInfo');
+  }
+
+  return Center(
+    child: FutureBuilder(
+      future: fetchBypassInfo(
+          meterSn,
+          SvcClaim(
+            username: username,
+            scope: AclScope.global.name,
+            target: getAclTargetStr(AclTarget.meter_p_bypass_policy),
+            operation: AclOperation.read.name,
+          )),
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        if (!snapshot.hasData) {
+          return xtWait(
+            color: Theme.of(context).colorScheme.primary,
+          );
+        } else {
+          dynamic creditBal = snapshot.data;
+          if (creditBal == null) {
+            return const Text('not set');
+          }
+          double? creditBalDouble = double.tryParse(creditBal);
+          String creditBalStr = creditBalDouble == null
+              ? 'not set'
+              : '${creditBalDouble.toStringAsFixed(2)}SGD';
+          return xtKeyValueText(
+            selectable: true,
+            keyText: 'Credit Bal: ',
+            valueText: creditBalStr,
+            valueStyle: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: creditBalDouble != null
+                    ? creditBalDouble <= 0
+                        ? Colors.red
+                        : Colors.green
+                    : null),
+          );
+        }
+      },
+    ),
+  );
 }
