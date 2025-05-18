@@ -12,6 +12,7 @@ enum PagItemKind {
   jobType('Job Type', Symbols.energy_program_time_used),
   jobTypeSub('Job Type Sub', Symbols.group),
   tariffPackage('Tariff Package', Symbols.price_change),
+  bill('Bill', Symbols.receipt_long),
   ;
 
   const PagItemKind(

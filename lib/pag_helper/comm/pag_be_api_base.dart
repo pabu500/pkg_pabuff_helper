@@ -261,6 +261,8 @@ class PagUrlBase {
   //ems
   static const String eptGetUserTenantList = '/ems/get_user_tenant_list';
   static const String eptSetUserTenantList = '/ems/set_user_tenant_list';
+
+  // Tariff Package Manager
   static const String eptGetTariffPackageTariffRateInfo =
       '/ems/tariff_package/get_tariff_package_tariff_rate_info';
   static const String eptSetTariffPackageTariffRateInfo =
@@ -277,7 +279,19 @@ class PagUrlBase {
   static const String eptUpdateTariffPackageTenantList =
       '/ems/tariff_package/update_tariff_package_tenant_list';
 
+  // Tenant Manager
   static const String eptPagCreateTenant = '/ems/tenant/create_tenant';
+
+  //Billing Manager
+  static const String eptGetBill = '/billing/get_bill';
+  static const String eptGenerateBillingRec = '/billing/generate_billing_rec';
+  static const String eptCheckTpInfo = '/billing/check_tp_rate_info';
+  static const String eptGetReleaseCandidate = '/billing/get_rc';
+  static const String eptReleaseBills = '/billing/release_bills';
+  static const String eptGetUsageFactor = '/billing/get_usage_factor';
+  static const String eptBlastBillingNotification =
+      '/billing/blast_billing_notification';
+  static const String eptBatchOpBill = '/billing/batch_op_bill';
 
   //meter_ops
   static const String eptMeterOpGetManualMeterList =
@@ -502,14 +516,4 @@ class PagUrlBase {
   static const String getLastManualTrigger = '/job/get_last_manual_trigger';
   static const String eptUpdateLastManualTrigger =
       '/job/update_last_manual_trigger';
-
-  //Billing Manager
-  static const String eptGetBill = '/billing/get_bill';
-  static const String eptGenerateBillingRec = '/billing/generate_billing_rec';
-  static const String eptCheckTpInfo = '/billing/check_tp_rate_info';
-  static const String eptGetReleaseCandidate = '/billing/get_rc';
-  static const String eptReleaseBills = '/billing/release_bills';
-  static const String eptGetUsageFactor = '/billing/get_usage_factor';
-  static const String eptBlastBillingNotification =
-      '/billing/blast_billing_notification';
 }
