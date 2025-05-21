@@ -34,12 +34,18 @@ class _WgtSubmitFilesState extends State<WgtSubmitFiles> {
   final List<String> _fileContentList = [];
 
   Future<dynamic> _getFile() async {
+    if (widget.fileExtensions == null) {
+      if (kDebugMode) {
+        print('fileExtensions is null');
+      }
+      return;
+    }
     try {
       await FilePicker.platform
           .pickFiles(
               type: FileType.custom,
               allowMultiple: true,
-              allowedExtensions: widget.fileExtensions)
+              allowedExtensions: widget.fileExtensions!)
           .then((result) {
         if (result == null || result.files.isEmpty) {
           if (mounted) {
