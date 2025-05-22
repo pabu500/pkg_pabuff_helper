@@ -195,6 +195,7 @@ class Evs2User {
   // String? tenantLabel;
   List<Map<String, dynamic>>? tenantList;
   String? allowServiceEmail;
+  String? uatTaskStr;
 
   Evs2User({
     this.id,
@@ -229,6 +230,7 @@ class Evs2User {
     // this.tenantLabel,
     this.tenantList,
     this.allowServiceEmail,
+    this.uatTaskStr,
   });
 
   void logout() {
@@ -264,6 +266,8 @@ class Evs2User {
     // tenantLabel = '';
     tenantList = [];
     allowServiceEmail = '';
+    isLoggedin = false;
+    uatTaskStr = '';
   }
 
   factory Evs2User.fromJson(Map<String, dynamic> respJson) {
@@ -307,6 +311,7 @@ class Evs2User {
         // tenantLabel: userJson['tenant_label'] ?? '',
         authProvider: AuthProvider.values.byName(userJson['auth_provider']),
         tenantList: tenantList,
+        uatTaskStr: userJson['uat_task_str'] ?? '',
       );
     } catch (e) {
       if (kDebugMode) {
@@ -369,6 +374,7 @@ class Evs2User {
         tenantList: tenantList,
         authProvider: authProvider,
         allowServiceEmail: userJson['allow_service_email'] ?? '',
+        uatTaskStr: userJson['uat_task_str'] ?? '',
       );
     } catch (e) {
       if (kDebugMode) {
@@ -427,6 +433,7 @@ class Evs2User {
       // 'tenant_label': tenantLabel ?? '',
       'tenant_list': tenantList ?? [],
       'allow_service_email': allowServiceEmail ?? '',
+      'uat_task_str': uatTaskStr ?? '',
     };
   }
 
