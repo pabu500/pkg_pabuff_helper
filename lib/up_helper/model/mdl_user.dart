@@ -374,7 +374,7 @@ class Evs2User {
         tenantList: tenantList,
         authProvider: authProvider,
         allowServiceEmail: userJson['allow_service_email'] ?? '',
-        uatTaskStr: userJson['uat_task_str'] ?? '',
+        uatTaskStr: userJson['uat_task'] ?? '',
       );
     } catch (e) {
       if (kDebugMode) {
