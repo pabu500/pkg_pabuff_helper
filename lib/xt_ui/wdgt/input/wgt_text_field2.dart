@@ -9,6 +9,7 @@ class WgtTextField extends StatefulWidget {
   const WgtTextField({
     super.key,
     required this.appConfig,
+    this.loggedInUser,
     required this.onChanged,
     this.controller,
     this.initialValue,
@@ -39,6 +40,7 @@ class WgtTextField extends StatefulWidget {
   });
 
   final dynamic appConfig;
+  final MdlPagUser? loggedInUser;
   final Function onChanged;
   final TextEditingController? controller;
   final String? initialValue;
@@ -47,7 +49,7 @@ class WgtTextField extends StatefulWidget {
   final Function? onEditingComplete;
   final Function? onTap;
   final Function? validator;
-  final Function(dynamic, String, String, String)? checkUnique;
+  final Function(dynamic, MdlPagUser?, String, String, String)? checkUnique;
   final String? uniqueKey;
   final String? itemTableName;
   final int maxLines;
@@ -98,8 +100,8 @@ class _WgtTextFieldState extends State<WgtTextField> {
     });
 
     try {
-      Map<String, dynamic> result =
-          await widget.checkUnique!(widget.appConfig, field, val, table);
+      Map<String, dynamic> result = await widget.checkUnique!(
+          widget.appConfig, widget.loggedInUser, field, val, table);
       if (result['exists'] != null) {
         bool exists = result['exists'] == true;
         setState(() {
