@@ -33,6 +33,7 @@ class MeterInfoModel {
   int? readingInterval;
   double? current;
   double? voltage;
+  String? commType;
   List<int>? rlsHistory = [];
 
   MeterInfoModel(
@@ -46,6 +47,7 @@ class MeterInfoModel {
       this.readingInterval,
       this.current,
       this.voltage,
+      this.commType,
       this.rlsHistory});
 
   factory MeterInfoModel.fromJson(Map<String, dynamic> json) {
@@ -60,6 +62,7 @@ class MeterInfoModel {
       readingInterval: json['read_interval'] ?? 0,
       current: double.parse(json['current']),
       voltage: double.parse(json['voltage']),
+      commType: json['comm_type'],
       rlsHistory: json['rls_history'] == null
           ? []
           : List<int>.from(json['rls_history'].map((x) => x)),
@@ -74,6 +77,7 @@ class MeterInfoModel {
       'meter_displayname': meterDisplayname,
       'address': address,
       'status': status,
+      'comm_type': commType,
       'rls_status': rlsStatus,
       'kwh_timestamp': kwhTimestamp,
       'kwh_reading': kwhReading,
