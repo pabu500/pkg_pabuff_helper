@@ -49,7 +49,7 @@ class WgtTextField extends StatefulWidget {
   final Function? onEditingComplete;
   final Function? onTap;
   final Function? validator;
-  final Function(dynamic, MdlPagUser?, String, String, String)? checkUnique;
+  final Function(dynamic, String, String, String)? checkUnique;
   final String? uniqueKey;
   final String? itemTableName;
   final int maxLines;
@@ -100,8 +100,8 @@ class _WgtTextFieldState extends State<WgtTextField> {
     });
 
     try {
-      Map<String, dynamic> result = await widget.checkUnique!(
-          widget.appConfig, widget.loggedInUser, field, val, table);
+      Map<String, dynamic> result =
+          await widget.checkUnique!(widget.appConfig, field, val, table);
       if (result['exists'] != null) {
         bool exists = result['exists'] == true;
         setState(() {
