@@ -2,14 +2,13 @@ import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import '../../../pag_helper/model/acl/mdl_pag_svc_claim.dart';
+
+import 'comm_pag_billing.dart';
 import '../tenant/tenant_usage_calc_r2.dart';
 import '../tenant/tenant_usage_calc_released_r2.dart';
 import '../tenant/wgt_pag_tenant_usage_summary.dart';
-import '../tenant/wgt_tenant_usage_summary2r2.dart';
-import '../tenant/wgt_tenant_usage_summary_released2r2.dart';
 import '../tenant/wgt_wgt_tenant_usage_summary_released.dart';
-import 'comm_pag_billing.dart';
+import '../../../pag_helper/model/acl/mdl_pag_svc_claim.dart';
 
 class WgtPagBillView extends StatefulWidget {
   const WgtPagBillView({
@@ -55,7 +54,8 @@ class _WgtPagBillViewState extends State<WgtPagBillView> {
       _gettingBill = true;
       _bill.clear();
     });
-    Map<String, String> queryMap = {
+    Map<String, dynamic> queryMap = {
+      'scope': widget.loggedInUser.selectedScope.toScopeMap(),
       'billing_rec_index': widget.billingRecIndexStr,
       'is_released_mode': _lcStatusDisplay == 'released' ? 'true' : 'false',
       'show_release_in_pv_mode': 'true',

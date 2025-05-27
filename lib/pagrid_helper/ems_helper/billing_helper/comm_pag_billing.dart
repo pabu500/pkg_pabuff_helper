@@ -8,7 +8,7 @@ import '../../../pag_helper/model/mdl_svc_query.dart';
 
 Future<dynamic> getPagBill(
   MdlPagAppConfig appConfig,
-  Map<String, String> queryMap,
+  Map<String, dynamic> queryMap,
   MdlPagSvcClaim svcClaim,
 ) async {
   svcClaim.svcName = PagSvcType.oresvc2.name;
