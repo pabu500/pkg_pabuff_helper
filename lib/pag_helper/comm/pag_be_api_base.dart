@@ -283,15 +283,16 @@ class PagUrlBase {
   static const String eptPagCreateTenant = '/ems/tenant/create_tenant';
 
   //Billing Manager
-  static const String eptGetBill = '/billing/get_bill';
-  static const String eptGenerateBillingRec = '/billing/generate_billing_rec';
-  static const String eptCheckTpInfo = '/billing/check_tp_rate_info';
-  static const String eptGetReleaseCandidate = '/billing/get_rc';
-  static const String eptReleaseBills = '/billing/release_bills';
-  static const String eptGetUsageFactor = '/billing/get_usage_factor';
+  static const String eptGetBill = '/ems/billing/get_bill';
+  static const String eptGenerateBillingRec =
+      '/ems/billing/generate_billing_rec';
+  static const String eptCheckTpInfo = '/ems/billing/check_tp_rate_info';
+  static const String eptGetReleaseCandidate = '/ems/billing/get_rc';
+  static const String eptReleaseBills = '/ems/billing/release_bills';
+  static const String eptGetUsageFactor = '/ems/billing/get_usage_factor';
   static const String eptBlastBillingNotification =
-      '/billing/blast_billing_notification';
-  static const String eptBatchOpBill = '/billing/batch_op_bill';
+      '/ems/billing/blast_billing_notification';
+  static const String eptBatchOpBill = '/ems/billing/batch_op_bill';
 
   //meter_ops
   static const String eptMeterOpGetManualMeterList =

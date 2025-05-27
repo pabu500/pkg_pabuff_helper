@@ -41,7 +41,19 @@ Future<dynamic> getPagBill(
     if (responseBody['error'] != null) {
       throw Exception(responseBody['error']);
     }
-    return {'result': responseBody['result']};
+    final data = responseBody['data'];
+    if (data == null) {
+      throw Exception("No data found in the response");
+    }
+    final result = data['result'];
+    if (result == null) {
+      throw Exception("No result found in the response");
+    }
+    String? resultKey = data['result_key'];
+    if (resultKey == null && resultKey!.isEmpty) {
+      throw Exception("Error: $resultKey");
+    }
+    return result[resultKey];
   } else if (response.statusCode == 403) {
     throw Exception("You are not authorized to perform this operation");
   } else {

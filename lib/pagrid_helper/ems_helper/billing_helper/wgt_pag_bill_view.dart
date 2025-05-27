@@ -73,9 +73,7 @@ class _WgtPagBillViewState extends State<WgtPagBillView> {
           operation: AclOperation.read.name,
         ),
       );
-      if (billResult['result'] != null) {
-        _bill.addAll(billResult['result']);
-      }
+      _bill.addAll(billResult);
     } catch (err) {
       _pullFails++;
       if (kDebugMode) {
@@ -215,7 +213,7 @@ class _WgtPagBillViewState extends State<WgtPagBillView> {
     String tenantName = _bill['tenant_name'];
     String tenantLabel = _bill['tenant_label'];
     String accountId = _bill['tenant_alt_name'] ?? '';
-    String tenantType = _bill['tenant_type'];
+    String tenantType = _bill['tenant_type'] ?? '';
     String fromTimestampStr = _bill['from_timestamp'];
     DateTime fromDatetime = getTargetDatetimeFromTargetStr(fromTimestampStr);
     String toTimestampStr = _bill['to_timestamp'];
@@ -259,7 +257,8 @@ class _WgtPagBillViewState extends State<WgtPagBillView> {
     String billBarFromMonth,
   ) {
     // sort time
-    bool isMonthly = _bill['is_monthly'] == 'true' ? true : false;
+    bool isMonthly = true;
+    // _bill['is_monthly'] == 'true' ? true : false;
     String billTimeRangeStr = getTimeRangeStr(
       fromDatetime,
       toDatetime,

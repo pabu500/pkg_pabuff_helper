@@ -114,6 +114,8 @@ class MdlPagListController /*extends ChangeNotifier*/ {
         case 'location':
           itemType = PagScopeType.location;
           break;
+        case 'bill':
+          itemType = PagItemKind.bill;
 
         default:
           itemType = null;
