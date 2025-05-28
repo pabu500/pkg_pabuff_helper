@@ -3,12 +3,14 @@ import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../../../pag_helper/model/mdl_pag_project_profile.dart';
 import '../tenant/pag_tenant_usage_calc.dart';
 import 'comm_pag_billing.dart';
 import '../tenant/tenant_usage_calc_released_r2.dart';
 import '../tenant/wgt_pag_tenant_usage_summary.dart';
 import '../tenant/wgt_pag_tenant_usage_summary_released.dart';
 import '../../../pag_helper/model/acl/mdl_pag_svc_claim.dart';
+import 'wgt_pag_bill_render_pdf.dart';
 
 class WgtPagBillView extends StatefulWidget {
   const WgtPagBillView({
@@ -47,6 +49,8 @@ class _WgtPagBillViewState extends State<WgtPagBillView> {
   late String _lcStatusDisplay; // released, generated
   bool _showGenTypeSwitch = false;
   bool _showRenderModeSwitch = false;
+
+  late final String assetFolder;
 
   Future<dynamic> _getBill() async {
     setState(() {
@@ -111,6 +115,10 @@ class _WgtPagBillViewState extends State<WgtPagBillView> {
     if (_lcStatusDisplay == 'released') {
       _renderMode = 'pdf';
     }
+
+    MdlPagProjectProfile selectedProjectProfile =
+        widget.loggedInUser.selectedScope.projectProfile!;
+    assetFolder = selectedProjectProfile.assetFolder!;
   }
 
   @override
@@ -363,7 +371,7 @@ class _WgtPagBillViewState extends State<WgtPagBillView> {
     emsTypeUsageCalc.doCalc();
 
     return _renderMode == 'pdf'
-        ? WgtBillRenderPdf(
+        ? WgtPagBillRenderPdf(
             billingInfo: {
               'customerName': tenantName,
               'customerAccountId': accountId,
@@ -402,6 +410,7 @@ class _WgtPagBillViewState extends State<WgtPagBillView> {
               'trendingG': emsTypeUsageCalc.trendingG,
               'lineItemLabel1': emsTypeUsageCalc.getLineItem(0)?['label'],
               'lineItemValue1': emsTypeUsageCalc.getLineItem(0)?['amount'],
+              'assetFolder': assetFolder,
             },
           )
         : WgtPagTenantUsageSummary(
