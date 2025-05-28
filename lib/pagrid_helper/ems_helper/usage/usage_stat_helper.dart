@@ -13,7 +13,7 @@ Widget getTypeUsageStat(
     bool isSubTenant = false,
     bool showFactoredUsage = true}) {
   MeterType? type = getMeterType(meterTypeTag);
-  Color statColor = Theme.of(context).colorScheme.onSurface.withOpacity(0.7);
+  Color statColor = Theme.of(context).colorScheme.onSurface.withAlpha(210);
   double usageVal = usage['usage'] as double;
   if (showFactoredUsage) {
     if (usage['factor'] != null) {
@@ -135,7 +135,7 @@ Widget getUsageTitle(
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).hintColor.withOpacity(0.7),
+                  color: Theme.of(context).hintColor.withAlpha(210),
                 ),
               ),
               horizontalSpaceRegular,
@@ -144,7 +144,7 @@ Widget getUsageTitle(
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).hintColor.withOpacity(0.7),
+                  color: Theme.of(context).hintColor.withAlpha(210),
                 ),
               ),
             ],
@@ -321,7 +321,7 @@ Widget getTypeUsageNet(
             'Net Usage',
             style: TextStyle(
               fontSize: 18,
-              color: Theme.of(context).hintColor.withOpacity(0.7),
+              color: Theme.of(context).hintColor.withAlpha(210),
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -337,7 +337,7 @@ Widget getTypeUsageNet(
             displayContextStr: displayContontextStr,
             isBillMode: true,
             rate: rateE,
-            statColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+            statColor: Theme.of(context).colorScheme.onSurface.withAlpha(210),
             showTrending: false,
             statVirticalStack: false,
             height: 110,
@@ -363,7 +363,7 @@ Widget getTypeUsageNet(
             displayContextStr: displayContontextStr,
             isBillMode: true,
             rate: rateB,
-            statColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+            statColor: Theme.of(context).colorScheme.onSurface.withAlpha(210),
             showTrending: false,
             statVirticalStack: false,
             height: 110,
@@ -389,7 +389,7 @@ Widget getTypeUsageNet(
             displayContextStr: displayContontextStr,
             isBillMode: true,
             rate: rateW,
-            statColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+            statColor: Theme.of(context).colorScheme.onSurface.withAlpha(210),
             showTrending: false,
             statVirticalStack: false,
             height: 110,
@@ -415,7 +415,7 @@ Widget getTypeUsageNet(
             displayContextStr: displayContontextStr,
             isBillMode: true,
             rate: rateN,
-            statColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+            statColor: Theme.of(context).colorScheme.onSurface.withAlpha(210),
             showTrending: false,
             statVirticalStack: false,
             height: 110,
@@ -441,7 +441,7 @@ Widget getTypeUsageNet(
             displayContextStr: displayContontextStr,
             isBillMode: true,
             rate: rateG,
-            statColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+            statColor: Theme.of(context).colorScheme.onSurface.withAlpha(210),
             showTrending: false,
             statVirticalStack: false,
             height: 110,
@@ -545,10 +545,8 @@ Widget getTotal(
                   getCommaNumberStr(subTotalAmt, decimal: 2),
                   'SGD',
                   statStrStyle: defStatStyle.copyWith(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withOpacity(0.7),
+                    color:
+                        Theme.of(context).colorScheme.onSurface.withAlpha(210),
                   ),
                 ),
               ],
@@ -574,10 +572,8 @@ Widget getTotal(
                   getCommaNumberStr(gstAmt, decimal: 2),
                   'SGD',
                   statStrStyle: defStatStyle.copyWith(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withOpacity(0.7),
+                    color:
+                        Theme.of(context).colorScheme.onSurface.withAlpha(210),
                   ),
                 ),
               ],
@@ -607,8 +603,7 @@ Widget getTotal(
                 getCommaNumberStr(totalAmt, decimal: 2, isRoundUp: false),
                 'SGD',
                 statStrStyle: defStatStyleLarge.copyWith(
-                  color:
-                      Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                  color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
                 ),
               ),
             ],

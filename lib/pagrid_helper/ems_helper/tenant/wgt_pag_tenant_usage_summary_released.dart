@@ -114,7 +114,7 @@ class _WgtPagTenantUsageSummaryReleasedState
                   widget.tenantName,
                   widget.tenantAccountId,
                 ),
-                getPagUsageTypeStat(
+                getPagUsageTypeTopStat(
                   costDecimals: widget.costDecimals,
                   context,
                   widget.isBillMode,
@@ -229,7 +229,7 @@ class _WgtPagTenantUsageSummaryReleasedState
               itemType: widget.itemType,
               historyType: PagItemHistoryType.meterListUsageSummary,
               isStaticUsageStat: true,
-              meterStat: meterStat,
+              meterUsageSummary: meterStat,
             ),
           ),
         );
@@ -317,7 +317,7 @@ class _WgtPagTenantUsageSummaryReleasedState
               historyType: PagItemHistoryType.meterListUsageSummary,
               isStaticUsageStat: true,
               isSubstractUsage: true,
-              meterStat: meterStat, //{'usage': usageVal},
+              meterUsageSummary: meterStat, //{'usage': usageVal},
               showRate: false,
             ),
           ),
@@ -387,7 +387,7 @@ class _WgtPagTenantUsageSummaryReleasedState
                 itemType: widget.itemType,
                 historyType: PagItemHistoryType.meterListUsageSummary,
                 isStaticUsageStat: true,
-                meterStat: {'usage': usageVal},
+                meterUsageSummary: {'usage': usageVal},
               ),
             ),
             // Text(

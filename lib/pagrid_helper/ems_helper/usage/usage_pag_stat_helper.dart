@@ -5,6 +5,7 @@ import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../pag_helper/model/mdl_history.dart';
 import '../../../pag_helper/model/mdl_pag_app_config.dart';
+import '../../../up_helper/helper/pag_meter_type_helper.dart';
 import 'wgt_pag_meter_stat_core.dart';
 
 Widget getPagTypeUsageStat(
@@ -15,7 +16,7 @@ Widget getPagTypeUsageStat(
     bool isSubTenant = false,
     bool showFactoredUsage = true}) {
   MeterType? type = getMeterType(meterTypeTag);
-  Color statColor = Theme.of(context).colorScheme.onSurface.withOpacity(0.7);
+  Color statColor = Theme.of(context).colorScheme.onSurface.withAlpha(210);
   double usageVal = usage['usage'] as double;
   if (showFactoredUsage) {
     if (usage['factor'] != null) {
@@ -137,7 +138,7 @@ Widget getPagUsageTitle(
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).hintColor.withOpacity(0.7),
+                  color: Theme.of(context).hintColor.withAlpha(210),
                 ),
               ),
               horizontalSpaceRegular,
@@ -146,7 +147,7 @@ Widget getPagUsageTitle(
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).hintColor.withOpacity(0.7),
+                  color: Theme.of(context).hintColor.withAlpha(210),
                 ),
               ),
             ],
@@ -166,7 +167,7 @@ Widget getPagUsageTitle(
   );
 }
 
-Widget getPagUsageTypeStat(
+Widget getPagUsageTypeTopStat(
     BuildContext context,
     bool isBillMode,
     double? netUsageE,
@@ -186,8 +187,7 @@ Widget getPagUsageTypeStat(
   TextStyle valueStyle = TextStyle(
     fontWeight: FontWeight.bold,
     fontSize: 34,
-    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-    // color: Colors.grey.shade800,
+    color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
   );
   return Row(
     children: [
@@ -196,7 +196,7 @@ Widget getPagUsageTypeStat(
           padding: const EdgeInsets.only(left: 13),
           child: Column(
             children: [
-              getMeterTypeWidget(MeterType.electricity1p, context),
+              getPagMeterTypeWidget(MeterType.electricity1p, context),
               isBillMode
                   ? getStatWithUnit(
                       getCommaNumberStr(costE, decimal: costDecimals), 'SGD',
@@ -213,7 +213,7 @@ Widget getPagUsageTypeStat(
           padding: const EdgeInsets.only(left: 13),
           child: Column(
             children: [
-              getMeterTypeWidget(MeterType.btu, context,
+              getPagMeterTypeWidget(MeterType.btu, context,
                   displayContextStr: displayContextStr),
               isBillMode
                   ? getStatWithUnit(
@@ -232,7 +232,7 @@ Widget getPagUsageTypeStat(
           padding: const EdgeInsets.only(left: 13),
           child: Column(
             children: [
-              getMeterTypeWidget(MeterType.water, context),
+              getPagMeterTypeWidget(MeterType.water, context),
               isBillMode
                   ? getStatWithUnit(
                       getCommaNumberStr(costW, decimal: costDecimals), 'SGD',
@@ -249,7 +249,7 @@ Widget getPagUsageTypeStat(
           padding: const EdgeInsets.only(left: 13),
           child: Column(
             children: [
-              getMeterTypeWidget(MeterType.newater, context),
+              getPagMeterTypeWidget(MeterType.newater, context),
               isBillMode
                   ? getStatWithUnit(
                       getCommaNumberStr(costN, decimal: costDecimals), 'SGD',
@@ -266,7 +266,7 @@ Widget getPagUsageTypeStat(
           padding: const EdgeInsets.only(left: 13),
           child: Column(
             children: [
-              getMeterTypeWidget(MeterType.gas, context),
+              getPagMeterTypeWidget(MeterType.gas, context),
               isBillMode
                   ? getStatWithUnit(
                       getCommaNumberStr(costG, decimal: costDecimals), 'SGD',
@@ -322,7 +322,7 @@ Widget getPagTypeUsageNet(
             'Net Usage',
             style: TextStyle(
               fontSize: 18,
-              color: Theme.of(context).hintColor.withOpacity(0.7),
+              color: Theme.of(context).hintColor.withAlpha(210),
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -337,7 +337,7 @@ Widget getPagTypeUsageNet(
             displayContextStr: displayContontextStr,
             isBillMode: true,
             rate: rateE,
-            statColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+            statColor: Theme.of(context).colorScheme.onSurface.withAlpha(210),
             showTrending: false,
             statVirticalStack: false,
             height: 110,
@@ -350,7 +350,7 @@ Widget getPagTypeUsageNet(
             itemType: ItemType.meter_iwow,
             historyType: PagItemHistoryType.meterListUsageSummary,
             isStaticUsageStat: true,
-            meterStat: {'usage': netUsageE},
+            meterUsageSummary: {'usage': netUsageE},
           ),
         ),
       if (netUsageB != null)
@@ -362,7 +362,7 @@ Widget getPagTypeUsageNet(
             displayContextStr: displayContontextStr,
             isBillMode: true,
             rate: rateB,
-            statColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+            statColor: Theme.of(context).colorScheme.onSurface.withAlpha(210),
             showTrending: false,
             statVirticalStack: false,
             height: 110,
@@ -375,7 +375,7 @@ Widget getPagTypeUsageNet(
             itemType: ItemType.meter_iwow,
             historyType: PagItemHistoryType.meterListUsageSummary,
             isStaticUsageStat: true,
-            meterStat: {'usage': netUsageB},
+            meterUsageSummary: {'usage': netUsageB},
           ),
         ),
       if (netUsageW != null)
@@ -387,7 +387,7 @@ Widget getPagTypeUsageNet(
             displayContextStr: displayContontextStr,
             isBillMode: true,
             rate: rateW,
-            statColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+            statColor: Theme.of(context).colorScheme.onSurface.withAlpha(210),
             showTrending: false,
             statVirticalStack: false,
             height: 110,
@@ -400,7 +400,7 @@ Widget getPagTypeUsageNet(
             itemType: ItemType.meter_iwow,
             historyType: PagItemHistoryType.meterListUsageSummary,
             isStaticUsageStat: true,
-            meterStat: {'usage': netUsageW},
+            meterUsageSummary: {'usage': netUsageW},
           ),
         ),
       if (netUsageN != null)
@@ -412,7 +412,7 @@ Widget getPagTypeUsageNet(
             displayContextStr: displayContontextStr,
             isBillMode: true,
             rate: rateN,
-            statColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+            statColor: Theme.of(context).colorScheme.onSurface.withAlpha(210),
             showTrending: false,
             statVirticalStack: false,
             height: 110,
@@ -425,7 +425,7 @@ Widget getPagTypeUsageNet(
             itemType: ItemType.meter_iwow,
             historyType: PagItemHistoryType.meterListUsageSummary,
             isStaticUsageStat: true,
-            meterStat: {'usage': netUsageN},
+            meterUsageSummary: {'usage': netUsageN},
           ),
         ),
       if (netUsageG != null)
@@ -437,7 +437,7 @@ Widget getPagTypeUsageNet(
             displayContextStr: displayContontextStr,
             isBillMode: true,
             rate: rateG,
-            statColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+            statColor: Theme.of(context).colorScheme.onSurface.withAlpha(210),
             showTrending: false,
             statVirticalStack: false,
             height: 110,
@@ -450,7 +450,7 @@ Widget getPagTypeUsageNet(
             itemType: ItemType.meter_iwow,
             historyType: PagItemHistoryType.meterListUsageSummary,
             isStaticUsageStat: true,
-            meterStat: {'usage': netUsageG},
+            meterUsageSummary: {'usage': netUsageG},
           ),
         ),
     ]),

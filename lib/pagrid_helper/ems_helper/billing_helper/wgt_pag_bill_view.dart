@@ -3,11 +3,11 @@ import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../tenant/pag_tenant_usage_calc.dart';
 import 'comm_pag_billing.dart';
-import '../tenant/tenant_usage_calc_r2.dart';
 import '../tenant/tenant_usage_calc_released_r2.dart';
 import '../tenant/wgt_pag_tenant_usage_summary.dart';
-import '../tenant/wgt_wgt_tenant_usage_summary_released.dart';
+import '../tenant/wgt_pag_tenant_usage_summary_released.dart';
 import '../../../pag_helper/model/acl/mdl_pag_svc_claim.dart';
 
 class WgtPagBillView extends StatefulWidget {
@@ -267,10 +267,14 @@ class _WgtPagBillViewState extends State<WgtPagBillView> {
     );
 
     //sort auto usage
-    List<Map<String, dynamic>> usageSummary = [];
-    if (_bill['tenant_usage_summary'] != null) {
-      for (var item in _bill['tenant_usage_summary']) {
-        usageSummary.add(item);
+    List<Map<String, dynamic>> meterGroupUsageList = [];
+    final tenantUsageSummary = _bill['tenant_usage_summary'];
+    if (tenantUsageSummary != null) {
+      if (tenantUsageSummary['meter_group_usage_list'] != null) {
+        for (var meterGroupUsage
+            in tenantUsageSummary['meter_group_usage_list']) {
+          meterGroupUsageList.add(meterGroupUsage);
+        }
       }
     }
     //sort manual usage
@@ -324,10 +328,10 @@ class _WgtPagBillViewState extends State<WgtPagBillView> {
     Map<String, dynamic> usageFactor = {};
     if (_bill['usage_factor_list'] != null) {
       for (var item in _bill['usage_factor_list']) {
-        String key = item['name'].replaceAll('usage_factor_', '').toUpperCase();
-        String valueStr = item['value'];
+        String meterType = item['meter_type'];
+        String valueStr = item['usage_factor'];
         double? value = double.tryParse(valueStr);
-        usageFactor[key] = value;
+        usageFactor[meterType] = value;
       }
     }
 
@@ -343,12 +347,12 @@ class _WgtPagBillViewState extends State<WgtPagBillView> {
       }
     }
 
-    EmsTypeUsageCalcR2 emsTypeUsageCalc = EmsTypeUsageCalcR2(
+    PagEmsTypeUsageCalc emsTypeUsageCalc = PagEmsTypeUsageCalc(
       costDecimals: widget.costDecimals,
       gst: gst,
       typeRates: typeRates,
       usageFactor: usageFactor,
-      autoUsageSummary: usageSummary,
+      autoUsageSummary: meterGroupUsageList,
       subTenantUsageSummary: subTenantListUsageSummary,
       manualUsageList: manualUsage,
       lineItemList: lineItems,
@@ -372,7 +376,7 @@ class _WgtPagBillViewState extends State<WgtPagBillView> {
               'billDate': _bill['released_bill_timestamp'] ??
                   _bill['created_timestamp'],
               'billTimeRangeStr': billTimeRangeStr,
-              'tenantUsageSummary': usageSummary,
+              'tenantUsageSummary': meterGroupUsageList,
               'subTotalAmount': emsTypeUsageCalc.subTotalCost,
               'gstAmount': emsTypeUsageCalc.gstAmount,
               'totalAmount': emsTypeUsageCalc.totalCost,
@@ -416,7 +420,7 @@ class _WgtPagBillViewState extends State<WgtPagBillView> {
             tenantLabel: tenantLabel,
             tenantAccountId: accountId,
             tenantType: tenantType,
-            tenantUsageSummary: usageSummary,
+            tenantUsageSummary: meterGroupUsageList,
             subTenantListUsageSummary: subTenantListUsageSummary,
             manualUsages: manualUsage,
             lineItems: lineItems,

@@ -21,7 +21,7 @@ class WgtPagUsageStatCore extends StatefulWidget {
     required this.meterIdType,
     required this.itemType,
     required this.historyType,
-    required this.meterStat,
+    required this.meterUsageSummary,
     this.statColor,
     this.isMonthly = true,
     this.showTrending = true,
@@ -48,7 +48,7 @@ class WgtPagUsageStatCore extends StatefulWidget {
   final ItemIdType meterIdType;
   final ItemType itemType;
   final PagItemHistoryType historyType;
-  final Map<String, dynamic> meterStat;
+  final Map<String, dynamic> meterUsageSummary;
   final bool isMonthly;
   final Color? statColor;
   final bool showTrending;
@@ -97,7 +97,7 @@ class _WgtPagUsageStatCoreState extends State<WgtPagUsageStatCore> {
                   'No Data',
                   style: TextStyle(
                     fontSize: 21,
-                    color: Theme.of(context).hintColor.withOpacity(0.3),
+                    color: Theme.of(context).hintColor.withAlpha(80),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -142,7 +142,7 @@ class _WgtPagUsageStatCoreState extends State<WgtPagUsageStatCore> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       SizedBox(
-                        width: 70,
+                        width: 130,
                         child: Padding(
                           padding: const EdgeInsets.only(top: 25),
                           child: Row(
@@ -187,8 +187,8 @@ class _WgtPagUsageStatCoreState extends State<WgtPagUsageStatCore> {
   }
 
   Widget getStatStatic() {
-    var usageFactoredObj = widget.meterStat['usage_factored'];
-    var usageObj = widget.meterStat['usage'];
+    var usageFactoredObj = widget.meterUsageSummary['usage_factored'];
+    var usageObj = widget.meterUsageSummary['usage'];
     if (usageFactoredObj is String) {
       usageFactoredObj = double.tryParse(usageFactoredObj);
     }
@@ -228,9 +228,9 @@ class _WgtPagUsageStatCoreState extends State<WgtPagUsageStatCore> {
                     color: widget.statColor ?? Colors.grey.shade800,
                   )),
               if (widget.showFactoredUsage &&
-                  (widget.meterStat['factor'] ?? 1) < 0.999999)
+                  (widget.meterUsageSummary['factor'] ?? 1) < 0.999999)
                 Text(
-                  'Factor: ${(1 / widget.meterStat['factor']).toStringAsFixed(5)}',
+                  'Factor: ${(1 / widget.meterUsageSummary['factor']).toStringAsFixed(5)}',
                   style: defStatStyleSmall,
                 ),
             ],
@@ -262,9 +262,9 @@ class _WgtPagUsageStatCoreState extends State<WgtPagUsageStatCore> {
                       showUnit: false,
                     ),
                     if (widget.showFactoredUsage &&
-                        (widget.meterStat['factor'] ?? 1) < 0.999999)
+                        (widget.meterUsageSummary['factor'] ?? 1) < 0.999999)
                       Text(
-                        'Factor: ${(1 / widget.meterStat['factor']).toStringAsFixed(5)}',
+                        'Factor: ${(1 / widget.meterUsageSummary['factor']).toStringAsFixed(5)}',
                         style: defStatStyleSmall,
                       ),
                   ],
@@ -325,7 +325,7 @@ class _WgtPagUsageStatCoreState extends State<WgtPagUsageStatCore> {
   }
 
   Widget getStat() {
-    var percentageObj = widget.meterStat['percentage'];
+    var percentageObj = widget.meterUsageSummary['percentage'];
     double? percentage;
     if (percentageObj is String) {
       percentage = double.tryParse(percentageObj);
@@ -339,9 +339,9 @@ class _WgtPagUsageStatCoreState extends State<WgtPagUsageStatCore> {
     bool showCost = widget.isBillMode && widget.rate != null;
 
     double? firstReadingValue =
-        double.tryParse(widget.meterStat['first_reading_val']);
+        double.tryParse(widget.meterUsageSummary['first_reading_value']);
     double? lastReadingValue =
-        double.tryParse(widget.meterStat['last_reading_val']);
+        double.tryParse(widget.meterUsageSummary['last_reading_value']);
 
     double? usage;
 
@@ -353,7 +353,7 @@ class _WgtPagUsageStatCoreState extends State<WgtPagUsageStatCore> {
         usage = usage * (percentage / 100);
       }
     } else {
-      var usageObj = widget.meterStat['usage'];
+      var usageObj = widget.meterUsageSummary['usage'];
       if (usageObj is String) {
         usage = double.tryParse(usageObj);
       } else {
@@ -365,7 +365,7 @@ class _WgtPagUsageStatCoreState extends State<WgtPagUsageStatCore> {
       }
     }
     if (usage != null) {
-      var usageFactorObj = widget.meterStat['factor'];
+      var usageFactorObj = widget.meterUsageSummary['factor'];
       double? usageFactor;
       if (usageFactorObj is String) {
         usageFactor = double.tryParse(usageFactorObj);
@@ -384,14 +384,18 @@ class _WgtPagUsageStatCoreState extends State<WgtPagUsageStatCore> {
     }
 
     //only to minutes substring(0, 16)
-    String firstReadingTime = widget.meterStat['first_reading_time'] == null ||
-            widget.meterStat['first_reading_time'].length < 16
-        ? '-'
-        : (widget.meterStat['first_reading_time'] as String).substring(0, 16);
-    String lastReadingTime = widget.meterStat['last_reading_time'] == null ||
-            widget.meterStat['last_reading_time'].length < 16
-        ? '-'
-        : (widget.meterStat['last_reading_time'] as String).substring(0, 16);
+    String firstReadingTime =
+        widget.meterUsageSummary['first_reading_timestamp'] == null ||
+                widget.meterUsageSummary['first_reading_timestamp'].length < 16
+            ? '-'
+            : (widget.meterUsageSummary['first_reading_timestamp'] as String)
+                .substring(0, 16);
+    String lastReadingTime =
+        widget.meterUsageSummary['last_reading_timestamp'] == null ||
+                widget.meterUsageSummary['last_reading_timestamp'].length < 16
+            ? '-'
+            : (widget.meterUsageSummary['last_reading_timestamp'] as String)
+                .substring(0, 16);
     return widget.statVirticalStack
         ? Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -463,9 +467,9 @@ class _WgtPagUsageStatCoreState extends State<WgtPagUsageStatCore> {
                       showUnit: false,
                     ),
                     if (widget.showFactoredUsage &&
-                        (widget.meterStat['factor'] ?? 1) < 0.999999)
+                        (widget.meterUsageSummary['factor'] ?? 1) < 0.999999)
                       Text(
-                        'Factor: ${(1 / widget.meterStat['factor']).toStringAsFixed(5)}',
+                        'Factor: ${(1 / widget.meterUsageSummary['factor']).toStringAsFixed(5)}',
                         style: defStatStyleSmall,
                       ),
                   ],
@@ -582,9 +586,9 @@ class _WgtPagUsageStatCoreState extends State<WgtPagUsageStatCore> {
 
   Widget getTrending() {
     DateTime firstReadingDate =
-        DateTime.parse(widget.meterStat['first_reading_time']);
+        DateTime.parse(widget.meterUsageSummary['first_reading_time']);
     DateTime lastReadingDate =
-        DateTime.parse(widget.meterStat['last_reading_time']);
+        DateTime.parse(widget.meterUsageSummary['last_reading_time']);
     double height = 170;
     double width = 460;
     double chartRatio = 1.3 * width / height;

@@ -1,4 +1,6 @@
 import 'package:buff_helper/pag_helper/model/mdl_history.dart';
+import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_tenant_usage_calc.dart';
+import 'package:buff_helper/pagrid_helper/ems_helper/usage/usage_pag_stat_helper.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 
@@ -10,7 +12,6 @@ import '../usage/usage_stat_helper.dart';
 import '../usage/wgt_pag_group_stat_core.dart';
 import '../usage/wgt_pag_meter_stat_core.dart';
 import 'mdl_ems_type_usage.dart';
-import 'tenant_usage_calc_r2.dart';
 
 class WgtPagTenantUsageSummary extends StatefulWidget {
   const WgtPagTenantUsageSummary({
@@ -50,7 +51,7 @@ class WgtPagTenantUsageSummary extends StatefulWidget {
   final MdlPagAppConfig appConfig;
   final MdlPagUser loggedInUser;
   final String displayContextStr;
-  final EmsTypeUsageCalcR2? usageCalc;
+  final PagEmsTypeUsageCalc? usageCalc;
   final bool showFactoredUsage;
   final ItemType itemType;
   final bool isMonthly;
@@ -83,7 +84,7 @@ class WgtPagTenantUsageSummary extends StatefulWidget {
 }
 
 class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
-  final double widgetWidth = 750;
+  final double statWidth = 800;
 
   final List<String> _meterTypes = ['E', 'W', 'B', 'N', 'G'];
 
@@ -128,7 +129,7 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
               children: [
                 // getUsageTitle(),
                 // getUsageTypeStat(),
-                getUsageTitle(
+                getPagUsageTitle(
                   context,
                   widget.fromDatetime,
                   widget.toDatetime,
@@ -137,7 +138,7 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
                   widget.tenantName,
                   widget.tenantAccountId,
                 ),
-                getUsageTypeStat(
+                getPagUsageTypeTopStat(
                   costDecimals: widget.costDecimals,
                   context,
                   widget.isBillMode,
@@ -174,6 +175,7 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
                 widget.usageCalc!.gstAmount,
                 widget.usageCalc!.totalCost,
                 widget.tenantType,
+                width: statWidth,
               ),
           ],
         ),
@@ -205,7 +207,7 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
       typeGroups.add(getGroupMeterStat(groupInfo, meterType));
     }
     return SizedBox(
-      width: widgetWidth,
+      width: statWidth,
       child: Column(
         children: [...typeGroups],
       ),
@@ -222,16 +224,16 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
     String groupName = groupInfo['meter_group_name'] ?? '';
     String groupLabel = groupInfo['meter_group_label'] ?? '';
     final meterGroupUsageSummary = groupInfo['meter_group_usage_summary'] ?? [];
-    final meterListUsageSummary =
-        meterGroupUsageSummary['meter_list_usage_summary'] ?? [];
+    final meterUsageList = meterGroupUsageSummary['meter_usage_list'];
 
     List<Widget> meterList = [];
     List<Map<String, dynamic>> meterStatList = [];
 
     // double usageFactor = getProjectMeterUsageFactor(widget.scopeProfile.selectedProjectScope, scopeProfiles, meterType);
     double? usageFactor = widget.usageCalc!.getTypeUsageFactor(groupType);
-    for (var meterStat in meterListUsageSummary) {
-      String usageStr = meterStat['usage'] ?? '';
+    for (var meterStat in meterUsageList) {
+      final meterUsageSummary = meterStat['meter_usage_summary'];
+      String usageStr = meterUsageSummary['usage'] ?? '';
       double? usageVal = double.tryParse(usageStr);
       if (usageVal == null) {
         if (kDebugMode) {
@@ -240,13 +242,13 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
       }
       if (usageVal != null && usageFactor != null) {
         usageVal = usageVal * usageFactor;
-        meterStat['usage_factored'] = usageVal;
-        meterStat['factor'] = usageFactor;
+        meterUsageSummary['usage_factored'] = usageVal;
+        meterUsageSummary['factor'] = usageFactor;
       }
 
-      meterStatList.add(meterStat);
+      meterStatList.add(meterUsageSummary);
       meterList.add(
-        getMeterStat(meterStat, groupType, false),
+        getMeterStat(meterUsageSummary, groupType, false),
       );
     }
 
@@ -308,11 +310,11 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
     );
   }
 
-  Widget getMeterStat(Map<String, dynamic> meterStat, String meterTypeTag,
+  Widget getMeterStat(Map<String, dynamic> meterUsage, String meterTypeTag,
       bool calcUsageFromReadings) {
-    String meterName = meterStat['item_name'];
-    String meterSn = meterStat['item_sn'];
-    String altName = meterStat['alt_name'];
+    // String meterName = meterStat['item_name'];
+    String meterSn = meterUsage['meter_sn'];
+    // String altName = meterStat['alt_name'];
 
     return Padding(
       padding: const EdgeInsets.only(top: 10),
@@ -324,7 +326,7 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
         appConfig: widget.appConfig,
         isBillMode: widget.isBillMode,
         rate: widget.typeRates?[meterTypeTag] ?? 0,
-        statColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+        statColor: Theme.of(context).colorScheme.onSurface.withAlpha(210),
         showTrending: false,
         statVirticalStack: false,
         // height: 110,
@@ -332,11 +334,11 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
         rateDecimals: widget.rateDecimals,
         costDecimals: widget.costDecimals,
         meterType: getMeterType(meterTypeTag)!,
-        meterId: meterName,
+        meterId: meterSn,
         meterIdType: ItemIdType.name,
         itemType: widget.itemType,
         historyType: PagItemHistoryType.meterListUsageSummary,
-        meterStat: meterStat,
+        meterUsageSummary: meterUsage,
       ),
     );
   }
@@ -377,7 +379,7 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
                 itemType: widget.itemType,
                 historyType: PagItemHistoryType.meterListUsageSummary,
                 isStaticUsageStat: true,
-                meterStat: {'usage': usageVal},
+                meterUsageSummary: {'usage': usageVal},
               ),
             ),
           );
@@ -385,7 +387,7 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
       }
     }
     return SizedBox(
-      width: widgetWidth,
+      width: statWidth,
       child: Column(
         children: [
           verticalSpaceSmall,
@@ -469,7 +471,7 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
         ),
         verticalSpaceSmall,
         Container(
-          width: widgetWidth,
+          width: statWidth,
           padding: const EdgeInsets.symmetric(horizontal: 3),
           constraints: const BoxConstraints(
             maxHeight: 55,
@@ -531,7 +533,7 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
     }
 
     return SizedBox(
-      width: widgetWidth,
+      width: statWidth,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
