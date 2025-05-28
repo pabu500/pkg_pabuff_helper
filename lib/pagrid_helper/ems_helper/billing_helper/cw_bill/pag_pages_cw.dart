@@ -325,7 +325,7 @@ class PagBill {
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
                 pw.Text('Issued on behalf of', style: textStyle),
-                pw.Text('National University of Singapore', style: textStyle),
+                // pw.Text('National University of Singapore', style: textStyle),
                 pw.SizedBox(height: 20),
                 pw.Text(
                     customerType == 'cw_nus_internal'
