@@ -276,6 +276,8 @@ class PagUrlBase {
       '/ems/tariff_package/create_tariff_package';
   static const String eptPagGetTariffPackageTenantList =
       '/ems/tariff_package/get_tariff_package_tenant_list';
+  static const String eptPagGetScopeTenantList =
+      '/ems/tariff_package/get_tariff_scope_tenant_list';
   static const String eptUpdateTariffPackageTenantList =
       '/ems/tariff_package/update_tariff_package_tenant_list';
 

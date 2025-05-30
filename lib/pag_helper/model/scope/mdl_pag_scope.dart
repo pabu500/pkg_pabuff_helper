@@ -1,3 +1,5 @@
+import 'package:buff_helper/pag_helper/def/scope_helper.dart';
+
 class MdlPagScope {
   String projectName;
   String projectId;
@@ -50,6 +52,23 @@ class MdlPagScope {
       return projectLabel!;
     }
     return projectName;
+  }
+
+  PagScopeType getScopeType() {
+    if (locationGroupId != null) {
+      return PagScopeType.locationGroup;
+    }
+    if (buildingId != null) {
+      return PagScopeType.building;
+    }
+    if (siteId != null) {
+      return PagScopeType.site;
+    }
+    if (siteGroupId != null) {
+      return PagScopeType.siteGroup;
+    }
+
+    return PagScopeType.project;
   }
 
   factory MdlPagScope.fromJson(Map<String, dynamic> json) {

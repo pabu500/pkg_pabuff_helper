@@ -71,3 +71,12 @@ PagScopeType getChildScopeType(PagScopeType parentScopeType) {
 bool isSmallerScope(PagScopeType scopeType1, PagScopeType scopeType2) {
   return scopeType1.index > scopeType2.index;
 }
+
+Widget getScopeIcon(BuildContext ctx, PagScopeType scopeType,
+    {double size = 24}) {
+  return Icon(
+    scopeType.iconData,
+    size: size,
+    color: Theme.of(ctx).hintColor,
+  );
+}

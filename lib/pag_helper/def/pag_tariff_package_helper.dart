@@ -4,8 +4,8 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'enum_helper.dart';
 
 enum PagTariffPackageType {
-  ftf('FTF', 'ftf', Colors.amberAccent),
-  spLt('SP LT', 'sp_lt', Colors.teal),
+  regular('Reg', 'regular', Colors.amberAccent),
+  system('Sys', 'system', Colors.teal),
   ;
 
   const PagTariffPackageType(
