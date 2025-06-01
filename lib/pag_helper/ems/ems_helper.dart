@@ -17,8 +17,7 @@ void populateListItemMeterUsage(Map<String, dynamic> item) {
 void populateListItemTenantUsage(Map<String, dynamic> item, var meterTypeList) {
   if (item['tenant_usage_summary'] != null) {
     var tenantUsageSummary = item['tenant_usage_summary'];
-    var meterGroupUsageList =
-        tenantUsageSummary['meter_group_usage_summary_list'];
+    var meterGroupUsageList = tenantUsageSummary['meter_group_usage_list'];
     // var meterTypeList = tenantUsageSummary['meter_type_list'];
 
     List<Map<String, dynamic>> meterTypeUsageList = [];
@@ -28,12 +27,13 @@ void populateListItemTenantUsage(Map<String, dynamic> item, var meterTypeList) {
     }
 
     for (var meterGroupUsage in meterGroupUsageList) {
+      String meterType = meterGroupUsage['meter_type'];
       Map<String, dynamic> meterGroupUsageSummary =
           meterGroupUsage['meter_group_usage_summary'];
-      var meterUsageSummaryList =
-          meterGroupUsageSummary['meter_usage_summary_list'];
-      String meterType = meterGroupUsageSummary['meter_type'];
-      for (var meterUsageSummary in meterUsageSummaryList) {
+      var meterUsageList = meterGroupUsageSummary['meter_usage_list'];
+
+      for (Map<String, dynamic> meter in meterUsageList) {
+        var meterUsageSummary = meter['meter_usage_summary'];
         String firstReadingTimestamp =
             meterUsageSummary['first_reading_timestamp'];
         String lastReadingTimestamp =
