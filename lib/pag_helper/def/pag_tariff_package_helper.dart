@@ -3,12 +3,12 @@ import 'package:material_symbols_icons/symbols.dart';
 
 import 'enum_helper.dart';
 
-enum PagTariffPackageType {
+enum PagTariffPackageTypeCat {
   regular('Reg', 'regular', Colors.amberAccent),
   system('Sys', 'system', Colors.teal),
   ;
 
-  const PagTariffPackageType(
+  const PagTariffPackageTypeCat(
     this.label,
     this.tag,
     this.color,
@@ -18,13 +18,13 @@ enum PagTariffPackageType {
   final String tag;
   final Color color;
 
-  static PagTariffPackageType? byLabel(String? label) => enumByLabel(
+  static PagTariffPackageTypeCat? byLabel(String? label) => enumByLabel(
         label,
         values,
         (e) => (e).label,
       );
 
-  static PagTariffPackageType? byTag(String? tag) => enumByTag(
+  static PagTariffPackageTypeCat? byTag(String? tag) => enumByTag(
         tag,
         values,
       );
@@ -33,7 +33,8 @@ enum PagTariffPackageType {
 T? enumByTag<T extends Enum>(String? tag, List<T> values) {
   if (tag == null) return null;
   for (var value in values) {
-    if (value is PagTariffPackageType && value.tag.replaceAll('.', '') == tag) {
+    if (value is PagTariffPackageTypeCat &&
+        value.tag.replaceAll('.', '') == tag) {
       return value as T;
     }
   }
