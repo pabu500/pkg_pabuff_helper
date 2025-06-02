@@ -1,6 +1,6 @@
 import 'package:buff_helper/pag_helper/model/mdl_history.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_ems_type_usage_calc.dart';
-import 'package:buff_helper/pagrid_helper/ems_helper/usage/usage_pag_stat_helper.dart';
+import 'package:buff_helper/pagrid_helper/ems_helper/usage/pag_usage_stat_helper.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 
@@ -35,7 +35,7 @@ class WgtPagTenantUsageSummary extends StatefulWidget {
     this.tenantLabel,
     this.tenantAccountId = '',
     // for rendering, not calculation
-    this.tenantUsageSummary = const [],
+    this.tenantUsageSummary = const {},
     this.subTenantListUsageSummary = const [],
     this.manualUsages = const [],
     this.isBillMode = false,
@@ -62,7 +62,7 @@ class WgtPagTenantUsageSummary extends StatefulWidget {
   final String tenantAccountId;
   final String tenantType;
   final bool excludeAutoUsage;
-  final List<Map<String, dynamic>> tenantUsageSummary;
+  final Map<String, dynamic> tenantUsageSummary;
   final List<Map<String, dynamic>> subTenantListUsageSummary;
   final bool isBillMode;
   // final Map<String, dynamic> meterTypeRates;
@@ -107,7 +107,7 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
   Widget build(BuildContext context) {
     if (widget.usageCalc == null) {
       return getErrorTextPrompt(
-          context: context, errorText: 'Usage data not available');
+          context: context, errorText: 'Usage calc not available');
     }
 
     return Padding(
@@ -197,8 +197,10 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
 
   Widget getTypeStat(String typeStr) {
     List<Widget> typeGroups = [];
-    List<Map<String, dynamic>> typeGroupInfoList = [];
-    typeGroupInfoList = widget.tenantUsageSummary
+    // List<Map<String, dynamic>> typeGroupInfoList = [];
+    final meterGroupUsageList =
+        widget.tenantUsageSummary['meter_group_usage_list'] ?? [];
+    final typeGroupInfoList = meterGroupUsageList
         .where((element) => element['meter_type'] == typeStr)
         .toList();
     for (var groupInfo in typeGroupInfoList) {
@@ -271,7 +273,7 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
             Text(groupName,
                 style: TextStyle(
                   fontSize: 18,
-                  color: Theme.of(context).hintColor.withOpacity(0.7),
+                  color: Theme.of(context).hintColor.withAlpha(180),
                   fontWeight: FontWeight.bold,
                 )),
           ],
@@ -280,7 +282,7 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
         Text(groupLabel,
             style: TextStyle(
               fontSize: 15,
-              color: Theme.of(context).hintColor.withOpacity(0.5),
+              color: Theme.of(context).hintColor.withAlpha(130),
               fontWeight: FontWeight.bold,
             )),
         if (groupInfo['showChart'] ?? false)
@@ -290,8 +292,7 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
               loggedInUser: widget.loggedInUser,
               appConfig: widget.appConfig,
               displayContextStr: widget.displayContextStr,
-              statColor:
-                  Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+              statColor: Theme.of(context).colorScheme.onSurface.withAlpha(180),
               itemType: widget.itemType,
               meterType: meterType,
               meterIdType: ItemIdType.name,
@@ -366,7 +367,7 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
                 isBillMode: widget.isBillMode,
                 rate: widget.typeRates?[meterTypeTag] ?? 0,
                 statColor:
-                    Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                    Theme.of(context).colorScheme.onSurface.withAlpha(180),
                 showTrending: false,
                 statVirticalStack: false,
                 height: 110,
@@ -400,7 +401,7 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
               Text('Manual Usage',
                   style: TextStyle(
                     fontSize: 18,
-                    color: Theme.of(context).hintColor.withOpacity(0.7),
+                    color: Theme.of(context).hintColor.withAlpha(180),
                     fontWeight: FontWeight.bold,
                   )),
             ],
@@ -433,7 +434,7 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
                 label,
                 style: TextStyle(
                   fontSize: 15,
-                  color: Theme.of(context).hintColor.withOpacity(0.7),
+                  color: Theme.of(context).hintColor.withAlpha(180),
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -443,7 +444,7 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
               getCommaNumberStr(valueVal, decimal: 2),
               'SGD',
               statStrStyle: defStatStyle.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                color: Theme.of(context).colorScheme.onSurface.withAlpha(180),
               ),
             ),
           ],
@@ -463,7 +464,7 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
               'Line Item',
               style: TextStyle(
                 fontSize: 18,
-                color: Theme.of(context).hintColor.withOpacity(0.7),
+                color: Theme.of(context).hintColor.withAlpha(180),
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -547,7 +548,7 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
               Text(tenantLabel,
                   style: TextStyle(
                     fontSize: 18,
-                    color: Theme.of(context).hintColor.withOpacity(0.7),
+                    color: Theme.of(context).hintColor.withAlpha(180),
                     fontWeight: FontWeight.bold,
                   )),
             ],

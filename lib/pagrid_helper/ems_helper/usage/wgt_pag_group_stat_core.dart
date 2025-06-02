@@ -245,7 +245,7 @@ class _WgtPagMeterGroupStatCoreState extends State<WgtPagMeterGroupStatCore> {
                 child: Text(
                   'No Data',
                   style: TextStyle(
-                    color: Theme.of(context).hintColor.withOpacity(0.3),
+                    color: Theme.of(context).hintColor.withAlpha(80),
                     fontSize: 21,
                     fontWeight: FontWeight.bold,
                   ),

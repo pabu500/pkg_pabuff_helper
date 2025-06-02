@@ -11,7 +11,7 @@ class PagEmsTypeUsageCalc {
   late final Map<String, dynamic> _typeRates;
   late final Map<String, dynamic> _usageFactor;
 
-  late final List<Map<String, dynamic>> _autoUsageSummary;
+  late final Map<String, dynamic> _autoUsageSummary;
   late final List<Map<String, dynamic>> _subTenantUsageSummary;
   late final List<Map<String, dynamic>> _manualUsageList;
   late final List<Map<String, dynamic>> _lineItemList;
@@ -67,7 +67,7 @@ class PagEmsTypeUsageCalc {
     double? gst,
     Map<String, dynamic> typeRates = const {},
     Map<String, dynamic> usageFactor = const {},
-    List<Map<String, dynamic>> autoUsageSummary = const [],
+    Map<String, dynamic> autoUsageSummary = const {},
     List<Map<String, dynamic>> subTenantUsageSummary = const [],
     List<Map<String, dynamic>> manualUsageList = const [],
     List<Map<String, dynamic>> lineItemList = const [],
@@ -185,7 +185,9 @@ class PagEmsTypeUsageCalc {
 
     // auto usage
     double? typeAutoUsageTotal;
-    for (var item in _autoUsageSummary) {
+    final meterGroupUsageList =
+        _autoUsageSummary['meter_group_usage_list'] ?? [];
+    for (var item in meterGroupUsageList) {
       String? usageType = item['meter_type'].toUpperCase();
       if (usageType != typeTag) {
         continue;

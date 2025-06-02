@@ -19,6 +19,7 @@ class WgtPagBillView extends StatefulWidget {
     required this.loggedInUser,
     required this.billingRecIndexStr,
     required this.defaultBillLcStatus,
+    this.isBillMode = true,
     this.costDecimals = 3,
     this.modes = const ['wgt', 'pdf'],
     this.genTypes = const ['generated', 'released'],
@@ -26,6 +27,7 @@ class WgtPagBillView extends StatefulWidget {
 
   final MdlPagUser loggedInUser;
   final MdlPagAppConfig appConfig;
+  final bool isBillMode;
   final String billingRecIndexStr;
   final int costDecimals;
   final List<String> modes;
@@ -360,7 +362,7 @@ class _WgtPagBillViewState extends State<WgtPagBillView> {
       gst: gst,
       typeRates: typeRates,
       usageFactor: usageFactor,
-      autoUsageSummary: meterGroupUsageList,
+      autoUsageSummary: tenantUsageSummary,
       subTenantUsageSummary: subTenantListUsageSummary,
       manualUsageList: manualUsage,
       lineItemList: lineItems,
@@ -419,7 +421,7 @@ class _WgtPagBillViewState extends State<WgtPagBillView> {
             loggedInUser: widget.loggedInUser,
             displayContextStr: '',
             usageCalc: emsTypeUsageCalc,
-            isBillMode: true,
+            isBillMode: widget.isBillMode,
             showRenderModeSwitch: true,
             itemType: ItemType.meter_iwow,
             isMonthly: isMonthly,
@@ -429,7 +431,7 @@ class _WgtPagBillViewState extends State<WgtPagBillView> {
             tenantLabel: tenantLabel,
             tenantAccountId: accountId,
             tenantType: tenantType,
-            tenantUsageSummary: meterGroupUsageList,
+            tenantUsageSummary: tenantUsageSummary,
             subTenantListUsageSummary: subTenantListUsageSummary,
             manualUsages: manualUsage,
             lineItems: lineItems,
@@ -624,7 +626,7 @@ class _WgtPagBillViewState extends State<WgtPagBillView> {
             appConfig: widget.appConfig,
             loggedInUser: widget.loggedInUser,
             displayContextStr: '',
-            isBillMode: true,
+            isBillMode: widget.isBillMode,
             usageCalc: emsTypeUsageCalcReleased,
             showRenderModeSwitch: true,
             itemType: ItemType.meter_iwow,
