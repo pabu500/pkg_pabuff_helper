@@ -5,7 +5,8 @@ import 'enum_helper.dart';
 
 enum PagTariffPackageTypeCat {
   regular('Reg', 'regular', Colors.amberAccent),
-  system('Sys', 'system', Colors.teal),
+  systemCycle('Sys Cycle', 'system_cycle', Colors.greenAccent),
+  systemRate('Sys Rate', 'system_rate', Colors.teal),
   ;
 
   const PagTariffPackageTypeCat(
