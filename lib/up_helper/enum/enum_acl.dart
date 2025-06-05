@@ -30,6 +30,10 @@ enum AclScope {
   site_smrt_buona_vista,
   site_smrt_commonwealth,
   site_smrt_queenstown,
+
+  site_cw_nus_krc,
+  site_cw_nus_utown,
+  site_cw_nus_btc,
 }
 
 enum AclTarget {
