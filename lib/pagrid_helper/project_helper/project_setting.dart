@@ -152,6 +152,7 @@ final projectProfileRepo = [
       SiteScope.NUS_YNC,
       SiteScope.NUS_RVRC,
       SiteScope.NUS_UTOWN,
+      SiteScope.NUS_VH,
     ],
     'timezone': 8,
     'currency': 'SGD',
@@ -457,7 +458,12 @@ String? nusSnValidator(String displayname) {
   RegExp exp = RegExp(r'^1\d{7}$');
   int displaynameInt = int.parse(displayname);
   if (exp.hasMatch(displayname)) {
-    return isRVRC(displayname);
+    bool isRvrc = isRVRC(displayname) == null;
+    bool isVh = isVH(displayname) == null;
+    if(isVh || isRvrc) {
+      return null;
+    }
+    return 'Invalid displayname';
     //check if the meter is under YNC, if yes, return invalid displayname
     // if ((displaynameInt >= 10002801 && displaynameInt <= 10003925) ||
     //     [10003963, 10003982, 10003985, 10009999].contains(displaynameInt)) {
@@ -501,6 +507,15 @@ String? isRVRC(String displayname) {
           displaynameInt != 10010016 &&
           !rvrc24List.contains(displaynameInt)) ||
       displaynameInt > 10013376)) {
+    return 'Invalid displayname';
+  }
+  return null;
+}
+
+String? isVH(String displayname) {
+  int displaynameInt = int.parse(displayname);
+  if ((displaynameInt < 10013400  ||
+      displaynameInt > 10014000)) {
     return 'Invalid displayname';
   }
   return null;
