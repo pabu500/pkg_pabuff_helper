@@ -169,14 +169,14 @@ class _WgtPagTenantCompositeUsageSummaryState
             // getLineItem(),
             verticalSpaceSmall,
             // if (widget.isBillMode)
-            // getTotal2(
-            //   context,
-            //   widget.usageCalc!.gst!,
-            //   widget.usageCalc!.subTotalCost,
-            //   widget.usageCalc!.gstAmount,
-            //   widget.usageCalc!.totalCost,
-            //   widget.tenantType,
-            //   width: statWidth,
+            getTotal2(
+              context,
+              usageCalc!.gst!,
+              widget.usageCalc!.subTotalCost,
+              widget.usageCalc!.gstAmount,
+              widget.usageCalc!.totalCost,
+              widget.tenantType,
+              width: statWidth,
             // ),
           ],
         ),
