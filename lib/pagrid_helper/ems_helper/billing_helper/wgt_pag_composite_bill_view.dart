@@ -296,6 +296,8 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       }
     }
 
+    List<PagEmsTypeUsageCalc> singularUsageCalcList = [];
+
     for (Map<String, dynamic> singularUsage in singularUsageList) {
       //sort auto usage
       List<Map<String, dynamic>> meterGroupUsageList = [];
@@ -341,9 +343,27 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
         //use billed trending snapshot
         billedTrendingSnapShot: [],
       );
-      emsTypeUsageCalc.doCalc();
+      emsTypeUsageCalc.doSingularCalc();
+      singularUsageCalcList.add(emsTypeUsageCalc);
+
       singularUsage['usage_calc'] = emsTypeUsageCalc;
     }
+
+    PagEmsTypeUsageCalc compositeUsageCalc = PagEmsTypeUsageCalc(
+      costDecimals: widget.costDecimals,
+      gst: 9.0,
+      typeRates: {},
+      usageFactor: usageFactor,
+      autoUsageSummary: {},
+      subTenantUsageSummary: [],
+      manualUsageList: [],
+      lineItemList: [],
+      billBarFromMonth: billBarFromMonth,
+      //use billed trending snapshot
+      billedTrendingSnapShot: [],
+      singularUsageCalcList: singularUsageCalcList,
+    );
+    compositeUsageCalc.doTotalCalc();
 
     //sort manual usage
     List<Map<String, dynamic>> manualUsage = [];

@@ -37,6 +37,8 @@ class PagEmsTypeUsageCalc {
 
   String? _billBarFromMonth;
 
+  List<PagEmsTypeUsageCalc> _singularCalcList = [];
+
   EmsTypeUsageR2? get typeUsageE => _typeUsageE;
   EmsTypeUsageR2? get typeUsageW => _typeUsageW;
   EmsTypeUsageR2? get typeUsageB => _typeUsageB;
@@ -62,6 +64,8 @@ class PagEmsTypeUsageCalc {
 
   String? get billBarFromMonth => _billBarFromMonth;
 
+  List<PagEmsTypeUsageCalc> get singularCalcList => _singularCalcList;
+
   PagEmsTypeUsageCalc({
     required int costDecimals,
     double? gst,
@@ -73,6 +77,7 @@ class PagEmsTypeUsageCalc {
     List<Map<String, dynamic>> lineItemList = const [],
     billBarFromMonth,
     List<Map<String, dynamic>>? billedTrendingSnapShot,
+    List<PagEmsTypeUsageCalc> singularUsageCalcList = const [],
   }) {
     if (usageFactor.isEmpty) {
       throw Exception('usageFactor is empty');
@@ -91,6 +96,12 @@ class PagEmsTypeUsageCalc {
     _billBarFromMonth = billBarFromMonth;
 
     _billedTrendingSnapShot = billedTrendingSnapShot;
+
+    if (singularUsageCalcList.isNotEmpty) {
+      for (var item in singularUsageCalcList) {
+        _singularCalcList.add(item);
+      }
+    }
   }
 
   void doCalc() {
@@ -105,6 +116,28 @@ class PagEmsTypeUsageCalc {
     _sortSubTenantUsage();
 
     _getUsageTrending();
+  }
+
+  void doSingularCalc() {
+    _calcTypeUsage('E');
+    _calcTypeUsage('W');
+    _calcTypeUsage('B');
+    _calcTypeUsage('N');
+    _calcTypeUsage('G');
+
+    // _calcTotalCost();
+
+    // _sortSubTenantUsage();
+
+    // _getUsageTrending();
+  }
+
+  // void doTotalCalc() {
+  //   _calcTotalCost();
+  // }
+
+  void doTotalCalc() {
+    _calcCompositeTotalCost();
   }
 
   Map<String, dynamic>? getLineItem(int index) {
@@ -334,6 +367,43 @@ class PagEmsTypeUsageCalc {
         subTotalCost += cost;
       }
     }
+    _subTotalCost = subTotalCost;
+    if (_subTotalCost != null) {
+      _subTotalCost = getRound(_subTotalCost!, 2);
+      if (subTotalCost != null && _gst != null) {
+        _gstAmount = subTotalCost * _gst / 100;
+      }
+      _gstAmount = getRoundUp(_gstAmount!, 2);
+      _totalCost = _subTotalCost! + _gstAmount!;
+    }
+  }
+
+  void _calcCompositeTotalCost() {
+    double? subTotalCost;
+
+    for (var item in _singularCalcList) {
+      if (item.typeUsageE?.hasCost() ?? false) {
+        subTotalCost ??= 0;
+        subTotalCost += item.typeUsageE!.cost!;
+      }
+      if (item.typeUsageW?.hasCost() ?? false) {
+        subTotalCost ??= 0;
+        subTotalCost += item.typeUsageW!.cost!;
+      }
+      if (item.typeUsageB?.hasCost() ?? false) {
+        subTotalCost ??= 0;
+        subTotalCost += item.typeUsageB!.cost!;
+      }
+      if (item.typeUsageN?.hasCost() ?? false) {
+        subTotalCost ??= 0;
+        subTotalCost += item.typeUsageN!.cost!;
+      }
+      if (item.typeUsageG?.hasCost() ?? false) {
+        subTotalCost ??= 0;
+        subTotalCost += item.typeUsageG!.cost!;
+      }
+    }
+
     _subTotalCost = subTotalCost;
     if (_subTotalCost != null) {
       _subTotalCost = getRound(_subTotalCost!, 2);

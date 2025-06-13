@@ -35,9 +35,10 @@ dependencies:
   flutter_secure_storage: ^9.2.2
   flutter_signin_button: ^2.0.0
   go_router: ^14.1.2
-  url_launcher: ^6.2.6
+  url_launcher: ^6.3.1
   local_auth: ^2.2.0
   flutter_fancy_tree_view: ^1.6.0
+  # two_dimensional_scrollables: ^0.3.6
   path_drawing: ^1.0.1
   latlong2: ^0.9.1
   web: ^1.1.1

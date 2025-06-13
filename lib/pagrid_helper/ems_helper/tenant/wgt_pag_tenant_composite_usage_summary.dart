@@ -177,7 +177,7 @@ class _WgtPagTenantCompositeUsageSummaryState
               widget.usageCalc!.totalCost,
               widget.tenantType,
               width: statWidth,
-            // ),
+            ),
           ],
         ),
       ),
