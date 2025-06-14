@@ -8,7 +8,7 @@ class PagEmsTypeUsageCalc {
   //input
   late final int _costDecimals;
   late final double? _gst;
-  late final Map<String, dynamic> _typeRates;
+  late final Map<String, dynamic> _typeRateInfo;
   late final Map<String, dynamic> _usageFactor;
 
   late final Map<String, dynamic> _autoUsageSummary;
@@ -86,7 +86,7 @@ class PagEmsTypeUsageCalc {
     _costDecimals = costDecimals;
 
     _gst = gst;
-    _typeRates = typeRates;
+    _typeRateInfo = typeRates;
     _usageFactor = usageFactor;
 
     _autoUsageSummary = autoUsageSummary;
@@ -132,12 +132,8 @@ class PagEmsTypeUsageCalc {
     // _getUsageTrending();
   }
 
-  // void doTotalCalc() {
-  //   _calcTotalCost();
-  // }
-
-  void doTotalCalc() {
-    _calcCompositeTotalCost();
+  void doCompositeCalc() {
+    _calcCompositeTypeUsage();
   }
 
   Map<String, dynamic>? getLineItem(int index) {
@@ -196,11 +192,11 @@ class PagEmsTypeUsageCalc {
             usage: subUsasgeTotal,
             usageFactored: subUsasgeTotalFactored,
             factor: _usageFactor[usageType],
-            rate: _typeRates[usageType],
-            cost:
-                subUsasgeTotalFactored == null || _typeRates[usageType] == null
-                    ? null
-                    : subUsasgeTotalFactored * _typeRates[usageType],
+            rate: _typeRateInfo[usageType],
+            cost: subUsasgeTotalFactored == null ||
+                    _typeRateInfo[usageType] == null
+                ? null
+                : subUsasgeTotalFactored * _typeRateInfo[usageType],
           );
           if (subUsasgeTotal != null) {
             typeUsageList.add(typeUsage);
@@ -309,7 +305,7 @@ class PagEmsTypeUsageCalc {
       usage: typeUsageTotal,
       usageFactored: typeUsageFactored,
       factor: _usageFactor[typeTag],
-      rate: _typeRates[typeTag],
+      rate: _typeRateInfo[typeTag],
       // cost: typeUsageFactored == null || _typeRates[typeTag] == null
       //     ? null
       //     : typeUsageFactored * _typeRates[typeTag],
@@ -378,29 +374,156 @@ class PagEmsTypeUsageCalc {
     }
   }
 
-  void _calcCompositeTotalCost() {
+  void _calcCompositeTypeUsage() {
+    double? compositeUsageE;
+    double? compositeUsageW;
+    double? compositeUsageB;
+    double? compositeUsageN;
+    double? compositeUsageG;
+    double? compositeUsageFactoredE;
+    double? compositeUsageFactoredW;
+    double? compositeUsageFactoredB;
+    double? compositeUsageFactoredN;
+    double? compositeUsageFactoredG;
+    double? compositeCostE;
+    double? compositeCostW;
+    double? compositeCostB;
+    double? compositeCostN;
+    double? compositeCostG;
+
+    for (var singularCalc in _singularCalcList) {
+      if (singularCalc.typeUsageE?.usage != null) {
+        compositeUsageE ??= 0;
+        compositeUsageE += singularCalc.typeUsageE!.usage!;
+      }
+      if (singularCalc.typeUsageW?.usage != null) {
+        compositeUsageW ??= 0;
+        compositeUsageW += singularCalc.typeUsageW!.usage!;
+      }
+      if (singularCalc.typeUsageB?.usage != null) {
+        compositeUsageB ??= 0;
+        compositeUsageB += singularCalc.typeUsageB!.usage!;
+      }
+      if (singularCalc.typeUsageN?.usage != null) {
+        compositeUsageN ??= 0;
+        compositeUsageN += singularCalc.typeUsageN!.usage!;
+      }
+      if (singularCalc.typeUsageG?.usage != null) {
+        compositeUsageG ??= 0;
+        compositeUsageG += singularCalc.typeUsageG!.usage!;
+      }
+
+      if (singularCalc.typeUsageE?.usageFactored != null) {
+        compositeUsageFactoredE ??= 0;
+        compositeUsageFactoredE += singularCalc.typeUsageE!.usageFactored!;
+      }
+      if (singularCalc.typeUsageW?.usageFactored != null) {
+        compositeUsageFactoredW ??= 0;
+        compositeUsageFactoredW += singularCalc.typeUsageW!.usageFactored!;
+      }
+      if (singularCalc.typeUsageB?.usageFactored != null) {
+        compositeUsageFactoredB ??= 0;
+        compositeUsageFactoredB += singularCalc.typeUsageB!.usageFactored!;
+      }
+      if (singularCalc.typeUsageN?.usageFactored != null) {
+        compositeUsageFactoredN ??= 0;
+        compositeUsageFactoredN += singularCalc.typeUsageN!.usageFactored!;
+      }
+      if (singularCalc.typeUsageG?.usageFactored != null) {
+        compositeUsageFactoredG ??= 0;
+        compositeUsageFactoredG += singularCalc.typeUsageG!.usageFactored!;
+      }
+
+      if (singularCalc.typeUsageE?.cost != null) {
+        compositeCostE ??= 0;
+        compositeCostE += singularCalc.typeUsageE!.cost!;
+      }
+      if (singularCalc.typeUsageW?.cost != null) {
+        compositeCostW ??= 0;
+        compositeCostW += singularCalc.typeUsageW!.cost!;
+      }
+      if (singularCalc.typeUsageB?.cost != null) {
+        compositeCostB ??= 0;
+        compositeCostB += singularCalc.typeUsageB!.cost!;
+      }
+      if (singularCalc.typeUsageN?.cost != null) {
+        compositeCostN ??= 0;
+        compositeCostN += singularCalc.typeUsageN!.cost!;
+      }
+      if (singularCalc.typeUsageG?.cost != null) {
+        compositeCostG ??= 0;
+        compositeCostG += singularCalc.typeUsageG!.cost!;
+      }
+    }
+
+    _typeUsageE = EmsTypeUsageR2(
+      typeTag: 'E',
+      usage: compositeUsageE,
+      usageFactored: compositeUsageFactoredE,
+      factor: _usageFactor['E'],
+      // rate: _typeRateInfo['E'],
+      cost: compositeCostE,
+      costDecimals: _costDecimals,
+    );
+    _typeUsageW = EmsTypeUsageR2(
+      typeTag: 'W',
+      usage: compositeUsageW,
+      usageFactored: compositeUsageFactoredW,
+      factor: _usageFactor['W'],
+      // rate: _typeRateInfo['W'],
+      cost: compositeCostW,
+      costDecimals: _costDecimals,
+    );
+    _typeUsageB = EmsTypeUsageR2(
+      typeTag: 'B',
+      usage: compositeUsageB,
+      usageFactored: compositeUsageFactoredB,
+      factor: _usageFactor['B'],
+      // rate: _typeRateInfo['B'],
+      cost: compositeCostB,
+      costDecimals: _costDecimals,
+    );
+    _typeUsageN = EmsTypeUsageR2(
+      typeTag: 'N',
+      usage: compositeUsageN,
+      usageFactored: compositeUsageFactoredN,
+      factor: _usageFactor['N'],
+      // rate: _typeRateInfo['N'],
+      cost: compositeCostN,
+      costDecimals: _costDecimals,
+    );
+    _typeUsageG = EmsTypeUsageR2(
+      typeTag: 'G',
+      usage: compositeUsageG,
+      usageFactored: compositeUsageFactoredG,
+      factor: _usageFactor['G'],
+      // rate: _typeRateInfo['G'],
+      cost: compositeCostG,
+      costDecimals: _costDecimals,
+    );
+
     double? subTotalCost;
 
-    for (var item in _singularCalcList) {
-      if (item.typeUsageE?.hasCost() ?? false) {
+    for (var singularCalc in _singularCalcList) {
+      if (singularCalc.typeUsageE?.hasCost() ?? false) {
         subTotalCost ??= 0;
-        subTotalCost += item.typeUsageE!.cost!;
+        subTotalCost += singularCalc.typeUsageE!.cost!;
       }
-      if (item.typeUsageW?.hasCost() ?? false) {
+      if (singularCalc.typeUsageW?.hasCost() ?? false) {
         subTotalCost ??= 0;
-        subTotalCost += item.typeUsageW!.cost!;
+        subTotalCost += singularCalc.typeUsageW!.cost!;
       }
-      if (item.typeUsageB?.hasCost() ?? false) {
+      if (singularCalc.typeUsageB?.hasCost() ?? false) {
         subTotalCost ??= 0;
-        subTotalCost += item.typeUsageB!.cost!;
+        subTotalCost += singularCalc.typeUsageB!.cost!;
       }
-      if (item.typeUsageN?.hasCost() ?? false) {
+      if (singularCalc.typeUsageN?.hasCost() ?? false) {
         subTotalCost ??= 0;
-        subTotalCost += item.typeUsageN!.cost!;
+        subTotalCost += singularCalc.typeUsageN!.cost!;
       }
-      if (item.typeUsageG?.hasCost() ?? false) {
+      if (singularCalc.typeUsageG?.hasCost() ?? false) {
         subTotalCost ??= 0;
-        subTotalCost += item.typeUsageG!.cost!;
+        subTotalCost += singularCalc.typeUsageG!.cost!;
       }
     }
 

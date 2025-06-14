@@ -363,7 +363,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       billedTrendingSnapShot: [],
       singularUsageCalcList: singularUsageCalcList,
     );
-    compositeUsageCalc.doTotalCalc();
+    compositeUsageCalc.doCompositeCalc();
 
     //sort manual usage
     List<Map<String, dynamic>> manualUsage = [];
@@ -467,6 +467,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             loggedInUser: widget.loggedInUser,
             displayContextStr: '',
             tenantSingularUsageInfoList: singularUsageList,
+            compositeUsageCalc: compositeUsageCalc,
             isBillMode: widget.isBillMode,
             showRenderModeSwitch: true,
             itemType: ItemType.meter_iwow,

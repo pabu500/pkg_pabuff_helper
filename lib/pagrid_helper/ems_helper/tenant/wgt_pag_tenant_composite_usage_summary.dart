@@ -36,6 +36,7 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
     this.tenantAccountId = '',
     // for rendering, not calculation
     this.tenantSingularUsageInfoList = const [],
+    this.compositeUsageCalc,
     this.subTenantListUsageSummary = const [],
     this.manualUsages = const [],
     this.isBillMode = false,
@@ -63,6 +64,7 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
   final String tenantType;
   final bool excludeAutoUsage;
   final List<Map<String, dynamic>> tenantSingularUsageInfoList;
+  final PagEmsTypeUsageCalc? compositeUsageCalc;
   final List<Map<String, dynamic>> subTenantListUsageSummary;
   final bool isBillMode;
   // final Map<String, dynamic> meterTypeRates;
@@ -139,45 +141,45 @@ class _WgtPagTenantCompositeUsageSummaryState
                   widget.tenantName,
                   widget.tenantAccountId,
                 ),
-                // getPagUsageTypeTopStat(
-                //   costDecimals: widget.costDecimals,
-                //   context,
-                //   widget.isBillMode,
-                //   widget.usageCalc!.typeUsageE!.usage,
-                //   widget.usageCalc!.typeUsageE!.cost,
-                //   widget.usageCalc!.typeUsageW!.usage,
-                //   widget.usageCalc!.typeUsageW!.cost,
-                //   widget.usageCalc!.typeUsageB!.usage,
-                //   widget.usageCalc!.typeUsageB!.cost,
-                //   widget.usageCalc!.typeUsageN!.usage,
-                //   widget.usageCalc!.typeUsageN!.cost,
-                //   widget.usageCalc!.typeUsageG!.usage,
-                //   widget.usageCalc!.typeUsageG!.cost,
-                //   displayContextStr: widget.displayContextStr,
-                // ),
+                getPagUsageTypeTopStat(
+                  costDecimals: widget.costDecimals,
+                  context,
+                  widget.isBillMode,
+                  widget.compositeUsageCalc!.typeUsageE!.usage,
+                  widget.compositeUsageCalc!.typeUsageE!.cost,
+                  widget.compositeUsageCalc!.typeUsageW!.usage,
+                  widget.compositeUsageCalc!.typeUsageW!.cost,
+                  widget.compositeUsageCalc!.typeUsageB!.usage,
+                  widget.compositeUsageCalc!.typeUsageB!.cost,
+                  widget.compositeUsageCalc!.typeUsageN!.usage,
+                  widget.compositeUsageCalc!.typeUsageN!.cost,
+                  widget.compositeUsageCalc!.typeUsageG!.usage,
+                  widget.compositeUsageCalc!.typeUsageG!.cost,
+                  displayContextStr: widget.displayContextStr,
+                ),
               ],
             ),
             Divider(color: Theme.of(context).hintColor),
             if (!widget.excludeAutoUsage) ...getStat(),
             if (widget.excludeAutoUsage) getAutoUsageExcludedInfo(context),
-            verticalSpaceSmall,
+            // verticalSpaceSmall,
             // getManualUsage(),
-            verticalSpaceSmall,
+            // verticalSpaceSmall,
             // getSubTenantUsageList(),
-            verticalSpaceSmall,
-            verticalSpaceSmall,
+            // verticalSpaceSmall,
+            // verticalSpaceSmall,
             // getLineItem(),
             verticalSpaceSmall,
-            // if (widget.isBillMode)
-            getTotal2(
-              context,
-              usageCalc!.gst!,
-              widget.usageCalc!.subTotalCost,
-              widget.usageCalc!.gstAmount,
-              widget.usageCalc!.totalCost,
-              widget.tenantType,
-              width: statWidth,
-            ),
+            if (widget.isBillMode)
+              getTotal2(
+                context,
+                widget.compositeUsageCalc!.gst!,
+                widget.compositeUsageCalc!.subTotalCost,
+                widget.compositeUsageCalc!.gstAmount,
+                widget.compositeUsageCalc!.totalCost,
+                widget.tenantType,
+                width: statWidth,
+              ),
           ],
         ),
       ),
@@ -200,6 +202,14 @@ class _WgtPagTenantCompositeUsageSummaryState
     List<Widget> slotList = [];
     for (Map<String, dynamic> singularUsageInfo
         in widget.tenantSingularUsageInfoList) {
+      String slotFromTimestampStr = singularUsageInfo['from_timestamp'] ?? '';
+      String slotToTimestampStr = singularUsageInfo['to_timestamp'] ?? '';
+      assert(
+        slotFromTimestampStr.isNotEmpty && slotToTimestampStr.isNotEmpty,
+        'from_timestamp and to_timestamp cannot be empty',
+      );
+      String slotStr =
+          '  ${slotFromTimestampStr.substring(0, 10)} - ${slotToTimestampStr.substring(0, 10)}';
       final tenantUsageSummary = singularUsageInfo['tenant_usage_summary'];
 
       final meterGroupUsageList =
@@ -207,7 +217,7 @@ class _WgtPagTenantCompositeUsageSummaryState
       final typeGroupInfoList = meterGroupUsageList
           .where((element) => element['meter_type'] == typeStr)
           .toList();
-      List<Widget> typeGroups = [];
+      List<Widget> typeGroupList = [];
       for (var groupInfo in typeGroupInfoList) {
         String meterTypeTag = groupInfo['meter_type'] ?? '';
         MeterType? meterType = getMeterType(meterTypeTag);
@@ -218,8 +228,27 @@ class _WgtPagTenantCompositeUsageSummaryState
         PagEmsTypeUsageCalc? usageCalc = singularUsageInfo['usage_calc'];
         assert(usageCalc != null, 'usageCalc cannot be null');
 
-        typeGroups.add(getGroupMeterStat(
-            groupInfo, meterType, meterTypeRateInfo!, usageCalc!));
+        typeGroupList.add(Column(
+          children: [
+            verticalSpaceTiny,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(slotStr,
+                    style: TextStyle(
+                      // fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).hintColor,
+                    ))
+              ],
+            ),
+            getGroupMeterStat(
+                groupInfo, meterType, meterTypeRateInfo!, usageCalc!),
+          ],
+        ));
+      }
+      if (typeGroupList.isEmpty) {
+        continue;
       }
       slotList.add(Container(
         width: statWidth,
@@ -227,9 +256,10 @@ class _WgtPagTenantCompositeUsageSummaryState
           border: Border.all(color: Colors.grey.shade600, width: 1),
           borderRadius: BorderRadius.circular(5.0),
         ),
+        margin: const EdgeInsets.only(top: 8),
         padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
         child: Column(
-          children: [...typeGroups],
+          children: [...typeGroupList],
         ),
       ));
     }
@@ -237,7 +267,7 @@ class _WgtPagTenantCompositeUsageSummaryState
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        verticalSpaceSmall,
+        // verticalSpaceSmall,
         ...slotList,
       ],
     );
@@ -283,37 +313,37 @@ class _WgtPagTenantCompositeUsageSummaryState
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        verticalSpaceSmall,
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            InkWell(
-                onTap: () {
-                  setState(() {
-                    groupInfo['showChart'] = !(groupInfo['showChart'] ?? false);
-                  });
-                },
-                child: Icon(Symbols.analytics,
-                    size: 21, color: Theme.of(context).colorScheme.primary)),
-            horizontalSpaceTiny,
-            Text(groupName,
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Theme.of(context).hintColor.withAlpha(180),
-                  fontWeight: FontWeight.bold,
-                )),
-          ],
-        ),
+        // verticalSpaceSmall,
+        // Row(
+        //   mainAxisAlignment: MainAxisAlignment.center,
+        //   children: [
+        //     InkWell(
+        //         onTap: () {
+        //           setState(() {
+        //             groupInfo['showChart'] = !(groupInfo['showChart'] ?? false);
+        //           });
+        //         },
+        //         child: Icon(Symbols.analytics,
+        //             size: 21, color: Theme.of(context).colorScheme.primary)),
+        //     horizontalSpaceTiny,
+        //     Text(groupName,
+        //         style: TextStyle(
+        //           fontSize: 18,
+        //           color: Theme.of(context).hintColor.withAlpha(180),
+        //           fontWeight: FontWeight.bold,
+        //         )),
+        //   ],
+        // ),
         // verticalSpaceTiny,
-        Text(groupLabel,
-            style: TextStyle(
-              fontSize: 15,
-              color: Theme.of(context).hintColor.withAlpha(130),
-              fontWeight: FontWeight.bold,
-            )),
+        // Text(groupLabel,
+        //     style: TextStyle(
+        //       fontSize: 15,
+        //       color: Theme.of(context).hintColor.withAlpha(130),
+        //       fontWeight: FontWeight.bold,
+        //     )),
         if (groupInfo['showChart'] ?? false)
           Padding(
-            padding: const EdgeInsets.only(top: 10),
+            padding: const EdgeInsets.only(top: 0),
             child: WgtPagMeterGroupStatCore(
               loggedInUser: widget.loggedInUser,
               appConfig: widget.appConfig,
@@ -350,7 +380,7 @@ class _WgtPagTenantCompositeUsageSummaryState
 
     // return Container();
     return Padding(
-      padding: const EdgeInsets.only(top: 10),
+      padding: const EdgeInsets.only(top: 5),
       child: WgtPagUsageStatCore(
         loggedInUser: widget.loggedInUser,
         displayContextStr: widget.displayContextStr,
