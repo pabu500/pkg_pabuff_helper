@@ -45,6 +45,7 @@ MdlPagAppContext appCtxEms = MdlPagAppContext(
   routeList: [
     PagPageRoute.emsDashboard,
     PagPageRoute.meterManager,
+    PagPageRoute.meterGroupManager,
     PagPageRoute.tenantManager,
     PagPageRoute.tariffManager,
     PagPageRoute.billingManager,

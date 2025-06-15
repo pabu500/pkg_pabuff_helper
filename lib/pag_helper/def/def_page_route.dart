@@ -62,6 +62,11 @@ enum PagPageRoute {
     'meter_manager',
     Symbols.speed,
   ),
+  meterGroupManager(
+    'Meter Group Manager',
+    'meter_group_manager',
+    Symbols.atr,
+  ),
   creditTransaction(
     'Credit Transaction',
     'credit_transaction',

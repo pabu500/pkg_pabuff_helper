@@ -283,6 +283,12 @@ class PagUrlBase {
 
   // Tenant Manager
   static const String eptPagCreateTenant = '/ems/tenant/create_tenant';
+  static const String eptPagGetTenantMeterGroupList =
+      '/ems/tenant/get_tenant_meter_group_list';
+  static const String eptPagGetTenantScopeMeterGroupList =
+      '/ems/tenant/get_tenant_scope_meter_group_list';
+  static const String eptPagUpdateTenantMeterGroupList =
+      '/ems/tenant/update_tenant_meter_group_list';
 
   //Billing Manager
   static const String eptGetBill = '/ems/billing/get_bill';
@@ -295,6 +301,16 @@ class PagUrlBase {
   static const String eptBlastBillingNotification =
       '/ems/billing/blast_billing_notification';
   static const String eptBatchOpBill = '/ems/billing/batch_op_bill';
+
+  // Meter Group Manager
+  static const String eptPagCreateMeterGroup =
+      '/ems/meter_group/create_meter_group';
+  static const String eptPagGetMeterGroupMetertList =
+      '/ems/meter_group/get_meter_group_meter_list';
+  static const String eptPagGetMeterGroupScopeMeterList =
+      '/ems/meter_group/get_meter_group_scope_meter_list';
+  static const String eptUpdateMetrGroupMeterList =
+      '/ems/meter_group/update_meter_group_meter_list';
 
   //meter_ops
   static const String eptMeterOpGetManualMeterList =

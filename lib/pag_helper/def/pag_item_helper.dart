@@ -13,6 +13,7 @@ enum PagItemKind {
   jobTypeSub('Job Type Sub', Symbols.group),
   tariffPackage('Tariff Package', Symbols.price_change),
   bill('Bill', Symbols.request_quote),
+  meterGroup('Meter Group', Symbols.atr),
   ;
 
   const PagItemKind(
