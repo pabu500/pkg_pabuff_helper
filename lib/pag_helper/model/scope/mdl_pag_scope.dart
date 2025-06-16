@@ -55,16 +55,16 @@ class MdlPagScope {
   }
 
   PagScopeType getScopeType() {
-    if (locationGroupId != null) {
+    if (locationGroupId != null || locationGroupName != null) {
       return PagScopeType.locationGroup;
     }
-    if (buildingId != null) {
+    if (buildingId != null || buildingName != null) {
       return PagScopeType.building;
     }
-    if (siteId != null) {
+    if (siteId != null || siteName != null) {
       return PagScopeType.site;
     }
-    if (siteGroupId != null) {
+    if (siteGroupId != null || siteGroupName != null) {
       return PagScopeType.siteGroup;
     }
 
