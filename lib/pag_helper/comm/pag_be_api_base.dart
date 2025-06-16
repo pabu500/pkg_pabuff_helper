@@ -289,6 +289,8 @@ class PagUrlBase {
       '/ems/tenant/get_tenant_scope_meter_group_list';
   static const String eptPagUpdateTenantMeterGroupList =
       '/ems/tenant/update_tenant_meter_group_list';
+  static const String eptPagGetMeterTenantAssignment =
+      '/ems/tenant/get_meter_tenant_assignment';
 
   //Billing Manager
   static const String eptGetBill = '/ems/billing/get_bill';
