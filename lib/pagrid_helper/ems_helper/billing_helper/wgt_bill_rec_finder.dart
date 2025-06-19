@@ -125,8 +125,22 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
               .toLowerCase()
               .contains('delete'));
         }
+
         _tenantInfoList.addAll(result);
-        _tenantLabelList.addAll(result.map((e) => e['tenant_label'] as String));
+
+        // filter out non internal tenant types
+        for (var tenant in _tenantInfoList) {
+          if (tenant['type'] != null &&
+              tenant['type'].toString().toLowerCase() != 'cw_nus_internal') {
+            continue;
+          }
+          _tenantLabelList.add(tenant['tenant_label'] as String);
+        }
+        // sort tenant labels asc
+        _tenantLabelList
+            .sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+
+        // _tenantLabelList.addAll(result.map((e) => e['tenant_label'] as String));
       }
       _pullFails = 0;
     } catch (e) {
