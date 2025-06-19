@@ -45,6 +45,7 @@ class WgtItemFinder2 extends StatefulWidget {
     this.showSiteScopeSelector = true,
     this.sidePadding = EdgeInsets.zero,
     this.useItemLabelDropdownSelector = false,
+    this.dropdownSelectorFilter,
     this.itemLableList = const [],
     this.onLabelSelected,
   });
@@ -85,6 +86,7 @@ class WgtItemFinder2 extends StatefulWidget {
   final bool showSiteScopeSelector;
   final EdgeInsets sidePadding;
   final bool useItemLabelDropdownSelector;
+  final String? dropdownSelectorFilter;
   final List<String> itemLableList;
   final void Function(String)? onLabelSelected;
 
