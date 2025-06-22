@@ -16,6 +16,9 @@ class MdlPagScope {
   String? locationGroupName;
   String? locationGroupId;
   String? locationGroupLabel;
+  String? locationId;
+  String? locationName;
+  String? locationLabel;
 
   MdlPagScope({
     required this.projectName,
@@ -33,9 +36,15 @@ class MdlPagScope {
     this.locationGroupName,
     this.locationGroupId,
     this.locationGroupLabel,
+    this.locationId,
+    this.locationName,
+    this.locationLabel,
   });
 
   String getLeafScopeLabel() {
+    if (locationLabel != null) {
+      return locationLabel!;
+    }
     if (locationGroupLabel != null) {
       return locationGroupLabel!;
     }
@@ -55,6 +64,9 @@ class MdlPagScope {
   }
 
   PagScopeType getScopeType() {
+    if (locationId != null || locationName != null) {
+      return PagScopeType.location;
+    }
     if (locationGroupId != null || locationGroupName != null) {
       return PagScopeType.locationGroup;
     }
@@ -97,6 +109,9 @@ class MdlPagScope {
       locationGroupName: json['location_group_name'],
       locationGroupId: json['location_group_id'],
       locationGroupLabel: json['location_group_label'],
+      locationId: json['location_id'],
+      locationName: json['location_name'],
+      locationLabel: json['location_label'],
     );
   }
 
@@ -117,6 +132,9 @@ class MdlPagScope {
       'location_group_name': locationGroupName,
       'location_group_id': locationGroupId,
       'location_group_label': locationGroupLabel,
+      'location_id': locationId,
+      'location_name': locationName,
+      'location_label': locationLabel,
     };
   }
 }
