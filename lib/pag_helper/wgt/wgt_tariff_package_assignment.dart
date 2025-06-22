@@ -453,6 +453,7 @@ class _WgtTariffPackageAssignmentState
         itemInfo['tpt_label_${widget.meterType.toLowerCase()}'];
     if (meterTypeTptLabel == null) {
       if (kDebugMode) {
+        // meter type tpt is not assigned for this tenant
         print(
             'Error: meterTypeTptLabel is null for ${widget.meterType} in itemInfo: $itemInfo');
       }
