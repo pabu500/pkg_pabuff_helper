@@ -21,7 +21,7 @@ class WgtPanelContainer extends StatefulWidget {
 }
 
 class _WgtPanelContainerState extends State<WgtPanelContainer> {
-  final List<Map<String, dynamic>> panelInfoList = [];
+  // final List<Map<String, dynamic>> panelInfoList = [];
 
   @override
   void initState() {
