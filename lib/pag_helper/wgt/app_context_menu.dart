@@ -155,16 +155,28 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
   List<Widget> _buildMenuItemList(PagAppProvider appModel) {
     List<Widget> tiles = [];
 
-    // PagScopeType scopeType = widget.loggedInUser.selectedScope.getScopeType();
-    // if (widget.routeList2 != null) {
     if (routeList.isNotEmpty) {
-      // for (PagPageRoute pr in widget.routeList2!) {
       for (PagPageRoute pr in routeList) {
         bool isDisabled = false;
+        bool show = true;
+
+        if (appModel.appName == 'pag_ems_tp') {
+          if (pr == PagPageRoute.consoleHomeTaskManager ||
+                  pr == PagPageRoute.emsDashboard ||
+                  pr == PagPageRoute.meterGroupManager ||
+                  // pr == PagPageRoute.billingManager ||
+                  pr == PagPageRoute.tenantManager ||
+                  pr == PagPageRoute.tariffManager
+              // pr == PagPageRoute.meterManager
+              ) {
+            isDisabled = true;
+            show = false;
+          }
+        }
+
         if (pr == PagPageRoute.consoleHomeAcl ||
             pr == PagPageRoute.consoleHomeSettings ||
             pr == PagPageRoute.billingManager) {
-          // if (scopeType != PagScopeType.project) {
           if (!widget.loggedInUser.selectedScope
               .isAtScopeType(PagScopeType.project)) {
             isDisabled = true;
@@ -219,6 +231,9 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
           }
         }
 
+        if (!show) {
+          continue;
+        }
         tiles.add(Tooltip(
           message: pr.label,
           waitDuration: const Duration(milliseconds: 500),
