@@ -158,17 +158,19 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
     if (routeList.isNotEmpty) {
       for (PagPageRoute pr in routeList) {
         bool isDisabled = false;
+        bool show = true;
 
         if (appModel.appName == 'pag_ems_tp') {
-          if (pr != PagPageRoute.consoleHomeTaskManager &&
-                  pr != PagPageRoute.meterGroupManager
-                  // && pr != PagPageRoute.billingManager
-                  &&
-                  pr != PagPageRoute.tenantManager &&
-                  pr != PagPageRoute.tariffManager
-              // && pr != PagPageRoute.meterManager
+          if (pr == PagPageRoute.consoleHomeTaskManager ||
+                  pr == PagPageRoute.emsDashboard ||
+                  pr == PagPageRoute.meterGroupManager ||
+                  // pr == PagPageRoute.billingManager ||
+                  pr == PagPageRoute.tenantManager ||
+                  pr == PagPageRoute.tariffManager
+              // pr == PagPageRoute.meterManager
               ) {
             isDisabled = true;
+            show = false;
           }
         }
 
@@ -229,6 +231,9 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
           }
         }
 
+        if (!show) {
+          continue;
+        }
         tiles.add(Tooltip(
           message: pr.label,
           waitDuration: const Duration(milliseconds: 500),
