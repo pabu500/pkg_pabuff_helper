@@ -259,8 +259,9 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     if (from == null || to == null) return;
 
     _selectedFromDate = DateTime(from.year, from.month, from.day);
-    _selectedToDate = DateTime(to.year, to.month, to.day, 23, 59, 59);
-    _selectedToDate = _selectedToDate!.add(const Duration(seconds: 1));
+    // _selectedToDate = DateTime(to.year, to.month, to.day, 23, 59, 59);
+    // _selectedToDate = _selectedToDate!.add(const Duration(seconds: 1));
+    _selectedToDate = DateTime(to.year, to.month, to.day, 0, 0, 0);
   }
 
   // get value list to populate input dropdown
@@ -860,7 +861,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
                   _selectedFromDate =
                       DateTime(selected.year, selected.month, 1);
                   _selectedToDate =
-                      DateTime(selected.year, selected.month + 1, 0);
+                      DateTime(selected.year, selected.month + 1, 1);
                   // _customRange = false;
                   DateTime localNow = getTargetLocalDatetimeNow(
                       widget.loggedInUser.selectedScope.getProjectTimezone());
