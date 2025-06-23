@@ -20,6 +20,7 @@ class WgtPagScopeSelector3 extends StatefulWidget {
     required this.projectList,
     required this.onChange,
     required this.iniScope,
+    this.readOnly = false,
   });
 
   final Function(
@@ -27,9 +28,10 @@ class WgtPagScopeSelector3 extends StatefulWidget {
       MdlPagSiteGroupProfile? pagSiteGroupScope,
       MdlPagSiteProfile? pagSiteScope,
       MdlPagBuildingProfile? pagBuildingScope,
-      MdlPagLocationGroupProfile? pagLocationGroupScope) onChange;
+      MdlPagLocationGroupProfile? pagLocationGroupScope)? onChange;
   final MdlPagScopeProfile iniScope;
   final List<MdlPagProjectProfile> projectList;
+  final bool readOnly;
 
   @override
   State<WgtPagScopeSelector3> createState() => _WgtPagScopeSelector3State();
@@ -190,17 +192,20 @@ class _WgtPagScopeSelector3State extends State<WgtPagScopeSelector3> {
   Widget build(BuildContext context) {
     return _scopeSet
         ? InkWell(
-            onTap: (widget.projectList.length == 1 &&
-                    _siteGroupProfileList.length == 1 &&
-                    _siteProfileList.length == 1 &&
-                    _buildingProfileList.length == 1 &&
-                    _locationGroupProfileList.length == 1)
+            onTap: widget.readOnly
                 ? null
-                : () {
-                    setState(() {
-                      _scopeSet = false;
-                    });
-                  },
+                : // if only one project, site group, site, building and location group is available, then do not allow scope change
+                (widget.projectList.length == 1 &&
+                        _siteGroupProfileList.length == 1 &&
+                        _siteProfileList.length == 1 &&
+                        _buildingProfileList.length == 1 &&
+                        _locationGroupProfileList.length == 1)
+                    ? null
+                    : () {
+                        setState(() {
+                          _scopeSet = false;
+                        });
+                      },
             child: Padding(
               padding: EdgeInsets.zero,
               child: Row(
@@ -259,7 +264,7 @@ class _WgtPagScopeSelector3State extends State<WgtPagScopeSelector3> {
                       return;
                     }
 
-                    widget.onChange(
+                    widget.onChange?.call(
                       _selectedProjectProfile,
                       _selectedSiteGroupProfile,
                       _selectedSiteProfile,

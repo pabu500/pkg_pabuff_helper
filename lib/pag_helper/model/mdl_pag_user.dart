@@ -73,6 +73,8 @@ class MdlPagUser {
 
   bool isDoingPostLogin = false;
 
+  MdlPagTenant? selectedTenant;
+
   MdlPagUser({
     this.id,
     this.username,
@@ -116,6 +118,8 @@ class MdlPagUser {
     roleProjectInfo = {};
     roleList = [];
     isDoingPostLogin = false;
+    selectedRole = null;
+    selectedTenant = null;
   }
 
   get isEmpty => username == '';
@@ -462,6 +466,13 @@ class MdlPagUser {
       return [];
     }
     return roleProjectInfo[selectedRole!.name] ?? [];
+  }
+
+  void updateSelectedTenant(MdlPagTenant? tenant) {
+    if (tenant == null) {
+      return;
+    }
+    selectedTenant = tenant;
   }
 
   factory MdlPagUser.fromJson2(Map<String, dynamic> respJson) {
