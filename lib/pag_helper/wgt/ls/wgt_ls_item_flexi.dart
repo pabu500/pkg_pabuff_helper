@@ -13,7 +13,6 @@ import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
 import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_scope.dart';
 import 'package:buff_helper/pagrid_helper/comm_helper/local_storage.dart';
-import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/wgt_pag_bill_view.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/wgt_pag_composite_bill_view.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_ems_type_usage_calc.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/tenant/wgt_pag_tenant_usage_summary.dart';
@@ -50,6 +49,7 @@ class WgtListSearchItemFlexi extends StatefulWidget {
     required this.listContextType,
     this.itemType,
     this.listController,
+    this.selectedItemInfoList,
     this.onListInfoListResult,
     this.onResult,
     this.additionalColumnConfig,
@@ -70,6 +70,7 @@ class WgtListSearchItemFlexi extends StatefulWidget {
   final PagListContextType listContextType;
   final String prefKey;
   final MdlPagListController? listController;
+  final List<Map<String, dynamic>>? selectedItemInfoList;
   final Function(List<MdlPagListController>)? onListInfoListResult;
   final Function(Map<String, dynamic>)? onResult;
   final List<Map<String, dynamic>>? additionalColumnConfig;
@@ -1182,6 +1183,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         itemType: _selectedListController!.itemType,
         listContextType: widget.listContextType,
         listController: _selectedListController!,
+        selectedItemInfoList: widget.selectedItemInfoList,
         meterTypeList: meterTypeList,
         // right padding as clerance for context menu
         sidePadding: const EdgeInsets.only(left: 0, right: 60),

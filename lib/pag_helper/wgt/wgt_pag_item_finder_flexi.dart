@@ -33,6 +33,7 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
     required this.listController,
     required this.listContextType,
     required this.onResult,
+    this.selectedItemInfoList,
     this.meterTypeList = const [],
     this.sectionName = '',
     this.panelName = '',
@@ -66,6 +67,7 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
   final String sectionName;
   final String panelName;
   final String panelTitle;
+  final List<Map<String, dynamic>>? selectedItemInfoList;
   final void Function()? onModified;
   final void Function()? onSearching;
   final void Function(Map<String, dynamic> itemFindResult) onResult;
@@ -175,6 +177,9 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
       'get_count_only': widget.getCountOnly ? 'true' : 'false',
       'list_context_type': widget.listContextType.name,
     };
+    if (widget.selectedItemInfoList != null) {
+      queryMap['selected_item_info_list'] = widget.selectedItemInfoList;
+    }
 
     if (widget.listContextType == PagListContextType.usage) {
       queryMap['meter_type_list'] = widget.meterTypeList;

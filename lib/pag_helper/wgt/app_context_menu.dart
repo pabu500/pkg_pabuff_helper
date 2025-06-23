@@ -174,12 +174,14 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
           }
         }
 
-        if (pr == PagPageRoute.consoleHomeAcl ||
-            pr == PagPageRoute.consoleHomeSettings ||
-            pr == PagPageRoute.billingManager) {
-          if (!widget.loggedInUser.selectedScope
-              .isAtScopeType(PagScopeType.project)) {
-            isDisabled = true;
+        if (appModel.appName == 'pag_ems_op') {
+          if (pr == PagPageRoute.consoleHomeAcl ||
+              pr == PagPageRoute.consoleHomeSettings ||
+              pr == PagPageRoute.billingManager) {
+            if (!widget.loggedInUser.selectedScope
+                .isAtScopeType(PagScopeType.project)) {
+              isDisabled = true;
+            }
           }
         }
 

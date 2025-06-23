@@ -17,6 +17,7 @@ class WgtPagLs extends StatefulWidget {
     this.onScopeTreeUpdate,
     this.getPaneWidget,
     this.validateTreeChildren,
+    this.selectedItemInfoList,
   });
 
   final MdlPagAppConfig appConfig;
@@ -29,6 +30,7 @@ class WgtPagLs extends StatefulWidget {
           Map<String, dynamic> item, List<Map<String, dynamic>> fullList)?
       getPaneWidget;
   final Function? validateTreeChildren;
+  final List<Map<String, dynamic>>? selectedItemInfoList;
 
   @override
   State<WgtPagLs> createState() => _WgtPagLsState();
@@ -51,6 +53,7 @@ class _WgtPagLsState extends State<WgtPagLs> {
           itemKind: widget.itemKind,
           pagAppContext: widget.pagAppContext,
           prefKey: prefKey,
+          selectedItemInfoList: widget.selectedItemInfoList,
           additionalColumnConfig: widget.additionalColumnConfig,
           listContextType: widget.listContextType,
           onScopeTreeUpdate: widget.onScopeTreeUpdate,

@@ -28,6 +28,7 @@ class WgtListSearchKind extends StatefulWidget {
     required this.listContextType,
     required this.prefKey,
     this.itemType,
+    this.selectedItemInfoList,
     this.onResult,
     this.additionalColumnConfig,
     this.onScopeTreeUpdate,
@@ -37,6 +38,7 @@ class WgtListSearchKind extends StatefulWidget {
   final MdlPagAppContext pagAppContext;
   final PagItemKind itemKind;
   final PagListContextType listContextType;
+  final List<Map<String, dynamic>>? selectedItemInfoList;
   final Function(Map<String, dynamic>)? onResult;
   final dynamic itemType;
   final String prefKey;
@@ -270,6 +272,7 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
               pagAppContext: widget.pagAppContext,
               itemKind: widget.itemKind,
               itemType: _selectedItemType,
+              selectedItemInfoList: widget.selectedItemInfoList,
               prefKey: prefKey,
               listContextType: widget.listContextType,
               additionalColumnConfig: widget.additionalColumnConfig,
