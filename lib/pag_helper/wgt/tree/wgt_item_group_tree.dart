@@ -909,6 +909,9 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
         case PagItemGroupType.tariffPackageTenant:
           isClickable = _isEditing;
           break;
+        case PagItemGroupType.userTenant:
+          isClickable = _isEditing &&
+              (isAddButton || node.treePartType == PagTreePartType.tenant);
         default:
           break;
       }
