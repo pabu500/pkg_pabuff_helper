@@ -113,6 +113,10 @@ class _WgtTenantpAssignmentState extends State<WgtTenantpAssignment> {
         if (itemInfo['mg_tenant_id'] == widget.itemGroupIndexStr) {
           itemInfo['assigned'] = true;
         }
+        itemInfo['used_for_billing'] = false;
+        if (itemInfo['brmg_meter_group_id'] != null) {
+          itemInfo['used_for_billing'] = true;
+        }
       }
       // sort assigned items to the top
       _itemGroupScopeMatchingItemList!.sort((a, b) {
@@ -488,6 +492,11 @@ class _WgtTenantpAssignmentState extends State<WgtTenantpAssignment> {
     );
 
     bool disabled = false; //_hasTptMismatchAssignmentError;
+    String disabledText = '';
+    if (itemInfo['used_for_billing'] == true) {
+      disabled = true;
+      disabledText = 'Used for billing, cannot change assignment';
+    }
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -524,20 +533,23 @@ class _WgtTenantpAssignmentState extends State<WgtTenantpAssignment> {
           ),
         ),
         horizontalSpaceTiny,
-        Checkbox(
-          value: itemInfo['assigned_new'] ?? itemInfo['assigned'],
-          onChanged: disabled
-              ? null
-              : (bool? value) {
-                  setState(() {
-                    if (value == null) return;
-                    itemInfo['assigned_new'] = value;
-                    if (itemInfo['assigned'] != itemInfo['assigned_new']) {
-                      _modified = true;
-                    }
-                  });
-                  _checkModified();
-                },
+        Tooltip(
+          message: disabled ? disabledText : '',
+          child: Checkbox(
+            value: itemInfo['assigned_new'] ?? itemInfo['assigned'],
+            onChanged: disabled
+                ? null
+                : (bool? value) {
+                    setState(() {
+                      if (value == null) return;
+                      itemInfo['assigned_new'] = value;
+                      if (itemInfo['assigned'] != itemInfo['assigned_new']) {
+                        _modified = true;
+                      }
+                    });
+                    _checkModified();
+                  },
+          ),
         ),
       ],
     );
