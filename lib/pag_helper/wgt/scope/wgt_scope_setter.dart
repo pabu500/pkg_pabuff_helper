@@ -112,16 +112,16 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
     if (widget.forScopeType == PagScopeType.location) return;
 
     if (_isFetchingChildrenList) return;
-    setState(() {
-      _isFetchingChildrenList = true;
-      _isCommitted = false;
-      _errorText = '';
-      _isReset = false;
-      // _isModified = false;
-      _committedMessage = '';
-      // _newParentScopeSeletedFromList = false;
-      _childrenListFetched = false;
-    });
+    // setState(() {
+    _isFetchingChildrenList = true;
+    _isCommitted = false;
+    _errorText = '';
+    _isReset = false;
+    // _isModified = false;
+    _committedMessage = '';
+    // _newParentScopeSeletedFromList = false;
+    _childrenListFetched = false;
+    // });
 
     Map<String, dynamic> queryMap = {
       'scope': loggedInUser!.selectedScope.toScopeMap(),
