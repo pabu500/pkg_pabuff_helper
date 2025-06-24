@@ -1,4 +1,4 @@
-import 'package:buff_helper/pag_helper/def/def_panel.dart';
+import 'package:buff_helper/pag_helper/def_helper/def_panel.dart';
 
 import 'mdl_page_config_item.dart';
 

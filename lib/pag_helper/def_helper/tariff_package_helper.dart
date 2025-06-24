@@ -1,4 +1,4 @@
-import 'package:buff_helper/pag_helper/def/pag_tariff_package_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/pag_tariff_package_helper.dart';
 import 'package:buff_helper/util/date_time_util.dart';
 
 String validateTpRateList({

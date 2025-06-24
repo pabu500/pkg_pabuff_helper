@@ -7,8 +7,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../model/mdl_pag_app_config.dart';
-import 'wgt_pag_date_range_picker2.dart';
+import '../../../model/mdl_pag_app_config.dart';
+import '../../datetime/wgt_pag_date_range_picker2.dart';
 
 class WgtNewEditTariffRate extends StatefulWidget {
   const WgtNewEditTariffRate({

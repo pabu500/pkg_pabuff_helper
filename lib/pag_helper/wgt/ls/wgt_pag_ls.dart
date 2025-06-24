@@ -1,5 +1,5 @@
-import 'package:buff_helper/pag_helper/def/list_helper.dart';
-import 'package:buff_helper/pag_helper/def/pag_item_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/list_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_context.dart';
 import 'package:flutter/material.dart';
 import '../../model/mdl_pag_app_config.dart';

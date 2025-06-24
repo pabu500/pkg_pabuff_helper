@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:convert';
 
-import '../../comm/pag_be_api_base.dart';
+import 'pag_be_api_base.dart';
 
 Future<dynamic> pagVerifyEmailAddress(
   MdlPagUser? loggedInUsr,

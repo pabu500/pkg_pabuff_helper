@@ -11,7 +11,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../model/mdl_pag_app_config.dart';
+import '../../model/mdl_pag_app_config.dart';
 
 class WgtNewEditSub extends StatefulWidget {
   const WgtNewEditSub({

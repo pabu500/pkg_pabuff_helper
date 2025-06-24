@@ -1,6 +1,6 @@
-import 'package:buff_helper/pag_helper/def/def_device.dart';
-import 'package:buff_helper/pag_helper/def/def_role.dart';
-import 'package:buff_helper/pag_helper/def/pag_item_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/def_device.dart';
+import 'package:buff_helper/pag_helper/def_helper/def_role.dart';
+import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_controller.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/pag_bill_def.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
@@ -15,7 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 
-import 'wgt_list_column_customize.dart';
+import '../wgt_list_column_customize.dart';
 
 class WgtPagEditCommitList extends StatefulWidget {
   const WgtPagEditCommitList({

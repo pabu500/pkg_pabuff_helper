@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:buff_helper/pag_helper/comm/comm_pag_item.dart';
-import 'package:buff_helper/pag_helper/def/list_helper.dart';
-import 'package:buff_helper/pag_helper/def/pag_item_helper.dart';
-import 'package:buff_helper/pag_helper/def/scope_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/list_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/scope_helper.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_building_profile.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_location_group_profile.dart';
@@ -18,10 +18,10 @@ import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_controller.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
-import '../comm/comm_list.dart';
-import 'wgt_custom_pin.dart';
+import '../../comm/comm_list.dart';
+import '../wgt_custom_pin.dart';
 import 'wgt_finder_field_input.dart';
-import 'wgt_input_dropdown.dart';
+import '../wgt_input_dropdown.dart';
 
 class WgtPagItemFinderFlexi extends StatefulWidget {
   const WgtPagItemFinderFlexi({

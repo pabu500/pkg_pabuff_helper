@@ -1,8 +1,8 @@
-import 'package:buff_helper/pag_helper/def/def_tree.dart';
+import 'package:buff_helper/pag_helper/def_helper/def_tree.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_project_profile.dart';
 import 'package:buff_helper/pag_helper/wgt/tree/wgt_tree_element.dart';
 
-import '../../def/scope_helper.dart';
+import '../../def_helper/scope_helper.dart';
 import '../app/mdl_project_config.dart';
 import '../mdl_pag_app_context.dart';
 import 'mdl_pag_site_group_profile.dart';

@@ -1,10 +1,10 @@
 import 'dart:convert';
 
 import 'package:buff_helper/pag_helper/comm/comm_pag_item.dart';
-import 'package:buff_helper/pag_helper/def/list_helper.dart';
-import 'package:buff_helper/pag_helper/def/pag_item_helper.dart';
-import 'package:buff_helper/pag_helper/def/pag_tariff_package_helper.dart';
-import 'package:buff_helper/pag_helper/def/scope_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/list_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/pag_tariff_package_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/scope_helper.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_controller.dart';
@@ -31,13 +31,13 @@ import 'package:provider/provider.dart';
 
 import '../../comm/comm_list.dart';
 import '../../model/mdl_pag_app_config.dart';
-import '../job_helper/wgt_job_type_op_panel.dart';
-import '../wgt_item_info_edit_panel.dart';
-import '../wgt_list_pane.dart';
-import '../wgt_meter_group_assignment.dart';
-import '../wgt_pag_item_finder_flexi.dart';
-import '../wgt_tariff_package_assignment.dart';
-import '../wgt_tenant_assignment.dart';
+import '../job/wgt_job_type_op_panel.dart';
+import 'wgt_item_info_edit_panel.dart';
+import 'wgt_list_pane.dart';
+import '../app/ems/wgt_meter_group_assignment.dart';
+import 'wgt_pag_item_finder_flexi.dart';
+import '../app/ems/wgt_tariff_package_assignment.dart';
+import '../app/ems/wgt_tenant_assignment.dart';
 
 class WgtListSearchItemFlexi extends StatefulWidget {
   const WgtListSearchItemFlexi({
@@ -1123,9 +1123,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     return SingleChildScrollView(
       // put the result widget as part of the loading widget
       // to avoid additional rebuild
-      child:
-          // getCompletedWidget(),
-          Column(
+      child: Column(
         children: [
           fetchListInfo
               ? FutureBuilder(

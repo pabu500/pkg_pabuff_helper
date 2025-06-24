@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:buff_helper/pag_helper/comm/comm_user_service.dart';
 
-import '../model/mdl_pag_app_config.dart';
+import '../../model/mdl_pag_app_config.dart';
 
 class WgtUesrRoleSetter extends StatefulWidget {
   const WgtUesrRoleSetter({

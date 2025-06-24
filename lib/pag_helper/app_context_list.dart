@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'vendor_helper.dart';
 import 'model/mdl_pag_user.dart';
-import 'def/def_page_route.dart';
+import 'def_helper/def_page_route.dart';
 
 MdlPagAppContext appCtxConsoleHome = MdlPagAppContext(
   name: 'consoleHome',

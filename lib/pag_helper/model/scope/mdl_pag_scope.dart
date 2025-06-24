@@ -1,4 +1,4 @@
-import 'package:buff_helper/pag_helper/def/scope_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/scope_helper.dart';
 
 class MdlPagScope {
   String projectName;

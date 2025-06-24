@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:buff_helper/pag_helper/def/scope_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/scope_helper.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/fleet_health/mdl_pag_fleet_health.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
@@ -12,7 +12,7 @@ import 'package:buff_helper/pag_helper/model/scope/mdl_pag_site_group_profile.da
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_site_profile.dart';
 import 'package:buff_helper/up_helper/model/mdl_svc_claim.dart';
 import 'package:flutter/foundation.dart';
-import 'package:buff_helper/pag_helper/def/def_page_route.dart';
+import 'package:buff_helper/pag_helper/def_helper/def_page_route.dart';
 
 import '../../comm/comm_es.dart';
 import '../../comm/comm_fh.dart';

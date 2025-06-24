@@ -1,6 +1,6 @@
 import 'package:buff_helper/pag_helper/comm/comm_scope.dart';
-import 'package:buff_helper/pag_helper/def/pag_item_helper.dart';
-import 'package:buff_helper/pag_helper/def/scope_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/scope_helper.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_building_profile.dart';

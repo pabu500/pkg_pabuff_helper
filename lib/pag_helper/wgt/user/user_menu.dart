@@ -1,4 +1,4 @@
-import 'package:buff_helper/pag_helper/def/def_page_route.dart';
+import 'package:buff_helper/pag_helper/def_helper/def_page_route.dart';
 import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +10,7 @@ import '../../model/acl/mdl_pag_role.dart';
 import '../../model/mdl_pag_app_config.dart';
 import '../../model/provider/pag_data_provider.dart';
 import '../../model/provider/pag_theme_provider.dart';
-import 'comm_sso.dart';
+import '../../comm/comm_sso.dart';
 import 'wgt_role_selector.dart';
 
 class UserMenu extends StatefulWidget {

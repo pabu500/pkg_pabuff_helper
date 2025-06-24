@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:buff_helper/pag_helper/app_context_list.dart';
-import 'package:buff_helper/pag_helper/def/def_device.dart';
-import 'package:buff_helper/pag_helper/def/list_helper.dart';
-import 'package:buff_helper/pag_helper/def/pag_item_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/def_device.dart';
+import 'package:buff_helper/pag_helper/def_helper/list_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_controller.dart';
 import 'package:buff_helper/pag_helper/model/mdl_history.dart';
@@ -13,7 +13,7 @@ import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:buff_helper/pag_helper/def/scope_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/scope_helper.dart';
 import 'package:provider/provider.dart';
 import '../../model/mdl_pag_app_config.dart';
 import '../../wgt/history_presentor/wgt_pag_item_history_presenter.dart';

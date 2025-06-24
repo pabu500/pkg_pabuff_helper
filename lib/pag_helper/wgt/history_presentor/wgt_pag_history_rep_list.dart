@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../model/mdl_pag_app_config.dart';
-import '../job_helper/wgt_post_job.dart';
+import '../job/wgt_post_job.dart';
 
 class WgtPagHistoryRepList extends StatefulWidget {
   const WgtPagHistoryRepList({

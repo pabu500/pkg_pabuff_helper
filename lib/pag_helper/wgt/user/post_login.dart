@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:buff_helper/pag_helper/def/def_page_route.dart';
+import 'package:buff_helper/pag_helper/def_helper/def_page_route.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:buff_helper/pag_helper/comm/comm_scope.dart';
 import 'package:provider/provider.dart';
 
-import '../../def/project_helper.dart';
+import '../../def_helper/project_helper.dart';
 import '../../vendor/ct_lab/comm_ct_lab.dart';
 
 Future<void> doPostLogin(

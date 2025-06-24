@@ -1,10 +1,10 @@
 import 'package:buff_helper/pag_helper/comm/comm_batch_op.dart';
 import 'package:buff_helper/pag_helper/comm/comm_pag_item.dart';
-import 'package:buff_helper/pag_helper/def/def_device.dart';
-import 'package:buff_helper/pag_helper/def/def_role.dart';
-import 'package:buff_helper/pag_helper/def/pag_item_helper.dart';
-import 'package:buff_helper/pag_helper/def/pag_tariff_package_helper.dart';
-import 'package:buff_helper/pag_helper/def/scope_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/def_device.dart';
+import 'package:buff_helper/pag_helper/def_helper/def_role.dart';
+import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/pag_tariff_package_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/scope_helper.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_controller.dart';
@@ -20,14 +20,14 @@ import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:buff_helper/pag_helper/def/def_item_group.dart';
+import 'package:buff_helper/pag_helper/def_helper/def_item_group.dart';
 import 'package:provider/provider.dart';
 
-import '../def/tariff_package_helper.dart';
-import '../model/mdl_pag_app_config.dart';
-import 'scope/wgt_scope_setter.dart';
-import 'tree/wgt_item_group_tree.dart';
-import 'wgt_uesr_role_setter.dart';
+import '../../def_helper/tariff_package_helper.dart';
+import '../../model/mdl_pag_app_config.dart';
+import '../scope/wgt_scope_setter.dart';
+import '../tree/wgt_item_group_tree.dart';
+import '../user/wgt_uesr_role_setter.dart';
 
 class WgtPagItemInfoEditPanel extends StatefulWidget {
   const WgtPagItemInfoEditPanel({

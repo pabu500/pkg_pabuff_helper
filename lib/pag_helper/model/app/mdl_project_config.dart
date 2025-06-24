@@ -1,6 +1,6 @@
 import 'package:buff_helper/pag_helper/app_context_list.dart';
-import 'package:buff_helper/pag_helper/def/def_page_route.dart';
-import 'package:buff_helper/pag_helper/def/scope_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/def_page_route.dart';
+import 'package:buff_helper/pag_helper/def_helper/scope_helper.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_context.dart';
 import 'package:flutter/foundation.dart';
 import 'package:buff_helper/pag_helper/model/app/mdl_page_config.dart';

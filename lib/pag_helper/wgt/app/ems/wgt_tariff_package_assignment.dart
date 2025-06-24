@@ -1,4 +1,4 @@
-import 'package:buff_helper/pag_helper/def/scope_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/scope_helper.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
 import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
@@ -12,8 +12,8 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
-import '../comm/comm_tariff_package.dart';
-import '../model/mdl_pag_app_config.dart';
+import '../../../comm/comm_tariff_package.dart';
+import '../../../model/mdl_pag_app_config.dart';
 
 class WgtTariffPackageAssignment extends StatefulWidget {
   const WgtTariffPackageAssignment({

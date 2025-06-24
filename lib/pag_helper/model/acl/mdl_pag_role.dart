@@ -1,5 +1,5 @@
-import 'package:buff_helper/pag_helper/def/def_role.dart';
-import 'package:buff_helper/pag_helper/def/scope_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/def_role.dart';
+import 'package:buff_helper/pag_helper/def_helper/scope_helper.dart';
 
 class MdlPagRole {
   int id;

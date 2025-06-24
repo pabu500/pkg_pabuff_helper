@@ -1,4 +1,4 @@
-import 'package:buff_helper/pag_helper/def/pag_item_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/xt_ui/wdgt/file/wgt_save_table.dart';
 
@@ -6,7 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
-import 'package:buff_helper/pag_helper/def/def_device.dart';
+import 'package:buff_helper/pag_helper/def_helper/def_device.dart';
 import '../../model/mdl_history.dart';
 import '../../model/mdl_pag_app_config.dart';
 import 'wgt_pag_history_rep_chart.dart';

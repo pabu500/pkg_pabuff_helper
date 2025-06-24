@@ -10,7 +10,7 @@ import 'package:go_router/go_router.dart';
 import '../../model/acl/mdl_pag_svc_claim.dart';
 import '../../model/provider/pag_data_provider.dart';
 import '../../model/provider/pag_user_provider.dart';
-import 'comm_sso.dart';
+import '../../comm/comm_sso.dart';
 import 'package:provider/provider.dart';
 
 class WgtPagUpdatePassword extends StatefulWidget {

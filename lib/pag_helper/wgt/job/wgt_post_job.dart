@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import '../../comm/comm_pag_job.dart';
 import '../../model/mdl_pag_app_config.dart';
-import 'job_def.dart';
+import '../../def_helper/job_def.dart';
 
 class WgtPagPostJob extends StatefulWidget {
   const WgtPagPostJob({

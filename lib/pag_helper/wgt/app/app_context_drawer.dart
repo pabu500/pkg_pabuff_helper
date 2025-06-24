@@ -6,7 +6,7 @@ import 'package:buff_helper/pag_helper/model/provider/pag_app_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:buff_helper/pag_helper/def/def_page_route.dart';
+import 'package:buff_helper/pag_helper/def_helper/def_page_route.dart';
 import 'package:provider/provider.dart';
 
 class WgtAppContextDrawer extends StatefulWidget {
