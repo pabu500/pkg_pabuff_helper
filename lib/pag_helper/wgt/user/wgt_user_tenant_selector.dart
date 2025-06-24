@@ -58,34 +58,44 @@ class _WgtUserTenantSelectorState extends State<WgtUserTenantSelector> {
 
   @override
   Widget build(BuildContext context) {
+    List<String> tenantLabelList =
+        tenantList.map((MdlPagTenant tenant) => tenant.label).toList();
+
+    // NOTE: do not use class as value for Dropdown,
+    // assigning a different class instance, even if it has the same values,
+    // will be considered a different value, causing assertation error.
+    // instead, use simple string labels as values.
     return SizedBox(
-      child: DropdownButton<MdlPagTenant>(
-        isDense: true,
-        value: _selectedTenant,
-        onChanged: (MdlPagTenant? tenant) {
-          if (tenant != null) {
-            setState(() {
-              // widget.loggedInUser.updateSelectedRole(
-              //   tenant,
-              //   lazyLoadScope: widget.appConfig.lazyLoadScope,
-              // );
-              _selectedTenant = tenant;
-            });
-
-            widget.onTenantSelected(tenant);
-
-            _saveScopePref();
+        child: DropdownButton<String>(
+      isDense: true,
+      value: _selectedTenant?.label,
+      onChanged: (String? tenantLabel) {
+        MdlPagTenant? tenant;
+        if (tenantLabel != null) {
+          for (MdlPagTenant t in tenantList) {
+            if (t.label == tenantLabel) {
+              tenant = t;
+              break;
+            }
           }
+        }
+
+        setState(() {
+          _selectedTenant = tenant;
+        });
+
+        widget.onTenantSelected(tenant);
+
+        _saveScopePref();
+      },
+      items: tenantLabelList.map<DropdownMenuItem<String>>(
+        (String label) {
+          return DropdownMenuItem<String>(
+            value: label,
+            child: Text(label),
+          );
         },
-        items: tenantList
-            .map(
-              (MdlPagTenant tenant) => DropdownMenuItem<MdlPagTenant>(
-                value: tenant,
-                child: Text(tenant.label),
-              ),
-            )
-            .toList(),
-      ),
-    );
+      ).toList(),
+    ));
   }
 }
