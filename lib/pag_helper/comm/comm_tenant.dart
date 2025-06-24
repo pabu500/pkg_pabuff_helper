@@ -106,7 +106,7 @@ Future<dynamic> doGetMeterTenantAssignment(
   MdlPagSvcClaim svcClaim,
 ) async {
   svcClaim.svcName = PagSvcType.oresvc2.name;
-  svcClaim.endpoint = PagUrlBase.eptPagGetMeterAssignment;
+  svcClaim.endpoint = PagUrlBase.eptPagGetMeterTenantAssignment;
 
   String svcToken = '';
   // try {

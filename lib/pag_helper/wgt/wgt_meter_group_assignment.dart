@@ -151,9 +151,9 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
           operation: 'read',
         ),
       );
-      final meterAssignment = data['meter_assignment'];
-      if (meterAssignment == null) {
-        throw Exception('meter_assignment is null');
+      final meterTenantAssignment = data['meter_tenant_assignment'];
+      if (meterTenantAssignment == null) {
+        throw Exception('meter_tenant_assignment is null');
       }
       itemInfo['assignment_info'] = data;
     } catch (e) {
@@ -526,9 +526,11 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
     final List<Map<String, dynamic>> tenantAssignmentList = [];
     final List<Map<String, dynamic>> assignmentBarList = [];
     if (hasAssignmentInfo) {
-      final meterGroupAssignmentList = assignmentInfo['meter_assignment'];
+      final meterGroupAssignmentList =
+          assignmentInfo['meter_tenant_assignment'];
       for (var meterGroupAssignment in meterGroupAssignmentList) {
         Map<String, dynamic> barInfo = {};
+
         if (meterGroupAssignment['meter_group_id'] ==
             widget.itemGroupIndexStr) {
           percentageAssignedToThisItemGroup =
@@ -556,30 +558,62 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
       }
     }
 
-    List<Widget> assignmentBarWidgets = [];
-    for (Map<String, dynamic> barInfo in assignmentBarList) {
-      double? tenantPercentage = barInfo['tenant_percentage'];
-      if (tenantPercentage != null) {
-        String tenantName = barInfo['tenant_name'] ?? 'Unknown Tenant';
-        String tenantLabel = barInfo['tenant_label'] ?? '';
-        double assignedWidth =
-            (tenantPercentage / 100.0) * maxAssignedWidth; // Calculate width
+    String assignmentError = '';
+    if (totalTenantPercentage > 100.0) {
+      assignmentError = 'overflow';
+      tooltipMessage = '[ Total tenant percentage exceeds 100% ]\n';
+      for (Map<String, dynamic> barInfo in assignmentBarList) {
+        double? tenantPercentage = barInfo['tenant_percentage'];
+        if (tenantPercentage != null) {
+          String tenantName = barInfo['tenant_name'] ?? 'Unknown Tenant';
+          tooltipMessage +=
+              '$tenantName - ${tenantPercentage.toStringAsFixed(2)}%\n';
+        }
+      }
+    }
 
-        Widget barWidget = Tooltip(
-          message:
-              '$tenantName ${tenantLabel.isNotEmpty ? "($tenantLabel)" : ""} - $tenantPercentage%',
+    List<Widget> assignmentBarWidgets = [];
+    if (assignmentError.isNotEmpty) {
+      assignmentBarWidgets.add(
+        Tooltip(
+          message: tooltipMessage,
           child: Container(
-            width: assignedWidth,
-            color: Colors.grey.shade700,
-            child: Center(
+            width: maxAssignedWidth,
+            color: Theme.of(context).colorScheme.error,
+            child: const Center(
               child: Text(
-                tenantName,
-                style: const TextStyle(color: Colors.white, fontSize: 10),
+                'Assignment Error',
+                style: TextStyle(color: Colors.white, fontSize: 10),
               ),
             ),
           ),
-        );
-        assignmentBarWidgets.add(barWidget);
+        ),
+      );
+    } else {
+      for (Map<String, dynamic> barInfo in assignmentBarList) {
+        double? tenantPercentage = barInfo['tenant_percentage'];
+        if (tenantPercentage != null) {
+          String tenantName = barInfo['tenant_name'] ?? 'Unknown Tenant';
+          String tenantLabel = barInfo['tenant_label'] ?? '';
+          double assignedWidth =
+              (tenantPercentage / 100.0) * maxAssignedWidth; // Calculate width
+
+          Widget barWidget = Tooltip(
+            message:
+                '$tenantName ${tenantLabel.isNotEmpty ? "($tenantLabel)" : ""} - $tenantPercentage%',
+            child: Container(
+              width: assignedWidth,
+              color: Colors.grey.shade700,
+              child: Center(
+                child: Text(
+                  tenantName,
+                  style: const TextStyle(color: Colors.white, fontSize: 10),
+                ),
+              ),
+            ),
+          );
+          assignmentBarWidgets.add(barWidget);
+        }
       }
     }
 
