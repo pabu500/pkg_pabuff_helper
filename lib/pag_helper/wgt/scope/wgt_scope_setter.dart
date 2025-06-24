@@ -1338,7 +1338,8 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
                             bool updateUiOnly = false;
                             if (widget.forItemKind ==
                                     PagItemKind.tariffPackage ||
-                                widget.forItemKind == PagItemKind.tenant) {
+                                widget.forItemKind == PagItemKind.tenant ||
+                                widget.forItemKind == PagItemKind.device) {
                               updateUiOnly = true;
                             }
                             // get leaf scope

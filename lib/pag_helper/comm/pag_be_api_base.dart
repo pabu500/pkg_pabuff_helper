@@ -316,6 +316,9 @@ class PagUrlBase {
   static const String eptUpdateMetrGroupMeterList =
       '/ems/meter_group/update_meter_group_meter_list';
 
+  // AM - Device Manager
+  static const String eptPagCreateDevice = '/am/device/create_device';
+
   //meter_ops
   static const String eptMeterOpGetManualMeterList =
       '/meter_ops/get_manual_meter_list';
