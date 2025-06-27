@@ -5,6 +5,7 @@ import 'package:buff_helper/pagrid_helper/chart_helper/history_presentor/wgt_his
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
 
 import '../../../xt_ui/wdgt/file/wgt_save_table.dart';
@@ -981,7 +982,8 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
                       waitDuration: const Duration(milliseconds: 500),
                       child: InkWell(
                         child: Icon(
-                          CupertinoIcons.chart_bar_square,
+                          // CupertinoIcons.chart_bar_square,
+                          Symbols.insert_chart,
                           size: 34,
                           color: _displayType == HistroyDisplayType.chart
                               ? Theme.of(context)
@@ -1041,7 +1043,8 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
                       waitDuration: const Duration(milliseconds: 500),
                       child: InkWell(
                         child: Icon(
-                          CupertinoIcons.square_list,
+                          // CupertinoIcons.square_list,
+                          Symbols.list_alt,
                           size: 34,
                           color: _displayType == HistroyDisplayType.table
                               ? Theme.of(context)
