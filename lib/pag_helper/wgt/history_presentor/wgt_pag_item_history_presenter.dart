@@ -5,6 +5,7 @@ import 'package:buff_helper/xt_ui/wdgt/file/wgt_save_table.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
 import 'package:buff_helper/pag_helper/def_helper/def_device.dart';
 import '../../model/mdl_history.dart';
@@ -706,7 +707,8 @@ class _WgtPagItemHistoryPresenterState
                       waitDuration: const Duration(milliseconds: 500),
                       child: InkWell(
                         child: Icon(
-                          CupertinoIcons.chart_bar_square,
+                          // CupertinoIcons.chart_bar_square,
+                          Symbols.insert_chart,
                           size: 34,
                           color: _displayType == HistroyDisplayType.chart
                               ? Theme.of(context).highlightColor.withAlpha(210)
@@ -757,7 +759,8 @@ class _WgtPagItemHistoryPresenterState
                       waitDuration: const Duration(milliseconds: 500),
                       child: InkWell(
                         child: Icon(
-                          CupertinoIcons.square_list,
+                          // CupertinoIcons.square_list,
+                          Symbols.list_alt,
                           size: 34,
                           color: _displayType == HistroyDisplayType.table
                               ? Theme.of(context).highlightColor.withAlpha(210)

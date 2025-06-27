@@ -19,6 +19,7 @@ class WgtDateRangePickerMonthly extends StatefulWidget {
     this.customRangeSelected = false,
     this.showMonthly = true,
     this.monthPicked,
+    this.maxHistoryDays = 180,
   });
 
   // final BuildContext context;
@@ -35,6 +36,7 @@ class WgtDateRangePickerMonthly extends StatefulWidget {
   // final DateTime? selectedEndDate;
   final bool customRangeSelected;
   final bool showMonthly;
+  final int maxHistoryDays;
 
   @override
   State<WgtDateRangePickerMonthly> createState() =>
@@ -154,7 +156,7 @@ class _WgtDateRangePickerMonthlyState extends State<WgtDateRangePickerMonthly> {
               });
               widget.onRangeSet.call(start, end);
             },
-            maxDuration: const Duration(days: 180),
+            maxDuration: Duration(days: widget.maxHistoryDays),
             onMaxDurationExceeded: () {},
           ),
         ),

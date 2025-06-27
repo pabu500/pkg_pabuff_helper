@@ -355,6 +355,7 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
               customRangeSelected: _customDateRangeSelectedCreated,
               scopeProfile: widget.scopeProfile,
               populateDefaultRange: false,
+              maxHistoryDays: 370,
               showMonthly: false,
               onRangeSet: (DateTime start, DateTime end) {
                 setState(() {
