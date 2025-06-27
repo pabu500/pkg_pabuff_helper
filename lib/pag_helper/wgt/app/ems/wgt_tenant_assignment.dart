@@ -492,10 +492,14 @@ class _WgtTenantpAssignmentState extends State<WgtTenantpAssignment> {
     );
 
     bool disabled = false; //_hasTptMismatchAssignmentError;
+
     String disabledText = '';
     if (itemInfo['used_for_billing'] == true) {
-      disabled = true;
-      disabledText = 'Used for billing, cannot change assignment';
+      // NOTE: meter groups can still be unassigned from tenant,
+      // because billing rec can still trace back the meter group used
+      // when gen bill, by looking up tenant_meter_group mapping table
+      // disabled = true;
+      // disabledText = 'Used for billing, cannot change assignment';
     }
 
     return Row(
