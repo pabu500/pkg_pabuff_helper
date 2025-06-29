@@ -1126,7 +1126,8 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
           appConfig: widget.appConfig,
           readOnly: !_isEditing,
           width: widget.width - 65,
-          jobTypeIdStr: widget.groupItemId,
+          groupItemId: widget.groupItemId,
+          tariffPackageMeterType: widget.initalValueMap?['meter_type'],
           initialValueMap: tariffRateInfo,
           onUpdate: (editedTariffRateInfo) {
             setState(() {
@@ -1287,8 +1288,9 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
     return WgtNewEditTariffRate(
       appConfig: widget.appConfig,
       width: widget.width - 65,
-      jobTypeIdStr: widget.groupItemId,
+      groupItemId: widget.groupItemId,
       initialValueMap: initialValueMap, //nextTariffRateInfo,
+      tariffPackageMeterType: widget.initalValueMap?['meter_type'],
       onUpdate: (newTariffRateInfo) {
         setState(() {
           newTariffRateInfo['edit_type'] = 'update';

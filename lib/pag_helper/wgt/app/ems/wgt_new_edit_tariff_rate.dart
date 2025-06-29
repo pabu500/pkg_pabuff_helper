@@ -14,7 +14,8 @@ class WgtNewEditTariffRate extends StatefulWidget {
   const WgtNewEditTariffRate({
     super.key,
     required this.appConfig,
-    required this.jobTypeIdStr,
+    required this.groupItemId,
+    required this.tariffPackageMeterType,
     this.initialValueMap,
     this.compactViewOnly = false,
     this.readOnly = false,
@@ -27,7 +28,8 @@ class WgtNewEditTariffRate extends StatefulWidget {
   });
 
   final MdlPagAppConfig appConfig;
-  final String jobTypeIdStr;
+  final String groupItemId;
+  final String tariffPackageMeterType;
   final bool readOnly;
   final Function? onInsert;
   final Function? onClose;
@@ -65,137 +67,6 @@ class _WgtNewEditTariffRateState extends State<WgtNewEditTariffRate> {
   String _errorText = '';
 
   String _resultStatusErrorText = '';
-
-  // Future<dynamic> _doSubmit() async {
-  //   if (_fullname == null || _email == null || _salutation == null) {
-  //     return;
-  //   }
-  //   if (_salutation!.isEmpty || _email!.isEmpty) {
-  //     return;
-  //   }
-  //   setState(() {
-  //     _resultStatusErrorText = '';
-  //   });
-
-  //   try {
-  //     Map<String, dynamic> result = await doAddTariffRate(
-  //       pagAppConfig,
-  //       _loggedInUser!,
-  //       {
-  //         'job_type_id': widget.jobTypeIdStr,
-  //         'name': _fullname,
-  //         'email': _email,
-  //         'salutation': _salutation,
-  //       },
-  //       MdlPagSvcClaim(
-  //         username: _loggedInUser!.username,
-  //         userId: _loggedInUser!.id,
-  //         scope: '',
-  //         target: '',
-  //         operation: '',
-  //       ),
-  //     );
-  //     if (result['code'] == 0) {
-  //       _resultStatusErrorText = 'Tariff rate added';
-  //     } else {
-  //       _resultStatusErrorText = 'Failed to add tariff rate';
-  //     }
-  //     return _resultStatusErrorText;
-  //   } catch (err) {
-  //     if (kDebugMode) {
-  //       print(err);
-  //     }
-  //     _resultStatusErrorText = 'Failed to add tariff rate';
-  //     return _resultStatusErrorText;
-  //   } finally {
-  //     setState(() {});
-  //   }
-  // }
-
-  // Future<dynamic> _doDelete() async {
-  //   setState(() {
-  //     _resultStatusErrorText = '';
-  //   });
-
-  //   try {
-  //     Map<String, dynamic> result = await doRemoveTariffRate(
-  //       pagAppConfig,
-  //       _loggedInUser!,
-  //       {
-  //         'id': widget.initialValueMap?['id'].toString(),
-  //       },
-  //       MdlPagSvcClaim(
-  //         username: _loggedInUser!.username,
-  //         userId: _loggedInUser!.id,
-  //         scope: '',
-  //         target: '',
-  //         operation: '',
-  //       ),
-  //     );
-  //     if (result['code'] == 0) {
-  //       _resultStatusErrorText = 'Tariff rate deleted';
-  //     } else {
-  //       _resultStatusErrorText = 'Failed to delete tariff rate';
-  //     }
-  //     return _resultStatusErrorText;
-  //   } catch (err) {
-  //     if (kDebugMode) {
-  //       print(err);
-  //     }
-  //     _resultStatusErrorText = 'Failed to delete tariff rate';
-  //     return _resultStatusErrorText;
-  //   } finally {
-  //     setState(() {});
-  //   }
-  // }
-
-  // Future<dynamic> _doUpdate() async {
-  //   setState(() {
-  //     _resultStatusErrorText = '';
-  //   });
-
-  //   Map<String, dynamic> queryMap = {
-  //     'op_name': 'multi_key_val_update',
-  //     'op_list': [
-  //       {
-  //         'id': widget.initialValueMap?['id'].toString(),
-  //         'sub_fullname': _fullname,
-  //         'sub_email': _email,
-  //         'sub_salutation': _salutation,
-  //         'checked': true,
-  //       }
-  //     ],
-  //   };
-
-  //   try {
-  //     List<Map<String, dynamic>> result = await doPagOpMultiKeyValUpdate(
-  //       pagAppConfig,
-  //       _loggedInUser,
-  //       queryMap,
-  //       MdlPagSvcClaim(
-  //         username: _loggedInUser!.username,
-  //         userId: _loggedInUser!.id,
-  //         scope: '',
-  //         target: '',
-  //         operation: '',
-  //       ),
-  //     );
-  //     if (result.isNotEmpty) {
-  //       _resultStatusErrorText = 'Tariff rate updated';
-  //     } else {
-  //       _resultStatusErrorText = 'Failed to update tariff rate';
-  //     }
-  //     return _resultStatusErrorText;
-  //   } catch (err) {
-  //     if (kDebugMode) {
-  //       print(err);
-  //     }
-  //     _resultStatusErrorText = 'Failed to update tariff rate';
-  //     return _resultStatusErrorText;
-  //   } finally {
-  //     setState(() {});
-  //   }
-  // }
 
   bool _gettingGstRate = false;
   int _pullFailed = 0;
@@ -284,6 +155,10 @@ class _WgtNewEditTariffRateState extends State<WgtNewEditTariffRate> {
     double? initialRate =
         double.tryParse(widget.initialValueMap?['rate'] ?? '');
 
+    String? billingRecTariffRateIdStr = widget.initialValueMap?[
+        'br_id_tariff_rate_id_${widget.tariffPackageMeterType.toLowerCase()}'];
+    bool isRateApplied = billingRecTariffRateIdStr != null;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 5),
       child: Row(
@@ -291,55 +166,59 @@ class _WgtNewEditTariffRateState extends State<WgtNewEditTariffRate> {
           horizontalSpaceSmall,
           SizedBox(
             width: 80,
-            child: WgtTextField(
-              enabled: !widget.readOnly,
-              appConfig: widget.appConfig,
-              hintText: 'Rate',
-              labelText: 'Rate',
-              initialValue: initialRate?.toStringAsFixed(widget.rateDecimal),
-              // maxLength: 8,
-              validator: validateTariffPrice,
-              onChanged: (val) {
-                setState(() {
-                  _isEditing = true;
-                  if (val != _rate) {
-                    _errorText = '';
-                  }
-                });
-                if (val.trim().isNotEmpty) {
+            child: Tooltip(
+              message: isRateApplied ? 'Rate is applied for billing' : '',
+              waitDuration: const Duration(milliseconds: 500),
+              child: WgtTextField(
+                enabled: !widget.readOnly && !isRateApplied,
+                appConfig: widget.appConfig,
+                hintText: 'Rate',
+                labelText: 'Rate',
+                initialValue: initialRate?.toStringAsFixed(widget.rateDecimal),
+                // maxLength: 8,
+                validator: validateTariffPrice,
+                onChanged: (val) {
                   setState(() {
-                    _rate = val;
-                    double? rate = double.tryParse(val);
-                    _rate = rate?.toStringAsFixed(widget.rateDecimal);
+                    _isEditing = true;
+                    if (val != _rate) {
+                      _errorText = '';
+                    }
                   });
-                }
-
-                return null;
-              },
-              onEditingComplete: () {
-                setState(() {
-                  _isEditing = false;
-                });
-                widget.onUpdate?.call(
-                  {
-                    'rate': _rate,
-                    'gst': _gstStr,
-                    'from_datetime': _fromDateTime,
-                    'to_datetime': _toDateTime,
-                    'from_timestamp': _fromDateTime?.toIso8601String(),
-                    'to_timestamp': _toDateTime?.toIso8601String(),
-                  },
-                );
-              },
-              onValidate: (String? result) {
-                setState(() {
-                  if (result == null) {
-                    _isRateValidated = true;
-                  } else {
-                    _isRateValidated = false;
+                  if (val.trim().isNotEmpty) {
+                    setState(() {
+                      _rate = val;
+                      double? rate = double.tryParse(val);
+                      _rate = rate?.toStringAsFixed(widget.rateDecimal);
+                    });
                   }
-                });
-              },
+
+                  return null;
+                },
+                onEditingComplete: () {
+                  setState(() {
+                    _isEditing = false;
+                  });
+                  widget.onUpdate?.call(
+                    {
+                      'rate': _rate,
+                      'gst': _gstStr,
+                      'from_datetime': _fromDateTime,
+                      'to_datetime': _toDateTime,
+                      'from_timestamp': _fromDateTime?.toIso8601String(),
+                      'to_timestamp': _toDateTime?.toIso8601String(),
+                    },
+                  );
+                },
+                onValidate: (String? result) {
+                  setState(() {
+                    if (result == null) {
+                      _isRateValidated = true;
+                    } else {
+                      _isRateValidated = false;
+                    }
+                  });
+                },
+              ),
             ),
           ),
           horizontalSpaceTiny,
