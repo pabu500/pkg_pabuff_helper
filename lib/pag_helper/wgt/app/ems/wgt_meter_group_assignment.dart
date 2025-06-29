@@ -58,6 +58,8 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
   List<Map<String, dynamic>>? _itemGroupScopeMatchingItemList;
   List<Map<String, dynamic>>? _itemGroupItemList;
 
+  String? _selectedMeterIndexStr;
+
   Future<void> _doAutoPopulate() async {
     if (_isFetching) {
       return;
@@ -308,6 +310,7 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
   Widget completedWidget() {
     return Container(
       height: 500,
+      // width: 500,
       decoration: BoxDecoration(
         border: Border.all(color: Theme.of(context).hintColor.withAlpha(50)),
         borderRadius: BorderRadius.circular(5),
@@ -441,7 +444,7 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
       Widget tile = getItemRow(itemInfo, ++index);
       itemWidgetList.add(
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 13),
+          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 3),
           child: tile,
         ),
       );
@@ -449,7 +452,7 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
 
     return ListView.builder(
       // shrinkWrap: true,
-      itemExtent: 35,
+      // itemExtent: 35,
       itemCount: itemWidgetList.length,
       itemBuilder: (context, index) {
         return itemWidgetList[index];
@@ -473,42 +476,47 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
 
     bool disabled = false; //_hasTptMismatchAssignmentError;
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
+    return Column(
       children: [
-        SizedBox(
-          width: 30,
-          child: Align(
-            alignment: Alignment.centerRight,
-            child: Text(
-              index.toString(),
-              style: TextStyle(color: Theme.of(context).hintColor),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 30,
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: Text(
+                  index.toString(),
+                  style: TextStyle(color: Theme.of(context).hintColor),
+                ),
+              ),
             ),
-          ),
+            horizontalSpaceSmall,
+            Container(
+              width: 100,
+              decoration: boxDecoration,
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+              child: SelectableText(
+                tenantName,
+                style: disabled ? disabledTextStyle : null,
+              ),
+            ),
+            horizontalSpaceSmall,
+            Container(
+              width: 160,
+              decoration: boxDecoration,
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+              child: SelectableText(
+                tenantLabel.isNotEmpty ? tenantLabel : '-',
+                style: disabled ? disabledTextStyle : null,
+              ),
+            ),
+            horizontalSpaceTiny,
+            getAssignmentBox(itemInfo),
+          ],
         ),
-        horizontalSpaceSmall,
-        Container(
-          width: 100,
-          decoration: boxDecoration,
-          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-          child: SelectableText(
-            tenantName,
-            style: disabled ? disabledTextStyle : null,
-          ),
-        ),
-        horizontalSpaceSmall,
-        Container(
-          width: 160,
-          decoration: boxDecoration,
-          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-          child: SelectableText(
-            tenantLabel.isNotEmpty ? tenantLabel : '-',
-            style: disabled ? disabledTextStyle : null,
-          ),
-        ),
-        horizontalSpaceTiny,
-        getAssignmentBox(itemInfo),
+        if (_selectedMeterIndexStr == itemInfo['id']) getAssignmentMap(),
       ],
     );
   }
@@ -690,13 +698,13 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
     double margin = 45;
     return SizedBox(
       width: barWidth + margin,
-      height: 26,
+      // height: 26,
       child: needToCheck
           ? WgtCommButton(
               label: 'Check Assignment',
               labelStyle: TextStyle(
                 color: Theme.of(context).hintColor,
-                fontSize: 12,
+                fontSize: 13.5,
               ),
               width: barWidth + margin,
               onPressed: () async {
@@ -704,6 +712,14 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
                   return;
                 }
                 await _doGetMeterAssignment(itemInfo);
+
+                setState(() {
+                  _selectedMeterIndexStr = itemInfo['id'];
+                  // _checkModified();
+                  // if (widget.onScopeTreeUpdate != null) {
+                  //   widget.onScopeTreeUpdate!();
+                  // }
+                });
               },
             )
           : Tooltip(
@@ -746,6 +762,52 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
                 ],
               ),
             ),
+    );
+  }
+
+  Widget getAssignmentMap() {
+    if (_itemGroupScopeMatchingItemList == null ||
+        _itemGroupScopeMatchingItemList!.isEmpty) {
+      return Container();
+    }
+    if (_itemGroupItemList == null || _itemGroupItemList!.isEmpty) {
+      return Container();
+    }
+    if (_selectedMeterIndexStr == null) {
+      return Container();
+    }
+
+    Map<String, dynamic>? itemInfo;
+    for (Map<String, dynamic> item in _itemGroupScopeMatchingItemList!) {
+      if (item['id'] == _selectedMeterIndexStr) {
+        itemInfo = item;
+        break;
+      }
+    }
+    if (itemInfo == null) {
+      return getErrorTextPrompt(
+          context: context, errorText: 'Error: Item not found');
+    }
+    Map<String, dynamic>? assignmentInfo = itemInfo['assignment_info'];
+    if (assignmentInfo == null) {
+      return getErrorTextPrompt(
+          context: context, errorText: 'Error: Assignment info not found');
+    }
+    return Container(
+      height: 150,
+      decoration: BoxDecoration(
+        border: Border.all(color: Theme.of(context).hintColor.withAlpha(50)),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      margin: const EdgeInsets.symmetric(horizontal: 5),
+      padding: const EdgeInsets.all(8.0),
+      child: Text(
+        'Meter Assignment Info',
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          color: Theme.of(context).hintColor,
+        ),
+      ),
     );
   }
 }
