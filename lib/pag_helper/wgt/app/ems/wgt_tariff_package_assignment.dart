@@ -152,10 +152,15 @@ class _WgtTariffPackageAssignmentState
     if (_isCommitting) {
       return;
     }
+    // filter out items that are not modified
+    final List<Map<String, dynamic>> assignmentList =
+        _tariffPackageScopeMatchingTenantList!
+            .where((tenant) => tenant['assigned_new'] != null)
+            .toList();
     Map<String, dynamic> queryMap = {
       'scope': loggedInUser!.selectedScope.toScopeMap(),
       'tariff_package_id': widget.itemGroupIndexStr,
-      'tenant_assignment_list': _tariffPackageScopeMatchingTenantList,
+      'tenant_assignment_list': assignmentList,
     };
     try {
       _isCommitting = true;

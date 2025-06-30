@@ -14,6 +14,7 @@ import 'package:provider/provider.dart';
 
 import '../../../comm/comm_tenant.dart';
 import '../../../comm/comm_tenant_ops.dart';
+import '../../../def_helper/dh_pag_tenant.dart';
 import '../../../model/mdl_pag_app_config.dart';
 
 class WgtTenantpAssignment extends StatefulWidget {
@@ -60,6 +61,8 @@ class _WgtTenantpAssignmentState extends State<WgtTenantpAssignment> {
   final TextEditingController _itemLabelFilterController =
       TextEditingController();
   String _itemLabelFilterStr = '';
+
+  String? _selectedMeterGroupIndexStr;
 
   Future<void> _doAutoPopulate() async {
     if (_isFetching) {
@@ -110,20 +113,36 @@ class _WgtTenantpAssignmentState extends State<WgtTenantpAssignment> {
       for (Map<String, dynamic> itemInfo in _itemGroupScopeMatchingItemList!) {
         // add assignment info
         itemInfo['assigned'] = false;
-        if (itemInfo['mg_tenant_id'] == widget.itemGroupIndexStr) {
+        if (itemInfo['meter_group_tenant_id'] != null) {
           itemInfo['assigned'] = true;
+        }
+        itemInfo['assgigned_to_this_tenant'] = false;
+        if (itemInfo['meter_group_tenant_id'] == widget.itemGroupIndexStr) {
+          itemInfo['assigned_to_this_tenant'] = true;
         }
         itemInfo['used_for_billing'] = false;
         if (itemInfo['brmg_meter_group_id'] != null) {
           itemInfo['used_for_billing'] = true;
         }
       }
-      // sort assigned items to the top
+      // sort un-assigned items to the top
       _itemGroupScopeMatchingItemList!.sort((a, b) {
         String assignedA = a['assigned'] ? '1' : '0';
         String assignedB = b['assigned'] ? '1' : '0';
-        return assignedB.compareTo(assignedA);
+        return assignedA.compareTo(assignedB);
       });
+      // find the item that is assgigned to this tenant,
+      // and move it to the top
+      for (Map<String, dynamic> itemInfo in _itemGroupScopeMatchingItemList!) {
+        int assignedToThisTenantIndex = _itemGroupScopeMatchingItemList!
+            .indexWhere((item) => item['assigned_to_this_tenant'] == true);
+        if (assignedToThisTenantIndex != -1) {
+          // move the item to the top
+          Map<String, dynamic> assignedItem = _itemGroupScopeMatchingItemList!
+              .removeAt(assignedToThisTenantIndex);
+          _itemGroupScopeMatchingItemList!.insert(0, assignedItem);
+        }
+      }
     } catch (e) {
       if (kDebugMode) {
         print(e);
@@ -141,10 +160,16 @@ class _WgtTenantpAssignmentState extends State<WgtTenantpAssignment> {
     if (_isCommitting) {
       return;
     }
+
+    // filter out items that are not modified
+    final List<Map<String, dynamic>> assignmentList =
+        _itemGroupScopeMatchingItemList!
+            .where((item) => item['assigned_new'] != null)
+            .toList();
     Map<String, dynamic> queryMap = {
       'scope': loggedInUser!.selectedScope.toScopeMap(),
       'item_group_id': widget.itemGroupIndexStr,
-      'item_assignment_list': _itemGroupScopeMatchingItemList,
+      'item_assignment_list': assignmentList,
     };
     try {
       _isCommitting = true;
@@ -469,7 +494,7 @@ class _WgtTenantpAssignmentState extends State<WgtTenantpAssignment> {
 
     return ListView.builder(
       // shrinkWrap: true,
-      itemExtent: 35,
+      // itemExtent: 35,
       itemCount: itemWidgetList.length,
       itemBuilder: (context, index) {
         return itemWidgetList[index];
@@ -478,8 +503,14 @@ class _WgtTenantpAssignmentState extends State<WgtTenantpAssignment> {
   }
 
   Widget getItemRow(Map<String, dynamic> itemInfo, int index) {
-    String tenantName = itemInfo['name'] ?? 'Unknown Item';
-    String tenantLabel = itemInfo['label'] ?? '';
+    String meterGroupName = itemInfo['name'] ?? '-';
+    String meterGroupLabel = itemInfo['label'] ?? '-';
+    String tenantName = itemInfo['tenant_name'] ?? '-';
+    String tenantLabel = itemInfo['tenant_label'] ?? '-';
+    String tenantLcStatus = itemInfo['lc_status'] ?? '';
+    PagTenantLcStatus? tenantLcStatusEnum =
+        PagTenantLcStatus.byTag(tenantLcStatus);
+    tenantLcStatusEnum ??= PagTenantLcStatus.active;
     bool assigned = itemInfo['assigned'] ?? false;
 
     BoxDecoration boxDecoration = BoxDecoration(
@@ -495,67 +526,215 @@ class _WgtTenantpAssignmentState extends State<WgtTenantpAssignment> {
 
     String disabledText = '';
     if (itemInfo['used_for_billing'] == true) {
-      // NOTE: meter groups can still be unassigned from tenant,
+      // NOTE: meter groups can still be unassigned from tenant ANYTIME,
       // because billing rec can still trace back the meter group used
       // when gen bill, by looking up tenant_meter_group mapping table
       // disabled = true;
       // disabledText = 'Used for billing, cannot change assignment';
     }
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
+    if (itemInfo['assigned'] == true &&
+        itemInfo['assigned_to_this_tenant'] != true) {
+      disabled = true;
+      disabledText = 'Already assigned to: $tenantLabel';
+    }
+
+    bool checked = itemInfo['assigned_new'] ??
+        (itemInfo['assigned_to_this_tenant'] == true ||
+            itemInfo['assigned'] == true);
+
+    return Column(
       children: [
-        SizedBox(
-          width: 30,
-          child: Align(
-            alignment: Alignment.centerRight,
-            child: Text(
-              index.toString(),
-              style: TextStyle(color: Theme.of(context).hintColor),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 30,
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: Text(
+                  index.toString(),
+                  style: TextStyle(color: Theme.of(context).hintColor),
+                ),
+              ),
             ),
-          ),
+            horizontalSpaceSmall,
+            Container(
+              width: 120,
+              decoration: boxDecoration,
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+              child: SelectableText(
+                meterGroupName,
+                style: disabled ? disabledTextStyle : null,
+              ),
+            ),
+            horizontalSpaceSmall,
+            Container(
+              width: 160,
+              decoration: boxDecoration,
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+              child: SelectableText(
+                meterGroupLabel,
+                style: disabled ? disabledTextStyle : null,
+              ),
+            ),
+            horizontalSpaceTiny,
+            Tooltip(
+              message: disabled ? disabledText : '',
+              child: Checkbox(
+                value: checked,
+                onChanged: disabled
+                    ? null
+                    : (bool? value) {
+                        setState(() {
+                          if (value == null) return;
+                          itemInfo['assigned_new'] = value;
+                          if (itemInfo['assigned'] !=
+                              itemInfo['assigned_new']) {
+                            _modified = true;
+                          }
+                        });
+                        _checkModified();
+                      },
+              ),
+            ),
+          ],
         ),
-        horizontalSpaceSmall,
-        Container(
-          width: 120,
-          decoration: boxDecoration,
-          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-          child: SelectableText(
-            tenantName,
-            style: disabled ? disabledTextStyle : null,
-          ),
-        ),
-        horizontalSpaceSmall,
-        Container(
-          width: 160,
-          decoration: boxDecoration,
-          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-          child: SelectableText(
-            tenantLabel.isNotEmpty ? tenantLabel : '-',
-            style: disabled ? disabledTextStyle : null,
-          ),
-        ),
-        horizontalSpaceTiny,
-        Tooltip(
-          message: disabled ? disabledText : '',
-          child: Checkbox(
-            value: itemInfo['assigned_new'] ?? itemInfo['assigned'],
-            onChanged: disabled
-                ? null
-                : (bool? value) {
-                    setState(() {
-                      if (value == null) return;
-                      itemInfo['assigned_new'] = value;
-                      if (itemInfo['assigned'] != itemInfo['assigned_new']) {
-                        _modified = true;
-                      }
-                    });
-                    _checkModified();
-                  },
-          ),
-        ),
+        if (_selectedMeterGroupIndexStr == itemInfo['id']) getAssignmentMap(),
       ],
+    );
+  }
+
+  Widget getAssignmentMap() {
+    if (_itemGroupScopeMatchingItemList == null ||
+        _itemGroupScopeMatchingItemList!.isEmpty) {
+      return Container();
+    }
+    // if (_itemGroupItemList == null || _itemGroupItemList!.isEmpty) {
+    //   return Container();
+    // }
+    if (_selectedMeterGroupIndexStr == null) {
+      return Container();
+    }
+
+    Map<String, dynamic>? itemInfo;
+    for (Map<String, dynamic> item in _itemGroupScopeMatchingItemList!) {
+      if (item['id'] == _selectedMeterGroupIndexStr) {
+        itemInfo = item;
+        break;
+      }
+    }
+    if (itemInfo == null) {
+      return getErrorTextPrompt(
+          context: context, errorText: 'Error: Item not found');
+    }
+    Map<String, dynamic>? assignmentInfo = itemInfo['assignment_info'];
+    if (assignmentInfo == null) {
+      return getErrorTextPrompt(
+          context: context, errorText: 'Error: Assignment info not found');
+    }
+    final meterTeantAssignmentList = assignmentInfo['meter_tenant_assignment'];
+    List<Widget> assignmentWidgetList = [];
+    int assignedToActiveTenantCount = 0;
+    for (Map<String, dynamic> assignment in meterTeantAssignmentList ?? []) {
+      String meterName = assignment['meter_name'] ?? '';
+      String meterLabel = assignment['meter_label'] ?? '';
+      String meterSn = assignment['meter_sn'] ?? '';
+      String meterGroupName = assignment['meter_group_name'] ?? '';
+      String meterGroupLabel = assignment['meter_group_label'] ?? '';
+      double percentage =
+          double.tryParse(assignment['percentage'] ?? '0.0') ?? 0.0;
+
+      final tenantInfo = assignment['tenant_info'];
+      String tenantName = tenantInfo?['name'] ?? '';
+      String tenantLabel = tenantInfo?['label'] ?? '';
+      String tenantLcStatus = tenantInfo?['lc_status'] ?? '';
+      PagTenantLcStatus? tenantLcStatusEnum =
+          PagTenantLcStatus.byTag(tenantLcStatus);
+      tenantLcStatusEnum ??= PagTenantLcStatus.active;
+      if (tenantInfo != null) {
+        if (tenantLcStatusEnum == PagTenantLcStatus.active ||
+            tenantLcStatusEnum == PagTenantLcStatus.onbarding ||
+            tenantLcStatusEnum == PagTenantLcStatus.offboarding) {
+          assignedToActiveTenantCount++;
+        }
+      }
+
+      bool meterGroupIsAssignedToActiveTenant = false;
+      if (assignedToActiveTenantCount != 0) {
+        meterGroupIsAssignedToActiveTenant = true;
+      }
+
+      if (assignedToActiveTenantCount > 1) {
+        return getErrorTextPrompt(
+          context: context,
+          errorText:
+              'Error: Multiple active tenants assigned to this meter group',
+        );
+      }
+
+      Widget assignmentWidget = Padding(
+        padding: const EdgeInsets.symmetric(vertical: 2.0),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: 135,
+              child: Text(
+                meterGroupName,
+                style: TextStyle(
+                    color: meterGroupIsAssignedToActiveTenant
+                        ? Colors.greenAccent
+                        : Theme.of(context).hintColor),
+              ),
+            ),
+            horizontalSpaceTiny,
+            SizedBox(
+              width: 60,
+              child: Text(
+                '${percentage.toStringAsFixed(2)}%',
+                style: TextStyle(color: Theme.of(context).hintColor),
+              ),
+            ),
+            horizontalSpaceTiny,
+            Tooltip(
+              message: tenantLabel,
+              child: SizedBox(
+                width: 170,
+                child: tenantName.isEmpty
+                    ? Text(
+                        '-',
+                        style: TextStyle(color: Theme.of(context).hintColor),
+                      )
+                    : SelectableText(
+                        tenantName,
+                        style: TextStyle(
+                          color: tenantLcStatusEnum.color,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+              ),
+            ),
+          ],
+        ),
+      );
+      assignmentWidgetList.add(assignmentWidget);
+    }
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Theme.of(context).hintColor.withAlpha(50)),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      margin: const EdgeInsets.symmetric(horizontal: 5),
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ...assignmentWidgetList,
+        ],
+      ),
     );
   }
 }

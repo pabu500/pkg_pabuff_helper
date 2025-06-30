@@ -175,10 +175,15 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
     if (_isCommitting) {
       return;
     }
+    // filter out items that are not modified
+    final List<Map<String, dynamic>> assignmentList =
+        _itemGroupScopeMatchingItemList!
+            .where((item) => item['assigned_new'] != null)
+            .toList();
     Map<String, dynamic> queryMap = {
       'scope': loggedInUser!.selectedScope.toScopeMap(),
       'item_group_id': widget.itemGroupIndexStr,
-      'item_assignment_list': _itemGroupScopeMatchingItemList,
+      'item_assignment_list': assignmentList,
     };
     try {
       _isCommitting = true;
