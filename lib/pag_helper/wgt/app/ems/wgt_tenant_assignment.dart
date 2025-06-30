@@ -134,14 +134,15 @@ class _WgtTenantpAssignmentState extends State<WgtTenantpAssignment> {
       // find the item that is assgigned to this tenant,
       // and move it to the top
       for (Map<String, dynamic> itemInfo in _itemGroupScopeMatchingItemList!) {
-        int assignedToThisTenantIndex = _itemGroupScopeMatchingItemList!
-            .indexWhere((item) => item['assigned_to_this_tenant'] == true);
-        if (assignedToThisTenantIndex != -1) {
-          // move the item to the top
-          Map<String, dynamic> assignedItem = _itemGroupScopeMatchingItemList!
-              .removeAt(assignedToThisTenantIndex);
-          _itemGroupScopeMatchingItemList!.insert(0, assignedItem);
+        if (itemInfo['assigned_to_this_tenant'] != true) {
+          continue;
         }
+        String itemIndexStr = itemInfo['id'];
+        // move this item to the top
+        _itemGroupScopeMatchingItemList!.removeWhere(
+          (item) => item['id'] == itemIndexStr,
+        );
+        _itemGroupScopeMatchingItemList!.insert(0, itemInfo);
       }
     } catch (e) {
       if (kDebugMode) {
