@@ -793,6 +793,8 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
       return getErrorTextPrompt(
           context: context, errorText: 'Error: Assignment info not found');
     }
+    final meterTeantAssignmentList = assignmentInfo['meter_tenant_assignment'];
+    List<Widget> assignmentWidgetList = [];
     return Container(
       height: 150,
       decoration: BoxDecoration(

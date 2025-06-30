@@ -226,6 +226,7 @@ class _WgtPagItemHistoryPresenterState
               }
             ],
             'timeKey': 'time',
+            'decimals': 3,
             'unit': getDeivceTypeUnit(widget.itemType),
             'chartType': ChartType.bar,
             'dataType': DataType.diff,
@@ -246,6 +247,7 @@ class _WgtPagItemHistoryPresenterState
               }
             ],
             'unit': 'kWh',
+            'decimals': 3,
             'chartType': ChartType.bar,
             'dataType': DataType.diff,
             'color': Colors.blue.withAlpha(210),
