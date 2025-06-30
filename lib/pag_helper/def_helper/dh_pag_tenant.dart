@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 
 import 'enum_helper.dart';
 
-enum PagTariffPackageTypeCat {
-  regular('Reg', 'regular', Colors.amberAccent),
-  systemCycle('Sys Cycle', 'system_cycle', Colors.greenAccent),
-  systemRate('Sys Rate', 'system_rate', Colors.teal),
+enum PagTenantLcStatus {
+  onbarding('Onboarding', 'onb', Colors.lightGreenAccent),
+  active('Active', 'act', Colors.teal),
+  offboarding('Offboarding', 'offb', Colors.orange),
+  terminated('Terminated', 'term', Colors.red),
   ;
 
-  const PagTariffPackageTypeCat(
+  const PagTenantLcStatus(
     this.label,
     this.tag,
     this.color,
@@ -18,13 +19,13 @@ enum PagTariffPackageTypeCat {
   final String tag;
   final Color color;
 
-  static PagTariffPackageTypeCat? byLabel(String? label) => enumByLabel(
+  static PagTenantLcStatus? byLabel(String? label) => enumByLabel(
         label,
         values,
         (e) => (e).label,
       );
 
-  static PagTariffPackageTypeCat? byTag(String? tag) => enumByTag(
+  static PagTenantLcStatus? byTag(String? tag) => enumByTag(
         tag,
         values,
       );
@@ -33,8 +34,7 @@ enum PagTariffPackageTypeCat {
 T? enumByTag<T extends Enum>(String? tag, List<T> values) {
   if (tag == null) return null;
   for (var value in values) {
-    if (value is PagTariffPackageTypeCat &&
-        value.tag.replaceAll('.', '') == tag) {
+    if (value is PagTenantLcStatus && value.tag.replaceAll('.', '') == tag) {
       return value as T;
     }
   }

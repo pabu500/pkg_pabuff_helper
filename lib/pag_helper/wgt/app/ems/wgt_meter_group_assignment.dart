@@ -1,3 +1,4 @@
+import 'package:buff_helper/pag_helper/def_helper/dh_pag_tenant.dart';
 import 'package:buff_helper/pag_helper/def_helper/scope_helper.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
@@ -216,6 +217,7 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
         _isCommitting = false;
         _isCommitted = true;
         _modified = false;
+        _selectedMeterIndexStr = null;
       });
     }
   }
@@ -609,13 +611,26 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
           Widget barWidget = Tooltip(
             message:
                 '$tenantName ${tenantLabel.isNotEmpty ? "($tenantLabel)" : ""} - $tenantPercentage%',
-            child: Container(
-              width: assignedWidth,
-              color: Colors.grey.shade700,
-              child: Center(
-                child: Text(
-                  tenantName,
-                  style: const TextStyle(color: Colors.white, fontSize: 10),
+            child: InkWell(
+              onTap: _selectedMeterIndexStr == itemInfo['id']
+                  ? null
+                  : () {
+                      if (itemInfo['is_fetching'] ?? false) {
+                        return;
+                      }
+
+                      setState(() {
+                        _selectedMeterIndexStr = itemInfo['id'];
+                      });
+                    },
+              child: Container(
+                width: assignedWidth,
+                color: Colors.grey.shade700,
+                child: Center(
+                  child: Text(
+                    tenantName,
+                    style: const TextStyle(color: Colors.white, fontSize: 13.5),
+                  ),
                 ),
               ),
             ),
@@ -711,7 +726,9 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
                 if (itemInfo['is_fetching'] ?? false) {
                   return;
                 }
-                await _doGetMeterAssignment(itemInfo);
+                if (itemInfo['assignment_info'] == null) {
+                  await _doGetMeterAssignment(itemInfo);
+                }
 
                 setState(() {
                   _selectedMeterIndexStr = itemInfo['id'];
@@ -728,6 +745,7 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
               child: Row(
                 children: [
                   Container(
+                    height: 25,
                     width: barWidth,
                     decoration: BoxDecoration(
                       color: Colors.transparent,
@@ -755,6 +773,9 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
                                 itemInfo['percentage'] =
                                     100.0; // Set to 100% if assigned
                               }
+                              // if (itemInfo['assigned_new'] == false) {
+                              //   itemInfo['assignment_info'] = null;
+                              // }
                               _checkModified();
                             });
                           },
@@ -770,9 +791,9 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
         _itemGroupScopeMatchingItemList!.isEmpty) {
       return Container();
     }
-    if (_itemGroupItemList == null || _itemGroupItemList!.isEmpty) {
-      return Container();
-    }
+    // if (_itemGroupItemList == null || _itemGroupItemList!.isEmpty) {
+    //   return Container();
+    // }
     if (_selectedMeterIndexStr == null) {
       return Container();
     }
@@ -795,20 +816,104 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
     }
     final meterTeantAssignmentList = assignmentInfo['meter_tenant_assignment'];
     List<Widget> assignmentWidgetList = [];
+    int assignedToActiveTenantCount = 0;
+    for (Map<String, dynamic> assignment in meterTeantAssignmentList ?? []) {
+      String meterName = assignment['meter_name'] ?? '';
+      String meterLabel = assignment['meter_label'] ?? '';
+      String meterSn = assignment['meter_sn'] ?? '';
+      String meterGroupName = assignment['meter_group_name'] ?? '';
+      String meterGroupLabel = assignment['meter_group_label'] ?? '';
+      double percentage =
+          double.tryParse(assignment['percentage'] ?? '0.0') ?? 0.0;
+
+      final tenantInfo = assignment['tenant_info'];
+      String tenantName = tenantInfo?['name'] ?? '';
+      String tenantLabel = tenantInfo?['label'] ?? '';
+      String tenantLcStatus = tenantInfo?['lc_status'] ?? '';
+      PagTenantLcStatus? tenantLcStatusEnum =
+          PagTenantLcStatus.byTag(tenantLcStatus);
+      tenantLcStatusEnum ??= PagTenantLcStatus.active;
+      if (tenantInfo != null) {
+        if (tenantLcStatusEnum == PagTenantLcStatus.active ||
+            tenantLcStatusEnum == PagTenantLcStatus.onbarding ||
+            tenantLcStatusEnum == PagTenantLcStatus.offboarding) {
+          assignedToActiveTenantCount++;
+        }
+      }
+
+      bool meterGroupIsAssignedToActiveTenant = false;
+      if (assignedToActiveTenantCount != 0) {
+        meterGroupIsAssignedToActiveTenant = true;
+      }
+
+      if (assignedToActiveTenantCount > 1) {
+        return getErrorTextPrompt(
+          context: context,
+          errorText:
+              'Error: Multiple active tenants assigned to this meter group',
+        );
+      }
+
+      Widget assignmentWidget = Padding(
+        padding: const EdgeInsets.symmetric(vertical: 2.0),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: 135,
+              child: Text(
+                meterGroupName,
+                style: TextStyle(
+                    color: meterGroupIsAssignedToActiveTenant
+                        ? Colors.greenAccent
+                        : Theme.of(context).hintColor),
+              ),
+            ),
+            horizontalSpaceTiny,
+            SizedBox(
+              width: 60,
+              child: Text(
+                '${percentage.toStringAsFixed(2)}%',
+                style: TextStyle(color: Theme.of(context).hintColor),
+              ),
+            ),
+            horizontalSpaceTiny,
+            Tooltip(
+              message: tenantLabel,
+              child: SizedBox(
+                width: 170,
+                child: tenantName.isEmpty
+                    ? Text(
+                        '-',
+                        style: TextStyle(color: Theme.of(context).hintColor),
+                      )
+                    : SelectableText(
+                        tenantName,
+                        style: TextStyle(
+                          color: tenantLcStatusEnum.color,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+              ),
+            ),
+          ],
+        ),
+      );
+      assignmentWidgetList.add(assignmentWidget);
+    }
     return Container(
-      height: 150,
       decoration: BoxDecoration(
         border: Border.all(color: Theme.of(context).hintColor.withAlpha(50)),
         borderRadius: BorderRadius.circular(5),
       ),
       margin: const EdgeInsets.symmetric(horizontal: 5),
       padding: const EdgeInsets.all(8.0),
-      child: Text(
-        'Meter Assignment Info',
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          color: Theme.of(context).hintColor,
-        ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ...assignmentWidgetList,
+        ],
       ),
     );
   }
