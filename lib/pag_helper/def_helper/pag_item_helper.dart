@@ -14,6 +14,7 @@ enum PagItemKind {
   tariffPackage('Tariff Package', Symbols.price_change),
   bill('Bill', Symbols.request_quote),
   meterGroup('Meter Group', Symbols.atr),
+  finance('Fianace', Symbols.account_balance),
   ;
 
   const PagItemKind(

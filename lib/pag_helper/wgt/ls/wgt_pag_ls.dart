@@ -1,3 +1,4 @@
+import 'package:buff_helper/pag_helper/def_helper/dh_pag_finance_type.dart';
 import 'package:buff_helper/pag_helper/def_helper/list_helper.dart';
 import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_context.dart';
@@ -64,10 +65,14 @@ class _WgtPagLsState extends State<WgtPagLs> {
             PagItemKind.meterGroup ||
             PagItemKind.tariffPackage ||
             PagItemKind.bill ||
-            PagItemKind.role:
+            PagItemKind.role ||
+            PagItemKind.finance:
         dynamic itemType;
         if (widget.itemKind == PagItemKind.bill) {
           itemType = PagItemKind.bill;
+        }
+        if (widget.itemKind == PagItemKind.finance) {
+          itemType = PagFinanceType.soa;
         }
         return WgtListSearchItemFlexi(
           appConfig: widget.appConfig,

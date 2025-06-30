@@ -4,6 +4,7 @@ enum PagListContextType {
   info,
   usage,
   scada,
+  soa,
 }
 
 enum PagListTypeName {
