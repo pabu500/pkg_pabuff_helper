@@ -72,6 +72,7 @@ class _WgtTenantpAssignmentState extends State<WgtTenantpAssignment> {
     Map<String, dynamic> queryMap = {
       'scope': loggedInUser!.selectedScope.toScopeMap(),
       'item_group_id': widget.itemGroupIndexStr,
+      'item_scope': widget.itemScope.toScopeMap(),
     };
 
     _isFetching = true;
@@ -562,7 +563,7 @@ class _WgtTenantpAssignmentState extends State<WgtTenantpAssignment> {
             ),
             horizontalSpaceSmall,
             Container(
-              width: 120,
+              width: 150,
               decoration: boxDecoration,
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
               child: SelectableText(
