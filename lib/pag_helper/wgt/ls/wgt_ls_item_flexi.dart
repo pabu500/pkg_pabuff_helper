@@ -31,6 +31,7 @@ import 'package:provider/provider.dart';
 
 import '../../comm/comm_list.dart';
 import '../../model/mdl_pag_app_config.dart';
+import '../app/ems/wgt_tenant_soa.dart';
 import '../job/wgt_job_type_op_panel.dart';
 import 'wgt_item_info_edit_panel.dart';
 import 'wgt_list_pane.dart';
@@ -332,11 +333,13 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     bool isBill = widget.itemKind == PagItemKind.bill;
     bool isEsInsights = widget.pagAppContext! == appCtxEs &&
         widget.itemKind == PagItemKind.scope;
+    bool isSoa = widget.listContextType == PagListContextType.soa;
     if (isEmsDeviceLs ||
         isEmsMeterUsage ||
         isEmsTenantUsage ||
         isEsInsights ||
-        isBill) {
+        isBill ||
+        isSoa) {
       addInfoColumn = false;
     }
     bool addOpColumn = false;
@@ -345,6 +348,10 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         widget.itemKind == PagItemKind.meterGroup ||
         widget.itemKind == PagItemKind.tenant) {
       addOpColumn = true;
+    }
+    if (widget.itemKind == PagItemKind.tenant &&
+        widget.listContextType == PagListContextType.soa) {
+      addOpColumn = false;
     }
     bool addMeterUsageColumn = false;
     if (isEmsMeterUsage) {
@@ -358,6 +365,12 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     if (widget.itemKind == PagItemKind.bill &&
         widget.listContextType == PagListContextType.info) {
       addViewBillColumn = true;
+    }
+
+    bool addViewSoAColumn = false;
+    if (widget.itemKind == PagItemKind.tenant &&
+        widget.listContextType == PagListContextType.soa) {
+      addViewSoAColumn = true;
     }
 
     if (addInfoColumn) {
@@ -374,6 +387,9 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     }
     if (addViewBillColumn) {
       _addViewBillColumn(listController);
+    }
+    if (addViewSoAColumn) {
+      _addViewSoAColumn(listController);
     }
   }
 
@@ -930,24 +946,6 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
 
                     xtShowModelBottomSheet(
                       context,
-                      // Container(),
-                      // WgtTenantUsageView(
-                      //   loggedInUser: loggedInUser!,
-                      //   appConfig: pagAppConfig,
-                      //   meterTypeList: meterTypeList,
-                      //   excludeAutoUsage: false,
-                      //   displayContextStr: '',
-                      //   fromDatetime: fromDatetime,
-                      //   toDatetime: toDatetime,
-                      //   isMonthly: false,
-                      //   tenantName: item['name'],
-                      //   tenantLabel: item['label'],
-                      //   tenantLocationLabel: item['location_label'],
-                      //   tenantAccountId: item['account_number'],
-                      //   itemType: ItemType.meter, //widget.itemType,
-                      //   // usageCalc: _emsTypeUsageCalc,
-                      //   tenantUsageSummary: item['tenant_usage_summary'],
-                      // ),
                       WgtPagTenantUsageSummary(
                         costDecimals: 2,
                         appConfig: widget.appConfig,
@@ -1019,6 +1017,45 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                   },
             child: Icon(
               Symbols.request_quote,
+              color: showDetail
+                  ? Theme.of(context).colorScheme.primary.withAlpha(200)
+                  : Theme.of(context).hintColor.withAlpha(130),
+            ),
+          ),
+        );
+      },
+    );
+    listController.listColControllerList.add(appCtxCol);
+  }
+
+  void _addViewSoAColumn(MdlPagListController listController) {
+    MdlListColController appCtxCol = MdlListColController(
+      colKey: 'detail',
+      colTitle: 'SoA',
+      includeColKeyAsFilter: false,
+      show: true,
+      colWidth: 55,
+      colWidgetType: PagColWidgetType.CUSTOM,
+      getCustomWidget: (item, fullList) {
+        bool showDetail = true;
+        return Padding(
+          padding: const EdgeInsets.only(right: 0),
+          child: InkWell(
+            onTap: !showDetail
+                ? null
+                : () {
+                    xtShowModelBottomSheet(
+                      context,
+                      WgtTenantSoA(
+                        appConfig: widget.appConfig,
+                        loggedInUser: loggedInUser!,
+                        billingRecIndexStr: item['id'],
+                      ),
+                      onClosed: () {},
+                    );
+                  },
+            child: Icon(
+              Symbols.contract,
               color: showDetail
                   ? Theme.of(context).colorScheme.primary.withAlpha(200)
                   : Theme.of(context).hintColor.withAlpha(130),

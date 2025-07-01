@@ -501,7 +501,7 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
             ),
             horizontalSpaceSmall,
             Container(
-              width: 100,
+              width: 135,
               decoration: boxDecoration,
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
               child: SelectableText(
@@ -820,6 +820,12 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
           context: context, errorText: 'Error: Assignment info not found');
     }
     final meterTeantAssignmentList = assignmentInfo['meter_tenant_assignment'];
+    if (meterTeantAssignmentList == null || meterTeantAssignmentList.isEmpty) {
+      return Text(
+        'This meter has not been assigned to any meter group',
+        style: TextStyle(color: Theme.of(context).hintColor),
+      );
+    }
     List<Widget> assignmentWidgetList = [];
     int assignedToActiveTenantCount = 0;
     for (Map<String, dynamic> assignment in meterTeantAssignmentList ?? []) {
