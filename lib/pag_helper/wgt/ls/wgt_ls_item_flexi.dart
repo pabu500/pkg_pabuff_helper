@@ -1049,7 +1049,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                       WgtTenantSoA(
                         appConfig: widget.appConfig,
                         loggedInUser: loggedInUser!,
-                        billingRecIndexStr: item['id'],
+                        teneantInfo: item,
                       ),
                       onClosed: () {},
                     );

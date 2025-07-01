@@ -1,3 +1,4 @@
+import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
 
 import '../../../model/mdl_pag_app_config.dart';
@@ -8,12 +9,12 @@ class WgtTenantSoA extends StatefulWidget {
     super.key,
     required this.appConfig,
     required this.loggedInUser,
-    required this.billingRecIndexStr,
+    required this.teneantInfo,
   });
 
   final MdlPagAppConfig appConfig;
   final MdlPagUser loggedInUser;
-  final String billingRecIndexStr;
+  final Map<String, dynamic> teneantInfo;
 
   @override
   State<WgtTenantSoA> createState() => _WgtTenantSoAState();
@@ -22,6 +23,12 @@ class WgtTenantSoA extends StatefulWidget {
 class _WgtTenantSoAState extends State<WgtTenantSoA> {
   @override
   Widget build(BuildContext context) {
+    String tenantName = widget.teneantInfo['name'] ?? '';
+    String tenantLabel = widget.teneantInfo['label'] ?? '';
+    if (tenantName.isEmpty || tenantLabel.isEmpty) {
+      return getErrorTextPrompt(
+          context: context, errorText: 'Error: Misising tenant name or label');
+    }
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -35,7 +42,7 @@ class _WgtTenantSoAState extends State<WgtTenantSoA> {
         ),
         const SizedBox(height: 16),
         Text(
-          'Billing Record Index: ${widget.billingRecIndexStr}',
+          'Tenant: $tenantName ($tenantLabel)',
           style: TextStyle(
             fontSize: 16,
             color: Theme.of(context).colorScheme.onSurface,

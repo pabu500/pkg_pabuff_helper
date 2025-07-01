@@ -468,8 +468,9 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
   }
 
   Widget getItemRow(Map<String, dynamic> itemInfo, int index) {
-    String tenantName = itemInfo['name'] ?? 'Unknown Tenant';
-    String tenantLabel = itemInfo['label'] ?? '';
+    String itemName = itemInfo['name'] ?? '-';
+    String itemLabel = itemInfo['label'] ?? '-';
+    String meterSn = itemInfo['meter_sn'] ?? '-';
     bool assigned = itemInfo['assigned'] ?? false;
 
     BoxDecoration boxDecoration = BoxDecoration(
@@ -493,7 +494,7 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
               width: 30,
               child: Align(
                 alignment: Alignment.centerRight,
-                child: Text(
+                child: SelectableText(
                   index.toString(),
                   style: TextStyle(color: Theme.of(context).hintColor),
                 ),
@@ -505,7 +506,17 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
               decoration: boxDecoration,
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
               child: SelectableText(
-                tenantName,
+                itemName,
+                style: disabled ? disabledTextStyle : null,
+              ),
+            ),
+            horizontalSpaceSmall,
+            Container(
+              width: 120,
+              decoration: boxDecoration,
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+              child: SelectableText(
+                meterSn,
                 style: disabled ? disabledTextStyle : null,
               ),
             ),
@@ -515,7 +526,7 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
               decoration: boxDecoration,
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
               child: SelectableText(
-                tenantLabel.isNotEmpty ? tenantLabel : '-',
+                itemLabel,
                 style: disabled ? disabledTextStyle : null,
               ),
             ),
