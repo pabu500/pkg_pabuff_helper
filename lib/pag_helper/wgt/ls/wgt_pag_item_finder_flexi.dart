@@ -920,6 +920,9 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
                       }
                     },
                     onEditingComplete: () async {
+                      if (!_enableSearch) {
+                        return;
+                      }
                       widget.onModified?.call();
                       if (colController.filterValue == null) {
                         return null;
