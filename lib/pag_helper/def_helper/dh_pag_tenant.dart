@@ -3,20 +3,23 @@ import 'package:flutter/material.dart';
 import 'enum_helper.dart';
 
 enum PagTenantLcStatus {
-  onbarding('Onboarding', 'onb', Colors.lightGreenAccent),
-  active('Active', 'act', Colors.teal),
-  offboarding('Offboarding', 'offb', Colors.orange),
-  terminated('Terminated', 'term', Colors.red),
+  onbarding('Onboarding', 'onb', 'onb', Colors.lightGreenAccent),
+  normal('Normal', 'normal', 'norm', Colors.teal),
+  offboarding('Offboarding', 'offb', 'offb', Colors.orange),
+  terminated('Terminated', 'terminated', 'term', Colors.red),
   ;
 
   const PagTenantLcStatus(
     this.label,
+    this.value, // the value that is stored in the database
     this.tag,
     this.color,
   );
 
   final String label;
+  final String value;
   final String tag;
+
   final Color color;
 
   static PagTenantLcStatus? byLabel(String? label) => enumByLabel(
@@ -25,10 +28,20 @@ enum PagTenantLcStatus {
         (e) => (e).label,
       );
 
-  static PagTenantLcStatus? byTag(String? tag) => enumByTag(
+  static PagTenantLcStatus byValue(String? value) =>
+      enumByLabel(
+        value,
+        values,
+        (e) => (e).value,
+      ) ??
+      normal;
+
+  static PagTenantLcStatus byTag(String? tag) =>
+      enumByTag(
         tag,
         values,
-      );
+      ) ??
+      normal;
 }
 
 T? enumByTag<T extends Enum>(String? tag, List<T> values) {

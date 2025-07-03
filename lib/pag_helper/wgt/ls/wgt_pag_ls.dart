@@ -74,6 +74,9 @@ class _WgtPagLsState extends State<WgtPagLs> {
         if (widget.itemKind == PagItemKind.finance) {
           itemType = PagFinanceType.soa;
         }
+        if (widget.itemKind == PagItemKind.tenant) {
+          itemType = PagItemKind.tenant;
+        }
         return WgtListSearchItemFlexi(
           appConfig: widget.appConfig,
           pagAppContext: widget.pagAppContext,

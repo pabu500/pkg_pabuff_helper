@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 
+import '../../def_helper/dh_pag_tenant.dart';
 import '../wgt_list_column_customize.dart';
 
 class WgtPagEditCommitList extends StatefulWidget {
@@ -1044,6 +1045,11 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
           tagLabel = billingLcStatus.tag ?? '';
           tagColor = billingLcStatus.color?.withAlpha(130) ??
               Colors.grey.withAlpha(130);
+        }
+        if (widget.itemType == PagItemKind.tenant) {
+          PagTenantLcStatus tenantLcStatus = PagTenantLcStatus.byValue(tagText);
+          tagLabel = tenantLcStatus.tag;
+          tagColor = tenantLcStatus.color.withAlpha(130);
         }
       }
     } else {

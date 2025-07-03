@@ -854,9 +854,9 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
       String tenantLcStatus = tenantInfo?['lc_status'] ?? '';
       PagTenantLcStatus? tenantLcStatusEnum =
           PagTenantLcStatus.byTag(tenantLcStatus);
-      tenantLcStatusEnum ??= PagTenantLcStatus.active;
+      tenantLcStatusEnum ??= PagTenantLcStatus.normal;
       if (tenantInfo != null) {
-        if (tenantLcStatusEnum == PagTenantLcStatus.active ||
+        if (tenantLcStatusEnum == PagTenantLcStatus.normal ||
             tenantLcStatusEnum == PagTenantLcStatus.onbarding ||
             tenantLcStatusEnum == PagTenantLcStatus.offboarding) {
           assignedToActiveTenantCount++;
