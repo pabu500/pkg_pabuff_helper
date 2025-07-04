@@ -229,6 +229,7 @@ class PagUrlBase {
 
   //oresvc2 endpoints
   //scope
+  static const String eptCreateScope = '/scope/create_scope';
   static const String eptGetUserRoleScopeList =
       '/scope/get_user_role_scope_list';
   static const String eptGetLocationGroupLocationList =

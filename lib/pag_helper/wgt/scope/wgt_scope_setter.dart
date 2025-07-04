@@ -1,6 +1,6 @@
 import 'package:buff_helper/pag_helper/comm/comm_scope.dart';
 import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
-import 'package:buff_helper/pag_helper/def_helper/scope_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_building_profile.dart';
@@ -38,6 +38,7 @@ class WgtScopeSetter extends StatefulWidget {
     // flexScope means the scope can be set to either SG, S, B, LG or L
     // if false, the scope must be set from SG all the way down to L
     this.flexScope = false,
+    this.updateUiOnly = false,
   });
 
   final MdlPagAppConfig appConfig;
@@ -54,6 +55,8 @@ class WgtScopeSetter extends StatefulWidget {
   final bool showCommitted;
   final String committedMessage;
   final bool flexScope;
+  final bool
+      updateUiOnly; // if true, the scope setter will not commit the scope
 
   @override
   State<WgtScopeSetter> createState() => _WgtScopeSetterState();
@@ -1342,6 +1345,9 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
                                 widget.forItemKind == PagItemKind.device) {
                               updateUiOnly = true;
                             }
+                            if (widget.updateUiOnly) {
+                              updateUiOnly = true;
+                            }
                             // get leaf scope
                             if (_selectedLocation != null) {
                               scope = _selectedLocation;
@@ -1354,6 +1360,14 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
                             } else if (_selectedSiteGroupProfile != null) {
                               scope = _selectedSiteGroupProfile;
                             }
+
+                            // // always add project id and name to the scope
+                            // scope = scope.copyWith(
+                            //   projectId: loggedInUser!
+                            //       .selectedScope.projectProfile!.id,
+                            //   projectName: loggedInUser!
+                            //       .selectedScope.projectProfile!.name,
+                            // );
 
                             if (updateUiOnly) {
                               // update UI only

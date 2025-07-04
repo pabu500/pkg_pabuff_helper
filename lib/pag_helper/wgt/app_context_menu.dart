@@ -1,4 +1,4 @@
-import 'package:buff_helper/pag_helper/def_helper/scope_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:buff_helper/pag_helper/model/app/mdl_project_config.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_context.dart';
 import 'package:buff_helper/pag_helper/model/provider/pag_app_provider.dart';

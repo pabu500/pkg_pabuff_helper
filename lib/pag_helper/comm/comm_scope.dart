@@ -8,6 +8,64 @@ import 'package:buff_helper/pag_helper/model/mdl_svc_query.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
+Future<dynamic> doPagCreateScope(
+  MdlPagUser loggedInUser,
+  MdlPagAppConfig appConfig,
+  Map<String, dynamic> queryMap,
+  MdlPagSvcClaim svcClaim,
+) async {
+  svcClaim.svcName = PagSvcType.oresvc2.name;
+  svcClaim.endpoint = PagUrlBase.eptCreateScope;
+
+  String svcToken = '';
+  // try {
+  //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
+  // } catch (err) {
+  //   throw Exception(err);
+  // }
+
+  try {
+    final response = await http.post(
+      Uri.parse(PagUrlController(loggedInUser, appConfig)
+          .getUrl(PagSvcType.oresvc2, svcClaim.endpoint!)),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $svcToken',
+      },
+      body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
+    );
+
+    if (response.statusCode == 201) {
+      final responseBody = jsonDecode(response.body);
+
+      if (responseBody['info'] != null) {
+        throw Exception(responseBody['info']);
+      }
+      if (responseBody['error'] != null) {
+        throw Exception(responseBody['error']);
+      }
+      final data = responseBody['data'];
+      if (data == null) {
+        throw Exception("No data found in the response");
+      }
+      final result = data['result'];
+      if (result == null) {
+        throw Exception("No result found in the response");
+      }
+      String? resultKey = data['result_key'];
+      if (resultKey == null && resultKey!.isEmpty) {
+        throw Exception("Error: $resultKey");
+      }
+      return result[resultKey];
+    } else {
+      Map<String, dynamic> responseBody = jsonDecode(response.body);
+      throw Exception(responseBody['error']);
+    }
+  } catch (err) {
+    throw Exception(err);
+  }
+}
+
 Future<dynamic> getUserRoleScopeList(
   MdlPagAppConfig appConfig,
   MdlPagUser? loggedInUser,

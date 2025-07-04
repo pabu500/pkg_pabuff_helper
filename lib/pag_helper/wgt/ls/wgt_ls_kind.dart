@@ -13,7 +13,7 @@ import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:buff_helper/pag_helper/def_helper/scope_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:provider/provider.dart';
 import '../../model/mdl_pag_app_config.dart';
 import '../../wgt/history_presentor/wgt_pag_item_history_presenter.dart';

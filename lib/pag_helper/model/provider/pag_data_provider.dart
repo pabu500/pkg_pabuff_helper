@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:buff_helper/pag_helper/def_helper/scope_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/fleet_health/mdl_pag_fleet_health.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';

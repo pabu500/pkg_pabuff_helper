@@ -80,3 +80,18 @@ Widget getScopeIcon(BuildContext ctx, PagScopeType scopeType,
     color: Theme.of(ctx).hintColor,
   );
 }
+
+String? validateLabelScope(String val) {
+  if (val.trim().isEmpty) {
+    return 'required';
+  }
+
+  // validate alphanumric, _, -, #, ' and dash, space,
+  // and minimum 5 characters
+  String pattern = r"^[a-zA-Z0-9_ \-#']{5,}$";
+  RegExp regExp = RegExp(pattern);
+  if (!regExp.hasMatch(val)) {
+    return 'min length is 5 and letter, number, space, _, - only';
+  }
+  return null;
+}

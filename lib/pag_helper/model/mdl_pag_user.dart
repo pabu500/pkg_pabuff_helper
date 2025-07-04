@@ -14,7 +14,7 @@ import 'package:buff_helper/pag_helper/def_helper/def_tree.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 
-import '../def_helper/scope_helper.dart';
+import '../def_helper/dh_scope.dart';
 import 'scope/mdl_pag_scope_profile.dart';
 
 enum PagUserKey {

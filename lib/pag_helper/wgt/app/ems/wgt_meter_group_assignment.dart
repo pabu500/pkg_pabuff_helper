@@ -1,5 +1,5 @@
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_tenant.dart';
-import 'package:buff_helper/pag_helper/def_helper/scope_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
 import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';

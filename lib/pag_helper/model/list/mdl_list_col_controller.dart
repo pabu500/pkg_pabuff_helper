@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../../def_helper/scope_helper.dart';
+import '../../def_helper/dh_scope.dart';
 
 enum PagFilterWidgetType {
   INPUT,
