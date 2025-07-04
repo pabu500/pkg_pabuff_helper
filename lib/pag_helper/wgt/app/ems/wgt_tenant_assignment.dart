@@ -26,6 +26,7 @@ class WgtTenantpAssignment extends StatefulWidget {
     required this.itemLabel,
     required this.itemScope,
     this.onScopeTreeUpdate,
+    this.onUpdate,
   });
 
   final MdlPagAppConfig appConfig;
@@ -34,6 +35,7 @@ class WgtTenantpAssignment extends StatefulWidget {
   final String itemLabel;
   final MdlPagScope itemScope;
   final Function? onScopeTreeUpdate;
+  final Function? onUpdate;
 
   @override
   State<WgtTenantpAssignment> createState() => _WgtTenantpAssignmentState();
@@ -370,6 +372,7 @@ class _WgtTenantpAssignmentState extends State<WgtTenantpAssignment> {
               ? null
               : () async {
                   await _doCommit();
+                  widget.onUpdate?.call();
                 },
           child: _isCommitted && _commitErrorText.isEmpty
               ? Text(

@@ -752,6 +752,11 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                           tariffPackageTypeLabel:
                               item['tariff_package_type_label'] ?? '',
                           itemScope: itemScope,
+                          onUpdate: () {
+                            setState(() {
+                              _itemUpdated = true;
+                            });
+                          },
                         );
                       case PagItemKind.meterGroup:
                         opWidget = WgtMeterGroupAssignment(
@@ -761,6 +766,11 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                           itemLabel: item['label'] ?? '',
                           meterType: item['meter_type'] ?? '',
                           itemScope: itemScope,
+                          onUpdate: () {
+                            setState(() {
+                              _itemUpdated = true;
+                            });
+                          },
                         );
                       case PagItemKind.tenant:
                         opWidget = WgtTenantpAssignment(
@@ -769,6 +779,11 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                           itemName: item['name'],
                           itemLabel: item['label'] ?? '',
                           itemScope: itemScope,
+                          onUpdate: () {
+                            setState(() {
+                              _itemUpdated = true;
+                            });
+                          },
                         );
                       default:
                         opWidget = Container();

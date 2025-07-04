@@ -28,6 +28,7 @@ class WgtMeterGroupAssignment extends StatefulWidget {
     required this.itemScope,
     required this.meterType,
     this.onScopeTreeUpdate,
+    this.onUpdate,
   });
 
   final MdlPagAppConfig appConfig;
@@ -37,6 +38,7 @@ class WgtMeterGroupAssignment extends StatefulWidget {
   final String meterType;
   final MdlPagScope itemScope;
   final Function? onScopeTreeUpdate;
+  final Function? onUpdate;
 
   @override
   State<WgtMeterGroupAssignment> createState() =>
@@ -345,6 +347,7 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
               ? null
               : () async {
                   await _doCommit();
+                  widget.onUpdate?.call();
                 },
           child: _isCommitted && _commitErrorText.isEmpty
               ? Text(

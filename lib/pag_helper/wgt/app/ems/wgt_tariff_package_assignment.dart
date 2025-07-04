@@ -27,6 +27,7 @@ class WgtTariffPackageAssignment extends StatefulWidget {
     required this.tariffPackageTypeName,
     required this.tariffPackageTypeLabel,
     this.onScopeTreeUpdate,
+    this.onUpdate,
   });
 
   final MdlPagAppConfig appConfig;
@@ -38,6 +39,7 @@ class WgtTariffPackageAssignment extends StatefulWidget {
   final String tariffPackageTypeLabel;
   final MdlPagScope itemScope;
   final Function? onScopeTreeUpdate;
+  final Function? onUpdate;
 
   @override
   State<WgtTariffPackageAssignment> createState() =>
@@ -333,6 +335,7 @@ class _WgtTariffPackageAssignmentState
               ? null
               : () async {
                   await _doCommit();
+                  widget.onUpdate?.call();
                 },
           child: _isCommitted && _commitErrorText.isEmpty
               ? Text('✓ Committed',
