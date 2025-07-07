@@ -515,7 +515,7 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
             ),
             horizontalSpaceSmall,
             Container(
-              width: 120,
+              width: 135,
               decoration: boxDecoration,
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
               child: SelectableText(
