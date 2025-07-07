@@ -1,6 +1,6 @@
 import 'package:buff_helper/pag_helper/comm/comm_batch_op.dart';
 import 'package:buff_helper/pag_helper/comm/comm_pag_item.dart';
-import 'package:buff_helper/pag_helper/def_helper/def_device.dart';
+// import 'package:buff_helper/pag_helper/def_helper/def_device.dart';
 import 'package:buff_helper/pag_helper/def_helper/def_role.dart';
 import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pag_helper/def_helper/pag_tariff_package_helper.dart';
@@ -23,6 +23,7 @@ import 'package:flutter/material.dart';
 import 'package:buff_helper/pag_helper/def_helper/def_item_group.dart';
 import 'package:provider/provider.dart';
 
+import '../../def_helper/dh_device.dart';
 import '../../def_helper/tariff_package_helper.dart';
 import '../../model/mdl_pag_app_config.dart';
 import '../scope/wgt_scope_setter.dart';
@@ -154,8 +155,8 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
       String itemTypeStr = '';
       if (widget.itemType is PagScopeType) {
         itemTypeStr = (widget.itemType as PagScopeType).name;
-      } else if (widget.itemType is PagDeviceType) {
-        itemTypeStr = (widget.itemType as PagDeviceType).name;
+      } else if (widget.itemType is PagDeviceCat) {
+        itemTypeStr = (widget.itemType as PagDeviceCat).name;
       }
       Map<String, dynamic> queryMap = {
         'scope': _loggedInUser!.selectedScope.toScopeMap(),
@@ -226,8 +227,8 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
 
     isDeleteableItem = false;
     if (widget.itemKind == PagItemKind.device) {
-      if (widget.itemType is PagDeviceType) {
-        if (widget.itemType == PagDeviceType.meter) {
+      if (widget.itemType is PagDeviceCat) {
+        if (widget.itemType == PagDeviceCat.meter) {
           isDeleteableItem = true;
         }
       }

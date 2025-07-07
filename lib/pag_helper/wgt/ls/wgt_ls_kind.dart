@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:buff_helper/pag_helper/app_context_list.dart';
-import 'package:buff_helper/pag_helper/def_helper/def_device.dart';
 import 'package:buff_helper/pag_helper/def_helper/list_helper.dart';
 import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
@@ -15,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:provider/provider.dart';
+import '../../def_helper/dh_device.dart';
 import '../../model/mdl_pag_app_config.dart';
 import '../../wgt/history_presentor/wgt_pag_item_history_presenter.dart';
 import 'wgt_ls_item_flexi.dart';
@@ -67,7 +67,10 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
   dynamic _selectedItemType;
   UniqueKey? _itemTypeFreshKey;
 
+  String _listTypeErrorText = '';
+
   void _updateItemType({dynamic itemType}) {
+    _selectedListController = null;
     if (_selectedItemType == itemType) {
       return;
     }
@@ -82,7 +85,7 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
     String itemTypeStr = '';
     if (itemType != null) {
       _selectedItemType = itemType;
-      if (itemType is PagDeviceType) {
+      if (itemType is PagDeviceCat) {
         itemTypeStr = itemType.name;
       } else if (itemType is PagScopeType) {
         itemTypeStr = itemType.name;
@@ -93,20 +96,23 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
       dynamic itemType = _getItemTypePref() ?? _listControllerList[0].itemType;
       if (itemType is String) {
         itemTypeStr = itemType;
-      } else if (itemType is PagDeviceType) {
-        itemTypeStr = itemType.name;
+      } else if (itemType is PagDeviceCat) {
+        itemTypeStr = itemType.value;
       } else if (itemType is PagScopeType) {
-        itemTypeStr = itemType.name;
-      } else if (itemType is DeviceCat) {
-        itemTypeStr = itemType.name;
+        itemTypeStr = itemType.key;
+      } else {
+        throw Exception('Unsupported item type: ${itemType.runtimeType}');
       }
-      itemTypeStr = itemTypeStr.toLowerCase();
+      // else if (itemType is PagDeviceCat) {
+      //   itemTypeStr = itemType.value;
+      // }
+      // itemTypeStr = itemTypeStr.toLowerCase();
 
       if (widget.itemKind == PagItemKind.device) {
-        _selectedItemType = PagDeviceType.values.byName(itemTypeStr);
+        _selectedItemType = PagDeviceCat.byValue(itemTypeStr);
         itemTypeFound = true;
       } else if (widget.itemKind == PagItemKind.scope) {
-        _selectedItemType = PagScopeType.values.byName(itemTypeStr);
+        _selectedItemType = PagScopeType.byKey(itemTypeStr);
         itemTypeFound = true;
       }
 
@@ -125,9 +131,18 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
 
     try {
       for (var listController in _listControllerList) {
-        if (getPagItemTypeStr(listController.itemType) == itemTypeStr) {
-          _selectedListController = listController;
-          break;
+        if (widget.itemKind == PagItemKind.device) {
+          if (getPagDeviceTypeStr(listController.itemType) == itemTypeStr) {
+            _selectedListController = listController;
+            break;
+          }
+        } else if (widget.itemKind == PagItemKind.scope) {
+          if (getPagScopeTypeStr(listController.itemType) == itemTypeStr) {
+            _selectedListController = listController;
+            break;
+          }
+        } else {
+          throw Exception('Unsupported item kind: ${widget.itemKind.name}');
         }
       }
       if (_selectedListController == null) {
@@ -145,13 +160,14 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
       if (kDebugMode) {
         print(e);
       }
+      _listTypeErrorText = 'Error getting list type';
     }
   }
 
   void _updateItemTypeListStatus() {
     for (Map<String, dynamic> itemTypeInfo in _itemTypeInfoList) {
       dynamic itemType = itemTypeInfo['item_type'];
-      if (itemType is PagDeviceType) {
+      if (itemType is PagDeviceCat) {
         itemType = itemType.name;
       } else if (itemType is PagScopeType) {
         itemType = itemType.name;
@@ -160,10 +176,10 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
       for (MdlPagListController listController in _listControllerList) {
         String listControllerItemTypeStr = '';
         String itemTypeStr = '';
-        if (itemType is PagDeviceType) {
+        if (itemType is PagDeviceCat) {
           itemTypeStr = itemType.name;
           listControllerItemTypeStr =
-              (listController.itemType as PagDeviceType).name;
+              (listController.itemType as PagDeviceCat).name;
         } else if (itemType is PagScopeType) {
           itemTypeStr = itemType.name;
           listControllerItemTypeStr =
@@ -185,6 +201,9 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
 
   String? _getItemTypePref() {
     String itemType = widget.itemType?.name ?? '';
+    if (itemType.isEmpty) {
+      return null;
+    }
     String itemTypePrefKey =
         '${widget.prefKey}_${widget.itemKind.name}_$itemType';
     String? itemTypeStr = readFromSharedPref(itemTypePrefKey);
@@ -229,7 +248,7 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
         for (Map<String, dynamic> itemType
             in loggedInUser!.selectedScope.projectProfile!.deviceTypeInfoList) {
           String deviceTypeStr = itemType.keys.first;
-          PagDeviceType deviceType = PagDeviceType.values.byName(deviceTypeStr);
+          PagDeviceCat deviceType = PagDeviceCat.byValue(deviceTypeStr);
           _itemTypeInfoList.add({'item_type': deviceType});
           itemTypeList.add(deviceType.name);
         }
@@ -307,9 +326,9 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
         dynamic itemType = itemTypeInfo['item_type'];
         String itemTypeStr = '';
         String selectedItemTypeStr = '';
-        if (itemType is PagDeviceType) {
+        if (itemType is PagDeviceCat) {
           itemTypeStr = itemType.name;
-          selectedItemTypeStr = (_selectedItemType as PagDeviceType).name;
+          selectedItemTypeStr = (_selectedItemType as PagDeviceCat).name;
         } else if (itemType is PagScopeType) {
           itemTypeStr = itemType.name;
           selectedItemTypeStr = (_selectedItemType as PagScopeType).name;
@@ -347,7 +366,7 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
                   color: color,
                   borderRadius: BorderRadius.circular(5),
                 ),
-                child: itemType is PagDeviceType
+                child: itemType is PagDeviceCat
                     ? Icon(
                         itemType.iconData,
                         color: Theme.of(context).colorScheme.onSecondary,

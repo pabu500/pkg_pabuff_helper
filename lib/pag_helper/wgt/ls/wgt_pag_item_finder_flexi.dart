@@ -10,7 +10,7 @@ import 'package:buff_helper/pag_helper/model/scope/mdl_pag_location_group_profil
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_site_group_profile.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_site_profile.dart';
 import 'package:buff_helper/pag_helper/wgt/datetime/wgt_date_range_picker_monthly.dart';
-import 'package:buff_helper/pkg_buff_helper.dart';
+// import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +18,14 @@ import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_controller.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
+import '../../../pagrid_helper/comm_helper/local_storage.dart';
+import '../../../util/date_time_util.dart';
+import '../../../xt_ui/wdgt/get_collapsed_bar.dart';
+import '../../../xt_ui/wdgt/info/get_error_text_prompt.dart';
+import '../../../xt_ui/xt_helpers.dart';
 import '../../comm/comm_list.dart';
+import '../../def_helper/dh_device.dart';
+import '../../model/mdl_pag_user.dart';
 import '../wgt_custom_pin.dart';
 import 'wgt_finder_field_input.dart';
 import '../wgt_input_dropdown.dart';
@@ -561,7 +568,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   void initState() {
     super.initState();
 
-    assert(widget.itemType is DeviceCat ||
+    assert(widget.itemType is PagDeviceCat ||
         widget.itemType is PagScopeType ||
         widget.itemType is PagItemKind ||
         widget.itemType == null);
@@ -578,10 +585,10 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     //   default:
     //     itemTypeStr = 'NOT_SET';
     // }
-    if (widget.itemType is DeviceCat) {
-      itemTypeStr = (widget.itemType as DeviceCat).name.toLowerCase();
+    if (widget.itemType is PagDeviceCat) {
+      itemTypeStr = (widget.itemType as PagDeviceCat).value.toLowerCase();
     } else if (widget.itemType is PagScopeType) {
-      itemTypeStr = (widget.itemType as PagScopeType).name.toLowerCase();
+      itemTypeStr = (widget.itemType as PagScopeType).key.toLowerCase();
     } else if (widget.itemType is PagItemKind) {
       itemTypeStr = (widget.itemType as PagItemKind).name.toLowerCase();
     } else {

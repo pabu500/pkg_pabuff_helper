@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
 import 'package:buff_helper/pag_helper/def_helper/def_device.dart';
+import '../../def_helper/dh_device.dart';
 import '../../model/mdl_history.dart';
 import '../../model/mdl_pag_app_config.dart';
 import 'wgt_pag_history_rep_chart.dart';
@@ -206,7 +207,7 @@ class _WgtPagItemHistoryPresenterState
 
   void _iniHistorySetting() {
     if (widget.itemKind == PagItemKind.device) {
-      assert(widget.itemType is PagDeviceType);
+      assert(widget.itemType is PagDeviceCat);
       assert(widget.itemSubType is MeterType);
 
       // single val meters
@@ -1096,7 +1097,7 @@ class _WgtPagItemHistoryPresenterState
             : Container(),
         SizedBox(
           width: widget.width,
-          height: widget.height - _getOverheadHeight() - 80,
+          height: widget.height - _getOverheadHeight() - 90,
           child: _isHistoryLoading
               ? Align(
                   alignment: Alignment.center,

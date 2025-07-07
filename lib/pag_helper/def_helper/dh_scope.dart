@@ -81,6 +81,25 @@ Widget getScopeIcon(BuildContext ctx, PagScopeType scopeType,
   );
 }
 
+String getPagScopeTypeStr(dynamic itemType) {
+  switch (itemType) {
+    case PagScopeType.project:
+      return 'project';
+    case PagScopeType.siteGroup:
+      return 'siteGroup';
+    case PagScopeType.site:
+      return 'site';
+    case PagScopeType.building:
+      return 'building';
+    case PagScopeType.locationGroup:
+      return 'locationGroup';
+    case PagScopeType.location:
+      return 'location';
+    default:
+      return '';
+  }
+}
+
 String? validateLabelScope(String val) {
   if (val.trim().isEmpty) {
     return 'required';

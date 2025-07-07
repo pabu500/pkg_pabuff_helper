@@ -119,8 +119,12 @@ class _TreeTileState extends State<TreeTile> {
           Flexible(
             child: Padding(
                 padding: EdgeInsets.only(left: isBranch ? 0 : 8),
-                child: widget.getNodeWidget?.call(widget.entry.node) ??
-                    Text.rich(titleSpan)),
+                child: Tooltip(
+                  message: widget.entry.node.name,
+                  waitDuration: const Duration(milliseconds: 500),
+                  child: widget.getNodeWidget?.call(widget.entry.node) ??
+                      Text.rich(titleSpan),
+                )),
           ),
         ],
       ),

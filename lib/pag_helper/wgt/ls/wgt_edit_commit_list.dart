@@ -1,4 +1,3 @@
-import 'package:buff_helper/pag_helper/def_helper/def_device.dart';
 import 'package:buff_helper/pag_helper/def_helper/def_role.dart';
 import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_controller.dart';
@@ -15,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 
+import '../../def_helper/dh_device.dart';
 import '../../def_helper/dh_pag_tenant.dart';
 import '../wgt_list_column_customize.dart';
 
@@ -1034,7 +1034,7 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
       tagLabel = portalType.tag;
       tagColor = portalType.color;
     } else if (configItem['col_key'] == 'lc_status') {
-      if (widget.itemType is PagDeviceType) {
+      if (widget.itemType is PagDeviceCat) {
         PagDeviceLsStatus deviceLsStatus = PagDeviceLsStatus.byTag(tagText);
         tagLabel = deviceLsStatus.tag;
         tagColor = deviceLsStatus.color.withAlpha(130);

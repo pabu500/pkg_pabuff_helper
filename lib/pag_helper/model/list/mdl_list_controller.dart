@@ -1,8 +1,10 @@
 import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
-import 'package:buff_helper/up_helper/helper/device_def.dart';
+// import 'package:buff_helper/up_helper/helper/device_def.dart';
 import 'package:flutter/foundation.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
+
+import '../../def_helper/dh_device.dart';
 
 class MdlPagListController /*extends ChangeNotifier*/ {
   // PagItemKind pagItemKind;
@@ -88,18 +90,22 @@ class MdlPagListController /*extends ChangeNotifier*/ {
     if (itemTypeStr != null) {
       switch (itemTypeStr) {
         case 'meter':
-          itemType = DeviceCat.METER;
+          itemType = PagDeviceCat.meter;
           break;
         case 'sensor':
-          itemType = DeviceCat.SENSOR;
+          itemType = PagDeviceCat.sensor;
           break;
         case 'lock':
-          itemType = DeviceCat.LOCK;
+          itemType = PagDeviceCat.lock;
+        case 'camera':
+          itemType = PagDeviceCat.camera;
+        case 'gateway':
+          itemType = PagDeviceCat.gateway;
           break;
         case 'project':
           itemType = PagScopeType.project;
           break;
-        case 'site_group':
+        case 'site_group' || 'siteGroup':
           itemType = PagScopeType.siteGroup;
           break;
         case 'site':
@@ -108,7 +114,7 @@ class MdlPagListController /*extends ChangeNotifier*/ {
         case 'building':
           itemType = PagScopeType.building;
           break;
-        case 'location_group':
+        case 'location_group' || 'locationGroup':
           itemType = PagScopeType.locationGroup;
           break;
         case 'location':
@@ -145,16 +151,22 @@ class MdlPagListController /*extends ChangeNotifier*/ {
     }
 
     String itemTypeStr = 'unknown_item_type';
-    if (itemType is DeviceCat) {
+    if (itemType is PagDeviceCat) {
       switch (itemType) {
-        case DeviceCat.METER:
+        case PagDeviceCat.meter:
           itemTypeStr = 'meter';
           break;
-        case DeviceCat.SENSOR:
+        case PagDeviceCat.sensor:
           itemTypeStr = 'sensor';
           break;
-        case DeviceCat.LOCK:
+        case PagDeviceCat.lock:
           itemTypeStr = 'lock';
+          break;
+        case PagDeviceCat.camera:
+          itemTypeStr = 'camera';
+          break;
+        case PagDeviceCat.gateway:
+          itemTypeStr = 'gateway';
           break;
         default:
           itemTypeStr = '';

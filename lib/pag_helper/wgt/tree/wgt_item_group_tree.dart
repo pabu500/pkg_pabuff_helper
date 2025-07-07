@@ -314,7 +314,7 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
     // search _newItemName in _groupItems and
     // if found, return error
     for (var item in _groupItemList) {
-      if (item['item_name'] == _newItemName) {
+      if (item['item_name'] == _newItemName || item['name'] == _newItemName) {
         _addNewItemErrorText = 'Item already exists';
         setState(() {
           _isSearchingNewItemInfo = false;
