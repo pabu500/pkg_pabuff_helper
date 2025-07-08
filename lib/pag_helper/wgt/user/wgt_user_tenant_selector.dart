@@ -2,6 +2,7 @@ import 'package:buff_helper/pag_helper/model/ems/mdl_pag_tenant.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
 import 'package:buff_helper/pagrid_helper/comm_helper/local_storage.dart';
+import 'package:buff_helper/xt_ui/xt_helpers.dart';
 import 'package:flutter/material.dart';
 
 class WgtUserTenantSelector extends StatefulWidget {
@@ -26,7 +27,10 @@ class WgtUserTenantSelector extends StatefulWidget {
 
 class _WgtUserTenantSelectorState extends State<WgtUserTenantSelector> {
   MdlPagTenant? _selectedTenant;
+  TenantItem? _selectedTenantItem;
   final List<MdlPagTenant> tenantList = [];
+  final List<TenantItem> tenantItemList = [];
+  final List<DropdownMenuItem<TenantItem>> tenantDropdownItemList = [];
 
   void _saveScopePref() {
     if (_selectedTenant == null) return;
@@ -44,6 +48,22 @@ class _WgtUserTenantSelectorState extends State<WgtUserTenantSelector> {
     // assert(_selectedTenant != null);
     tenantList.addAll(widget.loggedInUser.getScopeTenantList());
 
+    for (var tenant in tenantList) {
+      tenantItemList.add(TenantItem(
+        name: tenant.name,
+        label: tenant.label,
+        accountNumber: tenant.accountNumber,
+      ));
+    }
+    tenantDropdownItemList.addAll(
+      tenantItemList.map((tenantItem) {
+        return DropdownMenuItem<TenantItem>(
+          value: tenantItem,
+          child: tenantItem,
+        );
+      }).toList(),
+    );
+
     if (tenantList.length == 1) {
       _selectedTenant = tenantList[0];
     }
@@ -58,44 +78,73 @@ class _WgtUserTenantSelectorState extends State<WgtUserTenantSelector> {
 
   @override
   Widget build(BuildContext context) {
-    List<String> tenantLabelList =
-        tenantList.map((MdlPagTenant tenant) => tenant.label).toList();
-
     // NOTE: do not use class as value for Dropdown,
     // assigning a different class instance, even if it has the same values,
     // will be considered a different value, causing assertation error.
     // instead, use simple string labels as values.
     return SizedBox(
-        child: DropdownButton<String>(
-      isDense: true,
-      value: _selectedTenant?.label,
-      onChanged: (String? tenantLabel) {
-        MdlPagTenant? tenant;
-        if (tenantLabel != null) {
-          for (MdlPagTenant t in tenantList) {
-            if (t.label == tenantLabel) {
-              tenant = t;
+        child: DropdownButton<TenantItem>(
+      itemHeight: 50,
+      value: _selectedTenantItem,
+      onChanged: (TenantItem? newValue) {
+        if (newValue == null) {
+          _selectedTenantItem = null;
+        } else {
+          _selectedTenantItem = newValue;
+          for (var tenant in tenantList) {
+            if (tenant.name == _selectedTenantItem!.name) {
+              _selectedTenant = tenant;
               break;
             }
           }
         }
-
-        setState(() {
-          _selectedTenant = tenant;
-        });
-
-        widget.onTenantSelected(tenant);
-
+        widget.onTenantSelected(_selectedTenant);
+        setState(() {});
         _saveScopePref();
       },
-      items: tenantLabelList.map<DropdownMenuItem<String>>(
-        (String label) {
-          return DropdownMenuItem<String>(
-            value: label,
-            child: Text(label),
-          );
-        },
-      ).toList(),
+      items: tenantDropdownItemList,
     ));
+  }
+}
+
+class TenantItem extends StatelessWidget {
+  const TenantItem({
+    super.key,
+    required this.name,
+    required this.label,
+    required this.accountNumber,
+  });
+
+  final String name;
+  final String label;
+  final String? accountNumber;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(label),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                accountNumber ?? '',
+                style: TextStyle(
+                    fontSize: 13.5,
+                    color: Theme.of(context).hintColor.withAlpha(150)),
+              ),
+              horizontalSpaceSmall,
+              Text(name,
+                  style: TextStyle(
+                      fontSize: 13.5, color: Theme.of(context).hintColor)),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }
