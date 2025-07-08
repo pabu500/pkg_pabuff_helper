@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../../pag_helper/model/mdl_pag_project_profile.dart';
 import '../tenant/pag_ems_type_usage_calc.dart';
-import 'comm_pag_billing.dart';
+import '../../../pag_helper/comm/comm_pag_billing.dart';
 import '../tenant/tenant_usage_calc_released_r2.dart';
 import '../tenant/wgt_pag_tenant_usage_summary.dart';
 import '../tenant/wgt_pag_tenant_usage_summary_released.dart';
@@ -68,7 +68,7 @@ class _WgtPagBillViewState extends State<WgtPagBillView> {
     };
 
     try {
-      Map<String, dynamic> billResult = await getPagBill(
+      final billResult = await getPagBill(
         widget.appConfig,
         queryMap,
         MdlPagSvcClaim(

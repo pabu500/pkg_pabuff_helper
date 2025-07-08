@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import '../../../pag_helper/model/mdl_pag_project_profile.dart';
 import '../tenant/pag_ems_type_usage_calc.dart';
 import '../tenant/wgt_pag_tenant_composite_usage_summary.dart';
-import 'comm_pag_billing.dart';
+import '../../../pag_helper/comm/comm_pag_billing.dart';
 import '../tenant/tenant_usage_calc_released_r2.dart';
 import '../tenant/wgt_pag_tenant_usage_summary_released.dart';
 import '../../../pag_helper/model/acl/mdl_pag_svc_claim.dart';
@@ -69,7 +69,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     };
 
     try {
-      Map<String, dynamic> billResult = await getPagCompositeBill(
+      final billResult = await getPagCompositeBill(
         widget.appConfig,
         queryMap,
         MdlPagSvcClaim(
@@ -497,7 +497,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     DateTime toDatetime,
     String billBarFromMonth,
   ) {
-    bool isMonthly = _bill['is_monthly'] == 'true' ? true : false;
+    bool isMonthly = true; //_bill['is_monthly'] == 'true' ? true : false;
     String billTimeRangeStr = getTimeRangeStr(
       fromDatetime,
       toDatetime,

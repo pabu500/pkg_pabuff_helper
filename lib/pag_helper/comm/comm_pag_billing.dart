@@ -1,10 +1,10 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import '../../../pag_helper/comm/pag_be_api_base.dart';
-import '../../../pag_helper/model/acl/mdl_pag_svc_claim.dart';
-import '../../../pag_helper/model/mdl_pag_app_config.dart';
-import '../../../pag_helper/model/mdl_svc_query.dart';
+import 'pag_be_api_base.dart';
+import '../model/acl/mdl_pag_svc_claim.dart';
+import '../model/mdl_pag_app_config.dart';
+import '../model/mdl_svc_query.dart';
 
 Future<dynamic> getPagBill(
   MdlPagAppConfig appConfig,
