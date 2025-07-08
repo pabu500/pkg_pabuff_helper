@@ -84,7 +84,7 @@ class _WgtUserTenantSelectorState extends State<WgtUserTenantSelector> {
     // instead, use simple string labels as values.
     return SizedBox(
         child: DropdownButton<TenantItem>(
-      itemHeight: 50,
+      itemHeight: 55,
       value: _selectedTenantItem,
       onChanged: (TenantItem? newValue) {
         if (newValue == null) {
@@ -122,7 +122,7 @@ class TenantItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
