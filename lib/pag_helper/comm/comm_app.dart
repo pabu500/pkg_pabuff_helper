@@ -9,6 +9,29 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:buff_helper/up_helper/up_helper.dart';
 
+Future<dynamic> getPortalStatus(
+    String appName, MdlPagAppConfig pagAppConfig) async {
+  String projectScope = pagAppConfig.activePortalPagProjectScopeList[0].name;
+
+  try {
+    String url =
+        '${PagUrlController(null, pagAppConfig).getUrl(PagSvcType.oresvc2, PagUrlBase.eptGetPortalStatus)}/$appName/$projectScope';
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final respJson = jsonDecode(response.body);
+      return respJson['status'] ?? '';
+    } else {
+      throw Exception('Failed to load status');
+    }
+  } catch (err) {
+    if (kDebugMode) {
+      print(err);
+    }
+    rethrow;
+  }
+}
+
 Future<dynamic> getVersion2(
     String appName, MdlPagAppConfig pagAppConfig) async {
   String projectScope = pagAppConfig.activePortalPagProjectScopeList[0].name;

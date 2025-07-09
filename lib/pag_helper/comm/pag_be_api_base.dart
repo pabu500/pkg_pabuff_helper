@@ -479,6 +479,8 @@ class PagUrlBase {
   static const String eptUpdateMeterKeyVal = '/update_key_val';
   static const String eptOreCheckExists = '/check_exists';
   static const String eptOreCheckExists2 = '/check_exists2';
+  static const String eptGetPortalStatus =
+      '/get_portal_status'; // This is used to check if the portal is under maintenance
   static const String eptGetVerion = '/get_version';
   static const String eptOreHello = '/hello';
   static const String eptGetSysVar = '/get_sys_var';

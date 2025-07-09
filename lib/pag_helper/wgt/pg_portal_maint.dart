@@ -13,16 +13,23 @@ class PgPortalMaint extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Portal Maintenance'),
       ),
-      body: const Center(
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Icon(Icons.build, size: 100, color: Colors.blue),
-            SizedBox(height: 20),
+            const Icon(
+              Icons.build,
+              size: 120,
+              color: Colors.blue,
+            ),
+            const SizedBox(height: 20),
             Text(
               'We are currently performing maintenance on the portal to serve you better.\nPlease check back later.',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 18),
+              style: TextStyle(
+                  fontSize: 21,
+                  color: Theme.of(context).hintColor,
+                  fontWeight: FontWeight.bold),
             ),
           ],
         ),
