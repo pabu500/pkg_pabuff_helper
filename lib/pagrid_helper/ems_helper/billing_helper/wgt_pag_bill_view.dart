@@ -578,8 +578,9 @@ class _WgtPagBillViewState extends State<WgtPagBillView> {
     emsTypeUsageCalcReleased.doCalc();
 
     return _renderMode == 'pdf'
-        ? WgtBillRenderPdf(
+        ? WgtPagBillRenderPdf(
             billingInfo: {
+              'assetFolder': assetFolder,
               'customerName': tenantName,
               'customerAccountId': accountId,
               'customerLabel': tenantLabel,

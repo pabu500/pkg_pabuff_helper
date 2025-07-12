@@ -646,7 +646,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     compositeUsageCalc.doCompositeCalc();
 
     return _renderMode == 'pdf'
-        ? WgtBillRenderPdf(
+        ? WgtPagBillRenderPdf(
             billingInfo: {
               'customerName': tenantName,
               'customerAccountId': accountId,
@@ -685,6 +685,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
               'trendingG': compositeUsageCalc.trendingG,
               'lineItemLabel1': compositeUsageCalc.getLineItem(0)?['label'],
               'lineItemValue1': compositeUsageCalc.getLineItem(0)?['amount'],
+              'assetFolder': assetFolder,
             },
           )
         : WgtPagTenantCompositeUsageSummaryReleased(
