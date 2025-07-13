@@ -30,7 +30,7 @@ Future<Uint8List> generatePagInvoice(
     customerName: billInfo['customerName'],
     customerAccountId: billInfo['customerAccountId'] ?? '',
     customerAddress: billInfo['customerAddress'] ?? '',
-    customerType: billInfo['customerType'],
+    customerType: billInfo['customerType'] ?? '',
     gst: billInfo['gst'],
     paymentInfo: billInfo['paymentInfo'] ?? '',
     billTimeRangeStr: billInfo['billTimeRangeStr'],

@@ -83,6 +83,8 @@ class PagEmsTypeUsageCalcReleased {
 
   String? get billBarFromMonth => _billBarFromMonth;
 
+  List<PagEmsTypeUsageCalcReleased> get singularCalcList => _singularCalcList;
+
   PagEmsTypeUsageCalcReleased({
     required int costDecimals,
     double? billedAutoUsageE,
@@ -114,6 +116,7 @@ class PagEmsTypeUsageCalcReleased {
     required List<Map<String, dynamic>>? lineItemList,
     List<Map<String, dynamic>>? billedTrendingSnapShot,
     String? billBarFromMonth,
+    List<PagEmsTypeUsageCalcReleased> singularUsageCalcList = const [],
   }) {
     _costDecimals = costDecimals;
 
@@ -148,6 +151,12 @@ class PagEmsTypeUsageCalcReleased {
     _lineItemList = lineItemList;
 
     _billBarFromMonth = billBarFromMonth;
+
+    if (singularUsageCalcList.isNotEmpty) {
+      for (var item in singularUsageCalcList) {
+        _singularCalcList.add(item);
+      }
+    }
   }
 
   void doCalc() {

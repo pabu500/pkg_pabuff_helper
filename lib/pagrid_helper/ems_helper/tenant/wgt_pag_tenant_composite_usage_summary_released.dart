@@ -1,6 +1,7 @@
 import 'package:buff_helper/pag_helper/model/mdl_history.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
+import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -145,24 +146,25 @@ class _WgtPagTenantCompositeUsageSummaryReleasedState
             // getSubTenantUsage(),
             // verticalSpaceSmall,
             verticalSpaceSmall,
-            getPagTypeUsageNet(
-              context,
-              widget.loggedInUser,
-              widget.appConfig,
-              widget.compositeUsageCalc!.typeUsageE!.usageFactored,
-              widget.compositeUsageCalc!.typeUsageE!.rate,
-              widget.compositeUsageCalc!.typeUsageW!.usageFactored,
-              widget.compositeUsageCalc!.typeUsageW!.rate,
-              widget.compositeUsageCalc!.typeUsageB!.usageFactored,
-              widget.compositeUsageCalc!.typeUsageB!.rate,
-              widget.compositeUsageCalc!.typeUsageN!.usageFactored,
-              widget.compositeUsageCalc!.typeUsageN!.rate,
-              widget.compositeUsageCalc!.typeUsageG!.usageFactored,
-              widget.compositeUsageCalc!.typeUsageG!.rate,
-              usageDecimals: widget.usageDecimals,
-              rateDecimals: widget.rateDecimals,
-              costDecimals: widget.costDecimals,
-            ),
+            // getPagTypeUsageNet(
+            //   context,
+            //   widget.loggedInUser,
+            //   widget.appConfig,
+            //   widget.compositeUsageCalc!.typeUsageE!.usageFactored,
+            //   widget.compositeUsageCalc!.typeUsageE!.rate,
+            //   widget.compositeUsageCalc!.typeUsageW!.usageFactored,
+            //   widget.compositeUsageCalc!.typeUsageW!.rate,
+            //   widget.compositeUsageCalc!.typeUsageB!.usageFactored,
+            //   widget.compositeUsageCalc!.typeUsageB!.rate,
+            //   widget.compositeUsageCalc!.typeUsageN!.usageFactored,
+            //   widget.compositeUsageCalc!.typeUsageN!.rate,
+            //   widget.compositeUsageCalc!.typeUsageG!.usageFactored,
+            //   widget.compositeUsageCalc!.typeUsageG!.rate,
+            //   usageDecimals: widget.usageDecimals,
+            //   rateDecimals: widget.rateDecimals,
+            //   costDecimals: widget.costDecimals,
+            // ),
+            getTypeStat(),
             verticalSpaceSmall,
             // getLineItem(),
             // verticalSpaceSmall,
@@ -178,6 +180,41 @@ class _WgtPagTenantCompositeUsageSummaryReleasedState
           ],
         ),
       ),
+    );
+  }
+
+  Widget getTypeStat() {
+    List<Widget> slotList = [];
+    for (Map<String, dynamic> singularUsageInfo
+        in widget.tenantSingularUsageInfoList) {
+      PagEmsTypeUsageCalcReleased? usageCalc = singularUsageInfo['usage_calc'];
+
+      slotList.add(getPagTypeUsageNet(
+        context,
+        widget.loggedInUser,
+        widget.appConfig,
+        usageCalc!.typeUsageE!.usageFactored,
+        usageCalc!.typeUsageE!.rate,
+        usageCalc!.typeUsageW!.usageFactored,
+        usageCalc!.typeUsageW!.rate,
+        usageCalc!.typeUsageB!.usageFactored,
+        usageCalc!.typeUsageB!.rate,
+        usageCalc!.typeUsageN!.usageFactored,
+        usageCalc!.typeUsageN!.rate,
+        usageCalc!.typeUsageG!.usageFactored,
+        usageCalc!.typeUsageG!.rate,
+        usageDecimals: widget.usageDecimals,
+        rateDecimals: widget.rateDecimals,
+        costDecimals: widget.costDecimals,
+      ));
+    }
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // verticalSpaceSmall,
+        ...slotList,
+      ],
     );
   }
 

@@ -533,9 +533,10 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       }
 
       Map<String, dynamic> billedUsageFactorInfo = {};
-      if (_bill['billed_usage_factor_list'] != null) {
-        for (var item in _bill['billed_usage_factor_list']) {
+      if (_bill['usage_factor_list'] != null) {
+        for (var item in _bill['usage_factor_list']) {
           String meterType = item['meter_type'];
+          meterType = meterType.toLowerCase();
           String valueStr = item['usage_factor'];
           double? value = double.tryParse(valueStr);
           billedUsageFactorInfo['billed_usage_factor_$meterType'] = value;
@@ -543,20 +544,12 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       }
 
       Map<String, dynamic> billedRateInfo = {};
-      if (_bill['billed_rate_list'] != null) {
-        for (var item in _bill['billed_rate_list']) {
-          String meterType = item['meter_type'];
-          String rateStr = item['rate'];
-          double? rate = double.tryParse(rateStr);
-          billedRateInfo['billed_rate_$meterType'] = rate;
-
-          if (meterType == 'G') {
-            String gstStr = item['gst'];
-            double? gst = double.tryParse(gstStr);
-            if (gst != null) {
-              billedRateInfo['billed_gst'] = gst;
-            }
-          }
+      for (String typeTag in usageTypeTags) {
+        typeTag = typeTag.toLowerCase();
+        String typebilledRateStr = singularUsage['billed_rate_$typeTag'] ?? '';
+        double? rate = double.tryParse(typebilledRateStr);
+        if (rate != null) {
+          billedRateInfo['billed_rate_$typeTag'] = rate;
         }
       }
 
@@ -564,8 +557,8 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       Map<String, dynamic> billedManualUsages = {};
       List<Map<String, dynamic>> billedTrendingSnapShot = [];
 
-      if (_bill['billed_gst'] != null) {
-        billedGst = double.tryParse(_bill['billed_gst']);
+      if (singularUsage['billed_gst'] != null) {
+        billedGst = double.tryParse(singularUsage['billed_gst']);
       }
 
       PagEmsTypeUsageCalcReleased emsTypeUsageCalcReleased =
@@ -608,6 +601,8 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       );
       emsTypeUsageCalcReleased.doSingularCalc();
       singularUsageCalcList.add(emsTypeUsageCalcReleased);
+
+      singularUsage['usage_calc'] = emsTypeUsageCalcReleased;
     }
 
     PagEmsTypeUsageCalcReleased compositeUsageCalc =
@@ -642,6 +637,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       billedTrendingSnapShot: _bill['billed_trending_snapshot'] ?? [],
       lineItemList: [],
       billBarFromMonth: billBarFromMonth,
+      singularUsageCalcList: singularUsageCalcList,
     );
     compositeUsageCalc.doCompositeCalc();
 
@@ -714,7 +710,6 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             compositeUsageCalc: compositeUsageCalc,
             excludeAutoUsage:
                 _bill['exclude_auto_usage'] == 'true' ? true : false,
-
             gst: billedGst,
           );
   }

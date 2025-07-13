@@ -243,7 +243,7 @@ class _WgtPagTenantCompositeUsageSummaryState
               ],
             ),
             getGroupMeterStat(
-                groupInfo, meterType, meterTypeRateInfo!, usageCalc!),
+                groupInfo, meterType, meterTypeRateInfo!, usageCalc!)
           ],
         ));
       }
