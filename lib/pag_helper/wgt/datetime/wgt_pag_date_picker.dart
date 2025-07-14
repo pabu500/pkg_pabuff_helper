@@ -2,8 +2,8 @@ import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class WgtDatePicker extends StatefulWidget {
-  const WgtDatePicker({
+class WgtPagDatePicker extends StatefulWidget {
+  const WgtPagDatePicker({
     super.key,
     required this.timeZone,
     this.prefix = const Icon(Icons.arrow_right),
@@ -14,23 +14,25 @@ class WgtDatePicker extends StatefulWidget {
     this.onDateCleared,
     this.label,
     this.initialDate,
+    this.mainAxisAlignment = MainAxisAlignment.start,
   });
 
   final int timeZone;
   final Icon? prefix;
-  final Icon suffix;
+  final Widget? suffix;
   final DateTime? defaultFirstDate;
   final DateTime? defaultLastDate;
   final Function(DateTime)? onDateChanged;
   final Function()? onDateCleared;
   final String? label;
   final DateTime? initialDate;
+  final MainAxisAlignment mainAxisAlignment;
 
   @override
-  State<WgtDatePicker> createState() => _WgtDatePickerState();
+  State<WgtPagDatePicker> createState() => _WgtPagDatePickerState();
 }
 
-class _WgtDatePickerState extends State<WgtDatePicker> {
+class _WgtPagDatePickerState extends State<WgtPagDatePicker> {
   // final sDateFormate = "dd/MM/yyyy";
   // DateTime selectedDate = DateTime.now();
   // String date = DateFormat("dd/MM/yyyy").format(DateTime.now());
@@ -77,16 +79,22 @@ class _WgtDatePickerState extends State<WgtDatePicker> {
       child: Container(
         decoration: panelBoxDecor(boarderColor),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: widget.mainAxisAlignment,
             children: <Widget>[
+              if (widget.label != null && _selectedDateTime != null)
+                Text(widget.label!,
+                    style: TextStyle(
+                      // fontSize: 16,
+                      color: Theme.of(context).hintColor,
+                    )),
               widget.prefix ?? Container(),
               InkWell(
                 child: Text(_selectedDateText,
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 18,
+                      // fontSize: 18,
                       color: _selectedDateTime == null
                           ? Theme.of(context).hintColor
                           : null,
