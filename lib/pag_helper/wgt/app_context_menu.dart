@@ -166,7 +166,8 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
                   pr == PagPageRoute.meterGroupManager ||
                   // pr == PagPageRoute.billingManager ||
                   pr == PagPageRoute.tenantManager ||
-                  pr == PagPageRoute.tariffManager
+                  pr == PagPageRoute.tariffManager ||
+                  pr == PagPageRoute.paymentManager
               // pr == PagPageRoute.meterManager
               ) {
             isDisabled = true;
@@ -191,6 +192,7 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
           if (pr != PagPageRoute.consoleHomeTaskManager &&
               pr != PagPageRoute.meterGroupManager &&
               pr != PagPageRoute.billingManager &&
+              pr != PagPageRoute.paymentManager &&
               pr != PagPageRoute.tenantManager &&
               pr != PagPageRoute.tariffManager &&
               pr != PagPageRoute.meterManager) {
@@ -284,8 +286,7 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
             fontWeight: FontWeight.bold,
           )
         : TextStyle(
-            color: Theme.of(context).colorScheme.onSurface.withAlpha(200),
-          );
+            color: Theme.of(context).colorScheme.onSurface.withAlpha(200));
   }
 
   Color getToggledTileColor(PagPageRoute pr, bool isDisabled) {

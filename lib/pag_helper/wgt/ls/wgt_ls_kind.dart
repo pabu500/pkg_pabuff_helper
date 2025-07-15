@@ -15,6 +15,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:provider/provider.dart';
 import '../../def_helper/dh_device.dart';
+import '../../def_helper/dh_pag_finance_type.dart';
 import '../../model/mdl_pag_app_config.dart';
 import '../../wgt/history_presentor/wgt_pag_item_history_presenter.dart';
 import 'wgt_ls_item_flexi.dart';
@@ -114,6 +115,11 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
       } else if (widget.itemKind == PagItemKind.scope) {
         _selectedItemType = PagScopeType.byKey(itemTypeStr);
         itemTypeFound = true;
+      } else if (widget.itemKind == PagItemKind.finance) {
+        _selectedItemType = PagFinanceType.byValue(itemTypeStr);
+        itemTypeFound = true;
+      } else {
+        throw Exception('Unsupported item kind: ${widget.itemKind.name}');
       }
 
       assert(itemTypeStr.isNotEmpty);
@@ -138,6 +144,11 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
           }
         } else if (widget.itemKind == PagItemKind.scope) {
           if (getPagScopeTypeStr(listController.itemType) == itemTypeStr) {
+            _selectedListController = listController;
+            break;
+          }
+        } else if (widget.itemKind == PagItemKind.finance) {
+          if (getPagFinanceTypeStr(listController.itemType) == itemTypeStr) {
             _selectedListController = listController;
             break;
           }
@@ -184,6 +195,12 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
           itemTypeStr = itemType.name;
           listControllerItemTypeStr =
               (listController.itemType as PagScopeType).name;
+        } else if (itemType is PagFinanceType) {
+          itemTypeStr = itemType.name;
+          listControllerItemTypeStr =
+              (listController.itemType as PagFinanceType).name;
+        } else {
+          throw Exception('Unsupported item type: ${itemType.runtimeType}');
         }
         // if (listController.itemType == itemType) {
         if (listControllerItemTypeStr == itemTypeStr) {
@@ -263,6 +280,16 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
           PagScopeType scopeType = scopeTypeInfo['item_type'];
           itemTypeList.add(scopeType.name);
         }
+      } else if (widget.itemKind == PagItemKind.finance) {
+        _itemTypeInfoList.add({'item_type': PagFinanceType.soa});
+        _itemTypeInfoList.add({'item_type': PagFinanceType.payment});
+
+        for (Map<String, dynamic> financeTypeInfo in _itemTypeInfoList) {
+          PagFinanceType financeType = financeTypeInfo['item_type'];
+          itemTypeList.add(financeType.name);
+        }
+      } else {
+        throw Exception('Unsupported item kind: ${widget.itemKind.name}');
       }
     }
 
@@ -332,6 +359,11 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
         } else if (itemType is PagScopeType) {
           itemTypeStr = itemType.name;
           selectedItemTypeStr = (_selectedItemType as PagScopeType).name;
+        } else if (itemType is PagFinanceType) {
+          itemTypeStr = itemType.name;
+          selectedItemTypeStr = (_selectedItemType as PagFinanceType).name;
+        } else {
+          throw Exception('Unsupported item type: ${itemType.runtimeType}');
         }
 
         Color color = itemTypeStr == selectedItemTypeStr

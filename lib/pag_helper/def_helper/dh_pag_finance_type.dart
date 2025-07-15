@@ -5,6 +5,7 @@ import 'enum_helper.dart';
 
 enum PagFinanceType {
   soa('Statement of Account', 'SoA', Symbols.contract),
+  payment('Payment', 'Payment', Symbols.attach_money),
   ;
 
   const PagFinanceType(
@@ -16,6 +17,14 @@ enum PagFinanceType {
   final String label;
   final String tag;
   final IconData iconData;
+
+  static PagFinanceType byValue(String? value) =>
+      enumByLabel(
+        value,
+        values,
+        (e) => (e).tag,
+      ) ??
+      soa;
 
   static PagFinanceType? byLabel(String? label) => enumByLabel(
         label,
@@ -37,4 +46,15 @@ T? enumByTag<T extends Enum>(String? tag, List<T> values) {
     }
   }
   return null;
+}
+
+String getPagFinanceTypeStr(dynamic itemType) {
+  switch (itemType) {
+    case PagFinanceType.soa:
+      return PagFinanceType.soa.label;
+    case PagFinanceType.payment:
+      return PagFinanceType.payment.label;
+    default:
+      return '';
+  }
 }

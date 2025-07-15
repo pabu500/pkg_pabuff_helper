@@ -87,6 +87,11 @@ enum PagPageRoute {
     'billing_manager',
     Symbols.request_quote,
   ),
+  paymentManager(
+    'Payment Manager',
+    'payment_manager',
+    Symbols.attach_money,
+  ),
   evsDashboard(
     'EVS',
     'evs_dashboard',
