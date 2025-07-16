@@ -101,6 +101,8 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
         itemTypeStr = itemType.value;
       } else if (itemType is PagScopeType) {
         itemTypeStr = itemType.key;
+      } else if (itemType is PagFinanceType) {
+        itemTypeStr = itemType.tag;
       } else {
         throw Exception('Unsupported item type: ${itemType.runtimeType}');
       }
@@ -178,11 +180,15 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
   void _updateItemTypeListStatus() {
     for (Map<String, dynamic> itemTypeInfo in _itemTypeInfoList) {
       dynamic itemType = itemTypeInfo['item_type'];
-      if (itemType is PagDeviceCat) {
-        itemType = itemType.name;
-      } else if (itemType is PagScopeType) {
-        itemType = itemType.name;
-      }
+      // if (itemType is PagDeviceCat) {
+      //   itemType = itemType.name;
+      // } else if (itemType is PagScopeType) {
+      //   itemType = itemType.name;
+      // } else if (itemType is PagFinanceType) {
+      //   itemType = itemType.name;
+      // } else {
+      //   throw Exception('Unsupported item type: ${itemType.runtimeType}');
+      // }
       bool itemTypeListInfoFound = false;
       for (MdlPagListController listController in _listControllerList) {
         String listControllerItemTypeStr = '';
@@ -408,10 +414,27 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
                             itemType.iconData,
                             color: Theme.of(context).colorScheme.onSecondary,
                           )
-                        : Icon(
-                            Symbols.help,
-                            color: Theme.of(context).colorScheme.onSecondary,
-                          ),
+                        : itemType is PagFinanceType
+                            ? Icon(
+                                itemType.iconData,
+                                color:
+                                    Theme.of(context).colorScheme.onSecondary,
+                              )
+                            : itemType is String
+                                ? Text(
+                                    itemType,
+                                    style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSecondary,
+                                    ),
+                                  )
+                                : Icon(
+                                    Symbols.help,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSecondary,
+                                  ),
               ),
             ),
           ),

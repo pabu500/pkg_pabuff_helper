@@ -105,7 +105,7 @@ String? validateLabelScope(String val) {
     return 'required';
   }
 
-  // validate alphanumric, _, -, #, ' and dash, space,
+  // validate alphanumeric, _, -, #, slash, back slash and dash, space,
   // and minimum 5 characters
   String pattern = r"^[a-zA-Z0-9/_ \-#']{5,}$";
   RegExp regExp = RegExp(pattern);

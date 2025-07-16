@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:buff_helper/pag_helper/comm/comm_pag_item.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_pag_finance_type.dart';
 import 'package:buff_helper/pag_helper/def_helper/list_helper.dart';
 import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
@@ -571,6 +572,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     assert(widget.itemType is PagDeviceCat ||
         widget.itemType is PagScopeType ||
         widget.itemType is PagItemKind ||
+        widget.itemType is PagFinanceType ||
         widget.itemType == null);
     // switch (widget.itemType.runtimeType) {
     //   case const (DeviceType):

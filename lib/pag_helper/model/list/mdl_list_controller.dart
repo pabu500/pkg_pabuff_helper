@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 
 import '../../def_helper/dh_device.dart';
+import '../../def_helper/dh_pag_finance_type.dart';
 
 class MdlPagListController /*extends ChangeNotifier*/ {
   // PagItemKind pagItemKind;
@@ -122,6 +123,12 @@ class MdlPagListController /*extends ChangeNotifier*/ {
           break;
         case 'bill':
           itemType = PagItemKind.bill;
+        case 'soa':
+          itemType = PagFinanceType.soa;
+          break;
+        case 'payment':
+          itemType = PagFinanceType.payment;
+          break;
 
         default:
           itemType = null;
