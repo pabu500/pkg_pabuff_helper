@@ -90,6 +90,10 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
         itemTypeStr = itemType.name;
       } else if (itemType is PagScopeType) {
         itemTypeStr = itemType.name;
+      } else if (itemType is PagFinanceType) {
+        itemTypeStr = itemType.name;
+      } else {
+        throw Exception('Unsupported item type: ${itemType.runtimeType}');
       }
       itemTypeFound = true;
     } else {
@@ -102,7 +106,7 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
       } else if (itemType is PagScopeType) {
         itemTypeStr = itemType.key;
       } else if (itemType is PagFinanceType) {
-        itemTypeStr = itemType.tag;
+        itemTypeStr = itemType.name;
       } else {
         throw Exception('Unsupported item type: ${itemType.runtimeType}');
       }

@@ -593,6 +593,8 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
       itemTypeStr = (widget.itemType as PagScopeType).key.toLowerCase();
     } else if (widget.itemType is PagItemKind) {
       itemTypeStr = (widget.itemType as PagItemKind).name.toLowerCase();
+    } else if (widget.itemType is PagFinanceType) {
+      itemTypeStr = (widget.itemType as PagFinanceType).name.toLowerCase();
     } else {
       itemTypeStr = 'unknown_item_type';
     }
