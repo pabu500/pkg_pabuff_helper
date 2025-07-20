@@ -1,3 +1,4 @@
+import 'package:buff_helper/pag_helper/def_helper/dh_pag_finance_type.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,7 @@ class WgtPagTableImporter extends StatefulWidget {
     this.listItemType = ListItemType.Meter,
     this.requiredFields = const [],
     this.identityField,
+    this.importerLabel,
   });
 
   final Function(List<Map<String, dynamic>>, List<Map<String, dynamic>>, int)
@@ -24,9 +26,10 @@ class WgtPagTableImporter extends StatefulWidget {
   final bool isImportTargetVal;
   final bool ignoreEmptyValue;
   final bool includeAddressCat;
-  final ListItemType listItemType;
+  final dynamic listItemType;
   final List<String> requiredFields;
   final String? identityField;
+  final String? importerLabel;
 
   @override
   State<WgtPagTableImporter> createState() => _WgtPagTableImporterState();
@@ -464,32 +467,17 @@ class _WgtPagTableImporterState extends State<WgtPagTableImporter> {
     List<String> meterCols = [];
 
     _listConfigBase.clear();
-    if (widget.listItemType == ListItemType.User) {
-      // for (var element in userColConfig) {
-      //   //skip enabled from csv, use popluate
-      //   if (element['fieldKey'] == 'enabled') {
-      //     continue;
-      //   }
-      //   _listConfigBase.add({
-      //     'fieldKey': element['fieldKey'],
-      //     'title': element['title'],
-      //     'width': element['width'],
-      //     'allowDuplicates': element['allowDuplicates'] ?? true,
-      //     'validator': element['validator'],
-      //     'disableIf': element['disableIf'],
-      //   });
-      // }
-
-      // for (var element in _listConfigBase) {
-      //   meterCols.add(element['fieldKey']!);
-      // }
-
-      // for (String colName in meterCols) {
-      //   _meterColsMapper.add({
-      //     'colName': colName,
-      //     'colHeader': '',
-      //   });
-      // }
+    if (widget.listItemType == PagFinanceType.payment) {
+      _listConfigBase.addAll([
+        {
+          'title': 'Conc ID',
+          'fieldKey': 'concentrator_id',
+          'width': 100,
+          'allowDuplicates': false,
+          'validator': null,
+          'disableIf': null,
+        },
+      ]);
     } else if (widget.listItemType == ListItemType.Concentrator) {
       _listConfigBase.add({
         'title': 'Conc ID',
@@ -518,85 +506,7 @@ class _WgtPagTableImporterState extends State<WgtPagTableImporter> {
           'colHeader': '',
         });
       }
-    } else {
-      // if (activePortalProjectScope == ProjectScope.EMS_CW_NUS) {
-      //   // _listConfig.addAll(meterColsIwowConfig);
-      //   //use deep copy
-      //   for (var element in meterColsConfigIwow) {
-      //     _listConfigBase.add({
-      //       'fieldKey': element['fieldKey'],
-      //       'title': element['title'],
-      //       'width': element['width'],
-      //       'allowDuplicates': element['allowDuplicates'] ?? true,
-      //       'validator': element['validator'],
-      //       'dbStrMapper': element['dbStrMapper'],
-      //     });
-      //   }
-
-      //   for (var element in _listConfigBase) {
-      //     meterCols.add(element['fieldKey']!);
-      //   }
-      //   for (String colName in meterCols) {
-      //     _meterColsMapper.add({
-      //       'colName': colName,
-      //       'colHeader': '',
-      //     });
-      //   }
-      // } else if (activePortalProjectScope == ProjectScope.EMS_SMRT) {
-      //   // _listConfig.addAll(meterColsSmrtConfig);
-      //   for (var element in meterColsConfigSmrt) {
-      //     _listConfigBase.add({
-      //       'fieldKey': element['fieldKey'],
-      //       'title': element['title'],
-      //       'width': element['width'],
-      //       'allowDuplicates': element['allowDuplicates'] ?? true,
-      //       'validator': element['validator'],
-      //     });
-      //   }
-
-      //   for (var element in _listConfigBase) {
-      //     meterCols.add(element['fieldKey']!);
-      //   }
-      //   for (String colName in meterCols) {
-      //     _meterColsMapper.add({
-      //       'colName': colName,
-      //       'colHeader': '',
-      //     });
-      //   }
-      // } else {
-      //   // _listConfig.addAll(meterColsMmsConfig);
-      //   for (var element in meterColsConfigMms) {
-      //     if (!widget.includeAddressCat && element['fieldCat'] == 'address') {
-      //       continue;
-      //     }
-      //     //skip concentrator_id from csv, use popluate
-      //     if (element['fieldKey'] == 'concentrator_id' ||
-      //         element['fieldKey'] == 'site_tag') {
-      //       continue;
-      //     }
-
-      //     _listConfigBase.add({
-      //       'fieldKey': element['fieldKey'],
-      //       'title': element['title'],
-      //       'width': element['width'],
-      //       'allowDuplicates': element['allowDuplicates'] ?? true,
-      //       'validator': element['validator'],
-      //       'fieldCat': element['fieldCat'],
-      //     });
-      //   }
-
-      //   for (var element in _listConfigBase) {
-      //     meterCols.add(element['fieldKey']!);
-      //   }
-
-      //   for (String colName in meterCols) {
-      //     _meterColsMapper.add({
-      //       'colName': colName,
-      //       'colHeader': '',
-      //     });
-      //   }
-      // }
-    }
+    } else {}
   }
 
   @override
@@ -634,9 +544,9 @@ class _WgtPagTableImporterState extends State<WgtPagTableImporter> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Text(
-          'Upload Op List',
-          style: TextStyle(
+        Text(
+          widget.importerLabel ?? 'Upload Op List',
+          style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w500,
           ),
@@ -646,7 +556,7 @@ class _WgtPagTableImporterState extends State<WgtPagTableImporter> {
           getList: (opList) {
             _getMeterList(opList);
           },
-          fileExtensions: ['csv'],
+          fileExtensions: const ['csv'],
         ),
       ],
     );
@@ -808,12 +718,12 @@ class _WgtPagTableImporterState extends State<WgtPagTableImporter> {
                   _import();
                 },
                 style: ButtonStyle(
-                  shape: MaterialStateProperty.all(
+                  shape: WidgetStateProperty.all(
                     RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(5),
                     ),
                   ),
-                  backgroundColor: MaterialStateProperty.all(
+                  backgroundColor: WidgetStateProperty.all(
                       Theme.of(context).colorScheme.primary),
                 ),
                 child: const Text(

@@ -167,6 +167,10 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
       }
 
       _displayNameKey = _selectedListController?.getDisplayNameKey() ?? '';
+      if (_displayNameKey.isEmpty) {
+        _displayNameKey =
+            _selectedListController?.listColControllerList.first.colKey ?? '';
+      }
       assert(_displayNameKey.isNotEmpty);
 
       // update col pref
