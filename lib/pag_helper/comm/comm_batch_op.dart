@@ -44,7 +44,23 @@ Future<dynamic> doPagCheckOpList(
     if (error != null) {
       throw Exception(error);
     }
-    final respListChecked = responseBody['op_list_checked'];
+    final data = responseBody['data'];
+    if (data == null) {
+      throw Exception('Failed to get response data');
+    }
+    final result = data['result'];
+    if (result == null) {
+      throw Exception("No result found in the response");
+    }
+    String? resultKey = data['result_key'];
+    if (resultKey == null && resultKey!.isEmpty) {
+      throw Exception("Error: $resultKey");
+    }
+    final respListChecked = result[resultKey];
+    if (respListChecked == null) {
+      throw Exception("No data found in the response");
+    }
+
     List<Map<String, dynamic>> listChecked = [];
     List<String> headers = respListChecked.first.keys.toList();
     for (var item in respListChecked) {
