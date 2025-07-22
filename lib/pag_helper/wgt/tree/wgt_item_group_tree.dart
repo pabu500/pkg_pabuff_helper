@@ -1249,13 +1249,14 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
       int nextMonth = month + 1;
       int nextYear = year;
       // NOTE: cycleDay edge cases
-      int nextDay = cycleDay - 1;
+      // int nextDay = cycleDay - 1;
+      int nextDay = day;
       if (nextMonth > 12) {
         nextMonth = 1;
         nextYear = year + 1;
       }
-      DateTime newToDateTime =
-          DateTime(nextYear, nextMonth, nextDay, 23, 59, 59);
+      // DateTime newToDateTime = DateTime(nextYear, nextMonth, nextDay, 23, 59, 59);
+      DateTime newToDateTime = DateTime(nextYear, nextMonth, nextDay, 0, 0, 0);
 
       initialValueMap['from_datetime'] = newFromDateTime;
       initialValueMap['to_datetime'] = newToDateTime;
