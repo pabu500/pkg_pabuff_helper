@@ -154,7 +154,7 @@ class _PgSplashState extends State<PgSplash> {
       // }
 
       try {
-        Map<String, dynamic> progressResult = await pagUpdateBatchOpProgress(
+        Map<String, dynamic> progressResult = await updatePagBatchOpProgress(
             widget.appConfig, loggedInUser, taskName);
 
         if (kDebugMode) {

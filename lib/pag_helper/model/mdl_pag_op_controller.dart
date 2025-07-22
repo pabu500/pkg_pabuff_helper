@@ -1,9 +1,15 @@
+import 'package:buff_helper/pag_helper/def_helper/dh_pag_finance_type.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 
+import '../def_helper/pag_item_helper.dart';
+
 class MdlPagOpController {
   MdlPagOpController({
+    required this.appConfig,
+    required this.loggedInUser,
+    required this.itemKind,
     required this.itemType,
     required this.itemIdType,
     required this.opName,
@@ -21,7 +27,10 @@ class MdlPagOpController {
     this.scheduledTime,
   });
 
-  ItemType itemType;
+  final MdlPagAppConfig appConfig;
+  final MdlPagUser? loggedInUser;
+  dynamic itemType;
+  PagItemKind itemKind;
   ItemIdType itemIdType;
   List<Map<String, dynamic>> listConfig;
   List<Map<String, dynamic>> opColsConfig;
@@ -128,12 +137,30 @@ class MdlPagOpController {
       item.removeWhere((key, value) => key.contains('_color'));
     }
 
+    String itemKindStr = itemKind.name;
+
+    String itemTypeStr = '';
+    if (itemType is PagFinanceType) {
+      itemTypeStr = (itemType as PagFinanceType).toString();
+    }
+    assert(itemTypeStr.isNotEmpty,
+        'itemTypeStr should not be empty, itemType: $itemType');
+
+    Map<String, dynamic> queryMap = {
+      'scope': loggedInUser!.selectedScope.toScopeMap(),
+      'op_name': opName,
+      'item_kind': itemKindStr,
+      'item_type': itemTypeStr,
+      'item_id_type': itemIdType.name,
+      'op_list': opList,
+      'op_field': isAdditonalKeySameTable ? opField : '',
+    };
+
     List<Map<String, dynamic>> opListDb = await doCheckOpList(
-      itemType,
-      opName.toString().toLowerCase(),
-      isAdditonalKeySameTable ? opField : '',
-      opList,
+      appConfig,
+      loggedInUser,
       svcClaim,
+      queryMap,
     );
     //check if the list item key has itemKey+'_from_db', add key itemKey+'_color'
     for (var item in opListDb) {

@@ -6,8 +6,83 @@ import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
 import 'package:buff_helper/pag_helper/model/mdl_svc_query.dart';
 import 'package:buff_helper/up_helper/up_helper.dart';
 import 'package:buff_helper/util/date_time_util.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:buff_helper/pag_helper/comm/pag_be_api_base.dart';
+
+Future<dynamic> doPagCheckOpList(
+  MdlPagAppConfig appConfig,
+  MdlPagUser? loggedInUser,
+  SvcClaim svcClaim,
+  Map<String, dynamic> queryMap,
+) async {
+  svcClaim.svcName = PagSvcType.oresvc2.name;
+  svcClaim.endpoint = PagUrlBase.eptCheckOpList;
+
+  String svcToken = '';
+  // try {
+  //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
+  // } catch (err) {
+  //   throw Exception(err);
+  // }
+
+  final response = await http.post(
+    Uri.parse(PagUrlController(loggedInUser, appConfig)
+        .getUrl(PagSvcType.oresvc2, svcClaim.endpoint!)),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer $svcToken',
+    },
+    body: jsonEncode(SvcQuery(svcClaim, queryMap).toJson()),
+  );
+
+  if (response.statusCode == 200) {
+    // If the server did return a 200 OK response, parse the JSON.
+    final responseBody = jsonDecode(response.body);
+    final error = responseBody['error'];
+    if (error != null) {
+      throw Exception(error);
+    }
+    final respListChecked = responseBody['op_list_checked'];
+    List<Map<String, dynamic>> listChecked = [];
+    List<String> headers = respListChecked.first.keys.toList();
+    for (var item in respListChecked) {
+      if (item['error'] == null) {
+        // set after refresh, not here
+        // item['prev_status'] = item['status'];
+        if (item['checked'] == true) {
+          item['status'] = 'ready for op';
+          item['status_color'] = Colors.green;
+        } else {
+          item['status'] = 'not selected';
+        }
+      } else {
+        Map<String, dynamic> error = item['error'];
+        var errorKey = error.keys.first;
+        if (!headers.contains(errorKey)) {
+          //replace the error map's key to 'status'
+          error = {'status': error[errorKey]};
+          item['error'] = error;
+        }
+        if (kDebugMode) {
+          print(item['status']);
+        }
+        if (item['status'].contains('csv check error')) {
+        } else {
+          item['prev_status'] = item['status'];
+          item['status'] = 'db check error';
+        }
+      }
+      listChecked.add(item);
+    }
+    return listChecked;
+  } else if (response.statusCode == 403) {
+    throw Exception("You are not authorized to perform this operation");
+  } else {
+    throw Exception(jsonDecode(response.body)['error']);
+  }
+}
 
 Future<dynamic> doOpSingleKeyValUpdate(
   MdlPagAppConfig appConfig,
@@ -139,7 +214,7 @@ Future<dynamic> doPagOpMultiKeyValUpdate(
   }
 }
 
-Future<Map<String, dynamic>> pagUpdateBatchOpProgress(
+Future<Map<String, dynamic>> updatePagBatchOpProgress(
     MdlPagAppConfig appConfig, MdlPagUser? loggedInUser, String opName) async {
   try {
     final response = await http.get(
