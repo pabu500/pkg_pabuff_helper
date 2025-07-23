@@ -15,6 +15,7 @@ class WgtPagDatePicker extends StatefulWidget {
     this.label,
     this.initialDate,
     this.mainAxisAlignment = MainAxisAlignment.start,
+    this.labelWhenDateIsSelected,
   });
 
   final int timeZone;
@@ -27,6 +28,7 @@ class WgtPagDatePicker extends StatefulWidget {
   final String? label;
   final DateTime? initialDate;
   final MainAxisAlignment mainAxisAlignment;
+  final String? labelWhenDateIsSelected;
 
   @override
   State<WgtPagDatePicker> createState() => _WgtPagDatePickerState();
@@ -84,7 +86,7 @@ class _WgtPagDatePickerState extends State<WgtPagDatePicker> {
             mainAxisAlignment: widget.mainAxisAlignment,
             children: <Widget>[
               if (widget.label != null && _selectedDateTime != null)
-                Text(widget.label!,
+                Text(widget.labelWhenDateIsSelected ?? widget.label!,
                     style: TextStyle(
                       // fontSize: 16,
                       color: Theme.of(context).hintColor,
@@ -113,7 +115,7 @@ class _WgtPagDatePickerState extends State<WgtPagDatePicker> {
                           widget.onDateCleared!();
                         }
                         setState(() {
-                          _selectedDateText = 'Select date';
+                          _selectedDateText = widget.label ?? 'Select date';
                           _selectedDateTime = null;
                         });
                       },
