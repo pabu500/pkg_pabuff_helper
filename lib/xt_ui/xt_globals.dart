@@ -6,6 +6,8 @@ const int maxPhoneLength = 20;
 const int maxPasswordLength = 30;
 const int minPasswordLength = 8;
 const int maxSalutationLength = 50;
+const int maxAddressLength = 255;
+const int maxCompanyTradeNameLength = 255;
 
 const String glb_reg_allkeyboard =
     r"^[a-zA-Z0-9!@#\$%^&*()_+\-=\[\]{};':\\|,.<>\/?\s]+$";
