@@ -10,6 +10,7 @@ class WgtTimeSlotPicker extends StatefulWidget {
     this.defaultTime,
     this.rangeFrom,
     this.rangeTo,
+    this.label,
     // this.setPairingRangeFrom,
   });
 
@@ -18,6 +19,7 @@ class WgtTimeSlotPicker extends StatefulWidget {
   final TimeOfDay? defaultTime;
   final TimeOfDay? rangeFrom;
   final TimeOfDay? rangeTo;
+  final String? label;
   // final void Function(TimeOfDay? startTime, TimeOfDay? endTime) onSearch;
   final void Function(TimeOfDay? selectedTime) onSelected;
 
@@ -42,6 +44,12 @@ class _WgtTimeSlotPickerState extends State<WgtTimeSlotPicker> {
     //widget dropdown button for time at slotMinutes interval
     return Row(
       children: [
+        widget.label != null
+            ? Padding(
+                padding: const EdgeInsets.only(right: 5.0),
+                child: Text(widget.label!),
+              )
+            : const SizedBox.shrink(),
         DropdownButton<TimeOfDay>(
           value: _selectedTime ?? widget.defaultTime,
           hint: Text(widget.hintText ?? 'Timeslot'),

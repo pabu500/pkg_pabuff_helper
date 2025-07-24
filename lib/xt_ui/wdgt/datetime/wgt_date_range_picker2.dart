@@ -23,7 +23,7 @@ class WgtDateRangePicker2 extends StatefulWidget {
     this.useEdgeTime = true,
     this.showHHmm = false,
     this.singleDate = false,
-    this.width = 350,
+    this.width = 362,
     this.updateRangeByParent = false,
     this.maxDuration = const Duration(days: 180),
     this.maxSelectionDuration = const Duration(days: 180),
@@ -226,7 +226,7 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
             valueStyle: TextStyle(
                 fontSize: 15,
                 color: fromText == 'Select'
-                    ? Theme.of(context).hintColor.withOpacity(0.34)
+                    ? Theme.of(context).hintColor.withAlpha(80)
                     : Theme.of(context).colorScheme.primary),
           ),
           horizontalSpaceTiny,
@@ -236,7 +236,7 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
             valueStyle: TextStyle(
                 fontSize: 15,
                 color: toText == 'Select'
-                    ? Theme.of(context).hintColor.withOpacity(0.34)
+                    ? Theme.of(context).hintColor.withAlpha(80)
                     : Theme.of(context).colorScheme.primary),
           ),
           horizontalSpaceSmall,
@@ -323,13 +323,20 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
                 _selectedEndDate = getTargetLocalDatetime(
                     widget.scopeProfile.timezone, 23, 59, 59, 999,
                     refLocalDatetime: _selectedEndDate!);
+                if (widget.setTime) {
+                  _selectedEndDate = getTargetLocalDatetime(
+                      widget.scopeProfile.timezone, 23, 45, 0, 0,
+                      refLocalDatetime: _selectedEndDate!);
+                } // to avoid assert error
               }
               // });
               if (!widget.updateRangeByParent) {
                 setState(() {});
               }
               if (_selectedStartDate != null && _selectedEndDate != null) {
-                widget.onSet(_selectedStartDate, _selectedEndDate);
+                if (!widget.setTime) {
+                  widget.onSet(_selectedStartDate, _selectedEndDate);
+                }
               }
 
               if (kDebugMode) {
@@ -343,6 +350,7 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               WgtTimeSlotPicker(
+                label: 'From',
                 hintText: 'From',
                 defaultTime: widget.showHHmm
                     ? TimeOfDay.fromDateTime(_selectedStartDate ?? // midnight
@@ -373,35 +381,36 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
                   }
                 },
               ),
-              horizontalSpaceTiny,
+              horizontalSpaceSmall,
               WgtTimeSlotPicker(
+                label: 'To',
                 hintText: 'To',
-                defaultTime: widget.showHHmm
-                    ? TimeOfDay.fromDateTime(_selectedStartDate ?? // midnight
-                        DateTime(DateTime.now().year, DateTime.now().month,
-                            DateTime.now().day, 0, 0))
-                    : null,
+                defaultTime: _selectedEndDate == null
+                    ? null
+                    : TimeOfDay(
+                        hour: _selectedEndDate!.hour,
+                        minute: _selectedEndDate!.minute),
                 rangeTo: _selectedEndDate != null
                     ? TimeOfDay.fromDateTime(DateTime(_selectedEndDate!.year,
                         _selectedEndDate!.month, _selectedEndDate!.day, 23, 45))
                     : null,
                 onSelected: (selectedTime) {
-                  if (_selectedStartDate != null && selectedTime != null) {
-                    DateTime startTime = DateTime(
-                      _selectedStartDate!.year,
-                      _selectedStartDate!.month,
-                      _selectedStartDate!.day,
+                  if (_selectedEndDate != null && selectedTime != null) {
+                    DateTime endTime = DateTime(
+                      _selectedEndDate!.year,
+                      _selectedEndDate!.month,
+                      _selectedEndDate!.day,
                       selectedTime.hour,
                       selectedTime.minute,
                     );
                     setState(() {
-                      _selectedStartDate = startTime;
+                      _selectedEndDate = endTime;
                     });
-                    if (_selectedEndDate != null) {
+                    if (_selectedStartDate != null) {
                       widget.onSet(_selectedStartDate, _selectedEndDate);
                     }
                   } else {
-                    widget.onSet(null, _selectedEndDate);
+                    widget.onSet(_selectedStartDate, null);
                   }
                 },
               ),
