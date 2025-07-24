@@ -1,4 +1,5 @@
 import 'package:buff_helper/pkg_buff_helper.dart';
+import 'package:buff_helper/xt_ui/wdgt/datetime/wgt_timeslot_picker.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_popup_button.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 
@@ -28,6 +29,7 @@ class WgtDateRangePicker2 extends StatefulWidget {
     this.maxSelectionDuration = const Duration(days: 180),
     this.onMaxDurationExceeded,
     // this.allowSameDay = false,
+    this.setTime = false,
   });
 
   final int timezone;
@@ -50,6 +52,7 @@ class WgtDateRangePicker2 extends StatefulWidget {
   final Duration maxSelectionDuration;
   final void Function()? onMaxDurationExceeded;
   // final bool allowSameDay;
+  final bool setTime;
 
   @override
   State<WgtDateRangePicker2> createState() => _WgtDateRangePicker2State();
@@ -335,6 +338,76 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
             },
           ),
         ),
+        if (widget.setTime)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              WgtTimeSlotPicker(
+                hintText: 'From',
+                defaultTime: widget.showHHmm
+                    ? TimeOfDay.fromDateTime(_selectedStartDate ?? // midnight
+                        DateTime(DateTime.now().year, DateTime.now().month,
+                            DateTime.now().day, 0, 0))
+                    : null,
+                rangeTo: _selectedEndDate != null
+                    ? TimeOfDay.fromDateTime(DateTime(_selectedEndDate!.year,
+                        _selectedEndDate!.month, _selectedEndDate!.day, 23, 45))
+                    : null,
+                onSelected: (selectedTime) {
+                  if (_selectedStartDate != null && selectedTime != null) {
+                    DateTime startTime = DateTime(
+                      _selectedStartDate!.year,
+                      _selectedStartDate!.month,
+                      _selectedStartDate!.day,
+                      selectedTime.hour,
+                      selectedTime.minute,
+                    );
+                    setState(() {
+                      _selectedStartDate = startTime;
+                    });
+                    if (_selectedEndDate != null) {
+                      widget.onSet(_selectedStartDate, _selectedEndDate);
+                    }
+                  } else {
+                    widget.onSet(null, _selectedEndDate);
+                  }
+                },
+              ),
+              horizontalSpaceTiny,
+              WgtTimeSlotPicker(
+                hintText: 'To',
+                defaultTime: widget.showHHmm
+                    ? TimeOfDay.fromDateTime(_selectedStartDate ?? // midnight
+                        DateTime(DateTime.now().year, DateTime.now().month,
+                            DateTime.now().day, 0, 0))
+                    : null,
+                rangeTo: _selectedEndDate != null
+                    ? TimeOfDay.fromDateTime(DateTime(_selectedEndDate!.year,
+                        _selectedEndDate!.month, _selectedEndDate!.day, 23, 45))
+                    : null,
+                onSelected: (selectedTime) {
+                  if (_selectedStartDate != null && selectedTime != null) {
+                    DateTime startTime = DateTime(
+                      _selectedStartDate!.year,
+                      _selectedStartDate!.month,
+                      _selectedStartDate!.day,
+                      selectedTime.hour,
+                      selectedTime.minute,
+                    );
+                    setState(() {
+                      _selectedStartDate = startTime;
+                    });
+                    if (_selectedEndDate != null) {
+                      widget.onSet(_selectedStartDate, _selectedEndDate);
+                    }
+                  } else {
+                    widget.onSet(null, _selectedEndDate);
+                  }
+                },
+              ),
+            ],
+          ),
+        verticalSpaceSmall,
         // if (_maxDurationExceeded)
         Transform.translate(
           offset: const Offset(0, -10),
@@ -389,7 +462,7 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
               width: 35,
               height: 35,
               popupWidth: 350,
-              popupHeight: 350,
+              popupHeight: widget.setTime ? 385 : 350,
               popupChild: _buildDefaultRangeDatePickerWithValue(),
               // disabled: disabled,
               child: Icon(

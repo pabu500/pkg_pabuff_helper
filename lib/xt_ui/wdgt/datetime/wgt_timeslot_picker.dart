@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class WgtTimeSlotPicker extends StatefulWidget {
   const WgtTimeSlotPicker({
-    Key? key,
+    super.key,
     // required this.onSearch,
     required this.onSelected,
     this.slotMinutes,
@@ -11,7 +11,7 @@ class WgtTimeSlotPicker extends StatefulWidget {
     this.rangeFrom,
     this.rangeTo,
     // this.setPairingRangeFrom,
-  }) : super(key: key);
+  });
 
   final int? slotMinutes;
   final String? hintText;
@@ -22,7 +22,7 @@ class WgtTimeSlotPicker extends StatefulWidget {
   final void Function(TimeOfDay? selectedTime) onSelected;
 
   @override
-  _WgtTimeSlotPickerState createState() => _WgtTimeSlotPickerState();
+  State<WgtTimeSlotPicker> createState() => _WgtTimeSlotPickerState();
 }
 
 //boilerplate code only
