@@ -579,7 +579,8 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
     // String leafScopeLabel = '';
     MdlPagScope? initialScope;
     if (widget.itemKind == PagItemKind.tariffPackage ||
-        widget.itemKind == PagItemKind.meterGroup) {
+        widget.itemKind == PagItemKind.meterGroup ||
+        widget.itemKind == PagItemKind.landlord) {
       isSingleLabel = true;
       isEditableByKind = false;
 

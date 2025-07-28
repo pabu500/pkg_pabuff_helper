@@ -43,6 +43,7 @@ class Evs2ListText extends StatefulWidget {
     this.clickCopy = false,
     this.forceShowTooltip = false,
     this.mainAixsAlignment,
+    this.displayWidthAdj = 1.0,
   });
 
   final String originalFullText;
@@ -82,6 +83,7 @@ class Evs2ListText extends StatefulWidget {
   final bool nonSelectable;
   final bool clickCopy;
   final MainAxisAlignment? mainAixsAlignment;
+  final double displayWidthAdj;
 
   @override
   State<Evs2ListText> createState() => _Evs2ListTextState();
@@ -185,7 +187,9 @@ class _Evs2ListTextState extends State<Evs2ListText> {
     final originalText = widget.originalFullText;
     final fontSize = widget.style?.fontSize ?? 15.0;
     // final color = _modified ? Colors.amber.shade900 : null;
-    String displayText = convertToDisplayString(_currentFullText, widget.width!,
+    String displayText = convertToDisplayString(
+        _currentFullText,
+        widget.width! / widget.displayWidthAdj,
         widget.style ?? const TextStyle(fontSize: 15));
     _controller.text = displayText;
     double stringDisplaySize = 1.116 *

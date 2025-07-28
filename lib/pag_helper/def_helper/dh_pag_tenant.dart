@@ -150,3 +150,70 @@ enum PagTenantPaymentMethod {
       ) ??
       other;
 }
+
+String? validateCompanyTradingName(String val) {
+  if (val.trim().isEmpty) {
+    return 'required';
+  }
+  //length 5-255, alphanumeric, space, /, ', - only
+  String pattern = r"^[a-zA-Z0-9 /'-]{5,255}$";
+  RegExp regExp = RegExp(pattern);
+  if (!regExp.hasMatch(val)) {
+    return 'invalid characters';
+  }
+  return null;
+}
+
+String? validateBillingAddress(String val) {
+  if (val.trim().isEmpty) {
+    return 'required';
+  }
+  //length 5-255, alphanumeric, space, /, ', -, # only
+  String pattern = r"^[a-zA-Z0-9 /'-#]{5,255}$";
+  RegExp regExp = RegExp(pattern);
+  if (!regExp.hasMatch(val)) {
+    return 'invalid characters';
+  }
+  return null;
+}
+
+String? validateBankAccountNumber(String val) {
+  if (val.trim().isEmpty) {
+    return 'required';
+  }
+
+  // validate number, letter, underscore, and dash,
+  // and minimum 5 characters
+  String pattern = r'^[a-zA-Z0-9_ -]{5,}$';
+  RegExp regExp = RegExp(pattern);
+  if (!regExp.hasMatch(val)) {
+    return 'min length is 5 and letter, number, _, - only';
+  }
+  return null;
+}
+
+String? validatePaymentAmount(String? value) {
+  if (value == null || value.isEmpty) {
+    return 'Payment amount is required';
+  }
+  // Add more validation logic if needed
+  // numeric, 0 to 1 billion, up to 2 decimal places
+  final RegExp numeric = RegExp(r'^\d{1,9}(\.\d{0,2})?$');
+  if (!numeric.hasMatch(value)) {
+    return 'Invalid payment amount format';
+  }
+  return null;
+}
+
+String? validateTenantRef(String? value) {
+  if (value == null || value.isEmpty) {
+    return 'Tenant reference is required';
+  }
+  // Add more validation logic if needed
+  // alphanumeric, space, - / # . + & and 1-255 characters
+  final RegExp alphanumeric = RegExp(r'^[a-zA-Z0-9\-\/#\. +&]{1,255}$');
+  if (!alphanumeric.hasMatch(value)) {
+    return 'Invalid tenant reference format';
+  }
+  return null;
+}
