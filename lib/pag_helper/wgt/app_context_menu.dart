@@ -167,7 +167,8 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
                   // pr == PagPageRoute.billingManager ||
                   pr == PagPageRoute.tenantManager ||
                   pr == PagPageRoute.tariffManager ||
-                  pr == PagPageRoute.paymentManager
+                  pr == PagPageRoute.paymentManager ||
+                  pr == PagPageRoute.landlordManager
               // pr == PagPageRoute.meterManager
               ) {
             isDisabled = true;
@@ -195,6 +196,7 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
               pr != PagPageRoute.paymentManager &&
               pr != PagPageRoute.tenantManager &&
               pr != PagPageRoute.tariffManager &&
+              pr != PagPageRoute.landlordManager &&
               pr != PagPageRoute.meterManager) {
             isDisabled = true;
           }

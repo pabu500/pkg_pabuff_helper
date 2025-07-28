@@ -64,6 +64,7 @@ class _WgtPagLsState extends State<WgtPagLs> {
             PagItemKind.meterGroup ||
             PagItemKind.tariffPackage ||
             PagItemKind.bill ||
+            PagItemKind.landlord ||
             PagItemKind.role:
         // || PagItemKind.finance:
         dynamic itemType;

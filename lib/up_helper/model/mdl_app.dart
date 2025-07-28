@@ -85,6 +85,7 @@ const tenantInfo = 'Tenant Info';
 const tariffManager = 'Tariff Manager';
 const billingManager = 'Billing Manager';
 const paymentManager = 'Payment Manager';
+const landlordManager = 'Landlord Manager';
 const jobManager = 'Task/Report Manager';
 const tariffInfo = 'Tariff Info';
 const createTariffPackage = 'Create Tariff Package';

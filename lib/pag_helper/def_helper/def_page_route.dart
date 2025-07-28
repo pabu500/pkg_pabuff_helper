@@ -92,6 +92,11 @@ enum PagPageRoute {
     'payment_manager',
     Symbols.attach_money,
   ),
+  landlordManager(
+    'Landlord Manager',
+    'landlord_manager',
+    Symbols.home_work,
+  ),
   evsDashboard(
     'EVS',
     'evs_dashboard',

@@ -9,12 +9,13 @@ enum PagItemKind {
   user('User', Symbols.person),
   role('Role', Symbols.badge),
   tenant('Tenant', Symbols.location_away),
+  landlord('Landlord', Symbols.home_work),
   jobType('Job Type', Symbols.energy_program_time_used),
   jobTypeSub('Job Type Sub', Symbols.group),
   tariffPackage('Tariff Package', Symbols.price_change),
   bill('Bill', Symbols.request_quote),
   meterGroup('Meter Group', Symbols.atr),
-  finance('Fianace', Symbols.account_balance),
+  finance('Finance', Symbols.account_balance),
   ;
 
   const PagItemKind(

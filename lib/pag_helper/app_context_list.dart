@@ -50,6 +50,7 @@ MdlPagAppContext appCtxEms = MdlPagAppContext(
     PagPageRoute.tariffManager,
     PagPageRoute.billingManager,
     PagPageRoute.paymentManager,
+    PagPageRoute.landlordManager,
     // PagPageRoute.emsTaskReportManager,
   ],
 );
