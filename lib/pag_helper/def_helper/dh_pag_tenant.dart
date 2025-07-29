@@ -151,8 +151,8 @@ enum PagTenantPaymentMethod {
       other;
 }
 
-String? validateCompanyTradingName(String val) {
-  if (val.trim().isEmpty) {
+String? validateCompanyTradingName(String? val) {
+  if (val == null || val.trim().isEmpty) {
     return 'required';
   }
   //length 5-255, alphanumeric, space, /, ', - only
@@ -164,8 +164,8 @@ String? validateCompanyTradingName(String val) {
   return null;
 }
 
-String? validateBillingAddress(String val) {
-  if (val.trim().isEmpty) {
+String? validateBillingAddress(String? val) {
+  if (val == null || val.trim().isEmpty) {
     return 'required';
   }
   //length 5-255, alphanumeric, space, /, ', -, # only
@@ -177,8 +177,8 @@ String? validateBillingAddress(String val) {
   return null;
 }
 
-String? validateBankAccountNumber(String val) {
-  if (val.trim().isEmpty) {
+String? validateBankAccountNumber(String? val) {
+  if (val == null || val.trim().isEmpty) {
     return 'required';
   }
 
@@ -210,8 +210,8 @@ String? validateTenantRef(String? value) {
     return 'Tenant reference is required';
   }
   // Add more validation logic if needed
-  // alphanumeric, space, - / # . + & and 1-255 characters
-  final RegExp alphanumeric = RegExp(r'^[a-zA-Z0-9\-\/#\. +&]{1,255}$');
+  // alphanumeric, space, - _ / # . + & ( ) ' : and 1-255 characters
+  final RegExp alphanumeric = RegExp(r"^[a-zA-Z0-9\-\/#_\. +&()/':]{1,255}$");
   if (!alphanumeric.hasMatch(value)) {
     return 'Invalid tenant reference format';
   }
