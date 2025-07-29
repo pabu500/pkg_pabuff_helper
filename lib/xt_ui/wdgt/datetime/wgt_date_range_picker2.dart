@@ -358,8 +358,12 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
                             DateTime.now().day, 0, 0))
                     : null,
                 rangeTo: _selectedEndDate != null
-                    ? TimeOfDay.fromDateTime(DateTime(_selectedEndDate!.year,
-                        _selectedEndDate!.month, _selectedEndDate!.day, 23, 45))
+                    ? TimeOfDay.fromDateTime(DateTime(
+                        _selectedEndDate!.year,
+                        _selectedEndDate!.month,
+                        _selectedEndDate!.day,
+                        23,
+                        widget.setTime ? 45 : 59))
                     : null,
                 onSelected: (selectedTime) {
                   if (_selectedStartDate != null && selectedTime != null) {
