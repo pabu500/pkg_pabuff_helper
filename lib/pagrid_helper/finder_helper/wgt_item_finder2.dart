@@ -545,7 +545,7 @@ class _WgtItemFinder2State extends State<WgtItemFinder2> {
                   initialValue: _itemLabel,
                   isInitialValueMutable: widget.fixedItemLabel == null,
                   height: 50,
-                  width: 280,
+                  width: 420,
                   onSelected: (String? value) async {
                     // if (value != null) {
                     if (value == _itemLabel) {
