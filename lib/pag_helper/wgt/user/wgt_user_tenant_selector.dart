@@ -66,9 +66,14 @@ class _WgtUserTenantSelectorState extends State<WgtUserTenantSelector> {
 
     if (tenantList.length == 1) {
       _selectedTenant = tenantList[0];
+      _selectedTenantItem = tenantItemList[0];
     }
     if (widget.initialTenant != null) {
       _selectedTenant = widget.initialTenant;
+      _selectedTenantItem = tenantItemList.firstWhere(
+        (item) => item.name == widget.initialTenant!.name,
+        orElse: () => tenantItemList[0],
+      );
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -78,6 +83,13 @@ class _WgtUserTenantSelectorState extends State<WgtUserTenantSelector> {
 
   @override
   Widget build(BuildContext context) {
+    // if (tenantList.length == 1) {
+    //   _selectedTenant = tenantList[0];
+    // }
+    // if (widget.initialTenant != null) {
+    //   _selectedTenant = widget.initialTenant;
+    // }
+
     // NOTE: do not use class as value for Dropdown,
     // assigning a different class instance, even if it has the same values,
     // will be considered a different value, causing assertation error.
