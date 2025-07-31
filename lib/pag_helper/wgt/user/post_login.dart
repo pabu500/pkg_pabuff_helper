@@ -35,6 +35,10 @@ Future<void> doPostLogin(
         // 'scope': loggedInUser.selectedScope.toScopeMap(),
         'portal_type_name': appConfig.portalType.name,
         'portal_type_label': appConfig.portalType.label,
+        // 'app_list': loggedInUser
+        //     .selectedScope.projectProfile!.appContextConfigList
+        //     .map((e) => e.appContextName)
+        //     .toList(),
         'user_id': loggedInUser.id.toString(),
         'user_role_list': loggedInUser.roleList.map((e) => e.toJson()).toList(),
         'task_name': taskName,
