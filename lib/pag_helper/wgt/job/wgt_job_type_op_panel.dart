@@ -79,8 +79,11 @@ class _WgtJobTypeOpPanelState extends State<WgtJobTypeOpPanel> {
     });
 
     // align to_timestamp to end of day
+    // _selectedToDate = DateTime(_selectedToDate!.year, _selectedToDate!.month,
+    //     _selectedToDate!.day, 23, 59, 59);
+    // align to the midnight of the next day
     _selectedToDate = DateTime(_selectedToDate!.year, _selectedToDate!.month,
-        _selectedToDate!.day, 23, 59, 59);
+        _selectedToDate!.day + 1, 0, 0, 0);
 
     try {
       Map<String, dynamic> jobScope = widget.jobTypeScope?.toScopeMap() ??
