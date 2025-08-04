@@ -71,7 +71,8 @@ class WgtPagItemInfoEditPanel extends StatefulWidget {
 
 class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
   late MdlPagUser? _loggedInUser;
-  final double _width = 395;
+  final double width = 500;
+  final double labelWidth = 150;
 
   String? _itemDisplayName;
 
@@ -264,7 +265,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
     }
 
     return SizedBox(
-      width: _width,
+      width: width,
       child: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -383,7 +384,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
                         ),
                         padding: const EdgeInsets.symmetric(
                             horizontal: 3, vertical: 3),
-                        width: _width,
+                        width: width,
                         child: Column(
                           children: [
                             ...getFields(),
@@ -438,12 +439,12 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
             ? Padding(
                 padding: const EdgeInsets.only(top: 5.0),
                 child: WgtViewEditField(
-                    width: _width,
+                    width: width,
                     editable: isEditableByAcl && (field['editable'] ?? false),
                     showCopy: field['show_copy'] ?? false,
                     useDatePicker: field['useDatePicker'] ?? false,
                     showLabel: true,
-                    labelWidth: 130,
+                    labelWidth: labelWidth,
                     hintText: hintText,
                     labelText: field['label'] ?? field['title'],
                     originalValue: field['value'] ?? field['val'] ?? '',
@@ -482,12 +483,12 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
               )
             : field['widget'] == 'dropdown' && field['value_list'] != null
                 ? WgtViewEditDropdown(
-                    width: _width,
+                    width: width,
                     readOnly:
                         !(isEditableByAcl && (field['editable'] ?? false)),
                     hasFocus: _currentField == field['col_key'],
                     showLabel: true,
-                    labelWidth: 130,
+                    labelWidth: labelWidth,
                     dropdownValueListMap: field['value_list'],
                     originalValueMap: field['value'] ?? field['val'],
                     hint: 'NOT SET', //field['label'] ?? field['title'],
@@ -598,7 +599,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
         isSingleLabel: isSingleLabel,
         // singleScopeLabel: leafScopeLabel,
         initialScope: initialScope,
-        width: _width,
+        width: width,
         labelWidth: 130,
         itemScopeMap: widget.itemScopeMap!,
         forItemKind: widget.itemKind,
@@ -705,7 +706,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
         child: WgtItemGroupTree(
           appConfig: widget.appConfig,
           mode: 'edit',
-          width: _width,
+          width: width,
           loggedInUser: _loggedInUser!,
           groupItemId: widget.itemIndexStr,
           itemGroupType: itemGroupType,
