@@ -58,3 +58,26 @@ String getPagFinanceTypeStr(dynamic itemType) {
       return '';
   }
 }
+
+enum PagPaymentLcStatus {
+  posted('posted', 'Posted', 'pt', Colors.lightBlue),
+  pending('matched', 'Matched', 'mt', Colors.teal),
+  failed('released', 'Released', 'rl', Colors.orangeAccent),
+  unknown('unknown', 'Unknown', 'un', Colors.grey),
+  ;
+
+  const PagPaymentLcStatus(this.value, this.label, this.tag, this.color);
+
+  final String label;
+  final String value;
+  final String tag;
+  final Color color;
+
+  static PagPaymentLcStatus byValue(String? value) =>
+      enumByLabel(
+        value,
+        values,
+        (e) => (e).value,
+      ) ??
+      unknown;
+}

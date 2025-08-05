@@ -1,4 +1,5 @@
 import 'package:buff_helper/pag_helper/def_helper/def_role.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_pag_finance_type.dart';
 import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_controller.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/pag_bill_def.dart';
@@ -1038,6 +1039,11 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
         PagDeviceLsStatus deviceLsStatus = PagDeviceLsStatus.byTag(tagText);
         tagLabel = deviceLsStatus.tag;
         tagColor = deviceLsStatus.color.withAlpha(130);
+      } else if (widget.itemType is PagFinanceType) {
+        PagPaymentLcStatus financeLcStatus =
+            PagPaymentLcStatus.byValue(tagText);
+        tagLabel = financeLcStatus.tag;
+        tagColor = financeLcStatus.color.withAlpha(130);
       } else if (widget.itemType is PagItemKind) {
         if (widget.itemType == PagItemKind.bill) {
           PagBillingLcStatus billingLcStatus =

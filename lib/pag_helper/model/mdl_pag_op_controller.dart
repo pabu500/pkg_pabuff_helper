@@ -236,6 +236,8 @@ class MdlPagOpController {
       svcClaim,
     );
 
+    Color successColor = Colors.green;
+
     for (var row in opResultList) {
       if (row['error'] != null) {
         // move error message in map
@@ -246,7 +248,7 @@ class MdlPagOpController {
         row['${key}_error'] = message;
       } else if (row['checked']) {
         // row['status'] = 'success';
-        row['status_color'] = commitColor;
+        row['status_color'] = successColor;
         List<String> modifiedKeys = [];
         for (var itemKey in row.keys) {
           if (row['${itemKey}_modified'] != null) {
