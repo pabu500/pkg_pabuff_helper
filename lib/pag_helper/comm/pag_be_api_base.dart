@@ -263,6 +263,9 @@ class PagUrlBase {
   static const String eptGetUserTenantList = '/ems/get_user_tenant_list';
   static const String eptSetUserTenantList = '/ems/set_user_tenant_list';
 
+  // ems/fin
+  static const String eptFinPostPayment = '/ems/fin/batch_op/post_payment';
+
   // Tariff Package Manager
   static const String eptGetTariffPackageTariffRateInfo =
       '/ems/tariff_package/get_tariff_package_tariff_rate_info';

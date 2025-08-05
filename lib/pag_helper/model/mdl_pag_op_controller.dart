@@ -1,4 +1,5 @@
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_finance_type.dart';
+import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
@@ -53,15 +54,7 @@ class MdlPagOpController {
   Function doCheckOpList;
   Function? additonalCheck;
   Future<dynamic> Function(
-    MdlPagAppConfig,
-    ItemType,
-    ItemIdType?,
-    String,
-    String,
-    List<Map<String, dynamic>>,
-    DateTime?,
-    SvcClaim,
-  )? doOp;
+      MdlPagAppConfig, Map<String, dynamic>, MdlPagSvcClaim)? doOp;
   Function? onUpdateSeleted;
   Function? onRefreshListItems;
   Function? onFlagListModified;
@@ -212,22 +205,68 @@ class MdlPagOpController {
         opList.where((element) => element['status'] == 'ready for op').length;
   }
 
-  Future<dynamic> commitOp(MdlPagAppConfig appConfig, SvcClaim svcClaim) async {
+  Future<dynamic> commitOp(
+    // MdlPagAppConfig appConfig,
+    // Map<String, dynamic> queryMap,
+    MdlPagSvcClaim svcClaim,
+  ) async {
     List<String> targetFields = [];
     for (var opTargets in opColsConfig) {
       targetFields.add(opTargets['fieldKey']);
     }
-    List<Map<String, dynamic>> opListReuslt = await doOp?.call(
+
+    Map<String, dynamic> queryMap = {
+      'scope': loggedInUser!.selectedScope.toScopeMap(),
+      'op_name': opName,
+      'item_kind': itemKind.name,
+      'item_type': itemType.toString(),
+      'item_id_type': itemIdType.name,
+      'target_fields': targetFields.join(','),
+      'op_list': opList,
+    };
+    final opResultList = await doOp?.call(
       appConfig,
-      itemType,
-      itemIdType,
-      'do_op_${opName.toString().toLowerCase()}',
-      targetFields.join(','),
-      opList,
-      scheduledTime,
+      // itemType,
+      // itemIdType,
+      // 'do_op_${opName.toString().toLowerCase()}',
+      // targetFields.join(','),
+      // opList,
+      // scheduledTime,
+      queryMap,
       svcClaim,
     );
-    return opListReuslt;
+
+    for (var row in opResultList) {
+      if (row['error'] != null) {
+        // move error message in map
+        // to error key for csv export
+        var error = row['error'];
+        String key = error.keys.first;
+        String message = error.values.first;
+        row['${key}_error'] = message;
+      } else if (row['checked']) {
+        // row['status'] = 'success';
+        row['status_color'] = commitColor;
+        List<String> modifiedKeys = [];
+        for (var itemKey in row.keys) {
+          if (row['${itemKey}_modified'] != null) {
+            modifiedKeys.add(itemKey);
+          }
+        }
+        for (var itemKey in modifiedKeys) {
+          row['${itemKey}_color'] = commitColor;
+        }
+      } else {
+        row['status'] = 'skipped';
+      }
+    }
+
+    List<Map<String, dynamic>> opResultListRet = [];
+    for (var item in opResultList) {
+      opResultListRet.add(item);
+    }
+
+    return opResultListRet;
   }
 
   void insertNewValCol(Color committedColor, {double? width = 120}) {
