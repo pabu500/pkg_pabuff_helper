@@ -12,7 +12,7 @@ Future<dynamic> doFinPostPayment(
   MdlPagSvcClaim svcClaim,
 ) async {
   svcClaim.svcName = PagSvcType.oresvc2.name;
-  svcClaim.endpoint = PagUrlBase.eptFinPostPayment;
+  svcClaim.endpoint = PagUrlBase.eptBatchOpFinPostPayment;
 
   String svcToken = '';
   // try {

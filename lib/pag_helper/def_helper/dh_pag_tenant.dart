@@ -1,3 +1,6 @@
+import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart'
+    hide enumByLabel;
+import 'package:buff_helper/xt_ui/util/xt_util_InputFieldValidator.dart';
 import 'package:flutter/material.dart';
 
 import 'enum_helper.dart';
@@ -151,6 +154,19 @@ enum PagTenantPaymentMethod {
       other;
 }
 
+String? validateTenantLabel(String? val) {
+  if (val == null || val.trim().isEmpty) {
+    return 'required';
+  }
+  //length 5-255, alphanumeric, space, /, ', - only
+  String pattern = r"^[a-zA-Z0-9 /'-]{5,255}$";
+  RegExp regExp = RegExp(pattern);
+  if (!regExp.hasMatch(val)) {
+    return 'invalid characters';
+  }
+  return null;
+}
+
 String? validateCompanyTradingName(String? val) {
   if (val == null || val.trim().isEmpty) {
     return 'required';
@@ -173,6 +189,45 @@ String? validateBillingAddress(String? val) {
   RegExp regExp = RegExp(pattern);
   if (!regExp.hasMatch(val)) {
     return 'invalid characters';
+  }
+  return null;
+}
+
+String? validateBillingAddressLine1(String? val) {
+  if (val == null || val.trim().isEmpty) {
+    return 'required';
+  }
+  //length 5-255, alphanumeric, space, /, ', -, # only
+  String pattern = r"^[a-zA-Z0-9 /'-#]{5,255}$";
+  RegExp regExp = RegExp(pattern);
+  if (!regExp.hasMatch(val)) {
+    return 'alphanumeric, space, /, -, # only and length 5-255';
+  }
+  return null;
+}
+
+String? validateBillingAddressLine2(String? val) {
+  if (val == null || val.trim().isEmpty) {
+    return 'required';
+  }
+  //length 5-255, alphanumeric, space, /, ', -, # only
+  String pattern = r"^[a-zA-Z0-9 /'-#]{5,255}$";
+  RegExp regExp = RegExp(pattern);
+  if (!regExp.hasMatch(val)) {
+    return 'alphanumeric, space, /, -, # only and length 5-255';
+  }
+  return null;
+}
+
+String? validateBillingAddressLine3(String? val) {
+  if (val == null || val.trim().isEmpty) {
+    return 'required';
+  }
+  //length 5-21, alphanumeric, space, /, ', -, # only
+  String pattern = r"^[a-zA-Z0-9 /'-#]{5,21}$";
+  RegExp regExp = RegExp(pattern);
+  if (!regExp.hasMatch(val)) {
+    return 'alphanumeric, space, /, -, # only and length 5-21';
   }
   return null;
 }
@@ -217,3 +272,507 @@ String? validateTenantRef(String? value) {
   }
   return null;
 }
+
+String? validatePaymentMethod(String? value) {
+  if (value == null || value.isEmpty) {
+    return 'Payment method is required';
+  }
+  // PagTenantPaymentMethod.values
+  if (!PagTenantPaymentMethod.values.any((e) => e.value == value)) {
+    return 'Invalid payment method';
+  }
+  return null;
+}
+
+String? validateCreditTerm(String? value) {
+  if (value == null || value.isEmpty) {
+    return 'Credit term is required';
+  }
+  // 1 to 30
+  final int? term = int.tryParse(value);
+  if (term == null || term < 1 || term > 30) {
+    return 'Credit term must be a positive integer between 1 and 30';
+  }
+  return null;
+}
+
+String? validateGfa(String? value) {
+  if (value == null || value.isEmpty) {
+    // return 'GFA is required';
+    return null;
+  }
+  // numeric, 0 to 1 billion, up to 2 decimal places
+  final RegExp numeric = RegExp(r'^\d{1,9}(\.\d{0,2})?$');
+  if (!numeric.hasMatch(value)) {
+    return 'Invalid GFA format';
+  }
+  return '';
+}
+
+String? validateLabel(String val) {
+  if (val.trim().isEmpty) {
+    return 'required';
+  }
+
+  // validate number, letter, underscore, and dash, space,
+  // and minimum 5 characters
+  String pattern = r'^[a-zA-Z0-9_ -]{5,}$';
+  RegExp regExp = RegExp(pattern);
+  if (!regExp.hasMatch(val)) {
+    return 'min length is 5 and letter, number, space, _, - only';
+  }
+  return null;
+}
+
+String? validateAccountNumber(String val) {
+  if (val.trim().isEmpty) {
+    return 'required';
+  }
+  // validate number, letter, underscore, and dash,
+  // and minimum 5 characters
+  String pattern = r'^[a-zA-Z0-9_ -]{5,}$';
+  RegExp regExp = RegExp(pattern);
+  if (!regExp.hasMatch(val)) {
+    return 'min length is 5 and letter, number, _, - only';
+  }
+  return null;
+}
+
+String? validateDepositeAmount(String val) {
+  if (val.trim().isEmpty) {
+    return 'required';
+  }
+  //must be a number
+  if (double.tryParse(val) == null) {
+    return 'must be a number';
+  }
+  return null;
+}
+
+String? validateFloorArea(String val) {
+  double max = 1000000;
+  if (val.trim().isEmpty) {
+    return 'required';
+  }
+  //must be a number
+  if (double.tryParse(val) == null) {
+    return 'must be a number';
+  }
+  // min max
+  double floorArea = double.parse(val);
+  if (floorArea < 1 || floorArea > max) {
+    return 'must be between 1 and $max';
+  }
+  return null;
+}
+
+String? validateBillingContactName(String val) {
+  return validateFullName(val);
+}
+
+String? validateBillingContactEmail(String val) {
+  return validateEmail(val);
+}
+
+String? validateBillingContactPhone(String val) {
+  return validatePhone(val);
+}
+
+String? validateSupplyCapKva(String val) {
+  double max = 10000;
+  if (val.trim().isEmpty) {
+    return 'required';
+  }
+  //must be a number
+  if (double.tryParse(val) == null) {
+    return 'must be a number';
+  }
+  // min max
+  double supplyCapKva = double.parse(val);
+  if (supplyCapKva < 1 || supplyCapKva > max) {
+    return 'must be between 1 and $max';
+  }
+  return null;
+}
+
+String? validateSupplyCapV(String val) {
+  double max = 1000;
+  if (val.trim().isEmpty) {
+    return 'required';
+  }
+  //must be a number
+  if (double.tryParse(val) == null) {
+    return 'must be a number';
+  }
+  // min max
+  double supplyCapV = double.parse(val);
+  if (supplyCapV < 1 || supplyCapV > max) {
+    return 'must be between 1 and $max';
+  }
+  return null;
+}
+
+String? validateSupplyCapAmp(String val) {
+  double max = 1000;
+  if (val.trim().isEmpty) {
+    return 'required';
+  }
+  //must be a number
+  if (double.tryParse(val) == null) {
+    return 'must be a number';
+  }
+  // min max
+  double supplyCapAmps = double.parse(val);
+  if (supplyCapAmps < 1 || supplyCapAmps > max) {
+    return 'must be between 1 and $max';
+  }
+  return null;
+}
+
+String? validateRequestedTurnOnDate(String val) {
+  if (val.trim().isEmpty) {
+    return 'required';
+  }
+  //must be a timestamp
+  if (DateTime.tryParse(val) == null) {
+    return 'must be a timestamp';
+  }
+  // must be in the future
+  DateTime requestedTurnOnDate = DateTime.parse(val);
+  if (requestedTurnOnDate.isBefore(DateTime.now())) {
+    return 'must be in the future';
+  }
+  return null;
+}
+
+String? validateFtfStartDate(String val) {
+  if (val.trim().isEmpty) {
+    return 'required';
+  }
+  //must be a timestamp
+  if (DateTime.tryParse(val) == null) {
+    return 'must be a timestamp';
+  }
+  // must be in the future
+  DateTime ftfStartDate = DateTime.parse(val);
+  if (ftfStartDate.isBefore(DateTime.now())) {
+    return 'must be in the future';
+  }
+  return null;
+}
+
+String? validateDdaNumber(String val) {
+  if (val.trim().isEmpty) {
+    return 'required';
+  }
+  // validate number, letter, underscore, and dash,
+  // and minimum 5 characters
+  String pattern = r'^[a-zA-Z0-9_ -]{5,}$';
+  RegExp regExp = RegExp(pattern);
+  if (!regExp.hasMatch(val)) {
+    return 'min length is 5 and letter, number, space, _, - only';
+  }
+  return null;
+}
+
+String? validateUnitType(String? value) {
+  if (value == null || value.isEmpty) {
+    return 'Unit type is required';
+  }
+  // PagTenantUnitType.values
+  if (!PagTenantUnitType.values.any((e) => e.value == value)) {
+    return 'Invalid unit type';
+  }
+  return null;
+}
+
+String? validateFirstReadingValue(String val) {
+  if (val.trim().isEmpty) {
+    // return 'required';
+  }
+  //must be a number
+  if (double.tryParse(val) == null) {
+    return 'must be a number';
+  }
+  return null;
+}
+
+String? validateFirstReadingTimestamp(String val) {
+  if (val.trim().isEmpty) {
+    // return 'required';
+  }
+  //must be a timestamp
+  if (DateTime.tryParse(val) == null) {
+    return 'must be a timestamp';
+  }
+  return null;
+}
+
+String? validateLastReadingValue(String val) {
+  if (val.trim().isEmpty) {
+    // return 'required';
+  }
+  //must be a number
+  if (double.tryParse(val) == null) {
+    return 'must be a number';
+  }
+  return null;
+}
+
+String? validateLastReadingTimestamp(
+    String val, String? firstReadingTimestampStr) {
+  if (val.trim().isEmpty) {
+    // return 'required';
+  }
+  //must be a timestamp
+  if (DateTime.tryParse(val) == null) {
+    return 'must be a timestamp';
+  }
+  // must be greater than first reading timestamp
+  if (firstReadingTimestampStr != null) {
+    DateTime firstReadingDatetime = DateTime.parse(firstReadingTimestampStr!);
+    DateTime lastReadingDatetime = DateTime.parse(val);
+    if (lastReadingDatetime.isBefore(firstReadingDatetime)) {
+      return 'must be greater than first reading timestamp';
+    }
+  }
+  return null;
+}
+
+enum PagTenantOps {
+  onboarding,
+  none,
+}
+
+/*
+company_trading_name
+billing_address,
+billing_address_line_1,
+billing_address_line_2,
+billing_address_line_3,
+label,
+account_number,
+billing_contact_name,
+billing_email,
+billing_did,
+payment_method,
+credit_term,
+bank_account_number,
+deposit_amount,
+unit_type,
+gfa,
+supply_cap_kva,
+supply_cap_v,
+supply_cap_amp,
+requested_turn_on_date,
+ftf_start_date,
+dda_number,
+site_label,
+building_label,
+location_label,
+ */
+final List<Map<String, dynamic>> listConfigBaseTenantOnb = [
+  {
+    'col_key': 'company_trading_name',
+    'title': 'Company Trading Name',
+    'col_type': 'string',
+    'width': 200,
+    'is_mapping_required': true,
+    'validator': validateCompanyTradingName,
+  },
+  {
+    'col_key': 'billing_address',
+    'title': 'Billing Address',
+    'col_type': 'string',
+    'width': 200,
+    'is_mapping_required': false,
+    'validator': validateBillingAddress,
+  },
+  {
+    'col_key': 'billing_address_line_1',
+    'title': 'Billing Address Line 1',
+    'col_type': 'string',
+    'width': 200,
+    'is_mapping_required': true,
+    'validator': validateBillingAddressLine1
+  },
+  {
+    'col_key': 'billing_address_line_2',
+    'title': 'Billing Address Line 2',
+    'col_type': 'string',
+    'width': 200,
+    'is_mapping_required': false,
+    'validator': validateBillingAddressLine2,
+  },
+  {
+    'col_key': 'billing_address_line_3',
+    'title': 'Billing Address Line 3',
+    'col_type': 'string',
+    'width': 200,
+    'is_mapping_required': false,
+    'validator': validateBillingAddressLine3,
+  },
+  {
+    'col_key': 'label',
+    'title': 'Label',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': false,
+    'validator': validateTenantLabel,
+  },
+  {
+    'col_key': 'account_number',
+    'title': 'Account Number',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': true,
+    'validator': validateBankAccountNumber,
+  },
+  {
+    'col_key': 'billing_contact_name',
+    'title': 'Billing Contact Name',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': true,
+    'validator': validateFullName,
+  },
+  {
+    'col_key': 'billing_email',
+    'title': 'Billing Email',
+    'col_type': 'email',
+    'width': 150,
+    'is_mapping_required': true,
+    'validator': validateEmail,
+  },
+  {
+    'col_key': 'billing_did',
+    'title': 'Billing DID',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': true,
+    'validator': validatePhone,
+  },
+  {
+    'col_key': 'payment_method',
+    'title': 'Payment Method',
+    'col_type': 'enum',
+    'width': 150,
+    'is_mapping_required': true,
+    // 'enum_values': PagTenantPaymentMethod.values
+    //     .map((e) => {'label': e.label, 'value': e.value})
+    //     .toList(),
+    'validator': validatePaymentMethod,
+  },
+  {
+    'col_key': 'credit_term',
+    'title': 'Credit Term',
+    'col_type': 'int',
+    'width': 100,
+    'is_mapping_required': true,
+    'validator': validateCreditTerm,
+  },
+  {
+    'col_key': 'bank_account_number',
+    'title': 'Bank Account Number',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': true,
+    'validator': validateBankAccountNumber,
+  },
+  {
+    'col_key': 'deposit_amount',
+    'title': 'Deposit Amount',
+    'col_type': 'double',
+    'width': 120,
+    'is_mapping_required': true,
+    'validator': validatePaymentAmount,
+  },
+  {
+    'col_key': 'unit_type',
+    'title': 'Unit Type',
+    'col_type': 'enum',
+    'width': 150,
+    'is_mapping_required': true,
+    'validator': validateUnitType,
+  },
+  {
+    'col_key': 'gfa',
+    'title': 'GFA',
+    'col_type': 'double',
+    'width': 120,
+    'is_mapping_required': false,
+    'validator': validateGfa
+  },
+  {
+    'col_key': 'supply_cap_kva',
+    'title': 'Supply Cap KVA',
+    'col_type': 'double',
+    'width': 120,
+    'is_mapping_required': false,
+    'validator': validateSupplyCapKva,
+  },
+  {
+    'col_key': 'supply_cap_v',
+    'title': 'Supply Cap V',
+    'col_type': 'double',
+    'width': 120,
+    'is_mapping_required': false,
+    'validator': validateSupplyCapV,
+  },
+  {
+    'col_key': 'supply_cap_amp',
+    'title': 'Supply Cap Amp',
+    'col_type': 'double',
+    'width': 120,
+    'is_mapping_required': false,
+    'validator': validateSupplyCapAmp,
+  },
+  {
+    'col_key': 'requested_turn_on_date',
+    'title': 'Requested Turn On Date',
+    'col_type': 'date',
+    'width': 120,
+    'is_mapping_required': true,
+    'validator': validateRequestedTurnOnDate,
+  },
+  {
+    'col_key': 'ftf_start_date',
+    'title': 'FTF Start Date',
+    'col_type': 'date',
+    'width': 120,
+    'is_mapping_required': false,
+    'validator': validateFtfStartDate,
+  },
+  {
+    'col_key': 'dda_number',
+    'title': 'DDA Number',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': true,
+    'validator': validateDdaNumber,
+  },
+  {
+    'col_key': 'site_label',
+    'title': 'Site Label',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': true,
+    'validator': validateLabelScope,
+  },
+  {
+    'col_key': 'building_label',
+    'title': 'Building Label',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': true,
+    'validator': validateLabelScope,
+  },
+  {
+    'col_key': 'location_label',
+    'title': 'Location Label',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': true,
+    'validator': validateLabelScope,
+  },
+];

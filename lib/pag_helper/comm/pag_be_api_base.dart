@@ -264,7 +264,8 @@ class PagUrlBase {
   static const String eptSetUserTenantList = '/ems/set_user_tenant_list';
 
   // ems/fin
-  static const String eptFinPostPayment = '/ems/fin/batch_op/post_payment';
+  static const String eptBatchOpFinPostPayment =
+      '/ems/fin/batch_op/post_payment';
 
   // Tariff Package Manager
   static const String eptGetTariffPackageTariffRateInfo =
@@ -298,6 +299,9 @@ class PagUrlBase {
   static const String eptPagGetTenantMeterAssignment =
       '/ems/tenant/get_tenant_meter_assignment';
   static const String eptGetTenantSoA = '/ems/fin/get_tenant_soa';
+
+  static const String eptBatchOpTenantOnboarding =
+      '/ems/tenant/batch_op/tenant_onboarding';
 
   //Billing Manager
   static const String eptGetBill = '/ems/billing/get_bill';

@@ -56,96 +56,6 @@ Future<dynamic> pagUpdateBatchOpProgress(
   }
 }
 
-Future<dynamic> getManualMeterList(
-  MdlPagAppConfig appConfig,
-  MdlPagUser? loggedInUser,
-  Map<String, dynamic> queryMap,
-  MdlPagSvcClaim svcClaim,
-) async {
-  svcClaim.svcName = PagSvcType.oresvc2.name;
-  svcClaim.endpoint = PagUrlBase.eptMeterOpGetManualMeterList;
-
-  String svcToken = '';
-  // try {
-  //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
-  // } catch (err) {
-  //   throw Exception(err);
-  // }
-
-  try {
-    final response = await http.post(
-      Uri.parse(PagUrlController(loggedInUser, appConfig)
-          .getUrl(PagSvcType.oresvc2, svcClaim.endpoint!)),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $svcToken',
-      },
-      body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
-    );
-
-    if (response.statusCode == 200) {
-      final respJson = jsonDecode(response.body);
-      if (respJson['data'] == null) {
-        String? message = respJson['error']?['message'];
-        if (message != null) {
-          throw Exception(message);
-        }
-        throw Exception('Failed to get manual meter list');
-      }
-      return respJson;
-    } else {
-      throw Exception('Failed to get manual meter list');
-    }
-  } catch (err) {
-    rethrow;
-  }
-}
-
-Future<dynamic> submitManualReadingList(
-  MdlPagAppConfig appConfig,
-  MdlPagUser? loggedInUser,
-  Map<String, dynamic> queryMap,
-  MdlPagSvcClaim svcClaim,
-) async {
-  svcClaim.svcName = PagSvcType.oresvc2.name;
-  svcClaim.endpoint = PagUrlBase.eptMeterOpSubmitManualReadingList;
-
-  String svcToken = '';
-  // try {
-  //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
-  // } catch (err) {
-  //   throw Exception(err);
-  // }
-
-  try {
-    final response = await http.post(
-      Uri.parse(PagUrlController(loggedInUser, appConfig)
-          .getUrl(PagSvcType.oresvc2, svcClaim.endpoint!)),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $svcToken',
-      },
-      body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
-    );
-
-    if (response.statusCode == 200) {
-      final respJson = jsonDecode(response.body);
-      if (respJson['data'] == null) {
-        String? message = respJson['error']?['message'];
-        if (message != null) {
-          throw Exception(message);
-        }
-        throw Exception('Failed to submit manual reading list');
-      }
-      return respJson;
-    } else {
-      throw Exception('Failed to submit manual reading list');
-    }
-  } catch (err) {
-    rethrow;
-  }
-}
-
 Future<dynamic> commitTenantMeterGroupList(
   MdlPagAppConfig appConfig,
   Map<String, dynamic> queryMap,
@@ -177,6 +87,60 @@ Future<dynamic> commitTenantMeterGroupList(
       throw Exception(respJson['error']);
     }
     return respJson['data'];
+  } else if (response.statusCode == 403) {
+    throw Exception("You are not authorized to perform this operation");
+  } else {
+    throw Exception(jsonDecode(response.body)['error']);
+  }
+}
+
+Future<dynamic> doTenantOnboarding(
+  MdlPagAppConfig appConfig,
+  Map<String, dynamic> queryMap,
+  MdlPagSvcClaim svcClaim,
+) async {
+  svcClaim.svcName = PagSvcType.oresvc2.name;
+  svcClaim.endpoint = PagUrlBase.eptBatchOpTenantOnboarding;
+
+  String svcToken = '';
+  // try {
+  //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
+  // } catch (err) {
+  //   throw Exception(err);
+  // }
+
+  final response = await http.post(
+    Uri.parse(PagUrlController(null, appConfig)
+        .getUrl(PagSvcType.oresvc2, svcClaim.endpoint!)),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer $svcToken',
+    },
+    body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
+  );
+
+  if (response.statusCode == 200) {
+    final responseBody = jsonDecode(response.body);
+    final error = responseBody['error'];
+    if (error != null) {
+      throw Exception(error);
+    }
+    final data = responseBody['data'];
+    if (data == null) {
+      throw Exception('Failed to get response data');
+    }
+    final result = data['result'];
+    if (result == null) {
+      throw Exception("No result found in the response");
+    }
+    String? resultKey = data['result_key'];
+    if (resultKey == null && resultKey!.isEmpty) {
+      throw Exception("Error: $resultKey");
+    }
+    if (result[resultKey] == null) {
+      throw Exception("No data found in the response");
+    }
+    return result[resultKey];
   } else if (response.statusCode == 403) {
     throw Exception("You are not authorized to perform this operation");
   } else {
