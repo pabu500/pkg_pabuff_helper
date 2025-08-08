@@ -1,5 +1,4 @@
-import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart'
-    hide enumByLabel;
+import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:buff_helper/xt_ui/util/xt_util_InputFieldValidator.dart';
 import 'package:flutter/material.dart';
 
@@ -31,7 +30,7 @@ enum PagTenantLcStatus {
         (e) => (e).label,
       );
 
-  static PagTenantLcStatus byValue(String? value) =>
+  static PagTenantLcStatus byValue(String value) =>
       enumByLabel(
         value,
         values,
@@ -39,7 +38,7 @@ enum PagTenantLcStatus {
       ) ??
       normal;
 
-  static PagTenantLcStatus byTag(String? tag) =>
+  static PagTenantLcStatus? byTag(String? tag) =>
       enumByTag(
         tag,
         values,
@@ -97,7 +96,7 @@ enum PagTenantUnitType {
         (e) => (e).label,
       );
 
-  static PagTenantUnitType byValue(String? value) =>
+  static PagTenantUnitType byValue(String value) =>
       enumByLabel(
         value,
         values,
@@ -114,7 +113,7 @@ enum PagTenantUnitType {
 }
 
 enum PagTenantPaymentMethod {
-  giro('GIRO', 'qiro', 'giro', Colors.green),
+  giro('GIRO', 'giro', 'giro', Colors.green),
   nonGiro('None GIRO', 'non_giro', 'ngiro', Colors.red),
   cheque('Cheque', 'cheque', 'chq', Colors.blue),
   other('Other', 'other', 'oth', Colors.grey),
@@ -138,7 +137,7 @@ enum PagTenantPaymentMethod {
         (e) => (e).label,
       );
 
-  static PagTenantPaymentMethod byValue(String? value) =>
+  static PagTenantPaymentMethod byValue(String value) =>
       enumByLabel(
         value,
         values,
@@ -154,86 +153,86 @@ enum PagTenantPaymentMethod {
       other;
 }
 
-String? validateTenantLabel(String? val) {
-  if (val == null || val.trim().isEmpty) {
+String? validateTenantLabel(String value) {
+  if (value.trim().isEmpty) {
     return 'required';
   }
   //length 5-255, alphanumeric, space, /, ', - only
-  String pattern = r"^[a-zA-Z0-9 /'-]{5,255}$";
+  String pattern = r"^[-a-zA-Z0-9 ./']{5,255}$";
   RegExp regExp = RegExp(pattern);
-  if (!regExp.hasMatch(val)) {
-    return 'invalid characters';
+  if (!regExp.hasMatch(value)) {
+    return 'alphanumeric, space, /, -, . only and length 5-255';
   }
   return null;
 }
 
-String? validateCompanyTradingName(String? val) {
-  if (val == null || val.trim().isEmpty) {
+String? validateCompanyTradingName(String value) {
+  if (value.trim().isEmpty) {
     return 'required';
   }
   //length 5-255, alphanumeric, space, /, ', - only
-  String pattern = r"^[a-zA-Z0-9 /'-]{5,255}$";
+  String pattern = r"^[-a-zA-Z0-9 ./']{5,255}$";
   RegExp regExp = RegExp(pattern);
-  if (!regExp.hasMatch(val)) {
-    return 'invalid characters';
+  if (!regExp.hasMatch(value)) {
+    return 'alphanumeric, space, /, -, . only and length 5-255';
   }
   return null;
 }
 
-String? validateBillingAddress(String? val) {
-  if (val == null || val.trim().isEmpty) {
+String? validateBillingAddress(String value) {
+  if (value.trim().isEmpty) {
     return 'required';
   }
   //length 5-255, alphanumeric, space, /, ', -, # only
-  String pattern = r"^[a-zA-Z0-9 /'-#]{5,255}$";
+  String pattern = r"^[-a-zA-Z0-9 ./'#]{5,255}$";
   RegExp regExp = RegExp(pattern);
-  if (!regExp.hasMatch(val)) {
-    return 'invalid characters';
+  if (!regExp.hasMatch(value)) {
+    return 'alphanumeric, space, /, -, . only and length 5-255';
   }
   return null;
 }
 
-String? validateBillingAddressLine1(String? val) {
-  if (val == null || val.trim().isEmpty) {
+String? validateBillingAddressLine1(String value) {
+  if (value.trim().isEmpty) {
     return 'required';
   }
-  //length 5-255, alphanumeric, space, /, ', -, # only
-  String pattern = r"^[a-zA-Z0-9 /'-#]{5,255}$";
+  //length 5-255, alphanumeric, space, /, ', -,  # only
+  String pattern = r"^[-a-zA-Z0-9 ./'#]{5,255}$";
   RegExp regExp = RegExp(pattern);
-  if (!regExp.hasMatch(val)) {
+  if (!regExp.hasMatch(value)) {
     return 'alphanumeric, space, /, -, # only and length 5-255';
   }
   return null;
 }
 
-String? validateBillingAddressLine2(String? val) {
-  if (val == null || val.trim().isEmpty) {
+String? validateBillingAddressLine2(String value) {
+  if (value.trim().isEmpty) {
     return 'required';
   }
   //length 5-255, alphanumeric, space, /, ', -, # only
-  String pattern = r"^[a-zA-Z0-9 /'-#]{5,255}$";
+  String pattern = r"^[-a-zA-Z0-9 ./'#]{5,255}$";
   RegExp regExp = RegExp(pattern);
-  if (!regExp.hasMatch(val)) {
+  if (!regExp.hasMatch(value)) {
     return 'alphanumeric, space, /, -, # only and length 5-255';
   }
   return null;
 }
 
-String? validateBillingAddressLine3(String? val) {
-  if (val == null || val.trim().isEmpty) {
+String? validateBillingAddressLine3(String value) {
+  if (value.trim().isEmpty) {
     return 'required';
   }
   //length 5-21, alphanumeric, space, /, ', -, # only
-  String pattern = r"^[a-zA-Z0-9 /'-#]{5,21}$";
+  String pattern = r"^[-a-zA-Z0-9 ./'#]{5,21}$";
   RegExp regExp = RegExp(pattern);
-  if (!regExp.hasMatch(val)) {
+  if (!regExp.hasMatch(value)) {
     return 'alphanumeric, space, /, -, # only and length 5-21';
   }
   return null;
 }
 
-String? validateBankAccountNumber(String? val) {
-  if (val == null || val.trim().isEmpty) {
+String? validateBankAccountNumber(String value) {
+  if (value.trim().isEmpty) {
     return 'required';
   }
 
@@ -241,14 +240,14 @@ String? validateBankAccountNumber(String? val) {
   // and minimum 5 characters
   String pattern = r'^[a-zA-Z0-9_ -]{5,}$';
   RegExp regExp = RegExp(pattern);
-  if (!regExp.hasMatch(val)) {
+  if (!regExp.hasMatch(value)) {
     return 'min length is 5 and letter, number, _, - only';
   }
   return null;
 }
 
-String? validatePaymentAmount(String? value) {
-  if (value == null || value.isEmpty) {
+String? validatePaymentAmount(String value) {
+  if (value.isEmpty) {
     return 'Payment amount is required';
   }
   // Add more validation logic if needed
@@ -260,8 +259,8 @@ String? validatePaymentAmount(String? value) {
   return null;
 }
 
-String? validateTenantRef(String? value) {
-  if (value == null || value.isEmpty) {
+String? validateTenantRef(String value) {
+  if (value.isEmpty) {
     return 'Tenant reference is required';
   }
   // Add more validation logic if needed
@@ -273,8 +272,8 @@ String? validateTenantRef(String? value) {
   return null;
 }
 
-String? validatePaymentMethod(String? value) {
-  if (value == null || value.isEmpty) {
+String? validatePaymentMethod(String value) {
+  if (value.isEmpty) {
     return 'Payment method is required';
   }
   // PagTenantPaymentMethod.values
@@ -284,8 +283,8 @@ String? validatePaymentMethod(String? value) {
   return null;
 }
 
-String? validateCreditTerm(String? value) {
-  if (value == null || value.isEmpty) {
+String? validateCreditTerm(String value) {
+  if (value.isEmpty) {
     return 'Credit term is required';
   }
   // 1 to 30
@@ -296,8 +295,8 @@ String? validateCreditTerm(String? value) {
   return null;
 }
 
-String? validateGfa(String? value) {
-  if (value == null || value.isEmpty) {
+String? validateGfa(String value) {
+  if (value.isEmpty) {
     // return 'GFA is required';
     return null;
   }
@@ -309,8 +308,8 @@ String? validateGfa(String? value) {
   return '';
 }
 
-String? validateLabel(String val) {
-  if (val.trim().isEmpty) {
+String? validateLabel(String value) {
+  if (value.trim().isEmpty) {
     return 'required';
   }
 
@@ -318,165 +317,165 @@ String? validateLabel(String val) {
   // and minimum 5 characters
   String pattern = r'^[a-zA-Z0-9_ -]{5,}$';
   RegExp regExp = RegExp(pattern);
-  if (!regExp.hasMatch(val)) {
+  if (!regExp.hasMatch(value)) {
     return 'min length is 5 and letter, number, space, _, - only';
   }
   return null;
 }
 
-String? validateAccountNumber(String val) {
-  if (val.trim().isEmpty) {
+String? validateAccountNumber(String value) {
+  if (value.trim().isEmpty) {
     return 'required';
   }
   // validate number, letter, underscore, and dash,
   // and minimum 5 characters
   String pattern = r'^[a-zA-Z0-9_ -]{5,}$';
   RegExp regExp = RegExp(pattern);
-  if (!regExp.hasMatch(val)) {
+  if (!regExp.hasMatch(value)) {
     return 'min length is 5 and letter, number, _, - only';
   }
   return null;
 }
 
-String? validateDepositeAmount(String val) {
-  if (val.trim().isEmpty) {
+String? validateDepositeAmount(String value) {
+  if (value.trim().isEmpty) {
     return 'required';
   }
   //must be a number
-  if (double.tryParse(val) == null) {
+  if (double.tryParse(value) == null) {
     return 'must be a number';
   }
   return null;
 }
 
-String? validateFloorArea(String val) {
+String? validateFloorArea(String value) {
   double max = 1000000;
-  if (val.trim().isEmpty) {
+  if (value.trim().isEmpty) {
     return 'required';
   }
   //must be a number
-  if (double.tryParse(val) == null) {
+  if (double.tryParse(value) == null) {
     return 'must be a number';
   }
   // min max
-  double floorArea = double.parse(val);
+  double floorArea = double.parse(value);
   if (floorArea < 1 || floorArea > max) {
     return 'must be between 1 and $max';
   }
   return null;
 }
 
-String? validateBillingContactName(String val) {
-  return validateFullName(val);
+String? validateBillingContactName(String value) {
+  return validateFullName(value);
 }
 
-String? validateBillingContactEmail(String val) {
-  return validateEmail(val);
+String? validateBillingContactEmail(String value) {
+  return validateEmail(value);
 }
 
-String? validateBillingContactPhone(String val) {
-  return validatePhone(val);
-}
+// String? validateBillingContactPhone(String value) {
+//   return validatePhone(value);
+// }
 
-String? validateSupplyCapKva(String val) {
-  double max = 10000;
-  if (val.trim().isEmpty) {
+String? validateSupplyCapKva(String value) {
+  if (value.trim().isEmpty) {
     return 'required';
   }
+  double max = 10000;
   //must be a number
-  if (double.tryParse(val) == null) {
+  if (double.tryParse(value) == null) {
     return 'must be a number';
   }
   // min max
-  double supplyCapKva = double.parse(val);
+  double supplyCapKva = double.parse(value);
   if (supplyCapKva < 1 || supplyCapKva > max) {
     return 'must be between 1 and $max';
   }
   return null;
 }
 
-String? validateSupplyCapV(String val) {
+String? validateSupplyCapV(String value) {
   double max = 1000;
-  if (val.trim().isEmpty) {
+  if (value.trim().isEmpty) {
     return 'required';
   }
   //must be a number
-  if (double.tryParse(val) == null) {
+  if (double.tryParse(value) == null) {
     return 'must be a number';
   }
   // min max
-  double supplyCapV = double.parse(val);
+  double supplyCapV = double.parse(value);
   if (supplyCapV < 1 || supplyCapV > max) {
     return 'must be between 1 and $max';
   }
   return null;
 }
 
-String? validateSupplyCapAmp(String val) {
+String? validateSupplyCapAmp(String value) {
   double max = 1000;
-  if (val.trim().isEmpty) {
+  if (value.trim().isEmpty) {
     return 'required';
   }
   //must be a number
-  if (double.tryParse(val) == null) {
+  if (double.tryParse(value) == null) {
     return 'must be a number';
   }
   // min max
-  double supplyCapAmps = double.parse(val);
+  double supplyCapAmps = double.parse(value);
   if (supplyCapAmps < 1 || supplyCapAmps > max) {
     return 'must be between 1 and $max';
   }
   return null;
 }
 
-String? validateRequestedTurnOnDate(String val) {
-  if (val.trim().isEmpty) {
+String? validateRequestedTurnOnDate(String value) {
+  if (value.trim().isEmpty) {
     return 'required';
   }
   //must be a timestamp
-  if (DateTime.tryParse(val) == null) {
+  if (DateTime.tryParse(value) == null) {
     return 'must be a timestamp';
   }
   // must be in the future
-  DateTime requestedTurnOnDate = DateTime.parse(val);
+  DateTime requestedTurnOnDate = DateTime.parse(value);
   if (requestedTurnOnDate.isBefore(DateTime.now())) {
     return 'must be in the future';
   }
   return null;
 }
 
-String? validateFtfStartDate(String val) {
-  if (val.trim().isEmpty) {
+String? validateFtfStartDate(String value) {
+  if (value.trim().isEmpty) {
     return 'required';
   }
   //must be a timestamp
-  if (DateTime.tryParse(val) == null) {
+  if (DateTime.tryParse(value) == null) {
     return 'must be a timestamp';
   }
   // must be in the future
-  DateTime ftfStartDate = DateTime.parse(val);
+  DateTime ftfStartDate = DateTime.parse(value);
   if (ftfStartDate.isBefore(DateTime.now())) {
     return 'must be in the future';
   }
   return null;
 }
 
-String? validateDdaNumber(String val) {
-  if (val.trim().isEmpty) {
+String? validateDdaNumber(String value) {
+  if (value.trim().isEmpty) {
     return 'required';
   }
   // validate number, letter, underscore, and dash,
   // and minimum 5 characters
   String pattern = r'^[a-zA-Z0-9_ -]{5,}$';
   RegExp regExp = RegExp(pattern);
-  if (!regExp.hasMatch(val)) {
+  if (!regExp.hasMatch(value)) {
     return 'min length is 5 and letter, number, space, _, - only';
   }
   return null;
 }
 
-String? validateUnitType(String? value) {
-  if (value == null || value.isEmpty) {
+String? validateUnitType(String value) {
+  if (value.isEmpty) {
     return 'Unit type is required';
   }
   // PagTenantUnitType.values
@@ -486,58 +485,70 @@ String? validateUnitType(String? value) {
   return null;
 }
 
-String? validateFirstReadingValue(String val) {
-  if (val.trim().isEmpty) {
-    // return 'required';
+String? validateFirstReadingValue(String value) {
+  if (value.trim().isEmpty) {
+    return 'required';
   }
   //must be a number
-  if (double.tryParse(val) == null) {
+  if (double.tryParse(value) == null) {
     return 'must be a number';
   }
   return null;
 }
 
-String? validateFirstReadingTimestamp(String val) {
-  if (val.trim().isEmpty) {
-    // return 'required';
+String? validateFirstReadingTimestamp(String value) {
+  if (value.trim().isEmpty) {
+    return 'required';
   }
   //must be a timestamp
-  if (DateTime.tryParse(val) == null) {
+  if (DateTime.tryParse(value) == null) {
     return 'must be a timestamp';
   }
+
   return null;
 }
 
-String? validateLastReadingValue(String val) {
-  if (val.trim().isEmpty) {
+String? validateLastReadingValue(String value) {
+  if (value.trim().isEmpty) {
     // return 'required';
   }
   //must be a number
-  if (double.tryParse(val) == null) {
+  if (double.tryParse(value) == null) {
     return 'must be a number';
   }
+
   return null;
 }
 
-String? validateLastReadingTimestamp(
-    String val, String? firstReadingTimestampStr) {
-  if (val.trim().isEmpty) {
+String? validateBillingDid(String value) {
+  if (value.trim().isEmpty) {
     // return 'required';
+    return null;
   }
-  //must be a timestamp
-  if (DateTime.tryParse(val) == null) {
-    return 'must be a timestamp';
-  }
-  // must be greater than first reading timestamp
-  if (firstReadingTimestampStr != null) {
-    DateTime firstReadingDatetime = DateTime.parse(firstReadingTimestampStr!);
-    DateTime lastReadingDatetime = DateTime.parse(val);
-    if (lastReadingDatetime.isBefore(firstReadingDatetime)) {
-      return 'must be greater than first reading timestamp';
-    }
-  }
-  return null;
+  return validatePhone(value);
 }
+
+// String? validateLastReadingTimestamp(
+//     String? val, String? firstReadingTimestampStr) {
+//   if (val == null || val.trim().isEmpty) {
+//     // return 'required';
+//   } else {
+//     //must be a timestamp
+//     if (DateTime.tryParse(val) == null) {
+//       return 'must be a timestamp';
+//     }
+
+//     // must be greater than first reading timestamp
+//     if (firstReadingTimestampStr != null) {
+//       DateTime firstReadingDatetime = DateTime.parse(firstReadingTimestampStr!);
+//       DateTime lastReadingDatetime = DateTime.parse(val);
+//       if (lastReadingDatetime.isBefore(firstReadingDatetime)) {
+//         return 'must be greater than first reading timestamp';
+//       }
+//     }
+//   }
+//   return null;
+// }
 
 enum PagTenantOps {
   onboarding,
@@ -649,8 +660,8 @@ final List<Map<String, dynamic>> listConfigBaseTenantOnb = [
     'title': 'Billing DID',
     'col_type': 'string',
     'width': 150,
-    'is_mapping_required': true,
-    'validator': validatePhone,
+    'is_mapping_required': false,
+    'validator': validateBillingDid,
   },
   {
     'col_key': 'payment_method',
@@ -676,7 +687,7 @@ final List<Map<String, dynamic>> listConfigBaseTenantOnb = [
     'title': 'Bank Account Number',
     'col_type': 'string',
     'width': 150,
-    'is_mapping_required': true,
+    'is_mapping_required': false,
     'validator': validateBankAccountNumber,
   },
   {
@@ -732,7 +743,7 @@ final List<Map<String, dynamic>> listConfigBaseTenantOnb = [
     'title': 'Requested Turn On Date',
     'col_type': 'date',
     'width': 120,
-    'is_mapping_required': true,
+    'is_mapping_required': false,
     'validator': validateRequestedTurnOnDate,
   },
   {
@@ -748,7 +759,7 @@ final List<Map<String, dynamic>> listConfigBaseTenantOnb = [
     'title': 'DDA Number',
     'col_type': 'string',
     'width': 150,
-    'is_mapping_required': true,
+    'is_mapping_required': false,
     'validator': validateDdaNumber,
   },
   {
@@ -756,7 +767,7 @@ final List<Map<String, dynamic>> listConfigBaseTenantOnb = [
     'title': 'Site Label',
     'col_type': 'string',
     'width': 150,
-    'is_mapping_required': true,
+    'is_mapping_required': false,
     'validator': validateLabelScope,
   },
   {

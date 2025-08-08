@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import 'enum_helper.dart';
+
 enum PagScopeType {
   project('Project', 'project', Symbols.flag),
   siteGroup('Site Group', 'site_group', Symbols.workspaces),
@@ -21,23 +23,23 @@ enum PagScopeType {
   final IconData iconData;
 
   static PagScopeType byLabel(String? label) =>
-      enumByLabel(label, values) ?? none;
+      enumByLabel(label, values, (e) => e.label) ?? none;
 
   static PagScopeType byKey(String? key) => enumByKey(key, values) ?? none;
 }
 
-T? enumByLabel<T extends Enum>(
-  String? label,
-  List<T> values,
-) {
-  if (label == null) return null;
-  for (var value in values) {
-    if (value is PagScopeType && value.label == label) {
-      return value as T;
-    }
-  }
-  return null;
-}
+// T? enumByLabel<T extends Enum>(
+//   String? label,
+//   List<T> values,
+// ) {
+//   if (label == null) return null;
+//   for (var value in values) {
+//     if (value is PagScopeType && value.label == label) {
+//       return value as T;
+//     }
+//   }
+//   return null;
+// }
 
 T? enumByKey<T extends Enum>(String? key, List<T> values) {
   if (key == null) return null;
@@ -107,10 +109,10 @@ String? validateLabelScope(String val) {
 
   // validate alphanumeric, _, -, #, slash, back slash and dash, space,
   // and minimum 5 characters
-  String pattern = r"^[a-zA-Z0-9/_ \-#']{5,}$";
+  String pattern = r"^[a-zA-Z0-9/_ \-#().']{5,255}$";
   RegExp regExp = RegExp(pattern);
   if (!regExp.hasMatch(val)) {
-    return 'min length is 5 and alphanumeric, space, #, /, _, - only';
+    return 'alphanumeric, space, /, -, ., (), # only and length 5-255';
   }
   return null;
 }
