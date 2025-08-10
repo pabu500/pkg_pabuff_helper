@@ -64,6 +64,13 @@ class _WgtTariffPackageAssignmentState
   // List<Map<String, dynamic>>? _tariffPackageTenantList;
   List<Map<String, dynamic>>? _tariffPackageScopeMatchingTenantList;
 
+  final TextEditingController _itemNamefilterController =
+      TextEditingController();
+  String _itemNameFilterStr = '';
+  final TextEditingController _itemLabelFilterController =
+      TextEditingController();
+  String _itemLabelFilterStr = '';
+
   Future<void> _doAutoPopulate() async {
     if (_isFetching) {
       return;
@@ -198,6 +205,22 @@ class _WgtTariffPackageAssignmentState
     }
   }
 
+  bool _showItem(Map<String, dynamic> item) {
+    if (_itemNameFilterStr.isNotEmpty) {
+      String? name = item['name'];
+      bool nameMatches = (name ?? '').isNotEmpty &&
+          (name ?? '').toLowerCase().contains(_itemNameFilterStr);
+      return nameMatches;
+    }
+    if (_itemLabelFilterStr.isNotEmpty) {
+      String? label = item['label'];
+      bool labelMatches = (label ?? '').isNotEmpty &&
+          (label ?? '').toLowerCase().contains(_itemLabelFilterStr);
+      return labelMatches;
+    }
+    return true; // Include item if no filter is applied
+  }
+
   @override
   void initState() {
     super.initState();
@@ -276,7 +299,7 @@ class _WgtTariffPackageAssignmentState
         borderRadius: BorderRadius.circular(5),
       ),
       margin: const EdgeInsets.symmetric(horizontal: 5),
-      child: getScopeTenantList(),
+      child: getScopeItemList(),
     );
   }
 
@@ -290,6 +313,31 @@ class _WgtTariffPackageAssignmentState
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 5),
+          child: SizedBox(
+            width: 180,
+            height: 39,
+            child: TextField(
+              controller: _itemNamefilterController,
+              readOnly: _isCommitting ||
+                  _isCommitted ||
+                  {_tariffPackageScopeMatchingTenantList ?? []}.isEmpty,
+              decoration: InputDecoration(
+                  hintText: 'Tenant Name',
+                  hintStyle: TextStyle(
+                      color: Theme.of(context)
+                          .hintColor) // prefixIcon: Icon(Icons.search),
+                  ),
+              onChanged: (value) {
+                setState(() {
+                  _itemNameFilterStr = value.trim().toLowerCase();
+                });
+              },
+            ),
+          ),
+        ),
+        horizontalSpaceSmall,
         InkWell(
           onTap: (_tariffPackageScopeMatchingTenantList ?? []).isEmpty ||
                   _hasTptMismatchAssignmentError
@@ -423,19 +471,25 @@ class _WgtTariffPackageAssignmentState
     );
   }
 
-  Widget getScopeTenantList() {
+  Widget getScopeItemList() {
     if (_tariffPackageScopeMatchingTenantList == null ||
         _tariffPackageScopeMatchingTenantList!.isEmpty) {
       return const Center(
         child: Text('No tenant found for this tariff package'),
       );
     }
-    List<Widget> tenantWidgets = [];
+
+    List<Widget> itemWidgetList = [];
     int index = 0;
-    for (Map<String, dynamic> tenant
-        in _tariffPackageScopeMatchingTenantList!) {
-      Widget tile = getTenantRow(tenant, ++index);
-      tenantWidgets.add(
+
+    for (Map<String, dynamic> itemInfo
+        in _tariffPackageScopeMatchingTenantList ?? []) {
+      bool showItem = _showItem(itemInfo);
+      if (!showItem) {
+        continue; // Skip this item if it doesn't match the filter
+      }
+      Widget tile = getItemRow(itemInfo, ++index);
+      itemWidgetList.add(
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 5),
           child: tile,
@@ -445,14 +499,14 @@ class _WgtTariffPackageAssignmentState
 
     return ListView.builder(
       itemExtent: 35,
-      itemCount: tenantWidgets.length,
+      itemCount: itemWidgetList.length,
       itemBuilder: (context, index) {
-        return tenantWidgets[index];
+        return itemWidgetList[index];
       },
     );
   }
 
-  Widget getTenantRow(Map<String, dynamic> itemInfo, int index) {
+  Widget getItemRow(Map<String, dynamic> itemInfo, int index) {
     String tenantName = itemInfo['name'] ?? 'Unknown Tenant';
     String tenantLabel = itemInfo['label'] ?? '';
     bool assigned = itemInfo['assigned'] ?? false;

@@ -461,15 +461,31 @@ class _WgtTenantpAssignmentState extends State<WgtTenantpAssignment> {
     );
   }
 
+  // bool _showItem(Map<String, dynamic> item) {
+  //   if (_itemNameFilterStr.isNotEmpty || _itemLabelFilterStr.isNotEmpty) {
+  //     String? name = item['name'];
+  //     String? label = item['label'];
+  //     bool nameMatches =
+  //         name != null && name.toLowerCase().contains(_itemNameFilterStr);
+  //     bool labelMatches =
+  //         label != null && label.toLowerCase().contains(_itemLabelFilterStr);
+  //     return nameMatches || labelMatches;
+  //   }
+  //   return true; // Include item if no filter is applied
+  // }
+
   bool _showItem(Map<String, dynamic> item) {
-    if (_itemNameFilterStr.isNotEmpty || _itemLabelFilterStr.isNotEmpty) {
+    if (_itemNameFilterStr.isNotEmpty) {
       String? name = item['name'];
+      bool nameMatches = (name ?? '').isNotEmpty &&
+          (name ?? '').toLowerCase().contains(_itemNameFilterStr);
+      return nameMatches;
+    }
+    if (_itemLabelFilterStr.isNotEmpty) {
       String? label = item['label'];
-      bool nameMatches =
-          name != null && name.toLowerCase().contains(_itemNameFilterStr);
-      bool labelMatches =
-          label != null && label.toLowerCase().contains(_itemLabelFilterStr);
-      return nameMatches || labelMatches;
+      bool labelMatches = (label ?? '').isNotEmpty &&
+          (label ?? '').toLowerCase().contains(_itemLabelFilterStr);
+      return labelMatches;
     }
     return true; // Include item if no filter is applied
   }
