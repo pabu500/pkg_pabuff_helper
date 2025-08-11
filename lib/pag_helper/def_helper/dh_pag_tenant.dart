@@ -412,7 +412,7 @@ String? validateSupplyCapV(String value) {
 }
 
 String? validateSupplyCapAmp(String value) {
-  double max = 1000;
+  double max = 3000;
   if (value.trim().isEmpty) {
     return 'required';
   }
