@@ -254,7 +254,7 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
     for (MdlListColController item
         in _selectedListController!.listColControllerList) {
       if (colCustomize.containsKey(item.colKey)) {
-        item.show = colCustomize[item.colKey];
+        item.showColumn = colCustomize[item.colKey];
       }
     }
   }

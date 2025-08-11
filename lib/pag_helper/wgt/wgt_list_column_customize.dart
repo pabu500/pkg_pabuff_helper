@@ -98,7 +98,7 @@ class _WgtPagListColumnCustomizeState extends State<WgtPagListColumnCustomize> {
     Map<String, dynamic> colCustomize = {};
     for (MdlListColController colController
         in widget.listController.listColControllerList) {
-      colCustomize[colController.colKey] = colController.show;
+      colCustomize[colController.colKey] = colController.showColumn;
     }
     saveToSharedPref(widget.sectionName, colCustomize);
   }
@@ -129,12 +129,12 @@ class _WgtPagListColumnCustomizeState extends State<WgtPagListColumnCustomize> {
             Transform.scale(
               scale: 0.8,
               child: Checkbox(
-                value: colController.show,
+                value: colController.showColumn,
                 onChanged: (value) {
                   if (value == null) return;
 
                   setState(() {
-                    colController.show = value;
+                    colController.showColumn = value;
                     // widget.onChanged(value);
                   });
                 },

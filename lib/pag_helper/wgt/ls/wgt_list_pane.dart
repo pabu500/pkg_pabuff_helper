@@ -172,7 +172,7 @@ class _WgtListPaneState extends State<WgtListPane> {
     for (MdlListColController col
         in widget.listController.listColControllerList) {
       bool isShowCol =
-          col.filterGroupType == PagFilterGroupType.IDENTITY && col.show;
+          col.filterGroupType == PagFilterGroupType.IDENTITY && col.showColumn;
       bool isSwitcherCol =
           col.colKey == 'info' && col.colWidgetType == PagColWidgetType.CUSTOM;
       bool isPaneListCol = col.isPaneKey;
@@ -244,7 +244,7 @@ class _WgtListPaneState extends State<WgtListPane> {
           colKey: 'info',
           colTitle: _listPaneMode == ListPaneMode.list ? 'Info' : '',
           includeColKeyAsFilter: false,
-          show: true,
+          showColumn: true,
           colWidth: 45,
           colWidgetType: PagColWidgetType.CUSTOM,
           getCustomWidget: (item, fullList) {

@@ -41,7 +41,8 @@ class MdlListColController {
   String colTitle;
   String filterLabel;
   double colWidth;
-  bool show;
+  bool showColumn;
+  bool showEditPanel;
   bool showSort;
   String sortOrder;
   bool hidden;
@@ -82,7 +83,8 @@ class MdlListColController {
     this.colTitle = '',
     this.filterLabel = '',
     this.colWidth = 0.0,
-    this.show = true,
+    this.showColumn = true,
+    this.showEditPanel = true,
     this.showSort = false,
     this.sortOrder = 'desc',
     this.hidden = false,
@@ -181,15 +183,17 @@ class MdlListColController {
       }
     }
 
-    bool show = true;
+    bool showColumn = true;
+    bool showEditPanel = true;
     if (json['show'] != null) {
       dynamic showValue = json['show'];
       if (showValue is bool) {
-        show = showValue;
+        showColumn = showValue;
       } else if (showValue is String) {
-        show = showValue.toLowerCase() == 'true';
+        showColumn = showValue.toLowerCase() == 'true';
       }
     }
+    showEditPanel = showColumn;
 
     bool permHidden = false;
     if (json['hidden'] != null) {
@@ -333,7 +337,8 @@ class MdlListColController {
       isDisplayNameKey: isDisplayNameKey,
       filterLabel: filterLabel,
       colWidth: width,
-      show: show,
+      showColumn: showColumn,
+      showEditPanel: showEditPanel,
       showSort: showSort,
       sortOrder: sortOrder,
       hidden: permHidden,
@@ -366,7 +371,8 @@ class MdlListColController {
     data['col_title'] = colTitle;
     data['filter_label'] = filterLabel;
     data['col_width'] = colWidth;
-    data['show'] = show.toString();
+    data['show_column'] = showColumn.toString();
+    data['show_edit_panel'] = showEditPanel.toString();
     data['show_sort'] = showSort.toString();
     // data['custHidden'] = hidden.toString();
     data['hidden'] = hidden.toString();

@@ -406,7 +406,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       colKey: 'info',
       colTitle: 'Info',
       includeColKeyAsFilter: false,
-      show: true,
+      showColumn: true,
       colWidth: addOpColumn ? 55 : 35,
       colWidgetType: PagColWidgetType.CUSTOM,
       getCustomWidget: (item, fullList) {
@@ -494,7 +494,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                       }
 
                       fieldList.add({
-                        'show': colController.show,
+                        'show': colController.showColumn,
                         'col_key': colController.colKey,
                         'label': colController.colTitle,
                         'value': value, //item[colController.colKey],
@@ -566,7 +566,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       },
     );
     // _selectedListController?.listColControllerList.add(appCtxCol);
-    listController.listColControllerList.add(appCtxCol);
+    listController.listColControllerList.insert(0, appCtxCol);
   }
 
   void _addOpColumn(MdlPagListController listController) {
@@ -583,7 +583,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       colKey: 'Ops',
       colTitle: 'Ops',
       includeColKeyAsFilter: false,
-      show: true,
+      showColumn: true,
       colWidth: 35,
       colWidgetType: PagColWidgetType.CUSTOM,
       getCustomWidget: (item, fullList) {
@@ -807,7 +807,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       },
     );
     // _selectedListController?.listColControllerList.add(appCtxCol);
-    listController.listColControllerList.add(appCtxCol);
+    listController.listColControllerList.insert(0, appCtxCol);
   }
 
   void _addMeterUsageColumn(MdlPagListController listController) {
@@ -816,7 +816,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       colKey: 'first_reading_timestamp',
       colTitle: 'first reading time',
       includeColKeyAsFilter: false,
-      show: true,
+      showColumn: true,
       colWidth: 150,
       colWidgetType: PagColWidgetType.TEXT,
     );
@@ -826,7 +826,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       colKey: 'last_reading_timestamp',
       colTitle: 'last reading time',
       includeColKeyAsFilter: false,
-      show: true,
+      showColumn: true,
       colWidth: 150,
       colWidgetType: PagColWidgetType.TEXT,
     );
@@ -836,7 +836,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       colKey: 'first_reading_value',
       colTitle: 'first reading',
       includeColKeyAsFilter: false,
-      show: true,
+      showColumn: true,
       colWidth: 110,
       colWidgetType: PagColWidgetType.TEXT,
       align: 'right',
@@ -848,7 +848,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       colKey: 'last_reading_value',
       colTitle: 'last reading',
       includeColKeyAsFilter: false,
-      show: true,
+      showColumn: true,
       colWidth: 110,
       colWidgetType: PagColWidgetType.TEXT,
       align: 'right',
@@ -860,7 +860,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       colKey: 'usage',
       colTitle: 'usage',
       includeColKeyAsFilter: false,
-      show: true,
+      showColumn: true,
       colWidth: 90,
       colWidgetType: PagColWidgetType.TEXT,
       align: 'right',
@@ -875,7 +875,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         colKey: 'usage_${meterType.toLowerCase()}',
         colTitle: 'usage_${meterType.toLowerCase()}',
         includeColKeyAsFilter: false,
-        show: true,
+        showColumn: true,
         colWidth: 90,
         colWidgetType: PagColWidgetType.TEXT,
         align: 'right',
@@ -888,7 +888,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       colKey: 'detail',
       colTitle: ' ',
       includeColKeyAsFilter: false,
-      show: true,
+      showColumn: true,
       colWidth: 35,
       colWidgetType: PagColWidgetType.CUSTOM,
       getCustomWidget: (item, fullList) {
@@ -1002,7 +1002,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       colKey: 'detail',
       colTitle: 'Bill',
       includeColKeyAsFilter: false,
-      show: true,
+      showColumn: true,
       colWidth: 55,
       colWidgetType: PagColWidgetType.CUSTOM,
       getCustomWidget: (item, fullList) {
@@ -1048,7 +1048,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       colKey: 'detail',
       colTitle: 'SoA',
       includeColKeyAsFilter: false,
-      show: true,
+      showColumn: true,
       colWidth: 55,
       colWidgetType: PagColWidgetType.CUSTOM,
       getCustomWidget: (item, fullList) {
@@ -1092,7 +1092,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     for (MdlListColController item
         in _selectedListController?.listColControllerList ?? []) {
       if (colCustomize.containsKey(item.colKey)) {
-        item.show = colCustomize[item.colKey];
+        item.showColumn = colCustomize[item.colKey];
       }
     }
   }

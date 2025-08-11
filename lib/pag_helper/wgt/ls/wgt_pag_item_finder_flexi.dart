@@ -895,7 +895,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   List<Widget> getItemIdGroupList() {
     List<Widget> list = [];
     for (var colController in widget.listController.listColControllerList) {
-      if (colController.show == false) continue;
+      if (colController.showColumn == false) continue;
       if (!_isFullPanel && !colController.pinned) continue;
 
       if (colController.filterGroupType == PagFilterGroupType.IDENTITY) {
@@ -967,7 +967,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     List<Widget> list = [];
     for (MdlListColController colController
         in widget.listController.listColControllerList) {
-      if (colController.show == false) continue;
+      if (colController.showColumn == false) continue;
       // need to pull the filter value list regardless of the panel status
       // because the value list is needed to populate for the info edit panel
       // if (!_isFullPanel && !colController.pinned) continue;
@@ -1011,7 +1011,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
 
     for (MdlListColController colController
         in widget.listController.listColControllerList) {
-      if (colController.show == false) continue;
+      if (colController.showColumn == false) continue;
       if (!_isFullPanel && !colController.pinned) continue;
 
       if (colController.filterGroupType == PagFilterGroupType.LOCATION) {
@@ -1043,7 +1043,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     List<Widget> list = [];
     for (MdlListColController item
         in widget.listController.listColControllerList) {
-      if (item.show == false) continue;
+      if (item.showColumn == false) continue;
       // need to pull the filter value list regardless of the panel status
       // because the value list is needed to populate for the info edit panel
       // if (!_isFullPanel && !item.pinned) continue;

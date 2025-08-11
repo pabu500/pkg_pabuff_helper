@@ -244,7 +244,7 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
     //   }
     // }
     for (var item in widget.listController.listColControllerList) {
-      if (item.show) {
+      if (item.showColumn) {
         width += item.colWidth;
       }
     }
@@ -393,7 +393,7 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
           item.colWidgetType == PagColWidgetType.CHECKBOX) {
         continue;
       }
-      if (!item.show) {
+      if (!item.showColumn) {
         continue;
       }
       List<Widget> suffix = [];
@@ -492,7 +492,7 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
         : Container();
     // for (Map<String, dynamic> configItem in _listConfig) {
     for (var ctrlItem in widget.listController.listColControllerList) {
-      if (!(ctrlItem.show)) {
+      if (!(ctrlItem.showColumn)) {
         continue;
       }
       if (widget.colKeyShowList.isNotEmpty &&
@@ -965,10 +965,10 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
             Transform.scale(
               scale: 0.8,
               child: Checkbox(
-                value: configItem.show,
+                value: configItem.showColumn,
                 onChanged: (value) {
                   setState(() {
-                    configItem.show = value!;
+                    configItem.showColumn = value!;
                   });
                 },
               ),
