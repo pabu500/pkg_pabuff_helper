@@ -16,6 +16,7 @@ class WgtPagDatePicker extends StatefulWidget {
     this.initialDate,
     this.mainAxisAlignment = MainAxisAlignment.start,
     this.labelWhenDateIsSelected,
+    this.required = false,
   });
 
   final int timeZone;
@@ -29,6 +30,7 @@ class WgtPagDatePicker extends StatefulWidget {
   final DateTime? initialDate;
   final MainAxisAlignment mainAxisAlignment;
   final String? labelWhenDateIsSelected;
+  final bool required;
 
   @override
   State<WgtPagDatePicker> createState() => _WgtPagDatePickerState();

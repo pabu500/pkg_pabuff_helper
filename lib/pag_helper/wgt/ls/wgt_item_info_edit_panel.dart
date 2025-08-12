@@ -742,6 +742,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
 
             String validatedResult = widget.validateTreeChildren?.call() ??
                 validateTpRateList(
+                  isEdit: true,
                   tpTypeCat: tpTypeCat!,
                   rateList: childreanList,
                   tpComingMonthCount: tpComingMonthCount,

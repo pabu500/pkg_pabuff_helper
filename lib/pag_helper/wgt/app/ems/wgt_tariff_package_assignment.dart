@@ -14,6 +14,7 @@ import 'package:provider/provider.dart';
 
 import '../../../comm/comm_tariff_package.dart';
 import '../../../model/mdl_pag_app_config.dart';
+import 'dart:developer' as dev;
 
 class WgtTariffPackageAssignment extends StatefulWidget {
   const WgtTariffPackageAssignment({
@@ -514,11 +515,11 @@ class _WgtTariffPackageAssignmentState
     String? meterTypeTptLabel =
         itemInfo['tpt_label_${widget.meterType.toLowerCase()}'];
     if (meterTypeTptLabel == null) {
-      if (kDebugMode) {
-        // meter type tpt is not assigned for this tenant
-        print(
-            'Error: meterTypeTptLabel is null for ${widget.meterType} in itemInfo: $itemInfo');
-      }
+      // if (kDebugMode) {
+      // meter type tpt is not assigned for this tenant
+      dev.log(
+          'warning: meterTypeTptLabel is null for ${widget.meterType} in itemInfo: $itemInfo');
+      // }
       return const SizedBox.shrink();
     }
     assert(meterTypeTptLabel.isNotEmpty);

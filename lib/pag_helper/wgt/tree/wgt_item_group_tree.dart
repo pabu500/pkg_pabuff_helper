@@ -306,6 +306,11 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
               _groupItemList.add(item);
             }
             break;
+          case PagItemGroupType.jobTypeSub:
+            for (var item in result['job_type_sub_list']) {
+              _groupItemList.add(item);
+            }
+            break;
           default:
             break;
         }
@@ -777,6 +782,7 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
           treePartType: rootTreePartType!,
           level: 0,
         );
+        break;
       case PagItemGroupType.tariffPackageTariffRate:
         rootTreePartType = PagTreePartType.tariffPackage;
         leafTreePartType = PagTreePartType.tariffRate;
@@ -792,9 +798,26 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
           treePartType: rootTreePartType!,
           level: 0,
         );
+        break;
       case PagItemGroupType.tariffPackageTenant:
         rootTreePartType = PagTreePartType.tariffPackage;
         leafTreePartType = PagTreePartType.tenant;
+        rootNode = PagTreeNode(
+          parent: null,
+          name: widget.rootName,
+          label: _rootLabel,
+          child: {
+            'id': rootChildId,
+            'name': widget.rootName,
+            'label': widget.rootLabel,
+          },
+          treePartType: rootTreePartType!,
+          level: 0,
+        );
+        break;
+      case PagItemGroupType.jobTypeSub:
+        rootTreePartType = PagTreePartType.jobType;
+        leafTreePartType = PagTreePartType.jobTypeSub;
         rootNode = PagTreeNode(
           parent: null,
           name: widget.rootName,
@@ -1475,7 +1498,7 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
                   icon: Icon(Icons.check,
                       color: enableCommit
                           ? Theme.of(context).colorScheme.primary
-                          : null),
+                          : Colors.red),
                   onPressed:
                       // add to list
                       addToList

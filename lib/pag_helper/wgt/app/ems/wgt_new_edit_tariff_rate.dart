@@ -206,6 +206,7 @@ class _WgtNewEditTariffRateState extends State<WgtNewEditTariffRate> {
                       'to_datetime': _toDateTime,
                       'from_timestamp': _fromDateTime?.toIso8601String(),
                       'to_timestamp': _toDateTime?.toIso8601String(),
+                      'remark': _remark,
                     },
                   );
                 },
@@ -257,7 +258,7 @@ class _WgtNewEditTariffRateState extends State<WgtNewEditTariffRate> {
             onSet: (startDate, endDate) {},
           ),
           SizedBox(
-            width: 70,
+            width: 150,
             child: WgtTextField(
               enabled: !widget.readOnly,
               appConfig: widget.appConfig,
@@ -286,6 +287,17 @@ class _WgtNewEditTariffRateState extends State<WgtNewEditTariffRate> {
                 setState(() {
                   _isEditing = false;
                 });
+                widget.onUpdate?.call(
+                  {
+                    'rate': _rate,
+                    'gst': _gstStr,
+                    'from_datetime': _fromDateTime,
+                    'to_datetime': _toDateTime,
+                    'from_timestamp': _fromDateTime?.toIso8601String(),
+                    'to_timestamp': _toDateTime?.toIso8601String(),
+                    'remark': _remark,
+                  },
+                );
               },
               onValidate: (String? result) {
                 setState(() {

@@ -6,6 +6,7 @@ String validateTpRateList({
   required List<Map<String, dynamic>> rateList,
   required int tpComingMonthCount,
   required int timezone,
+  bool isEdit = false,
 }) {
   DateTime localNow = getTargetLocalDatetimeNow(timezone);
 
@@ -48,11 +49,13 @@ String validateTpRateList({
     }
     int fromYear = fromDateTime.year;
     int fromMonth = fromDateTime.month;
-    if (fromYear < minYear) {
-      return '"From month" should be after $minYear-$minMonth';
-    }
-    if (fromYear == minYear && fromMonth < minMonth) {
-      return '"From month" should be after $minYear-$minMonth';
+    if (!isEdit) {
+      if (fromYear < minYear) {
+        return '"From month" should be after $minYear-$minMonth';
+      }
+      if (fromYear == minYear && fromMonth < minMonth) {
+        return '"From month" should be after $minYear-$minMonth';
+      }
     }
 
     // the furtherest date should be greater than the _tpComingMonthCount
