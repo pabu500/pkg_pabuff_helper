@@ -23,6 +23,7 @@ import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../comm/comm_ems.dart';
+import '../../comm/comm_tenant.dart';
 import '../../model/mdl_pag_app_config.dart';
 import '../job/wgt_new_edit_sub.dart';
 import '../app/ems/wgt_new_edit_tariff_rate.dart';
@@ -155,6 +156,20 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
             ),
           );
           break;
+        case PagItemGroupType.tenantUser:
+          result = await commitTenantUserList(
+            widget.appConfig,
+            widget.loggedInUser,
+            querrMap,
+            MdlPagSvcClaim(
+              username: widget.loggedInUser.username,
+              userId: widget.loggedInUser.id,
+              scope: '',
+              target: '',
+              operation: 'update',
+            ),
+          );
+          break;
         case PagItemGroupType.jobTypeSub:
           result = await commitJobTypeSubList(
             widget.appConfig,
@@ -238,10 +253,14 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
     _isFetchingTreeData = true;
 
     Map<String, dynamic> result = {};
+    dynamic stdResult;
     try {
       switch (widget.itemGroupType) {
         case PagItemGroupType.userTenant:
           result = await _getUserTenantList(widget.queryMap);
+          break;
+        case PagItemGroupType.tenantUser:
+          stdResult = await _getTenantUserList(widget.queryMap);
           break;
         case PagItemGroupType.jobTypeSub:
           result = await _getJobTypeSubList(widget.queryMap);
@@ -256,7 +275,7 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
           break;
       }
 
-      if (result.isNotEmpty) {
+      if (result.isNotEmpty || stdResult != null) {
         _groupItemList.clear();
         switch (widget.itemGroupType) {
           case PagItemGroupType.userTenant:
@@ -264,8 +283,9 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
               _groupItemList.add(item);
             }
             break;
-          case PagItemGroupType.jobTypeSub:
-            for (var item in result['job_type_sub_list']) {
+          case PagItemGroupType.tenantUser:
+            final tenantUserList = stdResult;
+            for (var item in tenantUserList) {
               _groupItemList.add(item);
             }
             break;
@@ -329,6 +349,9 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
         case PagItemGroupType.userTenant:
           itemKind = PagItemKind.tenant;
           break;
+        case PagItemGroupType.tenantUser:
+          itemKind = PagItemKind.user;
+          break;
         case PagItemGroupType.jobTypeSub:
           itemKind = PagItemKind.jobTypeSub;
           break;
@@ -391,6 +414,22 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
 
   Future<dynamic> _getUserTenantList(Map<String, dynamic> queryMap) async {
     var result = await getUserTenantList(
+      widget.appConfig,
+      widget.loggedInUser,
+      queryMap,
+      MdlPagSvcClaim(
+        username: widget.loggedInUser.username,
+        userId: widget.loggedInUser.id,
+        scope: '',
+        target: '',
+        operation: '',
+      ),
+    );
+    return result;
+  }
+
+  Future<dynamic> _getTenantUserList(Map<String, dynamic> queryMap) async {
+    var result = await getTenantUserList(
       widget.appConfig,
       widget.loggedInUser,
       queryMap,
@@ -484,6 +523,21 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
             level: level,
           );
           parantNode.children.add(tenantNode);
+        }
+        break;
+      case PagItemGroupType.tenantUser:
+        for (Map<String, dynamic> userInfo in _groupItemList) {
+          String name = userInfo['username'] ?? '';
+          String label = userInfo['full_name'] ?? name;
+          final PagTreeNode userNode = PagTreeNode(
+            parent: parantNode,
+            name: name,
+            label: label,
+            child: userInfo,
+            treePartType: PagTreePartType.user,
+            level: level,
+          );
+          parantNode.children.add(userNode);
         }
         break;
       case PagItemGroupType.jobTypeSub:
@@ -708,9 +762,9 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
           level: 0,
         );
         break;
-      case PagItemGroupType.jobTypeSub:
-        rootTreePartType = PagTreePartType.jobType;
-        leafTreePartType = PagTreePartType.jobTypeSub;
+      case PagItemGroupType.tenantUser:
+        rootTreePartType = PagTreePartType.tenant;
+        leafTreePartType = PagTreePartType.user;
         rootNode = PagTreeNode(
           parent: null,
           name: widget.rootName,
@@ -914,6 +968,11 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
         case PagItemGroupType.userTenant:
           isClickable = _isEditing &&
               (isAddButton || node.treePartType == PagTreePartType.tenant);
+          break;
+        case PagItemGroupType.tenantUser:
+          isClickable = _isEditing &&
+              (isAddButton || node.treePartType == PagTreePartType.user);
+          break;
         default:
           break;
       }

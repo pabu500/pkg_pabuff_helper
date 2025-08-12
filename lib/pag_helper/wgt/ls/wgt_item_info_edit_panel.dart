@@ -676,6 +676,18 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
         rootLabel = userName;
         addButtonLabelSuffix = 'tenant';
         break;
+      case PagItemKind.tenant:
+        itemGroupType = PagItemGroupType.tenantUser;
+
+        String tenantId = widget.itemIndexStr;
+        String tenantName = widget.fields
+            .firstWhere((element) => element['col_key'] == 'name')['value'];
+
+        queryMap = {'tenant_id': tenantId, 'tenantName': tenantName};
+        rootName = tenantName;
+        rootLabel = tenantName;
+        addButtonLabelSuffix = 'user';
+        break;
       case PagItemKind.jobType:
         itemGroupType = PagItemGroupType.jobTypeSub;
         queryMap = {'job_type_id': widget.itemIndexStr};

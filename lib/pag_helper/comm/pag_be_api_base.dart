@@ -260,8 +260,10 @@ class PagUrlBase {
   static const String eptSetJobTypeSubList = '/job/set_job_type_sub_list';
 
   //ems
-  static const String eptGetUserTenantList = '/ems/get_user_tenant_list';
-  static const String eptSetUserTenantList = '/ems/set_user_tenant_list';
+  static const String eptGetUserTenantList = '/ems/tenant/get_user_tenant_list';
+  static const String eptSetUserTenantList = '/ems/tenant/set_user_tenant_list';
+  static const String eptGetTenantUserList = '/ems/tenant/get_tenant_user_list';
+  static const String eptSetTenantUserList = '/ems/tenant/set_tenant_user_list';
 
   // ems/fin
   static const String eptBatchOpFinPostPayment =
