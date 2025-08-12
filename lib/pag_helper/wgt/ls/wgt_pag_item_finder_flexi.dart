@@ -10,8 +10,9 @@ import 'package:buff_helper/pag_helper/model/scope/mdl_pag_building_profile.dart
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_location_group_profile.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_site_group_profile.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_site_profile.dart';
+import 'package:buff_helper/pag_helper/wgt/cam/wgt_code_scanner.dart';
 import 'package:buff_helper/pag_helper/wgt/datetime/wgt_date_range_picker_monthly.dart';
-// import 'package:buff_helper/pkg_buff_helper.dart';
+
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -61,8 +62,7 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
     this.sidePadding = EdgeInsets.zero,
     this.onLabelSelected,
     this.onCustomizeSet,
-    // this.getItemList,
-    // this.projectProfile,
+    this.validator,
   });
 
   final MdlPagUser loggedInUser;
@@ -92,8 +92,7 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
   final EdgeInsets sidePadding;
   final void Function(String)? onLabelSelected;
   final void Function()? onCustomizeSet;
-  // final MdlPagProjectProfile? projectProfile;
-  // final Function? getItemList;
+  final String? Function(String)? validator;
 
   @override
   State<WgtPagItemFinderFlexi> createState() => _WgtPagItemFinderFlexiState();
@@ -103,6 +102,8 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   late final String listName;
   late final String itemTypeStr;
   BoxDecoration? blockDecoration;
+
+  String? _code;
 
   late DateTime _lastLoadingTime;
   DateTime? _lastRequestTime;
@@ -1342,6 +1343,39 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
           _showPanel = false;
           widget.onShowPanel?.call(false);
         });
+      },
+    );
+  }
+
+  Widget getScanner({String? type = 'qr', double? iconSize, Color? iconColor}) {
+    return InkWell(
+      child: Icon(
+        type == 'qr' ? Symbols.qr_code_scanner : Symbols.barcode_scanner,
+        color: iconColor ?? Theme.of(context).colorScheme.primary,
+        size: iconSize ?? 21,
+      ),
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+              builder: (context) => WgtCodeScanner(
+                    onDetect: (String code) async {
+                      setState(() {
+                        _code = code;
+                      });
+
+                      Map<String, dynamic> itemFindResult =
+                          await _getItemList();
+
+                      // widget.onResult({
+                      //   'itemType': _itemType,
+                      //   'itemFindResult': itemFindResult,
+                      //   'itemSnKeyName': _itemSnKeyName ?? 'item_sn',
+                      //   'itemNameKeyName': _itemNameKeyName ?? 'item_name',
+                      // });
+                    },
+                    validator: widget.validator,
+                  )),
+        );
       },
     );
   }
