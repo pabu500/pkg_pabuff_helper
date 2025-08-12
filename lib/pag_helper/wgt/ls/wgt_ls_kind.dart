@@ -33,6 +33,10 @@ class WgtListSearchKind extends StatefulWidget {
     this.onResult,
     this.additionalColumnConfig,
     this.onScopeTreeUpdate,
+    this.isSingleItemMode = false,
+    this.isCompactFinder = false,
+    this.onItemTypeSelected,
+    this.width,
   });
 
   final MdlPagAppConfig appConfig;
@@ -45,6 +49,10 @@ class WgtListSearchKind extends StatefulWidget {
   final String prefKey;
   final List<Map<String, dynamic>>? additionalColumnConfig;
   final Function? onScopeTreeUpdate;
+  final bool isSingleItemMode;
+  final bool isCompactFinder;
+  final Function(dynamic)? onItemTypeSelected;
+  final double? width;
 
   @override
   State<WgtListSearchKind> createState() => _WgtListSearchKindState();
@@ -66,15 +74,26 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
 
   late final List<Map<String, dynamic>> _itemTypeInfoList = [];
   dynamic _selectedItemType;
-  UniqueKey? _itemTypeFreshKey;
+  UniqueKey? _itemTypeRefreshKey;
 
   String _listTypeErrorText = '';
 
   void _updateItemType({dynamic itemType}) {
     _selectedListController = null;
-    if (_selectedItemType == itemType) {
-      return;
+
+    // NOTE: keep the order of the following 2 if
+    if (itemType != null) {
+      if (_selectedItemType == itemType) {
+        return;
+      }
     }
+    if (_selectedItemType != null) {
+      if (itemType != null) {
+        _selectedItemType = itemType;
+      }
+    }
+    ////////////////////////////////////////
+
     if (_listControllerList.isEmpty) {
       if (kDebugMode) {
         print('ListConfigList is empty');
@@ -131,7 +150,7 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
       assert(itemTypeStr.isNotEmpty);
     }
     if (itemTypeFound) {
-      _itemTypeFreshKey = UniqueKey();
+      _itemTypeRefreshKey = UniqueKey();
     }
 
     // String itemTypeStr = '';
@@ -143,23 +162,27 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
 
     try {
       for (var listController in _listControllerList) {
-        if (widget.itemKind == PagItemKind.device) {
-          if (getPagDeviceTypeStr(listController.itemType) == itemTypeStr) {
-            _selectedListController = listController;
-            break;
-          }
-        } else if (widget.itemKind == PagItemKind.scope) {
-          if (getPagScopeTypeStr(listController.itemType) == itemTypeStr) {
-            _selectedListController = listController;
-            break;
-          }
-        } else if (widget.itemKind == PagItemKind.finance) {
-          if (getPagFinanceTypeStr(listController.itemType) == itemTypeStr) {
-            _selectedListController = listController;
-            break;
-          }
-        } else {
-          throw Exception('Unsupported item kind: ${widget.itemKind.name}');
+        // if (widget.itemKind == PagItemKind.device) {
+        //   if (getPagDeviceTypeStr(listController.itemType) == itemTypeStr) {
+        //     _selectedListController = listController;
+        //     break;
+        //   }
+        // } else if (widget.itemKind == PagItemKind.scope) {
+        //   if (getPagScopeTypeStr(listController.itemType) == itemTypeStr) {
+        //     _selectedListController = listController;
+        //     break;
+        //   }
+        // } else if (widget.itemKind == PagItemKind.finance) {
+        //   if (getPagFinanceTypeStr(listController.itemType) == itemTypeStr) {
+        //     _selectedListController = listController;
+        //     break;
+        //   }
+        // } else {
+        //   throw Exception('Unsupported item kind: ${widget.itemKind.name}');
+        // }
+        if (itemTypeStr == _getItemTypeStr(listController.itemType)) {
+          _selectedListController = listController;
+          break;
         }
       }
       if (_selectedListController == null) {
@@ -175,6 +198,8 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
 
       // update col pref
       _loadColPref();
+
+      widget.onItemTypeSelected?.call(_selectedItemType);
 
       setState(() {});
     } catch (e) {
@@ -231,12 +256,7 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
   }
 
   String? _getItemTypePref() {
-    String itemType = widget.itemType?.name ?? '';
-    if (itemType.isEmpty) {
-      return null;
-    }
-    String itemTypePrefKey =
-        '${widget.prefKey}_${widget.itemKind.name}_$itemType';
+    String itemTypePrefKey = '${widget.prefKey}_${widget.itemKind.name}';
     String? itemTypeStr = readFromSharedPref(itemTypePrefKey);
     if (itemTypeStr == 'null' || itemTypeStr == null) {
       return null;
@@ -260,10 +280,21 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
   }
 
   void _saveItemTypePref() {
-    String itemType = widget.itemType?.name ?? '';
-    String itemTypePrefKey =
-        '${widget.prefKey}_${widget.itemKind.name}_$itemType';
-    saveToSharedPref(itemTypePrefKey, _selectedListController?.itemType);
+    String? itemTypeStr = _getItemTypeStr(_selectedListController?.itemType);
+    String itemTypePrefKey = '${widget.prefKey}_${widget.itemKind.name}';
+    saveToSharedPref(itemTypePrefKey, itemTypeStr);
+  }
+
+  String? _getItemTypeStr(dynamic itemType) {
+    if (itemType is PagDeviceCat) {
+      return getPagDeviceTypeStr(itemType);
+    } else if (itemType is PagScopeType) {
+      return getPagScopeTypeStr(itemType);
+    } else if (itemType is PagFinanceType) {
+      return getPagFinanceTypeStr(itemType);
+    } else {
+      throw Exception('Unsupported item type: ${itemType.runtimeType}');
+    }
   }
 
   @override
@@ -327,8 +358,11 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
           if (_selectedItemType != null)
             WgtListSearchItemFlexi(
               appConfig: widget.appConfig,
+              width: widget.width,
               // key: _itemTypeFreshKey,
-              finderRefreshKey: _itemTypeFreshKey,
+              isCompactFinder: widget.isCompactFinder,
+              isSingleItemMode: widget.isSingleItemMode,
+              finderRefreshKey: _itemTypeRefreshKey,
               pagAppContext: widget.pagAppContext,
               itemKind: widget.itemKind,
               itemType: _selectedItemType,

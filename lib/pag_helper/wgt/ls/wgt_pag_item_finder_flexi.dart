@@ -16,6 +16,7 @@ import 'package:buff_helper/pag_helper/wgt/datetime/wgt_date_range_picker_monthl
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_controller.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
@@ -63,6 +64,8 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
     this.onLabelSelected,
     this.onCustomizeSet,
     this.validator,
+    this.isCompactMode = false,
+    this.isSingleItemMode = false,
   });
 
   final MdlPagUser loggedInUser;
@@ -93,6 +96,8 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
   final void Function(String)? onLabelSelected;
   final void Function()? onCustomizeSet;
   final String? Function(String)? validator;
+  final bool isCompactMode;
+  final bool isSingleItemMode;
 
   @override
   State<WgtPagItemFinderFlexi> createState() => _WgtPagItemFinderFlexiState();
@@ -103,6 +108,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   late final String itemTypeStr;
   BoxDecoration? blockDecoration;
 
+  bool _showScanner = false;
   String? _code;
 
   late DateTime _lastLoadingTime;
@@ -658,15 +664,44 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   }
 
   Widget completedWidget(double width) {
-    return width > 800
-        ? Padding(
-            padding: widget.sidePadding,
-            child: getItemPickerWide(width),
-          )
-        : getItemPickerNarrow();
+    return widget.isCompactMode
+        ? getCompactFinder()
+        : width > 800
+            ? Padding(
+                padding: widget.sidePadding,
+                child: getItemPickerWide(width),
+              )
+            : getItemPickerNarrow();
+  }
+
+  Widget getCompactFinder() {
+    return Container(
+      width: widget.width,
+      padding: const EdgeInsets.symmetric(horizontal: 21, vertical: 5),
+      decoration: BoxDecoration(
+        // color: Theme.of(context).colorScheme.background,
+        borderRadius: BorderRadius.circular(5),
+        border: Border.all(
+            color: Theme.of(context).hintColor /*.withOpacity(0.3)*/, width: 1),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          getOptions(showPanelModeButton: false),
+          horizontalSpaceTiny,
+          getFileterCore(isCompactMode: true),
+          horizontalSpaceTiny,
+          getSearchButton(),
+        ],
+      ),
+    );
   }
 
   Widget getItemPickerNarrow() {
+    bool isPhone = context.isPhone;
+    _showScanner = _showScanner && isPhone;
     return _showPanel
         ? Container(
             width: widget.width,
@@ -733,7 +768,15 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     );
   }
 
-  Widget getFileterCore() {
+  Widget getFileterCore({bool isCompactMode = false}) {
+    if (isCompactMode) {
+      _isFullPanel = true;
+      String? singleIdFilterKey = getSingleIdFilterKey();
+      return Column(children: [
+        getItemIdFilterGroup(
+            isCompactMode: isCompactMode, singleIdFilterKey: singleIdFilterKey)
+      ]);
+    }
     return Column(
       children: [
         Wrap(
@@ -749,8 +792,23 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     );
   }
 
-  Widget getItemIdFilterGroup() {
-    List<Widget> list = getItemIdGroupList();
+  String? getSingleIdFilterKey() {
+    if (widget.itemType is PagDeviceCat) {
+      switch (widget.itemType) {
+        case PagDeviceCat.meter:
+          return 'meter_sn';
+        case PagDeviceCat.gateway:
+          return 'iccid';
+        default:
+          return null;
+      }
+    }
+    return null;
+  }
+
+  Widget getItemIdFilterGroup(
+      {bool isCompactMode = false, String? singleIdFilterKey}) {
+    List<Widget> list = getItemIdGroupList(singleIdFilter: singleIdFilterKey);
     if (list.isEmpty) {
       return Container();
     }
@@ -893,9 +951,13 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     );
   }
 
-  List<Widget> getItemIdGroupList() {
+  List<Widget> getItemIdGroupList({String? singleIdFilter}) {
     List<Widget> list = [];
     for (var colController in widget.listController.listColControllerList) {
+      if (singleIdFilter != null && colController.colKey != singleIdFilter) {
+        continue;
+      }
+
       if (colController.showColumn == false) continue;
       if (!_isFullPanel && !colController.pinned) continue;
 
@@ -952,6 +1014,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
                     },
                     onModified: widget.onModified,
                     onUpdateEnableSearchButton: _enableSearchButton,
+                    scanner: _showScanner ? getScanner() : null,
                   ),
                 ],
               ),
@@ -1215,12 +1278,12 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     );
   }
 
-  Widget getOptions() {
+  Widget getOptions({showPanelModeButton = true}) {
     return Row(
       children: [
         getClearButton(),
         horizontalSpaceRegular,
-        getPanelModeButton(),
+        if (showPanelModeButton) getPanelModeButton(),
       ],
     );
   }
@@ -1350,7 +1413,8 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   Widget getScanner({String? type = 'qr', double? iconSize, Color? iconColor}) {
     return InkWell(
       child: Icon(
-        type == 'qr' ? Symbols.qr_code_scanner : Symbols.barcode_scanner,
+        // type == 'qr' ? Symbols.qr_code_scanner : Symbols.barcode_scanner,
+        Symbols.crop_free,
         color: iconColor ?? Theme.of(context).colorScheme.primary,
         size: iconSize ?? 21,
       ),
@@ -1362,9 +1426,6 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
                       setState(() {
                         _code = code;
                       });
-
-                      Map<String, dynamic> itemFindResult =
-                          await _getItemList();
 
                       // widget.onResult({
                       //   'itemType': _itemType,

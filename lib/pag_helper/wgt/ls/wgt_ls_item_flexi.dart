@@ -62,6 +62,9 @@ class WgtListSearchItemFlexi extends StatefulWidget {
     this.finderRefreshKey,
     this.onScopeTreeUpdate,
     this.validateTreeChildren,
+    this.isCompactFinder = false,
+    this.isSingleItemMode = false,
+    this.width,
   });
 
   final MdlPagAppConfig appConfig;
@@ -86,6 +89,9 @@ class WgtListSearchItemFlexi extends StatefulWidget {
   final UniqueKey? finderRefreshKey;
   final Function? onScopeTreeUpdate;
   final Function? validateTreeChildren;
+  final bool isCompactFinder;
+  final bool isSingleItemMode;
+  final double? width;
 
   @override
   State<WgtListSearchItemFlexi> createState() => _WgtListSearchItemFlexiState();
@@ -1227,6 +1233,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       // if (_selectedListController != null)
       WgtPagItemFinderFlexi(
         key: _finderRefreshKey, //_listContentRefreshKey,
+        width: widget.width,
         loggedInUser: loggedInUser!,
         appConfig: widget.appConfig,
         itemKind: widget.itemKind,
@@ -1234,6 +1241,8 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         listContextType: widget.listContextType,
         listController: _selectedListController!,
         selectedItemInfoList: widget.selectedItemInfoList,
+        isCompactMode: widget.isCompactFinder,
+        isSingleItemMode: widget.isSingleItemMode,
         meterTypeList: meterTypeList,
         // right padding as clerance for context menu
         sidePadding: const EdgeInsets.only(left: 0, right: 60),

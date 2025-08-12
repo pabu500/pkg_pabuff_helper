@@ -47,3 +47,8 @@ T? enumByTag<T extends Enum>(String? tag, List<T> values) {
   }
   return null;
 }
+
+enum PagLinkOpType {
+  gatewayToDevice,
+  none,
+}

@@ -590,7 +590,7 @@ class _WgtHistoryLineChartState extends State<WgtHistoryLineChart> {
                             }).toList();
                           },
                           touchTooltipData: LineTouchTooltipData(
-                            tooltipRoundedRadius: 2,
+                            tooltipBorderRadius: BorderRadius.circular(2),
                             // tooltipBgColor: Colors.blueGrey.withOpacity(0.8),
                             getTooltipItems: getToolTipItems,
                           ),
