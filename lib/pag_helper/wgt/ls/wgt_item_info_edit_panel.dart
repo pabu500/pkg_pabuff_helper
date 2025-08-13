@@ -715,7 +715,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
       child: ConstrainedBox(
         constraints: const BoxConstraints(
           minHeight: 200,
-          maxHeight: 350,
+          maxHeight: 395,
           // maxWidth: _width,
         ),
         child: WgtItemGroupTree(
