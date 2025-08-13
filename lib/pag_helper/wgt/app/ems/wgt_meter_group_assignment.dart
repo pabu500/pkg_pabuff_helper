@@ -63,6 +63,9 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
 
   String? _selectedMeterIndexStr;
 
+  final TextEditingController _itemSnFilterController = TextEditingController();
+  String _itemSnFilterStr = '';
+
   Future<void> _doAutoPopulate() async {
     if (_isFetching) {
       return;
@@ -245,6 +248,17 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
     return modified;
   }
 
+  bool _showItem(Map<String, dynamic> item) {
+    if (_itemSnFilterStr.isNotEmpty) {
+      String? sn = item['meter_sn'];
+      bool snMatches = (sn ?? '').isNotEmpty &&
+          (sn ?? '').toLowerCase().contains(_itemSnFilterStr);
+      return snMatches;
+    }
+
+    return true; // Include item if no filter is applied
+  }
+
   @override
   void initState() {
     super.initState();
@@ -339,6 +353,31 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 5),
+          child: SizedBox(
+            width: 180,
+            height: 39,
+            child: TextField(
+              controller: _itemSnFilterController,
+              readOnly: _isCommitting ||
+                  _isCommitted ||
+                  {_itemGroupScopeMatchingItemList ?? []}.isEmpty,
+              decoration: InputDecoration(
+                  hintText: 'Meter S/N',
+                  hintStyle: TextStyle(
+                      color: Theme.of(context)
+                          .hintColor) // prefixIcon: Icon(Icons.search),
+                  ),
+              onChanged: (value) {
+                setState(() {
+                  _itemSnFilterStr = value.trim().toLowerCase();
+                });
+              },
+            ),
+          ),
+        ),
+        horizontalSpaceSmall,
         InkWell(
           onTap: !_modified ||
                   _isCommitting ||
@@ -451,6 +490,10 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
     List<Widget> itemWidgetList = [];
     int index = 0;
     for (Map<String, dynamic> itemInfo in _itemGroupScopeMatchingItemList!) {
+      bool showItem = _showItem(itemInfo);
+      if (!showItem) {
+        continue; // Skip this item if it doesn't match the filter
+      }
       Widget tile = getItemRow(itemInfo, ++index);
       itemWidgetList.add(
         Padding(
