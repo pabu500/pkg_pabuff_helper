@@ -60,7 +60,7 @@ class WgtListSearchKind extends StatefulWidget {
 
 class _WgtListSearchKindState extends State<WgtListSearchKind> {
   final double paneWidth = 850;
-  final double paneHeight = 820;
+  final double paneHeight = 830;
 
   late final MdlPagUser? loggedInUser;
   late final prefKey = widget.pagAppContext.route;
