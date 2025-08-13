@@ -357,6 +357,31 @@ class _WgtTenantpAssignmentState extends State<WgtTenantpAssignment> {
           ),
         ),
         horizontalSpaceSmall,
+        // Container(
+        //   padding: const EdgeInsets.symmetric(horizontal: 5),
+        //   child: SizedBox(
+        //     width: 180,
+        //     height: 39,
+        //     child: TextField(
+        //       controller: _itemLabelFilterController,
+        //       readOnly: _isCommitting ||
+        //           _isCommitted ||
+        //           {_itemGroupScopeMatchingItemList ?? []}.isEmpty,
+        //       decoration: InputDecoration(
+        //           hintText: 'Meter Group Label',
+        //           hintStyle: TextStyle(
+        //               color: Theme.of(context)
+        //                   .hintColor) // prefixIcon: Icon(Icons.search),
+        //           ),
+        //       onChanged: (value) {
+        //         setState(() {
+        //           _itemLabelFilterStr = value.trim().toLowerCase();
+        //         });
+        //       },
+        //     ),
+        //   ),
+        // ),
+        // horizontalSpaceSmall,
         // virtical separator
         Container(
           width: 1,

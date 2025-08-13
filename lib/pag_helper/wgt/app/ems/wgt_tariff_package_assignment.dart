@@ -63,7 +63,7 @@ class _WgtTariffPackageAssignmentState
   String _commitErrorText = '';
 
   // List<Map<String, dynamic>>? _tariffPackageTenantList;
-  List<Map<String, dynamic>>? _tariffPackageScopeMatchingTenantList;
+  List<Map<String, dynamic>>? _itemGroupScopeMatchingItemList;
 
   final TextEditingController _itemNamefilterController =
       TextEditingController();
@@ -106,17 +106,16 @@ class _WgtTariffPackageAssignmentState
         throw Exception(
             'No scope matching tenant found for this tariff package');
       }
-      _tariffPackageScopeMatchingTenantList =
+      _itemGroupScopeMatchingItemList =
           List<Map<String, dynamic>>.from(tpScopeMatchingTenantList);
       // sort by label
-      _tariffPackageScopeMatchingTenantList!.sort((a, b) {
+      _itemGroupScopeMatchingItemList!.sort((a, b) {
         String labelA = a['label'] ?? '';
         String labelB = b['label'] ?? '';
         return labelA.compareTo(labelB);
       });
 
-      for (Map<String, dynamic> tenant
-          in _tariffPackageScopeMatchingTenantList!) {
+      for (Map<String, dynamic> tenant in _itemGroupScopeMatchingItemList!) {
         String tenantMeterTypeTpKey =
             'tp_name_${widget.meterType.toLowerCase()}';
         String tenantMeterTypeTpTypeName =
@@ -164,7 +163,7 @@ class _WgtTariffPackageAssignmentState
     }
     // filter out items that are not modified
     final List<Map<String, dynamic>> assignmentList =
-        _tariffPackageScopeMatchingTenantList!
+        _itemGroupScopeMatchingItemList!
             .where((tenant) => tenant['assigned_new'] != null)
             .toList();
     Map<String, dynamic> queryMap = {
@@ -323,7 +322,7 @@ class _WgtTariffPackageAssignmentState
               controller: _itemNamefilterController,
               readOnly: _isCommitting ||
                   _isCommitted ||
-                  {_tariffPackageScopeMatchingTenantList ?? []}.isEmpty,
+                  {_itemGroupScopeMatchingItemList ?? []}.isEmpty,
               decoration: InputDecoration(
                   hintText: 'Tenant Name',
                   hintStyle: TextStyle(
@@ -339,14 +338,39 @@ class _WgtTariffPackageAssignmentState
           ),
         ),
         horizontalSpaceSmall,
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 5),
+          child: SizedBox(
+            width: 180,
+            height: 39,
+            child: TextField(
+              controller: _itemLabelFilterController,
+              readOnly: _isCommitting ||
+                  _isCommitted ||
+                  {_itemGroupScopeMatchingItemList ?? []}.isEmpty,
+              decoration: InputDecoration(
+                  hintText: 'Tenant Label',
+                  hintStyle: TextStyle(
+                      color: Theme.of(context)
+                          .hintColor) // prefixIcon: Icon(Icons.search),
+                  ),
+              onChanged: (value) {
+                setState(() {
+                  _itemLabelFilterStr = value.trim().toLowerCase();
+                });
+              },
+            ),
+          ),
+        ),
+        horizontalSpaceSmall,
         InkWell(
-          onTap: (_tariffPackageScopeMatchingTenantList ?? []).isEmpty ||
+          onTap: (_itemGroupScopeMatchingItemList ?? []).isEmpty ||
                   _hasTptMismatchAssignmentError
               ? null
               : () {
                   setState(() {
                     for (Map<String, dynamic> tenant
-                        in _tariffPackageScopeMatchingTenantList!) {
+                        in _itemGroupScopeMatchingItemList!) {
                       if (tenant['tpt_mismatch']) {
                         continue;
                       }
@@ -379,7 +403,7 @@ class _WgtTariffPackageAssignmentState
           onTap: !_modified ||
                   _isCommitting ||
                   _isCommitted ||
-                  (_tariffPackageScopeMatchingTenantList ?? []).isEmpty ||
+                  (_itemGroupScopeMatchingItemList ?? []).isEmpty ||
                   _hasTptMismatchAssignmentError
               ? null
               : () async {
@@ -473,8 +497,8 @@ class _WgtTariffPackageAssignmentState
   }
 
   Widget getScopeItemList() {
-    if (_tariffPackageScopeMatchingTenantList == null ||
-        _tariffPackageScopeMatchingTenantList!.isEmpty) {
+    if (_itemGroupScopeMatchingItemList == null ||
+        _itemGroupScopeMatchingItemList!.isEmpty) {
       return const Center(
         child: Text('No tenant found for this tariff package'),
       );
@@ -484,7 +508,7 @@ class _WgtTariffPackageAssignmentState
     int index = 0;
 
     for (Map<String, dynamic> itemInfo
-        in _tariffPackageScopeMatchingTenantList ?? []) {
+        in _itemGroupScopeMatchingItemList ?? []) {
       bool showItem = _showItem(itemInfo);
       if (!showItem) {
         continue; // Skip this item if it doesn't match the filter

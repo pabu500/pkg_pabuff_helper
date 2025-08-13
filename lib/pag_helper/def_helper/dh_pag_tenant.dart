@@ -157,7 +157,7 @@ String? validateTenantLabel(String value) {
   if (value.trim().isEmpty) {
     return 'required';
   }
-  //length 5-255, alphanumeric, space, /, ', - only
+  //length 5-255, alphanumeric, space, /, ', ., - only
   String pattern = r"^[-a-zA-Z0-9 ./']{5,255}$";
   RegExp regExp = RegExp(pattern);
   if (!regExp.hasMatch(value)) {
@@ -185,10 +185,10 @@ String? validateBillingAddress(String value) {
   }
   //length 5-255, alphanumeric, space, /, ', -, #, and line break only
   // String pattern = r"^[-a-zA-Z0-9 ./'#]{5,255}$";
-  String pattern = r"^[-a-zA-Z0-9 ./'#\n]{5,255}$";
+  String pattern = r"^[-a-zA-Z0-9 .,/'#\n]{5,255}$";
   RegExp regExp = RegExp(pattern);
   if (!regExp.hasMatch(value)) {
-    return 'alphanumeric, space, /, -, #, and line break only and length 5-255';
+    return 'alphanumeric, space, /, ,, ., -, #, and line break only and length 5-255';
   }
   return null;
 }
@@ -309,20 +309,20 @@ String? validateGfa(String value) {
   return '';
 }
 
-String? validateLabel(String value) {
-  if (value.trim().isEmpty) {
-    return 'required';
-  }
+// String? validateLabel(String value) {
+//   if (value.trim().isEmpty) {
+//     return 'required';
+//   }
 
-  // validate number, letter, underscore, and dash, space,
-  // and minimum 5 characters
-  String pattern = r'^[a-zA-Z0-9_ -]{5,}$';
-  RegExp regExp = RegExp(pattern);
-  if (!regExp.hasMatch(value)) {
-    return 'min length is 5 and letter, number, space, _, - only';
-  }
-  return null;
-}
+//   // validate number, letter, underscore, and dash, space,
+//   // and minimum 5 characters
+//   String pattern = r'^[a-zA-Z0-9_ -]{5,}$';
+//   RegExp regExp = RegExp(pattern);
+//   if (!regExp.hasMatch(value)) {
+//     return 'min length is 5 and letter, number, space, _, - only';
+//   }
+//   return null;
+// }
 
 String? validateAccountNumber(String value) {
   if (value.trim().isEmpty) {

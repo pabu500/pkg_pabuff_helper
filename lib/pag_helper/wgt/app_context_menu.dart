@@ -179,7 +179,10 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
         if (appModel.appName == 'pag_ems_op') {
           if (pr == PagPageRoute.consoleHomeAcl ||
               pr == PagPageRoute.consoleHomeSettings ||
-              pr == PagPageRoute.billingManager) {
+              pr == PagPageRoute.billingManager ||
+              pr == PagPageRoute.tariffManager ||
+              pr == PagPageRoute.paymentManager ||
+              pr == PagPageRoute.landlordManager) {
             if (!widget.loggedInUser.selectedScope
                 .isAtScopeType(PagScopeType.project)) {
               isDisabled = true;
