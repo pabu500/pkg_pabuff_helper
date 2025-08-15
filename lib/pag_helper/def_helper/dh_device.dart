@@ -60,24 +60,24 @@ T? enumByTag<T extends Enum>(String? tag, List<T> values) {
   return null;
 }
 
-String getPagDeviceTypeStr(dynamic itemType) {
-  switch (itemType) {
-    case PagDeviceCat.meter:
-      return 'meter';
-    case PagDeviceCat.sensor:
-      return 'sensor';
-    case PagDeviceCat.lock:
-      return 'lock';
-    case PagDeviceCat.camera:
-      return 'camera';
-    case PagDeviceCat.gateway:
-      return 'gateway';
-    case PagDeviceCat.meterGroup:
-      return 'meterGroup';
-    default:
-      return '';
-  }
-}
+// String getPagDeviceTypeStr(dynamic itemType) {
+//   switch (itemType) {
+//     case PagDeviceCat.meter:
+//       return 'meter';
+//     case PagDeviceCat.sensor:
+//       return 'sensor';
+//     case PagDeviceCat.lock:
+//       return 'lock';
+//     case PagDeviceCat.camera:
+//       return 'camera';
+//     case PagDeviceCat.gateway:
+//       return 'gateway';
+//     case PagDeviceCat.meterGroup:
+//       return 'meterGroup';
+//     default:
+//       return '';
+//   }
+// }
 
 Widget getSensorTypeIcon(SensorType sensorType) {
   Color iconColor = Colors.white.withAlpha(230);

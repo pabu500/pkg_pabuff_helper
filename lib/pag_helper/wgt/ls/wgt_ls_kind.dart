@@ -287,7 +287,8 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
 
   String? _getItemTypeStr(dynamic itemType) {
     if (itemType is PagDeviceCat) {
-      return getPagDeviceTypeStr(itemType);
+      // return getPagDeviceTypeStr(itemType);
+      return itemType.name;
     } else if (itemType is PagScopeType) {
       return getPagScopeTypeStr(itemType);
     } else if (itemType is PagFinanceType) {
