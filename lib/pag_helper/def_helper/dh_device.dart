@@ -4,6 +4,7 @@ import 'package:material_symbols_icons/symbols.dart';
 
 enum PagDeviceCat {
   meter('Meter', 'meter', 'm', Symbols.speed),
+  meterGroup('Meter Group', 'meter_group', 'mg', Symbols.graph_6),
   sensor('Sensor', 'sensor', 'ss', Symbols.sensors),
   lock('Lock', 'lock', 'lk', Symbols.lock),
   camera('Camera', 'camera', 'cam', Symbols.videocam),
@@ -71,6 +72,8 @@ String getPagDeviceTypeStr(dynamic itemType) {
       return 'camera';
     case PagDeviceCat.gateway:
       return 'gateway';
+    case PagDeviceCat.meterGroup:
+      return 'meterGroup';
     default:
       return '';
   }
