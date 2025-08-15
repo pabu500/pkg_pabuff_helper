@@ -161,25 +161,29 @@ class MdlPagListController /*extends ChangeNotifier*/ {
 
     String itemTypeStr = 'unknown_item_type';
     if (itemType is PagDeviceCat) {
-      switch (itemType) {
-        case PagDeviceCat.meter:
-          itemTypeStr = 'meter';
-          break;
-        case PagDeviceCat.sensor:
-          itemTypeStr = 'sensor';
-          break;
-        case PagDeviceCat.lock:
-          itemTypeStr = 'lock';
-          break;
-        case PagDeviceCat.camera:
-          itemTypeStr = 'camera';
-          break;
-        case PagDeviceCat.gateway:
-          itemTypeStr = 'gateway';
-          break;
-        default:
-          itemTypeStr = '';
-      }
+      itemTypeStr = getPagDeviceTypeStr(itemType);
+      // switch (itemType) {
+      //   case PagDeviceCat.meter:
+      //     itemTypeStr = 'meter';
+      //     break;
+      //   case PagDeviceCat.meterGroup:
+      //     itemTypeStr = 'meterGroup';
+      //     break;
+      //   case PagDeviceCat.sensor:
+      //     itemTypeStr = 'sensor';
+      //     break;
+      //   case PagDeviceCat.lock:
+      //     itemTypeStr = 'lock';
+      //     break;
+      //   case PagDeviceCat.camera:
+      //     itemTypeStr = 'camera';
+      //     break;
+      //   case PagDeviceCat.gateway:
+      //     itemTypeStr = 'gateway';
+      //     break;
+      //   default:
+      //     itemTypeStr = '';
+      // }
     }
 
     data['item_type'] = itemTypeStr;
