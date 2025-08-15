@@ -39,6 +39,7 @@ import '../app/ems/wgt_meter_group_assignment.dart';
 import 'wgt_pag_item_finder_flexi.dart';
 import '../app/ems/wgt_tariff_package_assignment.dart';
 import '../app/ems/wgt_tenant_assignment.dart';
+import 'dart:developer' as dev;
 
 class WgtListSearchItemFlexi extends StatefulWidget {
   const WgtListSearchItemFlexi({
@@ -234,7 +235,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       }
     } catch (e) {
       // if (kDebugMode) {
-      print(e);
+      dev.log(e.toString());
       // }
       _failedPullListInfo++;
       rethrow;
