@@ -135,7 +135,7 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
       // itemTypeStr = itemTypeStr.toLowerCase();
 
       if (widget.itemKind == PagItemKind.device) {
-        _selectedItemType = PagDeviceCat.byValue(itemTypeStr);
+        _selectedItemType = PagDeviceCat.values.byName(itemTypeStr);
         itemTypeFound = true;
       } else if (widget.itemKind == PagItemKind.scope) {
         _selectedItemType = PagScopeType.byKey(itemTypeStr);
