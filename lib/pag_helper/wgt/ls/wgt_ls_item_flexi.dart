@@ -233,9 +233,9 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         widget.onListInfoListResult?.call(_listControllerList);
       }
     } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
+      // if (kDebugMode) {
+      print(e);
+      // }
       _failedPullListInfo++;
       rethrow;
     } finally {
