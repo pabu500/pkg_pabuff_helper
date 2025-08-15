@@ -162,7 +162,7 @@ class MdlPagListController /*extends ChangeNotifier*/ {
     String itemTypeStr = 'unknown_item_type';
     if (itemType is PagDeviceCat) {
       // itemTypeStr = getPagDeviceTypeStr(itemType);
-      itemTypeStr = itemType.name; // use the enum's name
+      itemTypeStr = (itemType as PagDeviceCat).name; // use the enum's name
       // switch (itemType) {
       //   case PagDeviceCat.meter:
       //     itemTypeStr = 'meter';
