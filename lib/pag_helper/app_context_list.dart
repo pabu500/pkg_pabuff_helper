@@ -61,15 +61,16 @@ MdlPagAppContext appCtxEvs = MdlPagAppContext(
   route: 'evs_dashboard',
   appContextType: PagAppContextType.evs,
   routeType: PagAppRouteType.route,
-  menuRouteList: [
-    getMenueItem(PagPageRoute.evsDashboard),
-    getMenueItem(PagPageRoute.meterManager),
-    getMenueItem(PagPageRoute.creditTransaction),
-    getMenueItem(PagPageRoute.evsTaskReportManager),
-  ],
+  // menuRouteList: [
+  //   getMenueItem(PagPageRoute.evsDashboard),
+  //   getMenueItem(PagPageRoute.meterManager),
+  //   getMenueItem(PagPageRoute.creditTransaction),
+  //   getMenueItem(PagPageRoute.evsTaskReportManager),
+  // ],
   routeList: [
     PagPageRoute.evsDashboard,
     PagPageRoute.meterManager,
+    PagPageRoute.tenantManager,
     PagPageRoute.creditTransaction,
     PagPageRoute.evsTaskReportManager,
   ],

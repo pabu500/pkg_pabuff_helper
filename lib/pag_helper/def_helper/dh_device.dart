@@ -9,6 +9,7 @@ enum PagDeviceCat {
   lock('Lock', 'lock', 'lk', Symbols.lock),
   camera('Camera', 'camera', 'cam', Symbols.videocam),
   gateway('Gateway', 'gateway', 'gw', Symbols.switch_access),
+  mcu('MCU', 'mcu', 'mcu', Symbols.memory),
   none('None', 'none', 'non', Symbols.help);
 
   const PagDeviceCat(
