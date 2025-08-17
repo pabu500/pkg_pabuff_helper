@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:buff_helper/pag_helper/comm/comm_pag_item.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_device.dart';
 import 'package:buff_helper/pag_helper/def_helper/list_helper.dart';
 import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pag_helper/def_helper/pag_tariff_package_helper.dart';
@@ -12,6 +13,7 @@ import 'package:buff_helper/pag_helper/model/mdl_pag_app_context.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
 import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_scope.dart';
+import 'package:buff_helper/pag_helper/wgt/app/am/wgt_am_meter_group_assignment.dart';
 import 'package:buff_helper/pagrid_helper/comm_helper/local_storage.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/wgt_pag_composite_bill_view.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_ems_type_usage_calc.dart';
@@ -65,6 +67,7 @@ class WgtListSearchItemFlexi extends StatefulWidget {
     this.validateTreeChildren,
     this.isCompactFinder = false,
     this.isSingleItemMode = false,
+    this.showList = true,
     this.width,
   });
 
@@ -92,6 +95,7 @@ class WgtListSearchItemFlexi extends StatefulWidget {
   final Function? validateTreeChildren;
   final bool isCompactFinder;
   final bool isSingleItemMode;
+  final bool showList;
   final double? width;
 
   @override
@@ -324,6 +328,22 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     if (listController == null) {
       return;
     }
+
+    bool hasInfoColumn = false;
+    for (var col in listController.listColControllerList) {
+      if (col.colKey == 'info') {
+        hasInfoColumn = true;
+        break;
+      }
+    }
+    bool hasOpColumn = false;
+    for (var col in listController.listColControllerList) {
+      if (col.colKey == 'op') {
+        hasOpColumn = true;
+        break;
+      }
+    }
+
     // if (_selectedListController == null) {
     //   return;
     // }
@@ -349,6 +369,9 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         isSoa) {
       addInfoColumn = false;
     }
+    if (hasInfoColumn) {
+      addInfoColumn = false;
+    }
     bool addOpColumn = false;
     if (widget.itemKind == PagItemKind.jobType ||
         widget.itemKind == PagItemKind.tariffPackage ||
@@ -360,6 +383,13 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         widget.listContextType == PagListContextType.soa) {
       addOpColumn = false;
     }
+    bool isAmDeviceMeterManager = widget.pagAppContext! == appCtxAm &&
+        widget.itemKind == PagItemKind.device &&
+        _selectedListController!.itemType == PagDeviceCat.meterGroup;
+    if (isAmDeviceMeterManager) {
+      addOpColumn = true;
+    }
+
     bool addMeterUsageColumn = false;
     if (isEmsMeterUsage) {
       addMeterUsageColumn = true;
@@ -378,6 +408,10 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     if (widget.itemKind == PagItemKind.tenant &&
         widget.listContextType == PagListContextType.soa) {
       addViewSoAColumn = true;
+    }
+
+    if (hasOpColumn) {
+      addOpColumn = false;
     }
 
     if (addInfoColumn) {
@@ -580,14 +614,15 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     if (widget.itemKind != PagItemKind.jobType &&
         widget.itemKind != PagItemKind.tariffPackage &&
         widget.itemKind != PagItemKind.meterGroup &&
-        widget.itemKind != PagItemKind.tenant) {
+        widget.itemKind != PagItemKind.tenant &&
+        widget.itemKind != PagItemKind.device) {
       return;
     }
 
     Map<String, dynamic> itemScopeMap = {};
     //add property edit column
     MdlListColController appCtxCol = MdlListColController(
-      colKey: 'Ops',
+      colKey: 'op',
       colTitle: 'Ops',
       includeColKeyAsFilter: false,
       showColumn: true,
@@ -611,6 +646,8 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           case PagItemKind.meterGroup:
             opIcon = Symbols.assignment;
           case PagItemKind.tenant:
+            opIcon = Symbols.assignment;
+          case PagItemKind.device:
             opIcon = Symbols.assignment;
           default:
             allowOps = false;
@@ -792,6 +829,24 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                             });
                           },
                         );
+                      case PagItemKind.device:
+                        _selectedListController?.itemType ==
+                                PagDeviceCat.meterGroup
+                            ? opWidget = WgtAmMeterGroupAssignment(
+                                appConfig: widget.appConfig,
+                                meterType: item['meter_type'] ?? '',
+                                itemGroupIndexStr: item['id'],
+                                itemName: item['name'],
+                                itemLabel: item['label'] ?? '',
+                                itemScope: itemScope,
+                                onUpdate: () {
+                                  setState(() {
+                                    _itemUpdated = true;
+                                  });
+                                },
+                              )
+                            : Container();
+                        break;
                       default:
                         opWidget = Container();
                     }
@@ -1137,6 +1192,10 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         loggedInUser!.selectedScope.isAtScopeType(PagScopeType.project);
     bool isAdmin = loggedInUser!.selectedRole?.isAdmin() ?? false;
     isEditableByAcl = isAdmin || isAtProjectLevel;
+
+    if (widget.listController != null) {
+      _selectedListController = widget.listController;
+    }
   }
 
   @override
@@ -1178,6 +1237,12 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     bool fetchListInfo = _failedPullListInfo <= 3 &&
         _listControllerList.isEmpty &&
         !_isFetchingListInfo;
+
+    if (widget.listController != null) {
+      fetchListInfo = false;
+      _selectedListController = widget.listController;
+      _addPagAppContextColumns(_selectedListController!);
+    }
 
     return SingleChildScrollView(
       // put the result widget as part of the loading widget
@@ -1326,6 +1391,9 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
   }
 
   Widget getResultList() {
+    if (!widget.showList) {
+      return Container();
+    }
     if (_selectedListController == null) {
       return getErrorTextPrompt(
           context: context, errorText: 'List Controller not found');

@@ -330,6 +330,15 @@ class PagUrlBase {
   // AM - Device Manager
   static const String eptPagCreateDevice = '/am/device/create_device';
 
+  // AM - Meter Group
+  // static const String eptPagAmCreateMeterGroup = '/am/create_meter_group';
+  // static const String eptPagAmGetMeterGroupMetertList =
+  //     '/am/get_meter_group_meter_list';
+  // static const String eptPagAmGetMeterGroupScopeMeterList =
+  //     '/am/get_meter_group_scope_meter_list';
+  // static const String eptAmUpdateMetrGroupMeterList =
+  //     '/am/update_meter_group_meter_list';
+
   //meter_ops
   static const String eptMeterOpGetManualMeterList =
       '/meter_ops/get_manual_meter_list';

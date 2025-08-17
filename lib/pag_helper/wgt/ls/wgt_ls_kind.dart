@@ -35,6 +35,7 @@ class WgtListSearchKind extends StatefulWidget {
     this.onScopeTreeUpdate,
     this.isSingleItemMode = false,
     this.isCompactFinder = false,
+    this.showList = true,
     this.onItemTypeSelected,
     this.width,
   });
@@ -51,6 +52,7 @@ class WgtListSearchKind extends StatefulWidget {
   final Function? onScopeTreeUpdate;
   final bool isSingleItemMode;
   final bool isCompactFinder;
+  final bool showList;
   final Function(dynamic)? onItemTypeSelected;
   final double? width;
 
@@ -363,6 +365,7 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
               // key: _itemTypeFreshKey,
               isCompactFinder: widget.isCompactFinder,
               isSingleItemMode: widget.isSingleItemMode,
+              showList: widget.showList,
               finderRefreshKey: _itemTypeRefreshKey,
               pagAppContext: widget.pagAppContext,
               itemKind: widget.itemKind,
