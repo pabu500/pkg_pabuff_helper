@@ -62,11 +62,17 @@ enum PagPageRoute {
     'meter_manager',
     Symbols.speed,
   ),
+  evsMeterManager(
+    'Meter Manager',
+    'evs_meter_manager',
+    Symbols.speed,
+  ),
   meterGroupManager(
     'Meter Group Manager',
     'meter_group_manager',
     Symbols.atr,
   ),
+
   creditTransaction(
     'Credit Transaction',
     'credit_transaction',
@@ -75,6 +81,11 @@ enum PagPageRoute {
   tenantManager(
     'Tenant Manager',
     'tenant_manager',
+    Symbols.location_away,
+  ),
+  evsTenantManager(
+    'Tenant Manager',
+    'evs_tenant_manager',
     Symbols.location_away,
   ),
   tariffManager(
@@ -196,6 +207,11 @@ enum PagPageRoute {
     'Scope Manager',
     'am_scope_manager',
     Symbols.file_map_stack,
+  ),
+  amCommsManager(
+    'Comms Manager',
+    'am_comms_manager',
+    Symbols.join,
   ),
   amDeviceManager(
     'Device Manager',

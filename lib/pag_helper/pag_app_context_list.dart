@@ -13,12 +13,12 @@ MdlPagAppContext appCtxConsoleHome = MdlPagAppContext(
   route: 'console_home_dashboard',
   appContextType: PagAppContextType.consoleHome,
   routeType: PagAppRouteType.route,
-  menuRouteList: [
-    getMenueItem(PagPageRoute.consoleHomeDashboard),
-    getMenueItem(PagPageRoute.consoleHomeUserService),
-    getMenueItem(PagPageRoute.consoleHomeAcl),
-    getMenueItem(PagPageRoute.consoleHomeSettings),
-  ],
+  // menuRouteList: [
+  //   getMenueItem(PagPageRoute.consoleHomeDashboard),
+  //   getMenueItem(PagPageRoute.consoleHomeUserService),
+  //   getMenueItem(PagPageRoute.consoleHomeAcl),
+  //   getMenueItem(PagPageRoute.consoleHomeSettings),
+  // ],
   routeList: [
     PagPageRoute.consoleHomeDashboard,
     PagPageRoute.consoleHomeUserService,
@@ -34,14 +34,14 @@ MdlPagAppContext appCtxEms = MdlPagAppContext(
   route: 'ems_dashboard',
   appContextType: PagAppContextType.ems,
   routeType: PagAppRouteType.route,
-  menuRouteList: [
-    getMenueItem(PagPageRoute.emsDashboard),
-    getMenueItem(PagPageRoute.meterManager),
-    getMenueItem(PagPageRoute.tenantManager),
-    // getMenueItem(PagPageRoute.tariffManager),
-    getMenueItem(PagPageRoute.billingManager),
-    // getMenueItem(PagPageRoute.emsTaskReportManager),
-  ],
+  // menuRouteList: [
+  //   getMenueItem(PagPageRoute.emsDashboard),
+  //   getMenueItem(PagPageRoute.meterManager),
+  //   getMenueItem(PagPageRoute.tenantManager),
+  //   // getMenueItem(PagPageRoute.tariffManager),
+  //   getMenueItem(PagPageRoute.billingManager),
+  //   // getMenueItem(PagPageRoute.emsTaskReportManager),
+  // ],
   routeList: [
     PagPageRoute.emsDashboard,
     PagPageRoute.meterManager,
@@ -69,8 +69,8 @@ MdlPagAppContext appCtxEvs = MdlPagAppContext(
   // ],
   routeList: [
     PagPageRoute.evsDashboard,
-    PagPageRoute.meterManager,
-    PagPageRoute.tenantManager,
+    PagPageRoute.evsMeterManager,
+    PagPageRoute.evsTenantManager,
     PagPageRoute.creditTransaction,
     PagPageRoute.evsTaskReportManager,
   ],
@@ -82,14 +82,14 @@ MdlPagAppContext appCtxPtw = MdlPagAppContext(
   route: 'ptw_dashboard',
   appContextType: PagAppContextType.ptw,
   routeType: PagAppRouteType.route,
-  menuRouteList: [
-    getMenueItem(PagPageRoute.ptwDashboard),
-    getMenueItem(PagPageRoute.lockManager),
-    getMenueItem(PagPageRoute.ptwWorkSiteManager),
-    getMenueItem(PagPageRoute.ptwApplicationManager),
-    getMenueItem(PagPageRoute.ptwWorkOrderManager),
-    getMenueItem(PagPageRoute.ptwTaskReportManager),
-  ],
+  // menuRouteList: [
+  //   getMenueItem(PagPageRoute.ptwDashboard),
+  //   getMenueItem(PagPageRoute.lockManager),
+  //   getMenueItem(PagPageRoute.ptwWorkSiteManager),
+  //   getMenueItem(PagPageRoute.ptwApplicationManager),
+  //   getMenueItem(PagPageRoute.ptwWorkOrderManager),
+  //   getMenueItem(PagPageRoute.ptwTaskReportManager),
+  // ],
   routeList: [
     PagPageRoute.ptwDashboard,
     PagPageRoute.lockManager,
@@ -106,12 +106,12 @@ MdlPagAppContext appCtxVm = MdlPagAppContext(
   route: 'vm_dashboard',
   appContextType: PagAppContextType.vm,
   routeType: PagAppRouteType.route,
-  menuRouteList: [
-    getMenueItem(PagPageRoute.vmDashboard),
-    getMenueItem(PagPageRoute.cameraManager),
-    getMenueItem(PagPageRoute.vmEventManager),
-    getMenueItem(PagPageRoute.vmTaskReportManager),
-  ],
+  // menuRouteList: [
+  //   getMenueItem(PagPageRoute.vmDashboard),
+  //   getMenueItem(PagPageRoute.cameraManager),
+  //   getMenueItem(PagPageRoute.vmEventManager),
+  //   getMenueItem(PagPageRoute.vmTaskReportManager),
+  // ],
   routeList: [
     PagPageRoute.vmDashboard,
     PagPageRoute.cameraManager,
@@ -126,9 +126,9 @@ MdlPagAppContext appCtxBms = MdlPagAppContext(
   route: 'bms',
   appContextType: PagAppContextType.bms,
   routeType: PagAppRouteType.route,
-  menuRouteList: [
-    getMenueItem(PagPageRoute.bmsDashboard),
-  ],
+  // menuRouteList: [
+  //   getMenueItem(PagPageRoute.bmsDashboard),
+  // ],
   routeList: [
     PagPageRoute.bmsDashboard,
   ],
@@ -140,11 +140,11 @@ MdlPagAppContext appCtxFh = MdlPagAppContext(
   route: 'fh_dashboard',
   appContextType: PagAppContextType.fh,
   routeType: PagAppRouteType.route,
-  menuRouteList: [
-    getMenueItem(PagPageRoute.fhDashboard),
-    getMenueItem(PagPageRoute.fhEventManager),
-    getMenueItem(PagPageRoute.fhTaskReportManager),
-  ],
+  // menuRouteList: [
+  //   getMenueItem(PagPageRoute.fhDashboard),
+  //   getMenueItem(PagPageRoute.fhEventManager),
+  //   getMenueItem(PagPageRoute.fhTaskReportManager),
+  // ],
   routeList: [
     PagPageRoute.fhDashboard,
     PagPageRoute.fhEventManager,
@@ -158,15 +158,16 @@ MdlPagAppContext appCtxAm = MdlPagAppContext(
   route: 'am_dashboard',
   appContextType: PagAppContextType.am,
   routeType: PagAppRouteType.route,
-  menuRouteList: [
-    getMenueItem(PagPageRoute.amDashboard),
-    getMenueItem(PagPageRoute.amDeviceManager),
-    getMenueItem(PagPageRoute.amScopeManager),
-  ],
+  // menuRouteList: [
+  //   getMenueItem(PagPageRoute.amDashboard),
+  //   getMenueItem(PagPageRoute.amDeviceManager),
+  //   getMenueItem(PagPageRoute.amScopeManager),
+  // ],
   routeList: [
     PagPageRoute.amDashboard,
     PagPageRoute.amDeviceManager,
     PagPageRoute.amScopeManager,
+    PagPageRoute.amCommsManager,
   ],
 );
 MdlPagAppContext appCtxQq = MdlPagAppContext(
@@ -176,11 +177,11 @@ MdlPagAppContext appCtxQq = MdlPagAppContext(
   route: 'pq_dashboard',
   appContextType: PagAppContextType.pq,
   routeType: PagAppRouteType.route,
-  menuRouteList: [
-    getMenueItem(PagPageRoute.pqDashboard),
-    getMenueItem(PagPageRoute.pqInsights),
-    getMenueItem(PagPageRoute.ctLab)
-  ],
+  // menuRouteList: [
+  //   getMenueItem(PagPageRoute.pqDashboard),
+  //   getMenueItem(PagPageRoute.pqInsights),
+  //   getMenueItem(PagPageRoute.ctLab)
+  // ],
   routeList: [
     PagPageRoute.pqDashboard,
     PagPageRoute.pqInsights,
@@ -208,10 +209,10 @@ MdlPagAppContext appCtxEs = MdlPagAppContext(
   route: 'es_dashboard',
   appContextType: PagAppContextType.es,
   routeType: PagAppRouteType.route,
-  menuRouteList: [
-    getMenueItem(PagPageRoute.esDashboard),
-    getMenueItem(PagPageRoute.esInsights),
-  ],
+  // menuRouteList: [
+  //   getMenueItem(PagPageRoute.esDashboard),
+  //   getMenueItem(PagPageRoute.esInsights),
+  // ],
   routeList: [
     PagPageRoute.esDashboard,
     PagPageRoute.esInsights,

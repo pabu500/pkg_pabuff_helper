@@ -6,9 +6,12 @@ class PagAppProvider extends ChangeNotifier {
   String? appVer;
   String? latestVer;
   String? oreVer;
+
+  // PagAppContextType appCtxCur = PagAppContextType.consoleHome;
   PagPageRoute prCur = PagPageRoute.projectPublicFront;
 
-  String? _currentRoute;
+  // PagAppContextType? _currentAppContext;
+  // String? _currentRoute;
 
   PagAppProvider({
     this.appName,
@@ -23,13 +26,24 @@ class PagAppProvider extends ChangeNotifier {
   //   // notifyListeners();
   // }
 
-  //getter
-  String? get currentRoute => _currentRoute;
-  //setter
-  set currentRoute(String? currentRoute) {
-    _currentRoute = currentRoute;
-    notifyListeners();
-  }
+  // //getter
+  // String? get currentRoute => _currentRoute;
+  // //setter
+  // set currentRoute(String? currentRoute) {
+  //   _currentRoute = currentRoute;
+  //   notifyListeners();
+  // }
+
+  // PagAppContextType? get currentAppContext => _currentAppContext;
+
+  // set currentAppContext(PagAppContextType? currentAppContext) {
+  //   _currentAppContext = currentAppContext;
+  //   notifyListeners();
+  // }
+
+  // void initAppContext(PagAppContextType appContextType) {
+  //   appCtxCur = appContextType;
+  // }
 
   void iniPageRoute(PagPageRoute curPageRoute) {
     prCur = curPageRoute;

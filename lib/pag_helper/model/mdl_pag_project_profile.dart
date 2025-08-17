@@ -10,6 +10,7 @@ import '../def_helper/project_helper.dart';
 import 'scope/mdl_pag_site_group_profile.dart';
 import 'scope/mdl_pag_site_profile.dart';
 import 'package:latlong2/latlong.dart';
+import 'dart:developer' as dev;
 
 class MdlPagProjectProfile {
   int id;
@@ -210,10 +211,9 @@ class MdlPagProjectProfile {
   }
 
   MdlPagPageConfig? getPageConfig(String appContextName, String pageName) {
-    if (kDebugMode) {
-      print(
-          'getPageConfig: looking for pageConfig: appCtx:$appContextName, pr:$pageName');
-    }
+    dev.log(
+        'getPageConfig: looking for pageConfig: appCtx:$appContextName, pr:$pageName');
+
     for (var appCtxConfig in appContextConfigList) {
       if (appCtxConfig.appContextName == appContextName) {
         for (var pageConfig in appCtxConfig.pageConfigList) {
@@ -224,6 +224,8 @@ class MdlPagProjectProfile {
       }
     }
     // throw Exception('Page config not found');
+    dev.log(
+        'getPageConfig: pageConfig not found: appCtx:$appContextName, pr:$pageName');
     return null;
   }
 

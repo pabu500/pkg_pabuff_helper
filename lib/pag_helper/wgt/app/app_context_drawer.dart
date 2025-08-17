@@ -83,10 +83,14 @@ class _WgtAppContextDrawerState extends State<WgtAppContextDrawer> {
     assert(appCtxConfigCurAppCtx != null);
 
     List<Widget> tiles = [];
-    for (Map<String, dynamic> routeItem in widget.appContext.menuRouteList!) {
-      String label = routeItem['label'];
-      String route = routeItem['route'];
-      PagPageRoute pr = routeItem['pr'];
+    // for (Map<String, dynamic> routeItem in widget.appContext.menuRouteList!) {
+    for (PagPageRoute pageRoute in widget.appContext.routeList ?? []) {
+      // String label = route?.label ?? '';
+      // String route = route?.route ?? '';
+      // PagPageRoute pr = route?.pr ?? '';
+      String label = pageRoute.label;
+      String route = pageRoute.route;
+      PagPageRoute pr = pageRoute;
 
       bool prFound = false;
       for (MdlPagPageConfig pc in appCtxConfigCurAppCtx!.pageConfigList) {

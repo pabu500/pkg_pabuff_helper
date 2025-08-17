@@ -2,6 +2,7 @@ import 'package:buff_helper/pag_helper/vendor_helper.dart';
 import 'package:buff_helper/pag_helper/def_helper/def_page_route.dart';
 
 enum PagAppContextType {
+  none,
   consoleHome,
   ems,
   evs,
@@ -31,7 +32,7 @@ class MdlPagAppContext {
   bool is3rdParty = false;
   PlatformVendor? platformVendor;
   VendorCredType? vendorCredType;
-  List<Map<String, dynamic>>? menuRouteList;
+  // List<Map<String, dynamic>>? menuRouteList;
   List<PagPageRoute>? routeList;
   PagPageRoute? appHomePageRoute;
 
@@ -45,7 +46,7 @@ class MdlPagAppContext {
     this.is3rdParty = false,
     this.platformVendor,
     this.vendorCredType,
-    this.menuRouteList,
+    // this.menuRouteList,
     this.routeList,
     this.appHomePageRoute,
   });

@@ -386,6 +386,10 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
                   _listInfoFetched = true;
                 });
               },
+              onResult: (result) {
+                // Handle the result here
+                widget.onResult?.call(result);
+              },
             ),
         ],
       ),
