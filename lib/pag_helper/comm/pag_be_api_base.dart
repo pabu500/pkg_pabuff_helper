@@ -331,7 +331,10 @@ class PagUrlBase {
   static const String eptPagCreateDevice = '/am/device/create_device';
 
   // AM - Comms Manager
-  static const String eptAmCommsLinkDevices = '/am/comms/link_devices';
+  static const String eptAmCommsUpdateDeviceLinkage =
+      '/am/comms/update_device_linkage';
+  static const String eptAmCommsCheckDeviceLinkage =
+      '/am/comms/check_device_linkage';
 
   // AM - Meter Group
   // static const String eptPagAmCreateMeterGroup = '/am/create_meter_group';

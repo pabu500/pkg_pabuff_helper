@@ -33,7 +33,7 @@ Widget getErrorTextPrompt(
                 fontWeight: FontWeight.bold,
               ),
             ),
-          Text(
+          SelectableText(
             errorText,
             style: TextStyle(
               color: textColor ?? Theme.of(context).colorScheme.error,

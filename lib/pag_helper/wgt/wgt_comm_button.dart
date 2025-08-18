@@ -13,6 +13,7 @@ class WgtCommButton extends StatefulWidget {
     this.hight,
     this.faceColor,
     this.labelStyle,
+    this.labelWidget,
     this.onPressed,
     this.onResult,
   });
@@ -24,6 +25,7 @@ class WgtCommButton extends StatefulWidget {
   final double? hight;
   final Color? faceColor;
   final TextStyle? labelStyle;
+  final Widget? labelWidget;
   final Function()? onPressed;
   final Function(dynamic)? onResult;
 
@@ -94,15 +96,16 @@ class _WgtCommButtonState extends State<WgtCommButton> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  widget.label,
-                  style: widget.labelStyle ??
-                      TextStyle(
-                        color: pagCallToActionText ??
-                            Theme.of(context).colorScheme.onSecondary,
-                        fontSize: 16,
-                      ),
-                ),
+                widget.labelWidget ??
+                    Text(
+                      widget.label,
+                      style: widget.labelStyle ??
+                          TextStyle(
+                            color: pagCallToActionText ??
+                                Theme.of(context).colorScheme.onSecondary,
+                            fontSize: 16,
+                          ),
+                    ),
                 if (_isWaiting || (widget.inComm ?? false))
                   const Padding(
                     padding: EdgeInsets.only(left: 8.0),
