@@ -19,6 +19,7 @@ import '../../def_helper/dh_pag_finance_type.dart';
 import '../../model/mdl_pag_app_config.dart';
 import '../../wgt/history_presentor/wgt_pag_item_history_presenter.dart';
 import 'wgt_ls_item_flexi.dart';
+import 'dart:developer' as dev;
 
 class WgtListSearchKind extends StatefulWidget {
   const WgtListSearchKind({
@@ -81,20 +82,15 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
   String _listTypeErrorText = '';
 
   void _updateItemType({dynamic itemType}) {
+    dev.log('Updating item type: $itemType');
+
     _selectedListController = null;
 
-    // NOTE: keep the order of the following 2 if
-    if (itemType != null) {
-      if (_selectedItemType == itemType) {
-        return;
-      }
-    }
     if (_selectedItemType != null) {
       if (itemType != null) {
         _selectedItemType = itemType;
       }
     }
-    ////////////////////////////////////////
 
     if (_listControllerList.isEmpty) {
       if (kDebugMode) {
@@ -212,18 +208,10 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
     }
   }
 
-  void _updateItemTypeListStatus() {
+  void _updateItemTypeListStatus({dynamic itemType}) {
     for (Map<String, dynamic> itemTypeInfo in _itemTypeInfoList) {
       dynamic itemType = itemTypeInfo['item_type'];
-      // if (itemType is PagDeviceCat) {
-      //   itemType = itemType.name;
-      // } else if (itemType is PagScopeType) {
-      //   itemType = itemType.name;
-      // } else if (itemType is PagFinanceType) {
-      //   itemType = itemType.name;
-      // } else {
-      //   throw Exception('Unsupported item type: ${itemType.runtimeType}');
-      // }
+
       bool itemTypeListInfoFound = false;
       for (MdlPagListController listController in _listControllerList) {
         String listControllerItemTypeStr = '';
@@ -267,6 +255,10 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
   }
 
   void _loadColPref() {
+    if (widget.itemType != null) {
+      return;
+    }
+
     if (_selectedListController == null) {
       return;
     }
@@ -384,7 +376,13 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
                 _listControllerList.clear();
                 _listControllerList.addAll(lisInfoList);
                 _updateItemTypeListStatus();
-                _updateItemType();
+
+                // if (widget.itemType == null) {
+                //   dev.log(
+                //       'No item type selected, updating to first available type');
+                _updateItemType(itemType: widget.itemType);
+                // }
+
                 setState(() {
                   _listInfoFetched = true;
                 });
