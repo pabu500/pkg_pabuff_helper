@@ -1,3 +1,4 @@
+import 'package:buff_helper/pag_helper/def_helper/dh_pag_finance_type.dart';
 import 'package:buff_helper/pag_helper/def_helper/list_helper.dart';
 import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_context.dart';
@@ -48,6 +49,20 @@ class _WgtPagLsState extends State<WgtPagLs> {
   Widget build(BuildContext context) {
     switch (widget.itemKind) {
       case PagItemKind.device || PagItemKind.scope || PagItemKind.finance:
+        if (widget.listContextType == PagListContextType.paymentMatching) {
+          return WgtListSearchItemFlexi(
+            appConfig: widget.appConfig,
+            pagAppContext: widget.pagAppContext,
+            itemKind: widget.itemKind,
+            itemType: PagFinanceType.payment,
+            listContextType: widget.listContextType,
+            prefKey: prefKey,
+            itemTypeListStr: PagFinanceType.payment.name,
+            additionalColumnConfig: widget.additionalColumnConfig,
+            getPaneWidget: widget.getPaneWidget,
+            validateTreeChildren: widget.validateTreeChildren,
+          );
+        }
         return WgtListSearchKind(
           appConfig: widget.appConfig,
           itemKind: widget.itemKind,

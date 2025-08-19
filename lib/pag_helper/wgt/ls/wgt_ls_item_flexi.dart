@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:buff_helper/pag_helper/comm/comm_pag_item.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_device.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_pag_finance_type.dart';
 import 'package:buff_helper/pag_helper/def_helper/list_helper.dart';
 import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pag_helper/def_helper/pag_tariff_package_helper.dart';
@@ -378,7 +379,8 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     if (widget.itemKind == PagItemKind.jobType ||
         widget.itemKind == PagItemKind.tariffPackage ||
         widget.itemKind == PagItemKind.meterGroup ||
-        widget.itemKind == PagItemKind.tenant) {
+        widget.itemKind == PagItemKind.tenant ||
+        widget.listContextType == PagListContextType.paymentMatching) {
       addOpColumn = true;
     }
     if (widget.itemKind == PagItemKind.tenant &&
@@ -411,6 +413,10 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         widget.listContextType == PagListContextType.soa) {
       addViewSoAColumn = true;
     }
+    bool addMatchPaymentColumn = false;
+    if (widget.listContextType == PagListContextType.paymentMatching) {
+      addMatchPaymentColumn = true;
+    }
 
     if (hasOpColumn) {
       addOpColumn = false;
@@ -433,6 +439,9 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     }
     if (addViewSoAColumn) {
       _addViewSoAColumn(listController);
+    }
+    if (addMatchPaymentColumn) {
+      _addMatchPaymentColumn(listController);
     }
   }
 
@@ -1144,6 +1153,48 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       },
     );
     listController.listColControllerList.add(appCtxCol);
+  }
+
+  void _addMatchPaymentColumn(MdlPagListController listController) {
+    MdlListColController appCtxCol = MdlListColController(
+      colKey: 'detail',
+      colTitle: 'Match',
+      includeColKeyAsFilter: false,
+      showColumn: true,
+      colWidth: 55,
+      colWidgetType: PagColWidgetType.CUSTOM,
+      getCustomWidget: (item, fullList) {
+        bool showDetail = true;
+
+        final onItemComm = (bool isComm) {};
+        item['on_item_comm'] = onItemComm;
+        return Padding(
+          padding: const EdgeInsets.only(right: 0),
+          child: InkWell(
+            onTap: !showDetail
+                ? null
+                : () {
+                    xtShowModelBottomSheet(
+                      context,
+                      WgtTenantSoA(
+                        appConfig: widget.appConfig,
+                        loggedInUser: loggedInUser!,
+                        teneantInfo: item,
+                      ),
+                      onClosed: () {},
+                    );
+                  },
+            child: Icon(
+              Symbols.payments,
+              color: showDetail
+                  ? Theme.of(context).colorScheme.primary.withAlpha(200)
+                  : Theme.of(context).hintColor.withAlpha(130),
+            ),
+          ),
+        );
+      },
+    );
+    listController.listColControllerList.insert(0, appCtxCol);
   }
 
   void _updateCustomize() {

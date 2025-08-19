@@ -268,6 +268,7 @@ class PagUrlBase {
   // ems/fin
   static const String eptBatchOpFinPostPayment =
       '/ems/fin/batch_op/post_payment';
+  static const String eptFinMatchPayment = '/ems/fin/match_payment';
 
   // Tariff Package Manager
   static const String eptGetTariffPackageTariffRateInfo =
