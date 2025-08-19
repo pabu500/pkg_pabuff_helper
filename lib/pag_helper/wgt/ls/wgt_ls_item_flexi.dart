@@ -361,12 +361,14 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     bool isEsInsights = widget.pagAppContext! == appCtxEs &&
         widget.itemKind == PagItemKind.scope;
     bool isSoa = widget.listContextType == PagListContextType.soa;
+    bool isPp = widget.listContextType == PagListContextType.paymentMatching;
     if (isEmsDeviceLs ||
         isEmsMeterUsage ||
         isEmsTenantUsage ||
         isEsInsights ||
         isBill ||
-        isSoa) {
+        isSoa ||
+        isPp) {
       addInfoColumn = false;
     }
     if (hasInfoColumn) {
