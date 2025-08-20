@@ -26,7 +26,7 @@ class _WgtMatchOnePaymentState extends State<WgtMatchOnePayment> {
     color: Theme.of(context).hintColor,
   );
   late final TextStyle mainTextStyle = const TextStyle(
-    fontSize: 21,
+    fontSize: 34,
     fontWeight: FontWeight.bold,
   );
 
