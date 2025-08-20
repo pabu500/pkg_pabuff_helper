@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:buff_helper/pag_helper/comm/comm_pag_item.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_device.dart';
-import 'package:buff_helper/pag_helper/def_helper/dh_pag_finance_type.dart';
 import 'package:buff_helper/pag_helper/def_helper/list_helper.dart';
 import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pag_helper/def_helper/pag_tariff_package_helper.dart';
@@ -15,6 +14,7 @@ import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
 import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_scope.dart';
 import 'package:buff_helper/pag_helper/wgt/app/am/wgt_am_meter_group_assignment.dart';
+import 'package:buff_helper/pag_helper/wgt/app/ems/wgt_match_payment.dart';
 import 'package:buff_helper/pagrid_helper/comm_helper/local_storage.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/wgt_pag_composite_bill_view.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_ems_type_usage_calc.dart';
@@ -299,6 +299,12 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           _totalItemCount = itemFindResult['count'];
         }
       });
+
+      // widget.onResult?.call({
+      //   'item_list': _entityItems,
+      //   'count': _totalItemCount,
+      //   'current_page': _currentPage,
+      // });
     } catch (e) {
       if (kDebugMode) {
         print(e);
@@ -441,7 +447,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       _addViewSoAColumn(listController);
     }
     if (addMatchPaymentColumn) {
-      _addMatchPaymentColumn(listController);
+      _addMatchPaymentColumn2(listController);
     }
   }
 
@@ -1197,6 +1203,29 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     listController.listColControllerList.insert(0, appCtxCol);
   }
 
+  void _addMatchPaymentColumn2(MdlPagListController listController) {
+    MdlListColController appCtxCol = MdlListColController(
+      colKey: 'detail',
+      colTitle: 'Match',
+      includeColKeyAsFilter: false,
+      showColumn: true,
+      colWidth: 55,
+      colWidgetType: PagColWidgetType.CUSTOM,
+      getCustomWidget: (item, fullList) {
+        bool showDetail = true;
+        return WgtPaymentMatchOpItem(
+          appConfig: widget.appConfig,
+          loggedInUser: loggedInUser!,
+          paymentMatchInfo: item,
+          regFresh: (doRefreshItem) {
+            item['is_comm'] = doRefreshItem;
+          },
+        );
+      },
+    );
+    listController.listColControllerList.insert(0, appCtxCol);
+  }
+
   void _updateCustomize() {
     if (_selectedListController == null) {
       return;
@@ -1478,6 +1507,9 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           paneHeight: widget.paneHeight,
           itemType: widget.itemType,
           listPrefix: _getListPrefix(),
+          onResult: (Map<String, dynamic> result) {
+            widget.onResult?.call(result);
+          },
         ),
       ),
     );
@@ -1497,5 +1529,71 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         onPressed(item, fullList);
       },
     );
+  }
+}
+
+class WgtPaymentMatchOpItem extends StatefulWidget {
+  const WgtPaymentMatchOpItem({
+    super.key,
+    required this.appConfig,
+    required this.loggedInUser,
+    required this.paymentMatchInfo,
+    this.regFresh,
+  });
+
+  final MdlPagAppConfig appConfig;
+  final MdlPagUser loggedInUser;
+  final Map<String, dynamic> paymentMatchInfo;
+  final void Function(void Function(bool isComm, bool isEnabled))? regFresh;
+
+  @override
+  State<WgtPaymentMatchOpItem> createState() => _WgtPaymentMatchOpItemState();
+}
+
+class _WgtPaymentMatchOpItemState extends State<WgtPaymentMatchOpItem> {
+  bool _isComm = false;
+  bool _isEnabled = false;
+
+  void _refresh(bool isComm, bool isEnabled) {
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _isComm = isComm;
+      _isEnabled = isEnabled;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    widget.regFresh?.call(_refresh);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // return widget;
+    return _isComm
+        ? const WgtPagWait(size: 21)
+        : InkWell(
+            onTap: !_isEnabled
+                ? null
+                : () {
+                    xtShowModelBottomSheet(
+                      context,
+                      WgtMatchOnePayment(
+                        appConfig: widget.appConfig,
+                        loggedInUser: widget.loggedInUser,
+                        paymentMatchingInfo: widget.paymentMatchInfo,
+                      ),
+                      onClosed: () {},
+                    );
+                  },
+            child: Icon(Symbols.payments,
+                color: _isEnabled
+                    ? Theme.of(context).colorScheme.primary.withAlpha(210)
+                    : Theme.of(context).hintColor.withAlpha(50)),
+          );
   }
 }

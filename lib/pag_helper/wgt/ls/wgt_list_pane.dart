@@ -30,6 +30,7 @@ class WgtListPane extends StatefulWidget {
     this.initialListPaneMode = ListPaneMode.list,
     this.paneHeight,
     this.itemType,
+    this.onResult,
   });
 
   final MdlPagAppConfig appConfig;
@@ -50,6 +51,7 @@ class WgtListPane extends StatefulWidget {
   final String listPrefix;
   final double? paneHeight;
   final dynamic itemType;
+  final Function(Map<String, dynamic>)? onResult;
 
   @override
   State<WgtListPane> createState() => _WgtListPaneState();
@@ -121,6 +123,12 @@ class _WgtListPaneState extends State<WgtListPane> {
         if (_currentPage == 1) {
           _totalItemCount = itemFindResult['count'];
         }
+      });
+
+      widget.onResult?.call({
+        'item_list': _entityItems,
+        'count': _totalItemCount,
+        'current_page': _currentPage,
       });
     } catch (e) {
       if (kDebugMode) {

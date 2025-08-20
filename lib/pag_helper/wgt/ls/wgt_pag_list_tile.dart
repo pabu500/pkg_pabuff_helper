@@ -5,14 +5,16 @@ class WgtPagListTile extends StatefulWidget {
     super.key,
     required this.index,
     // this.globalKey,
-    required this.listItem,
+    required this.tileWidgetList,
+    this.decor,
     // required this.builder,
     // this.onUpdate,
     this.regFresh,
   });
 
   final int index;
-  final List<Widget> listItem;
+  final List<Widget> tileWidgetList;
+  final BoxDecoration? decor;
   // final GlobalKey? globalKey;
   // final Function(BuildContext, void Function() refresh) builder;
   final Function? regFresh;
@@ -22,17 +24,25 @@ class WgtPagListTile extends StatefulWidget {
 }
 
 class _WgtPagListTileState extends State<WgtPagListTile> {
+  late final BoxDecoration defaultDecor = BoxDecoration(
+    border: Border(
+      bottom: BorderSide(
+        color: Theme.of(context).hintColor.withAlpha(80),
+        width: 0.5,
+      ),
+    ),
+  );
   Color? _borderColor;
   TextStyle? _textStyle;
   String? _toolTip;
   Widget? _status;
   late int _iniItems;
 
-  void refresh({
+  void _refresh({
     Color? borderColor,
     TextStyle? textStyle,
     String? toolTip,
-    Widget? status,
+    Widget? statusWidget,
   }) {
     if (!mounted) {
       return;
@@ -42,10 +52,10 @@ class _WgtPagListTileState extends State<WgtPagListTile> {
       _borderColor = borderColor;
       _textStyle = textStyle;
       _toolTip = toolTip;
-      _status = status;
-      if (status != null) {
-        widget.listItem.removeLast();
-        widget.listItem.add(status);
+      _status = statusWidget;
+      if (statusWidget != null) {
+        widget.tileWidgetList.removeLast();
+        widget.tileWidgetList.add(statusWidget);
       }
     });
   }
@@ -53,33 +63,26 @@ class _WgtPagListTileState extends State<WgtPagListTile> {
   @override
   void initState() {
     super.initState();
-    if (widget.regFresh != null) {
-      widget.regFresh!(widget.index, refresh);
-    }
-    _iniItems = widget.listItem.length;
+
+    widget.regFresh?.call(widget.index, _refresh);
+
+    _iniItems = widget.tileWidgetList.length;
   }
 
   @override
   Widget build(BuildContext context) {
-    // widget.builder.call(context, refresh);
+    BoxDecoration decor = widget.decor ?? defaultDecor;
     return ListTile(
       // minVerticalPadding: -4,
       visualDensity: const VisualDensity(vertical: -4),
       dense: true,
       title: Container(
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: Theme.of(context).hintColor.withOpacity(0.3),
-              width: 0.5,
-            ),
-          ),
-        ),
+        decoration: decor,
         child: _borderColor == null
             ? Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: widget.listItem,
+                children: widget.tileWidgetList,
               )
             : Container(
                 decoration: BoxDecoration(
@@ -88,7 +91,7 @@ class _WgtPagListTileState extends State<WgtPagListTile> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.center,
-                  children: widget.listItem,
+                  children: widget.tileWidgetList,
                 ),
               ),
       ),
