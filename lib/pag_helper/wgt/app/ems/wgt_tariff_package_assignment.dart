@@ -544,9 +544,9 @@ class _WgtTariffPackageAssignmentState
       dev.log(
           'warning: meterTypeTptLabel is null for ${widget.meterType} in itemInfo: $itemInfo');
       // }
-      return const SizedBox.shrink();
+      // return const SizedBox.shrink();
     }
-    assert(meterTypeTptLabel.isNotEmpty);
+    // assert(meterTypeTptLabel.isNotEmpty);
 
     BoxDecoration boxDecoration = BoxDecoration(
       border: Border.all(color: Theme.of(context).hintColor.withAlpha(50)),
@@ -556,7 +556,8 @@ class _WgtTariffPackageAssignmentState
     TextStyle disabledTextStyle =
         TextStyle(color: Theme.of(context).hintColor.withAlpha(150));
 
-    bool disabled = _hasTptMismatchAssignmentError ||
+    bool disabled = meterTypeTptLabel == null ||
+        _hasTptMismatchAssignmentError ||
         itemInfo['assigned_to_another_tp_name'] != null ||
         itemInfo['tpt_mismatch'] ||
         itemInfo['tpt_mismatch_assignment_error'];
@@ -595,12 +596,14 @@ class _WgtTariffPackageAssignmentState
         ),
         horizontalSpaceSmall,
         Tooltip(
-          message: itemInfo['tpt_mismatch_assignment_error']
-              ? 'TP Type Mismatch Error'
-              : itemInfo['tpt_mismatch'] &&
-                      (itemInfo['assigned_to_another_tp_name'] == null)
-                  ? 'TP Type Mismatch'
-                  : '',
+          message: meterTypeTptLabel == null
+              ? 'Tpt is not set for the tenant'
+              : itemInfo['tpt_mismatch_assignment_error']
+                  ? 'TP Type Mismatch Error'
+                  : itemInfo['tpt_mismatch'] &&
+                          (itemInfo['assigned_to_another_tp_name'] == null)
+                      ? 'TP Type Mismatch'
+                      : '',
           child: Container(
             width: 90,
             decoration: itemInfo['tpt_mismatch_assignment_error']
@@ -613,7 +616,7 @@ class _WgtTariffPackageAssignmentState
                         border: Border.all(color: Colors.yellow.withAlpha(130)))
                     : boxDecoration,
             padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-            child: Text(meterTypeTptLabel,
+            child: Text(meterTypeTptLabel ?? '-',
                 style: disabled ? disabledTextStyle : null),
           ),
         ),
