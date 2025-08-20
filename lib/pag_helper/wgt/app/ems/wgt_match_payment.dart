@@ -47,6 +47,7 @@ class _WgtMatchOnePaymentState extends State<WgtMatchOnePayment> {
           Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text('Payment Amount: ', style: mainLabelStyle),
               Text(paymentAmount, style: mainTextStyle)
@@ -55,6 +56,7 @@ class _WgtMatchOnePaymentState extends State<WgtMatchOnePayment> {
           Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text('Payment Value Date: ', style: mainLabelStyle),
               Text(paymentValueDateOnly, style: mainTextStyle),
