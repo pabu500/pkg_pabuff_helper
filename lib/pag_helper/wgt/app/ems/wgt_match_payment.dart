@@ -60,9 +60,9 @@ class _WgtMatchOnePaymentState extends State<WgtMatchOnePayment> {
               Text(paymentValueDateOnly, style: mainTextStyle),
             ],
           ),
-          const Divider(),
           verticalSpaceSmall,
           const Text('Matched Billing Record'),
+          const Divider(),
           verticalSpaceSmall,
           WgtPagCompositeBillView(
             costDecimals: 2,
