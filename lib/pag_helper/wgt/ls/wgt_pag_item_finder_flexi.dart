@@ -108,7 +108,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   late final String itemTypeStr;
   BoxDecoration? blockDecoration;
 
-  bool _showScanner = false;
+  bool _showScanner = true;
   String? _code;
 
   late DateTime _lastLoadingTime;
@@ -701,7 +701,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
 
   Widget getItemPickerNarrow() {
     bool isPhone = context.isPhone;
-    _showScanner = _showScanner && isPhone;
+    _showScanner = _showScanner /* && isPhone8 */;
     return _showPanel
         ? Container(
             width: widget.width,
@@ -808,7 +808,8 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
 
   Widget getItemIdFilterGroup(
       {bool isCompactMode = false, String? singleIdFilterKey}) {
-    List<Widget> list = getItemIdGroupList(singleIdFilter: singleIdFilterKey);
+    List<Widget> list = getItemIdGroupList(
+        singleIdFilter: singleIdFilterKey, showScanner: isCompactMode);
     if (list.isEmpty) {
       return Container();
     }
@@ -951,7 +952,8 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     );
   }
 
-  List<Widget> getItemIdGroupList({String? singleIdFilter}) {
+  List<Widget> getItemIdGroupList(
+      {String? singleIdFilter, bool showScanner = false}) {
     List<Widget> list = [];
     for (var colController in widget.listController.listColControllerList) {
       if (singleIdFilter != null && colController.colKey != singleIdFilter) {
@@ -1014,7 +1016,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
                     },
                     onModified: widget.onModified,
                     onUpdateEnableSearchButton: _enableSearchButton,
-                    scanner: _showScanner ? getScanner() : null,
+                    scanner: _showScanner || showScanner ? getScanner() : null,
                   ),
                 ],
               ),
