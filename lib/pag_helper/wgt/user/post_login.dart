@@ -10,7 +10,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'package:buff_helper/pag_helper/comm/comm_scope.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'dart:developer' as dev;
 
 import '../../def_helper/project_helper.dart';
 import '../../vendor/ct_lab/comm_ct_lab.dart';
@@ -108,5 +110,11 @@ Future<void> doPostLogin(
   if (context.mounted) {
     Provider.of<PagUserProvider>(context, listen: false)
         .setCurrentUser(loggedInUser);
+
+    if (loggedInUser.selectedRole?.homePageRoute != null) {
+      String homeRouteStr = getRoute(loggedInUser.selectedRole!.homePageRoute!);
+      dev.log('Navigating to home route: $homeRouteStr');
+      context.go(homeRouteStr);
+    }
   }
 }

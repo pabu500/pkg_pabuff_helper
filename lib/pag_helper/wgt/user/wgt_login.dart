@@ -10,9 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_signin_button/button_list.dart';
 import 'package:flutter_signin_button/button_view.dart';
 import 'package:go_router/go_router.dart';
-import '../../model/provider/pag_user_provider.dart';
 import '../../wgt/wgt_comm_button.dart';
-import 'package:provider/provider.dart';
 
 class WgtLogin extends StatefulWidget {
   const WgtLogin({

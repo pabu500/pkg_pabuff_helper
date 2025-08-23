@@ -5,6 +5,7 @@ import 'package:buff_helper/pag_helper/model/provider/pag_app_provider.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:buff_helper/pag_helper/def_helper/def_page_route.dart';
 import 'package:provider/provider.dart';
@@ -34,6 +35,7 @@ class WgtAppContextMenu extends StatefulWidget {
 }
 
 class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
+  bool _isPhone = false;
   String _dragStatus = '';
   late final List<PagPageRoute> routeList;
 
@@ -54,6 +56,7 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
 
   @override
   Widget build(BuildContext context) {
+    _isPhone = context.isPhone;
     // if (_renderBox == null) {
     //   return const SizedBox();
     // }
@@ -84,7 +87,7 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
           padding: const EdgeInsets.only(top: 20),
           child: getMenu(),
         ),
-        getDragHandle(),
+        if (!_isPhone) getDragHandle(),
       ],
     );
   }
@@ -140,13 +143,18 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
             borderRadius: BorderRadius.circular(5),
           ),
           margin: const EdgeInsets.symmetric(horizontal: 5),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ..._buildMenuItemList(appModel),
-              verticalSpaceTiny,
-            ],
-          ),
+          child: _isPhone
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [..._buildMenuItemList(appModel)],
+                )
+              : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ..._buildMenuItemList(appModel),
+                    verticalSpaceTiny,
+                  ],
+                ),
         ),
       ),
     );
@@ -255,7 +263,8 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
             child: Container(
               width: 35,
               height: 35,
-              margin: const EdgeInsets.only(left: 8, right: 8, top: 8),
+              margin: EdgeInsets.only(
+                  left: 8, right: 8, top: 8, bottom: _isPhone ? 8 : 0),
               decoration: BoxDecoration(
                 color: getToggledTileColor(pr, isDisabled),
                 borderRadius: BorderRadius.circular(3),

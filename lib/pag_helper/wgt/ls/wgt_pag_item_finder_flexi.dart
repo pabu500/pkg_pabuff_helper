@@ -104,6 +104,8 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
 }
 
 class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
+  bool _isPhone = false;
+
   late final String listName;
   late final String itemTypeStr;
   BoxDecoration? blockDecoration;
@@ -661,6 +663,8 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
 
   @override
   Widget build(BuildContext context) {
+    _isPhone = context.isPhone;
+
     _dropDownListTextStyle =
         const TextStyle(fontSize: 13, fontWeight: FontWeight.w500);
     _dropDownListHintStyle =
@@ -692,7 +696,8 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   Widget getCompactFinder() {
     return Container(
       width: widget.width,
-      padding: const EdgeInsets.symmetric(horizontal: 21, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 1, vertical: 5),
+      margin: const EdgeInsets.symmetric(horizontal: 2),
       decoration: BoxDecoration(
         // color: Theme.of(context).colorScheme.background,
         borderRadius: BorderRadius.circular(5),
@@ -715,7 +720,6 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   }
 
   Widget getItemPickerNarrow() {
-    bool isPhone = context.isPhone;
     _showScanner = _showScanner /* && isPhone8 */;
     return _showPanel
         ? Container(
@@ -1398,6 +1402,9 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     bool? pinned,
     bool? allowUnpin,
   }) {
+    if (widget.isCompactMode) {
+      return Container();
+    }
     String key = customKey ?? listColController!.colKey;
     bool iniPinned = pinned ?? listColController!.pinned;
 

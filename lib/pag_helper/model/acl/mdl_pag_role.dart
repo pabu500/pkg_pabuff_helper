@@ -1,5 +1,8 @@
 import 'package:buff_helper/pag_helper/def_helper/def_role.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
+import 'dart:developer' as dev;
+
+import '../../def_helper/def_page_route.dart';
 
 class MdlPagRole {
   int id;
@@ -10,6 +13,7 @@ class MdlPagRole {
   PagPortalType portalType;
   PagScopeType scopeType;
   String scopeLabel;
+  PagPageRoute? homePageRoute;
 
   MdlPagRole({
     required this.id,
@@ -20,6 +24,7 @@ class MdlPagRole {
     this.portalType = PagPortalType.none,
     this.scopeType = PagScopeType.none,
     this.scopeLabel = '',
+    this.homePageRoute,
   });
 
   bool isAdmin() {
@@ -55,6 +60,16 @@ class MdlPagRole {
       sType = PagScopeType.siteGroup;
     }
 
+    String? homePageRouteStr = json['home_pr'];
+    PagPageRoute? homePageRoute;
+    if (homePageRouteStr != null) {
+      try {
+        homePageRoute = PagPageRoute.values.byName(homePageRouteStr);
+      } catch (e) {
+        dev.log('Invalid home page route: $homePageRouteStr');
+      }
+    }
+
     return MdlPagRole(
       id: id,
       name: json['name'],
@@ -64,6 +79,7 @@ class MdlPagRole {
       portalType: portalType,
       scopeType: sType,
       scopeLabel: json['scope_label'] ?? '',
+      homePageRoute: homePageRoute,
     );
   }
 
@@ -78,6 +94,7 @@ class MdlPagRole {
       'portal_type_name': portalType.name,
       'scope_type_label': scopeType.label,
       'scope_label': scopeLabel,
+      'home_page_route': homePageRoute?.name,
     };
   }
 }
