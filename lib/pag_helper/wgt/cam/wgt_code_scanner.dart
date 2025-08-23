@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import 'scanner_error_widget.dart';
+import 'dart:developer' as dev;
 
 class WgtCodeScanner extends StatefulWidget {
   const WgtCodeScanner({
@@ -28,38 +29,42 @@ class _WgtCodeScannerState extends State<WgtCodeScanner>
 
   void _onBarcodeDetect(BarcodeCapture barcodeCapture) {
     final barcode = barcodeCapture.barcodes.last;
-    setState(() {
-      _overlayText = barcodeCapture.barcodes.last.displayValue ??
-          barcode.rawValue ??
-          'Barcode has no displayable value';
+    try {
+      setState(() {
+        _overlayText = barcodeCapture.barcodes.last.displayValue ??
+            barcode.rawValue ??
+            'Barcode has no displayable value';
 
-      _capture = barcodeCapture;
-      if (_capture == null) return;
+        _capture = barcodeCapture;
+        if (_capture == null) return;
 
-      if (_capture!.barcodes.isNotEmpty) {
-        String code = _capture!.barcodes.first.rawValue ?? '';
-        if (kDebugMode) {
-          print('Barcode detected: $code');
-        }
-
-        _isValid = false;
-        if (widget.validator != null) {
-          if (widget.validator!(code) == null) {
-            _isValid = true;
-          } else {
-            if (kDebugMode) {
-              print('Invalid code');
-            }
+        if (_capture!.barcodes.isNotEmpty) {
+          String code = _capture!.barcodes.first.rawValue ?? '';
+          if (kDebugMode) {
+            print('Barcode detected: $code');
           }
-        } else {
-          _isValid = true;
+
+          _isValid = false;
+          if (widget.validator != null) {
+            if (widget.validator!(code) == null) {
+              _isValid = true;
+            } else {
+              if (kDebugMode) {
+                print('Invalid code');
+              }
+            }
+          } else {
+            _isValid = true;
+          }
+          if (_isValid) {
+            widget.onDetect(code);
+            return Navigator.of(context).pop(code);
+          }
         }
-        if (_isValid) {
-          widget.onDetect(code);
-          return Navigator.of(context).pop(code);
-        }
-      }
-    });
+      });
+    } catch (e) {
+      dev.log('Error occurred while scanning: $e');
+    }
   }
 
   @override

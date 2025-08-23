@@ -10,7 +10,7 @@ import 'package:buff_helper/pag_helper/model/scope/mdl_pag_building_profile.dart
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_location_group_profile.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_site_group_profile.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_site_profile.dart';
-import 'package:buff_helper/pag_helper/wgt/cam/wgt_code_scanner.dart';
+import 'package:buff_helper/pag_helper/wgt/cam/wgt_code_scanner2.dart';
 import 'package:buff_helper/pag_helper/wgt/datetime/wgt_date_range_picker_monthly.dart';
 
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
@@ -162,6 +162,21 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   bool _customDateRangeSelected = false;
   bool _isMTD = false;
   DateTime? _pickedMonth;
+
+  String? _defaultItemIdValidator(String idStr) {
+    if (idStr.isEmpty) {
+      return 'Item ID cannot be empty';
+    }
+    if (idStr.length < 8) {
+      return 'Item ID must be at least 8 characters';
+    }
+    // alphanumeric only, 8-21
+    if (!RegExp(r'^[a-zA-Z0-9]{8,21}$').hasMatch(idStr)) {
+      return 'alphanumeric, length 8-21';
+    }
+
+    return null;
+  }
 
   Future<dynamic> _getItemList() async {
     if (_isSearching) {
@@ -1016,7 +1031,9 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
                     },
                     onModified: widget.onModified,
                     onUpdateEnableSearchButton: _enableSearchButton,
-                    scanner: _showScanner || showScanner ? getScanner() : null,
+                    scanner: _showScanner || showScanner
+                        ? getScanner(colController)
+                        : null,
                   ),
                 ],
               ),
@@ -1412,7 +1429,11 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     );
   }
 
-  Widget getScanner({String? type = 'qr', double? iconSize, Color? iconColor}) {
+  Widget getScanner(
+    MdlListColController colController, {
+    double? iconSize,
+    Color? iconColor,
+  }) {
     return InkWell(
       child: Icon(
         // type == 'qr' ? Symbols.qr_code_scanner : Symbols.barcode_scanner,
@@ -1422,22 +1443,31 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
       ),
       onTap: () {
         Navigator.of(context).push(
-          MaterialPageRoute(
-              builder: (context) => WgtCodeScanner(
-                    onDetect: (String code) async {
-                      setState(() {
-                        _code = code;
-                      });
-
-                      // widget.onResult({
-                      //   'itemType': _itemType,
-                      //   'itemFindResult': itemFindResult,
-                      //   'itemSnKeyName': _itemSnKeyName ?? 'item_sn',
-                      //   'itemNameKeyName': _itemNameKeyName ?? 'item_name',
-                      // });
-                    },
-                    validator: widget.validator,
-                  )),
+          MaterialPageRoute<void>(
+            builder: (context) => WgtCodeScanner2(
+              onDetect: (String code) async {
+                if (!_enableSearch) {
+                  return;
+                }
+                colController.filterValue = {'value': code, 'label': code};
+                if (code.isNotEmpty && !_enableSearch) {
+                  setState(() {
+                    _enableSearch = _enableSearchButton();
+                  });
+                }
+                widget.onModified?.call();
+                if (colController.filterValue == null) {
+                  return;
+                }
+                if (colController.filterValue!['label'].trim().isEmpty) {
+                  return;
+                }
+                Map<String, dynamic> itemFindResult = await _getItemList();
+                widget.onResult(itemFindResult);
+              },
+              validator: colController.validator ?? _defaultItemIdValidator,
+            ),
+          ),
         );
       },
     );

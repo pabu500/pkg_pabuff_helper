@@ -70,6 +70,7 @@ class MdlListColController {
   PagScopeType? scopeType;
   String? align;
   bool useComma;
+  String? Function(String)? validator;
 
   MdlListColController({
     required this.colKey,
@@ -108,6 +109,7 @@ class MdlListColController {
     this.scopeType,
     this.align,
     this.useComma = false,
+    this.validator,
   }) {
     pinned = pinned ?? false;
   }
