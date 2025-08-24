@@ -56,7 +56,7 @@ class _WgtCommButtonState extends State<WgtCommButton> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         InkWell(
-          onTap: !widget.enabled
+          onTap: !widget.enabled || (widget.onPressed == null)
               ? null
               : () async {
                   // comm could be initiated by onEditComplete, instead of onPressed
