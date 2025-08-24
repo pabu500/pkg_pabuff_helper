@@ -1035,10 +1035,11 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
                     },
                     onModified: widget.onModified,
                     onUpdateEnableSearchButton: _enableSearchButton,
-                    scanner: _showScanner || showScanner
-                        ? getScanner(colController)
-                        : null,
+                    // scanner: _showScanner || showScanner
+                    //     ? getScanner(colController)
+                    //     : null,
                   ),
+                  if (_showScanner || showScanner) getScanner(colController),
                 ],
               ),
             ),
