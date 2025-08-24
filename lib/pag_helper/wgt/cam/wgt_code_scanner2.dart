@@ -69,12 +69,12 @@ class _WgtCodeScanner2State extends State<WgtCodeScanner2>
       if (widget.validator?.call(code) == null) {
         _isValid = true;
       }
-      if (_isValid) {
-        dev.log('validated code: $code');
-        widget.onDetect(code);
-        return Navigator.of(context).pop(code);
-      }
     });
+    if (_isValid) {
+      dev.log('validated code: $code');
+      widget.onDetect(code);
+      return Navigator.of(context).pop(code);
+    }
   }
 
   @override
