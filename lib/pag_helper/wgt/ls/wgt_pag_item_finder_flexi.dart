@@ -1453,24 +1453,24 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
           MaterialPageRoute<void>(
             builder: (context) => WgtCodeScanner2(
               onDetect: (String code) async {
-                // if (!_enableSearch) {
-                //   return;
-                // }
-                // colController.filterValue = {'value': code, 'label': code};
-                // if (code.isNotEmpty && !_enableSearch) {
-                //   setState(() {
-                //     _enableSearch = _enableSearchButton();
-                //   });
-                // }
-                // widget.onModified?.call();
-                // if (colController.filterValue == null) {
-                //   return;
-                // }
-                // if (colController.filterValue!['label'].trim().isEmpty) {
-                //   return;
-                // }
-                // Map<String, dynamic> itemFindResult = await _getItemList();
-                // widget.onResult(itemFindResult);
+                if (!_enableSearch) {
+                  return;
+                }
+                colController.filterValue = {'value': code, 'label': code};
+                if (code.isNotEmpty && !_enableSearch) {
+                  setState(() {
+                    _enableSearch = _enableSearchButton();
+                  });
+                }
+                widget.onModified?.call();
+                if (colController.filterValue == null) {
+                  return;
+                }
+                if (colController.filterValue!['label'].trim().isEmpty) {
+                  return;
+                }
+                Map<String, dynamic> itemFindResult = await _getItemList();
+                widget.onResult(itemFindResult);
               },
               validator: colController.validator ?? _defaultItemIdValidator,
             ),

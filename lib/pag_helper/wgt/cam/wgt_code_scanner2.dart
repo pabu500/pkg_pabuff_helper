@@ -73,7 +73,9 @@ class _WgtCodeScanner2State extends State<WgtCodeScanner2>
     if (_isValid) {
       dev.log('validated code: $code');
       widget.onDetect(code);
-      return Navigator.of(context).pop(code);
+      // return Navigator.of(context).pop(code);
+      // go back
+      Navigator.of(context).pop();
     }
   }
 
