@@ -70,13 +70,18 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
       print(_position.dy);
     }
 
-    return AnimatedPositioned(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-      top: _position.dy,
-      right: 0,
-      child: getDraggable(),
-    );
+    return _isPhone
+        ? Container(
+            // padding: const EdgeInsets.only(top: 20),
+            child: getMenu(),
+          )
+        : AnimatedPositioned(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            top: _position.dy,
+            right: 0,
+            child: getDraggable(),
+          );
   }
 
   Widget getDraggable() {
@@ -87,7 +92,7 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
           padding: const EdgeInsets.only(top: 20),
           child: getMenu(),
         ),
-        if (!_isPhone) getDragHandle(),
+        getDragHandle(),
       ],
     );
   }
@@ -148,8 +153,8 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // ..._buildMenuItemList(appModel)
-                    Container(width: 30, height: 30, color: Colors.red),
+                    ..._buildMenuItemList(appModel)
+                    // Container(width: 30, height: 30, color: Colors.red),
                   ],
                 )
               : Column(
@@ -265,8 +270,8 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
                     context.go('/${pr.route}');
                   },
             child: Container(
-              width: 35,
-              height: 35,
+              width: _isPhone ? 50 : 35,
+              height: _isPhone ? 50 : 35,
               margin: EdgeInsets.only(
                   left: 8, right: 8, top: 8, bottom: _isPhone ? 8 : 0),
               decoration: BoxDecoration(
