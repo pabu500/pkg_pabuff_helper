@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:buff_helper/xt_ui/style/evs2_colors.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +17,7 @@ class WgtCodeScanner2 extends StatefulWidget {
   });
 
   final String title;
-  final void Function(String code) onDetect;
+  final Future<void> Function(String code) onDetect;
   final String? Function(String code)? validator;
 
   @override
@@ -47,7 +49,7 @@ class _WgtCodeScanner2State extends State<WgtCodeScanner2>
     );
   }
 
-  void _onDetect(BarcodeCapture barcodes) {
+  Future<void> _onDetect(BarcodeCapture barcodes) async {
     if (!mounted) return;
 
     if (barcodes.barcodes.isEmpty) return;
@@ -72,7 +74,7 @@ class _WgtCodeScanner2State extends State<WgtCodeScanner2>
     // });
     if (_isValid) {
       dev.log('validated code: $code');
-      widget.onDetect(code);
+      await widget.onDetect(code);
       // return Navigator.of(context).pop(code);
       // go back
       Navigator.of(context).pop();
