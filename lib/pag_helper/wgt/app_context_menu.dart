@@ -147,7 +147,9 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
               ? Row(
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [..._buildMenuItemList(appModel)],
+                  children: [
+                    // ..._buildMenuItemList(appModel)
+                  ],
                 )
               : Column(
                   mainAxisSize: MainAxisSize.min,
