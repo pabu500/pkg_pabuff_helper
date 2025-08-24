@@ -149,6 +149,7 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     // ..._buildMenuItemList(appModel)
+                    Container(width: 30, height: 30, color: Colors.red),
                   ],
                 )
               : Column(
