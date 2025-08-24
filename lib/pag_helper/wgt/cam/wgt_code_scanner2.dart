@@ -59,17 +59,17 @@ class _WgtCodeScanner2State extends State<WgtCodeScanner2>
 
     String code = _barcode?.rawValue ?? '';
 
-    setState(() {
-      String allCodes = barcodes.barcodes.map((b) => b.rawValue).join(', ');
-      dev.log('barcodes found: $allCodes');
+    // setState(() {
+    String allCodes = barcodes.barcodes.map((b) => b.rawValue).join(', ');
+    dev.log('barcodes found: $allCodes');
 
-      dev.log('code: $code');
+    dev.log('code: $code');
 
-      _isValid = widget.validator == null;
-      if (widget.validator?.call(code) == null) {
-        _isValid = true;
-      }
-    });
+    _isValid = widget.validator == null;
+    if (widget.validator?.call(code) == null) {
+      _isValid = true;
+    }
+    // });
     if (_isValid) {
       dev.log('validated code: $code');
       widget.onDetect(code);
