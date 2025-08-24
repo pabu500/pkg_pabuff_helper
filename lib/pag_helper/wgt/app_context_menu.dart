@@ -145,6 +145,7 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
           margin: const EdgeInsets.symmetric(horizontal: 5),
           child: _isPhone
               ? Row(
+                  mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [..._buildMenuItemList(appModel)],
                 )
