@@ -241,6 +241,21 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
     isDeleteableByAcl = isAtProjectLevel && isAdmin;
   }
 
+  String? tagValidator(String? value) {
+    if (value == null) {
+      return null;
+    }
+    //alphanumeric, 5-55
+    final RegExp alphanumeric = RegExp(r'^[a-zA-Z0-9]+$');
+    if (!alphanumeric.hasMatch(value)) {
+      return 'Tag must be alphanumeric';
+    }
+    if (value.length < 5 || value.length > 55) {
+      return 'Tag must be between 5 and 55 characters';
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     bool isItemMFD = false;
@@ -434,6 +449,12 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
             }
             return null;
           };
+        }
+      }
+
+      if (field['col_key'] == 'tag') {
+        if (field['validator'] == null) {
+          field['validator'] = tagValidator;
         }
       }
 

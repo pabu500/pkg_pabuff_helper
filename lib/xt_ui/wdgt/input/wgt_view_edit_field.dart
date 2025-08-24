@@ -258,9 +258,8 @@ class _WgtViewEditFieldState extends State<WgtViewEditField> {
                                     });
                                     return;
                                   }
-                                  String? validated = widget.validator == null
-                                      ? null
-                                      : widget.validator!(_controller.text);
+                                  String? validated =
+                                      widget.validator?.call(_controller.text);
                                   if (validated != null) {
                                     setState(() {
                                       _errorText = validated;
