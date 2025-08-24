@@ -17,7 +17,7 @@ class WgtCodeScanner2 extends StatefulWidget {
   });
 
   final String title;
-  final Future<void> Function(String code) onDetect;
+  final void Function(String code) onDetect;
   final String? Function(String code)? validator;
 
   @override
@@ -49,7 +49,7 @@ class _WgtCodeScanner2State extends State<WgtCodeScanner2>
     );
   }
 
-  Future<void> _onDetect(BarcodeCapture barcodes) async {
+  void _onDetect(BarcodeCapture barcodes) {
     if (!mounted) return;
 
     if (barcodes.barcodes.isEmpty) return;
@@ -74,7 +74,7 @@ class _WgtCodeScanner2State extends State<WgtCodeScanner2>
     // });
     if (_isValid) {
       dev.log('validated code: $code');
-      await widget.onDetect(code);
+      // widget.onDetect(code);
       // return Navigator.of(context).pop(code);
       // go back
       Navigator.of(context).pop();
