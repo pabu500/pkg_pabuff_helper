@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:buff_helper/pag_helper/comm/comm_pag_item.dart';
@@ -12,6 +13,7 @@ import 'package:buff_helper/pag_helper/model/scope/mdl_pag_site_group_profile.da
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_site_profile.dart';
 import 'package:buff_helper/pag_helper/wgt/cam/wgt_code_scanner2.dart';
 import 'package:buff_helper/pag_helper/wgt/datetime/wgt_date_range_picker_monthly.dart';
+import 'package:buff_helper/xt_ui/wdgt/show_model_bottom_sheet.dart';
 
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 import 'package:flutter/foundation.dart';
@@ -1450,33 +1452,71 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
         size: iconSize ?? 21,
       ),
       onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute<void>(
-            builder: (context) => WgtCodeScanner2(
-              onDetect: (String code) async {
-                if (!_enableSearch) {
-                  return;
-                }
-                colController.filterValue = {'value': code, 'label': code};
-                if (code.isNotEmpty && !_enableSearch) {
-                  setState(() {
-                    _enableSearch = _enableSearchButton();
-                  });
-                }
-                widget.onModified?.call();
-                if (colController.filterValue == null) {
-                  return;
-                }
-                if (colController.filterValue!['label'].trim().isEmpty) {
-                  return;
-                }
-                Map<String, dynamic> itemFindResult = await _getItemList();
-                widget.onResult(itemFindResult);
-              },
-              validator: colController.validator ?? _defaultItemIdValidator,
-            ),
+        xtShowModelBottomSheet(
+          context,
+          WgtCodeScanner2(
+            onDetect: (String code) async {
+              if (!_enableSearch) {
+                return;
+              }
+              colController.filterValue = {'value': code, 'label': code};
+              if (code.isNotEmpty && !_enableSearch) {
+                setState(() {
+                  _enableSearch = _enableSearchButton();
+                });
+              }
+              widget.onModified?.call();
+              if (colController.filterValue == null) {
+                return;
+              }
+              if (colController.filterValue!['label'].trim().isEmpty) {
+                return;
+              }
+              // Map<String, dynamic> itemFindResult = await _getItemList();
+              // widget.onResult(itemFindResult);
+
+              // Timer(const Duration(milliseconds: 500), () {
+              Navigator.of(context).pop();
+              // });
+            },
+            validator: colController.validator ?? _defaultItemIdValidator,
           ),
+          onClosed: () async {
+            Map<String, dynamic> itemFindResult = await _getItemList();
+            widget.onResult(itemFindResult);
+          },
         );
+        // Navigator.of(context).push(
+        //   MaterialPageRoute<void>(
+        //     builder: (context) => WgtCodeScanner2(
+        //       onDetect: (String code) async {
+        //         if (!_enableSearch) {
+        //           return;
+        //         }
+        //         colController.filterValue = {'value': code, 'label': code};
+        //         if (code.isNotEmpty && !_enableSearch) {
+        //           setState(() {
+        //             _enableSearch = _enableSearchButton();
+        //           });
+        //         }
+        //         widget.onModified?.call();
+        //         if (colController.filterValue == null) {
+        //           return;
+        //         }
+        //         if (colController.filterValue!['label'].trim().isEmpty) {
+        //           return;
+        //         }
+        //         // Map<String, dynamic> itemFindResult = await _getItemList();
+        //         // widget.onResult(itemFindResult);
+
+        //         // Timer(const Duration(milliseconds: 500), () {
+        //         Navigator.of(context).pop();
+        //         // });
+        //       },
+        //       validator: colController.validator ?? _defaultItemIdValidator,
+        //     ),
+        //   ),
+        // );
       },
     );
   }

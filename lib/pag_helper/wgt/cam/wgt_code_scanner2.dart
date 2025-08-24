@@ -77,7 +77,7 @@ class _WgtCodeScanner2State extends State<WgtCodeScanner2>
       widget.onDetect(code);
       // return Navigator.of(context).pop(code);
       // go back
-      Navigator.of(context).pop();
+      // Navigator.of(context).pop();
     }
   }
 
