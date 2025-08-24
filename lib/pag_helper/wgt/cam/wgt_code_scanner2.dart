@@ -54,6 +54,8 @@ class _WgtCodeScanner2State extends State<WgtCodeScanner2>
 
     if (barcodes.barcodes.isEmpty) return;
 
+    Navigator.of(context).pop();
+
     _barcode = barcodes.barcodes.firstOrNull;
     if (_barcode == null) {
       return;
