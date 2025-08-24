@@ -54,8 +54,6 @@ class _WgtCodeScanner2State extends State<WgtCodeScanner2>
 
     if (barcodes.barcodes.isEmpty) return;
 
-    Navigator.of(context).pop();
-
     _barcode = barcodes.barcodes.firstOrNull;
     if (_barcode == null) {
       return;
@@ -76,7 +74,7 @@ class _WgtCodeScanner2State extends State<WgtCodeScanner2>
     // });
     if (_isValid) {
       dev.log('validated code: $code');
-      // widget.onDetect(code);
+      widget.onDetect(code);
       // return Navigator.of(context).pop(code);
       // go back
       Navigator.of(context).pop();
