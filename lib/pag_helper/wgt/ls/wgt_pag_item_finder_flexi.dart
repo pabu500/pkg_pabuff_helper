@@ -1453,32 +1453,24 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
           MaterialPageRoute<void>(
             builder: (context) => WgtCodeScanner2(
               onDetect: (String code) async {
-                if (!_enableSearch) {
-                  return;
-                }
-                print('scanned code: $code');
-                colController.filterValue = {'value': code, 'label': code};
-                if (code.isNotEmpty && !_enableSearch) {
-                  setState(() {
-                    print('search enabled');
-                    _enableSearch = _enableSearchButton();
-                  });
-                }
-
-                print("calling widget.onModified");
-                widget.onModified?.call();
-                if (colController.filterValue == null) {
-                  print('filter value is null');
-                  return;
-                }
-                if (colController.filterValue!['label'].trim().isEmpty) {
-                  print('filter label is empty');
-                  return;
-                }
-                print("calling _getItemList");
-                Map<String, dynamic> itemFindResult = await _getItemList();
-                print("calling widget.onResult: ${itemFindResult.toString()}");
-                widget.onResult(itemFindResult);
+                // if (!_enableSearch) {
+                //   return;
+                // }
+                // colController.filterValue = {'value': code, 'label': code};
+                // if (code.isNotEmpty && !_enableSearch) {
+                //   setState(() {
+                //     _enableSearch = _enableSearchButton();
+                //   });
+                // }
+                // widget.onModified?.call();
+                // if (colController.filterValue == null) {
+                //   return;
+                // }
+                // if (colController.filterValue!['label'].trim().isEmpty) {
+                //   return;
+                // }
+                // Map<String, dynamic> itemFindResult = await _getItemList();
+                // widget.onResult(itemFindResult);
               },
               validator: colController.validator ?? _defaultItemIdValidator,
             ),
