@@ -271,6 +271,13 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
         throw Exception('Failed to get item list');
       }
 
+      if (widget.isSingleItemMode) {
+        if (itemList.length > 1) {
+          _errorText = 'More than one items found';
+          result = {'error': _errorText};
+        }
+      }
+
       _isLoaded = true;
 
       return result;
