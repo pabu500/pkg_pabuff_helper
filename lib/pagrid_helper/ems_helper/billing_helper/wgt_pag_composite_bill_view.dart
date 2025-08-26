@@ -471,6 +471,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             tenantSingularUsageInfoList: singularUsageList,
             compositeUsageCalc: compositeUsageCalc,
             isBillMode: widget.isBillMode,
+            billInfo: _bill,
             showRenderModeSwitch: true,
             itemType: ItemType.meter_iwow,
             isMonthly: isMonthly,

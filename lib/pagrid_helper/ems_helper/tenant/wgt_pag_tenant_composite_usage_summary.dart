@@ -3,6 +3,7 @@ import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_ems_type_usage_c
 import 'package:buff_helper/pagrid_helper/ems_helper/usage/pag_usage_stat_helper.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
+import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -40,6 +41,7 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
     this.subTenantListUsageSummary = const [],
     this.manualUsages = const [],
     this.isBillMode = false,
+    this.billInfo = const {},
     // this.meterTypeRates = const {},
     // this.gst,
     this.lineItems = const [],
@@ -67,6 +69,7 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
   final PagEmsTypeUsageCalc? compositeUsageCalc;
   final List<Map<String, dynamic>> subTenantListUsageSummary;
   final bool isBillMode;
+  final Map<String, dynamic> billInfo;
   // final Map<String, dynamic> meterTypeRates;
   // final double? gst;
   final List<Map<String, dynamic>> manualUsages;
@@ -127,11 +130,14 @@ class _WgtPagTenantCompositeUsageSummaryState
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            if (widget.isBillMode) getBillTitleRow(),
+            const Divider(),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // getUsageTitle(),
                 // getUsageTypeStat(),
+
                 getPagUsageTitle(
                   context,
                   widget.fromDatetime,
@@ -182,6 +188,34 @@ class _WgtPagTenantCompositeUsageSummaryState
               ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget getBillTitleRow() {
+    if (widget.billInfo.isEmpty) {
+      dev.log('Bill info is empty');
+      return Container();
+    }
+    String billLabel = widget.billInfo['bill_label'] ?? '';
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 13),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text('Invoice: ',
+              style: TextStyle(
+                fontSize: 18,
+                color: Theme.of(context).hintColor.withAlpha(180),
+                fontWeight: FontWeight.bold,
+              )),
+          Text(billLabel,
+              style: const TextStyle(
+                fontSize: 21,
+                fontWeight: FontWeight.bold,
+              )),
+        ],
       ),
     );
   }
