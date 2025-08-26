@@ -84,7 +84,8 @@ Widget getPagenationBar(
                   color: Theme.of(context).hintColor,
                 ),
               ),
-              Expanded(child: Container()),
+              // Expanded(child: Container()),
+              horizontalSpaceRegular,
               Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
@@ -125,6 +126,7 @@ Widget getPagenationBar(
                   ),
                 ],
               ),
+              Expanded(child: Container()),
             ],
           ),
   );
