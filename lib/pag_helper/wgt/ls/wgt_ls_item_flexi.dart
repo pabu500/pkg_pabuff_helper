@@ -1106,7 +1106,17 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                             ? const ['generated', 'released']
                             : const ['generated'],
                       ),
-                      onClosed: () {},
+                      onClosed: () async {
+                        // Map<String, dynamic> itemFindResult =
+                        //     await _getItemList();
+                        // widget.onResult?.call(itemFindResult);
+                        if (_itemUpdated) {
+                          setState(() {
+                            _listContentRefreshKey = UniqueKey();
+                            _itemUpdated = false;
+                          });
+                        }
+                      },
                     );
                   },
             child: Icon(

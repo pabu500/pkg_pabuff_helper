@@ -154,25 +154,50 @@ PagBillingLcStatus? getBillingLcStatusFromTagStr(String? tagStr) {
   return null;
 }
 
+Widget getBillLcStatusTagWidget(
+  BuildContext ctx,
+  PagBillingLcStatus status, {
+  TextStyle? style,
+}) {
+  Color bgColor = billingLcStatusInfo[status]!['color'];
+  return Container(
+    decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(3),
+        border: Border.all(
+          color: Theme.of(ctx).hintColor,
+        )),
+    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+    child: Text(
+      billingLcStatusInfo[status]!['tag'],
+      style: style ??
+          const TextStyle(
+            color: Colors.white,
+            fontSize: 13.5,
+          ),
+    ),
+  );
+}
+
 final Map<PagBillingLcStatus, dynamic> billingLcStatusInfo = {
   PagBillingLcStatus.generated: {
     'tag': 'Gn',
-    'color': Colors.teal.withOpacity(0.8),
+    'color': Colors.teal.withAlpha(210),
     'tooltip': 'Generated',
   },
   PagBillingLcStatus.released: {
     'tag': 'Rl',
-    'color': Colors.orangeAccent.withOpacity(0.7),
+    'color': Colors.orangeAccent.withAlpha(210),
     'tooltip': 'Released',
   },
   PagBillingLcStatus.pv: {
     'tag': 'Pv',
-    'color': Colors.blue.withOpacity(0.7),
+    'color': Colors.blue.withAlpha(210),
     'tooltip': 'Pending Verification',
   },
   PagBillingLcStatus.mfd: {
     'tag': 'Dl',
-    'color': Colors.redAccent.shade200.withOpacity(0.7),
+    'color': Colors.redAccent.shade200.withAlpha(210),
     'tooltip': 'Marked for Delete',
   },
 };
