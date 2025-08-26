@@ -25,7 +25,7 @@ class WgtPagCompositeBillView extends StatefulWidget {
     this.costDecimals = 3,
     this.modes = const ['wgt', 'pdf'],
     this.genTypes = const ['generated', 'released'],
-    this.onClose,
+    this.onUpdate,
   });
 
   final MdlPagUser loggedInUser;
@@ -36,7 +36,7 @@ class WgtPagCompositeBillView extends StatefulWidget {
   final List<String> modes;
   final List<String> genTypes;
   final String defaultBillLcStatus;
-  final Function? onClose;
+  final Function? onUpdate;
 
   @override
   State<WgtPagCompositeBillView> createState() =>
@@ -58,8 +58,6 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
   bool _showRenderModeSwitch = false;
 
   late final String assetFolder;
-
-  bool _infoUpdated = false;
 
   Future<dynamic> _getCompositeBill() async {
     setState(() {
@@ -170,9 +168,6 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
                     icon: const Icon(Icons.close),
                     onPressed: () {
                       Navigator.of(context).pop();
-                      if (_infoUpdated) {
-                        widget.onClose?.call();
-                      }
                     },
                   ),
                   horizontalSpaceMedium,
@@ -509,10 +504,8 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             lineItems: lineItems,
             excludeAutoUsage:
                 _bill['exclude_auto_usage'] == 'true' ? true : false,
-            onInfoUpdated: () {
-              setState(() {
-                _infoUpdated = true;
-              });
+            onUpdate: () {
+              widget.onUpdate?.call();
             },
           );
   }

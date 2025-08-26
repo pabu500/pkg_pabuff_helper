@@ -1105,6 +1105,11 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                                 item['lc_status'] == 'pv'
                             ? const ['generated', 'released']
                             : const ['generated'],
+                        onUpdate: () {
+                          setState(() {
+                            _itemUpdated = true;
+                          });
+                        },
                       ),
                       onClosed: () async {
                         // Map<String, dynamic> itemFindResult =
