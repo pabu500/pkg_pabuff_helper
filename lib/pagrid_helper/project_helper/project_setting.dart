@@ -460,7 +460,8 @@ String? nusSnValidator(String displayname) {
   if (exp.hasMatch(displayname)) {
     bool isRvrc = isRVRC(displayname) == null;
     bool isVh = isVH(displayname) == null;
-    if(isVh || isRvrc) {
+    bool isNusC = isNUSC(displayname) == null;
+    if(isVh || isRvrc || isNusC) {
       return null;
     }
     return 'Invalid displayname';
@@ -516,6 +517,14 @@ String? isVH(String displayname) {
   int displaynameInt = int.parse(displayname);
   if ((displaynameInt < 10013400  ||
       displaynameInt > 10014000)) {
+    return 'Invalid displayname';
+  }
+  return null;
+}
+
+String? isNUSC(String displayname) {
+  int displaynameInt = int.parse(displayname);
+  if (displaynameInt < 10002801  || (displaynameInt > 10003925 && displaynameInt != 10003963 && displaynameInt != 10003982 && displaynameInt != 10003985 && displaynameInt != 10009999)) {
     return 'Invalid displayname';
   }
   return null;
