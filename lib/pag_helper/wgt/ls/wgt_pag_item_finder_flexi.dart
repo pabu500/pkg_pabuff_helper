@@ -112,7 +112,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   late final String itemTypeStr;
   BoxDecoration? blockDecoration;
 
-  bool _showScanner = true;
+  bool _showScanner = false;
   String? _code;
 
   late DateTime _lastLoadingTime;
