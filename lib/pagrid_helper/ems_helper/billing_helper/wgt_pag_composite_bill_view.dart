@@ -506,6 +506,9 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
                 _bill['exclude_auto_usage'] == 'true' ? true : false,
             onUpdate: () {
               widget.onUpdate?.call();
+              setState(() {
+                _lcStatusDisplay = _bill['lc_status'];
+              });
             },
           );
   }
@@ -736,6 +739,9 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             gst: billedGst,
             onUpdate: () {
               widget.onUpdate?.call();
+              setState(() {
+                _lcStatusDisplay = _bill['lc_status'];
+              });
             },
           );
   }
