@@ -712,6 +712,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             loggedInUser: widget.loggedInUser,
             displayContextStr: '',
             isBillMode: widget.isBillMode,
+            billInfo: _bill,
             // usageCalc: compositeUsageCalc,
             showRenderModeSwitch: true,
             itemType: ItemType.meter_iwow,
@@ -733,6 +734,9 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             excludeAutoUsage:
                 _bill['exclude_auto_usage'] == 'true' ? true : false,
             gst: billedGst,
+            onUpdate: () {
+              widget.onUpdate?.call();
+            },
           );
   }
 

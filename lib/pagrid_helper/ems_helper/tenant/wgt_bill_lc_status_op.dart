@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/pag_bill_def.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
@@ -89,7 +91,7 @@ class _WgtPagBillLcStatusOpState extends State<WgtPagBillLcStatusOp> {
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    // return Container();
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -122,30 +124,43 @@ class _WgtPagBillLcStatusOpState extends State<WgtPagBillLcStatusOp> {
       fontWeight: FontWeight.bold,
     );
 
-    bool enableTap = _selectedStatus != status;
-    if (widget.initialStatus == PagBillingLcStatus.generated &&
-        status != PagBillingLcStatus.pv) {
-      enableTap = false;
+    bool clickEnabled = _selectedStatus != status;
+    bool highlighted = _selectedStatus == status;
+    switch (widget.initialStatus) {
+      case PagBillingLcStatus.mfd:
+        if (status == PagBillingLcStatus.released) {
+          clickEnabled = false;
+        }
+        break;
+      case PagBillingLcStatus.generated:
+        if (status == PagBillingLcStatus.released) {
+          clickEnabled = false;
+        }
+        break;
+      case PagBillingLcStatus.pv:
+        break;
+      case PagBillingLcStatus.released:
+        clickEnabled = false;
+        break;
+      default:
     }
-    if (widget.initialStatus == PagBillingLcStatus.pv &&
-        status != PagBillingLcStatus.released) {
-      enableTap = false;
-    }
-    if (widget.initialStatus == PagBillingLcStatus.released) {
-      enableTap = false;
-    }
+
     return InkWell(
-      onTap: !enableTap
+      onTap: !clickEnabled
           ? null
           : () {
               setState(() {
                 _selectedStatus = status;
               });
             },
-      child: getBillLcStatusTagWidget(
-        context,
-        status,
-        style: status == _selectedStatus ? tagTextStyleHighLight : tagTextStyle,
+      child: Opacity(
+        opacity: clickEnabled || highlighted ? 1.0 : 0.5,
+        child: getBillLcStatusTagWidget(
+          context,
+          status,
+          style:
+              status == _selectedStatus ? tagTextStyleHighLight : tagTextStyle,
+        ),
       ),
     );
   }

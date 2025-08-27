@@ -1,14 +1,13 @@
-import 'package:buff_helper/pag_helper/model/mdl_history.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
+import 'package:buff_helper/pagrid_helper/ems_helper/tenant/wgt_bill_lc_status_op.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
-import 'package:flutter/foundation.dart';
+import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 
+import '../billing_helper/pag_bill_def.dart';
 import '../usage/pag_usage_stat_helper.dart';
 import '../usage/usage_stat_helper.dart';
-import '../usage/wgt_pag_meter_stat_core.dart';
 import 'pag_ems_type_usage_calc_released.dart';
 
 class WgtPagTenantCompositeUsageSummaryReleased extends StatefulWidget {
@@ -29,7 +28,8 @@ class WgtPagTenantCompositeUsageSummaryReleased extends StatefulWidget {
     this.showRenderModeSwitch = false,
     this.tenantLabel,
     this.tenantAccountId = '',
-    this.isBillMode = false,
+    this.isBillMode = true,
+    this.billInfo = const {},
     this.gst,
     // this.meterTypeRates = const {},
     // this.manualUsages = const {},
@@ -42,6 +42,7 @@ class WgtPagTenantCompositeUsageSummaryReleased extends StatefulWidget {
     this.costDecimals = 3,
     this.tenantSingularUsageInfoList = const [],
     required this.compositeUsageCalc,
+    this.onUpdate,
   });
 
   final MdlPagAppConfig appConfig;
@@ -59,6 +60,7 @@ class WgtPagTenantCompositeUsageSummaryReleased extends StatefulWidget {
   final String tenantType;
   final bool excludeAutoUsage;
   final bool isBillMode;
+  final Map<String, dynamic> billInfo;
   final double? gst;
   final String renderMode;
   final bool showRenderModeSwitch;
@@ -72,6 +74,7 @@ class WgtPagTenantCompositeUsageSummaryReleased extends StatefulWidget {
   final int costDecimals;
   final List<Map<String, dynamic>> tenantSingularUsageInfoList;
   final PagEmsTypeUsageCalcReleased? compositeUsageCalc;
+  final Function? onUpdate;
 
   @override
   State<WgtPagTenantCompositeUsageSummaryReleased> createState() =>
@@ -85,6 +88,12 @@ class _WgtPagTenantCompositeUsageSummaryReleasedState
   final widgetWidth = 750.0;
   String _renderMode = 'wgt'; // wgt, pdf
 
+  UniqueKey? _lcStatusOpsKey;
+
+  late final _billInfo = Map<String, dynamic>.from(widget.billInfo);
+
+  bool _isDisabled = false;
+
   @override
   void initState() {
     super.initState();
@@ -93,6 +102,9 @@ class _WgtPagTenantCompositeUsageSummaryReleasedState
 
   @override
   Widget build(BuildContext context) {
+    String lcStatus = _billInfo['lc_status'] ?? '';
+    PagBillingLcStatus currentStatus = PagBillingLcStatus.byValue(lcStatus);
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 13),
       child: Container(
@@ -107,6 +119,36 @@ class _WgtPagTenantCompositeUsageSummaryReleasedState
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            Stack(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [getBillTitleRow()],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    WgtPagBillLcStatusOp(
+                      key: _lcStatusOpsKey,
+                      appConfig: widget.appConfig,
+                      loggedInUser: widget.loggedInUser,
+                      billInfo: _billInfo,
+                      initialStatus: currentStatus,
+                      onCommitted: (newStatus) {
+                        setState(() {
+                          _lcStatusOpsKey = UniqueKey();
+                          _billInfo['lc_status'] = newStatus.value;
+                        });
+                        widget.onUpdate?.call();
+                      },
+                    )
+                  ],
+                ),
+              ],
+            ),
+            const Divider(),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -179,6 +221,36 @@ class _WgtPagTenantCompositeUsageSummaryReleasedState
               ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget getBillTitleRow() {
+    if (widget.billInfo.isEmpty) {
+      dev.log('Bill info is empty');
+      return Container();
+    }
+    String billLabel = widget.billInfo['bill_label'] ?? '';
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 13),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          getBillLcStatusTagWidget(context, PagBillingLcStatus.generated),
+          horizontalSpaceSmall,
+          Text('Invoice: ',
+              style: TextStyle(
+                fontSize: 18,
+                color: Theme.of(context).hintColor.withAlpha(180),
+                fontWeight: FontWeight.bold,
+              )),
+          Text(billLabel,
+              style: const TextStyle(
+                fontSize: 21,
+                fontWeight: FontWeight.bold,
+              )),
+        ],
       ),
     );
   }
