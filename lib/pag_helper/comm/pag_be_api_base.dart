@@ -317,6 +317,8 @@ class PagUrlBase {
   static const String eptBlastBillingNotification =
       '/ems/billing/blast_billing_notification';
   static const String eptBatchOpBill = '/ems/billing/batch_op_bill';
+  static const String eptUpdateBillLcStatus =
+      '/ems/billing/update_bill_lc_status';
 
   // Meter Group Manager
   static const String eptPagCreateMeterGroup =

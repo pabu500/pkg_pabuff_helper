@@ -25,6 +25,7 @@ class WgtPagCompositeBillView extends StatefulWidget {
     this.costDecimals = 3,
     this.modes = const ['wgt', 'pdf'],
     this.genTypes = const ['generated', 'released'],
+    this.onUpdate,
   });
 
   final MdlPagUser loggedInUser;
@@ -35,6 +36,7 @@ class WgtPagCompositeBillView extends StatefulWidget {
   final List<String> modes;
   final List<String> genTypes;
   final String defaultBillLcStatus;
+  final Function? onUpdate;
 
   @override
   State<WgtPagCompositeBillView> createState() =>
@@ -147,16 +149,32 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       child: Column(
         children: [
           verticalSpaceSmall,
-          if (_showRenderModeSwitch && !_gettingBill)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                getSwitchRenderMode(),
-                horizontalSpaceRegular,
-                // if (_lcStatusDisplay == 'released') getSwitchGenType(),
-                if (_showGenTypeSwitch) getSwitchGenType(),
-              ],
-            ),
+          Stack(
+            children: [
+              if (_showRenderModeSwitch && !_gettingBill)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    getSwitchRenderMode(),
+                    horizontalSpaceRegular,
+                    // if (_lcStatusDisplay == 'released') getSwitchGenType(),
+                    if (_showGenTypeSwitch) getSwitchGenType(),
+                  ],
+                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  horizontalSpaceMedium,
+                ],
+              ),
+            ],
+          ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 13),
             child: Container(
@@ -471,6 +489,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             tenantSingularUsageInfoList: singularUsageList,
             compositeUsageCalc: compositeUsageCalc,
             isBillMode: widget.isBillMode,
+            billInfo: _bill,
             showRenderModeSwitch: true,
             itemType: ItemType.meter_iwow,
             isMonthly: isMonthly,
@@ -485,6 +504,12 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             lineItems: lineItems,
             excludeAutoUsage:
                 _bill['exclude_auto_usage'] == 'true' ? true : false,
+            onUpdate: () {
+              widget.onUpdate?.call();
+              setState(() {
+                _lcStatusDisplay = _bill['lc_status'];
+              });
+            },
           );
   }
 
@@ -690,6 +715,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             loggedInUser: widget.loggedInUser,
             displayContextStr: '',
             isBillMode: widget.isBillMode,
+            billInfo: _bill,
             // usageCalc: compositeUsageCalc,
             showRenderModeSwitch: true,
             itemType: ItemType.meter_iwow,
@@ -711,6 +737,12 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             excludeAutoUsage:
                 _bill['exclude_auto_usage'] == 'true' ? true : false,
             gst: billedGst,
+            onUpdate: () {
+              widget.onUpdate?.call();
+              setState(() {
+                _lcStatusDisplay = _bill['lc_status'];
+              });
+            },
           );
   }
 

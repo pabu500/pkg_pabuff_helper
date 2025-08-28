@@ -1,8 +1,10 @@
 import 'package:buff_helper/pag_helper/model/mdl_history.dart';
+import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/pag_bill_def.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_ems_type_usage_calc.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/usage/pag_usage_stat_helper.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
+import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -12,6 +14,7 @@ import '../usage/usage_stat_helper.dart';
 import '../usage/wgt_pag_group_stat_core.dart';
 import '../usage/wgt_pag_meter_stat_core.dart';
 import 'mdl_ems_type_usage.dart';
+import 'wgt_bill_lc_status_op.dart';
 
 class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
   const WgtPagTenantCompositeUsageSummary({
@@ -40,6 +43,7 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
     this.subTenantListUsageSummary = const [],
     this.manualUsages = const [],
     this.isBillMode = false,
+    this.billInfo = const {},
     // this.meterTypeRates = const {},
     // this.gst,
     this.lineItems = const [],
@@ -47,6 +51,7 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
     this.usageDecimals = 3,
     this.rateDecimals = 4,
     this.costDecimals = 3,
+    this.onUpdate,
   });
 
   final MdlPagAppConfig appConfig;
@@ -67,6 +72,7 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
   final PagEmsTypeUsageCalc? compositeUsageCalc;
   final List<Map<String, dynamic>> subTenantListUsageSummary;
   final bool isBillMode;
+  final Map<String, dynamic> billInfo;
   // final Map<String, dynamic> meterTypeRates;
   // final double? gst;
   final List<Map<String, dynamic>> manualUsages;
@@ -79,6 +85,7 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
   final int costDecimals;
   // final Map<String, dynamic> usageFactor;
   // final Map<String, dynamic>? typeRates;
+  final Function? onUpdate;
 
   @override
   State<WgtPagTenantCompositeUsageSummary> createState() =>
@@ -100,6 +107,12 @@ class _WgtPagTenantCompositeUsageSummaryState
 
   String _renderMode = 'wgt'; // wgt, pdf
 
+  UniqueKey? _lcStatusOpsKey;
+
+  late final _billInfo = Map<String, dynamic>.from(widget.billInfo);
+
+  bool _isDisabled = false;
+
   @override
   void initState() {
     super.initState();
@@ -112,76 +125,143 @@ class _WgtPagTenantCompositeUsageSummaryState
     //   return getErrorTextPrompt(
     //       context: context, errorText: 'Usage calc not available');
     // }
+    String lcStatus = _billInfo['lc_status'] ?? '';
+    PagBillingLcStatus currentStatus = PagBillingLcStatus.byValue(lcStatus);
+
+    return Opacity(
+      opacity: _isDisabled ? 0.5 : 1.0,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 13),
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Theme.of(context).hintColor,
+              width: 1,
+            ),
+            borderRadius: BorderRadius.circular(5),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 13),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (widget.isBillMode)
+                Stack(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.max,
+                      children: [getBillTitleRow()],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        WgtPagBillLcStatusOp(
+                          key: _lcStatusOpsKey,
+                          appConfig: widget.appConfig,
+                          loggedInUser: widget.loggedInUser,
+                          billInfo: _billInfo,
+                          initialStatus: currentStatus,
+                          onCommitted: (newStatus) {
+                            setState(() {
+                              _lcStatusOpsKey = UniqueKey();
+                              _billInfo['lc_status'] = newStatus.value;
+                            });
+                            widget.onUpdate?.call();
+                          },
+                        )
+                      ],
+                    ),
+                  ],
+                ),
+              const Divider(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // getUsageTitle(),
+                  // getUsageTypeStat(),
+
+                  getPagUsageTitle(
+                    context,
+                    widget.fromDatetime,
+                    widget.toDatetime,
+                    widget.isMonthly,
+                    widget.tenantLabel,
+                    widget.tenantName,
+                    widget.tenantAccountId,
+                  ),
+                  getPagUsageTypeTopStat(
+                    costDecimals: widget.costDecimals,
+                    context,
+                    widget.isBillMode,
+                    widget.compositeUsageCalc!.typeUsageE!.usage,
+                    widget.compositeUsageCalc!.typeUsageE!.cost,
+                    widget.compositeUsageCalc!.typeUsageW!.usage,
+                    widget.compositeUsageCalc!.typeUsageW!.cost,
+                    widget.compositeUsageCalc!.typeUsageB!.usage,
+                    widget.compositeUsageCalc!.typeUsageB!.cost,
+                    widget.compositeUsageCalc!.typeUsageN!.usage,
+                    widget.compositeUsageCalc!.typeUsageN!.cost,
+                    widget.compositeUsageCalc!.typeUsageG!.usage,
+                    widget.compositeUsageCalc!.typeUsageG!.cost,
+                    displayContextStr: widget.displayContextStr,
+                  ),
+                ],
+              ),
+              Divider(color: Theme.of(context).hintColor),
+              if (!widget.excludeAutoUsage) ...getStat(),
+              if (widget.excludeAutoUsage) getAutoUsageExcludedInfo(context),
+              // verticalSpaceSmall,
+              // getManualUsage(),
+              // verticalSpaceSmall,
+              // getSubTenantUsageList(),
+              // verticalSpaceSmall,
+              // verticalSpaceSmall,
+              // getLineItem(),
+              verticalSpaceSmall,
+              if (widget.isBillMode)
+                getTotal2(
+                  context,
+                  widget.compositeUsageCalc!.gst!,
+                  widget.compositeUsageCalc!.subTotalCost,
+                  widget.compositeUsageCalc!.gstAmount,
+                  widget.compositeUsageCalc!.totalCost,
+                  widget.tenantType,
+                  width: statWidth,
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget getBillTitleRow() {
+    if (widget.billInfo.isEmpty) {
+      dev.log('Bill info is empty');
+      return Container();
+    }
+    String billLabel = widget.billInfo['bill_label'] ?? '';
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 13),
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: Theme.of(context).hintColor,
-            width: 1,
-          ),
-          borderRadius: BorderRadius.circular(5),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 13),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // getUsageTitle(),
-                // getUsageTypeStat(),
-                getPagUsageTitle(
-                  context,
-                  widget.fromDatetime,
-                  widget.toDatetime,
-                  widget.isMonthly,
-                  widget.tenantLabel,
-                  widget.tenantName,
-                  widget.tenantAccountId,
-                ),
-                getPagUsageTypeTopStat(
-                  costDecimals: widget.costDecimals,
-                  context,
-                  widget.isBillMode,
-                  widget.compositeUsageCalc!.typeUsageE!.usage,
-                  widget.compositeUsageCalc!.typeUsageE!.cost,
-                  widget.compositeUsageCalc!.typeUsageW!.usage,
-                  widget.compositeUsageCalc!.typeUsageW!.cost,
-                  widget.compositeUsageCalc!.typeUsageB!.usage,
-                  widget.compositeUsageCalc!.typeUsageB!.cost,
-                  widget.compositeUsageCalc!.typeUsageN!.usage,
-                  widget.compositeUsageCalc!.typeUsageN!.cost,
-                  widget.compositeUsageCalc!.typeUsageG!.usage,
-                  widget.compositeUsageCalc!.typeUsageG!.cost,
-                  displayContextStr: widget.displayContextStr,
-                ),
-              ],
-            ),
-            Divider(color: Theme.of(context).hintColor),
-            if (!widget.excludeAutoUsage) ...getStat(),
-            if (widget.excludeAutoUsage) getAutoUsageExcludedInfo(context),
-            // verticalSpaceSmall,
-            // getManualUsage(),
-            // verticalSpaceSmall,
-            // getSubTenantUsageList(),
-            // verticalSpaceSmall,
-            // verticalSpaceSmall,
-            // getLineItem(),
-            verticalSpaceSmall,
-            if (widget.isBillMode)
-              getTotal2(
-                context,
-                widget.compositeUsageCalc!.gst!,
-                widget.compositeUsageCalc!.subTotalCost,
-                widget.compositeUsageCalc!.gstAmount,
-                widget.compositeUsageCalc!.totalCost,
-                widget.tenantType,
-                width: statWidth,
-              ),
-          ],
-        ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          getBillLcStatusTagWidget(context, PagBillingLcStatus.generated),
+          horizontalSpaceSmall,
+          Text('Invoice: ',
+              style: TextStyle(
+                fontSize: 18,
+                color: Theme.of(context).hintColor.withAlpha(180),
+                fontWeight: FontWeight.bold,
+              )),
+          Text(billLabel,
+              style: const TextStyle(
+                fontSize: 21,
+                fontWeight: FontWeight.bold,
+              )),
+        ],
       ),
     );
   }

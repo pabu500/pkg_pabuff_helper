@@ -422,6 +422,7 @@ class _WgtPagBillViewState extends State<WgtPagBillView> {
             displayContextStr: '',
             usageCalc: emsTypeUsageCalc,
             isBillMode: widget.isBillMode,
+            billInfo: _bill,
             showRenderModeSwitch: true,
             itemType: ItemType.meter_iwow,
             isMonthly: isMonthly,

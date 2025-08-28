@@ -69,9 +69,9 @@ class WgtHistoryBarChart extends StatefulWidget {
     Color? errorTooltipBackgroundColor,
     this.isBiDirection = false,
   })  : errorTooltipBackgroundColor =
-            errorTooltipBackgroundColor ?? Colors.redAccent.withOpacity(0.62),
+            errorTooltipBackgroundColor ?? Colors.redAccent.withAlpha(155),
         bottomTextColor =
-            bottomTextColor ?? AppColors.contentColorYellow.withOpacity(0.62);
+            bottomTextColor ?? AppColors.contentColorYellow.withAlpha(155);
 
   final List<Map<String, dynamic>> historyData;
   final String timeKey;
@@ -375,7 +375,7 @@ class _WgtHistoryBarChartState extends State<WgtHistoryBarChart> {
   Color? setBarColor(int i, int touchedValue) {
     if (widget.altBarColorIf != null) {
       if (widget.altBarColorIf!(i, widget.historyData[i])) {
-        return widget.barColor.withOpacity(0.5);
+        return widget.barColor.withAlpha(128);
       }
     }
 
@@ -383,12 +383,12 @@ class _WgtHistoryBarChartState extends State<WgtHistoryBarChart> {
       return widget.tooltipBackgroundColor;
       // return widget.highlightColor; //Colors.white;
     }
-    Color barColor = widget.barColor.withOpacity(0.67);
+    Color barColor = widget.barColor.withAlpha(155);
 
     return widget.useAltBarColor ?? false
         ? widget.altBarTipIf != null
             ? widget.altBarTipIf!(_altBarTipData[i].values.first)
-                ? widget.barColor.withOpacity(0.5)
+                ? widget.barColor.withAlpha(128)
                 : barColor
             : barColor
         : barColor;

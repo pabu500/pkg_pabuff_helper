@@ -3,6 +3,7 @@ import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_ems_type_usage_c
 import 'package:buff_helper/pagrid_helper/ems_helper/usage/pag_usage_stat_helper.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
+import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -39,6 +40,7 @@ class WgtPagTenantUsageSummary extends StatefulWidget {
     this.subTenantListUsageSummary = const [],
     this.manualUsages = const [],
     this.isBillMode = false,
+    this.billInfo = const {},
     // this.meterTypeRates = const {},
     // this.gst,
     this.lineItems = const [],
@@ -65,6 +67,7 @@ class WgtPagTenantUsageSummary extends StatefulWidget {
   final Map<String, dynamic> tenantUsageSummary;
   final List<Map<String, dynamic>> subTenantListUsageSummary;
   final bool isBillMode;
+  final Map<String, dynamic> billInfo;
   // final Map<String, dynamic> meterTypeRates;
   // final double? gst;
   final List<Map<String, dynamic>> manualUsages;
@@ -130,6 +133,7 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
                 children: [
                   // getUsageTitle(),
                   // getUsageTypeStat(),
+                  if (widget.isBillMode) getBillTitleRow(),
                   getPagUsageTitle(
                     context,
                     widget.fromDatetime,
@@ -181,6 +185,29 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget getBillTitleRow() {
+    if (widget.billInfo.isEmpty) {
+      dev.log('Bill info is empty');
+      return Container();
+    }
+    String billLabel = widget.billInfo['label'] ?? '';
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 13),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(billLabel,
+              style: TextStyle(
+                fontSize: 18,
+                color: Theme.of(context).hintColor.withAlpha(180),
+                fontWeight: FontWeight.bold,
+              )),
+        ],
       ),
     );
   }

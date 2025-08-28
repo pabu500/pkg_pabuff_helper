@@ -10,7 +10,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
 import '../../model/mdl_pag_app_config.dart';
-import 'wgt_edit_commit_list.dart';
+import 'wgt_pag_edit_commit_list.dart';
 
 enum ListPaneMode { list, pane }
 

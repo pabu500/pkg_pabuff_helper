@@ -112,7 +112,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   late final String itemTypeStr;
   BoxDecoration? blockDecoration;
 
-  bool _showScanner = true;
+  bool _showScanner = false;
   String? _code;
 
   late DateTime _lastLoadingTime;
@@ -269,6 +269,13 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
       var itemList = result['item_list'];
       if (itemList == null) {
         throw Exception('Failed to get item list');
+      }
+
+      if (widget.isSingleItemMode) {
+        if (itemList.length > 1) {
+          _errorText = 'More than one items found';
+          result = {'error': _errorText};
+        }
       }
 
       _isLoaded = true;

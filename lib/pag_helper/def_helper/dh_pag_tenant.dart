@@ -265,8 +265,8 @@ String? validateTenantRef(String value) {
     return 'Tenant reference is required';
   }
   // Add more validation logic if needed
-  // alphanumeric, space, - _ / # . + & ( ) ' : and 1-255 characters
-  final RegExp alphanumeric = RegExp(r"^[a-zA-Z0-9\-\/#_\. +&()/':]{1,255}$");
+  // alphanumeric, space, - _ / # . + & ( ) ' : @ and 1-255 characters
+  final RegExp alphanumeric = RegExp(r"^[a-zA-Z0-9\-\/#_\. +&()/':@]{1,255}$");
   if (!alphanumeric.hasMatch(value)) {
     return 'Invalid tenant reference format';
   }
