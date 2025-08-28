@@ -171,7 +171,7 @@ class PagUrlBase {
       // 'http://3.1.141.233:8081';
       'http://localhost:8081';
 
-  static const String _rProdUsersvcUrl = 'https://pag-u.evs.com.sg';
+  static const String _rProdUsersvcUrl = 'https://usersvc2.web-ems.com';
   static const String _rTestUsersvcUrl = 'https://test-usersvc2.web-ems.com';
   static const String _rDevUsersvcUrl = 'https://dev-usersvc2.evs.com.sg';
 
