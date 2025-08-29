@@ -344,9 +344,10 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
   @override
   Widget build(BuildContext context) {
     bool enablePaneModeSwitcher = (widget.pagAppContext == appCtxEms &&
-        widget.listContextType == PagListContextType.info)||(widget.pagAppContext == appCtxCm &&
-        widget.listContextType == PagListContextType.info);
-        
+            widget.listContextType == PagListContextType.info) ||
+        (widget.pagAppContext == appCtxCm &&
+            widget.listContextType == PagListContextType.info);
+
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -410,6 +411,21 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
         String itemTypeStr = '';
         String selectedItemTypeStr = '';
         if (itemType is PagDeviceCat) {
+          switch (widget.pagAppContext.appContextType) {
+            case PagAppContextType.ems:
+              if (itemType != PagDeviceCat.meter) {
+                // skip non-sensor types in ems context
+                continue;
+              }
+            case PagAppContextType.cm:
+              if (itemType != PagDeviceCat.sensor) {
+                // skip non-sensor types in cm context
+                continue;
+              }
+              break;
+            default:
+          }
+
           itemTypeStr = itemType.name;
           selectedItemTypeStr = (_selectedItemType as PagDeviceCat).name;
         } else if (itemType is PagScopeType) {
@@ -556,8 +572,10 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
       );
     }
 
-    dynamic itemSubTypeStr = item['meter_type'] ?? '';
-    dynamic itemSubType = getMeterType(itemSubTypeStr);
+    dynamic itemSubTypeStr = item['meter_type'] ?? item['sensor_type'] ?? '';
+    dynamic itemSubType = item['meter_type'] != null
+        ? getMeterType(itemSubTypeStr)
+        : getSensorType(itemSubTypeStr);
 
     String displayTitle = item[_displayNameKey];
     if (item['location_label'] != null) {
