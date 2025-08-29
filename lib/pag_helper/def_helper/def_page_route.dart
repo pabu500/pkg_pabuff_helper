@@ -203,6 +203,16 @@ enum PagPageRoute {
     'am_dashboard',
     Symbols.grid_view,
   ),
+  cmDashboard(
+    'Condition Minitoring',
+    'cm_dashboard',
+    Symbols.grid_view,
+  ),
+  cmManager(
+    'CM Manager',
+    'cm_manager',
+    Symbols.home_iot_device,
+  ),
   amScopeManager(
     'Scope Manager',
     'am_scope_manager',
