@@ -343,8 +343,10 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
 
   @override
   Widget build(BuildContext context) {
-    bool enablePaneModeSwitcher = widget.pagAppContext == appCtxEms &&
-        widget.listContextType == PagListContextType.info;
+    bool enablePaneModeSwitcher = (widget.pagAppContext == appCtxEms &&
+        widget.listContextType == PagListContextType.info)||(widget.pagAppContext == appCtxCm &&
+        widget.listContextType == PagListContextType.info);
+        
     return SingleChildScrollView(
       child: Column(
         children: [
