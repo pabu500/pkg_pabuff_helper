@@ -79,12 +79,12 @@ class MdlPagProjectProfile {
   @override
   int get hashCode => Object.hash(id, name, label);
 
-  bool equals(MdlPagProjectProfile? projectProfile) {
-    if (projectProfile == null) {
-      return false;
-    }
-    return name == projectProfile.name;
-  }
+  // bool equals(MdlPagProjectProfile? projectProfile) {
+  //   if (projectProfile == null) {
+  //     return false;
+  //   }
+  //   return name == projectProfile.name;
+  // }
 
   get isEmpty => siteGroupProfileList.isEmpty;
   get isNotEmpty => siteGroupProfileList.isNotEmpty;

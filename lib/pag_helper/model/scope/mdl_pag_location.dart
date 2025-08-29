@@ -13,11 +13,11 @@ class MdlPagLocation {
     this.lng,
   });
 
-  bool equals(MdlPagLocation? other) {
-    if (other == null) {
-      return false;
-    }
-    return id == other.id;
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is MdlPagLocation && other.id == id && other.name == name;
   }
 
   factory MdlPagLocation.fromJson(Map<String, dynamic> json) {

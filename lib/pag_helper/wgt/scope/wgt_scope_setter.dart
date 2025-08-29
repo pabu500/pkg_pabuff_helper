@@ -256,7 +256,7 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
     if (_selectedLocation != null) {
       bool hasSelectedLocation = false;
       for (var location in _locationList) {
-        if (location.equals(_selectedLocation)) {
+        if (location == _selectedLocation) {
           hasSelectedLocation = true;
           break;
         }
@@ -295,7 +295,7 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
     if (_selectedLocationGroupProfile != null) {
       bool hasSelectedLocationGroup = false;
       for (var locationGroup in _locationGroupProfileList) {
-        if (locationGroup.equals(_selectedLocationGroupProfile)) {
+        if (locationGroup == _selectedLocationGroupProfile) {
           hasSelectedLocationGroup = true;
           break;
         }
@@ -331,7 +331,7 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
     if (_selectedBuildingProfile != null) {
       bool hasSelectedBuilding = false;
       for (var building in _buildingProfileList) {
-        if (building.equals(_selectedBuildingProfile)) {
+        if (building == _selectedBuildingProfile) {
           hasSelectedBuilding = true;
           break;
         }
@@ -367,7 +367,7 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
     if (_selectedSiteProfile != null) {
       bool hasSelectedSite = false;
       for (var site in _siteProfileList) {
-        if (site.equals(_selectedSiteProfile)) {
+        if (site == _selectedSiteProfile) {
           hasSelectedSite = true;
           break;
         }
@@ -401,7 +401,7 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
     if (_selectedSiteGroupProfile != null) {
       bool hasSelectedSiteGroup = false;
       for (var siteGroup in _siteGroupProfileList) {
-        if (siteGroup.equals(_selectedSiteGroupProfile)) {
+        if (siteGroup == _selectedSiteGroupProfile) {
           hasSelectedSiteGroup = true;
           break;
         }
@@ -598,18 +598,29 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
       pullChildrenList = true;
     }
 
-    if ((((widget.forScopeType == PagScopeType.location) ||
-                (widget.forItemKind != PagItemKind.scope)) &&
-            _selectedLocation == null) ||
-        (widget.forScopeType == PagScopeType.locationGroup &&
-            _selectedLocationGroupProfile == null) ||
-        (widget.forScopeType == PagScopeType.building &&
-            _selectedBuildingProfile == null) ||
-        (widget.forScopeType == PagScopeType.site &&
-            _selectedSiteProfile == null) ||
-        (widget.forScopeType == PagScopeType.siteGroup &&
-            _selectedSiteGroupProfile == null)) {
+    bool case1 = (widget.forScopeType == PagScopeType.location &&
+        _selectedLocation == null);
+    // bool case2 = (widget.forItemKind != PagItemKind.scope && _selectedLocation == null);
+    bool case3 = (widget.forScopeType == PagScopeType.locationGroup &&
+        _selectedLocationGroupProfile == null);
+    bool case4 = (widget.forScopeType == PagScopeType.building &&
+        _selectedBuildingProfile == null);
+    bool case5 = (widget.forScopeType == PagScopeType.site &&
+        _selectedSiteProfile == null);
+    bool case6 = (widget.forScopeType == PagScopeType.siteGroup &&
+        _selectedSiteGroupProfile == null);
+
+    if (case1 || /*case2 ||*/ case3 || case4 || case5 || case6) {
       pullChildrenList = true;
+    }
+
+    // for scope, or for item kinds with flexi scope
+    if (widget.forItemKind == PagItemKind.scope ||
+        widget.forItemKind == PagItemKind.meterGroup ||
+        widget.forItemKind == PagItemKind.tariffPackage) {
+      if (_selectedLocationGroupProfile == null) {
+        pullChildrenList = false;
+      }
     }
 
     String initialScopeLabel = widget.initialScope?.getLeafScopeLabel() ?? '';
@@ -772,10 +783,8 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
               iconSize: 21,
               style: TextStyle(color: Theme.of(context).colorScheme.primary),
               onChanged: (MdlPagSiteGroupProfile? value) {
-                if (_selectedSiteGroupProfile != null) {
-                  if (_selectedSiteGroupProfile!.equals(value)) {
-                    return;
-                  }
+                if (_selectedSiteGroupProfile == value) {
+                  return;
                 }
                 setState(() {
                   _selectedSiteGroupProfile = value;
@@ -784,9 +793,6 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
                   _selectedLocationGroupProfile = null;
                   _selectedLocation = null;
 
-                  // _isModified = true;
-                  // _isCommitted = false;
-                  // _committedMessage = '';
                   _markModified();
 
                   _siteProfileList.clear();
@@ -872,10 +878,8 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
               iconSize: 21,
               style: TextStyle(color: Theme.of(context).colorScheme.primary),
               onChanged: (MdlPagSiteProfile? value) {
-                if (_selectedSiteProfile != null) {
-                  if (_selectedSiteProfile!.equals(value)) {
-                    return;
-                  }
+                if (_selectedSiteProfile == value) {
+                  return;
                 }
                 setState(() {
                   _selectedSiteProfile = value;
@@ -886,9 +890,6 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
                   _selectedLocationGroupProfile = null;
                   _selectedLocation = null;
 
-                  // _isModified = true;
-                  // _isCommitted = false;
-                  // _committedMessage = '';
                   _markModified();
 
                   _buildingProfileList.clear();
@@ -966,10 +967,8 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
               iconSize: 21,
               style: TextStyle(color: Theme.of(context).colorScheme.primary),
               onChanged: (MdlPagBuildingProfile? value) {
-                if (_selectedBuildingProfile != null) {
-                  if (_selectedBuildingProfile!.equals(value)) {
-                    return;
-                  }
+                if (_selectedBuildingProfile == value) {
+                  return;
                 }
 
                 setState(() {
@@ -981,9 +980,6 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
                   _selectedLocationGroupProfile = null;
                   _selectedLocation = null;
 
-                  // _isModified = true;
-                  // _isCommitted = false;
-                  // _committedMessage = '';
                   _markModified();
 
                   _locationGroupProfileList.clear();
@@ -1053,16 +1049,13 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
               iconSize: 21,
               style: TextStyle(color: Theme.of(context).colorScheme.primary),
               onChanged: (MdlPagLocationGroupProfile? value) async {
-                if (_selectedLocationGroupProfile != null) {
-                  if (_selectedLocationGroupProfile!.equals(value)) {
+                if (_selectedLocationGroupProfile == value) {
+                  return;
+                }
+                if (_selectedLocationGroupProfile == null) {
+                  if (value?.id == -1) {
                     return;
                   }
-                }
-
-                _selectedLocationGroupProfile = value;
-                if (widget.isFlexiScope &&
-                    _selectedLocationGroupProfile!.id == -1) {
-                  _selectedLocationGroupProfile = null;
                 }
 
                 if (widget.forScopeType != PagScopeType.location) {
@@ -1071,14 +1064,16 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
 
                 setState(() {
                   _selectedLocationGroupProfile = value;
+
+                  if (value?.id == -1) {
+                    _selectedLocationGroupProfile = null;
+                  }
+
                   _selectedLocation = null;
                   if (_locationList.length == 1) {
                     _selectedLocation = _locationList[0];
                   }
 
-                  // _isModified = true;
-                  // _isCommitted = false;
-                  // _committedMessage = '';
                   _markModified();
                 });
               },
@@ -1148,10 +1143,8 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
               MdlPagLocation? location = _locationList.firstWhere(
                   (MdlPagLocation location) =>
                       location.id.toString() == value['value']);
-              if (_selectedLocation != null) {
-                if (_selectedLocation!.equals(location)) {
-                  return;
-                }
+              if (_selectedLocation == location) {
+                return;
               }
 
               setState(() {
@@ -1176,31 +1169,20 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
 
   Widget getControl({String errorText = ''}) {
     bool isChanged = false;
-    if (_selectedSiteGroupProfile != null) {
-      if (!_selectedSiteGroupProfile!.equals(originalSiteGroupProfile)) {
-        isChanged = true;
-      }
+    if (_selectedSiteGroupProfile == originalSiteGroupProfile) {
+      isChanged = true;
     }
-    if (_selectedSiteProfile != null) {
-      if (!_selectedSiteProfile!.equals(originalSiteProfile)) {
-        isChanged = true;
-      }
+    if (_selectedSiteProfile == originalSiteProfile) {
+      isChanged = true;
     }
-    if (_selectedBuildingProfile != null) {
-      if (!_selectedBuildingProfile!.equals(originalBuildingProfile)) {
-        isChanged = true;
-      }
+    if (_selectedBuildingProfile == originalBuildingProfile) {
+      isChanged = true;
     }
-    if (_selectedLocationGroupProfile != null) {
-      if (!_selectedLocationGroupProfile!
-          .equals(originalLocationGroupProfile)) {
-        isChanged = true;
-      }
+    if (!(_selectedLocationGroupProfile == originalLocationGroupProfile)) {
+      isChanged = true;
     }
-    if (_selectedLocation != null) {
-      if (!_selectedLocation!.equals(originalLocation)) {
-        isChanged = true;
-      }
+    if (_selectedLocation == originalLocation) {
+      isChanged = true;
     }
 
     // check enable commit
@@ -1312,46 +1294,32 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
                                 if (widget.forScopeType !=
                                     PagScopeType.siteGroup) {
                                   isEqual = isEqual &&
-                                      ((_selectedSiteGroupProfile == null &&
-                                              originalSiteGroupProfile ==
-                                                  null) ||
-                                          _selectedSiteGroupProfile!.equals(
-                                              originalSiteGroupProfile));
+                                      (_selectedSiteGroupProfile ==
+                                          originalSiteGroupProfile);
                                 }
                                 if (widget.forScopeType != PagScopeType.site) {
                                   isEqual = isEqual &&
-                                      ((_selectedSiteProfile == null &&
-                                              originalSiteProfile == null) ||
-                                          _selectedSiteProfile!
-                                              .equals(originalSiteProfile));
+                                      (_selectedSiteProfile ==
+                                          originalSiteProfile);
                                 }
                                 if (widget.forScopeType !=
                                     PagScopeType.building) {
                                   isEqual = isEqual &&
-                                      ((_selectedBuildingProfile == null &&
-                                              originalBuildingProfile ==
-                                                  null) ||
-                                          _selectedBuildingProfile!
-                                              .equals(originalBuildingProfile));
+                                      (_selectedBuildingProfile ==
+                                          originalBuildingProfile);
                                 }
                                 if (widget.forScopeType !=
                                     PagScopeType.locationGroup) {
                                   isEqual = isEqual &&
-                                      ((_selectedLocationGroupProfile == null &&
-                                              originalLocationGroupProfile ==
-                                                  null) ||
-                                          _selectedLocationGroupProfile!.equals(
-                                              originalLocationGroupProfile));
+                                      (_selectedLocationGroupProfile ==
+                                          originalLocationGroupProfile);
                                 }
                                 // if (widget.forItemKind != PagItemKind.scope) {
                                 if ((widget.forScopeType !=
                                         PagScopeType.location) ||
                                     (widget.forItemKind != PagItemKind.scope)) {
                                   isEqual = isEqual &&
-                                      ((_selectedLocation == null &&
-                                              originalLocation == null) ||
-                                          _selectedLocation!
-                                              .equals(originalLocation));
+                                      (_selectedLocation == originalLocation);
                                 }
                                 if (isEqual) {
                                   setState(() {
@@ -1401,20 +1369,20 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
                                 }
                                 // get leaf scope
                                 if (_selectedLocation != null &&
-                                    _selectedLocation!.id != -1) {
+                                    _selectedLocation?.id != -1) {
                                   scope = _selectedLocation;
                                 } else if (_selectedLocationGroupProfile !=
                                         null &&
-                                    _selectedLocationGroupProfile!.id != -1) {
+                                    _selectedLocationGroupProfile?.id != -1) {
                                   scope = _selectedLocationGroupProfile;
                                 } else if (_selectedBuildingProfile != null &&
-                                    _selectedBuildingProfile!.id != -1) {
+                                    _selectedBuildingProfile?.id != -1) {
                                   scope = _selectedBuildingProfile;
                                 } else if (_selectedSiteProfile != null &&
-                                    _selectedSiteProfile!.id != -1) {
+                                    _selectedSiteProfile?.id != -1) {
                                   scope = _selectedSiteProfile;
                                 } else if (_selectedSiteGroupProfile != null &&
-                                    _selectedSiteGroupProfile!.id != -1) {
+                                    _selectedSiteGroupProfile?.id != -1) {
                                   scope = _selectedSiteGroupProfile;
                                 }
 
@@ -1435,7 +1403,7 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
                                   widget.onScopeSet?.call(scope);
                                 } else {
                                   // commit to db
-                                  Map<String, dynamic>? result =
+                                  final result =
                                       await widget.onScopeSet?.call(scope);
 
                                   if (result == null) {
@@ -1445,23 +1413,23 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
                                     return;
                                   }
 
-                                  setState(() {
-                                    if (result['error'] == null) {
-                                      _errorText = '';
-                                      _updateOriginalScope();
-                                      _showCommitted = widget.showCommitted;
-                                      // _newParentScopeSeletedFromList = false;
-                                      if (result['show_committed'] != null) {
-                                        _showCommitted =
-                                            result['show_committed'];
-                                      }
-                                      _committedMessage = result['message'] ??
-                                          'Change committed';
-                                    } else {
-                                      _committedMessage = 'Error setting scope';
-                                      _errorText =
-                                          'Error setting scope'; //result['error'];
+                                  if (result['error'] == null) {
+                                    _errorText = '';
+                                    _updateOriginalScope();
+                                    _showCommitted = widget.showCommitted;
+                                    // _newParentScopeSeletedFromList = false;
+                                    if (result['show_committed'] != null) {
+                                      _showCommitted = result['show_committed'];
                                     }
+                                    _committedMessage =
+                                        result['message'] ?? 'Change committed';
+                                  } else {
+                                    _committedMessage = 'Error setting scope';
+                                    _errorText =
+                                        'Error setting scope'; //result['error'];
+                                  }
+
+                                  setState(() {
                                     _isEditing = false;
                                     _isReset = false;
                                   });
@@ -1488,53 +1456,53 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
   }
 }
 
-Widget getItemScopeSetter({
-  required MdlPagAppConfig appConfig,
-  UniqueKey? scopeSetterKey,
-  required PagItemKind itemKind,
-  double width = 395,
-  Function(String, String)? onSetState,
-}) {
-  return Padding(
-    padding: const EdgeInsets.only(top: 8.0),
-    child: WgtScopeSetter(
-      appConfig: appConfig,
-      key: scopeSetterKey,
-      width: width,
-      labelWidth: 130,
-      // itemScopeMap: widget.itemScopeMap!,
-      forItemKind: itemKind,
-      // forScopeType: widget.itemType is PagScopeType ? widget.itemType : null,
-      onScopeSet: (dynamic profile) {
-        if (profile == null) {
-          if (kDebugMode) {
-            print('Profile is null');
-          }
-          return {};
-        }
-        String scopeIdColName = '';
-        if (profile is MdlPagSiteGroupProfile) {
-          scopeIdColName = 'site_group_id';
-        } else if (profile is MdlPagSiteProfile) {
-          scopeIdColName = 'site_id';
-        } else if (profile is MdlPagBuildingProfile) {
-          scopeIdColName = 'building_id';
-        } else if (profile is MdlPagLocationGroupProfile) {
-          scopeIdColName = 'location_group_id';
-        } else if (profile is MdlPagLocation) {
-          scopeIdColName = 'location_id';
-        }
-        if (scopeIdColName.isEmpty) {
-          if (kDebugMode) {
-            print('Invalid profile type');
-          }
-          return {};
-        }
-        onSetState?.call(scopeIdColName, profile.id.toString());
-        // setState(() {
-        //   _itemScopeMap[scopeIdColName] = profile.id.toString();
-        // });
-      },
-    ),
-  );
-}
+// Widget getItemScopeSetter({
+//   required MdlPagAppConfig appConfig,
+//   UniqueKey? scopeSetterKey,
+//   required PagItemKind itemKind,
+//   double width = 395,
+//   Function(String, String)? onSetState,
+// }) {
+//   return Padding(
+//     padding: const EdgeInsets.only(top: 8.0),
+//     child: WgtScopeSetter(
+//       appConfig: appConfig,
+//       key: scopeSetterKey,
+//       width: width,
+//       labelWidth: 130,
+//       // itemScopeMap: widget.itemScopeMap!,
+//       forItemKind: itemKind,
+//       // forScopeType: widget.itemType is PagScopeType ? widget.itemType : null,
+//       onScopeSet: (dynamic profile) {
+//         if (profile == null) {
+//           if (kDebugMode) {
+//             print('Profile is null');
+//           }
+//           return {};
+//         }
+//         String scopeIdColName = '';
+//         if (profile is MdlPagSiteGroupProfile) {
+//           scopeIdColName = 'site_group_id';
+//         } else if (profile is MdlPagSiteProfile) {
+//           scopeIdColName = 'site_id';
+//         } else if (profile is MdlPagBuildingProfile) {
+//           scopeIdColName = 'building_id';
+//         } else if (profile is MdlPagLocationGroupProfile) {
+//           scopeIdColName = 'location_group_id';
+//         } else if (profile is MdlPagLocation) {
+//           scopeIdColName = 'location_id';
+//         }
+//         if (scopeIdColName.isEmpty) {
+//           if (kDebugMode) {
+//             print('Invalid profile type');
+//           }
+//           return {};
+//         }
+//         onSetState?.call(scopeIdColName, profile.id.toString());
+//         // setState(() {
+//         //   _itemScopeMap[scopeIdColName] = profile.id.toString();
+//         // });
+//       },
+//     ),
+//   );
+// }

@@ -32,12 +32,17 @@ class MdlPagSiteGroupProfile {
   get isEmpty => siteProfileList.isEmpty;
   get isNotEmpty => siteProfileList.isNotEmpty;
 
-  bool equals(MdlPagSiteGroupProfile? siteProfile) {
-    if (siteProfile == null) {
-      return false;
-    }
-    return id == siteProfile.id;
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is MdlPagSiteGroupProfile &&
+        other.id == id &&
+        other.name == name;
   }
+
+  @override
+  int get hashCode => Object.hash(id, name);
 
   int getSiteCount() {
     return siteProfileList.length;

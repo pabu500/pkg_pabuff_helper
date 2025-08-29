@@ -244,20 +244,15 @@ class _WgtPagScopeSelector3State extends State<WgtPagScopeSelector3> {
                 ElevatedButton(
                   onPressed: () {
                     // no change
-                    if (_selectedProjectProfile
-                            .equals(widget.iniScope.projectProfile) &&
-                        (_selectedSiteGroupProfile == null ||
-                            _selectedSiteGroupProfile!
-                                .equals(widget.iniScope.siteGroupProfile)) &&
-                        (_selectedSiteProfile != null &&
-                            _selectedSiteProfile!
-                                .equals(widget.iniScope.siteProfile)) &&
-                        (_selectedBuildingProfile != null &&
-                            _selectedBuildingProfile!
-                                .equals(widget.iniScope.buildingProfile)) &&
-                        (_selectedLocationGroupProfile != null &&
-                            _selectedLocationGroupProfile!.equals(
-                                widget.iniScope.locationGroupProfile))) {
+                    if (_selectedProjectProfile ==
+                            widget.iniScope.projectProfile &&
+                        (_selectedSiteGroupProfile ==
+                            widget.iniScope.siteGroupProfile) &&
+                        (_selectedSiteProfile == widget.iniScope.siteProfile) &&
+                        (_selectedBuildingProfile ==
+                            widget.iniScope.buildingProfile) &&
+                        (_selectedLocationGroupProfile ==
+                            widget.iniScope.locationGroupProfile)) {
                       setState(() {
                         _scopeSet = true;
                       });

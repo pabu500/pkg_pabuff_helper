@@ -26,12 +26,17 @@ class MdlPagBuildingProfile {
     this.fleetHealth,
   });
 
-  bool equals(MdlPagBuildingProfile? buildingProfile) {
-    if (buildingProfile == null) {
-      return false;
-    }
-    return id == buildingProfile.id;
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is MdlPagBuildingProfile &&
+        other.id == id &&
+        other.name == name;
   }
+
+  @override
+  int get hashCode => Object.hash(id, name);
 
   int getLocationGroupCount() {
     return locationGroupProfileList.length;
