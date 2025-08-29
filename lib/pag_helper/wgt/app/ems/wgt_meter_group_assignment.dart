@@ -424,11 +424,11 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
   }
 
   Widget getItemGroupInfo() {
-    String itemGroupScopeLabel = widget.itemScope.getLeafScopeLabel();
-    PagScopeType itemScopeType = widget.itemScope.getScopeType();
-    Widget scopeIcon = getScopeIcon(context, itemScopeType, size: 21);
+    // String itemGroupScopeLabel = widget.itemScope.getLeafScopeLabel();
+    // PagScopeType itemScopeType = widget.itemScope.getScopeType();
+    // Widget scopeIcon = getScopeIcon(context, itemScopeType, size: 21);
     BoxDecoration boxDecoration = BoxDecoration(
-      border: Border.all(color: Theme.of(context).hintColor.withAlpha(50)),
+      border: Border.all(color: Theme.of(context).hintColor, width: 1.5),
       borderRadius: BorderRadius.circular(5),
     );
     return Row(
@@ -453,24 +453,26 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         horizontalSpaceSmall,
-        Container(
-          decoration: boxDecoration,
-          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              scopeIcon,
-              horizontalSpaceTiny,
-              Text(itemGroupScopeLabel),
-            ],
-          ),
-        ),
+        // Container(
+        //   decoration: boxDecoration,
+        //   padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+        //   child: Row(
+        //     mainAxisSize: MainAxisSize.min,
+        //     children: [
+        //       scopeIcon,
+        //       horizontalSpaceTiny,
+        //       Text(itemGroupScopeLabel),
+        //     ],
+        //   ),
+        // ),
+        getScopeLabel(context, widget.itemScope),
         horizontalSpaceSmall,
         Container(
           // width: 20,
           decoration: boxDecoration,
           padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-          child: Text(widget.meterType),
+          child: Text(widget.meterType,
+              style: const TextStyle(fontWeight: FontWeight.bold)),
         ),
         horizontalSpaceSmall,
         // Container(

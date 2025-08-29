@@ -450,7 +450,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       _addViewSoAColumn(listController);
     }
     if (addMatchPaymentColumn) {
-      _addMatchPaymentColumn2(listController);
+      _addMatchPaymentColumn(listController);
     }
   }
 
@@ -1180,48 +1180,6 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
   }
 
   void _addMatchPaymentColumn(MdlPagListController listController) {
-    MdlListColController appCtxCol = MdlListColController(
-      colKey: 'detail',
-      colTitle: 'Match',
-      includeColKeyAsFilter: false,
-      showColumn: true,
-      colWidth: 55,
-      colWidgetType: PagColWidgetType.CUSTOM,
-      getCustomWidget: (item, fullList) {
-        bool showDetail = true;
-
-        final onItemComm = (bool isComm) {};
-        item['on_item_comm'] = onItemComm;
-        return Padding(
-          padding: const EdgeInsets.only(right: 0),
-          child: InkWell(
-            onTap: !showDetail
-                ? null
-                : () {
-                    xtShowModelBottomSheet(
-                      context,
-                      WgtTenantSoA(
-                        appConfig: widget.appConfig,
-                        loggedInUser: loggedInUser!,
-                        teneantInfo: item,
-                      ),
-                      onClosed: () {},
-                    );
-                  },
-            child: Icon(
-              Symbols.payments,
-              color: showDetail
-                  ? Theme.of(context).colorScheme.primary.withAlpha(200)
-                  : Theme.of(context).hintColor.withAlpha(130),
-            ),
-          ),
-        );
-      },
-    );
-    listController.listColControllerList.insert(0, appCtxCol);
-  }
-
-  void _addMatchPaymentColumn2(MdlPagListController listController) {
     MdlListColController appCtxCol = MdlListColController(
       colKey: 'detail',
       colTitle: 'Match',

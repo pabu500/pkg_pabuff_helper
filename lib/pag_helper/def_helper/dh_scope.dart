@@ -1,3 +1,5 @@
+import 'package:buff_helper/pag_helper/model/scope/mdl_pag_scope.dart';
+import 'package:buff_helper/xt_ui/xt_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -115,4 +117,72 @@ String? validateLabelScope(String val) {
     return 'alphanumeric, space, /, -, ,, ., (), # only and length 5-255';
   }
   return null;
+}
+
+Widget getScopeLabel(BuildContext context, MdlPagScope scope) {
+  BoxDecoration boxDecoration = BoxDecoration(
+    border: Border.all(color: Theme.of(context).hintColor.withAlpha(50)),
+    borderRadius: BorderRadius.circular(5),
+  );
+  BoxDecoration boxDecorationLeaf = BoxDecoration(
+    border: Border.all(color: Theme.of(context).hintColor, width: 1.5),
+    borderRadius: BorderRadius.circular(5),
+  );
+  List<Map<String, dynamic>> scopeChain = scope.getScopeChain();
+  List<Widget> scopeWidgets = [];
+
+  PagScopeType scopeType = scope.getScopeType();
+  PagScopeType leafScopeType = scopeChain.last['type'];
+
+  for (var item in scopeChain) {
+    PagScopeType chainScopeType = item['type'];
+    bool isLeaf = chainScopeType == leafScopeType;
+
+    // only show the leaf scope for site group, site, and building
+    if (scopeType == PagScopeType.siteGroup ||
+        scopeType == PagScopeType.site ||
+        scopeType == PagScopeType.building) {
+      if (!isLeaf) {
+        continue;
+      }
+    }
+
+    // show up to the building level for location group and location
+    if (scopeType == PagScopeType.locationGroup ||
+        scopeType == PagScopeType.location) {
+      if (chainScopeType == PagScopeType.siteGroup ||
+          chainScopeType == PagScopeType.site) {
+        continue;
+      }
+    }
+
+    String itemGroupScopeLabel = item['label'];
+    Widget scopeIcon = getScopeIcon(context, chainScopeType, size: 21);
+
+    scopeWidgets.add(
+      Container(
+        decoration: isLeaf ? boxDecorationLeaf : boxDecoration,
+        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            scopeIcon,
+            horizontalSpaceTiny,
+            Text(itemGroupScopeLabel,
+                style: isLeaf
+                    ? const TextStyle(fontWeight: FontWeight.bold)
+                    : null),
+          ],
+        ),
+      ),
+    );
+    if (!isLeaf) {
+      scopeWidgets.add(Icon(Symbols.chevron_right,
+          size: 18, color: Theme.of(context).hintColor));
+    }
+  }
+
+  return Row(
+    children: scopeWidgets,
+  );
 }
