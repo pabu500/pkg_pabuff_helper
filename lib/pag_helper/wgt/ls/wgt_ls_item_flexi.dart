@@ -15,6 +15,7 @@ import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_scope.dart';
 import 'package:buff_helper/pag_helper/wgt/app/am/wgt_am_meter_group_assignment.dart';
 import 'package:buff_helper/pag_helper/wgt/app/ems/wgt_match_payment.dart';
+import 'package:buff_helper/pag_helper/wgt/app/ems/wgt_meter_group_assignment2.dart';
 import 'package:buff_helper/pagrid_helper/comm_helper/local_storage.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/wgt_pag_composite_bill_view.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_ems_type_usage_calc.dart';
@@ -823,12 +824,13 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                           },
                         );
                       case PagItemKind.meterGroup:
-                        opWidget = WgtMeterGroupAssignment(
+                        opWidget = WgtMeterGroupAssignment2(
                           appConfig: widget.appConfig,
                           itemGroupIndexStr: item['id'],
                           itemName: item['name'],
                           itemLabel: item['label'] ?? '',
                           meterType: item['meter_type'] ?? '',
+                          itemInfo: item,
                           itemScope: itemScope,
                           onUpdate: () {
                             setState(() {
@@ -1188,7 +1190,6 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       colWidth: 55,
       colWidgetType: PagColWidgetType.CUSTOM,
       getCustomWidget: (item, fullList) {
-        bool showDetail = true;
         return WgtPaymentMatchOpItem(
           appConfig: widget.appConfig,
           loggedInUser: loggedInUser!,

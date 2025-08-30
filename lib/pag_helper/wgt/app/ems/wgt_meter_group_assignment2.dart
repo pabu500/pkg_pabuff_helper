@@ -1,5 +1,7 @@
+import 'package:buff_helper/pag_helper/def_helper/dh_device.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_tenant.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
+import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
 import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
@@ -12,14 +14,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
+import 'dart:developer' as dev;
 
 import '../../../comm/comm_meter_group.dart';
 import '../../../comm/comm_tenant.dart';
 import '../../../model/mdl_pag_app_config.dart';
 import '../../wgt_comm_button.dart';
 
-class WgtMeterGroupAssignment extends StatefulWidget {
-  const WgtMeterGroupAssignment({
+class WgtMeterGroupAssignment2 extends StatefulWidget {
+  const WgtMeterGroupAssignment2({
     super.key,
     required this.appConfig,
     required this.itemGroupIndexStr,
@@ -27,6 +30,7 @@ class WgtMeterGroupAssignment extends StatefulWidget {
     required this.itemLabel,
     required this.itemScope,
     required this.meterType,
+    this.itemInfo,
     this.onScopeTreeUpdate,
     this.onUpdate,
   });
@@ -36,22 +40,23 @@ class WgtMeterGroupAssignment extends StatefulWidget {
   final String itemName;
   final String itemLabel;
   final String meterType;
+  final Map<String, dynamic>? itemInfo;
   final MdlPagScope itemScope;
   final Function? onScopeTreeUpdate;
   final Function? onUpdate;
 
   @override
-  State<WgtMeterGroupAssignment> createState() =>
-      _WgtMeterGroupAssignmentState();
+  State<WgtMeterGroupAssignment2> createState() =>
+      _WgtMeterGroupAssignment2State();
 }
 
-class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
+class _WgtMeterGroupAssignment2State extends State<WgtMeterGroupAssignment2> {
   late final MdlPagUser? loggedInUser;
 
   final double width = 395.0;
 
-  bool _isFetching = false;
-  bool _isFetched = false;
+  bool _isScopeMatchingListFetching = false;
+  bool _isScopeMathingItemListFetched = false;
   bool _modified = false;
 
   bool _isCommitting = false;
@@ -59,15 +64,17 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
   String _commitErrorText = '';
 
   List<Map<String, dynamic>>? _itemGroupScopeMatchingItemList;
-  List<Map<String, dynamic>>? _itemGroupItemList;
+  // List<Map<String, dynamic>>? _itemGroupItemList;
 
-  String? _selectedMeterIndexStr;
+  // String? _selectedMeterIndexStr;
+  bool _isFetchingAllAssignmentInfo = false;
+  bool _isAllAssignmentInfoFetched = false;
 
   final TextEditingController _itemSnFilterController = TextEditingController();
   String _itemSnFilterStr = '';
 
   Future<void> _doAutoPopulate() async {
-    if (_isFetching) {
+    if (_isScopeMatchingListFetching) {
       return;
     }
 
@@ -76,7 +83,7 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
       'item_group_id': widget.itemGroupIndexStr,
     };
 
-    _isFetching = true;
+    _isScopeMatchingListFetching = true;
     try {
       final data = await doGetScopeMeterList(
         widget.appConfig,
@@ -110,7 +117,7 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
       _itemGroupScopeMatchingItemList = List<Map<String, dynamic>>.from(
         itemGroupScopeMatchingItemList,
       );
-      _itemGroupItemList = List<Map<String, dynamic>>.from(itemGroupItemList);
+      // _itemGroupItemList = List<Map<String, dynamic>>.from(itemGroupItemList);
       // sort by label
       _itemGroupScopeMatchingItemList!.sort((a, b) {
         String labelA = a['label'] ?? '';
@@ -130,8 +137,8 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
       rethrow;
     } finally {
       setState(() {
-        _isFetching = false;
-        _isFetched = true;
+        _isScopeMatchingListFetching = false;
+        _isScopeMathingItemListFetched = true;
       });
     }
   }
@@ -227,7 +234,7 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
         _isCommitting = false;
         _isCommitted = true;
         _modified = false;
-        _selectedMeterIndexStr = null;
+        // _selectedMeterIndexStr = null;
       });
     }
   }
@@ -257,6 +264,73 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
     }
 
     return true; // Include item if no filter is applied
+  }
+
+  Future<void> _checkAllAssignments() async {
+    if (_isFetchingAllAssignmentInfo) return;
+
+    final queryMap = <String, dynamic>{
+      'scope': loggedInUser!.selectedScope.toScopeMap(),
+    };
+    setState(() {
+      _isFetchingAllAssignmentInfo = true;
+      _isAllAssignmentInfoFetched = false;
+    });
+
+    for (var itemInfo in _itemGroupScopeMatchingItemList ?? []) {
+      queryMap['tenant_id'] = itemInfo['tenant_id'];
+      queryMap['payment_amount'] = itemInfo['amount'];
+      queryMap['value_timestamp'] = itemInfo['value_timestamp'];
+      queryMap['lc_status'] = itemInfo['lc_status'];
+
+      itemInfo['is_comm']?.call(true, false);
+
+      bool showResult = false;
+      try {
+        await _doGetMeterAssignment(itemInfo);
+      } catch (e) {
+      } finally {
+        itemInfo['is_comm']?.call(false, showResult);
+      }
+    }
+
+    // sort meters assigned to this meter group to the top
+    dev.log('Sorting meter group assignments');
+    _sortItemGroupScopeMatchingItemList();
+
+    setState(() {
+      _isFetchingAllAssignmentInfo = false;
+      _isAllAssignmentInfoFetched = true;
+    });
+  }
+
+  void _sortItemGroupScopeMatchingItemList() {
+    for (var item in _itemGroupScopeMatchingItemList ?? []) {
+      final assignmentInfo = item['assignment_info'];
+      if (assignmentInfo == null) {
+        dev.log('No assignment info for item: ${item['id']}, skipping.');
+        continue;
+      }
+      final meterTenantAssignment = assignmentInfo['meter_tenant_assignment'];
+      if (meterTenantAssignment == null) {
+        dev.log(
+            'No meter tenant assignment for item: ${item['id']}, skipping.');
+        continue;
+      }
+      for (var tenantAssignment in meterTenantAssignment) {
+        // Process each tenant assignment
+        final tenantInfo = tenantAssignment['tenant_info'];
+        if (tenantInfo == null) {
+          continue;
+        }
+        String tenantName = tenantInfo['name'] ?? '';
+        if (tenantName == widget.itemInfo?['tenant_name']) {
+          // move it to the top
+          _itemGroupScopeMatchingItemList?.remove(item);
+          _itemGroupScopeMatchingItemList?.insert(0, item);
+        }
+      }
+    }
   }
 
   @override
@@ -290,10 +364,14 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
               ),
             ],
           ),
-          const Divider(),
+          const Divider(thickness: 0.5),
           verticalSpaceTiny,
           getOpRow(),
           verticalSpaceSmall,
+          Text(
+            'List of meters matching the scope of this meter group:',
+            style: TextStyle(color: Theme.of(context).hintColor),
+          ),
           Padding(
             padding: const EdgeInsets.only(top: 5.0),
             child: getAssignmentOpList(),
@@ -305,7 +383,7 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
 
   Widget getAssignmentOpList() {
     bool fetchData = false;
-    if (!_isFetched) {
+    if (!_isScopeMathingItemListFetched) {
       fetchData = true;
     }
     return fetchData
@@ -353,6 +431,20 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        WgtCommButton(
+          label: 'Check All Assignments',
+          hight: 35,
+          labelStyle: TextStyle(
+            color: Theme.of(context).hintColor,
+            fontSize: 15,
+          ),
+          onPressed: _isAllAssignmentInfoFetched
+              ? null
+              : () async {
+                  await _checkAllAssignments();
+                },
+        ),
+        horizontalSpaceSmall,
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 5),
           child: SizedBox(
@@ -409,75 +501,79 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
                               : Theme.of(context).hintColor,
                         ),
         ),
-        // if (_hasTptMismatchAssignmentError)
-        //   Container(
-        //     margin: const EdgeInsets.only(left: 10),
-        //     padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-        //     decoration: boxDecoration.copyWith(color: Colors.transparent),
-        //     child: Text(
-        //       '✘ TPT Mismatch Error',
-        //       style: TextStyle(color: Theme.of(context).colorScheme.error),
-        //     ),
-        //   ),
       ],
     );
   }
 
   Widget getItemGroupInfo() {
-    String itemGroupScopeLabel = widget.itemScope.getLeafScopeLabel();
-    PagScopeType itemScopeType = widget.itemScope.getScopeType();
-    Widget scopeIcon = getScopeIcon(context, itemScopeType, size: 21);
     BoxDecoration boxDecoration = BoxDecoration(
-      border: Border.all(color: Theme.of(context).hintColor.withAlpha(50)),
+      border: Border.all(color: Theme.of(context).hintColor, width: 1.5),
       borderRadius: BorderRadius.circular(5),
     );
-    return Row(
+    return Column(
       mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(
-          'Assignment',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).hintColor,
-          ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Assignment ',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).hintColor,
+              ),
+            ),
+            Icon(PagItemKind.meterGroup.iconData, size: 21),
+            horizontalSpaceTiny,
+            SelectableText(
+              widget.itemName,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            horizontalSpaceSmall,
+            SelectableText(
+              widget.itemLabel.isNotEmpty ? widget.itemLabel : '-',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            horizontalSpaceSmall,
+            getScopeLabel(context, widget.itemScope),
+            horizontalSpaceSmall,
+            Container(
+              // width: 20,
+              decoration: boxDecoration,
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+              child: Text(widget.meterType,
+                  style: const TextStyle(fontWeight: FontWeight.bold)),
+            ),
+            horizontalSpaceSmall,
+          ],
         ),
-        horizontalSpaceSmall,
-        Text(
-          widget.itemName,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        horizontalSpaceSmall,
-        Text(
-          widget.itemLabel.isNotEmpty ? widget.itemLabel : '-',
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        horizontalSpaceSmall,
-        Container(
-          decoration: boxDecoration,
-          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              scopeIcon,
-              horizontalSpaceTiny,
-              Text(itemGroupScopeLabel),
-            ],
-          ),
-        ),
-        horizontalSpaceSmall,
-        Container(
-          // width: 20,
-          decoration: boxDecoration,
-          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-          child: Text(widget.meterType),
-        ),
-        horizontalSpaceSmall,
-        // Container(
-        //   decoration: boxDecoration,
-        //   padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-        //   child: Text(widget.tariffPackageTypeLabel),
-        // ),
+        if ((widget.itemInfo?['tenant_label'] ?? '').isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 5.0),
+            child: Row(
+              children: [
+                Text(
+                  'Assigned to ',
+                  style: TextStyle(
+                    color: Theme.of(context).hintColor,
+                  ),
+                ),
+                Icon(PagItemKind.tenant.iconData,
+                    size: 18, color: Theme.of(context).hintColor),
+                horizontalSpaceTiny,
+                SelectableText(
+                  '${widget.itemInfo?['tenant_name']}',
+                  style: const TextStyle(fontSize: 16),
+                ),
+                horizontalSpaceTiny,
+                SelectableText(
+                  '${widget.itemInfo?['tenant_label']}',
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ],
+            ),
+          )
       ],
     );
   }
@@ -491,14 +587,23 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
     int index = 0;
     for (Map<String, dynamic> itemInfo in _itemGroupScopeMatchingItemList!) {
       bool showItem = _showItem(itemInfo);
+      itemInfo['index'] = ++index;
       if (!showItem) {
         continue; // Skip this item if it doesn't match the filter
       }
-      Widget tile = getItemRow(itemInfo, ++index);
       itemWidgetList.add(
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 3),
-          child: tile,
+          child: WgtMeterGroupAssignmentItem(
+            appConfig: widget.appConfig,
+            loggedInUser: loggedInUser!,
+            itemInfo: itemInfo,
+            itemGroupIndexStr: widget.itemGroupIndexStr,
+            getMeterAssignment: _doGetMeterAssignment,
+            onModified: () {
+              _checkModified();
+            },
+          ),
         ),
       );
     }
@@ -512,8 +617,69 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
       },
     );
   }
+}
 
-  Widget getItemRow(Map<String, dynamic> itemInfo, int index) {
+class WgtMeterGroupAssignmentItem extends StatefulWidget {
+  const WgtMeterGroupAssignmentItem({
+    super.key,
+    required this.appConfig,
+    required this.loggedInUser,
+    required this.itemInfo,
+    required this.getMeterAssignment,
+    required this.itemGroupIndexStr,
+    this.regFresh,
+    this.onModified,
+  });
+
+  final MdlPagAppConfig appConfig;
+  final MdlPagUser loggedInUser;
+  final Map<String, dynamic> itemInfo;
+  final String itemGroupIndexStr;
+  final void Function(void Function(bool isComm, bool isEnabled))? regFresh;
+  final Future<void> Function(Map<String, dynamic> itemInfo) getMeterAssignment;
+  final void Function()? onModified;
+
+  @override
+  State<WgtMeterGroupAssignmentItem> createState() =>
+      _WgtMeterGroupAssignmentItemState();
+}
+
+class _WgtMeterGroupAssignmentItemState
+    extends State<WgtMeterGroupAssignmentItem> {
+  bool _assignmentInfoFetched = false;
+  bool _isComm = false;
+  bool _isEnabled = false;
+
+  void _refresh(bool isComm, bool isEnabled) {
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _isComm = isComm;
+      _isEnabled = isEnabled;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    widget.regFresh?.call(_refresh);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // return widget;
+    return _isComm
+        ? const WgtPagWait(size: 21)
+        : InkWell(
+            onTap: !_isEnabled ? null : () {},
+            child: getAssignmentRow(widget.itemInfo),
+          );
+  }
+
+  Widget getAssignmentRow(Map<String, dynamic> itemInfo) {
+    int index = itemInfo['index'] ?? 0;
     String itemName = itemInfo['name'] ?? '-';
     String itemLabel = itemInfo['label'] ?? '-';
     String meterSn = itemInfo['meter_sn'] ?? '-';
@@ -546,7 +712,10 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
                 ),
               ),
             ),
-            horizontalSpaceSmall,
+            horizontalSpaceTiny,
+            Icon(PagDeviceCat.meter.iconData,
+                color: Theme.of(context).hintColor, size: 18),
+            horizontalSpaceTiny,
             Container(
               width: 135,
               decoration: boxDecoration,
@@ -580,7 +749,7 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
             getAssignmentBox(itemInfo),
           ],
         ),
-        if (_selectedMeterIndexStr == itemInfo['id']) getAssignmentMap(),
+        if (true) getAssignmentMap(),
       ],
     );
   }
@@ -674,7 +843,7 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
             message:
                 '$tenantName ${tenantLabel.isNotEmpty ? "($tenantLabel)" : ""} - $tenantPercentage%',
             child: InkWell(
-              onTap: _selectedMeterIndexStr == itemInfo['id']
+              onTap: true
                   ? null
                   : () {
                       if (itemInfo['is_fetching'] ?? false) {
@@ -682,16 +851,25 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
                       }
 
                       setState(() {
-                        _selectedMeterIndexStr = itemInfo['id'];
+                        // _selectedMeterIndexStr = itemInfo['id'];
                       });
                     },
               child: Container(
                 width: assignedWidth,
                 color: Colors.grey.shade700,
                 child: Center(
-                  child: Text(
-                    tenantName,
-                    style: const TextStyle(color: Colors.white, fontSize: 13.5),
+                  child: Row(
+                    children: [
+                      horizontalSpaceTiny,
+                      Icon(PagItemKind.tenant.iconData,
+                          size: 17, color: Colors.white),
+                      horizontalSpaceTiny,
+                      Text(
+                        tenantName,
+                        style: const TextStyle(
+                            color: Colors.white, fontSize: 13.5),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -715,6 +893,7 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
               child: const Center(
                 child: Text(
                   'this meter group (unassigned)',
+                  // 'this meter group',
                   style: TextStyle(color: Colors.white, fontSize: 10),
                 ),
               ),
@@ -736,7 +915,7 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
         itemInfo['assigned'] ??
         percentageAssignedToThisItemGroup > 0.0;
 
-    if (itemInfo['assigned_new'] == true) {
+    if (itemInfo['assigned_new'] == true && itemInfo['assigned'] == false) {
       assignmentBarWidgets.add(
         Tooltip(
           message: 'Assigned to this item group',
@@ -789,15 +968,11 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
                   return;
                 }
                 if (itemInfo['assignment_info'] == null) {
-                  await _doGetMeterAssignment(itemInfo);
+                  await widget.getMeterAssignment(itemInfo);
                 }
 
                 setState(() {
-                  _selectedMeterIndexStr = itemInfo['id'];
-                  // _checkModified();
-                  // if (widget.onScopeTreeUpdate != null) {
-                  //   widget.onScopeTreeUpdate!();
-                  // }
+                  // _selectedMeterIndexStr = itemInfo['id'];
                 });
               },
             )
@@ -838,7 +1013,8 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
                               // if (itemInfo['assigned_new'] == false) {
                               //   itemInfo['assignment_info'] = null;
                               // }
-                              _checkModified();
+                              // _checkModified();
+                              widget.onModified?.call();
                             });
                           },
                   ),
@@ -849,32 +1025,14 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
   }
 
   Widget getAssignmentMap() {
-    if (_itemGroupScopeMatchingItemList == null ||
-        _itemGroupScopeMatchingItemList!.isEmpty) {
-      return Container();
-    }
-    // if (_itemGroupItemList == null || _itemGroupItemList!.isEmpty) {
-    //   return Container();
-    // }
-    if (_selectedMeterIndexStr == null) {
-      return Container();
-    }
-
-    Map<String, dynamic>? itemInfo;
-    for (Map<String, dynamic> item in _itemGroupScopeMatchingItemList!) {
-      if (item['id'] == _selectedMeterIndexStr) {
-        itemInfo = item;
-        break;
-      }
-    }
-    if (itemInfo == null) {
-      return getErrorTextPrompt(
-          context: context, errorText: 'Error: Item not found');
-    }
-    Map<String, dynamic>? assignmentInfo = itemInfo['assignment_info'];
+    Map<String, dynamic>? assignmentInfo = widget.itemInfo['assignment_info'];
     if (assignmentInfo == null) {
-      return getErrorTextPrompt(
-          context: context, errorText: 'Error: Assignment info not found');
+      if (_assignmentInfoFetched) {
+        return getErrorTextPrompt(
+            context: context, errorText: 'Error: Assignment info not found');
+      } else {
+        return Container();
+      }
     }
     final meterTeantAssignmentList = assignmentInfo['meter_tenant_assignment'];
     if (meterTeantAssignmentList == null || meterTeantAssignmentList.isEmpty) {
@@ -927,6 +1085,9 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
+            Icon(PagItemKind.meterGroup.iconData,
+                color: Theme.of(context).hintColor, size: 18),
+            horizontalSpaceTiny,
             SizedBox(
               width: 135,
               child: Text(
@@ -945,6 +1106,10 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
                 style: TextStyle(color: Theme.of(context).hintColor),
               ),
             ),
+            Icon(Symbols.arrow_right,
+                size: 18, color: Theme.of(context).hintColor),
+            Icon(PagItemKind.tenant.iconData,
+                color: Theme.of(context).hintColor, size: 18),
             horizontalSpaceTiny,
             Tooltip(
               message: tenantLabel,
