@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 
 import 'package:fl_chart/fl_chart.dart';
 
-import '../../../pag_helper/model/acl/mdl_pag_svc_claim.dart';
-import '../../../pag_helper/model/mdl_pag_app_config.dart';
-import 'comm_pag_meter_usage.dart';
+import '../../../model/acl/mdl_pag_svc_claim.dart';
+import '../../../model/mdl_pag_app_config.dart';
+import '../../../comm/comm_pag_meter_usage.dart';
 
 class WgtPagMeterGroupStatCore extends StatefulWidget {
   const WgtPagMeterGroupStatCore({

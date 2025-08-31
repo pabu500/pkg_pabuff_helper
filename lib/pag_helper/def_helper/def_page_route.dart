@@ -183,6 +183,11 @@ enum PagPageRoute {
     'fh_dashboard',
     Symbols.grid_view,
   ),
+  fhDeviceManager(
+    'FH',
+    'fh_device_manager',
+    Symbols.home_iot_device,
+  ),
   fhEventManager(
     'Event Manager',
     'fh_event_manager',
@@ -208,9 +213,9 @@ enum PagPageRoute {
     'cm_dashboard',
     Symbols.grid_view,
   ),
-  cmManager(
-    'CM Manager',
-    'cm_manager',
+  cmDeviceManager(
+    'Device Manager',
+    'cm_device_manager',
     Symbols.home_iot_device,
   ),
   amScopeManager(
@@ -326,245 +331,6 @@ enum PagPageRoute {
 T? enumByLabel<T extends Enum>(String? label, List<T> values) {
   return label == null ? null : values.asNameMap()[label];
 }
-
-// const routeList = [
-//   {
-//     'pageRoute': PagPageRoute.projectPublicFront,
-//     'route': 'project_public_front',
-//     'pageTitle': 'Project Public Front',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.home,
-//     'route': 'home',
-//     'pageTitle': 'Home',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.login,
-//     'route': 'login',
-//     'pageTitle': 'Login',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.register,
-//     'route': 'register',
-//     'pageTitle': 'Register',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.profile,
-//     'route': 'profile',
-//     'pageTitle': 'Profile',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.consoleHomeDashboard,
-//     'route': 'console_home_dashboard',
-//     'pageTitle': 'Home',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.consoleHomeUserService,
-//     'route': 'user_service',
-//     'pageTitle': 'User Service',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.consoleHomeAcl,
-//     'route': 'console_home_acl',
-//     'pageTitle': 'Role & Access',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.consoleHomeSettings,
-//     'route': 'console_home_settings',
-//     'pageTitle': 'Settings',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.meterManager,
-//     'route': 'meter_manager',
-//     'pageTitle': 'Meter Manager',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.creditTransaction,
-//     'route': 'credit_transaction',
-//     'pageTitle': 'Credit Transaction',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.tenantManager,
-//     'route': 'tenant_manager',
-//     'pageTitle': 'Tenant Manager',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.billingManager,
-//     'route': 'billing_manager',
-//     'pageTitle': 'Billing Manager',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.evsDashboard,
-//     'route': 'evs_dashboard',
-//     'pageTitle': 'EVS',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.evsTaskReportManager,
-//     'route': 'evs_task_report_manager',
-//     'pageTitle': 'Task/Report Manager',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.emsDashboard,
-//     'route': 'ems_dashboard',
-//     'pageTitle': 'EMS',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.emsTaskReportManager,
-//     'route': 'ems_task_report_manager',
-//     'pageTitle': 'Task/Report Manager',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.lockManager,
-//     'route': 'lock_manager',
-//     'pageTitle': 'Lock Manager',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.ptwDashboard,
-//     'route': 'ptw_dashboard',
-//     'pageTitle': 'PTW',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.ptwWorkSiteManager,
-//     'route': 'ptw_work_site_manager',
-//     'pageTitle': 'Work Site Manager',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.ptwApplicationManager,
-//     'route': 'ptw_application_manager',
-//     'pageTitle': 'Application Manager',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.ptwWorkOrderManager,
-//     'route': 'ptw_work_order_manager',
-//     'pageTitle': 'Work Order Manager',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.ptwTaskReportManager,
-//     'route': 'ptw_task_report_manager',
-//     'pageTitle': 'Task/Report Manager',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.cameraManager,
-//     'route': 'camera_manager',
-//     'pageTitle': 'Camera Manager',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.vmDashboard,
-//     'route': 'vm_dashboard',
-//     'pageTitle': 'VM',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.vmEventManager,
-//     'route': 'vm_event_manager',
-//     'pageTitle': 'Event Manager',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.vmTaskReportManager,
-//     'route': 'vm_task_report_manager',
-//     'pageTitle': 'Task/Report Manager',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.fhDashboard,
-//     'route': 'fh_dashboard',
-//     'pageTitle': 'FH',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.fhEventManager,
-//     'route': 'fh_event_manager',
-//     'pageTitle': 'Event Manager',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.fhTaskReportManager,
-//     'route': 'fh_task_report_manager',
-//     'pageTitle': 'Task/Report Manager',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.bmsDashboard,
-//     'route': 'bms_dashboard',
-//     'pageTitle': 'BMS',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.amDashboard,
-//     'route': 'am_dashboard',
-//     'pageTitle': 'Asset Management',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.amScopeManager,
-//     'route': 'am_location_manager',
-//     'pageTitle': 'Location Manager',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.amDeviceManager,
-//     'route': 'am_device_manager',
-//     'pageTitle': 'Device Manager',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.pqDashboard,
-//     'route': 'pq_dashboard',
-//     'pageTitle': 'PQ',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.pqInsights,
-//     'route': 'pq_insights',
-//     'pageTitle': 'PQ Insights',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.ctLab,
-//     'route': 'ctlab',
-//     'pageTitle': 'CT Lab',
-//     'menueLabel': 'CT Lab',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.esDashboard,
-//     'route': 'es_dashboard',
-//     'pageTitle': 'ES',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.esInsights,
-//     'route': 'es_insights',
-//     'pageTitle': 'ES Insights',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.about,
-//     'route': 'about',
-//     'pageTitle': 'About',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.contact,
-//     'route': 'contact',
-//     'pageTitle': 'Contact',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.terms,
-//     'route': 'terms',
-//     'pageTitle': 'Terms',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.privacy,
-//     'route': 'privacy',
-//     'pageTitle': 'Privacy',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.help,
-//     'route': 'help',
-//     'pageTitle': 'Help',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.faq,
-//     'route': 'faq',
-//     'pageTitle': 'FAQ',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.feedback,
-//     'route': 'feedback',
-//     'pageTitle': 'Feedback',
-//   },
-//   {
-//     'pageRoute': PagPageRoute.none,
-//     'route': '',
-//     'pageTitle': '',
-//   },
-// ];
 
 String getRoute(PagPageRoute pageRoute) {
   String? route;

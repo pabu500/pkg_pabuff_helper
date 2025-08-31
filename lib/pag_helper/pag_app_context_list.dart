@@ -147,8 +147,9 @@ MdlPagAppContext appCtxFh = MdlPagAppContext(
   // ],
   routeList: [
     PagPageRoute.fhDashboard,
+    PagPageRoute.fhDeviceManager,
     PagPageRoute.fhEventManager,
-    PagPageRoute.fhTaskReportManager,
+    // PagPageRoute.fhTaskReportManager,
   ],
 );
 MdlPagAppContext appCtxAm = MdlPagAppContext(
@@ -200,7 +201,7 @@ MdlPagAppContext appCtxCm = MdlPagAppContext(
   //   getMenueItem(PagPageRoute.pqInsights),
   //   getMenueItem(PagPageRoute.ctLab)
   // ],
-  routeList: [PagPageRoute.cmDashboard, PagPageRoute.cmManager],
+  routeList: [PagPageRoute.cmDashboard, PagPageRoute.cmDeviceManager],
 );
 // final PagAppContext ctlab = PagAppContext(
 //   name: 'ctlab',

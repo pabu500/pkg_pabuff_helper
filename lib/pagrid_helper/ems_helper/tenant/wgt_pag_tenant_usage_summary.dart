@@ -10,7 +10,7 @@ import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../pag_helper/model/mdl_pag_app_config.dart';
 import '../usage/usage_stat_helper.dart';
-import '../usage/wgt_pag_group_stat_core.dart';
+import '../../../pag_helper/wgt/app/ems/wgt_pag_group_stat_core.dart';
 import '../usage/wgt_pag_meter_stat_core.dart';
 import 'mdl_ems_type_usage.dart';
 

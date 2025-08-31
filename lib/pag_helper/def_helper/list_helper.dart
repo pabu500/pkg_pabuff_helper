@@ -6,6 +6,7 @@ enum PagListContextType {
   scada,
   soa,
   none,
+  fh,
   paymentMatching,
 }
 

@@ -5,7 +5,7 @@ import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pag_helper/model/mdl_svc_query.dart';
 import 'package:http/http.dart' as http;
-import 'package:buff_helper/pkg_buff_helper.dart';
+import 'package:buff_helper/pkg_buff_helper.dart' hide MdlPagSvcClaim;
 
 Future<dynamic> doPagPostJob(
   MdlPagAppConfig appConfig,

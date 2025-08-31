@@ -119,7 +119,7 @@ class MdlPagOpController {
     }
   }
 
-  Future<dynamic> checkOpList(SvcClaim svcClaim,
+  Future<dynamic> checkOpList(MdlPagSvcClaim svcClaim,
       {Color? itemColor, Color? dbColor}) async {
     String currentValKey = 'pre_edit_$opField';
     String currentValTitle =

@@ -7,6 +7,9 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:buff_helper/pkg_buff_helper.dart';
 
+import '../../model/acl/mdl_pag_svc_claim.dart';
+import '../../model/mdl_svc_query.dart';
+
 Future<dynamic> doLoadVendorCredential(
     MdlPagAppConfig appConfig, MdlPagUser loggedInUser) async {
   //get ct_lab access token
@@ -18,7 +21,7 @@ Future<dynamic> doLoadVendorCredential(
       {
         'user_id': loggedInUser.id.toString(),
       },
-      SvcClaim(
+      MdlPagSvcClaim(
         userId: loggedInUser.id,
         username: loggedInUser.username,
         scope: '',
@@ -50,7 +53,7 @@ Future<dynamic> getCtLabAccessToken(
   MdlPagAppConfig appConfig,
   MdlPagUser? loggedInUser,
   Map<String, dynamic> queryMap,
-  SvcClaim svcClaim,
+  MdlPagSvcClaim svcClaim,
 ) async {
   svcClaim.svcName = PagSvcType.oresvc2.name;
   svcClaim.endpoint = PagUrlBase.eptCtLabGetAccessToken;
@@ -69,7 +72,7 @@ Future<dynamic> getCtLabAccessToken(
       'Content-Type': 'application/json; charset=UTF-8',
       'Authorization': 'Bearer $svcToken',
     },
-    body: jsonEncode(SvcQuery(svcClaim, queryMap).toJson()),
+    body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
   );
 
   try {
@@ -94,7 +97,7 @@ Future<dynamic> getTrending(
   MdlPagAppConfig appConfig,
   MdlPagUser? loggedInUser,
   Map<String, dynamic> queryMap,
-  SvcClaim svcClaim,
+  MdlPagSvcClaim svcClaim,
 ) async {
   svcClaim.svcName = PagSvcType.oresvc2.name;
   svcClaim.endpoint = PagUrlBase.eptCtLabGetTrending;
@@ -113,7 +116,7 @@ Future<dynamic> getTrending(
       'Content-Type': 'application/json; charset=UTF-8',
       'Authorization': 'Bearer $svcToken',
     },
-    body: jsonEncode(SvcQuery(svcClaim, queryMap).toJson()),
+    body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
   );
 
   try {
@@ -136,7 +139,7 @@ Future<dynamic> getEventList(
   MdlPagAppConfig appConfig,
   MdlPagUser? loggedInUser,
   Map<String, dynamic> queryMap,
-  SvcClaim svcClaim,
+  MdlPagSvcClaim svcClaim,
 ) async {
   svcClaim.svcName = PagSvcType.oresvc2.name;
   svcClaim.endpoint = PagUrlBase.eptCtLabGetEventList;
@@ -155,7 +158,7 @@ Future<dynamic> getEventList(
       'Content-Type': 'application/json; charset=UTF-8',
       'Authorization': 'Bearer $svcToken',
     },
-    body: jsonEncode(SvcQuery(svcClaim, queryMap).toJson()),
+    body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
   );
 
   try {

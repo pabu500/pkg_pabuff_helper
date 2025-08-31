@@ -141,7 +141,7 @@ class PagDataProvider extends ChangeNotifier {
         pagAppConfig,
         loggedInUser,
         reqMap,
-        SvcClaim(
+        MdlPagSvcClaim(
           userId: loggedInUser.id,
           username: loggedInUser.username,
           scope: '',
