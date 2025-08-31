@@ -50,13 +50,13 @@ Future<dynamic> getFhStat(
   }
 }
 
-Future<dynamic> getDeviceHealth(
+Future<dynamic> getDeviceHealthInfo(
   MdlPagAppConfig appConfig,
   Map<String, dynamic> queryMap,
   MdlPagSvcClaim svcClaim,
 ) async {
   svcClaim.svcName = PagSvcType.oresvc2.name;
-  svcClaim.endpoint = PagUrlBase.eptUpdateMetrGroupMeterList;
+  svcClaim.endpoint = PagUrlBase.eptGetDeviceHealthInfo;
 
   String svcToken = '';
   // try {
@@ -78,9 +78,33 @@ Future<dynamic> getDeviceHealth(
   if (response.statusCode == 200) {
     final respJson = jsonDecode(response.body);
     if (respJson['error'] != null) {
+      final error = respJson['error'];
+      final code = error['code'] ?? 'unknown';
+      final message = error['message'] ?? '';
+      if (code == ApiCode.resultNotFound.code) {
+        return <String, dynamic>{
+          'info': 'Device not found',
+          'message': message,
+        };
+      }
       throw Exception(respJson['error']);
     }
-    return respJson['data'];
+    final data = respJson['data'];
+    if (data == null) {
+      throw Exception('Failed to get response data');
+    }
+    final result = data['result'];
+    if (result == null) {
+      throw Exception("No result found in the response");
+    }
+    String? resultKey = data['result_key'];
+    if (resultKey == null && resultKey!.isEmpty) {
+      throw Exception("Error: $resultKey");
+    }
+    if (result[resultKey] == null) {
+      throw Exception("No data found in the response");
+    }
+    return result[resultKey];
   } else if (response.statusCode == 403) {
     throw Exception("You are not authorized to perform this operation");
   } else {

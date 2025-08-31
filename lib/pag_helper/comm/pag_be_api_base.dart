@@ -5,6 +5,18 @@ import 'package:flutter/foundation.dart';
 
 enum PagSvcType { usersvc2, oresvc2 }
 
+enum ApiCode {
+  requestMissingParameter('REQUEST_MISSING_PARAMETER'),
+  resultGenericError('RESULT_GENERIC_ERROR'),
+  resultNotFound('RESULT_NOT_FOUND'),
+  unknownError('UNKNOWN_ERROR'),
+  ;
+
+  const ApiCode(this.code);
+
+  final String code;
+}
+
 class PagUrlController {
   late PagPortalProjectScope _activePortalProjectScope;
   PagPortalProjectScope get activePortalProjectScope =>
@@ -356,6 +368,7 @@ class PagUrlBase {
 
   //fh
   static const String eptGetFhStat = '/fh/get_stat';
+  static const String eptGetDeviceHealthInfo = '/fh/get_device_health_info';
 
   //ptw
   static const String eptGetDashboardPtwEventList =
