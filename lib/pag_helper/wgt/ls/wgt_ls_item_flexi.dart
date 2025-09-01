@@ -14,7 +14,6 @@ import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
 import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_scope.dart';
 import 'package:buff_helper/pag_helper/wgt/app/am/wgt_am_meter_group_assignment.dart';
-import 'package:buff_helper/pag_helper/wgt/app/ems/wgt_match_payment.dart';
 import 'package:buff_helper/pag_helper/wgt/app/ems/wgt_meter_group_assignment2.dart';
 import 'package:buff_helper/pagrid_helper/comm_helper/local_storage.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/wgt_pag_composite_bill_view.dart';
@@ -1217,7 +1216,10 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           appConfig: widget.appConfig,
           loggedInUser: loggedInUser!,
           paymentMatchInfo: item,
-          tenantInfo: {'tenant_id': item['tenant_id']},
+          tenantInfo: {
+            'tenant_name': item['tenant_name'],
+            'tenant_label': item['tenant_label'],
+          },
           regFresh: (doRefreshItem) {
             item['is_comm'] = doRefreshItem;
           },

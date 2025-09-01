@@ -3,8 +3,6 @@ import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
-import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/wgt_pag_composite_bill_view.dart';
-import 'package:buff_helper/xt_ui/xt_helpers.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as dev;
 
@@ -49,7 +47,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
   // late final String paymentValueDate = matchedPaymentInfo['value_timestamp'];
   // // only get the date from the time
   // late final String paymentValueDateOnly = paymentValueDate.split(' ').first;
-  late final String tenantIdStr = widget.tenantInfo['tenant_id'];
+  late final String tenantName = widget.tenantInfo['tenant_name'];
 
   bool _isFetchingBillList = false;
   bool _billListFetchTried = false;
@@ -66,7 +64,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
     Map<String, dynamic> queryMap = {
       'scope': widget.loggedInUser.selectedScope.toScopeMap(),
       'item_kind': PagItemKind.bill.name,
-      'tenant_id': tenantIdStr,
+      't.name': tenantName,
     };
 
     try {
