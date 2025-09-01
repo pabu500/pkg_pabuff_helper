@@ -35,6 +35,7 @@ import 'package:provider/provider.dart';
 
 import '../../comm/comm_list.dart';
 import '../../model/mdl_pag_app_config.dart';
+import '../app/ems/wgt_match_one_payment2.dart';
 import '../app/ems/wgt_tenant_soa.dart';
 import '../app/fh/wgt_pag_device_health.dart';
 import '../job/wgt_job_type_op_panel.dart';
@@ -1216,6 +1217,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           appConfig: widget.appConfig,
           loggedInUser: loggedInUser!,
           paymentMatchInfo: item,
+          tenantInfo: {'tenant_id': item['tenant_id']},
           regFresh: (doRefreshItem) {
             item['is_comm'] = doRefreshItem;
           },
@@ -1572,12 +1574,14 @@ class WgtPaymentMatchOpItem extends StatefulWidget {
     super.key,
     required this.appConfig,
     required this.loggedInUser,
+    required this.tenantInfo,
     required this.paymentMatchInfo,
     this.regFresh,
   });
 
   final MdlPagAppConfig appConfig;
   final MdlPagUser loggedInUser;
+  final Map<String, dynamic> tenantInfo;
   final Map<String, dynamic> paymentMatchInfo;
   final void Function(void Function(bool isComm, bool isEnabled))? regFresh;
 
@@ -1617,9 +1621,10 @@ class _WgtPaymentMatchOpItemState extends State<WgtPaymentMatchOpItem> {
                 : () {
                     xtShowModelBottomSheet(
                       context,
-                      WgtMatchOnePayment(
+                      WgtMatchOnePayment2(
                         appConfig: widget.appConfig,
                         loggedInUser: widget.loggedInUser,
+                        tenantInfo: widget.tenantInfo,
                         paymentMatchingInfo: widget.paymentMatchInfo,
                       ),
                       onClosed: () {},

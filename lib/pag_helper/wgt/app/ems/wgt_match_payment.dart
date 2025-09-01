@@ -33,7 +33,9 @@ class _WgtMatchOnePaymentState extends State<WgtMatchOnePayment> {
   late final matchedPaymentInfo =
       widget.paymentMatchingInfo['matched_payment_info'];
   late final String billingRecId = matchedPaymentInfo['billing_rec_id'];
-  late final String billingLcStatus = matchedPaymentInfo['lc_status'];
+  late final String billingLcStatusStr =
+      matchedPaymentInfo['billing_lc_status'];
+  late final String paymentLcStatusStr = matchedPaymentInfo['lc_status'];
   late final String paymentAmount = matchedPaymentInfo['amount'];
   late final String paymentValueDate = matchedPaymentInfo['value_timestamp'];
   // only get the date from the time
@@ -71,11 +73,9 @@ class _WgtMatchOnePaymentState extends State<WgtMatchOnePayment> {
             appConfig: widget.appConfig,
             loggedInUser: widget.loggedInUser,
             billingRecIndexStr: billingRecId,
-            defaultBillLcStatusStr: billingLcStatus,
-            modes: const ['widget', 'pdf'],
-            genTypes: billingLcStatus == 'released' || billingLcStatus == 'pv'
-                ? const ['generated', 'released']
-                : const ['generated'],
+            defaultBillLcStatusStr: billingLcStatusStr,
+            modes: const ['wgt', 'pdf'],
+            genTypes: const ['released'],
           ),
         ],
       ),
