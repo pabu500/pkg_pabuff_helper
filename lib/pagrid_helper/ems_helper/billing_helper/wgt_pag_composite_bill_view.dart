@@ -119,8 +119,11 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     _showGenTypeSwitch = widget.genTypes.length > 1;
     _showRenderModeSwitch = widget.modes.length > 1;
     _renderMode = widget.modes[0];
+
     if (_lcStatusDisplay == 'released') {
-      _renderMode = 'pdf';
+      // _renderMode = 'pdf';
+      // temp to put wgt till pdf template is ready
+      _renderMode = 'wgt';
     }
 
     MdlPagProjectProfile selectedProjectProfile =

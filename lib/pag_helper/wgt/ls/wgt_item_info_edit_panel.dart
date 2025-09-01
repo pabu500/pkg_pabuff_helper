@@ -249,7 +249,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
     if (value == null) {
       return null;
     }
-    //alphanumeric, 5-55
+    //alphanumeric, 2-55
     final RegExp alphanumeric = RegExp(r'^[a-zA-Z0-9]+$');
     if (!alphanumeric.hasMatch(value)) {
       return 'Tag must be alphanumeric';

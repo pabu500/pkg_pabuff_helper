@@ -166,6 +166,7 @@ class _WgtPagTenantCompositeUsageSummaryState
                             setState(() {
                               _lcStatusOpsKey = UniqueKey();
                               _billInfo['lc_status'] = newStatus.value;
+                              _isDisabled = newStatus == PagBillingLcStatus.pv;
                             });
                             widget.onUpdate?.call();
                           },
