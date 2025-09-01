@@ -94,7 +94,7 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
 
 class _WgtPagTenantCompositeUsageSummaryState
     extends State<WgtPagTenantCompositeUsageSummary> {
-  final double statWidth = 800;
+  final double statWidth = 850;
 
   final List<String> _meterTypes = ['E', 'W', 'B', 'N', 'G'];
 

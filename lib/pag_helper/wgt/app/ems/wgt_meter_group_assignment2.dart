@@ -435,7 +435,7 @@ class _WgtMeterGroupAssignment2State extends State<WgtMeterGroupAssignment2> {
           label: 'Check All Assignments',
           hight: 35,
           labelStyle: TextStyle(
-            color: Theme.of(context).hintColor,
+            color: Theme.of(context).colorScheme.onSecondary,
             fontSize: 15,
           ),
           onPressed: _isAllAssignmentInfoFetched
@@ -959,7 +959,7 @@ class _WgtMeterGroupAssignmentItemState
           ? WgtCommButton(
               label: 'Check Assignment',
               labelStyle: TextStyle(
-                color: Theme.of(context).hintColor,
+                color: Theme.of(context).colorScheme.onSecondary,
                 fontSize: 13.5,
               ),
               width: barWidth + margin,

@@ -254,8 +254,8 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
     if (!alphanumeric.hasMatch(value)) {
       return 'Tag must be alphanumeric';
     }
-    if (value.length < 5 || value.length > 55) {
-      return 'Tag must be between 5 and 55 characters';
+    if (value.length < 2 || value.length > 55) {
+      return 'Tag must be between 2 and 55 characters';
     }
     return null;
   }
