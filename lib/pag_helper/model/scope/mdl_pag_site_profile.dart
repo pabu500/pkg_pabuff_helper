@@ -36,12 +36,15 @@ class MdlPagSiteProfile {
     this.isAllBuildings = false,
   });
 
-  bool equals(MdlPagSiteProfile? siteProfile) {
-    if (siteProfile == null) {
-      return false;
-    }
-    return id == siteProfile.id;
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is MdlPagSiteProfile && other.id == id && other.name == name;
   }
+
+  @override
+  int get hashCode => Object.hash(id, name);
 
   int getBuildingCount() {
     return buildingProfileList.length;

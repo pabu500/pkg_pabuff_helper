@@ -63,6 +63,47 @@ class MdlPagScope {
     return projectName;
   }
 
+  List<Map<String, dynamic>> getScopeChain() {
+    List<Map<String, dynamic>> scopeChain = [];
+    if (projectLabel != null) {
+      scopeChain.add({
+        'type': PagScopeType.project,
+        'label': projectLabel ?? projectName,
+      });
+    }
+    if (siteGroupLabel != null) {
+      scopeChain.add({
+        'type': PagScopeType.siteGroup,
+        'label': siteGroupLabel ?? siteGroupName,
+      });
+    }
+    if (siteLabel != null) {
+      scopeChain.add({
+        'type': PagScopeType.site,
+        'label': siteLabel ?? siteName,
+      });
+    }
+    if (buildingLabel != null) {
+      scopeChain.add({
+        'type': PagScopeType.building,
+        'label': buildingLabel ?? buildingName,
+      });
+    }
+    if (locationGroupLabel != null) {
+      scopeChain.add({
+        'type': PagScopeType.locationGroup,
+        'label': locationGroupLabel ?? locationGroupName,
+      });
+    }
+    if (locationLabel != null) {
+      scopeChain.add({
+        'type': PagScopeType.location,
+        'label': locationLabel ?? locationName,
+      });
+    }
+    return scopeChain;
+  }
+
   PagScopeType getScopeType() {
     if (locationId != null || locationName != null) {
       return PagScopeType.location;

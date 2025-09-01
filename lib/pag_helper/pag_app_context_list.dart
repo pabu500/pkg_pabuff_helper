@@ -147,8 +147,9 @@ MdlPagAppContext appCtxFh = MdlPagAppContext(
   // ],
   routeList: [
     PagPageRoute.fhDashboard,
+    PagPageRoute.fhDeviceManager,
     PagPageRoute.fhEventManager,
-    PagPageRoute.fhTaskReportManager,
+    // PagPageRoute.fhTaskReportManager,
   ],
 );
 MdlPagAppContext appCtxAm = MdlPagAppContext(
@@ -187,6 +188,20 @@ MdlPagAppContext appCtxQq = MdlPagAppContext(
     PagPageRoute.pqInsights,
     PagPageRoute.ctLab,
   ],
+);
+MdlPagAppContext appCtxCm = MdlPagAppContext(
+  name: 'cm',
+  label: 'Condition Monitoring',
+  shortLabel: 'CM',
+  route: 'cm_dashboard',
+  appContextType: PagAppContextType.cm,
+  routeType: PagAppRouteType.route,
+  // menuRouteList: [
+  //   getMenueItem(PagPageRoute.pqDashboard),
+  //   getMenueItem(PagPageRoute.pqInsights),
+  //   getMenueItem(PagPageRoute.ctLab)
+  // ],
+  routeList: [PagPageRoute.cmDashboard, PagPageRoute.cmDeviceManager],
 );
 // final PagAppContext ctlab = PagAppContext(
 //   name: 'ctlab',
@@ -228,6 +243,7 @@ final List<MdlPagAppContext> appContextList = [
   appCtxPtw,
   appCtxVm,
   appCtxBms,
+  appCtxCm,
   appCtxQq,
   appCtxEs,
   // ctlab,

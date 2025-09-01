@@ -14,7 +14,7 @@ import 'package:buff_helper/pag_helper/comm/pag_be_api_base.dart';
 Future<dynamic> doPagCheckOpList(
   MdlPagAppConfig appConfig,
   MdlPagUser? loggedInUser,
-  SvcClaim svcClaim,
+  MdlPagSvcClaim svcClaim,
   Map<String, dynamic> queryMap,
 ) async {
   svcClaim.svcName = PagSvcType.oresvc2.name;
@@ -34,7 +34,7 @@ Future<dynamic> doPagCheckOpList(
       'Content-Type': 'application/json; charset=UTF-8',
       'Authorization': 'Bearer $svcToken',
     },
-    body: jsonEncode(SvcQuery(svcClaim, queryMap).toJson()),
+    body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
   );
 
   if (response.statusCode == 200) {
@@ -110,7 +110,7 @@ Future<dynamic> doOpSingleKeyValUpdate(
   List<Map<String, dynamic>> opList,
   DateTime? scheduledTime,
   String projectScope,
-  SvcClaim svcClaim,
+  MdlPagSvcClaim svcClaim,
 ) async {
   svcClaim.svcName = PagSvcType.oresvc2.name;
   svcClaim.endpoint = PagUrlBase.eptDoOpUpdateSingleKeyVal;
@@ -134,7 +134,7 @@ Future<dynamic> doOpSingleKeyValUpdate(
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $svcToken',
       },
-      body: jsonEncode(SvcQuery(svcClaim, <String, dynamic>{
+      body: jsonEncode(MdlPagSvcQuery(svcClaim, <String, dynamic>{
         'op_name': opName,
         'item_type': itemType.name,
         'item_id_type': itemIdType != null ? itemIdType.name : '',

@@ -105,121 +105,126 @@ class _WgtPagTenantCompositeUsageSummaryReleasedState
     String lcStatus = _billInfo['lc_status'] ?? '';
     PagBillingLcStatus currentStatus = PagBillingLcStatus.byValue(lcStatus);
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 13),
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: Theme.of(context).hintColor,
-            width: 1,
+    return Opacity(
+      opacity: _isDisabled ? 0.5 : 1.0,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 13),
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Theme.of(context).hintColor,
+              width: 1,
+            ),
+            borderRadius: BorderRadius.circular(5),
           ),
-          borderRadius: BorderRadius.circular(5),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 13),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Stack(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [getBillTitleRow()],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    WgtPagBillLcStatusOp(
-                      key: _lcStatusOpsKey,
-                      appConfig: widget.appConfig,
-                      loggedInUser: widget.loggedInUser,
-                      billInfo: _billInfo,
-                      initialStatus: currentStatus,
-                      onCommitted: (newStatus) {
-                        setState(() {
-                          _lcStatusOpsKey = UniqueKey();
-                          _billInfo['lc_status'] = newStatus.value;
-                        });
-                        widget.onUpdate?.call();
-                      },
-                    )
-                  ],
-                ),
-              ],
-            ),
-            const Divider(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                getPagUsageTitle(
-                  context,
-                  widget.fromDatetime,
-                  widget.toDatetime,
-                  widget.isMonthly,
-                  widget.tenantLabel,
-                  widget.tenantName,
-                  widget.tenantAccountId,
-                ),
-                getPagUsageTypeTopStat(
-                  costDecimals: widget.costDecimals,
-                  context,
-                  widget.isBillMode,
-                  widget.compositeUsageCalc!.typeUsageE!.usageFactored,
-                  widget.compositeUsageCalc!.typeUsageE!.cost,
-                  widget.compositeUsageCalc!.typeUsageW!.usageFactored,
-                  widget.compositeUsageCalc!.typeUsageW!.cost,
-                  widget.compositeUsageCalc!.typeUsageB!.usageFactored,
-                  widget.compositeUsageCalc!.typeUsageB!.cost,
-                  widget.compositeUsageCalc!.typeUsageN!.usageFactored,
-                  widget.compositeUsageCalc!.typeUsageN!.cost,
-                  widget.compositeUsageCalc!.typeUsageG!.usageFactored,
-                  widget.compositeUsageCalc!.typeUsageG!.cost,
-                ),
-              ],
-            ),
-            Divider(color: Theme.of(context).hintColor),
-            // widget.excludeAutoUsage
-            //     ? getAutoUsageExcludedInfo(context)
-            //     : getAutoUsage(),
-            verticalSpaceSmall,
-            // getManualUsage(),
-            // verticalSpaceSmall,
-            // getSubTenantUsage(),
-            // verticalSpaceSmall,
-            verticalSpaceSmall,
-            // getPagTypeUsageNet(
-            //   context,
-            //   widget.loggedInUser,
-            //   widget.appConfig,
-            //   widget.compositeUsageCalc!.typeUsageE!.usageFactored,
-            //   widget.compositeUsageCalc!.typeUsageE!.rate,
-            //   widget.compositeUsageCalc!.typeUsageW!.usageFactored,
-            //   widget.compositeUsageCalc!.typeUsageW!.rate,
-            //   widget.compositeUsageCalc!.typeUsageB!.usageFactored,
-            //   widget.compositeUsageCalc!.typeUsageB!.rate,
-            //   widget.compositeUsageCalc!.typeUsageN!.usageFactored,
-            //   widget.compositeUsageCalc!.typeUsageN!.rate,
-            //   widget.compositeUsageCalc!.typeUsageG!.usageFactored,
-            //   widget.compositeUsageCalc!.typeUsageG!.rate,
-            //   usageDecimals: widget.usageDecimals,
-            //   rateDecimals: widget.rateDecimals,
-            //   costDecimals: widget.costDecimals,
-            // ),
-            getTypeStat(),
-            verticalSpaceSmall,
-            // getLineItem(),
-            // verticalSpaceSmall,
-            if (widget.isBillMode)
-              getTotal2(
-                context,
-                widget.gst!,
-                widget.compositeUsageCalc!.subTotalCost,
-                widget.compositeUsageCalc!.gstAmount,
-                widget.compositeUsageCalc!.totalCost,
-                widget.tenantType,
+          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 13),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Stack(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [getBillTitleRow()],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      WgtPagBillLcStatusOp(
+                        key: _lcStatusOpsKey,
+                        appConfig: widget.appConfig,
+                        loggedInUser: widget.loggedInUser,
+                        billInfo: _billInfo,
+                        initialStatus: currentStatus,
+                        onCommitted: (newStatus) {
+                          setState(() {
+                            _lcStatusOpsKey = UniqueKey();
+                            _billInfo['lc_status'] = newStatus.value;
+                            _isDisabled =
+                                newStatus == PagBillingLcStatus.generated;
+                          });
+                          widget.onUpdate?.call();
+                        },
+                      )
+                    ],
+                  ),
+                ],
               ),
-          ],
+              const Divider(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  getPagUsageTitle(
+                    context,
+                    widget.fromDatetime,
+                    widget.toDatetime,
+                    widget.isMonthly,
+                    widget.tenantLabel,
+                    widget.tenantName,
+                    widget.tenantAccountId,
+                  ),
+                  getPagUsageTypeTopStat(
+                    costDecimals: widget.costDecimals,
+                    context,
+                    widget.isBillMode,
+                    widget.compositeUsageCalc!.typeUsageE!.usageFactored,
+                    widget.compositeUsageCalc!.typeUsageE!.cost,
+                    widget.compositeUsageCalc!.typeUsageW!.usageFactored,
+                    widget.compositeUsageCalc!.typeUsageW!.cost,
+                    widget.compositeUsageCalc!.typeUsageB!.usageFactored,
+                    widget.compositeUsageCalc!.typeUsageB!.cost,
+                    widget.compositeUsageCalc!.typeUsageN!.usageFactored,
+                    widget.compositeUsageCalc!.typeUsageN!.cost,
+                    widget.compositeUsageCalc!.typeUsageG!.usageFactored,
+                    widget.compositeUsageCalc!.typeUsageG!.cost,
+                  ),
+                ],
+              ),
+              Divider(color: Theme.of(context).hintColor),
+              // widget.excludeAutoUsage
+              //     ? getAutoUsageExcludedInfo(context)
+              //     : getAutoUsage(),
+              verticalSpaceSmall,
+              // getManualUsage(),
+              // verticalSpaceSmall,
+              // getSubTenantUsage(),
+              // verticalSpaceSmall,
+              verticalSpaceSmall,
+              // getPagTypeUsageNet(
+              //   context,
+              //   widget.loggedInUser,
+              //   widget.appConfig,
+              //   widget.compositeUsageCalc!.typeUsageE!.usageFactored,
+              //   widget.compositeUsageCalc!.typeUsageE!.rate,
+              //   widget.compositeUsageCalc!.typeUsageW!.usageFactored,
+              //   widget.compositeUsageCalc!.typeUsageW!.rate,
+              //   widget.compositeUsageCalc!.typeUsageB!.usageFactored,
+              //   widget.compositeUsageCalc!.typeUsageB!.rate,
+              //   widget.compositeUsageCalc!.typeUsageN!.usageFactored,
+              //   widget.compositeUsageCalc!.typeUsageN!.rate,
+              //   widget.compositeUsageCalc!.typeUsageG!.usageFactored,
+              //   widget.compositeUsageCalc!.typeUsageG!.rate,
+              //   usageDecimals: widget.usageDecimals,
+              //   rateDecimals: widget.rateDecimals,
+              //   costDecimals: widget.costDecimals,
+              // ),
+              getTypeStat(),
+              verticalSpaceSmall,
+              // getLineItem(),
+              // verticalSpaceSmall,
+              if (widget.isBillMode)
+                getTotal2(
+                  context,
+                  widget.gst!,
+                  widget.compositeUsageCalc!.subTotalCost,
+                  widget.compositeUsageCalc!.gstAmount,
+                  widget.compositeUsageCalc!.totalCost,
+                  widget.tenantType,
+                ),
+            ],
+          ),
         ),
       ),
     );

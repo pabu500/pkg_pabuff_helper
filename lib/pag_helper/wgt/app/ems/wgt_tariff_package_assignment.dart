@@ -443,7 +443,7 @@ class _WgtTariffPackageAssignmentState
     PagScopeType itemScopeType = widget.itemScope.getScopeType();
     Widget scopeIcon = getScopeIcon(context, itemScopeType, size: 21);
     BoxDecoration boxDecoration = BoxDecoration(
-      border: Border.all(color: Theme.of(context).hintColor.withAlpha(50)),
+      border: Border.all(color: Theme.of(context).hintColor, width: 1.5),
       borderRadius: BorderRadius.circular(5),
     );
     return Row(
@@ -466,31 +466,34 @@ class _WgtTariffPackageAssignmentState
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         horizontalSpaceSmall,
-        Container(
-          decoration: boxDecoration,
-          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              scopeIcon,
-              horizontalSpaceTiny,
-              Text(tariffPackageScopeLabel),
-            ],
-          ),
-        ),
+        // Container(
+        //   decoration: boxDecoration,
+        //   padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+        //   child: Row(
+        //     mainAxisSize: MainAxisSize.min,
+        //     children: [
+        //       scopeIcon,
+        //       horizontalSpaceTiny,
+        //       Text(tariffPackageScopeLabel),
+        //     ],
+        //   ),
+        // ),
+        getScopeLabel(context, widget.itemScope),
         horizontalSpaceSmall,
         Container(
           // width: 20,
           decoration: boxDecoration,
           padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-          child: Text(widget.meterType),
+          child: Text(widget.meterType,
+              style: const TextStyle(fontWeight: FontWeight.bold)),
         ),
         horizontalSpaceSmall,
         Container(
           // width: 60,
           decoration: boxDecoration,
           padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-          child: Text(widget.tariffPackageTypeLabel),
+          child: Text(widget.tariffPackageTypeLabel,
+              style: const TextStyle(fontWeight: FontWeight.bold)),
         ),
       ],
     );

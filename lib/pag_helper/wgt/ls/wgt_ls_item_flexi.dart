@@ -15,6 +15,7 @@ import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_scope.dart';
 import 'package:buff_helper/pag_helper/wgt/app/am/wgt_am_meter_group_assignment.dart';
 import 'package:buff_helper/pag_helper/wgt/app/ems/wgt_match_payment.dart';
+import 'package:buff_helper/pag_helper/wgt/app/ems/wgt_meter_group_assignment2.dart';
 import 'package:buff_helper/pagrid_helper/comm_helper/local_storage.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/wgt_pag_composite_bill_view.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_ems_type_usage_calc.dart';
@@ -35,10 +36,10 @@ import 'package:provider/provider.dart';
 import '../../comm/comm_list.dart';
 import '../../model/mdl_pag_app_config.dart';
 import '../app/ems/wgt_tenant_soa.dart';
+import '../app/fh/wgt_pag_device_health.dart';
 import '../job/wgt_job_type_op_panel.dart';
 import 'wgt_item_info_edit_panel.dart';
 import 'wgt_list_pane.dart';
-import '../app/ems/wgt_meter_group_assignment.dart';
 import 'wgt_pag_item_finder_flexi.dart';
 import '../app/ems/wgt_tariff_package_assignment.dart';
 import '../app/ems/wgt_tenant_assignment.dart';
@@ -336,10 +337,10 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       return;
     }
 
-    bool hasInfoColumn = false;
+    bool hasInfoViewEditColumn = false;
     for (var col in listController.listColControllerList) {
       if (col.colKey == 'info') {
-        hasInfoColumn = true;
+        hasInfoViewEditColumn = true;
         break;
       }
     }
@@ -350,12 +351,19 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         break;
       }
     }
+    bool hasDetailColumn = false;
+    for (var col in listController.listColControllerList) {
+      if (col.colKey == 'detail') {
+        hasDetailColumn = true;
+        break;
+      }
+    }
 
     // if (_selectedListController == null) {
     //   return;
     // }
 
-    bool addInfoColumn = true;
+    bool addInfoViewEditColumn = true;
     bool isEmsDeviceLs = widget.pagAppContext! == appCtxEms &&
         widget.itemKind == PagItemKind.device;
     bool isEmsMeterUsage = widget.pagAppContext! == appCtxEms &&
@@ -369,17 +377,23 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         widget.itemKind == PagItemKind.scope;
     bool isSoa = widget.listContextType == PagListContextType.soa;
     bool isPp = widget.listContextType == PagListContextType.paymentMatching;
+    bool isCmDeviceLs = widget.pagAppContext! == appCtxCm &&
+        widget.itemKind == PagItemKind.device;
+    bool isFhDevice = widget.pagAppContext! == appCtxFh &&
+        widget.itemKind == PagItemKind.device;
     if (isEmsDeviceLs ||
         isEmsMeterUsage ||
         isEmsTenantUsage ||
         isEsInsights ||
         isBill ||
         isSoa ||
-        isPp) {
-      addInfoColumn = false;
+        isPp ||
+        isCmDeviceLs ||
+        isFhDevice) {
+      addInfoViewEditColumn = false;
     }
-    if (hasInfoColumn) {
-      addInfoColumn = false;
+    if (hasInfoViewEditColumn) {
+      addInfoViewEditColumn = false;
     }
     bool addOpColumn = false;
     if (widget.itemKind == PagItemKind.jobType ||
@@ -423,17 +437,23 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     if (widget.listContextType == PagListContextType.paymentMatching) {
       addMatchPaymentColumn = true;
     }
+    bool addDeviceHealthColumn = false;
+    if (widget.itemKind == PagItemKind.device &&
+        widget.listContextType == PagListContextType.fh) {
+      addDeviceHealthColumn = true;
+    }
 
     if (hasOpColumn) {
       addOpColumn = false;
     }
 
-    if (addInfoColumn) {
+    if (addInfoViewEditColumn) {
       _addInfoColumn(listController, addOpColumn);
     }
     if (addOpColumn) {
       _addOpColumn(listController);
     }
+
     if (addMeterUsageColumn) {
       _addMeterUsageColumn(listController);
     }
@@ -447,7 +467,10 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       _addViewSoAColumn(listController);
     }
     if (addMatchPaymentColumn) {
-      _addMatchPaymentColumn2(listController);
+      _addMatchPaymentColumn(listController);
+    }
+    if (addDeviceHealthColumn && !hasDetailColumn) {
+      _addDeviceHealthColumn(listController);
     }
   }
 
@@ -820,12 +843,13 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                           },
                         );
                       case PagItemKind.meterGroup:
-                        opWidget = WgtMeterGroupAssignment(
+                        opWidget = WgtMeterGroupAssignment2(
                           appConfig: widget.appConfig,
                           itemGroupIndexStr: item['id'],
                           itemName: item['name'],
                           itemLabel: item['label'] ?? '',
                           meterType: item['meter_type'] ?? '',
+                          itemInfo: item,
                           itemScope: itemScope,
                           onUpdate: () {
                             setState(() {
@@ -1100,7 +1124,10 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                         loggedInUser: loggedInUser!,
                         billingRecIndexStr: item['id'],
                         defaultBillLcStatus: item['lc_status'],
-                        modes: const ['widget', 'pdf'],
+                        modes: item['lc_status'] == 'released' ||
+                                item['lc_status'] == 'pv'
+                            ? const ['wgt', 'pdf']
+                            : const ['wgt'],
                         genTypes: item['lc_status'] == 'released' ||
                                 item['lc_status'] == 'pv'
                             ? const ['generated', 'released']
@@ -1185,49 +1212,6 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       colWidth: 55,
       colWidgetType: PagColWidgetType.CUSTOM,
       getCustomWidget: (item, fullList) {
-        bool showDetail = true;
-
-        final onItemComm = (bool isComm) {};
-        item['on_item_comm'] = onItemComm;
-        return Padding(
-          padding: const EdgeInsets.only(right: 0),
-          child: InkWell(
-            onTap: !showDetail
-                ? null
-                : () {
-                    xtShowModelBottomSheet(
-                      context,
-                      WgtTenantSoA(
-                        appConfig: widget.appConfig,
-                        loggedInUser: loggedInUser!,
-                        teneantInfo: item,
-                      ),
-                      onClosed: () {},
-                    );
-                  },
-            child: Icon(
-              Symbols.payments,
-              color: showDetail
-                  ? Theme.of(context).colorScheme.primary.withAlpha(200)
-                  : Theme.of(context).hintColor.withAlpha(130),
-            ),
-          ),
-        );
-      },
-    );
-    listController.listColControllerList.insert(0, appCtxCol);
-  }
-
-  void _addMatchPaymentColumn2(MdlPagListController listController) {
-    MdlListColController appCtxCol = MdlListColController(
-      colKey: 'detail',
-      colTitle: 'Match',
-      includeColKeyAsFilter: false,
-      showColumn: true,
-      colWidth: 55,
-      colWidgetType: PagColWidgetType.CUSTOM,
-      getCustomWidget: (item, fullList) {
-        bool showDetail = true;
         return WgtPaymentMatchOpItem(
           appConfig: widget.appConfig,
           loggedInUser: loggedInUser!,
@@ -1235,6 +1219,42 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           regFresh: (doRefreshItem) {
             item['is_comm'] = doRefreshItem;
           },
+        );
+      },
+    );
+    listController.listColControllerList.insert(0, appCtxCol);
+  }
+
+  void _addDeviceHealthColumn(MdlPagListController listController) {
+    PagDeviceCat? deviceCat = listController.itemType;
+    assert(deviceCat != null);
+
+    MdlListColController appCtxCol = MdlListColController(
+      colKey: 'detail',
+      colTitle: ' ',
+      includeColKeyAsFilter: false,
+      showColumn: true,
+      colWidth: 35,
+      colWidgetType: PagColWidgetType.CUSTOM,
+      getCustomWidget: (item, fullList) {
+        return Padding(
+          padding: const EdgeInsets.only(right: 0),
+          child: IconButton(
+            icon: Icon(Symbols.pageview,
+                color: Theme.of(context).colorScheme.primary.withAlpha(200)),
+            onPressed: () {
+              xtShowModelBottomSheet(
+                context,
+                WgtPagDeviceHealth(
+                  appConfig: widget.appConfig,
+                  loggedInUser: loggedInUser!,
+                  deviceCat: deviceCat!,
+                  deviceInfo: item,
+                ),
+                onClosed: () {},
+              );
+            },
+          ),
         );
       },
     );

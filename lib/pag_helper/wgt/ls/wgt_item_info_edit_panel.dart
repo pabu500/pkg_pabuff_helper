@@ -92,8 +92,17 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
   String _errorText = '';
 
   Future<List<Map<String, dynamic>>> _updateProfile(String key, String value,
-      {String? oldVal}) async {
+      {String? oldVal, String? scopeProfileIdColName}) async {
     try {
+      Map<String, dynamic> opItem = {
+        'id': widget.itemIndexStr,
+        key: value,
+        'checked': true,
+      };
+      if (scopeProfileIdColName != null) {
+        opItem['scope_profile_id_column_name'] = scopeProfileIdColName;
+      }
+
       Map<String, dynamic> queryMap = {
         'scope': _loggedInUser!.selectedScope.toScopeMap(),
         'id': widget.itemIndexStr,
@@ -104,14 +113,9 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
         // 'key1, key2, key3, ...'
         'update_key_str': key,
         'op_name': 'multi_key_val_update',
-        'op_list': [
-          {
-            'id': widget.itemIndexStr,
-            key: value,
-            'checked': true,
-          }
-        ],
+        'op_list': [opItem],
       };
+
       if (widget.listController != null) {
         queryMap['item_table_name'] = widget.listController!.rootTableName;
       }
@@ -245,13 +249,13 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
     if (value == null) {
       return null;
     }
-    //alphanumeric, 5-55
+    //alphanumeric, 2-55
     final RegExp alphanumeric = RegExp(r'^[a-zA-Z0-9]+$');
     if (!alphanumeric.hasMatch(value)) {
       return 'Tag must be alphanumeric';
     }
-    if (value.length < 5 || value.length > 55) {
-      return 'Tag must be between 5 and 55 characters';
+    if (value.length < 2 || value.length > 55) {
+      return 'Tag must be between 2 and 55 characters';
     }
     return null;
   }
@@ -601,10 +605,11 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
 
     bool isSingleLabel = false;
     bool isEditableByKind = true;
+    bool isEditableByMapping = true;
     // String leafScopeLabel = '';
     MdlPagScope? initialScope;
     if (widget.itemKind == PagItemKind.tariffPackage ||
-        widget.itemKind == PagItemKind.meterGroup ||
+        /*widget.itemKind == PagItemKind.meterGroup ||*/
         widget.itemKind == PagItemKind.landlord) {
       isSingleLabel = true;
       isEditableByKind = false;
@@ -615,11 +620,25 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
       // leafScopeLabel = scope.getLeafScopeLabel();
     }
 
+    // if tenant_id for meter group is not null (meter group is assigned to a tenant),
+    // disable scope edit
+    if (widget.itemKind == PagItemKind.meterGroup &&
+        (widget.itemInfoMap?['tenant_id'] != null)) {
+      isEditableByMapping = false;
+    }
+
+    bool isFlexiScope = false;
+    if (widget.itemKind == PagItemKind.scope ||
+        widget.itemKind == PagItemKind.meterGroup ||
+        widget.itemKind == PagItemKind.tariffPackage) {
+      isFlexiScope = true;
+    }
+
     return Padding(
       padding: const EdgeInsets.only(top: 8.0),
       child: WgtScopeSetter(
         appConfig: widget.appConfig,
-        isEditable: isEditableByKind && isEditableByAcl,
+        isEditable: isEditableByKind && isEditableByAcl && isEditableByMapping,
         isSingleLabel: isSingleLabel,
         // singleScopeLabel: leafScopeLabel,
         initialScope: initialScope,
@@ -627,6 +646,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
         labelWidth: 130,
         itemScopeMap: widget.itemScopeMap!,
         forItemKind: widget.itemKind,
+        isFlexiScope: isFlexiScope,
         forScopeType: widget.itemType is PagScopeType ? widget.itemType : null,
         onScopeSet: (dynamic profile) async {
           if (profile == null) {
@@ -651,14 +671,18 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
           } else if (profile is MdlPagLocation) {
             scopeIdColName = 'location_id';
           }
+
           if (scopeIdColName.isEmpty) {
             if (kDebugMode) {
               print('Invalid profile type');
             }
             return {};
           }
-          List<Map<String, dynamic>> result =
-              await _updateProfile(scopeIdColName, profile.id.toString());
+          List<Map<String, dynamic>> result = await _updateProfile(
+            isFlexiScope ? 'scope_id' : scopeIdColName,
+            profile.id.toString(),
+            scopeProfileIdColName: scopeIdColName,
+          );
           Map<String, dynamic> resultMap = result[0];
           if (resultMap['error'] == null) {
             setState(() {

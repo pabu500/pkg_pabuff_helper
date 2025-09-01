@@ -48,7 +48,7 @@ Future<dynamic> doCreateTariffPackage(
 Future<dynamic> doUpdateTariffPackage(
   MdlPagAppConfig appConfig,
   Map<String, dynamic> reqMap,
-  SvcClaim svcClaim,
+  MdlPagSvcClaim svcClaim,
 ) async {
   svcClaim.svcName = PagSvcType.oresvc2.name;
   svcClaim.endpoint = PagUrlBase.eptUpdateTenantMeterGroups;
@@ -73,7 +73,7 @@ Future<dynamic> doUpdateTariffPackage(
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $svcToken',
       },
-      body: jsonEncode(SvcQuery(svcClaim, reqMap).toJson()),
+      body: jsonEncode(MdlPagSvcQuery(svcClaim, reqMap).toJson()),
     );
 
     if (response.statusCode == 200) {
@@ -95,7 +95,7 @@ Future<dynamic> doUpdateTariffPackage(
 Future<dynamic> doGetTariffPackageRateRows(
   MdlPagAppConfig appConfig,
   Map<String, dynamic> reqMap,
-  SvcClaim svcClaim,
+  MdlPagSvcClaim svcClaim,
 ) async {
   svcClaim.svcName = PagSvcType.oresvc2.name;
   svcClaim.endpoint = PagUrlBase.eptGetRateRowList;
@@ -120,7 +120,7 @@ Future<dynamic> doGetTariffPackageRateRows(
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $svcToken',
       },
-      body: jsonEncode(SvcQuery(svcClaim, reqMap).toJson()),
+      body: jsonEncode(MdlPagSvcQuery(svcClaim, reqMap).toJson()),
     );
 
     if (response.statusCode == 200) {
@@ -148,7 +148,7 @@ Future<dynamic> doGetTariffPackageRateRows(
 Future<dynamic> doUpdateTariffPackageRateRows(
   MdlPagAppConfig appConfig,
   Map<String, dynamic> reqMap,
-  SvcClaim svcClaim,
+  MdlPagSvcClaim svcClaim,
 ) async {
   svcClaim.svcName = PagSvcType.oresvc2.name;
   svcClaim.endpoint = PagUrlBase.eptUpdatePackageRateRowList;
@@ -173,7 +173,7 @@ Future<dynamic> doUpdateTariffPackageRateRows(
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $svcToken',
       },
-      body: jsonEncode(SvcQuery(svcClaim, reqMap).toJson()),
+      body: jsonEncode(MdlPagSvcQuery(svcClaim, reqMap).toJson()),
     );
 
     if (response.statusCode == 200) {
@@ -200,7 +200,7 @@ Future<dynamic> doUpdateTariffPackageRateRows(
 Future<dynamic> doAssignTenantsToTariffPackage(
   MdlPagAppConfig appConfig,
   Map<String, dynamic> reqMap,
-  SvcClaim svcClaim,
+  MdlPagSvcClaim svcClaim,
 ) async {
   svcClaim.svcName = PagSvcType.oresvc2.name;
   svcClaim.endpoint = PagUrlBase.eptUpdateTariffPackageTenants;
@@ -225,7 +225,7 @@ Future<dynamic> doAssignTenantsToTariffPackage(
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $svcToken',
       },
-      body: jsonEncode(SvcQuery(svcClaim, reqMap).toJson()),
+      body: jsonEncode(MdlPagSvcQuery(svcClaim, reqMap).toJson()),
     );
 
     if (response.statusCode == 200) {

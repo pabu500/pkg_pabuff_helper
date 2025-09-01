@@ -11,7 +11,7 @@ import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../pag_helper/model/mdl_pag_app_config.dart';
 import '../usage/usage_stat_helper.dart';
-import '../usage/wgt_pag_group_stat_core.dart';
+import '../../../pag_helper/wgt/app/ems/wgt_pag_group_stat_core.dart';
 import '../usage/wgt_pag_meter_stat_core.dart';
 import 'mdl_ems_type_usage.dart';
 import 'wgt_bill_lc_status_op.dart';
@@ -94,7 +94,7 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
 
 class _WgtPagTenantCompositeUsageSummaryState
     extends State<WgtPagTenantCompositeUsageSummary> {
-  final double statWidth = 800;
+  final double statWidth = 850;
 
   final List<String> _meterTypes = ['E', 'W', 'B', 'N', 'G'];
 
@@ -166,6 +166,7 @@ class _WgtPagTenantCompositeUsageSummaryState
                             setState(() {
                               _lcStatusOpsKey = UniqueKey();
                               _billInfo['lc_status'] = newStatus.value;
+                              _isDisabled = newStatus == PagBillingLcStatus.pv;
                             });
                             widget.onUpdate?.call();
                           },

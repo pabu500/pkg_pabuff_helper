@@ -33,12 +33,25 @@ class MdlPagLocationGroupProfile {
     this.isAllLocations = false,
   });
 
-  bool equals(MdlPagLocationGroupProfile? siteProfile) {
-    if (siteProfile == null) {
-      return false;
-    }
-    return id == siteProfile.id;
+  // override == operator
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is MdlPagLocationGroupProfile &&
+        other.id == id &&
+        other.name == name;
   }
+
+  @override
+  int get hashCode => Object.hash(id, name);
+
+  // bool equals(MdlPagLocationGroupProfile? siteProfile) {
+  //   if (siteProfile == null) {
+  //     return false;
+  //   }
+  //   return id == siteProfile.id;
+  // }
 
   MdlPagLocation? getLocationByLabel(String? label) {
     if (label == null) {

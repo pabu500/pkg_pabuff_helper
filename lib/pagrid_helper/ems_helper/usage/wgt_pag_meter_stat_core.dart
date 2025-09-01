@@ -70,7 +70,7 @@ class WgtPagUsageStatCore extends StatefulWidget {
 }
 
 class _WgtPagUsageStatCoreState extends State<WgtPagUsageStatCore> {
-  final totalWidth = 185.0;
+  final totalWidth = 210.0;
 
   @override
   void initState() {
@@ -238,7 +238,7 @@ class _WgtPagUsageStatCoreState extends State<WgtPagUsageStatCore> {
         : Row(
             children: [
               SizedBox(
-                width: 200,
+                width: 210,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

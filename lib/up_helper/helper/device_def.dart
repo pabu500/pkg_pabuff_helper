@@ -10,6 +10,10 @@ enum SensorType {
   ir,
   water_leak,
   multi,
+  light,
+  co2,
+  fan,
+  switchSensor,
   unknown,
 }
 
@@ -122,6 +126,34 @@ MeterType? getMeterType(String meterTypeTag) {
       return MeterType.bidirection;
     // case 'ME':
     //   return MeterType.manualElectricity1p;
+    default:
+      return null;
+  }
+}
+
+SensorType? getSensorType(String sensorTypeTag) {
+  switch (sensorTypeTag.toUpperCase()) {
+    case 'TEMPERATURE':
+      return SensorType.temperature;
+    case 'HUMIDITY':
+      return SensorType.humidity;
+    case 'IR':
+      return SensorType.ir;
+    case 'SMOKE':
+      return SensorType.smoke;
+    case 'WATER_LEAK':
+      return SensorType.water_leak;
+    case 'MULTI':
+      return SensorType.multi;
+    case 'LIGHT':
+      return SensorType.light;
+    case 'CO2':
+      return SensorType.co2;
+    case 'FAN':
+      return SensorType.fan;
+    case 'SWITCH':
+      return SensorType.switchSensor;
+
     default:
       return null;
   }

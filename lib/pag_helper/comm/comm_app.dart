@@ -117,7 +117,7 @@ Future<dynamic> getOaxLink(
   MdlPagAppConfig appConfig,
   MdlPagUser? loggedInUser,
   Map<String, dynamic> queryMap,
-  SvcClaim svcClaim,
+  MdlPagSvcClaim svcClaim,
 ) async {
   svcClaim.svcName = PagSvcType.oresvc2.name;
   svcClaim.endpoint = PagUrlBase.eptGetOaxLink;
@@ -136,7 +136,7 @@ Future<dynamic> getOaxLink(
       'Content-Type': 'application/json; charset=UTF-8',
       'Authorization': 'Bearer $svcToken',
     },
-    body: jsonEncode(SvcQuery(svcClaim, queryMap).toJson()),
+    body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
   );
 
   try {

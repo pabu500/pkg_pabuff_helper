@@ -7,7 +7,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:multi_dropdown/multiselect_dropdown.dart';
-import 'package:buff_helper/pag_helper/def_helper/def_device.dart';
 import '../../def_helper/dh_device.dart';
 import '../../model/mdl_history.dart';
 import '../../model/mdl_pag_app_config.dart';
@@ -208,145 +207,186 @@ class _WgtPagItemHistoryPresenterState
   void _iniHistorySetting() {
     if (widget.itemKind == PagItemKind.device) {
       assert(widget.itemType is PagDeviceCat);
-      assert(widget.itemSubType is MeterType);
+      assert(
+          widget.itemSubType is MeterType || widget.itemSubType is SensorType);
 
-      // single val meters
-      if (widget.itemSubType == MeterType.electricity1p ||
-          widget.itemSubType == MeterType.water ||
-          widget.itemSubType == MeterType.gas ||
-          widget.itemSubType == MeterType.newater) {
-        _selectedChartReadingTypeKey = 'val_meter';
+      switch (widget.itemSubType) {
+        case MeterType.electricity1p ||
+              MeterType.water ||
+              MeterType.gas ||
+              MeterType.newater:
+          _selectedChartReadingTypeKey = 'val_meter';
 
-        _readingTypeConfig.clear();
-        _readingTypeConfig.addAll({
-          'val_meter': {
-            'title': 'kWh',
-            'dataFields': [
-              {
-                'field': 'val',
-              }
-            ],
-            'timeKey': 'time',
-            'decimals': 3,
-            'unit': getDeivceTypeUnit(widget.itemType),
-            'chartType': ChartType.bar,
-            'dataType': DataType.diff,
-            'color': Colors.blue.withAlpha(210),
-            'width': 150,
-          }
-        });
-      } else if (widget.itemSubType == MeterType.btu) {
-        _selectedChartReadingTypeKey = 'val_meter';
+          _readingTypeConfig.clear();
+          _readingTypeConfig.addAll({
+            'val_meter': {
+              'title': 'kWh',
+              'dataFields': [
+                {
+                  'field': 'val',
+                }
+              ],
+              'timeKey': 'time',
+              'decimals': 3,
+              'unit': getDeivceTypeUnit(widget.itemType),
+              'chartType': ChartType.bar,
+              'dataType': DataType.diff,
+              'color': Colors.blue.withAlpha(210),
+              'width': 150,
+            }
+          });
+          break;
+        case MeterType.electricity3p:
+        case MeterType.water:
+        case MeterType.gas:
+        case MeterType.newater:
+        case MeterType.btu:
+          _selectedChartReadingTypeKey = 'val_meter';
 
-        _readingTypeConfig.clear();
-        _readingTypeConfig.addAll({
-          'val_meter': {
-            'title': 'kWh',
-            'dataFields': [
-              {
-                'field': 'val',
-              }
-            ],
-            'unit': 'kWh',
-            'decimals': 3,
-            'chartType': ChartType.bar,
-            'dataType': DataType.diff,
-            'color': Colors.blue.withAlpha(210),
-          },
-          'flow': {
-            'title': 'Flow (m3/h)',
-            'dataFields': [
-              {
-                'field': 'flow',
-              }
-            ],
-            'unit': '',
-            // 'decimals': 1,
-            'chartType': ChartType.line,
-            'dataType': DataType.total,
-            'color': Colors.blueGrey.withAlpha(210),
-          },
-          'power': {
-            'title': 'Power (kW)',
-            'dataFields': [
-              {
-                'field': 'power',
-              }
-            ],
-            'unit': 'kW',
-            'chartType': ChartType.line,
-            'dataType': DataType.total,
-            'color': Colors.green.withAlpha(210),
-          },
-          'volume': {
-            'title': 'Volume (m3)',
-            'dataFields': [
-              {
-                'field': 'volume',
-              },
-            ],
-            'unit': 'm3',
-            'chartType': ChartType.bar,
-            'dataType': DataType.diff,
-            'color': Colors.green.withAlpha(210),
-          },
-          'forward_temp': {
-            'title': 'Forward Temp (°C)',
-            'dataFields': [
-              {
-                'field': 'forward_temp',
-              },
-            ],
-            'unit': '°C',
-            'chartType': ChartType.line,
-            'dataType': DataType.total,
-            'color': Colors.green,
-          },
-          'return_temp': {
-            'title': 'Return Temp (°C)',
-            'dataFields': [
-              {
-                'field': 'return_temp',
-              }
-            ],
-            'unit': '°C',
-            'chartType': ChartType.line,
-            'dataType': DataType.total,
-            'color': Colors.blueGrey.withAlpha(210),
-          },
-        });
-      } else if (widget.itemSubType == MeterType.bidirection) {
-        _selectedChartReadingTypeKey = 'delivered_total';
+          _readingTypeConfig.clear();
+          _readingTypeConfig.addAll({
+            'val_meter': {
+              'title': 'kWh',
+              'dataFields': [
+                {
+                  'field': 'val',
+                }
+              ],
+              'unit': 'kWh',
+              'decimals': 3,
+              'chartType': ChartType.bar,
+              'dataType': DataType.diff,
+              'color': Colors.blue.withAlpha(210),
+            },
+            'flow': {
+              'title': 'Flow (m3/h)',
+              'dataFields': [
+                {
+                  'field': 'flow',
+                }
+              ],
+              'unit': '',
+              // 'decimals': 1,
+              'chartType': ChartType.line,
+              'dataType': DataType.total,
+              'color': Colors.blueGrey.withAlpha(210),
+            },
+            'power': {
+              'title': 'Power (kW)',
+              'dataFields': [
+                {
+                  'field': 'power',
+                }
+              ],
+              'unit': 'kW',
+              'chartType': ChartType.line,
+              'dataType': DataType.total,
+              'color': Colors.green.withAlpha(210),
+            },
+            'volume': {
+              'title': 'Volume (m3)',
+              'dataFields': [
+                {
+                  'field': 'volume',
+                },
+              ],
+              'unit': 'm3',
+              'chartType': ChartType.bar,
+              'dataType': DataType.diff,
+              'color': Colors.green.withAlpha(210),
+            },
+            'forward_temp': {
+              'title': 'Forward Temp (°C)',
+              'dataFields': [
+                {
+                  'field': 'forward_temp',
+                },
+              ],
+              'unit': '°C',
+              'chartType': ChartType.line,
+              'dataType': DataType.total,
+              'color': Colors.green,
+            },
+            'return_temp': {
+              'title': 'Return Temp (°C)',
+              'dataFields': [
+                {
+                  'field': 'return_temp',
+                }
+              ],
+              'unit': '°C',
+              'chartType': ChartType.line,
+              'dataType': DataType.total,
+              'color': Colors.blueGrey.withAlpha(210),
+            },
+          });
+          break;
+        case MeterType.bidirection:
+          _selectedChartReadingTypeKey = 'delivered_total';
 
-        _readingTypeConfig.clear();
-        _readingTypeConfig.addAll({
-          'delivered_total': {
-            'title': 'Delivered Energy (kWh)',
-            'dataFields': [
-              {
-                'field': 'delivered_total',
-              }
-            ],
-            'unit': 'kWh',
-            'chartType': ChartType.bar,
-            'dataType': DataType.diff,
-            'color': Colors.orange.withAlpha(210),
-          },
-          'received_total': {
-            'title': 'Received Energy (kWh)',
-            'dataFields': [
-              {
-                'field': 'received_total',
-              }
-            ],
-            'unit': 'kWh',
-            'chartType': ChartType.bar,
-            'dataType': DataType.diff,
-            'color': Colors.blue.withAlpha(210),
-          },
-        });
+          _readingTypeConfig.clear();
+          _readingTypeConfig.addAll({
+            'delivered_total': {
+              'title': 'Delivered Energy (kWh)',
+              'dataFields': [
+                {
+                  'field': 'delivered_total',
+                }
+              ],
+              'unit': 'kWh',
+              'chartType': ChartType.bar,
+              'dataType': DataType.diff,
+              'color': Colors.orange.withAlpha(210),
+            },
+            'received_total': {
+              'title': 'Received Energy (kWh)',
+              'dataFields': [
+                {
+                  'field': 'received_total',
+                }
+              ],
+              'unit': 'kWh',
+              'chartType': ChartType.bar,
+              'dataType': DataType.diff,
+              'color': Colors.blue.withAlpha(210),
+            },
+          });
+
+          break;
+        case SensorType.temperature ||
+              SensorType.humidity ||
+              SensorType.ir ||
+              SensorType.light ||
+              SensorType.co2 ||
+              SensorType.fan ||
+              SensorType.switchSensor:
+          _selectedChartReadingTypeKey = 'val_sensor';
+
+          _readingTypeConfig.clear();
+          _readingTypeConfig.addAll({
+            'val_sensor': {
+              'title': '',
+              'dataFields': [
+                {
+                  'field': 'val',
+                }
+              ],
+              'timeKey': 'time',
+              'decimals': 1,
+              'unit': getDeivceTypeUnit(widget.itemType),
+              'chartType': ChartType.line,
+              'dataType': DataType.total,
+              'color': Colors.blue.withAlpha(210),
+              'width': 150,
+            }
+          });
+          break;
+        default:
+          throw Exception('Unsupported itemSubType: ${widget.itemSubType}');
       }
     }
+
+    assert(_readingTypeConfig.isNotEmpty);
 
     _displayType = widget.displayType ?? HistroyDisplayType.chart;
     if (!widget.config.contains('chart_core') &&
@@ -368,7 +408,7 @@ class _WgtPagItemHistoryPresenterState
     if (widget.itemType == ItemType.meter_3p) {
       _selectedChartReadingTypeKey = 'a_imp';
     }
-    if (widget.itemType == ItemType.sensor) {
+    if (widget.itemType == PagDeviceCat.sensor) {
       _selectedChartReadingTypeKey = 'val_sensor';
     }
     if (widget.itemType == ItemType.fleet_health) {
