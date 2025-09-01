@@ -14,7 +14,6 @@ import '../usage/usage_stat_helper.dart';
 import '../../../pag_helper/wgt/app/ems/wgt_pag_group_stat_core.dart';
 import '../usage/wgt_pag_meter_stat_core.dart';
 import 'mdl_ems_type_usage.dart';
-import 'wgt_bill_lc_status_op.dart';
 
 class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
   const WgtPagTenantCompositeUsageSummary({
@@ -29,6 +28,7 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
     required this.tenantType,
     required this.excludeAutoUsage,
     required this.displayContextStr,
+    this.isDisabled = false,
     // this.usageCalc,
     this.showFactoredUsage = true,
     // required this.usageFactor,
@@ -56,6 +56,7 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
 
   final MdlPagAppConfig appConfig;
   final MdlPagUser loggedInUser;
+  final bool isDisabled;
   final String displayContextStr;
   // final PagEmsTypeUsageCalc? usageCalc;
   final bool showFactoredUsage;
@@ -111,7 +112,7 @@ class _WgtPagTenantCompositeUsageSummaryState
 
   late final _billInfo = Map<String, dynamic>.from(widget.billInfo);
 
-  bool _isDisabled = false;
+  // bool _isDisabled = false;
 
   @override
   void initState() {
@@ -129,7 +130,7 @@ class _WgtPagTenantCompositeUsageSummaryState
     PagBillingLcStatus currentStatus = PagBillingLcStatus.byValue(lcStatus);
 
     return Opacity(
-      opacity: _isDisabled ? 0.5 : 1.0,
+      opacity: widget.isDisabled ? 0.5 : 1.0,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 13),
         child: Container(
@@ -144,37 +145,7 @@ class _WgtPagTenantCompositeUsageSummaryState
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (widget.isBillMode)
-                Stack(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.max,
-                      children: [getBillTitleRow()],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        WgtPagBillLcStatusOp(
-                          key: _lcStatusOpsKey,
-                          appConfig: widget.appConfig,
-                          loggedInUser: widget.loggedInUser,
-                          billInfo: _billInfo,
-                          initialStatus: currentStatus,
-                          onCommitted: (newStatus) {
-                            setState(() {
-                              _lcStatusOpsKey = UniqueKey();
-                              _billInfo['lc_status'] = newStatus.value;
-                              _isDisabled = newStatus == PagBillingLcStatus.pv;
-                            });
-                            widget.onUpdate?.call();
-                          },
-                        )
-                      ],
-                    ),
-                  ],
-                ),
+              if (widget.isBillMode) getBillTitleRow(),
               const Divider(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,

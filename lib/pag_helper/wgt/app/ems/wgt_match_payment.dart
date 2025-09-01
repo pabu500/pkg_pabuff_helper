@@ -71,7 +71,7 @@ class _WgtMatchOnePaymentState extends State<WgtMatchOnePayment> {
             appConfig: widget.appConfig,
             loggedInUser: widget.loggedInUser,
             billingRecIndexStr: billingRecId,
-            defaultBillLcStatus: billingLcStatus,
+            defaultBillLcStatusStr: billingLcStatus,
             modes: const ['widget', 'pdf'],
             genTypes: billingLcStatus == 'released' || billingLcStatus == 'pv'
                 ? const ['generated', 'released']

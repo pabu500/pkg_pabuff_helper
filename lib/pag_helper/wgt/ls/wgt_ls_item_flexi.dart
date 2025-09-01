@@ -1123,7 +1123,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                         appConfig: widget.appConfig,
                         loggedInUser: loggedInUser!,
                         billingRecIndexStr: item['id'],
-                        defaultBillLcStatus: item['lc_status'],
+                        defaultBillLcStatusStr: item['lc_status'],
                         modes: item['lc_status'] == 'released' ||
                                 item['lc_status'] == 'pv'
                             ? const ['wgt', 'pdf']

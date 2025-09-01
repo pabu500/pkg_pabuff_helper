@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../pag_helper/comm/comm_pag_billing.dart';
 import '../../../pag_helper/model/acl/mdl_pag_svc_claim.dart';
@@ -99,9 +100,9 @@ class _WgtPagBillLcStatusOpState extends State<WgtPagBillLcStatusOp> {
                 style: tagTextStyle),
             horizontalSpaceLarge,
             getLcStatusButton(PagBillingLcStatus.generated),
-            const Text('  ►  '),
+            Icon(Symbols.chevron_forward, color: Theme.of(context).hintColor),
             getLcStatusButton(PagBillingLcStatus.pv),
-            const Text('  ►  '),
+            Icon(Symbols.chevron_forward, color: Theme.of(context).hintColor),
             getLcStatusButton(PagBillingLcStatus.released),
             getCommitButton(),
           ],
