@@ -77,7 +77,7 @@ final Map<PagBillGenType, dynamic> genTypeInfo = {
   },
   PagBillGenType.manual: {
     'tag': 'M',
-    'color': Colors.orangeAccent.withOpacity(0.7),
+    'color': Colors.orangeAccent.withAlpha(210),
     'tooltip': 'Manual',
   },
 };

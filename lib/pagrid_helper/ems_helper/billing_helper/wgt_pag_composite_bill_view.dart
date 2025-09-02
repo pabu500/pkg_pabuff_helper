@@ -23,7 +23,7 @@ class WgtPagCompositeBillView extends StatefulWidget {
     required this.loggedInUser,
     required this.billingRecIndexStr,
     required this.defaultBillLcStatusStr,
-    this.displayContext = 'bill_view',
+    this.displayContextStr = 'bill_view',
     this.isBillMode = true,
     this.costDecimals = 3,
     this.modes = const ['wgt', 'pdf'],
@@ -34,7 +34,7 @@ class WgtPagCompositeBillView extends StatefulWidget {
   final MdlPagUser loggedInUser;
   final MdlPagAppConfig appConfig;
   final bool isBillMode;
-  final String displayContext;
+  final String displayContextStr;
   final String billingRecIndexStr;
   final int costDecimals;
   final List<String> modes;
@@ -183,7 +183,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
                     key: _lcStatusOpsKey,
                     appConfig: widget.appConfig,
                     loggedInUser: widget.loggedInUser,
-                    enableEdit: widget.displayContext == 'bill_view',
+                    enableEdit: widget.displayContextStr == 'bill_view',
                     billInfo: _bill,
                     initialStatus: _lcStatusDisplay,
                     onCommitted: (newStatus) {
@@ -527,7 +527,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             costDecimals: widget.costDecimals,
             appConfig: widget.appConfig,
             loggedInUser: widget.loggedInUser,
-            displayContextStr: '',
+            displayContextStr: widget.displayContextStr,
             tenantSingularUsageInfoList: singularUsageList,
             compositeUsageCalc: compositeUsageCalc,
             isBillMode: widget.isBillMode,
@@ -756,7 +756,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             costDecimals: widget.costDecimals,
             appConfig: widget.appConfig,
             loggedInUser: widget.loggedInUser,
-            displayContextStr: '',
+            displayContextStr: widget.displayContextStr,
             isBillMode: widget.isBillMode,
             billInfo: _bill,
             // usageCalc: compositeUsageCalc,

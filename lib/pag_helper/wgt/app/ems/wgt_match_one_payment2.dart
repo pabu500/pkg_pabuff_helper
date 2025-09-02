@@ -125,8 +125,9 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                 children: [
                   Icon(PagItemKind.tenant.iconData),
                   Text(' $tenantLabel', style: billLabelStyle),
-                  horizontalSpaceSmall,
-                  Text('Payment Amount: ', style: mainLabelStyle),
+                  Icon(Symbols.chevron_forward,
+                      color: Theme.of(context).hintColor),
+                  Text('Payment: ', style: mainLabelStyle),
                   Text(
                       widget.paymentMatchingInfo?['matched_payment_info']
                               ?['amount'] ??
@@ -243,7 +244,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                   Row(
                     children: [
                       Text(
-                        'Billed Total Cost: ',
+                        'Total: ',
                         style: billKeyStyle,
                       ),
                       Text('$billedTotalCost',
@@ -260,7 +261,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
               costDecimals: 2,
               appConfig: widget.appConfig,
               loggedInUser: widget.loggedInUser,
-              displayContext: 'match_one_paymment',
+              displayContextStr: 'match_one_paymment',
               billingRecIndexStr: billingRecId,
               defaultBillLcStatusStr: billingLcStatusStr,
               modes: const ['wgt', 'pdf'],

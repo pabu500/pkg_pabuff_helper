@@ -207,13 +207,16 @@ class _WgtPagTenantCompositeUsageSummaryReleasedState
       return Container();
     }
     String billLabel = widget.billInfo['bill_label'] ?? '';
+    String billLcStatusStr = widget.billInfo['lc_status'] ?? '';
+    PagBillingLcStatus billLcStatus =
+        PagBillingLcStatus.values.byName(billLcStatusStr);
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 13),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          getBillLcStatusTagWidget(context, PagBillingLcStatus.generated),
+          getBillLcStatusTagWidget(context, billLcStatus),
           horizontalSpaceSmall,
           Text('Invoice: ',
               style: TextStyle(
