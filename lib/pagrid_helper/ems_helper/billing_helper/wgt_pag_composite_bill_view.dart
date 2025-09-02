@@ -23,6 +23,7 @@ class WgtPagCompositeBillView extends StatefulWidget {
     required this.loggedInUser,
     required this.billingRecIndexStr,
     required this.defaultBillLcStatusStr,
+    this.displayContext = 'bill_view',
     this.isBillMode = true,
     this.costDecimals = 3,
     this.modes = const ['wgt', 'pdf'],
@@ -33,6 +34,7 @@ class WgtPagCompositeBillView extends StatefulWidget {
   final MdlPagUser loggedInUser;
   final MdlPagAppConfig appConfig;
   final bool isBillMode;
+  final String displayContext;
   final String billingRecIndexStr;
   final int costDecimals;
   final List<String> modes;
@@ -181,6 +183,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
                     key: _lcStatusOpsKey,
                     appConfig: widget.appConfig,
                     loggedInUser: widget.loggedInUser,
+                    enableEdit: widget.displayContext == 'bill_view',
                     billInfo: _bill,
                     initialStatus: _lcStatusDisplay,
                     onCommitted: (newStatus) {

@@ -35,6 +35,7 @@ import 'package:provider/provider.dart';
 import '../../comm/comm_list.dart';
 import '../../model/mdl_pag_app_config.dart';
 import '../app/ems/wgt_match_one_payment2.dart';
+import '../app/ems/wgt_match_payment_op_item.dart';
 import '../app/ems/wgt_tenant_soa.dart';
 import '../app/fh/wgt_pag_device_health.dart';
 import '../job/wgt_job_type_op_panel.dart';
@@ -1568,74 +1569,5 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         onPressed(item, fullList);
       },
     );
-  }
-}
-
-class WgtPaymentMatchOpItem extends StatefulWidget {
-  const WgtPaymentMatchOpItem({
-    super.key,
-    required this.appConfig,
-    required this.loggedInUser,
-    required this.tenantInfo,
-    required this.paymentMatchInfo,
-    this.regFresh,
-  });
-
-  final MdlPagAppConfig appConfig;
-  final MdlPagUser loggedInUser;
-  final Map<String, dynamic> tenantInfo;
-  final Map<String, dynamic> paymentMatchInfo;
-  final void Function(void Function(bool isComm, bool isEnabled))? regFresh;
-
-  @override
-  State<WgtPaymentMatchOpItem> createState() => _WgtPaymentMatchOpItemState();
-}
-
-class _WgtPaymentMatchOpItemState extends State<WgtPaymentMatchOpItem> {
-  bool _isComm = false;
-  bool _isEnabled = false;
-
-  void _refresh(bool isComm, bool isEnabled) {
-    if (!mounted) {
-      return;
-    }
-
-    setState(() {
-      _isComm = isComm;
-      _isEnabled = isEnabled;
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    widget.regFresh?.call(_refresh);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // return widget;
-    return _isComm
-        ? const WgtPagWait(size: 21)
-        : InkWell(
-            onTap: !_isEnabled
-                ? null
-                : () {
-                    xtShowModelBottomSheet(
-                      context,
-                      WgtMatchOnePayment2(
-                        appConfig: widget.appConfig,
-                        loggedInUser: widget.loggedInUser,
-                        tenantInfo: widget.tenantInfo,
-                        paymentMatchingInfo: widget.paymentMatchInfo,
-                      ),
-                      onClosed: () {},
-                    );
-                  },
-            child: Icon(Symbols.payments,
-                color: _isEnabled
-                    ? Theme.of(context).colorScheme.primary.withAlpha(210)
-                    : Theme.of(context).hintColor.withAlpha(50)),
-          );
   }
 }

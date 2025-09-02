@@ -19,6 +19,7 @@ class WgtPagBillLcStatusOp extends StatefulWidget {
     required this.billInfo,
     required this.initialStatus,
     this.onCommitted,
+    this.enableEdit = false,
   });
 
   final MdlPagAppConfig appConfig;
@@ -26,6 +27,7 @@ class WgtPagBillLcStatusOp extends StatefulWidget {
   final Map<String, dynamic> billInfo;
   final PagBillingLcStatus initialStatus;
   final Function? onCommitted;
+  final bool enableEdit;
 
   @override
   State<WgtPagBillLcStatusOp> createState() => _WgtPagBillLcStatusOpState();
@@ -91,25 +93,28 @@ class _WgtPagBillLcStatusOpState extends State<WgtPagBillLcStatusOp> {
   @override
   Widget build(BuildContext context) {
     // return Container();
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Row(
-          children: [
-            getBillLcStatusTagWidget(context, PagBillingLcStatus.mfd,
-                style: tagTextStyle),
-            horizontalSpaceLarge,
-            getLcStatusButton(PagBillingLcStatus.generated),
-            Icon(Symbols.chevron_forward, color: Theme.of(context).hintColor),
-            getLcStatusButton(PagBillingLcStatus.pv),
-            Icon(Symbols.chevron_forward, color: Theme.of(context).hintColor),
-            getLcStatusButton(PagBillingLcStatus.released),
-            getCommitButton(),
-          ],
-        ),
-        if (_errorText.isNotEmpty)
-          getErrorTextPrompt(context: context, errorText: _errorText)
-      ],
+    return Opacity(
+      opacity: widget.enableEdit ? 1.0 : 0.5,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              getBillLcStatusTagWidget(context, PagBillingLcStatus.mfd,
+                  style: tagTextStyle),
+              horizontalSpaceLarge,
+              getLcStatusButton(PagBillingLcStatus.generated),
+              Icon(Symbols.chevron_forward, color: Theme.of(context).hintColor),
+              getLcStatusButton(PagBillingLcStatus.pv),
+              Icon(Symbols.chevron_forward, color: Theme.of(context).hintColor),
+              getLcStatusButton(PagBillingLcStatus.released),
+              getCommitButton(),
+            ],
+          ),
+          if (_errorText.isNotEmpty)
+            getErrorTextPrompt(context: context, errorText: _errorText)
+        ],
+      ),
     );
   }
 
@@ -145,7 +150,7 @@ class _WgtPagBillLcStatusOpState extends State<WgtPagBillLcStatusOp> {
     }
 
     return InkWell(
-      onTap: !clickEnabled
+      onTap: !widget.enableEdit || !clickEnabled
           ? null
           : () {
               setState(() {
