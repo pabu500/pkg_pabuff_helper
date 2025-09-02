@@ -6,13 +6,13 @@ import 'dart:developer' as dev;
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-import '../../../pag_helper/comm/comm_pag_billing.dart';
-import '../../../pag_helper/model/acl/mdl_pag_svc_claim.dart';
-import '../../../pag_helper/model/mdl_pag_app_config.dart';
-import '../../../pag_helper/wgt/wgt_comm_button.dart';
+import '../../../comm/comm_pag_billing.dart';
+import '../../../model/acl/mdl_pag_svc_claim.dart';
+import '../../../model/mdl_pag_app_config.dart';
+import '../../wgt_comm_button.dart';
 
-class WgtPagBillLcStatusOp extends StatefulWidget {
-  const WgtPagBillLcStatusOp({
+class WgtPagPaymentLcStatusOp extends StatefulWidget {
+  const WgtPagPaymentLcStatusOp({
     super.key,
     required this.appConfig,
     required this.loggedInUser,
@@ -30,10 +30,11 @@ class WgtPagBillLcStatusOp extends StatefulWidget {
   final bool enableEdit;
 
   @override
-  State<WgtPagBillLcStatusOp> createState() => _WgtPagBillLcStatusOpState();
+  State<WgtPagPaymentLcStatusOp> createState() =>
+      _WgtPagPaymentLcStatusOpState();
 }
 
-class _WgtPagBillLcStatusOpState extends State<WgtPagBillLcStatusOp> {
+class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
   late final tagTextStyle = TextStyle(
     color: Theme.of(context).colorScheme.onPrimary,
   );
