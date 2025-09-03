@@ -6,7 +6,6 @@ import 'dart:developer' as dev;
 import '../../../../xt_ui/wdgt/show_model_bottom_sheet.dart';
 import '../../../../xt_ui/wdgt/wgt_pag_wait.dart';
 import '../../../model/mdl_pag_app_config.dart';
-import '../../../model/mdl_pag_user.dart';
 import 'wgt_match_one_payment2.dart';
 
 class WgtPaymentMatchOpItem extends StatefulWidget {

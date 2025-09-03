@@ -273,10 +273,13 @@ class MdlPagListController /*extends ChangeNotifier*/ {
       listColControllerListFlitered.add(colControllerLocationLeaf);
     }
 */
+
     List<MdlListColController> listColControllerListFlitered =
         listColControllerList;
     for (var colController in listColControllerListFlitered) {
       if (colController.filterValue != null) {
+        // if (false) {
+        // use join key (in e.g. s.label, b.name etc., format for filter map)
         if (colController.joinKey != null) {
           filterMap[colController.joinKey!] = colController
               .filterValue?[getFilterValueKey?.call(colController)];
