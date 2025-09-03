@@ -67,7 +67,7 @@ class _WgtLoginState extends State<WgtLogin> {
           PagUserKey.email.name: email,
           PagUserKey.authProvider.name: authProvider,
           'portal_type_name': widget.appConfig.portalType.name,
-          'portal_type_label': widget.appConfig.portalType.label,
+          // 'portal_type_label': widget.appConfig.portalType.label,
         }),
       );
 

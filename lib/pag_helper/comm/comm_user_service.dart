@@ -29,7 +29,7 @@ Future<MdlPagUser> doLoginPag(
           formData[PagUserKey.authProvider.name] ?? '',
       // PagUserKey.destPortal.name: 'pag_console',
       'portal_type_name': formData['portal_type_name'] ?? '',
-      'portal_type_label': formData['portal_type_label'] ?? '',
+      // 'portal_type_label': formData['portal_type_label'] ?? '',
     }),
   );
 
