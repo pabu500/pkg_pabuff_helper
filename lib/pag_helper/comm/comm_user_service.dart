@@ -28,7 +28,7 @@ Future<MdlPagUser> doLoginPag(
       PagUserKey.authProvider.name:
           formData[PagUserKey.authProvider.name] ?? '',
       // PagUserKey.destPortal.name: 'pag_console',
-      'portal_type_name': formData['portal_type_name'] ?? '',
+      'portal_type': formData['portal_type'] ?? '',
       // 'portal_type_label': formData['portal_type_label'] ?? '',
     }),
   );
@@ -209,12 +209,12 @@ Future<dynamic> doGetVisibleRoleList(
     if (itemListJson != null) {
       for (var item in itemListJson) {
         String portalTypeStr = item['portal_type'];
-        PagPortalType portalType = PagPortalType.byLabel(portalTypeStr);
+        PagPortalType portalType = PagPortalType.byValue(portalTypeStr);
         if (portalType == PagPortalType.none) {
           throw Exception('Invalid portal type: $portalTypeStr');
         }
-        item['portal_type_name'] = portalType.name;
-        item['portal_type_label'] = portalType.label;
+        item['portal_type'] = portalType.value;
+        // item['portal_type_label'] = portalType.label;
         itemList.add(item);
       }
     }

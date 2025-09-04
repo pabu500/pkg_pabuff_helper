@@ -7,7 +7,6 @@ import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
 import 'package:buff_helper/pag_helper/model/mdl_svc_query.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:buff_helper/up_helper/up_helper.dart';
 
 Future<dynamic> getPortalStatus(
     String appName, MdlPagAppConfig pagAppConfig) async {

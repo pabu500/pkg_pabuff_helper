@@ -41,7 +41,7 @@ class _WgtRoleSelectorState extends State<WgtRoleSelector> {
     _selectedRole = widget.loggedInUser.selectedRole;
 
     roleList.addAll(
-        widget.loggedInUser.getRoleList(widget.appConfig.portalType.label));
+        widget.loggedInUser.getRoleList(widget.appConfig.portalType.value));
 
     assert(_selectedRole != null);
   }

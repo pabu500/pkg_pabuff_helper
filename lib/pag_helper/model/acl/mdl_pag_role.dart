@@ -42,7 +42,9 @@ class MdlPagRole {
       rank = int.tryParse(rank);
     }
 
-    PagPortalType portalType = PagPortalType.byLabel(json['portal_type']);
+    PagPortalType portalType = PagPortalType.byValue(json['portal_type']);
+    assert(portalType != PagPortalType.none,
+        'Invalid portal type: ${json['portal_type']}');
 
     // get scope type
     String? sgId = json['sg_id'];
@@ -90,8 +92,9 @@ class MdlPagRole {
       'label': label,
       'tag': tag,
       'rank': rank,
-      'portal_type_label': portalType.label,
-      'portal_type_name': portalType.name,
+      // 'portal_type_label': portalType.label,
+      // 'portal_type_name': portalType.name,
+      'portal_type': portalType.value,
       'scope_type_label': scopeType.label,
       'scope_label': scopeLabel,
       'home_page_route': homePageRoute?.name,

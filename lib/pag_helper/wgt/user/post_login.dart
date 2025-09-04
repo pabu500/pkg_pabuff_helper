@@ -35,8 +35,9 @@ Future<void> doPostLogin(
       loggedInUser,
       {
         // 'scope': loggedInUser.selectedScope.toScopeMap(),
-        'portal_type_name': appConfig.portalType.name,
-        'portal_type_label': appConfig.portalType.label,
+        // 'portal_type_name': appConfig.portalType.name,
+        // 'portal_type_label': appConfig.portalType.label,
+        'portal_type': appConfig.portalType.value,
         // 'app_list': loggedInUser
         //     .selectedScope.projectProfile!.appContextConfigList
         //     .map((e) => e.appContextName)
@@ -58,9 +59,8 @@ Future<void> doPostLogin(
       loggedInUser.populateRoleScope(result['user_role_scope_list'], appConfig);
     }
   } catch (e) {
-    if (kDebugMode) {
-      print('doPostLogin error: $e');
-    }
+    dev.log('doPostLogin error: $e');
+
     rethrow;
   }
 

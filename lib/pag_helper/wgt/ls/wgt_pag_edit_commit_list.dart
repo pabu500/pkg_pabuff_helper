@@ -1031,7 +1031,7 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
     String tagLabel = '';
     Color tagColor = Colors.grey;
     if (configItem['col_key'] == 'portal_type_str') {
-      PagPortalType portalType = PagPortalType.byLabel(tagText);
+      PagPortalType portalType = PagPortalType.byValue(tagText);
       tagLabel = portalType.tag;
       tagColor = portalType.color;
     } else if (configItem['col_key'] == 'lc_status') {
