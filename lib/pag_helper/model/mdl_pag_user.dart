@@ -479,6 +479,8 @@ class MdlPagUser {
   factory MdlPagUser.fromJson2(Map<String, dynamic> respJson) {
     try {
       Map<String, dynamic> userJson = respJson['userInfo'];
+      assert(
+          userJson['error'] == null, 'Error in response: ${userJson['error']}');
       List<MdlPagRole> roleList = [];
 
       if (userJson['role_list'] != null) {
