@@ -360,3 +360,44 @@ Future<dynamic> doCheckKeyVal(
     throw Exception(jsonDecode(response.body)['err']);
   }
 }
+
+Future<dynamic> doResetUserPassword(
+  MdlPagAppConfig appConfig,
+  Map<String, dynamic> queryMap,
+  MdlPagSvcClaim svcClaim,
+) async {
+  svcClaim.svcName = PagSvcType.usersvc2.name;
+  svcClaim.endpoint = PagUrlBase.eptUsersvcGetUserKeyVal;
+
+  String svcToken = '';
+  // try {
+  //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
+  // } catch (err) {
+  //   throw Exception(err);
+  // }
+
+  final response = await http.post(
+    Uri.parse(PagUrlController(null, appConfig)
+        .getUrl(PagSvcType.usersvc2, svcClaim.endpoint!)),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer $svcToken',
+    },
+    body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
+  );
+
+  if (response.statusCode == 200) {
+    // If the server did return a 200 OK response, parse the JSON.
+    // User.fromJson(jsonDecode(response.body));
+    final respJson = jsonDecode(response.body);
+    if (respJson['error'] != null) {
+      throw Exception(respJson['error']);
+    }
+    if (respJson['data'] == null) {
+      throw Exception('Failed to update user key value');
+    }
+    return respJson['data'];
+  } else {
+    throw Exception(jsonDecode(response.body)['err']);
+  }
+}

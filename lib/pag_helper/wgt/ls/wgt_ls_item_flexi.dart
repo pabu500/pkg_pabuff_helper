@@ -34,7 +34,6 @@ import 'package:provider/provider.dart';
 
 import '../../comm/comm_list.dart';
 import '../../model/mdl_pag_app_config.dart';
-import '../app/ems/wgt_match_one_payment2.dart';
 import '../app/ems/wgt_match_payment_op_item.dart';
 import '../app/ems/wgt_tenant_soa.dart';
 import '../app/fh/wgt_pag_device_health.dart';
