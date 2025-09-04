@@ -367,7 +367,7 @@ Future<dynamic> doResetUserPassword(
   MdlPagSvcClaim svcClaim,
 ) async {
   svcClaim.svcName = PagSvcType.usersvc2.name;
-  svcClaim.endpoint = PagUrlBase.eptUsersvcGetUserKeyVal;
+  svcClaim.endpoint = PagUrlBase.eptOpResetUserPassword;
 
   String svcToken = '';
   // try {
@@ -387,16 +387,26 @@ Future<dynamic> doResetUserPassword(
   );
 
   if (response.statusCode == 200) {
-    // If the server did return a 200 OK response, parse the JSON.
-    // User.fromJson(jsonDecode(response.body));
     final respJson = jsonDecode(response.body);
     if (respJson['error'] != null) {
       throw Exception(respJson['error']);
     }
-    if (respJson['data'] == null) {
-      throw Exception('Failed to update user key value');
+    final data = respJson['data'];
+    if (data == null) {
+      throw Exception('Failed to get response data');
     }
-    return respJson['data'];
+    final result = data['result'];
+    if (result == null) {
+      throw Exception("No result found in the response");
+    }
+    String? resultKey = data['result_key'];
+    if (resultKey == null && resultKey!.isEmpty) {
+      throw Exception("Error: $resultKey");
+    }
+    if (result[resultKey] == null) {
+      throw Exception("No data found in the response");
+    }
+    return result[resultKey];
   } else {
     throw Exception(jsonDecode(response.body)['err']);
   }

@@ -415,6 +415,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
                         ),
                       ),
                       getUserRoleSetter(),
+                      getUserPasswordReset(),
                       getItemScopeSetter(),
                       getItemGroupTree(),
                     ],
@@ -569,7 +570,8 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
         loggedInUser: _loggedInUser!,
         targetUserIndexStr: widget.itemIndexStr,
         targetUsername: widget.itemInfoMap?['username'] ?? '',
-        height: 200,
+        targetUserAuthProvider: widget.itemInfoMap?['auth_provider'] ?? '',
+        // height: 200,
         onPasswordReset: () {
           // setState(() {
           //   _fieldUpdated = true;

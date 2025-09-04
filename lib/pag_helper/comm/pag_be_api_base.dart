@@ -238,6 +238,7 @@ class PagUrlBase {
       '/ops/progress_update';
   static const String eptUsersvcGetUserKeyVal = '/ops/get_user_key_val';
   static const String eptUsersvcSsoVerifyEmailAddress = '/sso/verify_email';
+  static const String eptOpResetUserPassword = '/ops/reset_user_password';
 
   //oresvc2 endpoints
   //scope
