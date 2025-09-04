@@ -14,6 +14,7 @@ enum SensorType {
   co2,
   fan,
   switchSensor,
+  temperature_humidity,
   unknown,
 }
 
@@ -135,6 +136,8 @@ SensorType? getSensorType(String sensorTypeTag) {
   switch (sensorTypeTag.toUpperCase()) {
     case 'TEMPERATURE':
       return SensorType.temperature;
+    case 'TEMPERATURE_HUMIDITY':
+      return SensorType.temperature_humidity;
     case 'HUMIDITY':
       return SensorType.humidity;
     case 'IR':

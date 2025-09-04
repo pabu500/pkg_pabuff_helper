@@ -359,16 +359,36 @@ class _WgtPagItemHistoryPresenterState
               SensorType.light ||
               SensorType.co2 ||
               SensorType.fan ||
+              SensorType.temperature_humidity ||
               SensorType.switchSensor:
           _selectedChartReadingTypeKey = 'val_sensor';
-
+           String valColName = "val";
+              switch(widget.itemSubType) {
+                  case SensorType.temperature || SensorType.temperature_humidity:
+                    valColName = "temperature_val";
+                    break;
+                  case SensorType.humidity:
+                    valColName = "humidity_val";
+                    break;
+                  case SensorType.ir:
+                    valColName = "ir_val";
+                    break;
+                  case SensorType.co2:
+                    valColName = "co2_val";
+                    break;
+                case SensorType.fan:
+                    valColName = "fan_val";
+                    break;
+              default: 
+                    break;
+              }
           _readingTypeConfig.clear();
           _readingTypeConfig.addAll({
             'val_sensor': {
               'title': '',
               'dataFields': [
                 {
-                  'field': 'val',
+                  'field': valColName,
                 }
               ],
               'timeKey': 'time',
