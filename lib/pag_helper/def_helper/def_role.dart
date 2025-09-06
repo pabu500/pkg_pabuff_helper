@@ -26,23 +26,3 @@ enum PagPortalType {
       ) ??
       none;
 }
-
-// T? enumByLabel<T extends Enum>(
-//   String? label,
-//   List<T> values,
-// ) {
-//   return label == null ? null : values.asNameMap()[label];
-// }
-
-// T? enumByLabel<T extends Enum>(
-//   String? value,
-//   List<T> values,
-// ) {
-//   if (value == null) return null;
-//   for (var val in values) {
-//     if (val is PagPortalType && val.value == value) {
-//       return value as T;
-//     }
-//   }
-//   return null;
-// }

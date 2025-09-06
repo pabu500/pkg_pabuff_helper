@@ -3,12 +3,13 @@ import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
 import 'package:buff_helper/pag_helper/pag_project_repo.dart';
 import 'package:flutter/foundation.dart';
 
-enum PagSvcType { usersvc2, oresvc2 }
+enum PagSvcType { usersvc2, ppmsvc, oresvc2 }
 
 enum ApiCode {
   requestMissingParameter('REQUEST_MISSING_PARAMETER'),
   resultGenericError('RESULT_GENERIC_ERROR'),
   resultNotFound('RESULT_NOT_FOUND'),
+  resultDatabaseError('RESULT_DATABASE_ERROR'),
   unknownError('UNKNOWN_ERROR'),
   ;
 
@@ -25,6 +26,9 @@ class PagUrlController {
   late String _usersvcURL;
   String get usersvcURL => _usersvcURL;
 
+  // late String _ppmsvcURL;
+  // String get ppmsvcURL => _ppmsvcURL;
+
   late String _oresvcURL;
   String get oresvcURL => _oresvcURL;
 
@@ -33,6 +37,7 @@ class PagUrlController {
 
   PagUrlController(MdlPagUser? loggedInUser, MdlPagAppConfig pagAppConfig) {
     _usersvcURL = getProjectHostUser(loggedInUser, pagAppConfig);
+    // _ppmsvcURL = getProjectHostPpmsvc(loggedInUser, pagAppConfig);
     _oresvcURL = getProjectHostOre(loggedInUser, pagAppConfig);
     _destPortalURL = getProjectHostDestPortal(loggedInUser);
   }
@@ -41,8 +46,12 @@ class PagUrlController {
     switch (svcType) {
       case PagSvcType.usersvc2:
         return '$_usersvcURL$endpoint';
+      // case PagSvcType.ppmsvc:
+      //   return '$_ppmsvcURL$endpoint';
       case PagSvcType.oresvc2:
         return '$_oresvcURL$endpoint';
+      default:
+        throw Exception('Service type not recognized');
     }
   }
 
@@ -89,6 +98,29 @@ class PagUrlController {
         return kDebugMode ? PagUrlBase.dUsersvcUrl : PagUrlBase.rDevUsersvcUrl;
     }
   }
+
+  // String getProjectHostPpmsvc(
+  //     MdlPagUser? loggedInUser, MdlPagAppConfig pagAppConfig) {
+  //   PagPortalProjectScope activeProjectScope = PagPortalProjectScope.none;
+  //   if (loggedInUser != null) {
+  //     if (loggedInUser.selectedScope.projectProfile != null) {
+  //       activeProjectScope =
+  //           loggedInUser.selectedScope.projectProfile!.portalProjectScope;
+  //     }
+  //   }
+
+  //   String ppmsvcEnv = pagAppConfig.ppmsvcEnv;
+  //   switch (ppmsvcEnv) {
+  //     case 'prod':
+  //       return kDebugMode ? PagUrlBase.dPpmsvcUrl : PagUrlBase.rProdPpmsvcUrl;
+  //     case 'test':
+  //       return kDebugMode ? PagUrlBase.dPpmsvcUrl : PagUrlBase.rTestPpmsvcUrl;
+  //     case 'dev':
+  //       return kDebugMode ? PagUrlBase.dPpmsvcUrl : PagUrlBase.rDevPpmsvcUrl;
+  //     default:
+  //       return kDebugMode ? PagUrlBase.dPpmsvcUrl : PagUrlBase.rDevPpmsvcUrl;
+  //   }
+  // }
 
   String getProjectHostOre(
       MdlPagUser? loggedInUser, MdlPagAppConfig pagAppConfig) {
@@ -166,6 +198,15 @@ class PagUrlBase {
   static const String _dDestPortalEvs2cp = 'https://cp2test.evs.com.sg';
   static const String _rDestPortalEvs2cp = 'https://cp2.evs.com.sg';
 
+  static const String _rProdUsersvcUrl = 'https://usersvc2.web-ems.com';
+  static const String _rTestUsersvcUrl = 'https://test-usersvc2.web-ems.com';
+  static const String _rDevUsersvcUrl = 'https://dev-usersvc2.evs.com.sg';
+
+  static const String _dPpmsvcUrl = 'http://localhost:8066';
+  static const String _rProdPpmsvcUrl = 'https://ppmsvc.web-ems.com';
+  static const String _rTestPpmsvcUrl = 'https://test-ppmsvc.web-ems.com';
+  static const String _rDevPpmsvcUrl = 'https://dev-ppmsvc.evs.com.sg';
+
   static const String _dOresvcUrl = 'http://localhost:8018';
   static const String _rProdOresvc = 'https://oresvc2.web-ems.com';
   static const String _rTestOresvc = 'https://test-oresvc2.web-ems.com';
@@ -183,10 +224,6 @@ class PagUrlBase {
       // 'http://3.1.141.233:8081';
       'http://localhost:8081';
 
-  static const String _rProdUsersvcUrl = 'https://usersvc2.web-ems.com';
-  static const String _rTestUsersvcUrl = 'https://test-usersvc2.web-ems.com';
-  static const String _rDevUsersvcUrl = 'https://dev-usersvc2.evs.com.sg';
-
   static get dDestPortalEvs2cp => _dDestPortalEvs2cp;
   static get rDestPortalEvs2cp => _rDestPortalEvs2cp;
 
@@ -194,6 +231,11 @@ class PagUrlBase {
   static get rProdUsersvcUrl => _rProdUsersvcUrl;
   static get rTestUsersvcUrl => _rTestUsersvcUrl;
   static get rDevUsersvcUrl => _rDevUsersvcUrl;
+
+  static get dPpmsvcUrl => _dPpmsvcUrl;
+  static get rProdPpmsvcUrl => _rProdPpmsvcUrl;
+  static get rTestPpmsvcUrl => _rTestPpmsvcUrl;
+  static get rDevPpmsvcUrl => _rDevPpmsvcUrl;
 
   static get dOresvcUrl => _dOresvcUrl;
   static get rProdOresvcUrl => _rProdOresvc;
@@ -239,6 +281,10 @@ class PagUrlBase {
   static const String eptUsersvcGetUserKeyVal = '/ops/get_user_key_val';
   static const String eptUsersvcSsoVerifyEmailAddress = '/sso/verify_email';
   static const String eptOpResetUserPassword = '/ops/reset_user_password';
+
+  //ppmsvc endpoints
+  // static const String eptGetPortalTargetStatus = '/get_portal_target_status';
+  // static const String eptSetPortalTargetStatus = '/set_portal_target_status';
 
   //oresvc2 endpoints
   //scope
@@ -520,8 +566,8 @@ class PagUrlBase {
   static const String eptUpdateMeterKeyVal = '/update_key_val';
   static const String eptOreCheckExists = '/check_exists';
   static const String eptOreCheckExists2 = '/check_exists2';
-  static const String eptGetPortalStatus =
-      '/get_portal_status'; // This is used to check if the portal is under maintenance
+  // static const String eptGetPortalStatus = '/get_portal_status'; // This is used to check if the portal is under maintenance
+  static const String eptGetPortalTargetStatus = '/get_portal_target_status';
   static const String eptGetVerion = '/get_version';
   static const String eptOreHello = '/hello';
   static const String eptGetSysVar = '/get_sys_var';
