@@ -43,7 +43,7 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
 
   final okColor = Colors.green.shade700;
   late final errorColor = Theme.of(context).colorScheme.error;
-  final unknownColor = Colors.grey.withAlpha(210);
+  final unknownColor = Colors.grey.shade600.withAlpha(210);
 
   bool _isFetching = false;
   bool _isFetched = false;
@@ -479,7 +479,8 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
               ),
               horizontalSpaceTiny,
               SelectableText('S/N: ${_selectedMeterInfo['meter_sn']}',
-                  style: valueStyle),
+                  style: valueStyle.copyWith(
+                      color: Theme.of(context).colorScheme.onSecondary)),
               horizontalSpaceSmall,
               WgtCommButton(
                   enabled: _isCheckingMeter != true &&
@@ -525,7 +526,8 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
                               : _checkMeterMessage.isNotEmpty
                                   ? _checkMeterMessage
                                   : 'Comm Unknown',
-                      style: valueStyle),
+                      style: valueStyle.copyWith(
+                          color: Theme.of(context).colorScheme.onSecondary)),
                 ],
               ));
   }
