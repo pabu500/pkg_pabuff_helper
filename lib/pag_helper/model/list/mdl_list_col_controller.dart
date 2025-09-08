@@ -197,6 +197,15 @@ class MdlListColController {
     }
     showEditPanel = showColumn;
 
+    if (json['show_edit'] != null) {
+      dynamic showEditPanelValue = json['show_edit'];
+      if (showEditPanelValue is bool) {
+        showEditPanel = showEditPanelValue;
+      } else if (showEditPanelValue is String) {
+        showEditPanel = showEditPanelValue.toLowerCase() == 'true';
+      }
+    }
+
     bool permHidden = false;
     if (json['hidden'] != null) {
       dynamic custHiddenValue = json['hidden'];
