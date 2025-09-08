@@ -61,8 +61,8 @@ String getPagFinanceTypeStr(dynamic itemType) {
 
 enum PagPaymentLcStatus {
   posted('posted', 'Posted', 'pt', Colors.lightBlue),
-  pending('matched', 'Matched', 'mt', Colors.teal),
-  failed('released', 'Released', 'rl', Colors.orangeAccent),
+  matched('matched', 'Matched', 'mt', Colors.teal),
+  released('released', 'Released', 'rl', Colors.orangeAccent),
   unknown('unknown', 'Unknown', 'un', Colors.grey),
   ;
 
@@ -80,4 +80,29 @@ enum PagPaymentLcStatus {
         (e) => (e).value,
       ) ??
       unknown;
+}
+
+Widget getPaymentLcStatusTagWidget(
+  BuildContext ctx,
+  PagPaymentLcStatus status, {
+  TextStyle? style,
+}) {
+  Color bgColor = status.color;
+  return Container(
+    decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(3),
+        border: Border.all(
+          color: Theme.of(ctx).hintColor,
+        )),
+    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+    child: Text(
+      status.tag,
+      style: style ??
+          const TextStyle(
+            color: Colors.white,
+            fontSize: 13.5,
+          ),
+    ),
+  );
 }

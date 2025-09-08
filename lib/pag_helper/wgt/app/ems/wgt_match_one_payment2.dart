@@ -11,6 +11,8 @@ import 'dart:developer' as dev;
 import '../../../../pagrid_helper/ems_helper/billing_helper/wgt_pag_composite_bill_view.dart';
 import '../../../../xt_ui/wdgt/info/get_error_text_prompt.dart';
 import '../../../../xt_ui/wdgt/wgt_pag_wait.dart';
+import '../../../def_helper/dh_pag_finance_type.dart';
+import 'wgt_payment_lc_status_op.dart';
 
 class WgtMatchOnePayment2 extends StatefulWidget {
   const WgtMatchOnePayment2({
@@ -188,15 +190,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
 
     return Padding(
       padding: const EdgeInsets.only(top: 10),
-      child: InkWell(
-        child: getBillItem(index),
-        onTap: () {
-          setState(() {
-            _billList[index]['show_bill'] =
-                !(_billList[index]['show_bill'] ?? false);
-          });
-        },
-      ),
+      child: getBillItem(index),
     );
   }
 
@@ -216,6 +210,14 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
               ?['billing_rec_id'] ==
           billingRecId;
     }
+
+    final lcStatusStr = widget.paymentMatchingInfo?['lc_status'] ?? '';
+    PagPaymentLcStatus lcStatus = PagPaymentLcStatus.byValue(lcStatusStr);
+
+    bool showPaymentLcStatusOp = false;
+    if (isMatchedBill) {
+      showPaymentLcStatusOp = true;
+    }
     return Container(
       decoration: BoxDecoration(
         border: isMatchedBill
@@ -230,12 +232,20 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
             children: [
               getBillLcStatusTagWidget(context, billLcStatus),
               horizontalSpaceSmall,
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('$billLabel', style: billLabelStyle),
-                  Text('$cycleStr', style: billLabelStyle),
-                ],
+              InkWell(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('$billLabel', style: billLabelStyle),
+                    Text('$cycleStr', style: billLabelStyle),
+                  ],
+                ),
+                onTap: () {
+                  setState(() {
+                    _billList[index]['show_bill'] =
+                        !(_billList[index]['show_bill'] ?? false);
+                  });
+                },
               ),
               horizontalSpaceSmall,
               Column(
@@ -252,6 +262,26 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                   ),
                 ],
               ),
+              const Spacer(),
+              if (showPaymentLcStatusOp)
+                WgtPagPaymentLcStatusOp(
+                  // key: _lcStatusOpsKey,
+                  appConfig: widget.appConfig,
+                  loggedInUser: widget.loggedInUser,
+                  enableEdit: true,
+                  paymentInfo: widget.paymentMatchingInfo ?? {},
+                  initialStatus: lcStatus,
+                  onCommitted: (newStatus) {
+                    setState(() {
+                      // _lcStatusOpsKey = UniqueKey();
+                      // _bill['lc_status'] = newStatus.value;
+                      // _isDisabledGn = newStatus == PagBillingLcStatus.pv ||
+                      //     newStatus == PagBillingLcStatus.released;
+                      // _lcStatusDisplay = newStatus;
+                    });
+                    // widget.onUpdate?.call();
+                  },
+                ),
             ],
           ),
           if (billInfo['show_bill'] ?? false) const Divider(),

@@ -1,4 +1,3 @@
-import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/pag_bill_def.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:developer' as dev;
@@ -6,7 +5,9 @@ import 'dart:developer' as dev;
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../../comm/comm_fin_ops.dart';
 import '../../../comm/comm_pag_billing.dart';
+import '../../../def_helper/dh_pag_finance_type.dart';
 import '../../../model/acl/mdl_pag_svc_claim.dart';
 import '../../../model/mdl_pag_app_config.dart';
 import '../../wgt_comm_button.dart';
@@ -16,7 +17,7 @@ class WgtPagPaymentLcStatusOp extends StatefulWidget {
     super.key,
     required this.appConfig,
     required this.loggedInUser,
-    required this.billInfo,
+    required this.paymentInfo,
     required this.initialStatus,
     this.onCommitted,
     this.enableEdit = false,
@@ -24,8 +25,8 @@ class WgtPagPaymentLcStatusOp extends StatefulWidget {
 
   final MdlPagAppConfig appConfig;
   final MdlPagUser? loggedInUser;
-  final Map<String, dynamic> billInfo;
-  final PagBillingLcStatus initialStatus;
+  final Map<String, dynamic> paymentInfo;
+  final PagPaymentLcStatus initialStatus;
   final Function? onCommitted;
   final bool enableEdit;
 
@@ -44,7 +45,7 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
     fontWeight: FontWeight.bold,
   );
 
-  late PagBillingLcStatus _selectedStatus = widget.initialStatus;
+  late PagPaymentLcStatus _selectedStatus = widget.initialStatus;
 
   bool _isCommitting = false;
   String _errorText = '';
@@ -54,8 +55,8 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
 
     final queryMap = {
       'scope': widget.loggedInUser?.selectedScope.toScopeMap(),
-      'bill_info': {
-        'billing_rec_id': widget.billInfo['billing_rec_id'],
+      'item_info': {
+        'item_id': widget.paymentInfo['payment_id'],
       },
       'target_status': _selectedStatus.value,
     };
@@ -63,7 +64,7 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
       _isCommitting = true;
       _errorText = '';
 
-      final result = await updateBillLcStatus(
+      final result = await updatePaymentLcStatus(
           widget.appConfig,
           queryMap,
           MdlPagSvcClaim(
@@ -71,9 +72,9 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
             target: '',
             operation: '',
           ));
-      dev.log('Bill Lc Status update result: $result');
+      dev.log('Payment Lc Status update result: $result');
       final newStatus = result['lc_status'];
-      PagBillingLcStatus updatedStatus = PagBillingLcStatus.byValue(newStatus);
+      PagPaymentLcStatus updatedStatus = PagPaymentLcStatus.byValue(newStatus);
       setState(() {
         _selectedStatus = updatedStatus;
       });
@@ -101,14 +102,13 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
         children: [
           Row(
             children: [
-              getBillLcStatusTagWidget(context, PagBillingLcStatus.mfd,
-                  style: tagTextStyle),
-              horizontalSpaceLarge,
-              getLcStatusButton(PagBillingLcStatus.generated),
+              // getPaymentLcStatusTagWidget(context, PagPaymentLcStatus.mfd, style: tagTextStyle),
+              // horizontalSpaceLarge,
+              getLcStatusButton(PagPaymentLcStatus.posted),
               Icon(Symbols.chevron_forward, color: Theme.of(context).hintColor),
-              getLcStatusButton(PagBillingLcStatus.pv),
+              getLcStatusButton(PagPaymentLcStatus.matched),
               Icon(Symbols.chevron_forward, color: Theme.of(context).hintColor),
-              getLcStatusButton(PagBillingLcStatus.released),
+              getLcStatusButton(PagPaymentLcStatus.released),
               getCommitButton(),
             ],
           ),
@@ -119,7 +119,7 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
     );
   }
 
-  Widget getLcStatusButton(PagBillingLcStatus status) {
+  Widget getLcStatusButton(PagPaymentLcStatus status) {
     final tagTextStyle = TextStyle(
       color: Theme.of(context).colorScheme.onPrimary,
     );
@@ -132,19 +132,19 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
     bool clickEnabled = _selectedStatus != status;
     bool highlighted = _selectedStatus == status;
     switch (widget.initialStatus) {
-      case PagBillingLcStatus.mfd:
-        if (status == PagBillingLcStatus.released) {
+      // case PagPaymentLcStatus.mfd:
+      //   if (status == PagPaymentLcStatus.released) {
+      //     clickEnabled = false;
+      //   }
+      //   break;
+      case PagPaymentLcStatus.posted:
+        if (status == PagPaymentLcStatus.released) {
           clickEnabled = false;
         }
         break;
-      case PagBillingLcStatus.generated:
-        if (status == PagBillingLcStatus.released) {
-          clickEnabled = false;
-        }
+      case PagPaymentLcStatus.matched:
         break;
-      case PagBillingLcStatus.pv:
-        break;
-      case PagBillingLcStatus.released:
+      case PagPaymentLcStatus.released:
         clickEnabled = false;
         break;
       default:
@@ -160,7 +160,7 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
             },
       child: Opacity(
         opacity: clickEnabled || highlighted ? 1.0 : 0.5,
-        child: getBillLcStatusTagWidget(
+        child: getPaymentLcStatusTagWidget(
           context,
           status,
           style:

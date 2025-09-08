@@ -313,6 +313,7 @@ class PagUrlBase {
   static const String eptCheckItemExists = '/item/check_item_exists';
   static const String eptGetItemKeyValList = '/item/get_item_key_val_list';
   static const String eptDeleteItem = '/item/delete_item';
+  static const String eptUpdateItemLcStatus = '/item/update_item_lc_status';
 
   //job
   // static const String eptPostJob = '/job/post_job';
