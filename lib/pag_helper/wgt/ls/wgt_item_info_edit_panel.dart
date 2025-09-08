@@ -27,6 +27,7 @@ import '../../def_helper/tariff_package_helper.dart';
 import '../../model/mdl_pag_app_config.dart';
 import '../scope/wgt_scope_setter.dart';
 import '../tree/wgt_item_group_tree.dart';
+import '../user/wgt_op_reset_password.dart';
 import '../user/wgt_uesr_role_setter.dart';
 
 class WgtPagItemInfoEditPanel extends StatefulWidget {
@@ -205,7 +206,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
   void _updateIsTenantUser(List<Map<String, dynamic>> userRoleList) {
     bool isTenantUser = false;
     for (Map<String, dynamic> roleInfo in userRoleList) {
-      if (roleInfo['portal_type_label'] == PagPortalType.emsTp.label) {
+      if (roleInfo['portal_type'] == PagPortalType.emsTp.value) {
         isTenantUser = true;
         break;
       }
@@ -414,6 +415,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
                         ),
                       ),
                       getUserRoleSetter(),
+                      getUserPasswordReset(),
                       getItemScopeSetter(),
                       getItemGroupTree(),
                     ],
@@ -554,6 +556,30 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
       // fields.add(verticalSpaceSmall);
     }
     return fields;
+  }
+
+  Widget getUserPasswordReset() {
+    if ((widget.itemKind != PagItemKind.user) || (_loggedInUser == null)) {
+      return Container();
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: WgtOpResetPassword(
+        appConfig: widget.appConfig,
+        loggedInUser: _loggedInUser!,
+        targetUserIndexStr: widget.itemIndexStr,
+        targetUsername: widget.itemInfoMap?['username'] ?? '',
+        targetUserAuthProvider: widget.itemInfoMap?['auth_provider'] ?? '',
+        // height: 200,
+        onPasswordReset: () {
+          // setState(() {
+          //   _fieldUpdated = true;
+          //   widget.onUpdate?.call();
+          // });
+        },
+      ),
+    );
   }
 
   Widget getUserRoleSetter() {

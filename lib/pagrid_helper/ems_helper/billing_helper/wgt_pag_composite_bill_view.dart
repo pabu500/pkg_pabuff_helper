@@ -6,12 +6,14 @@ import 'package:flutter/material.dart';
 import '../../../pag_helper/model/mdl_pag_project_profile.dart';
 import '../tenant/pag_ems_type_usage_calc.dart';
 import '../tenant/pag_ems_type_usage_calc_released.dart';
+import '../../../pag_helper/wgt/app/ems/wgt_bill_lc_status_op.dart';
 import '../tenant/wgt_pag_tenant_composite_usage_summary.dart';
 import '../../../pag_helper/comm/comm_pag_billing.dart';
 import '../tenant/tenant_usage_calc_released_r2.dart';
 import '../tenant/wgt_pag_tenant_composite_usage_summary_released.dart';
 import '../tenant/wgt_pag_tenant_usage_summary_released.dart';
 import '../../../pag_helper/model/acl/mdl_pag_svc_claim.dart';
+import 'pag_bill_def.dart';
 import 'wgt_pag_bill_render_pdf.dart';
 
 class WgtPagCompositeBillView extends StatefulWidget {
@@ -20,7 +22,8 @@ class WgtPagCompositeBillView extends StatefulWidget {
     required this.appConfig,
     required this.loggedInUser,
     required this.billingRecIndexStr,
-    required this.defaultBillLcStatus,
+    required this.defaultBillLcStatusStr,
+    this.displayContextStr = 'bill_view',
     this.isBillMode = true,
     this.costDecimals = 3,
     this.modes = const ['wgt', 'pdf'],
@@ -31,11 +34,12 @@ class WgtPagCompositeBillView extends StatefulWidget {
   final MdlPagUser loggedInUser;
   final MdlPagAppConfig appConfig;
   final bool isBillMode;
+  final String displayContextStr;
   final String billingRecIndexStr;
   final int costDecimals;
   final List<String> modes;
   final List<String> genTypes;
-  final String defaultBillLcStatus;
+  final String defaultBillLcStatusStr;
   final Function? onUpdate;
 
   @override
@@ -53,11 +57,16 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
 
   final Map<String, dynamic> _bill = {};
   String _renderMode = 'wgt'; // wgt, pdf
-  late String _lcStatusDisplay; // released, generated
+  // late String _lcStatusDisplay; // released, generated
+  late PagBillingLcStatus _lcStatusDisplay;
   bool _showGenTypeSwitch = false;
   bool _showRenderModeSwitch = false;
 
   late final String assetFolder;
+
+  UniqueKey? _lcStatusOpsKey;
+  bool _isDisabledGn = false;
+  bool _isDisabledPvRl = false;
 
   Future<dynamic> _getCompositeBill() async {
     setState(() {
@@ -68,7 +77,8 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     Map<String, dynamic> queryMap = {
       'scope': widget.loggedInUser.selectedScope.toScopeMap(),
       'billing_rec_index': widget.billingRecIndexStr,
-      'is_released_mode': _lcStatusDisplay == 'released' ? 'true' : 'false',
+      'is_released_mode':
+          _lcStatusDisplay == PagBillingLcStatus.released ? 'true' : 'false',
       'show_release_in_pv_mode': 'true',
     };
 
@@ -111,16 +121,17 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     super.initState();
 
     _pullFails = 0;
-    _lcStatusDisplay = widget.defaultBillLcStatus;
-    if (_lcStatusDisplay == 'pv') {
-      _lcStatusDisplay = 'released';
-    }
+    _lcStatusDisplay =
+        PagBillingLcStatus.byValue(widget.defaultBillLcStatusStr);
+    // if (_lcStatusDisplay == PagBillingLcStatus.pv) {
+    //   _lcStatusDisplay = PagBillingLcStatus.released;
+    // }
 
     _showGenTypeSwitch = widget.genTypes.length > 1;
     _showRenderModeSwitch = widget.modes.length > 1;
     _renderMode = widget.modes[0];
 
-    if (_lcStatusDisplay == 'released') {
+    if (_lcStatusDisplay == PagBillingLcStatus.released) {
       // _renderMode = 'pdf';
       // temp to put wgt till pdf template is ready
       _renderMode = 'wgt';
@@ -164,6 +175,32 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
                     if (_showGenTypeSwitch) getSwitchGenType(),
                   ],
                 ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  horizontalSpaceRegular,
+                  WgtPagBillLcStatusOp(
+                    key: _lcStatusOpsKey,
+                    appConfig: widget.appConfig,
+                    loggedInUser: widget.loggedInUser,
+                    enableEdit: widget.displayContextStr == 'bill_view',
+                    billInfo: _bill,
+                    initialStatus: _lcStatusDisplay,
+                    onCommitted: (newStatus) {
+                      setState(() {
+                        _lcStatusOpsKey = UniqueKey();
+                        _bill['lc_status'] = newStatus.value;
+                        _isDisabledGn = newStatus == PagBillingLcStatus.pv ||
+                            newStatus == PagBillingLcStatus.released;
+                        _isDisabledPvRl =
+                            newStatus == PagBillingLcStatus.generated;
+                        _lcStatusDisplay = newStatus;
+                      });
+                      widget.onUpdate?.call();
+                    },
+                  ),
+                ],
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -254,7 +291,8 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     DateTime toDatetime = getTargetDatetimeFromTargetStr(toTimestampStr);
     String billBarFromMonth = _bill['bill_bar_from_timestamp'] ?? '';
 
-    if (_lcStatusDisplay == 'released') {
+    if (_lcStatusDisplay == PagBillingLcStatus.released ||
+        _lcStatusDisplay == PagBillingLcStatus.pv) {
       return getReleaseRender(
           tenantName,
           tenantLabel,
@@ -485,10 +523,11 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             },
           )
         : WgtPagTenantCompositeUsageSummary(
+            isDisabled: _isDisabledGn,
             costDecimals: widget.costDecimals,
             appConfig: widget.appConfig,
             loggedInUser: widget.loggedInUser,
-            displayContextStr: '',
+            displayContextStr: widget.displayContextStr,
             tenantSingularUsageInfoList: singularUsageList,
             compositeUsageCalc: compositeUsageCalc,
             isBillMode: widget.isBillMode,
@@ -510,7 +549,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             onUpdate: () {
               widget.onUpdate?.call();
               setState(() {
-                _lcStatusDisplay = _bill['lc_status'];
+                // _lcStatusDisplay = _bill['lc_status'];
               });
             },
           );
@@ -713,10 +752,11 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             },
           )
         : WgtPagTenantCompositeUsageSummaryReleased(
+            isDisabled: _isDisabledPvRl,
             costDecimals: widget.costDecimals,
             appConfig: widget.appConfig,
             loggedInUser: widget.loggedInUser,
-            displayContextStr: '',
+            displayContextStr: widget.displayContextStr,
             isBillMode: widget.isBillMode,
             billInfo: _bill,
             // usageCalc: compositeUsageCalc,
@@ -743,7 +783,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             onUpdate: () {
               widget.onUpdate?.call();
               setState(() {
-                _lcStatusDisplay = _bill['lc_status'];
+                // _lcStatusDisplay = _bill['lc_status'];
               });
             },
           );
@@ -986,15 +1026,15 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
         const Text('View in Gn Mode'),
         horizontalSpaceTiny,
         Switch(
-          value: _lcStatusDisplay == 'released' ? true : false,
+          value: _lcStatusDisplay == PagBillingLcStatus.released ? true : false,
           onChanged: _gettingBill
               ? null
               : (value) {
                   setState(() {
                     _isSwitching = true;
                     value
-                        ? _lcStatusDisplay = 'released'
-                        : _lcStatusDisplay = 'generated';
+                        ? _lcStatusDisplay = PagBillingLcStatus.released
+                        : _lcStatusDisplay = PagBillingLcStatus.generated;
                     _bill.clear();
                   });
                 },

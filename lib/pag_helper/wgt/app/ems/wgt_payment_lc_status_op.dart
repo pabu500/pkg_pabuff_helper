@@ -4,20 +4,22 @@ import 'package:flutter/foundation.dart';
 import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
-import '../../../pag_helper/comm/comm_pag_billing.dart';
-import '../../../pag_helper/model/acl/mdl_pag_svc_claim.dart';
-import '../../../pag_helper/model/mdl_pag_app_config.dart';
-import '../../../pag_helper/wgt/wgt_comm_button.dart';
+import '../../../comm/comm_pag_billing.dart';
+import '../../../model/acl/mdl_pag_svc_claim.dart';
+import '../../../model/mdl_pag_app_config.dart';
+import '../../wgt_comm_button.dart';
 
-class WgtPagBillLcStatusOp extends StatefulWidget {
-  const WgtPagBillLcStatusOp({
+class WgtPagPaymentLcStatusOp extends StatefulWidget {
+  const WgtPagPaymentLcStatusOp({
     super.key,
     required this.appConfig,
     required this.loggedInUser,
     required this.billInfo,
     required this.initialStatus,
     this.onCommitted,
+    this.enableEdit = false,
   });
 
   final MdlPagAppConfig appConfig;
@@ -25,12 +27,14 @@ class WgtPagBillLcStatusOp extends StatefulWidget {
   final Map<String, dynamic> billInfo;
   final PagBillingLcStatus initialStatus;
   final Function? onCommitted;
+  final bool enableEdit;
 
   @override
-  State<WgtPagBillLcStatusOp> createState() => _WgtPagBillLcStatusOpState();
+  State<WgtPagPaymentLcStatusOp> createState() =>
+      _WgtPagPaymentLcStatusOpState();
 }
 
-class _WgtPagBillLcStatusOpState extends State<WgtPagBillLcStatusOp> {
+class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
   late final tagTextStyle = TextStyle(
     color: Theme.of(context).colorScheme.onPrimary,
   );
@@ -90,25 +94,28 @@ class _WgtPagBillLcStatusOpState extends State<WgtPagBillLcStatusOp> {
   @override
   Widget build(BuildContext context) {
     // return Container();
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Row(
-          children: [
-            getBillLcStatusTagWidget(context, PagBillingLcStatus.mfd,
-                style: tagTextStyle),
-            horizontalSpaceLarge,
-            getLcStatusButton(PagBillingLcStatus.generated),
-            const Text('  ►  '),
-            getLcStatusButton(PagBillingLcStatus.pv),
-            const Text('  ►  '),
-            getLcStatusButton(PagBillingLcStatus.released),
-            getCommitButton(),
-          ],
-        ),
-        if (_errorText.isNotEmpty)
-          getErrorTextPrompt(context: context, errorText: _errorText)
-      ],
+    return Opacity(
+      opacity: widget.enableEdit ? 1.0 : 0.5,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              getBillLcStatusTagWidget(context, PagBillingLcStatus.mfd,
+                  style: tagTextStyle),
+              horizontalSpaceLarge,
+              getLcStatusButton(PagBillingLcStatus.generated),
+              Icon(Symbols.chevron_forward, color: Theme.of(context).hintColor),
+              getLcStatusButton(PagBillingLcStatus.pv),
+              Icon(Symbols.chevron_forward, color: Theme.of(context).hintColor),
+              getLcStatusButton(PagBillingLcStatus.released),
+              getCommitButton(),
+            ],
+          ),
+          if (_errorText.isNotEmpty)
+            getErrorTextPrompt(context: context, errorText: _errorText)
+        ],
+      ),
     );
   }
 
@@ -144,7 +151,7 @@ class _WgtPagBillLcStatusOpState extends State<WgtPagBillLcStatusOp> {
     }
 
     return InkWell(
-      onTap: !clickEnabled
+      onTap: !widget.enableEdit || !clickEnabled
           ? null
           : () {
               setState(() {

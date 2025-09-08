@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'dart:developer' as dev;
 import 'package:buff_helper/pag_helper/comm/comm_user_service.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pag_helper/comm/comm_sso.dart';
@@ -66,10 +67,16 @@ class _WgtLoginState extends State<WgtLogin> {
           PagUserKey.password.name: _password,
           PagUserKey.email.name: email,
           PagUserKey.authProvider.name: authProvider,
-          'portal_type_name': widget.appConfig.portalType.name,
-          'portal_type_label': widget.appConfig.portalType.label,
+          // 'portal_type_name': widget.appConfig.portalType.name,
+          // 'portal_type_label': widget.appConfig.portalType.label,
+          'portal_type': widget.appConfig.portalType.value,
         }),
       );
+
+      if (user.resetPasswordToken == 'flag_reset') {
+        dev.log('Password reset required. Not saving password.');
+        _savePassword = false;
+      }
 
       // user.flatReset
       // if (user.resetPasswordToken == 'flag_reset') {
@@ -340,9 +347,8 @@ class _WgtLoginState extends State<WgtLogin> {
 
   @override
   Widget build(BuildContext context) {
-    if (kDebugMode) {
-      print('WgtLogin.build()');
-    }
+    dev.log('WgtLogin.build()');
+
     bool enabled = !_isLoggingIn &&
         _username.isNotEmpty &&
         _password.isNotEmpty &&
@@ -379,11 +385,13 @@ class _WgtLoginState extends State<WgtLogin> {
                 },
               ),
               WgtTextField(
-                enabled: !_isLoggingIn,
+                enabled: !_isLoggingIn &&
+                    !_hasLoggedIn /*&& _errorTextLocal != 'Login failed'*/,
                 appConfig: widget.appConfig,
                 hintText: 'Password',
                 obscureText: true,
                 showClearButton: false,
+                unfocusOnEditingComplete: true,
                 onChanged: (value) {
                   setState(() {
                     _errorTextLocal = '';
@@ -394,7 +402,7 @@ class _WgtLoginState extends State<WgtLogin> {
                   // onEditingComplete is called twice.
                   // causing awkward behavior.
                   // This is a workaround
-                  if (_hasLoggedIn) {
+                  if (_isLoggingIn || _hasLoggedIn) {
                     return;
                   }
                   // onEditingComplete is called repeatedly
@@ -407,16 +415,26 @@ class _WgtLoginState extends State<WgtLogin> {
                     return;
                   }
 
-                  if (kDebugMode) {
-                    print('onEditingComplete');
-                  }
+                  dev.log('login:onEditingComplete');
 
-                  await _login().then((user) {
-                    // _logginThen(user);
-                    if (user != null) {
-                      widget.onLoggedIn?.call(user);
-                    }
-                  });
+                  // await _login().then((user) {
+                  //   // _logginThen(user);
+                  //   if (user != null) {
+                  //     widget.onLoggedIn?.call(user);
+                  //   } else {
+                  //     dev.log('login:onEditingComplete failed');
+                  //     _errorTextLocal = 'Login failed';
+                  //     setState(() {});
+                  //   }
+                  // });
+                  final user = await _login();
+                  if (user != null) {
+                    widget.onLoggedIn?.call(user);
+                  } else {
+                    dev.log('login:onEditingComplete failed');
+                    _errorTextLocal = 'Login failed';
+                    setState(() {});
+                  }
                 },
                 suffix: InkWell(
                   child: Padding(

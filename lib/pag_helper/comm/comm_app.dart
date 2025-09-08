@@ -7,28 +7,86 @@ import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
 import 'package:buff_helper/pag_helper/model/mdl_svc_query.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:buff_helper/up_helper/up_helper.dart';
 
-Future<dynamic> getPortalStatus(
-    String appName, MdlPagAppConfig pagAppConfig) async {
-  String projectScope = pagAppConfig.activePortalPagProjectScopeList[0].name;
+// Future<dynamic> getPortalStatus(
+//     String appName, MdlPagAppConfig pagAppConfig) async {
+//   String projectScope = pagAppConfig.activePortalPagProjectScopeList[0].name;
 
-  try {
-    String url =
-        '${PagUrlController(null, pagAppConfig).getUrl(PagSvcType.oresvc2, PagUrlBase.eptGetPortalStatus)}/$appName/$projectScope';
-    final response = await http.get(Uri.parse(url));
+//   try {
+//     String url =
+//         '${PagUrlController(null, pagAppConfig).getUrl(PagSvcType.oresvc2, PagUrlBase.eptGetTargetPortalStatus)}/$appName/$projectScope';
+//     final response = await http.get(Uri.parse(url));
 
-    if (response.statusCode == 200) {
-      final respJson = jsonDecode(response.body);
-      return respJson['status'] ?? '';
-    } else {
-      throw Exception('Failed to load status');
+//     if (response.statusCode == 200) {
+//       final respJson = jsonDecode(response.body);
+//       return respJson['status'] ?? '';
+//     } else {
+//       throw Exception('Failed to load status');
+//     }
+//   } catch (err) {
+//     if (kDebugMode) {
+//       print(err);
+//     }
+//     rethrow;
+//   }
+// }
+
+Future<dynamic> getPortalTargetStatus(MdlPagAppConfig appConfig) async {
+  String endpoint = PagUrlBase.eptGetPortalTargetStatus;
+
+  String svcToken = '';
+  // try {
+  //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
+  // } catch (err) {
+  //   throw Exception(err);
+  // }
+
+  final response = await http.post(
+    Uri.parse(
+        PagUrlController(null, appConfig).getUrl(PagSvcType.oresvc2, endpoint)),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer $svcToken',
+    },
+    body: jsonEncode(MdlPagSvcQuery(MdlPagSvcClaim(), {
+      'portal_type': appConfig.portalType.value,
+    }).toJson()),
+  );
+
+  if (response.statusCode == 200) {
+    final responseBody = jsonDecode(response.body);
+    if (responseBody['error'] != null) {
+      // final error = responseBody['error'];
+      // final code = error['code'] ?? 'unknown';
+      // final message = error['message'] ?? '';
+      // if (code == ApiCode.resultNotFound.code) {
+      //   return <String, dynamic>{
+      //     'info': 'not found',
+      //     'message': message,
+      //   };
+      // }
+      throw Exception(responseBody['error']);
     }
-  } catch (err) {
-    if (kDebugMode) {
-      print(err);
+    final data = responseBody['data'];
+    if (data == null) {
+      throw Exception('Failed to get response data');
     }
-    rethrow;
+    final result = data['result'];
+    if (result == null) {
+      throw Exception("No result found in the response");
+    }
+    String? resultKey = data['result_key'];
+    if (resultKey == null && resultKey!.isEmpty) {
+      throw Exception("Error: $resultKey");
+    }
+    if (result[resultKey] == null) {
+      throw Exception("No data found in the response");
+    }
+    return result[resultKey];
+  } else if (response.statusCode == 403) {
+    throw Exception("You are not authorized to perform this operation");
+  } else {
+    throw Exception(jsonDecode(response.body)['error']);
   }
 }
 

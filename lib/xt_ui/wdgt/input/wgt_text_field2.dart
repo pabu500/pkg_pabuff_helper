@@ -37,6 +37,7 @@ class WgtTextField extends StatefulWidget {
     this.decoration,
     this.isPag = false,
     this.suffix,
+    this.unfocusOnEditingComplete = false,
   });
 
   final dynamic appConfig;
@@ -68,6 +69,7 @@ class WgtTextField extends StatefulWidget {
   final InputDecoration? decoration;
   final bool isPag;
   final Widget? suffix;
+  final bool unfocusOnEditingComplete;
 
   @override
   State<WgtTextField> createState() => _WgtTextFieldState();
@@ -232,6 +234,11 @@ class _WgtTextFieldState extends State<WgtTextField> {
               if (widget.checkUnique != null) {
                 checkUnique(widget.appConfig, widget.uniqueKey!,
                     _controller.text, widget.itemTableName!);
+              }
+
+              // unfocus
+              if (widget.unfocusOnEditingComplete) {
+                FocusScope.of(context).unfocus();
               }
             },
             decoration: widget.decoration ??

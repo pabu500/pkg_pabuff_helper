@@ -14,7 +14,6 @@ import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
 import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_scope.dart';
 import 'package:buff_helper/pag_helper/wgt/app/am/wgt_am_meter_group_assignment.dart';
-import 'package:buff_helper/pag_helper/wgt/app/ems/wgt_match_payment.dart';
 import 'package:buff_helper/pag_helper/wgt/app/ems/wgt_meter_group_assignment2.dart';
 import 'package:buff_helper/pagrid_helper/comm_helper/local_storage.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/wgt_pag_composite_bill_view.dart';
@@ -35,8 +34,9 @@ import 'package:provider/provider.dart';
 
 import '../../comm/comm_list.dart';
 import '../../model/mdl_pag_app_config.dart';
+import '../app/ems/wgt_match_payment_op_item.dart';
 import '../app/ems/wgt_tenant_soa.dart';
-import '../app/fh/wgt_pag_device_health.dart';
+import '../app/fh/wgt_fh_device_health.dart';
 import '../job/wgt_job_type_op_panel.dart';
 import 'wgt_item_info_edit_panel.dart';
 import 'wgt_list_pane.dart';
@@ -1123,7 +1123,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                         appConfig: widget.appConfig,
                         loggedInUser: loggedInUser!,
                         billingRecIndexStr: item['id'],
-                        defaultBillLcStatus: item['lc_status'],
+                        defaultBillLcStatusStr: item['lc_status'],
                         modes: item['lc_status'] == 'released' ||
                                 item['lc_status'] == 'pv'
                             ? const ['wgt', 'pdf']
@@ -1216,6 +1216,10 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           appConfig: widget.appConfig,
           loggedInUser: loggedInUser!,
           paymentMatchInfo: item,
+          tenantInfo: {
+            'tenant_name': item['tenant_name'],
+            'tenant_label': item['tenant_label'],
+          },
           regFresh: (doRefreshItem) {
             item['is_comm'] = doRefreshItem;
           },
@@ -1245,7 +1249,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
             onPressed: () {
               xtShowModelBottomSheet(
                 context,
-                WgtPagDeviceHealth(
+                WgtFhDeviceHealth(
                   appConfig: widget.appConfig,
                   loggedInUser: loggedInUser!,
                   deviceCat: deviceCat!,
@@ -1564,71 +1568,5 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         onPressed(item, fullList);
       },
     );
-  }
-}
-
-class WgtPaymentMatchOpItem extends StatefulWidget {
-  const WgtPaymentMatchOpItem({
-    super.key,
-    required this.appConfig,
-    required this.loggedInUser,
-    required this.paymentMatchInfo,
-    this.regFresh,
-  });
-
-  final MdlPagAppConfig appConfig;
-  final MdlPagUser loggedInUser;
-  final Map<String, dynamic> paymentMatchInfo;
-  final void Function(void Function(bool isComm, bool isEnabled))? regFresh;
-
-  @override
-  State<WgtPaymentMatchOpItem> createState() => _WgtPaymentMatchOpItemState();
-}
-
-class _WgtPaymentMatchOpItemState extends State<WgtPaymentMatchOpItem> {
-  bool _isComm = false;
-  bool _isEnabled = false;
-
-  void _refresh(bool isComm, bool isEnabled) {
-    if (!mounted) {
-      return;
-    }
-
-    setState(() {
-      _isComm = isComm;
-      _isEnabled = isEnabled;
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    widget.regFresh?.call(_refresh);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // return widget;
-    return _isComm
-        ? const WgtPagWait(size: 21)
-        : InkWell(
-            onTap: !_isEnabled
-                ? null
-                : () {
-                    xtShowModelBottomSheet(
-                      context,
-                      WgtMatchOnePayment(
-                        appConfig: widget.appConfig,
-                        loggedInUser: widget.loggedInUser,
-                        paymentMatchingInfo: widget.paymentMatchInfo,
-                      ),
-                      onClosed: () {},
-                    );
-                  },
-            child: Icon(Symbols.payments,
-                color: _isEnabled
-                    ? Theme.of(context).colorScheme.primary.withAlpha(210)
-                    : Theme.of(context).hintColor.withAlpha(50)),
-          );
   }
 }

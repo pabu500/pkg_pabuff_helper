@@ -385,6 +385,7 @@ class MdlPagUser {
     List<MdlPagProjectProfile> projectProfileList, {
     String lazyLoadScope = '',
   }) {
+    assert(projectProfileList.isNotEmpty);
     MdlPagProjectProfile? selectedProjectProfile = projectProfileList[0];
     assert(selectedProjectProfile.isNotEmpty);
     MdlPagSiteGroupProfile? selectSiteGroupProfile;
@@ -442,10 +443,10 @@ class MdlPagUser {
     }
   }
 
-  List<MdlPagRole> getRoleList(String portalTypeLable) {
+  List<MdlPagRole> getRoleList(String portalTypeValue) {
     List<MdlPagRole> roleList = [];
     for (MdlPagRole role in this.roleList) {
-      if (role.portalType.label == portalTypeLable) {
+      if (role.portalType.value == portalTypeValue) {
         roleList.add(role);
       }
     }
@@ -478,6 +479,8 @@ class MdlPagUser {
   factory MdlPagUser.fromJson2(Map<String, dynamic> respJson) {
     try {
       Map<String, dynamic> userJson = respJson['userInfo'];
+      assert(
+          userJson['error'] == null, 'Error in response: ${userJson['error']}');
       List<MdlPagRole> roleList = [];
 
       if (userJson['role_list'] != null) {

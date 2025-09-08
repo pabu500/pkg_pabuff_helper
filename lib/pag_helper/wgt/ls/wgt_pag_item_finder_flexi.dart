@@ -1398,9 +1398,12 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
               : Theme.of(context).hintColor.withAlpha(75)),
       onPressed: _enableSearch
           ? () async {
-              Map<String, dynamic> itemFindResult = await _getItemList();
-
-              widget.onResult(itemFindResult);
+              final itemFindResult = await _getItemList();
+              if (itemFindResult == null) {
+                _errorText = 'Error fetching item list';
+              } else {
+                widget.onResult(itemFindResult);
+              }
             }
           : null,
     );

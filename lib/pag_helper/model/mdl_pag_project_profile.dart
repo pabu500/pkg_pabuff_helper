@@ -267,8 +267,8 @@ class MdlPagProjectProfile {
 
   factory MdlPagProjectProfile.fromJson2(Map<String, dynamic> json) {
     // String portalTypeNameStr = json['portal_type_name'] ?? '';
-    String portalTypeLabelStr = json['portal_type_label'] ?? '';
-    assert(portalTypeLabelStr.isNotEmpty);
+    String portalTypeStr = json['portal_type'] ?? '';
+    assert(portalTypeStr.isNotEmpty);
     // assert(portalTypeNameStr.isNotEmpty);
 
     String projectIdStr = json['project_id'];
@@ -353,7 +353,7 @@ class MdlPagProjectProfile {
     List<Map<String, dynamic>> deviceTypeInfoList = [];
     Map<String, dynamic> configInfo = {};
     for (var config in configInfoList) {
-      if (config['portal_type'] == portalTypeLabelStr) {
+      if (config['portal_type'] == portalTypeStr) {
         configInfo.addAll(config);
         break;
       }

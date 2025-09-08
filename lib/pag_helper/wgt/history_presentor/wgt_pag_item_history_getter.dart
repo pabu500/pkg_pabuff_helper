@@ -284,7 +284,7 @@ class _WgtPagItemHistoryGetterState extends State<WgtPagItemHistoryGetter> {
 
       queryMap = {
         'scope': widget.loggedInUser.selectedScope.toScopeMap(),
-        'item_type': itemTypeStr,
+        'item_type': itemTypeStr=="" ? widget.itemType?.value : itemTypeStr,
         'item_id_type': widget.itemIdType.name,
         'item_id_value': widget.itemId,
         'history_type': widget.historyType.name,
@@ -323,6 +323,8 @@ class _WgtPagItemHistoryGetterState extends State<WgtPagItemHistoryGetter> {
           operation: '',
         ),
       );
+
+      queryMap["item_type"] = itemTypeStr;
 
       var itemHistoryInfo = data['item_history'];
 

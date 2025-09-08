@@ -1,5 +1,4 @@
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
-import 'package:buff_helper/pagrid_helper/ems_helper/tenant/wgt_bill_lc_status_op.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'dart:developer' as dev;
 
@@ -24,6 +23,7 @@ class WgtPagTenantCompositeUsageSummaryReleased extends StatefulWidget {
     required this.tenantType,
     required this.excludeAutoUsage,
     required this.displayContextStr,
+    this.isDisabled = false,
     this.renderMode = 'wgt', // wgt, pdf
     this.showRenderModeSwitch = false,
     this.tenantLabel,
@@ -51,6 +51,7 @@ class WgtPagTenantCompositeUsageSummaryReleased extends StatefulWidget {
   final String displayContextStr;
   // final PagEmsTypeUsageCalcReleased usageCalc;
   final ItemType itemType;
+  final bool isDisabled;
   final bool isMonthly;
   final DateTime fromDatetime;
   final DateTime toDatetime;
@@ -92,7 +93,7 @@ class _WgtPagTenantCompositeUsageSummaryReleasedState
 
   late final _billInfo = Map<String, dynamic>.from(widget.billInfo);
 
-  bool _isDisabled = false;
+  // bool _isDisabled = false;
 
   @override
   void initState() {
@@ -106,7 +107,7 @@ class _WgtPagTenantCompositeUsageSummaryReleasedState
     PagBillingLcStatus currentStatus = PagBillingLcStatus.byValue(lcStatus);
 
     return Opacity(
-      opacity: _isDisabled ? 0.5 : 1.0,
+      opacity: widget.isDisabled ? 0.5 : 1.0,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 13),
         child: Container(
@@ -121,37 +122,7 @@ class _WgtPagTenantCompositeUsageSummaryReleasedState
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Stack(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.max,
-                    children: [getBillTitleRow()],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      WgtPagBillLcStatusOp(
-                        key: _lcStatusOpsKey,
-                        appConfig: widget.appConfig,
-                        loggedInUser: widget.loggedInUser,
-                        billInfo: _billInfo,
-                        initialStatus: currentStatus,
-                        onCommitted: (newStatus) {
-                          setState(() {
-                            _lcStatusOpsKey = UniqueKey();
-                            _billInfo['lc_status'] = newStatus.value;
-                            _isDisabled =
-                                newStatus == PagBillingLcStatus.generated;
-                          });
-                          widget.onUpdate?.call();
-                        },
-                      )
-                    ],
-                  ),
-                ],
-              ),
+              getBillTitleRow(),
               const Divider(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -236,13 +207,16 @@ class _WgtPagTenantCompositeUsageSummaryReleasedState
       return Container();
     }
     String billLabel = widget.billInfo['bill_label'] ?? '';
+    String billLcStatusStr = widget.billInfo['lc_status'] ?? '';
+    PagBillingLcStatus billLcStatus =
+        PagBillingLcStatus.values.byName(billLcStatusStr);
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 13),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          getBillLcStatusTagWidget(context, PagBillingLcStatus.generated),
+          getBillLcStatusTagWidget(context, billLcStatus),
           horizontalSpaceSmall,
           Text('Invoice: ',
               style: TextStyle(

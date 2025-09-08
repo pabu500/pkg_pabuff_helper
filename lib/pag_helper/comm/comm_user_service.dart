@@ -28,8 +28,8 @@ Future<MdlPagUser> doLoginPag(
       PagUserKey.authProvider.name:
           formData[PagUserKey.authProvider.name] ?? '',
       // PagUserKey.destPortal.name: 'pag_console',
-      'portal_type_name': formData['portal_type_name'] ?? '',
-      'portal_type_label': formData['portal_type_label'] ?? '',
+      'portal_type': formData['portal_type'] ?? '',
+      // 'portal_type_label': formData['portal_type_label'] ?? '',
     }),
   );
 
@@ -209,12 +209,12 @@ Future<dynamic> doGetVisibleRoleList(
     if (itemListJson != null) {
       for (var item in itemListJson) {
         String portalTypeStr = item['portal_type'];
-        PagPortalType portalType = PagPortalType.byLabel(portalTypeStr);
+        PagPortalType portalType = PagPortalType.byValue(portalTypeStr);
         if (portalType == PagPortalType.none) {
           throw Exception('Invalid portal type: $portalTypeStr');
         }
-        item['portal_type_name'] = portalType.name;
-        item['portal_type_label'] = portalType.label;
+        item['portal_type'] = portalType.value;
+        // item['portal_type_label'] = portalType.label;
         itemList.add(item);
       }
     }
@@ -356,6 +356,57 @@ Future<dynamic> doCheckKeyVal(
       throw Exception('Failed to update user key value');
     }
     return respJson['data'];
+  } else {
+    throw Exception(jsonDecode(response.body)['err']);
+  }
+}
+
+Future<dynamic> doResetUserPassword(
+  MdlPagAppConfig appConfig,
+  Map<String, dynamic> queryMap,
+  MdlPagSvcClaim svcClaim,
+) async {
+  svcClaim.svcName = PagSvcType.usersvc2.name;
+  svcClaim.endpoint = PagUrlBase.eptOpResetUserPassword;
+
+  String svcToken = '';
+  // try {
+  //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
+  // } catch (err) {
+  //   throw Exception(err);
+  // }
+
+  final response = await http.post(
+    Uri.parse(PagUrlController(null, appConfig)
+        .getUrl(PagSvcType.usersvc2, svcClaim.endpoint!)),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer $svcToken',
+    },
+    body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
+  );
+
+  if (response.statusCode == 200) {
+    final respJson = jsonDecode(response.body);
+    if (respJson['error'] != null) {
+      throw Exception(respJson['error']);
+    }
+    final data = respJson['data'];
+    if (data == null) {
+      throw Exception('Failed to get response data');
+    }
+    final result = data['result'];
+    if (result == null) {
+      throw Exception("No result found in the response");
+    }
+    String? resultKey = data['result_key'];
+    if (resultKey == null && resultKey!.isEmpty) {
+      throw Exception("Error: $resultKey");
+    }
+    if (result[resultKey] == null) {
+      throw Exception("No data found in the response");
+    }
+    return result[resultKey];
   } else {
     throw Exception(jsonDecode(response.body)['err']);
   }

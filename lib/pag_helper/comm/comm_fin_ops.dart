@@ -87,9 +87,17 @@ Future<dynamic> matchPayment(
 
   if (response.statusCode == 200) {
     final responseBody = jsonDecode(response.body);
-    final error = responseBody['error'];
-    if (error != null) {
-      throw Exception(error);
+    if (responseBody['error'] != null) {
+      final error = responseBody['error'];
+      final code = error['code'] ?? 'unknown';
+      final message = error['message'] ?? '';
+      if (code == ApiCode.resultNotFound.code) {
+        return <String, dynamic>{
+          'info': 'not found',
+          'message': message,
+        };
+      }
+      throw Exception(responseBody['error']);
     }
     final data = responseBody['data'];
     if (data == null) {
