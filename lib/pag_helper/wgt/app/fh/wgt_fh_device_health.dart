@@ -41,8 +41,9 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
   final valueWidth = null;
   final contentWidth = 365.0;
 
-  final okColor = Colors.teal;
-  late final errorColor = Theme.of(context).colorScheme.error.withAlpha(210);
+  final okColor = Colors.green.shade700;
+  late final errorColor = Theme.of(context).colorScheme.error;
+  final unknownColor = Colors.grey.withAlpha(210);
 
   bool _isFetching = false;
   bool _isFetched = false;
@@ -52,6 +53,7 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
   Map<String, dynamic> _selectedMeterInfo = {};
   bool? _isCheckingMeter;
   String _checkMeterErrorText = '';
+  String _checkMeterMessage = '';
 
   final Map<String, dynamic> _gatewayHealthData = {};
   final Map<String, dynamic> _meterHealthData = {};
@@ -110,7 +112,7 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
     setState(() {
       _isCheckingMeter = true;
       _checkMeterErrorText = '';
-      _message = '';
+      _checkMeterMessage = '';
     });
 
     Map<String, dynamic> queryMap = {
@@ -133,7 +135,10 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
             operation: '',
           ));
       if (result['info'] != null) {
-        _message = result['message'];
+        _checkMeterMessage = result['message'];
+        if (_checkMeterMessage.toLowerCase().contains('timeout')) {
+          _checkMeterErrorText = 'Request timout';
+        }
       } else {
         final meterHealthInfo = result['meter_health_info'];
         _meterHealthData.clear();
@@ -446,6 +451,13 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
       decoration: BoxDecoration(
         border: Border.all(color: Theme.of(context).hintColor.withAlpha(130)),
         borderRadius: BorderRadius.circular(5.0),
+        color: _meterHealthData.isNotEmpty
+            ? (_meterHealthData['comm_check_result'] == 'ok'
+                ? okColor
+                : (_meterHealthData['comm_check_result'] == 'fail'
+                    ? errorColor
+                    : unknownColor))
+            : unknownColor,
       ),
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
       child: Column(
@@ -499,30 +511,23 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
     String commCheckResult = _meterHealthData['comm_check_result'] ?? '';
 
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-      child: commCheckResult.isEmpty
-          ? Container()
-          : commCheckResult == 'ok'
-              ? Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Symbols.check_circle, color: okColor, size: 25),
-                    horizontalSpaceTiny,
-                    Text('Meter Comm Check OK', style: valueStyle),
-                  ],
-                )
-              : Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Symbols.error,
-                        color:
-                            Theme.of(context).colorScheme.error.withAlpha(180),
-                        size: 30),
-                    horizontalSpaceSmall,
-                    Text('Meter is offline', style: valueStyle),
-                  ],
-                ),
-    );
+        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+        child: commCheckResult.isEmpty
+            ? Container()
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                      commCheckResult == 'ok'
+                          ? 'Comm OK'
+                          : commCheckResult == 'fail'
+                              ? 'Comm Fail'
+                              : _checkMeterMessage.isNotEmpty
+                                  ? _checkMeterMessage
+                                  : 'Comm Unknown',
+                      style: valueStyle),
+                ],
+              ));
   }
 
   // Widget getOpPanel(Map<String, dynamic> fhStat) {

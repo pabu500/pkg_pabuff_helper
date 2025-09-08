@@ -87,6 +87,12 @@ Future<dynamic> getDeviceHealthInfo(
           'message': message,
         };
       }
+      if (code == ApiCode.resultTimeOut.code) {
+        return <String, dynamic>{
+          'info': 'Request timed out',
+          'message': message,
+        };
+      }
       throw Exception(respJson['error']);
     }
     final data = respJson['data'];

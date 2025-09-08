@@ -9,6 +9,7 @@ enum ApiCode {
   requestMissingParameter('REQUEST_MISSING_PARAMETER'),
   resultGenericError('RESULT_GENERIC_ERROR'),
   resultNotFound('RESULT_NOT_FOUND'),
+  resultTimeOut('RESULT_TIMEOUT'),
   resultDatabaseError('RESULT_DATABASE_ERROR'),
   unknownError('UNKNOWN_ERROR'),
   ;
