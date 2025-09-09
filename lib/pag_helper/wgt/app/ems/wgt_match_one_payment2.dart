@@ -20,13 +20,17 @@ class WgtMatchOnePayment2 extends StatefulWidget {
     required this.appConfig,
     required this.loggedInUser,
     required this.tenantInfo,
+    required this.defaultPaymentLcStatusStr,
     this.paymentMatchingInfo,
+    this.onUpdate,
   });
 
   final MdlPagAppConfig appConfig;
   final MdlPagUser loggedInUser;
   final Map<String, dynamic> tenantInfo;
   final Map<String, dynamic>? paymentMatchingInfo;
+  final String defaultPaymentLcStatusStr;
+  final Function? onUpdate;
 
   @override
   State<WgtMatchOnePayment2> createState() => _WgtMatchOnePayment2State();
@@ -42,7 +46,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
     fontWeight: FontWeight.bold,
   );
 
-  late final TextStyle billLabelStyle = TextStyle(
+  late final TextStyle billLabelStyle = const TextStyle(
     fontWeight: FontWeight.bold,
     fontSize: 18,
     // color: Theme.of(context).colorScheme.primary,
@@ -69,6 +73,9 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
   String _errorText = '';
 
   final List<Map<String, dynamic>> _billList = [];
+  late PagPaymentLcStatus _lcStatusDisplay;
+  UniqueKey? _lcStatusOpsKey;
+  late Map<String, dynamic> _paymentInfo = widget.paymentMatchingInfo ?? {};
 
   Future<void> _fetchBillList() async {
     if (_isFetchingBillList || _billListFetchTried) return;
@@ -109,10 +116,37 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _lcStatusDisplay =
+        PagPaymentLcStatus.byValue(widget.defaultPaymentLcStatusStr);
+  }
+
+  @override
   Widget build(BuildContext context) {
     bool fetchingBillList = _billList.isEmpty && !_billListFetchTried;
 
     final tenantLabel = widget.tenantInfo['tenant_label'] ?? '';
+
+    bool showPaymentLcStatusOp = false;
+    final lcStatusStr = widget.paymentMatchingInfo?['lc_status'] ?? '';
+    PagPaymentLcStatus lcStatus = PagPaymentLcStatus.byValue(lcStatusStr);
+
+    bool hasMatchedBill = false;
+    for (var bill in _billList) {
+      if (widget.paymentMatchingInfo != null &&
+          widget.paymentMatchingInfo!['matched_payment_info'] != null &&
+          widget.paymentMatchingInfo!['matched_payment_info']
+                  ['billing_rec_id'] ==
+              bill['id']) {
+        hasMatchedBill = true;
+        break;
+      }
+    }
+    if (hasMatchedBill) {
+      showPaymentLcStatusOp = true;
+    }
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -133,7 +167,31 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                       widget.paymentMatchingInfo?['matched_payment_info']
                               ?['amount'] ??
                           '',
-                      style: mainTextStyle)
+                      style: mainTextStyle),
+                  const Spacer(),
+                  if (hasMatchedBill)
+                    WgtPagPaymentLcStatusOp(
+                      key: _lcStatusOpsKey,
+                      appConfig: widget.appConfig,
+                      loggedInUser: widget.loggedInUser,
+                      enableEdit: true,
+                      paymentInfo: widget.paymentMatchingInfo ?? {},
+                      initialStatus: _lcStatusDisplay,
+                      onCommitted: (newStatus) {
+                        setState(() {
+                          _lcStatusOpsKey = UniqueKey();
+                          // _bill['lc_status'] = newStatus.value;
+                          _paymentInfo['lc_status'] = newStatus.value;
+
+                          // _isDisabledGn = newStatus == PagBillingLcStatus.pv ||
+                          //     newStatus == PagBillingLcStatus.released;
+                          _lcStatusDisplay = newStatus;
+                        });
+                        dev.log('on committed: $newStatus');
+                        widget.onUpdate?.call();
+                      },
+                    ),
+                  const Padding(padding: EdgeInsets.only(right: 60)),
                 ]),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -211,13 +269,9 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
           billingRecId;
     }
 
-    final lcStatusStr = widget.paymentMatchingInfo?['lc_status'] ?? '';
-    PagPaymentLcStatus lcStatus = PagPaymentLcStatus.byValue(lcStatusStr);
+    // final lcStatusStr = widget.paymentMatchingInfo?['lc_status'] ?? '';
+    // PagPaymentLcStatus lcStatus = PagPaymentLcStatus.byValue(lcStatusStr);
 
-    bool showPaymentLcStatusOp = false;
-    if (isMatchedBill) {
-      showPaymentLcStatusOp = true;
-    }
     return Container(
       decoration: BoxDecoration(
         border: isMatchedBill
@@ -263,25 +317,6 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                 ],
               ),
               const Spacer(),
-              if (showPaymentLcStatusOp)
-                WgtPagPaymentLcStatusOp(
-                  // key: _lcStatusOpsKey,
-                  appConfig: widget.appConfig,
-                  loggedInUser: widget.loggedInUser,
-                  enableEdit: true,
-                  paymentInfo: widget.paymentMatchingInfo ?? {},
-                  initialStatus: lcStatus,
-                  onCommitted: (newStatus) {
-                    setState(() {
-                      // _lcStatusOpsKey = UniqueKey();
-                      // _bill['lc_status'] = newStatus.value;
-                      // _isDisabledGn = newStatus == PagBillingLcStatus.pv ||
-                      //     newStatus == PagBillingLcStatus.released;
-                      // _lcStatusDisplay = newStatus;
-                    });
-                    // widget.onUpdate?.call();
-                  },
-                ),
             ],
           ),
           if (billInfo['show_bill'] ?? false) const Divider(),

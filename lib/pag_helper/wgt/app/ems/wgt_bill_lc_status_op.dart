@@ -54,7 +54,10 @@ class _WgtPagBillLcStatusOpState extends State<WgtPagBillLcStatusOp> {
     final queryMap = {
       'scope': widget.loggedInUser?.selectedScope.toScopeMap(),
       'bill_info': {
+        'tenant_id': widget.billInfo['tenant_id'],
         'billing_rec_id': widget.billInfo['billing_rec_id'],
+        'bill_timestamp': widget.billInfo['to_timestamp'],
+        'billed_total_cost': widget.billInfo['billed_total_cost'],
       },
       'target_status': _selectedStatus.value,
     };

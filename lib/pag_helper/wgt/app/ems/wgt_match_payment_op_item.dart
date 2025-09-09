@@ -16,6 +16,8 @@ class WgtPaymentMatchOpItem extends StatefulWidget {
     required this.tenantInfo,
     required this.paymentMatchInfo,
     this.regFresh,
+    this.onUpdate,
+    this.onClosed,
   });
 
   final MdlPagAppConfig appConfig;
@@ -23,6 +25,8 @@ class WgtPaymentMatchOpItem extends StatefulWidget {
   final Map<String, dynamic> tenantInfo;
   final Map<String, dynamic> paymentMatchInfo;
   final void Function(void Function(bool isComm, bool isEnabled))? regFresh;
+  final Function? onUpdate;
+  final Function? onClosed;
 
   @override
   State<WgtPaymentMatchOpItem> createState() => _WgtPaymentMatchOpItemState();
@@ -75,8 +79,17 @@ class _WgtPaymentMatchOpItemState extends State<WgtPaymentMatchOpItem> {
                         loggedInUser: widget.loggedInUser,
                         tenantInfo: widget.tenantInfo,
                         paymentMatchingInfo: widget.paymentMatchInfo,
+                        defaultPaymentLcStatusStr:
+                            widget.paymentMatchInfo['lc_status'] ?? '',
+                        onUpdate: () {
+                          // _refresh(isComm, isEnabled);
+                          widget.onUpdate?.call(); // to refresh the icon state
+                        },
                       ),
-                      onClosed: () {},
+                      onClosed: () {
+                        // widget.onUpdate?.call();
+                        widget.onClosed?.call();
+                      },
                     );
                   },
             child: Container(

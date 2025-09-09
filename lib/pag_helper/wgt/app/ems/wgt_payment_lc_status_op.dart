@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../comm/comm_fin_ops.dart';
-import '../../../comm/comm_pag_billing.dart';
 import '../../../def_helper/dh_pag_finance_type.dart';
 import '../../../model/acl/mdl_pag_svc_claim.dart';
 import '../../../model/mdl_pag_app_config.dart';
@@ -53,17 +52,20 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
   Future<void> _commit() async {
     if (_isCommitting) return;
 
+    _isCommitting = true;
+    _errorText = '';
+
     final queryMap = {
       'scope': widget.loggedInUser?.selectedScope.toScopeMap(),
       'item_info': {
-        'item_id': widget.paymentInfo['payment_id'],
+        'item_id': widget.paymentInfo['id'],
+        'tenant_id': widget.paymentInfo['tenant_id'],
+        'value_timestamp': widget.paymentInfo['value_timestamp'],
+        'credit_amount': widget.paymentInfo['amount'],
       },
       'target_status': _selectedStatus.value,
     };
     try {
-      _isCommitting = true;
-      _errorText = '';
-
       final result = await updatePaymentLcStatus(
           widget.appConfig,
           queryMap,
@@ -178,6 +180,7 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
     return Padding(
       padding: const EdgeInsets.only(left: 21),
       child: WgtCommButton(
+        enabled: !_isCommitting && _errorText.isEmpty,
         label: 'Commit',
         onPressed: () async {
           await _commit();

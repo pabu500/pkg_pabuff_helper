@@ -15,6 +15,7 @@ import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_scope.dart';
 import 'package:buff_helper/pag_helper/wgt/app/am/wgt_am_meter_group_assignment.dart';
 import 'package:buff_helper/pag_helper/wgt/app/ems/wgt_meter_group_assignment2.dart';
+import 'package:buff_helper/pag_helper/wgt/app/ems/wgt_tenant_soa2.dart';
 import 'package:buff_helper/pagrid_helper/comm_helper/local_storage.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/wgt_pag_composite_bill_view.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_ems_type_usage_calc.dart';
@@ -1182,7 +1183,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                 : () {
                     xtShowModelBottomSheet(
                       context,
-                      WgtTenantSoA(
+                      WgtTenantSoA2(
                         appConfig: widget.appConfig,
                         loggedInUser: loggedInUser!,
                         teneantInfo: item,
@@ -1200,7 +1201,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         );
       },
     );
-    listController.listColControllerList.add(appCtxCol);
+    listController.listColControllerList.insert(0, appCtxCol);
   }
 
   void _addMatchPaymentColumn(MdlPagListController listController) {
@@ -1222,6 +1223,22 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           },
           regFresh: (doRefreshItem) {
             item['is_comm'] = doRefreshItem;
+          },
+          onUpdate: () {
+            setState(() {
+              _itemUpdated = true;
+            });
+          },
+          onClosed: () async {
+            // Map<String, dynamic> itemFindResult =
+            //     await _getItemList();
+            // widget.onResult?.call(itemFindResult);
+            if (_itemUpdated) {
+              setState(() {
+                _listContentRefreshKey = UniqueKey();
+                _itemUpdated = false;
+              });
+            }
           },
         );
       },
