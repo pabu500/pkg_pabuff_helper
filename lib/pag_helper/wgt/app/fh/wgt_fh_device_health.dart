@@ -45,6 +45,8 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
   late final errorColor = Theme.of(context).colorScheme.error;
   final unknownColor = Colors.grey.shade600.withAlpha(210);
 
+  final int minimumCooldownSeconds = 21;
+
   bool _isFetching = false;
   bool _isFetched = false;
   String _errorText = '';
@@ -176,10 +178,25 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
       return getErrorTextPrompt(context: context, errorText: _errorText);
     }
     if (_message.isNotEmpty) {
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [Text(_message)],
+      return Container(
+        width: contentWidth,
+        decoration: BoxDecoration(
+          border: Border.all(color: Theme.of(context).hintColor.withAlpha(130)),
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 5),
+        margin: const EdgeInsets.only(bottom: 20),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Symbols.info, color: Theme.of(context).hintColor),
+            horizontalSpaceTiny,
+            Flexible(
+              child: Text(_message, style: valueStyle),
+            ),
+          ],
+        ),
       );
     }
 
@@ -405,20 +422,22 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
 
   Widget getMeterBox(String meterTag, String meterSn, bool hasError) {
     return InkWell(
-      onTap: () {
-        setState(() {
-          if (meterSn == _selectedMeterInfo['meter_sn']) {
-            _selectedMeterInfo = {};
-            return;
-          }
-          _selectedMeterInfo = {
-            'meter_sn': meterSn,
-            'meter_tag': meterTag,
-          };
-          _checkMeterErrorText = '';
-          _meterHealthData.clear();
-        });
-      },
+      onTap: _isCheckingMeter == true
+          ? null
+          : () {
+              setState(() {
+                if (meterSn == _selectedMeterInfo['meter_sn']) {
+                  _selectedMeterInfo = {};
+                  return;
+                }
+                _selectedMeterInfo = {
+                  'meter_sn': meterSn,
+                  'meter_tag': meterTag,
+                };
+                _checkMeterErrorText = '';
+                _meterHealthData.clear();
+              });
+            },
       child: Container(
         width: 60,
         decoration: BoxDecoration(
@@ -446,6 +465,43 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
     final content = _gatewayHealthData['content'];
     final errorList = content['el'] ?? [];
     final meterInfoList = _gatewayHealthData['meter_info_list'] ?? [];
+
+    String gatewayLastStatusQueryTimestampStr =
+        _gatewayHealthData['gateway_last_status_query_timestamp'] ?? '';
+    String meterLastStatusQueryTimestampStr =
+        _meterHealthData['meter_last_status_query_timestamp'] ?? '';
+
+    DateTime? gatewayLastStatusQueryTimestamp;
+    DateTime? meterLastStatusQueryTimestamp;
+    DateTime? localNow = getTargetLocalDatetimeNow(
+        widget.loggedInUser.selectedScope.getProjectTimezone());
+    if (gatewayLastStatusQueryTimestampStr.isNotEmpty) {
+      gatewayLastStatusQueryTimestamp =
+          DateTime.parse(gatewayLastStatusQueryTimestampStr).toLocal();
+    }
+    if (meterLastStatusQueryTimestampStr.isNotEmpty) {
+      meterLastStatusQueryTimestamp =
+          DateTime.parse(meterLastStatusQueryTimestampStr).toLocal();
+    }
+
+    if (gatewayLastStatusQueryTimestamp != null) {
+      int secondsSinceLastQuery =
+          localNow.difference(gatewayLastStatusQueryTimestamp).inSeconds;
+      if (secondsSinceLastQuery < minimumCooldownSeconds) {
+        int waitSeconds = minimumCooldownSeconds - secondsSinceLastQuery;
+        _checkMeterErrorText =
+            'Comms in cooldown. Please wait $waitSeconds seconds before checking again.';
+      }
+    }
+    if (meterLastStatusQueryTimestamp != null) {
+      int secondsSinceLastQuery =
+          localNow.difference(meterLastStatusQueryTimestamp).inSeconds;
+      if (secondsSinceLastQuery < minimumCooldownSeconds) {
+        int waitSeconds = minimumCooldownSeconds - secondsSinceLastQuery;
+        _checkMeterErrorText =
+            'Comms in cooldown. Please wait $waitSeconds seconds before checking again.';
+      }
+    }
 
     return Container(
       decoration: BoxDecoration(
