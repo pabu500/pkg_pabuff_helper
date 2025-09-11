@@ -828,7 +828,7 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
                     //             ),
                     //           )
                     : Container(
-                        width: width,
+                        width: width + 10,
                         alignment: Alignment.centerLeft,
                         child: ctrlItem.colWidgetType == PagColWidgetType.CUSTOM
                             ? Container(

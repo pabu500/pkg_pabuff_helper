@@ -36,7 +36,6 @@ import 'package:provider/provider.dart';
 import '../../comm/comm_list.dart';
 import '../../model/mdl_pag_app_config.dart';
 import '../app/ems/wgt_match_payment_op_item.dart';
-import '../app/ems/wgt_tenant_soa.dart';
 import '../app/fh/wgt_fh_device_health.dart';
 import '../job/wgt_job_type_op_panel.dart';
 import 'wgt_item_info_edit_panel.dart';
@@ -1263,6 +1262,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           child: IconButton(
             icon: Icon(Symbols.pageview,
                 color: Theme.of(context).colorScheme.primary.withAlpha(200)),
+            iconSize: 30,
             onPressed: () {
               xtShowModelBottomSheet(
                 context,
