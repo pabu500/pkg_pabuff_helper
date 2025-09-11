@@ -268,6 +268,7 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
         getMeterGroupStatus(),
         verticalSpaceSmall,
         getMeterIssuePanel(),
+        verticalSpaceMedium,
         if (false)
           // if (issueList.isNotEmpty)
           WgtPagDashboardList(
