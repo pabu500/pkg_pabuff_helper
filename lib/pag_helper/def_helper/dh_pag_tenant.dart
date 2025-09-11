@@ -170,11 +170,11 @@ String? validateCompanyTradingName(String value) {
   if (value.trim().isEmpty) {
     return 'required';
   }
-  //length 5-255, alphanumeric, space, /, ', - only
-  String pattern = r"^[-a-zA-Z0-9 ./']{5,255}$";
+  //length 5-255, alphanumeric, space, /, ', +, -, #, @, (), ., only
+  String pattern = r"^[-a-zA-Z0-9 ./+-()#@]{5,255}$";
   RegExp regExp = RegExp(pattern);
   if (!regExp.hasMatch(value)) {
-    return 'alphanumeric, space, /, -, . only and length 5-255';
+    return 'alphanumeric, space, /, +, -, #, @, (), ., only and length 5-255';
   }
   return null;
 }
