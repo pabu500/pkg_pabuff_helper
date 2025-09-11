@@ -14,6 +14,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
+import 'package:flutter/services.dart';
 
 import '../../def_helper/dh_device.dart';
 import '../../def_helper/dh_pag_tenant.dart';
@@ -644,6 +645,7 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
                   originalFullText: originalFullText,
                   width: width,
                   style: _listItemStyle,
+                  clickCopy: true,
                   alignment: ctrlItem.align == 'right'
                       ? Alignment.centerRight
                       : Alignment.centerLeft,
@@ -881,6 +883,7 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
     required double width,
     required TextStyle style,
     Alignment alignment = Alignment.centerLeft,
+    bool clickCopy = false,
     // required String fieldKey,
     // required Map<String, dynamic> modifiedRow,
     // required Function(bool) flagModified,
@@ -889,16 +892,35 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
     // required bool nonSelectable,
     // required bool clickCopy,
   }) {
-    String displayText = convertToDisplayString(originalFullText, width, style);
+    // String displayText = convertToDisplayString(originalFullText, width, style);
 
     return SizedBox(
       width: width,
       child: Align(
         alignment: alignment,
-        child: SelectableText.rich(
-          TextSpan(
-            text: displayText,
+        child:
+            // SelectableText.rich(
+            //   TextSpan(
+            //     text: displayText,
+            //     style: style,
+            //   ),
+            // ),
+            InkWell(
+          onTap: !clickCopy
+              ? null
+              : () {
+                  Clipboard.setData(
+                    ClipboardData(text: originalFullText),
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Copied to clipboard')),
+                  );
+                },
+          child: Text(
+            originalFullText,
             style: style,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ),
