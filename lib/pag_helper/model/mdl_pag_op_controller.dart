@@ -37,6 +37,7 @@ class MdlPagOpController {
   List<Map<String, dynamic>> opColsConfig;
   List<Map<String, dynamic>> opList;
   List<Map<String, dynamic>>? targetValList;
+  List<Map<String, dynamic>>? targetKeyList;
   List<String> requiredFields = [];
   String? identifierField;
   String? selectedTargetVal;
@@ -70,6 +71,7 @@ class MdlPagOpController {
     isImportTargetVal = true;
     isAdditonalKeySameTable = false;
     targetValList = [];
+    targetKeyList = [];
     requiredFields = [];
     identifierField = null;
     opField = '';

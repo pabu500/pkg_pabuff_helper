@@ -555,6 +555,7 @@ String? validateBillingDid(String value) {
 
 enum PagTenantOps {
   onboarding,
+  update,
   none,
 }
 
