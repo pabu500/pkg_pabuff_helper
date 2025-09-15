@@ -604,9 +604,10 @@ dda_number,
 site_label,
 building_label,
 location_label,
-initial_balance
+initial_balance,
+initial_balance_timestamp
  */
-final List<Map<String, dynamic>> listConfigBaseTenantOnb = [
+final List<Map<String, dynamic>> listConfigBaseTenant = [
   {
     'col_key': 'company_trading_name',
     'title': 'Company Trading Name',
@@ -614,6 +615,14 @@ final List<Map<String, dynamic>> listConfigBaseTenantOnb = [
     'width': 200,
     'is_mapping_required': true,
     'validator': validateCompanyTradingName,
+  },
+  {
+    'col_key': 'label',
+    'title': 'Label',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': false,
+    'validator': validateTenantLabel,
   },
   {
     'col_key': 'billing_address',
@@ -646,14 +655,6 @@ final List<Map<String, dynamic>> listConfigBaseTenantOnb = [
     'width': 200,
     'is_mapping_required': false,
     'validator': validateBillingAddressLine3,
-  },
-  {
-    'col_key': 'label',
-    'title': 'Label',
-    'col_type': 'string',
-    'width': 150,
-    'is_mapping_required': false,
-    'validator': validateTenantLabel,
   },
   {
     'col_key': 'account_number',
@@ -817,5 +818,13 @@ final List<Map<String, dynamic>> listConfigBaseTenantOnb = [
     'width': 150,
     'is_mapping_required': true,
     'validator': validateInitialBalance,
+  },
+  {
+    'col_key': 'initial_balance_timestamp',
+    'title': 'Initial Balance Date',
+    'col_type': 'date',
+    'width': 150,
+    'is_mapping_required': true,
+    'validator': validateDate,
   },
 ];
