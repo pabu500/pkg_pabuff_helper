@@ -154,7 +154,7 @@ Future<dynamic> doTenantUpdate(
   MdlPagSvcClaim svcClaim,
 ) async {
   svcClaim.svcName = PagSvcType.oresvc2.name;
-  svcClaim.endpoint = PagUrlBase.eptBatchOpTenantOnboarding;
+  svcClaim.endpoint = PagUrlBase.eptBatchOpTenantUpdate;
 
   String svcToken = '';
   // try {

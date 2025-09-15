@@ -366,6 +366,8 @@ class PagUrlBase {
 
   static const String eptBatchOpTenantOnboarding =
       '/ems/tenant/batch_op/tenant_onboarding';
+  static const String eptBatchOpTenantUpdate =
+      '/ems/tenant/batch_op/tenant_update';
 
   //Billing Manager
   static const String eptGetBill = '/ems/billing/get_bill';

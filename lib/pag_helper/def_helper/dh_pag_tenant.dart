@@ -531,6 +531,25 @@ String? validateBillingDid(String value) {
   return validatePhone(value);
 }
 
+String? validateBillingContactDid(String value) {
+  if (value.trim().isEmpty) {
+    // return 'required';
+    return null;
+  }
+  return validatePhone(value);
+}
+
+String? validateInitialBalance(String value) {
+  if (value.trim().isEmpty) {
+    // return 'required';
+  }
+  //must be a number
+  if (double.tryParse(value) == null) {
+    return 'must be a number';
+  }
+
+  return null;
+}
 // String? validateLastReadingTimestamp(
 //     String? val, String? firstReadingTimestampStr) {
 //   if (val == null || val.trim().isEmpty) {
@@ -585,6 +604,7 @@ dda_number,
 site_label,
 building_label,
 location_label,
+initial_balance
  */
 final List<Map<String, dynamic>> listConfigBaseTenantOnb = [
   {
@@ -789,5 +809,13 @@ final List<Map<String, dynamic>> listConfigBaseTenantOnb = [
     'width': 150,
     'is_mapping_required': true,
     'validator': validateLabelScope,
+  },
+  {
+    'col_key': 'initial_balance',
+    'title': 'Initial Balance',
+    'col_type': 'double',
+    'width': 150,
+    'is_mapping_required': true,
+    'validator': validateInitialBalance,
   },
 ];
