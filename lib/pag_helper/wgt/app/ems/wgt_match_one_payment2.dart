@@ -252,6 +252,55 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
     );
   }
 
+  Widget getPaymentApply() {
+    bool isEnabled = false;
+
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(
+            color: isEnabled
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).disabledColor.withAlpha(130)),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            width: 95,
+            child: WgtTextField(
+              appConfig: widget.appConfig,
+              loggedInUser: widget.loggedInUser,
+              hintText: 'Usage',
+              labelText: 'Usage',
+              onChanged: (value) {
+                // setState(() {
+                //   _paymentApply = value;
+                // });
+              },
+            ),
+          ),
+          horizontalSpaceSmall, // interest bucket
+          SizedBox(
+            width: 95,
+            child: WgtTextField(
+              appConfig: widget.appConfig,
+              loggedInUser: widget.loggedInUser,
+              hintText: 'Interest',
+              labelText: 'Interest',
+              onChanged: (value) {
+                // setState(() {
+                //   _paymentApply = value;
+                // });
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget getBillItem(int index) {
     Map<String, dynamic> billInfo = _billList[index];
     final billingRecId = billInfo['id'] ?? '';
@@ -317,6 +366,8 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                 ],
               ),
               const Spacer(),
+              getPaymentApply(),
+              horizontalSpaceSmall,
             ],
           ),
           if (billInfo['show_bill'] ?? false) const Divider(),

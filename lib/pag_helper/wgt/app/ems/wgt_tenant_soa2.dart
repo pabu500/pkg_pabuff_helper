@@ -114,7 +114,7 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
     if (debitList.isNotEmpty) {
       for (var item in debitList) {
         _soaData.add({
-          'type': 'debit',
+          'entry_type': 'debit',
           'date': item['date'],
           'amount': item['amount'],
           'description': item['description'] ?? '',
@@ -124,7 +124,7 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
     if (creditList.isNotEmpty) {
       for (var item in creditList) {
         _soaData.add({
-          'type': 'credit',
+          'entry_type': 'credit',
           'date': item['date'],
           'description': item['description'],
           'amount': item['amount'],
@@ -135,7 +135,7 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
     // insert header
     if (_soaData.isNotEmpty) {
       _soaData.insert(0, {
-        'type': 'header',
+        'entry_type': 'header',
         'date': 'Date',
         'amount': 'Amount',
         'description': 'Description',
@@ -319,7 +319,7 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
   }
 
   Widget getSoaRow(Map<String, dynamic> item) {
-    String date = item['transaction_timestamp'] ?? '';
+    String date = item['entry_timestamp'] ?? '';
     // only show date if it is not empty
     if (date.isNotEmpty) {
       date = DateTime.parse(date).toLocal().toIso8601String().split('T')[0];
@@ -336,14 +336,18 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
         SizedBox(
           width: 100,
           child: Text(
-            item['type'] == 'debit' ? item['debit_amount'].toString() : '',
+            item['entry_type'] == 'debit'
+                ? item['debit_amount'].toString()
+                : '',
             style: rowStyle.copyWith(color: Colors.red),
           ),
         ),
         SizedBox(
           width: 100,
           child: Text(
-            item['type'] == 'credit' ? item['credit_amount'].toString() : '',
+            item['entry_type'] == 'credit'
+                ? item['credit_amount'].toString()
+                : '',
             style: rowStyle.copyWith(color: Colors.green),
           ),
         ),
