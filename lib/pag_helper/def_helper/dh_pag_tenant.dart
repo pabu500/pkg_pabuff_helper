@@ -200,10 +200,10 @@ String? validateBillingAddressLine1(String value) {
     return 'required';
   }
   //length 5-255, alphanumeric, space, /, ', -,  # only
-  String pattern = r"^[-a-zA-Z0-9 ./'#]{5,255}$";
+  String pattern = r"^[-a-zA-Z0-9 ./'#&]{5,255}$";
   RegExp regExp = RegExp(pattern);
   if (!regExp.hasMatch(value)) {
-    return 'alphanumeric, space, /, -, # only and length 5-255';
+    return 'alphanumeric, space, /, -, #, & only and length 5-255';
   }
   return null;
 }
@@ -226,10 +226,10 @@ String? validateBillingAddressLine3(String value) {
     return 'required';
   }
   //length 5-21, alphanumeric, space, /, ', -, # only
-  String pattern = r"^[-a-zA-Z0-9 ./'#]{5,21}$";
+  String pattern = r"^[-a-zA-Z0-9 ./'#&]{5,21}$";
   RegExp regExp = RegExp(pattern);
   if (!regExp.hasMatch(value)) {
-    return 'alphanumeric, space, /, -, # only and length 5-21';
+    return 'alphanumeric, space, /, -, #, & only and length 5-21';
   }
   return null;
 }
@@ -624,14 +624,14 @@ final List<Map<String, dynamic>> listConfigBaseTenant = [
     'is_mapping_required': false,
     'validator': validateTenantLabel,
   },
-  {
-    'col_key': 'billing_address',
-    'title': 'Billing Address',
-    'col_type': 'string',
-    'width': 200,
-    'is_mapping_required': false,
-    'validator': validateBillingAddress,
-  },
+  // {
+  //   'col_key': 'billing_address',
+  //   'title': 'Billing Address',
+  //   'col_type': 'string',
+  //   'width': 200,
+  //   'is_mapping_required': false,
+  //   'validator': validateBillingAddress,
+  // },
   {
     'col_key': 'billing_address_line_1',
     'title': 'Billing Address Line 1',
