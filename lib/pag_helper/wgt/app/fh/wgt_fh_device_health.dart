@@ -123,6 +123,7 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
       'device_info': {
         'meter_sn': _selectedMeterInfo['meter_sn'],
         'meter_tag': _selectedMeterInfo['meter_tag'],
+        'gateway_id': widget.deviceInfo['id'],
         'gateway_tag': widget.deviceInfo['tag'],
       },
     };
