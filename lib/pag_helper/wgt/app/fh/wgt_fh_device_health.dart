@@ -4,6 +4,7 @@ import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'dart:developer' as dev;
 
@@ -309,49 +310,77 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
       child: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(
-                  width: keyWidth,
-                  child: Icon(Symbols.clock_arrow_up,
-                      color: Theme.of(context).hintColor)),
-              // horizontalSpaceTiny,
-              SizedBox(
-                  width: valueWidth,
-                  child: Text(submittedTimestamp, style: valueStyle)),
-            ],
+          Tooltip(
+            message: 'Last Health Data Submit Time',
+            waitDuration: const Duration(milliseconds: 500),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                    width: keyWidth,
+                    child: Icon(Symbols.clock_arrow_up,
+                        color: Theme.of(context).hintColor)),
+                // horizontalSpaceTiny,
+                SizedBox(
+                    width: valueWidth,
+                    child: Text(submittedTimestamp, style: valueStyle)),
+              ],
+            ),
           ),
+          verticalSpaceTiny,
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              SizedBox(
-                  width: keyWidth,
-                  child: Icon(Symbols.deployed_code,
-                      color: Theme.of(context).hintColor)),
-              // horizontalSpaceTiny,
-              SizedBox(
-                  width: valueWidth, child: Text(version, style: valueStyle)),
+              Tooltip(
+                message: 'Version',
+                waitDuration: const Duration(milliseconds: 500),
+                child: Row(
+                  children: [
+                    SizedBox(
+                        width: keyWidth,
+                        child: Icon(Symbols.deployed_code,
+                            color: Theme.of(context).hintColor)),
+                    SizedBox(
+                        width: valueWidth,
+                        child: Text(version, style: valueStyle)),
+                  ],
+                ),
+              ),
               horizontalSpaceSmall,
-              SizedBox(
-                  width: keyWidth,
-                  child: Icon(Symbols.thermostat,
-                      color: Theme.of(context).hintColor)),
-              // horizontalSpaceTiny,
-              SizedBox(
-                  width: valueWidth,
-                  child: Text(temperature, style: valueStyle)),
+              Tooltip(
+                message: 'Core Temperature',
+                waitDuration: const Duration(milliseconds: 500),
+                child: Wrap(
+                  children: [
+                    SizedBox(
+                        width: keyWidth,
+                        child: Icon(Symbols.thermostat,
+                            color: Theme.of(context).hintColor)),
+                    SizedBox(
+                        width: valueWidth,
+                        child: Text(temperature, style: valueStyle)),
+                  ],
+                ),
+              ),
               horizontalSpaceSmall,
-              SizedBox(
-                  width: keyWidth,
-                  child: Icon(Symbols.signal_cellular_alt,
-                      color: Theme.of(context).hintColor)),
-              // horizontalSpaceTiny,
-              SizedBox(
-                  width: valueWidth,
-                  child:
-                      Text('$signal ($signalPercentage)', style: valueStyle)),
+              Tooltip(
+                message: 'Signal Strength',
+                waitDuration: const Duration(milliseconds: 500),
+                child: Wrap(
+                  children: [
+                    SizedBox(
+                        width: keyWidth,
+                        child: Icon(Symbols.signal_cellular_alt,
+                            color: Theme.of(context).hintColor)),
+                    // horizontalSpaceTiny,
+                    SizedBox(
+                        width: valueWidth,
+                        child: Text('$signal ($signalPercentage)',
+                            style: valueStyle)),
+                  ],
+                ),
+              ),
             ],
           ),
         ],
@@ -399,18 +428,22 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
       child: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(
-                  width: keyWidth,
-                  child: Icon(PagDeviceCat.meterGroup.iconData,
-                      color: Theme.of(context).hintColor)),
-              horizontalSpaceTiny,
-              SizedBox(
-                  width: valueWidth,
-                  child: Text(meterGroupLabel, style: valueStyle)),
-            ],
+          Tooltip(
+            message: 'Meter Group',
+            waitDuration: const Duration(milliseconds: 500),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                    width: keyWidth,
+                    child: Icon(PagDeviceCat.meterGroup.iconData,
+                        color: Theme.of(context).hintColor)),
+                horizontalSpaceTiny,
+                SizedBox(
+                    width: valueWidth,
+                    child: Text(meterGroupLabel, style: valueStyle)),
+              ],
+            ),
           ),
           verticalSpaceSmall,
           Wrap(
