@@ -297,6 +297,9 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
     final version = content['v'];
     final temperature = content['t'];
     final signal = content['s'];
+    final signalPercentage = content['s'] == null
+        ? '-'
+        : '${(int.parse(content['s'] as String) * 100 / 31).clamp(0, 100).toInt()}%';
 
     return Container(
       decoration: BoxDecoration(
@@ -346,7 +349,9 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
                       color: Theme.of(context).hintColor)),
               // horizontalSpaceTiny,
               SizedBox(
-                  width: valueWidth, child: Text(signal, style: valueStyle)),
+                  width: valueWidth,
+                  child:
+                      Text('$signal ($signalPercentage)', style: valueStyle)),
             ],
           ),
         ],
