@@ -534,9 +534,12 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text('Last checked at: ', style: keyStyle),
-              Text(meterLastStatusQueryTimestampStr.isEmpty
-                  ? '[unknown]'
-                  : meterLastStatusQueryTimestampStr),
+              Text(
+                  meterLastStatusQueryTimestampStr.isEmpty
+                      ? '[unknown]'
+                      : meterLastStatusQueryTimestampStr,
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSecondary)),
             ],
           ),
           verticalSpaceSmall,
