@@ -359,7 +359,7 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
                             color: Theme.of(context).hintColor)),
                     SizedBox(
                         width: valueWidth,
-                        child: Text(temperature, style: valueStyle)),
+                        child: Text('$temperature°C', style: valueStyle)),
                   ],
                 ),
               ),
