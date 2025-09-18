@@ -496,12 +496,13 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
           DateTime.parse(meterLastStatusQueryTimestampStr).toLocal();
     }
 
+    String meterCooldownText = '';
     if (gatewayLastStatusQueryTimestamp != null) {
       int secondsSinceLastQuery =
           localNow.difference(gatewayLastStatusQueryTimestamp).inSeconds;
       if (secondsSinceLastQuery < minimumCooldownSeconds) {
         int waitSeconds = minimumCooldownSeconds - secondsSinceLastQuery;
-        _checkMeterErrorText =
+        meterCooldownText =
             'Comms in cooldown. Please wait $waitSeconds seconds before checking again.';
       }
     }
@@ -510,7 +511,7 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
           localNow.difference(meterLastStatusQueryTimestamp).inSeconds;
       if (secondsSinceLastQuery < minimumCooldownSeconds) {
         int waitSeconds = minimumCooldownSeconds - secondsSinceLastQuery;
-        _checkMeterErrorText =
+        meterCooldownText =
             'Comms in cooldown. Please wait $waitSeconds seconds before checking again.';
       }
     }
@@ -580,6 +581,13 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
             getErrorTextPrompt(
                 context: context, errorText: _checkMeterErrorText),
           if (_meterHealthData.isNotEmpty) getMeterHealth(),
+          verticalSpaceTiny,
+          if (meterCooldownText.isNotEmpty)
+            getErrorTextPrompt(
+                context: context,
+                errorText: meterCooldownText,
+                textColor: Theme.of(context).hintColor,
+                borderColor: Theme.of(context).hintColor),
         ],
       ),
     );
