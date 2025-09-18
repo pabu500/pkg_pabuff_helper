@@ -502,8 +502,10 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
           localNow.difference(gatewayLastStatusQueryTimestamp).inSeconds;
       if (secondsSinceLastQuery < minimumCooldownSeconds) {
         int waitSeconds = minimumCooldownSeconds - secondsSinceLastQuery;
-        meterCooldownText =
-            'Comms in cooldown. Please wait $waitSeconds seconds before checking again.';
+        if (waitSeconds > 1) {
+          meterCooldownText =
+              'Comms in cooldown. Please wait $waitSeconds seconds before checking again.';
+        }
       }
     }
     if (meterLastStatusQueryTimestamp != null) {
@@ -511,8 +513,10 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
           localNow.difference(meterLastStatusQueryTimestamp).inSeconds;
       if (secondsSinceLastQuery < minimumCooldownSeconds) {
         int waitSeconds = minimumCooldownSeconds - secondsSinceLastQuery;
-        meterCooldownText =
-            'Comms in cooldown. Please wait $waitSeconds seconds before checking again.';
+        if (waitSeconds > 1) {
+          meterCooldownText =
+              'Comms in cooldown. Please wait $waitSeconds seconds before checking again.';
+        }
       }
     }
 
