@@ -472,6 +472,16 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
         _gatewayHealthData['gateway_last_status_query_timestamp'] ?? '';
     String meterLastStatusQueryTimestampStr =
         _meterHealthData['meter_last_status_query_timestamp'] ?? '';
+    if (meterLastStatusQueryTimestampStr.isEmpty) {
+      // search in the meter info list
+      for (var meterInfo in meterInfoList) {
+        if (meterInfo['meter_sn'] == _selectedMeterInfo['meter_sn']) {
+          meterLastStatusQueryTimestampStr =
+              meterInfo['meter_last_status_query_timestamp'] ?? '';
+          break;
+        }
+      }
+    }
 
     DateTime? gatewayLastStatusQueryTimestamp;
     DateTime? meterLastStatusQueryTimestamp;
@@ -520,6 +530,16 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
       child: Column(
         children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Last checked at: ', style: keyStyle),
+              Text(meterLastStatusQueryTimestampStr.isEmpty
+                  ? '[unknown]'
+                  : meterLastStatusQueryTimestampStr),
+            ],
+          ),
+          verticalSpaceSmall,
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
