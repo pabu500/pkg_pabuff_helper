@@ -471,7 +471,7 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
     String gatewayLastStatusQueryTimestampStr =
         _gatewayHealthData['gateway_last_status_query_timestamp'] ?? '';
     String meterLastStatusQueryTimestampStr =
-        _meterHealthData['meter_last_status_query_timestamp'] ?? '';
+        _meterHealthData['last_status_query_timestamp'] ?? '';
     if (meterLastStatusQueryTimestampStr.isEmpty) {
       // search in the meter info list
       for (var meterInfo in meterInfoList) {
