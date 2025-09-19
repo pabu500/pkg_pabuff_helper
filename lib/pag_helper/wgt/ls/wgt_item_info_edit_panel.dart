@@ -206,7 +206,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
   void _updateIsTenantUser(List<Map<String, dynamic>> userRoleList) {
     bool isTenantUser = false;
     for (Map<String, dynamic> roleInfo in userRoleList) {
-      if (roleInfo['portal_type'] == PagPortalType.emsTp.value) {
+      if (roleInfo['portal_type'] == PagPortalType.pagEmsTp.value) {
         isTenantUser = true;
         break;
       }

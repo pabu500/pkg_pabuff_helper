@@ -9,6 +9,7 @@ enum ApiCode {
   requestMissingParameter('REQUEST_MISSING_PARAMETER'),
   resultGenericError('RESULT_GENERIC_ERROR'),
   resultNotFound('RESULT_NOT_FOUND'),
+  resultTimeOut('RESULT_TIMEOUT'),
   resultDatabaseError('RESULT_DATABASE_ERROR'),
   unknownError('UNKNOWN_ERROR'),
   ;
@@ -320,6 +321,7 @@ class PagUrlBase {
   static const String eptCheckItemExists = '/item/check_item_exists';
   static const String eptGetItemKeyValList = '/item/get_item_key_val_list';
   static const String eptDeleteItem = '/item/delete_item';
+  static const String eptUpdateItemLcStatus = '/item/update_item_lc_status';
 
   //job
   // static const String eptPostJob = '/job/post_job';
@@ -372,6 +374,8 @@ class PagUrlBase {
 
   static const String eptBatchOpTenantOnboarding =
       '/ems/tenant/batch_op/tenant_onboarding';
+  static const String eptBatchOpTenantUpdate =
+      '/ems/tenant/batch_op/tenant_update';
 
   //Billing Manager
   static const String eptGetBill = '/ems/billing/get_bill';

@@ -34,6 +34,7 @@ const String glb_regNG_email = r"[^a-zA-Z0-9@. ]+|([@\.])([@\.])";
 
 /* for test https://regex101.com/
 95687951
+9568 7951
 6595687951
 +6595687951
 +65 95687951
@@ -41,7 +42,9 @@ const String glb_regNG_email = r"[^a-zA-Z0-9@. ]+|([@\.])([@\.])";
 +86 13851610359
 +60 1223568874
 */
-const String glb_reg_phone = r"^\+?[0-9]{0,3}[\s]*[0-9]{0,3}[\s]*[0-9]{8,13}$";
+// const String glb_reg_phone = r"^\+?[0-9]{0,3}[\s]*[0-9]{0,3}[\s]*[0-9]{8,13}$";
+const String glb_reg_phone = r'^\+?\d{0,3}\s*\d{0,3}\s*[\d\s]{8,13}$';
+
 const String glb_phone_callout = 'Please provide a valid phone number';
 const String glb_regNG_phone = r"[^0-9+ ]|([0-9+ ])([+])|(\s)(\s)";
 

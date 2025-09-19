@@ -15,6 +15,7 @@ import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_scope.dart';
 import 'package:buff_helper/pag_helper/wgt/app/am/wgt_am_meter_group_assignment.dart';
 import 'package:buff_helper/pag_helper/wgt/app/ems/wgt_meter_group_assignment2.dart';
+import 'package:buff_helper/pag_helper/wgt/app/ems/wgt_tenant_soa2.dart';
 import 'package:buff_helper/pagrid_helper/comm_helper/local_storage.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/wgt_pag_composite_bill_view.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_ems_type_usage_calc.dart';
@@ -35,7 +36,6 @@ import 'package:provider/provider.dart';
 import '../../comm/comm_list.dart';
 import '../../model/mdl_pag_app_config.dart';
 import '../app/ems/wgt_match_payment_op_item.dart';
-import '../app/ems/wgt_tenant_soa.dart';
 import '../app/fh/wgt_fh_device_health.dart';
 import '../job/wgt_job_type_op_panel.dart';
 import 'wgt_item_info_edit_panel.dart';
@@ -1182,7 +1182,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                 : () {
                     xtShowModelBottomSheet(
                       context,
-                      WgtTenantSoA(
+                      WgtTenantSoA2(
                         appConfig: widget.appConfig,
                         loggedInUser: loggedInUser!,
                         teneantInfo: item,
@@ -1200,7 +1200,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         );
       },
     );
-    listController.listColControllerList.add(appCtxCol);
+    listController.listColControllerList.insert(0, appCtxCol);
   }
 
   void _addMatchPaymentColumn(MdlPagListController listController) {
@@ -1222,6 +1222,22 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           },
           regFresh: (doRefreshItem) {
             item['is_comm'] = doRefreshItem;
+          },
+          onUpdate: () {
+            setState(() {
+              _itemUpdated = true;
+            });
+          },
+          onClosed: () async {
+            // Map<String, dynamic> itemFindResult =
+            //     await _getItemList();
+            // widget.onResult?.call(itemFindResult);
+            if (_itemUpdated) {
+              setState(() {
+                _listContentRefreshKey = UniqueKey();
+                _itemUpdated = false;
+              });
+            }
           },
         );
       },
@@ -1246,6 +1262,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           child: IconButton(
             icon: Icon(Symbols.pageview,
                 color: Theme.of(context).colorScheme.primary.withAlpha(200)),
+            iconSize: 30,
             onPressed: () {
               xtShowModelBottomSheet(
                 context,

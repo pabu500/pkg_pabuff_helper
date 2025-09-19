@@ -111,7 +111,7 @@ Map<String, dynamic> getBillingLcStatusTag(row, fieldKey) {
 
   return {
     'tag': getBillingLcStatusTagStr(valueStr),
-    'color': getBillingLcSatusColor(status.name),
+    'color': getBillingLcStatusColor(status.name),
     'tooltip': getBillingLcStatusMessage(status.name),
   };
 }
@@ -121,7 +121,7 @@ String? getBillingLcStatusTagStr(String? statusStr) {
     return null;
   }
   PagBillingLcStatus? status = PagBillingLcStatus.values.byName(statusStr!);
-  return billingLcStatusInfo[status]!['tag'];
+  return status.tag;
 }
 
 String getBillingLcStatusMessage(String? statusStr) {
@@ -130,16 +130,16 @@ String getBillingLcStatusMessage(String? statusStr) {
   }
   PagBillingLcStatus? status = PagBillingLcStatus.values.byName(statusStr);
 
-  return billingLcStatusInfo[status]!['tooltip'];
+  return status.label!;
 }
 
-Color getBillingLcSatusColor(String? statusStr) {
+Color getBillingLcStatusColor(String? statusStr) {
   if (statusStr == null || statusStr.isEmpty) {
     return Colors.transparent;
   }
   PagBillingLcStatus? status = PagBillingLcStatus.values.byName(statusStr);
 
-  return billingLcStatusInfo[status]!['color'];
+  return status.color!;
 }
 
 PagBillingLcStatus? getBillingLcStatusFromTagStr(String? tagStr) {
@@ -147,7 +147,7 @@ PagBillingLcStatus? getBillingLcStatusFromTagStr(String? tagStr) {
     return PagBillingLcStatus.generated;
   }
   for (var status in PagBillingLcStatus.values) {
-    if (billingLcStatusInfo[status]!['tag'] == tagStr) {
+    if (status.tag == tagStr) {
       return status;
     }
   }
@@ -159,7 +159,7 @@ Widget getBillLcStatusTagWidget(
   PagBillingLcStatus status, {
   TextStyle? style,
 }) {
-  Color bgColor = billingLcStatusInfo[status]!['color'];
+  Color bgColor = status.color!;
   return Container(
     decoration: BoxDecoration(
         color: bgColor,
@@ -169,7 +169,7 @@ Widget getBillLcStatusTagWidget(
         )),
     padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
     child: Text(
-      billingLcStatusInfo[status]!['tag'],
+      status.tag!,
       style: style ??
           const TextStyle(
             color: Colors.white,
@@ -179,25 +179,25 @@ Widget getBillLcStatusTagWidget(
   );
 }
 
-final Map<PagBillingLcStatus, dynamic> billingLcStatusInfo = {
-  PagBillingLcStatus.generated: {
-    'tag': 'Gn',
-    'color': Colors.teal.withAlpha(210),
-    'tooltip': 'Generated',
-  },
-  PagBillingLcStatus.released: {
-    'tag': 'Rl',
-    'color': Colors.orangeAccent.withAlpha(210),
-    'tooltip': 'Released',
-  },
-  PagBillingLcStatus.pv: {
-    'tag': 'Pv',
-    'color': Colors.blue.withAlpha(210),
-    'tooltip': 'Pending Verification',
-  },
-  PagBillingLcStatus.mfd: {
-    'tag': 'Dl',
-    'color': Colors.redAccent.shade200.withAlpha(210),
-    'tooltip': 'Marked for Delete',
-  },
-};
+// final Map<PagBillingLcStatus, dynamic> billingLcStatusInfo = {
+//   PagBillingLcStatus.generated: {
+//     'tag': 'Gn',
+//     'color': Colors.teal.withAlpha(210),
+//     'tooltip': 'Generated',
+//   },
+//   PagBillingLcStatus.released: {
+//     'tag': 'Rl',
+//     'color': Colors.orangeAccent.withAlpha(210),
+//     'tooltip': 'Released',
+//   },
+//   PagBillingLcStatus.pv: {
+//     'tag': 'Pv',
+//     'color': Colors.blue.withAlpha(210),
+//     'tooltip': 'Pending Verification',
+//   },
+//   PagBillingLcStatus.mfd: {
+//     'tag': 'Dl',
+//     'color': Colors.redAccent.shade200.withAlpha(210),
+//     'tooltip': 'Marked for Delete',
+//   },
+// };

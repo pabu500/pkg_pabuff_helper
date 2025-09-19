@@ -107,9 +107,12 @@ class _WgtCommButtonState extends State<WgtCommButton> {
                           ),
                     ),
                 if (_isWaiting || (widget.inComm ?? false))
-                  const Padding(
-                    padding: EdgeInsets.only(left: 8.0),
-                    child: WgtPagWait(size: 21),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: WgtPagWait(
+                      size: 21,
+                      colorA: Theme.of(context).colorScheme.onSecondary,
+                    ),
                   )
               ],
             ),

@@ -229,6 +229,37 @@ String? validateDateTime(String? value,
   return result;
 }
 
+String? validateDate(String? value,
+    {String? emptyCallout, Map<Enum, String?>? formErrors, Enum? filedKey}) {
+  String? result;
+  // must be in YYYY-MM-DD format, and 1970-01-01 to 2099-12-31
+  RegExp dateRegExp = RegExp(r'^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$');
+  if (!dateRegExp.hasMatch(value ?? '')) {
+    result = 'Invalid date format';
+    if (emptyCallout != null) {
+      result = emptyCallout;
+    }
+    return result;
+  }
+
+  //validate date format
+  try {
+    DateTime.parse(value ?? '');
+  } catch (e) {
+    result = 'Invalid date format';
+    if (emptyCallout != null) {
+      result = emptyCallout;
+    }
+    return result;
+  }
+
+  if (formErrors != null && filedKey != null) {
+    formErrors[filedKey] = result;
+  }
+
+  return result;
+}
+
 String? validateSalutation(String? value,
     {Map<Enum, String?>? formErrors,
     Enum? filedKey,

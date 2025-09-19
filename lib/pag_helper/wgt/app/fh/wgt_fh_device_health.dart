@@ -4,6 +4,7 @@ import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'dart:developer' as dev;
 
@@ -41,8 +42,11 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
   final valueWidth = null;
   final contentWidth = 365.0;
 
-  final okColor = Colors.teal;
-  late final errorColor = Theme.of(context).colorScheme.error.withAlpha(210);
+  final okColor = Colors.green.shade700;
+  late final errorColor = Theme.of(context).colorScheme.error;
+  final unknownColor = Colors.grey.shade600.withAlpha(210);
+
+  final int minimumCooldownSeconds = 21;
 
   bool _isFetching = false;
   bool _isFetched = false;
@@ -52,6 +56,7 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
   Map<String, dynamic> _selectedMeterInfo = {};
   bool? _isCheckingMeter;
   String _checkMeterErrorText = '';
+  String _checkMeterMessage = '';
 
   final Map<String, dynamic> _gatewayHealthData = {};
   final Map<String, dynamic> _meterHealthData = {};
@@ -110,7 +115,7 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
     setState(() {
       _isCheckingMeter = true;
       _checkMeterErrorText = '';
-      _message = '';
+      _checkMeterMessage = '';
     });
 
     Map<String, dynamic> queryMap = {
@@ -119,6 +124,7 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
       'device_info': {
         'meter_sn': _selectedMeterInfo['meter_sn'],
         'meter_tag': _selectedMeterInfo['meter_tag'],
+        'gateway_id': widget.deviceInfo['id'],
         'gateway_tag': widget.deviceInfo['tag'],
       },
     };
@@ -133,7 +139,10 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
             operation: '',
           ));
       if (result['info'] != null) {
-        _message = result['message'];
+        _checkMeterMessage = result['message'];
+        if (_checkMeterMessage.toLowerCase().contains('timeout')) {
+          _checkMeterErrorText = 'Request timout';
+        }
       } else {
         final meterHealthInfo = result['meter_health_info'];
         _meterHealthData.clear();
@@ -171,10 +180,25 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
       return getErrorTextPrompt(context: context, errorText: _errorText);
     }
     if (_message.isNotEmpty) {
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [Text(_message)],
+      return Container(
+        width: contentWidth,
+        decoration: BoxDecoration(
+          border: Border.all(color: Theme.of(context).hintColor.withAlpha(130)),
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 5),
+        margin: const EdgeInsets.only(bottom: 20),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Symbols.info, color: Theme.of(context).hintColor),
+            horizontalSpaceTiny,
+            Flexible(
+              child: Text(_message, style: valueStyle),
+            ),
+          ],
+        ),
       );
     }
 
@@ -246,6 +270,7 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
         getMeterGroupStatus(),
         verticalSpaceSmall,
         getMeterIssuePanel(),
+        verticalSpaceMedium,
         if (false)
           // if (issueList.isNotEmpty)
           WgtPagDashboardList(
@@ -273,6 +298,9 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
     final version = content['v'];
     final temperature = content['t'];
     final signal = content['s'];
+    final signalPercentage = content['s'] == null
+        ? '-'
+        : '${(int.parse(content['s'] as String) * 100 / 31).clamp(0, 100).toInt()}%';
 
     return Container(
       decoration: BoxDecoration(
@@ -282,47 +310,77 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
       child: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(
-                  width: keyWidth,
-                  child: Icon(Symbols.clock_arrow_up,
-                      color: Theme.of(context).hintColor)),
-              // horizontalSpaceTiny,
-              SizedBox(
-                  width: valueWidth,
-                  child: Text(submittedTimestamp, style: valueStyle)),
-            ],
+          Tooltip(
+            message: 'Last Health Data Submit Time',
+            waitDuration: const Duration(milliseconds: 500),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                    width: keyWidth,
+                    child: Icon(Symbols.clock_arrow_up,
+                        color: Theme.of(context).hintColor)),
+                // horizontalSpaceTiny,
+                SizedBox(
+                    width: valueWidth,
+                    child: Text(submittedTimestamp, style: valueStyle)),
+              ],
+            ),
           ),
+          verticalSpaceTiny,
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              SizedBox(
-                  width: keyWidth,
-                  child: Icon(Symbols.deployed_code,
-                      color: Theme.of(context).hintColor)),
-              // horizontalSpaceTiny,
-              SizedBox(
-                  width: valueWidth, child: Text(version, style: valueStyle)),
+              Tooltip(
+                message: 'Version',
+                waitDuration: const Duration(milliseconds: 500),
+                child: Row(
+                  children: [
+                    SizedBox(
+                        width: keyWidth,
+                        child: Icon(Symbols.deployed_code,
+                            color: Theme.of(context).hintColor)),
+                    SizedBox(
+                        width: valueWidth,
+                        child: Text(version, style: valueStyle)),
+                  ],
+                ),
+              ),
               horizontalSpaceSmall,
-              SizedBox(
-                  width: keyWidth,
-                  child: Icon(Symbols.thermostat,
-                      color: Theme.of(context).hintColor)),
-              // horizontalSpaceTiny,
-              SizedBox(
-                  width: valueWidth,
-                  child: Text(temperature, style: valueStyle)),
+              Tooltip(
+                message: 'Core Temperature',
+                waitDuration: const Duration(milliseconds: 500),
+                child: Wrap(
+                  children: [
+                    SizedBox(
+                        width: keyWidth,
+                        child: Icon(Symbols.thermostat,
+                            color: Theme.of(context).hintColor)),
+                    SizedBox(
+                        width: valueWidth,
+                        child: Text('$temperature°C', style: valueStyle)),
+                  ],
+                ),
+              ),
               horizontalSpaceSmall,
-              SizedBox(
-                  width: keyWidth,
-                  child: Icon(Symbols.signal_cellular_alt,
-                      color: Theme.of(context).hintColor)),
-              // horizontalSpaceTiny,
-              SizedBox(
-                  width: valueWidth, child: Text(signal, style: valueStyle)),
+              Tooltip(
+                message: 'Signal Strength',
+                waitDuration: const Duration(milliseconds: 500),
+                child: Wrap(
+                  children: [
+                    SizedBox(
+                        width: keyWidth,
+                        child: Icon(Symbols.signal_cellular_alt,
+                            color: Theme.of(context).hintColor)),
+                    // horizontalSpaceTiny,
+                    SizedBox(
+                        width: valueWidth,
+                        child: Text('$signal ($signalPercentage)',
+                            style: valueStyle)),
+                  ],
+                ),
+              ),
             ],
           ),
         ],
@@ -370,18 +428,22 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
       child: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(
-                  width: keyWidth,
-                  child: Icon(PagDeviceCat.meterGroup.iconData,
-                      color: Theme.of(context).hintColor)),
-              horizontalSpaceTiny,
-              SizedBox(
-                  width: valueWidth,
-                  child: Text(meterGroupLabel, style: valueStyle)),
-            ],
+          Tooltip(
+            message: 'Meter Group',
+            waitDuration: const Duration(milliseconds: 500),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                    width: keyWidth,
+                    child: Icon(PagDeviceCat.meterGroup.iconData,
+                        color: Theme.of(context).hintColor)),
+                horizontalSpaceTiny,
+                SizedBox(
+                    width: valueWidth,
+                    child: Text(meterGroupLabel, style: valueStyle)),
+              ],
+            ),
           ),
           verticalSpaceSmall,
           Wrap(
@@ -400,20 +462,22 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
 
   Widget getMeterBox(String meterTag, String meterSn, bool hasError) {
     return InkWell(
-      onTap: () {
-        setState(() {
-          if (meterSn == _selectedMeterInfo['meter_sn']) {
-            _selectedMeterInfo = {};
-            return;
-          }
-          _selectedMeterInfo = {
-            'meter_sn': meterSn,
-            'meter_tag': meterTag,
-          };
-          _checkMeterErrorText = '';
-          _meterHealthData.clear();
-        });
-      },
+      onTap: _isCheckingMeter == true
+          ? null
+          : () {
+              setState(() {
+                if (meterSn == _selectedMeterInfo['meter_sn']) {
+                  _selectedMeterInfo = {};
+                  return;
+                }
+                _selectedMeterInfo = {
+                  'meter_sn': meterSn,
+                  'meter_tag': meterTag,
+                };
+                _checkMeterErrorText = '';
+                _meterHealthData.clear();
+              });
+            },
       child: Container(
         width: 60,
         decoration: BoxDecoration(
@@ -442,14 +506,86 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
     final errorList = content['el'] ?? [];
     final meterInfoList = _gatewayHealthData['meter_info_list'] ?? [];
 
+    String gatewayLastStatusQueryTimestampStr =
+        _gatewayHealthData['gateway_last_status_query_timestamp'] ?? '';
+    String meterLastStatusQueryTimestampStr =
+        _meterHealthData['last_status_query_timestamp'] ?? '';
+    if (meterLastStatusQueryTimestampStr.isEmpty) {
+      // search in the meter info list
+      for (var meterInfo in meterInfoList) {
+        if (meterInfo['meter_sn'] == _selectedMeterInfo['meter_sn']) {
+          meterLastStatusQueryTimestampStr =
+              meterInfo['meter_last_status_query_timestamp'] ?? '';
+          break;
+        }
+      }
+    }
+
+    DateTime? gatewayLastStatusQueryTimestamp;
+    DateTime? meterLastStatusQueryTimestamp;
+    DateTime? localNow = getTargetLocalDatetimeNow(
+        widget.loggedInUser.selectedScope.getProjectTimezone());
+    if (gatewayLastStatusQueryTimestampStr.isNotEmpty) {
+      gatewayLastStatusQueryTimestamp =
+          DateTime.parse(gatewayLastStatusQueryTimestampStr).toLocal();
+    }
+    if (meterLastStatusQueryTimestampStr.isNotEmpty) {
+      meterLastStatusQueryTimestamp =
+          DateTime.parse(meterLastStatusQueryTimestampStr).toLocal();
+    }
+
+    String meterCooldownText = '';
+    if (gatewayLastStatusQueryTimestamp != null) {
+      int secondsSinceLastQuery =
+          localNow.difference(gatewayLastStatusQueryTimestamp).inSeconds;
+      if (secondsSinceLastQuery < minimumCooldownSeconds) {
+        int waitSeconds = minimumCooldownSeconds - secondsSinceLastQuery;
+        if (waitSeconds > 1) {
+          meterCooldownText =
+              'Comms in cooldown. Please wait $waitSeconds seconds before checking again.';
+        }
+      }
+    }
+    if (meterLastStatusQueryTimestamp != null) {
+      int secondsSinceLastQuery =
+          localNow.difference(meterLastStatusQueryTimestamp).inSeconds;
+      if (secondsSinceLastQuery < minimumCooldownSeconds) {
+        int waitSeconds = minimumCooldownSeconds - secondsSinceLastQuery;
+        if (waitSeconds > 1) {
+          meterCooldownText =
+              'Comms in cooldown. Please wait $waitSeconds seconds before checking again.';
+        }
+      }
+    }
+
     return Container(
       decoration: BoxDecoration(
         border: Border.all(color: Theme.of(context).hintColor.withAlpha(130)),
         borderRadius: BorderRadius.circular(5.0),
+        color: _meterHealthData.isNotEmpty
+            ? (_meterHealthData['comm_check_result'] == 'ok'
+                ? okColor
+                : (_meterHealthData['comm_check_result'] == 'fail'
+                    ? errorColor
+                    : unknownColor))
+            : unknownColor,
       ),
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
       child: Column(
         children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Last checked at: ', style: keyStyle),
+              Text(
+                  meterLastStatusQueryTimestampStr.isEmpty
+                      ? '[unknown]'
+                      : meterLastStatusQueryTimestampStr,
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSecondary)),
+            ],
+          ),
+          verticalSpaceSmall,
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -467,7 +603,8 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
               ),
               horizontalSpaceTiny,
               SelectableText('S/N: ${_selectedMeterInfo['meter_sn']}',
-                  style: valueStyle),
+                  style: valueStyle.copyWith(
+                      color: Theme.of(context).colorScheme.onSecondary)),
               horizontalSpaceSmall,
               WgtCommButton(
                   enabled: _isCheckingMeter != true &&
@@ -486,6 +623,13 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
             getErrorTextPrompt(
                 context: context, errorText: _checkMeterErrorText),
           if (_meterHealthData.isNotEmpty) getMeterHealth(),
+          verticalSpaceTiny,
+          if (meterCooldownText.isNotEmpty)
+            getErrorTextPrompt(
+                context: context,
+                errorText: meterCooldownText,
+                textColor: Theme.of(context).hintColor,
+                borderColor: Theme.of(context).hintColor),
         ],
       ),
     );
@@ -499,30 +643,24 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
     String commCheckResult = _meterHealthData['comm_check_result'] ?? '';
 
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-      child: commCheckResult.isEmpty
-          ? Container()
-          : commCheckResult == 'ok'
-              ? Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Symbols.check_circle, color: okColor, size: 25),
-                    horizontalSpaceTiny,
-                    Text('Meter Comm Check OK', style: valueStyle),
-                  ],
-                )
-              : Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Symbols.error,
-                        color:
-                            Theme.of(context).colorScheme.error.withAlpha(180),
-                        size: 30),
-                    horizontalSpaceSmall,
-                    Text('Meter is offline', style: valueStyle),
-                  ],
-                ),
-    );
+        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+        child: commCheckResult.isEmpty
+            ? Container()
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                      commCheckResult == 'ok'
+                          ? 'Comm OK'
+                          : commCheckResult == 'fail'
+                              ? 'Comm Fail'
+                              : _checkMeterMessage.isNotEmpty
+                                  ? _checkMeterMessage
+                                  : 'Comm Unknown',
+                      style: valueStyle.copyWith(
+                          color: Theme.of(context).colorScheme.onSecondary)),
+                ],
+              ));
   }
 
   // Widget getOpPanel(Map<String, dynamic> fhStat) {

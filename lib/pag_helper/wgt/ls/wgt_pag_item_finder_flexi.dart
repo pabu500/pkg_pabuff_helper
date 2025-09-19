@@ -14,6 +14,7 @@ import 'package:buff_helper/pag_helper/model/scope/mdl_pag_site_profile.dart';
 import 'package:buff_helper/pag_helper/wgt/cam/wgt_code_scanner2.dart';
 import 'package:buff_helper/pag_helper/wgt/datetime/wgt_date_range_picker_monthly.dart';
 import 'package:buff_helper/xt_ui/wdgt/show_model_bottom_sheet.dart';
+import 'dart:developer' as dev;
 
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 import 'package:flutter/foundation.dart';
@@ -356,10 +357,8 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
         listColController.filterValue = value;
       }
     } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
-      rethrow;
+      dev.log('Error getting filter value list: $e');
+      // rethrow;
     } finally {
       if (mounted) {
         setState(() {

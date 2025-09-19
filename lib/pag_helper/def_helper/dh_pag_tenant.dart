@@ -157,11 +157,12 @@ String? validateTenantLabel(String value) {
   if (value.trim().isEmpty) {
     return 'required';
   }
-  //length 5-255, alphanumeric, space, /, ', ., - only
-  String pattern = r"^[-a-zA-Z0-9 ./']{5,255}$";
+  //length 5-255, alphanumeric, space, /, ', +, -, #, @, (), ., only
+  String pattern = r"^[-a-zA-Z0-9 ./'()+&#@]{5,255}$";
   RegExp regExp = RegExp(pattern);
   if (!regExp.hasMatch(value)) {
-    return 'alphanumeric, space, /, -, . only and length 5-255';
+    return 'alphanumeric, space, /, +, -, #, &, @, (), '
+        ', ., only and length 5-255';
   }
   return null;
 }
@@ -170,11 +171,12 @@ String? validateCompanyTradingName(String value) {
   if (value.trim().isEmpty) {
     return 'required';
   }
-  //length 5-255, alphanumeric, space, /, ', - only
-  String pattern = r"^[-a-zA-Z0-9 ./']{5,255}$";
+  //length 5-255, alphanumeric, space, /, ', +, -, #, @, (), ., only
+  String pattern = r"^[-a-zA-Z0-9 ./'()+&#@]{5,255}$";
   RegExp regExp = RegExp(pattern);
   if (!regExp.hasMatch(value)) {
-    return 'alphanumeric, space, /, -, . only and length 5-255';
+    return 'alphanumeric, space, /, +, -, '
+        ', #, &, @, (), ., only and length 5-255';
   }
   return null;
 }
@@ -183,12 +185,12 @@ String? validateBillingAddress(String value) {
   if (value.trim().isEmpty) {
     return 'required';
   }
-  //length 5-255, alphanumeric, space, /, ', -, #, and line break only
+  //length 5-255, alphanumeric, space, /, ', -, &, #, and line break only
   // String pattern = r"^[-a-zA-Z0-9 ./'#]{5,255}$";
-  String pattern = r"^[-a-zA-Z0-9 .,/'#\n]{5,255}$";
+  String pattern = r"^[-a-zA-Z0-9 .,/'&#\n]{5,255}$";
   RegExp regExp = RegExp(pattern);
   if (!regExp.hasMatch(value)) {
-    return 'alphanumeric, space, /, ,, ., -, #, and line break only and length 5-255';
+    return 'alphanumeric, space, /, &, ., -, #, and line break only and length 5-255';
   }
   return null;
 }
@@ -198,10 +200,10 @@ String? validateBillingAddressLine1(String value) {
     return 'required';
   }
   //length 5-255, alphanumeric, space, /, ', -,  # only
-  String pattern = r"^[-a-zA-Z0-9 ./'#]{5,255}$";
+  String pattern = r"^[-a-zA-Z0-9 ./'#&]{5,255}$";
   RegExp regExp = RegExp(pattern);
   if (!regExp.hasMatch(value)) {
-    return 'alphanumeric, space, /, -, # only and length 5-255';
+    return 'alphanumeric, space, /, -, #, & only and length 5-255';
   }
   return null;
 }
@@ -211,10 +213,10 @@ String? validateBillingAddressLine2(String value) {
     return 'required';
   }
   //length 5-255, alphanumeric, space, /, ', -, # only
-  String pattern = r"^[-a-zA-Z0-9 ./'#]{5,255}$";
+  String pattern = r"^[-a-zA-Z0-9 ./'#&]{5,255}$";
   RegExp regExp = RegExp(pattern);
   if (!regExp.hasMatch(value)) {
-    return 'alphanumeric, space, /, -, # only and length 5-255';
+    return 'alphanumeric, space, /, -, #, & only and length 5-255';
   }
   return null;
 }
@@ -224,10 +226,10 @@ String? validateBillingAddressLine3(String value) {
     return 'required';
   }
   //length 5-21, alphanumeric, space, /, ', -, # only
-  String pattern = r"^[-a-zA-Z0-9 ./'#]{5,21}$";
+  String pattern = r"^[-a-zA-Z0-9 ./'#&]{5,21}$";
   RegExp regExp = RegExp(pattern);
   if (!regExp.hasMatch(value)) {
-    return 'alphanumeric, space, /, -, # only and length 5-21';
+    return 'alphanumeric, space, /, -, #, & only and length 5-21';
   }
   return null;
 }
@@ -529,6 +531,25 @@ String? validateBillingDid(String value) {
   return validatePhone(value);
 }
 
+String? validateBillingContactDid(String value) {
+  if (value.trim().isEmpty) {
+    // return 'required';
+    return null;
+  }
+  return validatePhone(value);
+}
+
+String? validateInitialBalance(String value) {
+  if (value.trim().isEmpty) {
+    // return 'required';
+  }
+  //must be a number
+  if (double.tryParse(value) == null) {
+    return 'must be a number';
+  }
+
+  return null;
+}
 // String? validateLastReadingTimestamp(
 //     String? val, String? firstReadingTimestampStr) {
 //   if (val == null || val.trim().isEmpty) {
@@ -553,6 +574,7 @@ String? validateBillingDid(String value) {
 
 enum PagTenantOps {
   onboarding,
+  update,
   none,
 }
 
@@ -582,8 +604,10 @@ dda_number,
 site_label,
 building_label,
 location_label,
+initial_balance,
+initial_balance_timestamp
  */
-final List<Map<String, dynamic>> listConfigBaseTenantOnb = [
+final List<Map<String, dynamic>> listConfigBaseTenant = [
   {
     'col_key': 'company_trading_name',
     'title': 'Company Trading Name',
@@ -593,13 +617,21 @@ final List<Map<String, dynamic>> listConfigBaseTenantOnb = [
     'validator': validateCompanyTradingName,
   },
   {
-    'col_key': 'billing_address',
-    'title': 'Billing Address',
+    'col_key': 'label',
+    'title': 'Label',
     'col_type': 'string',
-    'width': 200,
+    'width': 150,
     'is_mapping_required': false,
-    'validator': validateBillingAddress,
+    'validator': validateTenantLabel,
   },
+  // {
+  //   'col_key': 'billing_address',
+  //   'title': 'Billing Address',
+  //   'col_type': 'string',
+  //   'width': 200,
+  //   'is_mapping_required': false,
+  //   'validator': validateBillingAddress,
+  // },
   {
     'col_key': 'billing_address_line_1',
     'title': 'Billing Address Line 1',
@@ -623,14 +655,6 @@ final List<Map<String, dynamic>> listConfigBaseTenantOnb = [
     'width': 200,
     'is_mapping_required': false,
     'validator': validateBillingAddressLine3,
-  },
-  {
-    'col_key': 'label',
-    'title': 'Label',
-    'col_type': 'string',
-    'width': 150,
-    'is_mapping_required': false,
-    'validator': validateTenantLabel,
   },
   {
     'col_key': 'account_number',
@@ -786,5 +810,21 @@ final List<Map<String, dynamic>> listConfigBaseTenantOnb = [
     'width': 150,
     'is_mapping_required': true,
     'validator': validateLabelScope,
+  },
+  {
+    'col_key': 'initial_balance',
+    'title': 'Initial Balance',
+    'col_type': 'double',
+    'width': 150,
+    'is_mapping_required': true,
+    'validator': validateInitialBalance,
+  },
+  {
+    'col_key': 'initial_balance_timestamp',
+    'title': 'Initial Balance Date',
+    'col_type': 'date',
+    'width': 150,
+    'is_mapping_required': true,
+    'validator': validateDate,
   },
 ];

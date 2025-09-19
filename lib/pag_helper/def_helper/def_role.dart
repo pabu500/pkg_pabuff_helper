@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 
 enum PagPortalType {
   pagConsole('pag-console', 'op', Colors.teal),
-  emsTp('ems-tp', 'tp', Colors.purple),
-  evsCp('evs-cp', 'cp', Colors.orange),
+  pagEmsTp('pag-ems-tp', 'tp', Colors.purple),
+  pagEvsCp('pag-evs-cp', 'cp', Colors.orange),
   none('none', 'none', Colors.grey),
   ;
 

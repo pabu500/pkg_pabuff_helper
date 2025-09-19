@@ -37,8 +37,10 @@ class MdlPagOpController {
   List<Map<String, dynamic>> opColsConfig;
   List<Map<String, dynamic>> opList;
   List<Map<String, dynamic>>? targetValList;
+  List<Map<String, dynamic>>? targetKeyList;
   List<String> requiredFields = [];
   String? identifierField;
+  String? updateKey;
   String? selectedTargetVal;
   bool allowScheduled;
   DateTime? scheduledTime;
@@ -70,8 +72,10 @@ class MdlPagOpController {
     isImportTargetVal = true;
     isAdditonalKeySameTable = false;
     targetValList = [];
+    targetKeyList = [];
     requiredFields = [];
     identifierField = null;
+    updateKey = null;
     opField = '';
     opFieldType = 'double';
     opFieldShortName = '';
@@ -150,6 +154,8 @@ class MdlPagOpController {
       'item_id_type': itemIdType.name,
       'op_list': opList,
       'op_field': isAdditonalKeySameTable ? opField : '',
+      'identity_key': identifierField ?? '',
+      'update_key': updateKey ?? '',
     };
 
     List<Map<String, dynamic>> opListDb = await doCheckOpList(
@@ -226,6 +232,8 @@ class MdlPagOpController {
       'item_id_type': itemIdType.name,
       'target_fields': targetFields.join(','),
       'op_list': opList,
+      'identity_key': identifierField ?? '',
+      'update_key': updateKey ?? '',
     };
     final opResultList = await doOp?.call(
       appConfig,
