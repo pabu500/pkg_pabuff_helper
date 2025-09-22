@@ -1,25 +1,31 @@
+import 'package:buff_helper/pag_helper/def_helper/list_helper.dart';
 import 'package:buff_helper/pag_helper/wgt/wgt_comm_button.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../xt_ui/wdgt/wgt_pag_wait.dart';
 import '../../../comm/comm_tenant.dart';
+import '../../../def_helper/dh_pag_finance_type.dart';
+import '../../../def_helper/pag_item_helper.dart';
 import '../../../model/acl/mdl_pag_svc_claim.dart';
 import '../../../model/mdl_pag_app_config.dart';
+import '../../../model/mdl_pag_app_context.dart';
 import '../../../model/mdl_pag_user.dart';
 import '../../datetime/wgt_date_range_picker_monthly.dart';
+import '../../ls/wgt_ls_item_flexi.dart';
 
 class WgtTenantSoA2 extends StatefulWidget {
   const WgtTenantSoA2({
     super.key,
     required this.appConfig,
     required this.loggedInUser,
+    required this.pagAppContext,
     required this.teneantInfo,
   });
 
   final MdlPagAppConfig appConfig;
   final MdlPagUser loggedInUser;
+  final MdlPagAppContext pagAppContext;
   final Map<String, dynamic> teneantInfo;
 
   @override
@@ -274,138 +280,150 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
   }
 
   Widget getSoAContainer() {
-    Widget wgt = const SizedBox.shrink();
-    if (!_fetched) {
-      return wgt;
-    } else if (_errorText.isNotEmpty) {
-      wgt = getErrorTextPrompt(context: context, errorText: _errorText);
-    } else if (_fetched && _soaData.isEmpty) {
-      wgt = const Text('No SoA data available for this tenant.');
-    } else {
-      wgt = SingleChildScrollView(
-          child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [getSoA()],
-      ));
-    }
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(5.0),
-        border: Border.all(color: Theme.of(context).hintColor, width: 1.0),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
-      child: wgt,
+    // Widget wgt = const SizedBox.shrink();
+    // if (!_fetched) {
+    //   return wgt;
+    // } else if (_errorText.isNotEmpty) {
+    //   wgt = getErrorTextPrompt(context: context, errorText: _errorText);
+    // } else if (_fetched && _soaData.isEmpty) {
+    //   wgt = const Text('No SoA data available for this tenant.');
+    // } else {
+    //   wgt = SingleChildScrollView(
+    //       child: Column(
+    //     crossAxisAlignment: CrossAxisAlignment.start,
+    //     children: [getSoA2()],
+    //   ));
+    // }
+    // return Container(
+    //   decoration: BoxDecoration(
+    //     borderRadius: BorderRadius.circular(5.0),
+    //     border: Border.all(color: Theme.of(context).hintColor, width: 1.0),
+    //   ),
+    //   padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
+    //   child: wgt,
+    // );
+    return getSoA2();
+  }
+
+  Widget getSoA2() {
+    return WgtListSearchItemFlexi(
+      appConfig: widget.appConfig,
+      pagAppContext: widget.pagAppContext,
+      itemKind: PagItemKind.finance,
+      itemType: PagFinanceType.soa,
+      prefKey: widget.pagAppContext.route,
+      listContextType: PagListContextType.soa,
     );
   }
 
-  Widget getSoA() {
-    return Container(
-      padding: const EdgeInsets.all(3.0),
-      // build list
-      child: ListView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: _soaData.length + (_soaData.isNotEmpty ? 1 : 0),
-        itemBuilder: (context, index) {
-          // if header
-          if (index == 0) {
-            return getSoaHeader();
-          }
-          final item = _soaData[index - 1];
-          return getSoaRow(item);
-        },
-      ),
-    );
-  }
+  // Widget getSoA() {
+  //   return Container(
+  //     padding: const EdgeInsets.all(3.0),
+  //     // build list
+  //     child: ListView.builder(
+  //       shrinkWrap: true,
+  //       physics: const NeverScrollableScrollPhysics(),
+  //       itemCount: _soaData.length + (_soaData.isNotEmpty ? 1 : 0),
+  //       itemBuilder: (context, index) {
+  //         // if header
+  //         if (index == 0) {
+  //           return getSoaHeader();
+  //         }
+  //         final item = _soaData[index - 1];
+  //         return getSoaRow(item);
+  //       },
+  //     ),
+  //   );
+  // }
 
-  Widget getSoaRow(Map<String, dynamic> item) {
-    String date = item['entry_timestamp'] ?? '';
-    // only show date if it is not empty
-    if (date.isNotEmpty) {
-      date = DateTime.parse(date).toLocal().toIso8601String().split('T')[0];
-    }
+  // Widget getSoaRow(Map<String, dynamic> item) {
+  //   String date = item['entry_timestamp'] ?? '';
+  //   // only show date if it is not empty
+  //   if (date.isNotEmpty) {
+  //     date = DateTime.parse(date).toLocal().toIso8601String().split('T')[0];
+  //   }
 
-    TextStyle rowStyle =
-        TextStyle(color: Theme.of(context).colorScheme.onSurface);
+  //   TextStyle rowStyle =
+  //       TextStyle(color: Theme.of(context).colorScheme.onSurface);
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        SizedBox(width: 100, child: Text(date, style: rowStyle)),
-        SizedBox(
-          width: 100,
-          child: Text(
-            item['entry_type'] == 'debit'
-                ? item['debit_amount'].toString()
-                : '',
-            style: rowStyle.copyWith(color: Colors.red),
-          ),
-        ),
-        SizedBox(
-          width: 100,
-          child: Text(
-            item['entry_type'] == 'credit'
-                ? item['credit_amount'].toString()
-                : '',
-            style: rowStyle.copyWith(color: Colors.green),
-          ),
-        ),
-        SizedBox(
-          width: 100,
-          child: Text(item['balance'] ?? '', style: rowStyle),
-        ),
-        SizedBox(
-          width: 200,
-          child: Text(item['description'] ?? '', style: rowStyle),
-        ),
-      ],
-    );
-  }
+  //   return Row(
+  //     mainAxisSize: MainAxisSize.min,
+  //     mainAxisAlignment: MainAxisAlignment.spaceAround,
+  //     children: [
+  //       SizedBox(width: 100, child: Text(date, style: rowStyle)),
+  //       SizedBox(
+  //         width: 100,
+  //         child: Text(
+  //           item['entry_type'] == 'debit'
+  //               ? item['debit_amount'].toString()
+  //               : '',
+  //           style: rowStyle.copyWith(color: Colors.red),
+  //         ),
+  //       ),
+  //       SizedBox(
+  //         width: 100,
+  //         child: Text(
+  //           item['entry_type'] == 'credit'
+  //               ? item['credit_amount'].toString()
+  //               : '',
+  //           style: rowStyle.copyWith(color: Colors.green),
+  //         ),
+  //       ),
+  //       SizedBox(
+  //         width: 100,
+  //         child: Text(item['balance'] ?? '', style: rowStyle),
+  //       ),
+  //       SizedBox(
+  //         width: 200,
+  //         child: Text(item['description'] ?? '', style: rowStyle),
+  //       ),
+  //     ],
+  //   );
+  // }
 
-  Widget getSoaHeader() {
-    TextStyle headerStyle = TextStyle(
-      fontSize: 16,
-      fontWeight: FontWeight.bold,
-      color: Theme.of(context).hintColor,
-    );
-    return Container(
-      // underline
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: Theme.of(context).hintColor,
-            width: 1.0,
-          ),
-        ),
-      ),
-      margin: const EdgeInsets.only(bottom: 5.0),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          SizedBox(
-            width: 90,
-            child: Text('Date', style: headerStyle),
-          ),
-          SizedBox(
-            width: 90,
-            child: Text('Debit', style: headerStyle),
-          ),
-          SizedBox(
-            width: 90,
-            child: Text('Credit', style: headerStyle),
-          ),
-          SizedBox(
-            width: 90,
-            child: Text('Balance', style: headerStyle),
-          ),
-          SizedBox(
-            width: 200,
-            child: Text('Description', style: headerStyle),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget getSoaHeader() {
+  //   TextStyle headerStyle = TextStyle(
+  //     fontSize: 16,
+  //     fontWeight: FontWeight.bold,
+  //     color: Theme.of(context).hintColor,
+  //   );
+  //   return Container(
+  //     // underline
+  //     decoration: BoxDecoration(
+  //       border: Border(
+  //         bottom: BorderSide(
+  //           color: Theme.of(context).hintColor,
+  //           width: 1.0,
+  //         ),
+  //       ),
+  //     ),
+  //     margin: const EdgeInsets.only(bottom: 5.0),
+  //     child: Row(
+  //       mainAxisSize: MainAxisSize.min,
+  //       mainAxisAlignment: MainAxisAlignment.spaceAround,
+  //       children: [
+  //         SizedBox(
+  //           width: 90,
+  //           child: Text('Date', style: headerStyle),
+  //         ),
+  //         SizedBox(
+  //           width: 90,
+  //           child: Text('Debit', style: headerStyle),
+  //         ),
+  //         SizedBox(
+  //           width: 90,
+  //           child: Text('Credit', style: headerStyle),
+  //         ),
+  //         SizedBox(
+  //           width: 90,
+  //           child: Text('Balance', style: headerStyle),
+  //         ),
+  //         SizedBox(
+  //           width: 200,
+  //           child: Text('Description', style: headerStyle),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 }
