@@ -11,6 +11,7 @@ import 'dart:developer' as dev;
 import '../../../../pagrid_helper/ems_helper/billing_helper/wgt_pag_composite_bill_view.dart';
 import '../../../../xt_ui/wdgt/info/get_error_text_prompt.dart';
 import '../../../../xt_ui/wdgt/wgt_pag_wait.dart';
+import '../../../comm/comm_fin_ops.dart';
 import '../../../def_helper/dh_pag_finance_type.dart';
 import 'wgt_payment_lc_status_op.dart';
 
@@ -77,6 +78,9 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
   UniqueKey? _lcStatusOpsKey;
   late Map<String, dynamic> _paymentInfo = widget.paymentMatchingInfo ?? {};
 
+  // info from payment_billing_rec mapping
+  Map<String, dynamic> _paymentBillingRecInfo = {};
+
   bool _isApplied = false;
 
   Future<void> _fetchBillList() async {
@@ -106,6 +110,53 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
       final itemList = result['item_list'] ?? [];
       _billList.clear();
       _billList.addAll(itemList);
+    } catch (e) {
+      dev.log('Error fetching bill list: $e');
+      _errorText = 'Failed to fetch bills';
+    } finally {
+      setState(() {
+        _isFetchingBillList = false;
+        _billListFetchTried = true;
+      });
+    }
+  }
+
+  Future<void> _fetchPaymentMatchOpInfo() async {
+    if (_isFetchingBillList || _billListFetchTried) return;
+
+    _isFetchingBillList = true;
+    _errorText = '';
+
+    Map<String, dynamic> queryMap = {
+      'scope': widget.loggedInUser.selectedScope.toScopeMap(),
+      'item_kind': PagItemKind.bill.name,
+      't.name': tenantName,
+      'payment_id': _paymentInfo['id'] ?? '',
+    };
+
+    try {
+      final result = await fetchPaymentMatchOpInfo(
+          widget.appConfig,
+          queryMap,
+          MdlPagSvcClaim(
+            userId: widget.loggedInUser.id,
+            username: widget.loggedInUser.username,
+            scope: '',
+            target: '',
+            operation: '',
+          ));
+      final itemList = result['bill_list'] ?? [];
+      // final itemList = result['item_list'] ?? [];
+      _billList.clear();
+      // _billList.addAll(itemList);
+      for (var item in itemList) {
+        Map<String, dynamic> billItem = item;
+        _billList.add(billItem);
+      }
+      _paymentBillingRecInfo = result['payment_billing_rec_info'] ?? {};
+      if (_paymentBillingRecInfo.isNotEmpty) {
+        _isApplied = true;
+      }
     } catch (e) {
       dev.log('Error fetching bill list: $e');
       _errorText = 'Failed to fetch bills';
@@ -210,7 +261,8 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
         ),
         fetchingBillList
             ? FutureBuilder(
-                future: _fetchBillList(),
+                // future: _fetchBillList(),
+                future: _fetchPaymentMatchOpInfo(),
                 builder: (context, snapshot) {
                   switch (snapshot.connectionState) {
                     case ConnectionState.waiting:
