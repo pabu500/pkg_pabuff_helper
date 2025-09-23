@@ -77,6 +77,8 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
   UniqueKey? _lcStatusOpsKey;
   late Map<String, dynamic> _paymentInfo = widget.paymentMatchingInfo ?? {};
 
+  bool _isApplied = false;
+
   Future<void> _fetchBillList() async {
     if (_isFetchingBillList || _billListFetchTried) return;
 
@@ -120,6 +122,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
     super.initState();
     _lcStatusDisplay =
         PagPaymentLcStatus.byValue(widget.defaultPaymentLcStatusStr);
+    _isApplied = _lcStatusDisplay == PagPaymentLcStatus.released;
   }
 
   @override
@@ -252,7 +255,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
     );
   }
 
-  Widget getPaymentApply() {
+  Widget getNewApply() {
     bool isEnabled = false;
 
     return Container(
@@ -366,7 +369,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                 ],
               ),
               const Spacer(),
-              getPaymentApply(),
+              _isApplied ? getAppliedPayment() : getNewApply(),
               horizontalSpaceSmall,
             ],
           ),
@@ -384,6 +387,30 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                   ? ['generated']
                   : ['released'],
             ),
+        ],
+      ),
+    );
+  }
+
+  Widget getAppliedPayment() {
+    bool isEnabled = false;
+
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(
+            color: isEnabled
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).disabledColor.withAlpha(130)),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('Applied', style: billLabelStyle),
+          horizontalSpaceSmall,
+          Icon(Symbols.check_circle,
+              color: Theme.of(context).colorScheme.primary),
         ],
       ),
     );
