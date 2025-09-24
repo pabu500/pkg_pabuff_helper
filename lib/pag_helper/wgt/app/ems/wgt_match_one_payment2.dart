@@ -57,16 +57,6 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
     color: Theme.of(context).hintColor,
   );
 
-  // late final matchedPaymentInfo =
-  //     widget.paymentMatchingInfo['matched_payment_info'];
-  // late final String billingRecId = matchedPaymentInfo['billing_rec_id'];
-  // late final String billingLcStatusStr =
-  //     matchedPaymentInfo['billing_lc_status'];
-  // late final String paymentLcStatusStr = matchedPaymentInfo['lc_status'];
-  // late final String paymentAmount = matchedPaymentInfo['amount'];
-  // late final String paymentValueDate = matchedPaymentInfo['value_timestamp'];
-  // // only get the date from the time
-  // late final String paymentValueDateOnly = paymentValueDate.split(' ').first;
   late final String tenantName = widget.tenantInfo['tenant_name'];
 
   bool _isFetchingBillList = false;
@@ -76,12 +66,16 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
   final List<Map<String, dynamic>> _billList = [];
   late PagPaymentLcStatus _lcStatusDisplay;
   UniqueKey? _lcStatusOpsKey;
-  late Map<String, dynamic> _paymentInfo = widget.paymentMatchingInfo ?? {};
+  late final Map<String, dynamic> _paymentInfo =
+      widget.paymentMatchingInfo ?? {};
+  late final double? _paymentAmount =
+      double.tryParse(_paymentInfo['amount'] ?? '');
 
   // info from payment_billing_rec mapping
-  Map<String, dynamic> _paymentBillingRecInfo = {};
+  final List<Map<String, dynamic>> _paymentApplyInfoListExisting = [];
+  final List<Map<String, dynamic>> _paymentApplyInfoListNew = [];
 
-  bool _isApplied = false;
+  double? _availableAmountToApply;
 
   Future<void> _fetchBillList() async {
     if (_isFetchingBillList || _billListFetchTried) return;
@@ -93,6 +87,8 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
       'scope': widget.loggedInUser.selectedScope.toScopeMap(),
       'item_kind': PagItemKind.bill.name,
       't.name': tenantName,
+      'sort_by': 'from_timestamp',
+      'sort_order': 'DESC',
     };
 
     try {
@@ -153,9 +149,19 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
         Map<String, dynamic> billItem = item;
         _billList.add(billItem);
       }
-      _paymentBillingRecInfo = result['payment_billing_rec_info'] ?? {};
-      if (_paymentBillingRecInfo.isNotEmpty) {
-        _isApplied = true;
+      final paymentApplyInfoList = result['payment_apply_info_list'] ?? {};
+
+      // double paymentAmount =  double.tryParse(_paymentInfo['amount'] ?? '0.0') ?? 0.0;
+      _availableAmountToApply = _paymentAmount;
+      for (var item in paymentApplyInfoList) {
+        _paymentApplyInfoListExisting.add(item);
+        final appliedAmountUsage =
+            double.tryParse(item['applied_usage_amount'] ?? '0.0') ?? 0.0;
+        final appliedAmountInterest =
+            double.tryParse(item['applied_interest_amount'] ?? '0.0') ?? 0.0;
+        double totalApplied = appliedAmountUsage + appliedAmountInterest;
+
+        _availableAmountToApply = _availableAmountToApply! - totalApplied;
       }
     } catch (e) {
       dev.log('Error fetching bill list: $e');
@@ -168,12 +174,86 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
     }
   }
 
+  void _populateApply() {
+    if (_availableAmountToApply == null || _availableAmountToApply! <= 0.0) {
+      return;
+    }
+    if (_billList.isEmpty) {
+      return;
+    }
+
+    double remainingAmount = _availableAmountToApply!;
+    _paymentApplyInfoListNew.clear();
+
+    // rule 1: pay oldest bill first
+    // rule 2: pay interest first, then usage
+    final billList = [];
+    billList.addAll(_billList);
+    billList.sort((a, b) {
+      final aTimestamp = a['from_timestamp'] ?? '';
+      final bTimestamp = b['from_timestamp'] ?? '';
+      return aTimestamp.compareTo(bTimestamp);
+    });
+
+    for (var bill in billList) {
+      if (remainingAmount <= 0.0) {
+        break;
+      }
+      final billingRecId = bill['id'] ?? '';
+      final billedTotalCost =
+          double.tryParse(bill['billed_total_cost'] ?? '0.0') ?? 0.0;
+      if (billedTotalCost <= 0.0) {
+        continue;
+      }
+      final billedInterestAmount =
+          double.tryParse(bill['billed_interest_amount'] ?? '0.0') ?? 0.0;
+      final billedUsageAmount = billedTotalCost - billedInterestAmount;
+
+      double appliedInterest = 0.0;
+      double appliedUsage = 0.0;
+      if (billedInterestAmount > 0.0) {
+        if (remainingAmount >= billedInterestAmount) {
+          appliedInterest = billedInterestAmount;
+          remainingAmount -= billedInterestAmount;
+        } else {
+          appliedInterest = remainingAmount;
+          remainingAmount = 0.0;
+        }
+      }
+      if (billedUsageAmount > 0.0) {
+        if (remainingAmount >= billedUsageAmount) {
+          appliedUsage = billedUsageAmount;
+          remainingAmount -= billedUsageAmount;
+        } else {
+          appliedUsage = remainingAmount;
+          remainingAmount = 0.0;
+        }
+      }
+      if (appliedInterest > 0.0 || appliedUsage > 0.0) {
+        _paymentApplyInfoListNew.add({
+          'billing_rec_id': billingRecId,
+          'applied_interest_amount': appliedInterest.toStringAsFixed(2),
+          'applied_usage_amount': appliedUsage.toStringAsFixed(2),
+        });
+      }
+      if (remainingAmount <= 0.0) {
+        break;
+      }
+
+      dev.log(
+          'Bill $billingRecId: applied interest $appliedInterest, usage $appliedUsage');
+    }
+
+    setState(() {
+      _availableAmountToApply = remainingAmount;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     _lcStatusDisplay =
         PagPaymentLcStatus.byValue(widget.defaultPaymentLcStatusStr);
-    _isApplied = _lcStatusDisplay == PagPaymentLcStatus.released;
   }
 
   @override
@@ -218,10 +298,31 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                       color: Theme.of(context).hintColor),
                   Text('Payment: ', style: mainLabelStyle),
                   Text(
-                      widget.paymentMatchingInfo?['matched_payment_info']
-                              ?['amount'] ??
-                          '',
+                      _paymentAmount != null
+                          ? _paymentAmount.toStringAsFixed(2)
+                          : '-',
                       style: mainTextStyle),
+                  horizontalSpaceSmall,
+                  // Text('Matched at: ', style: mainLabelStyle),
+                  // Text(
+                  //     widget.paymentMatchingInfo?['matched_payment_info']
+                  //                 ?['value_timestamp']
+                  //             .toString()
+                  //             .split(' ')
+                  //             .first ??
+                  //         '',
+                  //     style: mainTextStyle),
+                  // horizontalSpaceSmall,
+                  Text('Available: ',
+                      style: billKeyStyle.copyWith(fontSize: 16)),
+                  Text(
+                      _availableAmountToApply != null
+                          ? _availableAmountToApply!.toStringAsFixed(2)
+                          : '0.00',
+                      style: mainTextStyle.copyWith(fontSize: 24)),
+                  horizontalSpaceSmall,
+                  getPopulateApply(),
+                  getCommitApply(),
                   const Spacer(),
                   if (hasMatchedBill)
                     WgtPagPaymentLcStatusOp(
@@ -307,8 +408,28 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
     );
   }
 
-  Widget getNewApply() {
-    bool isEnabled = false;
+  Widget getApplyOp(
+      bool isMatchedBill,
+      double? availableAmountToApply,
+      double? appliedAmountUsage,
+      double? appliedAmountInterest,
+      String? appliedByOpUsername,
+      String? appliedTimestampStr) {
+    bool isEnabled = true;
+    if (!isMatchedBill) {
+      if (availableAmountToApply == null || availableAmountToApply <= 0.0) {
+        isEnabled = false;
+      }
+    }
+
+    if (_lcStatusDisplay == PagPaymentLcStatus.released) {
+      isEnabled = false;
+    }
+
+    final initialValueUsage =
+        isMatchedBill ? appliedAmountUsage?.toString() : null;
+    final initialValueInterest =
+        isMatchedBill ? appliedAmountInterest?.toString() : null;
 
     return Container(
       decoration: BoxDecoration(
@@ -319,38 +440,53 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
         borderRadius: BorderRadius.circular(5),
       ),
       padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
+      child: Column(
         children: [
-          SizedBox(
-            width: 95,
-            child: WgtTextField(
-              appConfig: widget.appConfig,
-              loggedInUser: widget.loggedInUser,
-              hintText: 'Usage',
-              labelText: 'Usage',
-              onChanged: (value) {
-                // setState(() {
-                //   _paymentApply = value;
-                // });
-              },
-            ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                width: 95,
+                child: WgtTextField(
+                  key: UniqueKey(),
+                  appConfig: widget.appConfig,
+                  loggedInUser: widget.loggedInUser,
+                  hintText: 'Usage',
+                  labelText: 'Usage',
+                  enabled: isEnabled,
+                  initialValue: initialValueUsage,
+                  onChanged: (value) {
+                    // setState(() {
+                    //   _paymentApply = value;
+                    // });
+                  },
+                ),
+              ),
+              horizontalSpaceSmall, // interest bucket
+              SizedBox(
+                width: 95,
+                child: WgtTextField(
+                  key: UniqueKey(),
+                  appConfig: widget.appConfig,
+                  loggedInUser: widget.loggedInUser,
+                  hintText: 'Interest',
+                  labelText: 'Interest',
+                  enabled: isEnabled,
+                  initialValue: initialValueInterest,
+                  onChanged: (value) {
+                    // setState(() {
+                    //   _paymentApply = value;
+                    // });
+                  },
+                ),
+              ),
+            ],
           ),
-          horizontalSpaceSmall, // interest bucket
-          SizedBox(
-            width: 95,
-            child: WgtTextField(
-              appConfig: widget.appConfig,
-              loggedInUser: widget.loggedInUser,
-              hintText: 'Interest',
-              labelText: 'Interest',
-              onChanged: (value) {
-                // setState(() {
-                //   _paymentApply = value;
-                // });
-              },
-            ),
-          ),
+          if (appliedTimestampStr != null && appliedByOpUsername != null) ...[
+            const SizedBox(height: 5),
+            Text('Applied by $appliedByOpUsername at $appliedTimestampStr',
+                style: billKeyStyle.copyWith(fontSize: 12)),
+          ]
         ],
       ),
     );
@@ -363,6 +499,12 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
     final cycleStr = billInfo['cycle_str'] ?? '';
     final billedTotalCost = billInfo['billed_total_cost'] ?? '';
     final billingLcStatusStr = billInfo['lc_status'] ?? '';
+    final usageAmount =
+        double.tryParse(billInfo['billed_total_cost'] ?? '0.0') ?? 0.0;
+    final interestAmount =
+        double.tryParse(billInfo['billed_interest_amount'] ?? '0.0') ?? 0.0;
+    final totalAmount = usageAmount + interestAmount;
+
     PagBillingLcStatus billLcStatus =
         PagBillingLcStatus.values.byName(billingLcStatusStr);
 
@@ -373,8 +515,33 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
           billingRecId;
     }
 
-    // final lcStatusStr = widget.paymentMatchingInfo?['lc_status'] ?? '';
-    // PagPaymentLcStatus lcStatus = PagPaymentLcStatus.byValue(lcStatusStr);
+    double? availableAmountToApply;
+    double? appliedAmountUsage;
+    double? appliedAmountInterest;
+    String? appliedByOpUsername;
+    String? appliedTimestampStr;
+
+    final applyInfoList = [];
+    applyInfoList.addAll(_paymentApplyInfoListNew);
+    if (applyInfoList.isEmpty) {
+      applyInfoList.addAll(_paymentApplyInfoListExisting);
+    }
+
+    double balanceAmount = totalAmount;
+    for (var item in applyInfoList) {
+      if (item['billing_rec_id'] == billingRecId) {
+        appliedAmountUsage =
+            double.tryParse(item['applied_usage_amount'] ?? '0.0') ?? 0.0;
+        appliedAmountInterest =
+            double.tryParse(item['applied_interest_amount'] ?? '0.0') ?? 0.0;
+        appliedByOpUsername = item['applied_by_op_username'];
+        appliedTimestampStr = item['applied_timestamp'];
+        isMatchedBill = true;
+        balanceAmount =
+            balanceAmount - (appliedAmountUsage + appliedAmountInterest);
+        break;
+      }
+    }
 
     return Container(
       decoration: BoxDecoration(
@@ -416,12 +583,38 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                       ),
                       Text('$billedTotalCost',
                           style: billLabelStyle.copyWith(fontSize: 34)),
+                      horizontalSpaceSmall,
+                      Text('Usage: ', style: billKeyStyle),
+                      Text(
+                        usageAmount.toStringAsFixed(2),
+                        style: mainTextStyle.copyWith(fontSize: 24),
+                      ),
+                      horizontalSpaceSmall,
+                      Text('Interest: ', style: billKeyStyle),
+                      Text(
+                        interestAmount.toStringAsFixed(2),
+                        style: mainTextStyle.copyWith(fontSize: 24),
+                      ),
+                      horizontalSpaceSmall,
+                      Text('Balance: ', style: billKeyStyle),
+                      Text(
+                        balanceAmount.toStringAsFixed(2),
+                        style: mainTextStyle.copyWith(fontSize: 24),
+                      ),
+                      horizontalSpaceSmall,
                     ],
                   ),
                 ],
               ),
               const Spacer(),
-              _isApplied ? getAppliedPayment() : getNewApply(),
+              // _isApplied ? getAppliedPayment() : getApplyOp(),
+              getApplyOp(
+                  isMatchedBill,
+                  availableAmountToApply,
+                  appliedAmountUsage,
+                  appliedAmountInterest,
+                  appliedByOpUsername,
+                  appliedTimestampStr),
               horizontalSpaceSmall,
             ],
           ),
@@ -444,26 +637,42 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
     );
   }
 
-  Widget getAppliedPayment() {
-    bool isEnabled = false;
-
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(
-            color: isEnabled
-                ? Theme.of(context).colorScheme.primary
-                : Theme.of(context).disabledColor.withAlpha(130)),
-        borderRadius: BorderRadius.circular(5),
+  Widget getPopulateApply() {
+    if (_lcStatusDisplay == PagPaymentLcStatus.released) {
+      return const SizedBox.shrink();
+    }
+    if (_availableAmountToApply == null || _availableAmountToApply! <= 0.0) {
+      return const SizedBox.shrink();
+    }
+    return InkWell(
+      onTap: () {
+        _populateApply();
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          // border: Border.all(color: Theme.of(context).colorScheme.primary),
+          color: Theme.of(context).colorScheme.secondary.withAlpha(210),
+          borderRadius: BorderRadius.circular(5),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+        child: Text('Populate Apply',
+            style: TextStyle(color: Theme.of(context).colorScheme.onSecondary)),
       ),
-      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text('Applied', style: billLabelStyle),
-          horizontalSpaceSmall,
-          Icon(Symbols.check_circle,
-              color: Theme.of(context).colorScheme.primary),
-        ],
+    );
+  }
+
+  Widget getCommitApply() {
+    if (_paymentApplyInfoListNew.isEmpty) {
+      return Container();
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 21),
+      child: IconButton(
+        onPressed: () {
+          // commit the apply info
+        },
+        icon: Icon(Icons.cloud_upload, color: commitColor),
       ),
     );
   }
