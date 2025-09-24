@@ -34,7 +34,7 @@ class WgtPaymentMatchOpItem extends StatefulWidget {
 
 class _WgtPaymentMatchOpItemState extends State<WgtPaymentMatchOpItem> {
   late final BoxDecoration matchedDecor = BoxDecoration(
-    border: Border.all(color: commitColor.withAlpha(130)),
+    border: Border.all(color: commitColor.withAlpha(210), width: 2),
     borderRadius: BorderRadius.circular(3),
   );
 
