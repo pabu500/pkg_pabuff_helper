@@ -136,6 +136,13 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
 
   int _failedPullListInfo = 0;
 
+  bool _meterUsageColumnExists = false;
+  bool _tenantUsageColumnExists = false;
+  bool _viewBillColumnExists = false;
+  bool _viewSoAColumnExists = false;
+  bool _matchPaymentColumnExists = false;
+  bool _deviceHealthColumnExists = false;
+
   Future<dynamic> _getListInfo() async {
     if (loggedInUser == null) {
       return;
@@ -455,22 +462,30 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     }
 
     if (addMeterUsageColumn) {
-      _addMeterUsageColumn(listController);
+      if (!_meterUsageColumnExists) {
+        _addMeterUsageColumn(listController);
+      }
+      _meterUsageColumnExists = true;
     }
     if (addTenantUsageColumn) {
       _addTenantUsageColumns(listController);
+      _tenantUsageColumnExists = true;
     }
     if (addViewBillColumn) {
       _addViewBillColumn(listController);
+      _viewBillColumnExists = true;
     }
     if (addViewSoAColumn) {
       _addViewSoAColumn(listController);
+      _viewSoAColumnExists = true;
     }
     if (addMatchPaymentColumn) {
       _addMatchPaymentColumn(listController);
+      _matchPaymentColumnExists = true;
     }
     if (addDeviceHealthColumn && !hasDetailColumn) {
       _addDeviceHealthColumn(listController);
+      _deviceHealthColumnExists = true;
     }
   }
 
