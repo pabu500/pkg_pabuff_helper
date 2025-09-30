@@ -330,6 +330,8 @@ class PagUrlBase {
   static const String eptBatchOpFinPostPayment =
       '/ems/fin/batch_op/post_payment';
   static const String eptFinMatchPayment = '/ems/fin/match_payment';
+  static const String eptFinGetPaymentMatchInfo =
+      '/ems/fin/get_payment_match_info';
   static const String eptGetPaymentMatchOpInfo =
       '/ems/fin/get_payment_match_op_info';
 
