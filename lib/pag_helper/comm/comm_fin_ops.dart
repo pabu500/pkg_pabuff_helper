@@ -60,13 +60,13 @@ Future<dynamic> doFinPostPayment(
   }
 }
 
-Future<dynamic> getPaymentMatchInfo(
+Future<dynamic> getPaymentApplyInfo(
   MdlPagAppConfig appConfig,
   Map<String, dynamic> queryMap,
   MdlPagSvcClaim svcClaim,
 ) async {
   svcClaim.svcName = PagSvcType.oresvc2.name;
-  svcClaim.endpoint = PagUrlBase.eptFinGetPaymentMatchInfo;
+  svcClaim.endpoint = PagUrlBase.eptFinGetPaymentApplyInfo;
 
   String svcToken = '';
   // try {
