@@ -259,6 +259,49 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
     });
   }
 
+  void _updateApplyInfo(int index, String fieldKey, String value) {
+    if (index < 0 || index >= _billList.length) {
+      return;
+    }
+    final billInfo = _billList[index];
+    final billingRecId = billInfo['id'] ?? '';
+
+    bool found = false;
+    for (var item in _paymentApplyInfoListNew) {
+      if (item['billing_rec_id'] == billingRecId) {
+        item[fieldKey] = value;
+        found = true;
+        break;
+      }
+    }
+    if (!found) {
+      // add new entry
+      _paymentApplyInfoListNew.add({
+        'billing_rec_id': billingRecId,
+        fieldKey: value,
+      });
+    }
+
+    // recalculate available amount to apply
+    double totalApplied = 0.0;
+    for (var item in _paymentApplyInfoListNew) {
+      final appliedAmountUsage =
+          double.tryParse(item['applied_usage_amount'] ?? '0.0') ?? 0.0;
+      final appliedAmountInterest =
+          double.tryParse(item['applied_interest_amount'] ?? '0.0') ?? 0.0;
+      totalApplied += (appliedAmountUsage + appliedAmountInterest);
+    }
+
+    // if all applied amount is zero, clear the list
+    if (totalApplied <= 0.0) {
+      _paymentApplyInfoListNew.clear();
+    }
+
+    setState(() {
+      _availableAmountToApply = (_paymentAmount ?? 0.0) - totalApplied;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -341,7 +384,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                         key: _lcStatusOpsKey,
                         appConfig: widget.appConfig,
                         loggedInUser: widget.loggedInUser,
-                        enableEdit: true,
+                        enableEdit: false,
                         paymentInfo: widget.paymentMatchingInfo ?? {},
                         initialStatus: _lcStatusDisplay,
                         onCommitted: (newStatus) {
@@ -423,6 +466,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
 
   Widget getApplyOp(
       bool isMatchedBill,
+      int index,
       double? availableAmountToApply,
       double? appliedAmountUsage,
       double? appliedAmountInterest,
@@ -472,6 +516,9 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                     // setState(() {
                     //   _paymentApply = value;
                     // });
+                  },
+                  onClear: () {
+                    _updateApplyInfo(index, 'applied_usage_amount', '');
                   },
                 ),
               ),
@@ -636,6 +683,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
               // _isApplied ? getAppliedPayment() : getApplyOp(),
               getApplyOp(
                   isMatchedBill,
+                  index,
                   availableAmountToApply,
                   appliedAmountUsage,
                   appliedAmountInterest,
