@@ -56,6 +56,11 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
     fontWeight: FontWeight.bold,
     color: Theme.of(context).hintColor,
   );
+  late final TextStyle billValStyle = TextStyle(
+    fontWeight: FontWeight.bold,
+    fontSize: 21,
+    color: Theme.of(context).colorScheme.onSurface,
+  );
 
   late final String tenantName = widget.tenantInfo['tenant_name'];
 
@@ -77,45 +82,45 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
 
   double? _availableAmountToApply;
 
-  Future<void> _fetchBillList() async {
-    if (_isFetchingBillList || _billListFetchTried) return;
+  // Future<void> _fetchBillList() async {
+  //   if (_isFetchingBillList || _billListFetchTried) return;
 
-    _isFetchingBillList = true;
-    _errorText = '';
+  //   _isFetchingBillList = true;
+  //   _errorText = '';
 
-    Map<String, dynamic> queryMap = {
-      'scope': widget.loggedInUser.selectedScope.toScopeMap(),
-      'item_kind': PagItemKind.bill.name,
-      't.name': tenantName,
-      'sort_by': 'from_timestamp',
-      'sort_order': 'DESC',
-    };
+  //   Map<String, dynamic> queryMap = {
+  //     'scope': widget.loggedInUser.selectedScope.toScopeMap(),
+  //     'item_kind': PagItemKind.bill.name,
+  //     't.name': tenantName,
+  //     'sort_by': 'from_timestamp',
+  //     'sort_order': 'DESC',
+  //   };
 
-    try {
-      final result = await fetchItemList(
-          widget.loggedInUser,
-          widget.appConfig,
-          queryMap,
-          MdlPagSvcClaim(
-            userId: widget.loggedInUser.id,
-            username: widget.loggedInUser.username,
-            scope: '',
-            target: '',
-            operation: '',
-          ));
-      final itemList = result['item_list'] ?? [];
-      _billList.clear();
-      _billList.addAll(itemList);
-    } catch (e) {
-      dev.log('Error fetching bill list: $e');
-      _errorText = 'Failed to fetch bills';
-    } finally {
-      setState(() {
-        _isFetchingBillList = false;
-        _billListFetchTried = true;
-      });
-    }
-  }
+  //   try {
+  //     final result = await fetchItemList(
+  //         widget.loggedInUser,
+  //         widget.appConfig,
+  //         queryMap,
+  //         MdlPagSvcClaim(
+  //           userId: widget.loggedInUser.id,
+  //           username: widget.loggedInUser.username,
+  //           scope: '',
+  //           target: '',
+  //           operation: '',
+  //         ));
+  //     final itemList = result['item_list'] ?? [];
+  //     _billList.clear();
+  //     _billList.addAll(itemList);
+  //   } catch (e) {
+  //     dev.log('Error fetching bill list: $e');
+  //     _errorText = 'Failed to fetch bills';
+  //   } finally {
+  //     setState(() {
+  //       _isFetchingBillList = false;
+  //       _billListFetchTried = true;
+  //     });
+  //   }
+  // }
 
   Future<void> _fetchPaymentMatchOpInfo() async {
     if (_isFetchingBillList || _billListFetchTried) return;
@@ -199,6 +204,11 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
       if (remainingAmount <= 0.0) {
         break;
       }
+      // skip if bill is not released
+      if (bill['lc_status'] != 'released') {
+        continue;
+      }
+
       final billingRecId = bill['id'] ?? '';
       final billedTotalCost =
           double.tryParse(bill['billed_total_cost'] ?? '0.0') ?? 0.0;
@@ -325,26 +335,29 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                   getCommitApply(),
                   const Spacer(),
                   if (hasMatchedBill)
-                    WgtPagPaymentLcStatusOp(
-                      key: _lcStatusOpsKey,
-                      appConfig: widget.appConfig,
-                      loggedInUser: widget.loggedInUser,
-                      enableEdit: true,
-                      paymentInfo: widget.paymentMatchingInfo ?? {},
-                      initialStatus: _lcStatusDisplay,
-                      onCommitted: (newStatus) {
-                        setState(() {
-                          _lcStatusOpsKey = UniqueKey();
-                          // _bill['lc_status'] = newStatus.value;
-                          _paymentInfo['lc_status'] = newStatus.value;
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: WgtPagPaymentLcStatusOp(
+                        key: _lcStatusOpsKey,
+                        appConfig: widget.appConfig,
+                        loggedInUser: widget.loggedInUser,
+                        enableEdit: true,
+                        paymentInfo: widget.paymentMatchingInfo ?? {},
+                        initialStatus: _lcStatusDisplay,
+                        onCommitted: (newStatus) {
+                          setState(() {
+                            _lcStatusOpsKey = UniqueKey();
+                            // _bill['lc_status'] = newStatus.value;
+                            _paymentInfo['lc_status'] = newStatus.value;
 
-                          // _isDisabledGn = newStatus == PagBillingLcStatus.pv ||
-                          //     newStatus == PagBillingLcStatus.released;
-                          _lcStatusDisplay = newStatus;
-                        });
-                        dev.log('on committed: $newStatus');
-                        widget.onUpdate?.call();
-                      },
+                            // _isDisabledGn = newStatus == PagBillingLcStatus.pv ||
+                            //     newStatus == PagBillingLcStatus.released;
+                            _lcStatusDisplay = newStatus;
+                          });
+                          dev.log('on committed: $newStatus');
+                          widget.onUpdate?.call();
+                        },
+                      ),
                     ),
                   const Padding(padding: EdgeInsets.only(right: 60)),
                 ]),
@@ -573,38 +586,51 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                 },
               ),
               horizontalSpaceSmall,
-              Column(
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        'Total: ',
-                        style: billKeyStyle,
-                      ),
-                      Text('$billedTotalCost',
-                          style: billLabelStyle.copyWith(fontSize: 34)),
-                      horizontalSpaceSmall,
-                      Text('Usage: ', style: billKeyStyle),
-                      Text(
-                        usageAmount.toStringAsFixed(2),
-                        style: mainTextStyle.copyWith(fontSize: 24),
-                      ),
-                      horizontalSpaceSmall,
-                      Text('Interest: ', style: billKeyStyle),
-                      Text(
-                        interestAmount.toStringAsFixed(2),
-                        style: mainTextStyle.copyWith(fontSize: 24),
-                      ),
-                      horizontalSpaceSmall,
-                      Text('Balance: ', style: billKeyStyle),
-                      Text(
-                        balanceAmount.toStringAsFixed(2),
-                        style: mainTextStyle.copyWith(fontSize: 24),
-                      ),
-                      horizontalSpaceSmall,
-                    ],
-                  ),
-                ],
+              IntrinsicHeight(
+                child: Row(
+                  children: [
+                    Column(
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              'Total: ',
+                              style: billKeyStyle,
+                            ),
+                            Text('$billedTotalCost',
+                                style: billValStyle.copyWith(fontSize: 25)),
+                          ],
+                        ),
+                        verticalSpaceTiny,
+                        Row(
+                          children: [
+                            Text('Usage: ', style: billKeyStyle),
+                            Text(
+                              usageAmount.toStringAsFixed(2),
+                              style: billValStyle,
+                            ),
+                            horizontalSpaceSmall,
+                            Text('Interest: ', style: billKeyStyle),
+                            Text(
+                              interestAmount.toStringAsFixed(2),
+                              style: billValStyle,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    VerticalDivider(
+                      color: Theme.of(context).hintColor,
+                      width: 20,
+                    ),
+                    Text('Balance: ', style: billKeyStyle),
+                    Text(
+                      balanceAmount.toStringAsFixed(2),
+                      style: billValStyle,
+                    ),
+                    horizontalSpaceSmall,
+                  ],
+                ),
               ),
               const Spacer(),
               // _isApplied ? getAppliedPayment() : getApplyOp(),
@@ -644,6 +670,15 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
     if (_availableAmountToApply == null || _availableAmountToApply! <= 0.0) {
       return const SizedBox.shrink();
     }
+
+    if (_billList.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    if (_paymentApplyInfoListNew.isNotEmpty) {
+      return const SizedBox.shrink();
+    }
+
     return InkWell(
       onTap: () {
         _populateApply();
@@ -666,13 +701,29 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
       return Container();
     }
 
+    bool isPaymentReleased = widget.paymentMatchingInfo != null &&
+        widget.paymentMatchingInfo!['lc_status'] == 'released';
+
     return Padding(
       padding: const EdgeInsets.only(left: 21),
-      child: IconButton(
-        onPressed: () {
-          // commit the apply info
-        },
-        icon: Icon(Icons.cloud_upload, color: commitColor),
+      child: Row(
+        children: [
+          IconButton(
+            onPressed: isPaymentReleased
+                ? () {
+                    // commit the apply info
+                  }
+                : null,
+            icon: Icon(Icons.cloud_upload,
+                color: isPaymentReleased ? commitColor : null),
+          ),
+          if (!isPaymentReleased)
+            Padding(
+              padding: const EdgeInsets.only(left: 8),
+              child: getInfoTextPrompt(
+                  context: context, infoText: 'Release payment to commit'),
+            ),
+        ],
       ),
     );
   }

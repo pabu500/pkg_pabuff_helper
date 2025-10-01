@@ -34,14 +34,18 @@ class WgtPaymentMatchOpItem extends StatefulWidget {
 
 class _WgtPaymentMatchOpItemState extends State<WgtPaymentMatchOpItem> {
   late final BoxDecoration matchedDecor = BoxDecoration(
+    border: Border.all(color: Colors.purple.withAlpha(210), width: 2),
+    borderRadius: BorderRadius.circular(3),
+  );
+  late final BoxDecoration hasAppliedPaymentsDecor = BoxDecoration(
     border: Border.all(color: commitColor.withAlpha(210), width: 2),
     borderRadius: BorderRadius.circular(3),
   );
-
   bool _isComm = false;
   bool _isEnabled = false;
 
   bool _matchedBillingRecFound = false;
+  bool _hasAppliedPayments = false;
 
   void _refresh(bool isComm, bool isEnabled) {
     if (!mounted) {
@@ -54,6 +58,8 @@ class _WgtPaymentMatchOpItemState extends State<WgtPaymentMatchOpItem> {
       // dev.log('isComm: $_isComm, isEnabled: $_isEnabled');
       _matchedBillingRecFound =
           widget.paymentMatchInfo['matched_billing_rec_found'] ?? false;
+      _hasAppliedPayments =
+          widget.paymentMatchInfo['has_applied_payments'] ?? false;
     });
   }
 
@@ -93,7 +99,11 @@ class _WgtPaymentMatchOpItemState extends State<WgtPaymentMatchOpItem> {
                     );
                   },
             child: Container(
-              decoration: !_matchedBillingRecFound ? null : matchedDecor,
+              decoration: !_matchedBillingRecFound
+                  ? !_hasAppliedPayments
+                      ? null
+                      : hasAppliedPaymentsDecor
+                  : matchedDecor,
               padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
               child: Icon(Symbols.payments,
                   color: _isEnabled

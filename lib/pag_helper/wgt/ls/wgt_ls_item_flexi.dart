@@ -388,6 +388,8 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         widget.itemKind == PagItemKind.device;
     bool isFhDevice = widget.pagAppContext! == appCtxFh &&
         widget.itemKind == PagItemKind.device;
+    bool isPaymentApply =
+        widget.listContextType == PagListContextType.paymentApply;
     if (isEmsDeviceLs ||
         isEmsMeterUsage ||
         isEmsTenantUsage ||
@@ -396,7 +398,8 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         isSoa ||
         isPp ||
         isCmDeviceLs ||
-        isFhDevice) {
+        isFhDevice ||
+        isPaymentApply) {
       addInfoViewEditColumn = false;
     }
     if (hasInfoViewEditColumn) {
