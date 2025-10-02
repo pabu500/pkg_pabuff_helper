@@ -77,8 +77,6 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
     };
 
     try {
-      // Simulate a network call to fetch device health data
-      // await Future.delayed(const Duration(seconds: 2));
       final result = await getDeviceHealthInfo(
           widget.appConfig,
           queryMap,
@@ -158,6 +156,21 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
               errorList.remove(errMeterTag);
               break;
             }
+          }
+        }
+        if (commCheckResult == 'fail') {
+          // add the meter tag to the error list if not already there
+          final content = _gatewayHealthData['content'];
+          final errorList = content['el'] ?? [];
+          bool alreadyInList = false;
+          for (var errMeterTag in errorList) {
+            if (errMeterTag == _selectedMeterInfo['meter_tag']) {
+              alreadyInList = true;
+              break;
+            }
+          }
+          if (!alreadyInList) {
+            errorList.add(_selectedMeterInfo['meter_tag']);
           }
         }
       }
