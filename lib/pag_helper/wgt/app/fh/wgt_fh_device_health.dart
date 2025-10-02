@@ -393,7 +393,7 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
         _gatewayHealthData['meter_group_label'] ?? 'Unknown';
 
     final content = _gatewayHealthData['content'];
-    final errorList = content['el'] ?? [];
+    final errorList = content['el'];
     final meterInfoList = _gatewayHealthData['meter_info_list'] ?? [];
 
     // sort by tag strings
@@ -410,14 +410,21 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
       final meterTag = meterInfo['meter_tag'] ?? 'Unknown';
 
       bool hasError = false;
-      for (var errMeterTag in errorList) {
-        if (errMeterTag == meterTag) {
-          hasError = true;
-          break;
+      bool isUnknown = false;
+      if (errorList == null || errorList.isEmpty) {
+        hasError = false;
+        isUnknown = true;
+      } else {
+        for (var errMeterTag in errorList) {
+          if (errMeterTag == meterTag) {
+            hasError = true;
+            isUnknown = false;
+            break;
+          }
         }
       }
 
-      meterRowList.add(getMeterBox(meterTag, meterSn, hasError));
+      meterRowList.add(getMeterBox(meterTag, meterSn, hasError, isUnknown));
     }
 
     return Container(
@@ -460,7 +467,8 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
     );
   }
 
-  Widget getMeterBox(String meterTag, String meterSn, bool hasError) {
+  Widget getMeterBox(
+      String meterTag, String meterSn, bool hasError, bool isUnknown) {
     return InkWell(
       onTap: _isCheckingMeter == true
           ? null
@@ -486,7 +494,11 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
                   color: Theme.of(context).hintColor.withAlpha(130), width: 5)
               : null,
           borderRadius: BorderRadius.circular(5.0),
-          color: hasError ? errorColor : okColor,
+          color: hasError
+              ? errorColor
+              : isUnknown
+                  ? unknownColor
+                  : okColor,
         ),
         padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 3),
         child: Center(
