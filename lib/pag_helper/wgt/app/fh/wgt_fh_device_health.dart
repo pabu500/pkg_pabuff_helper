@@ -411,7 +411,7 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
 
       bool hasError = false;
       bool isUnknown = false;
-      if (errorList == null || errorList.isEmpty) {
+      if (errorList == null) {
         hasError = false;
         isUnknown = true;
       } else {
