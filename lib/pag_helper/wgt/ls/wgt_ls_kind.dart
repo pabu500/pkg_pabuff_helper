@@ -577,7 +577,7 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
         ? getMeterType(itemSubTypeStr)
         : getSensorType(itemSubTypeStr);
 
-    String displayTitle = item[_displayNameKey];
+    String displayTitle = item[_displayNameKey] ?? '-';
     if (item['location_label'] != null) {
       displayTitle = '$displayTitle @ ${item['location_label']}';
     }

@@ -14,6 +14,7 @@ import 'package:buff_helper/pag_helper/model/scope/mdl_pag_location_group_profil
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_scope.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_site_group_profile.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_site_profile.dart';
+import 'package:buff_helper/pag_helper/wgt/app/ems/wgt_payment_lc_status_op.dart';
 import 'package:buff_helper/pagrid_helper/batch_op_helper/wgt_confirm_box.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
@@ -21,6 +22,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:buff_helper/pag_helper/def_helper/def_item_group.dart';
 import 'package:provider/provider.dart';
+import 'dart:developer' as dev;
 
 import '../../def_helper/dh_device.dart';
 import '../../def_helper/tariff_package_helper.dart';
@@ -91,6 +93,9 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
   String _deleteResultText = '';
 
   String _errorText = '';
+
+  UniqueKey? _lcStatusOpsKey;
+  late dynamic _lcStatusDisplay;
 
   Future<List<Map<String, dynamic>>> _updateProfile(String key, String value,
       {String? oldVal, String? scopeProfileIdColName}) async {
@@ -375,8 +380,11 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
                   ),
                 ),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  // mainAxisAlignment: MainAxisAlignment.end,
                   children: [
+                    getLcStatusOp(widget.fields.firstWhere(
+                        (element) => element['col_key'] == 'lc_status')),
+                    const Spacer(),
                     IconButton(
                       icon: const Icon(Icons.close),
                       onPressed: () {
@@ -625,7 +633,8 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
     }
     if (widget.itemKind == PagItemKind.jobType ||
         widget.itemKind == PagItemKind.user ||
-        widget.itemKind == PagItemKind.role) {
+        widget.itemKind == PagItemKind.role ||
+        widget.itemKind == PagItemKind.finance) {
       return Container();
     }
 
@@ -829,6 +838,31 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
             return 'valid';
           },
         ),
+      ),
+    );
+  }
+
+  Widget getLcStatusOp(Map<String, dynamic> field) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 8.0),
+      child: WgtPagPaymentLcStatusOp(
+        key: _lcStatusOpsKey,
+        appConfig: widget.appConfig,
+        loggedInUser: _loggedInUser,
+        enableEdit: false,
+        paymentInfo: field,
+        initialStatus: _lcStatusDisplay,
+        onCommitted: (newStatus) {
+          setState(() {
+            _lcStatusOpsKey = UniqueKey();
+            // _bill['lc_status'] = newStatus.value;
+            field['lc_status'] = newStatus.value;
+
+            _lcStatusDisplay = newStatus;
+          });
+          dev.log('on committed: $newStatus');
+          widget.onUpdate?.call();
+        },
       ),
     );
   }

@@ -594,6 +594,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
 
                       fieldList.add({
                         'show': colController.showColumn,
+                        'show_edit_panel': colController.showEditPanel,
                         'col_key': colController.colKey,
                         'label': colController.colTitle,
                         'value': value, //item[colController.colKey],
@@ -1571,7 +1572,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         padding: const EdgeInsets.only(left: 0, right: 60),
         child: WgtListPane(
           appConfig: widget.appConfig,
-          enablePaneModeSwitcher: widget.enablePaneModeSwitcher,
+          // enablePaneModeSwitcher: widget.enablePaneModeSwitcher,
           initialItemList: _entityItems,
           queryMap: _queryMap,
           totalItemCount: _totalItemCount,
