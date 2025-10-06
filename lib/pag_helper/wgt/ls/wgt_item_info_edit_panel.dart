@@ -24,7 +24,9 @@ import 'package:buff_helper/pag_helper/def_helper/def_item_group.dart';
 import 'package:provider/provider.dart';
 import 'dart:developer' as dev;
 
+import '../../comm/comm_fin_ops.dart';
 import '../../def_helper/dh_device.dart';
+import '../../def_helper/dh_pag_finance_type.dart';
 import '../../def_helper/tariff_package_helper.dart';
 import '../../model/mdl_pag_app_config.dart';
 import '../scope/wgt_scope_setter.dart';
@@ -96,6 +98,11 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
 
   UniqueKey? _lcStatusOpsKey;
   late dynamic _lcStatusDisplay;
+
+  bool _isFetchingPaymentApplies = false;
+  bool _paymentAppliesFetched = false;
+  String _getPaymentAppliesErrorText = '';
+  List<Map<String, dynamic>> _paymentApplies = [];
 
   Future<List<Map<String, dynamic>>> _updateProfile(String key, String value,
       {String? oldVal, String? scopeProfileIdColName}) async {
@@ -219,6 +226,54 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
     setState(() {
       _isTenantUser = isTenantUser;
     });
+  }
+
+  Future<dynamic> _getPaymentApplies() async {
+    if (_isFetchingPaymentApplies || _paymentAppliesFetched) {
+      return;
+    }
+
+    _isFetchingPaymentApplies = true;
+    _getPaymentAppliesErrorText = '';
+
+    try {
+      Map<String, dynamic> queryMap = {
+        'scope': _loggedInUser!.selectedScope.toScopeMap(),
+        'id': widget.itemIndexStr,
+        'item_kind': widget.itemKind.name,
+        'item_id_type': ItemIdType.id.name,
+      };
+
+      final result = await getPaymentApplyInfo(
+        widget.appConfig,
+        queryMap,
+        MdlPagSvcClaim(
+          username: _loggedInUser!.username,
+          userId: _loggedInUser!.id,
+          scope: '',
+          target: '',
+          operation: '',
+        ),
+      );
+
+      if (result is List) {
+        _paymentApplies = List<Map<String, dynamic>>.from(result);
+      } else {
+        _getPaymentAppliesErrorText = 'No payment applies found';
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+        _getPaymentAppliesErrorText = 'Error getting payment applies';
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isFetchingPaymentApplies = false;
+          _paymentAppliesFetched = true;
+        });
+      }
+    }
   }
 
   @override
@@ -382,8 +437,11 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
                 Row(
                   // mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    getLcStatusOp(widget.fields.firstWhere(
-                        (element) => element['col_key'] == 'lc_status')),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: getLcStatusOp(widget.fields.firstWhere(
+                          (element) => element['col_key'] == 'lc_status')),
+                    ),
                     const Spacer(),
                     IconButton(
                       icon: const Icon(Icons.close),
@@ -843,27 +901,72 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
   }
 
   Widget getLcStatusOp(Map<String, dynamic> field) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 8.0),
-      child: WgtPagPaymentLcStatusOp(
-        key: _lcStatusOpsKey,
-        appConfig: widget.appConfig,
-        loggedInUser: _loggedInUser,
-        enableEdit: false,
-        paymentInfo: field,
-        initialStatus: _lcStatusDisplay,
-        onCommitted: (newStatus) {
-          setState(() {
-            _lcStatusOpsKey = UniqueKey();
-            // _bill['lc_status'] = newStatus.value;
-            field['lc_status'] = newStatus.value;
+    if (widget.itemInfoMap == null || widget.itemInfoMap!.isEmpty) {
+      return Container();
+    }
 
-            _lcStatusDisplay = newStatus;
-          });
-          dev.log('on committed: $newStatus');
-          widget.onUpdate?.call();
-        },
-      ),
-    );
+    String? lcStatusStr = widget.itemInfoMap?['lc_status'];
+    if (lcStatusStr == null || lcStatusStr.isEmpty) {
+      dev.log('lc status is null or empty');
+      return Container();
+    }
+
+    switch (widget.itemKind) {
+      case PagItemKind.finance:
+        if (widget.itemType is PagFinanceType) {
+          if (widget.itemType != PagFinanceType.payment) {
+            return Container();
+          } else {
+            _lcStatusDisplay = PagPaymentLcStatus.byValue(lcStatusStr);
+
+            widget.itemInfoMap!['item_kind'] = widget.itemKind.name;
+          }
+        }
+        return Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: WgtPagPaymentLcStatusOp(
+              key: _lcStatusOpsKey,
+              appConfig: widget.appConfig,
+              loggedInUser: _loggedInUser!,
+              enableEdit: true,
+              paymentInfo: widget.itemInfoMap!,
+              initialStatus: _lcStatusDisplay,
+              onCommitted: (newStatus) {
+                setState(() {
+                  _lcStatusOpsKey = UniqueKey();
+                  // _bill['lc_status'] = newStatus.value;
+                  field['lc_status'] = newStatus.value;
+
+                  _lcStatusDisplay = newStatus;
+                });
+                dev.log('on committed: $newStatus');
+                widget.onUpdate?.call();
+              },
+            ));
+      default:
+        return Container();
+    }
+  }
+
+  Widget getPaymentApplies() {
+    return FutureBuilder(
+        future: _getPaymentApplies(),
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const WgtPagWait(size: 30);
+          } else if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Text('No applies found');
+          } else {
+            List<Widget> appliesWidgets = snapshot.data!
+                .map((apply) => ListTile(
+                      title: Text('Apply ID: ${apply['id']}'),
+                      subtitle: Text('Amount: ${apply['amount']}'),
+                    ))
+                .toList();
+            return Column(children: appliesWidgets);
+          }
+        });
   }
 }

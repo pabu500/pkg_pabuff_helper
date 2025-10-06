@@ -1,3 +1,4 @@
+import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:developer' as dev;
@@ -64,6 +65,8 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
         'credit_amount': widget.paymentInfo['amount'],
       },
       'target_status': _selectedStatus.value,
+      'item_kind': PagItemKind.finance.name,
+      'item_type': PagFinanceType.payment.name,
     };
     try {
       final result = await updatePaymentLcStatus(
