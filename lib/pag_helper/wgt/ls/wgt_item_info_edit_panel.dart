@@ -102,7 +102,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
   bool _isFetchingPaymentApplies = false;
   bool _paymentAppliesFetched = false;
   String _getPaymentAppliesErrorText = '';
-  List<Map<String, dynamic>> _paymentApplies = [];
+  List<Map<String, dynamic>> _paymentApplyList = [];
 
   Future<List<Map<String, dynamic>>> _updateProfile(String key, String value,
       {String? oldVal, String? scopeProfileIdColName}) async {
@@ -239,7 +239,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
     try {
       Map<String, dynamic> queryMap = {
         'scope': _loggedInUser!.selectedScope.toScopeMap(),
-        'id': widget.itemIndexStr,
+        'payment_id': widget.itemIndexStr,
         'item_kind': widget.itemKind.name,
         'item_id_type': ItemIdType.id.name,
       };
@@ -256,23 +256,19 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
         ),
       );
 
-      if (result is List) {
-        _paymentApplies = List<Map<String, dynamic>>.from(result);
+      final paymentApplyList = result['payment_apply_list'];
+      if (paymentApplyList is List) {
+        _paymentApplyList = List<Map<String, dynamic>>.from(paymentApplyList);
       } else {
-        _getPaymentAppliesErrorText = 'No payment applies found';
+        throw Exception('Invalid payment apply list');
       }
     } catch (e) {
-      if (kDebugMode) {
-        print(e);
-        _getPaymentAppliesErrorText = 'Error getting payment applies';
-      }
+      dev.log(e.toString());
+      _getPaymentAppliesErrorText = 'Error getting Payment Applies';
+      rethrow;
     } finally {
-      if (mounted) {
-        setState(() {
-          _isFetchingPaymentApplies = false;
-          _paymentAppliesFetched = true;
-        });
-      }
+      _isFetchingPaymentApplies = false;
+      _paymentAppliesFetched = true;
     }
   }
 
@@ -437,11 +433,11 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
                 Row(
                   // mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
-                      child: getLcStatusOp(widget.fields.firstWhere(
-                          (element) => element['col_key'] == 'lc_status')),
-                    ),
+                    // Padding(
+                    //   padding: const EdgeInsets.only(bottom: 8.0),
+                    //   child: getLcStatusOp(widget.fields.firstWhere(
+                    //       (element) => element['col_key'] == 'lc_status')),
+                    // ),
                     const Spacer(),
                     IconButton(
                       icon: const Icon(Icons.close),
@@ -465,6 +461,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
                 : Column(
                     // alignment: WrapAlignment.center,
                     children: [
+                      getPaymentApplies(),
                       Container(
                         decoration: BoxDecoration(
                           border: Border.all(
@@ -900,73 +897,253 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
     );
   }
 
-  Widget getLcStatusOp(Map<String, dynamic> field) {
-    if (widget.itemInfoMap == null || widget.itemInfoMap!.isEmpty) {
-      return Container();
-    }
+  // Widget getLcStatusOp(Map<String, dynamic> field) {
+  //   if (widget.itemInfoMap == null || widget.itemInfoMap!.isEmpty) {
+  //     return Container();
+  //   }
 
-    String? lcStatusStr = widget.itemInfoMap?['lc_status'];
-    if (lcStatusStr == null || lcStatusStr.isEmpty) {
-      dev.log('lc status is null or empty');
-      return Container();
-    }
+  //   String? lcStatusStr = widget.itemInfoMap?['lc_status'];
+  //   if (lcStatusStr == null || lcStatusStr.isEmpty) {
+  //     dev.log('lc status is null or empty');
+  //     return Container();
+  //   }
 
-    switch (widget.itemKind) {
-      case PagItemKind.finance:
-        if (widget.itemType is PagFinanceType) {
-          if (widget.itemType != PagFinanceType.payment) {
-            return Container();
-          } else {
-            _lcStatusDisplay = PagPaymentLcStatus.byValue(lcStatusStr);
+  //   switch (widget.itemKind) {
+  //     case PagItemKind.finance:
+  //       if (widget.itemType is PagFinanceType) {
+  //         if (widget.itemType != PagFinanceType.payment) {
+  //           return Container();
+  //         } else {
+  //           _lcStatusDisplay = PagPaymentLcStatus.byValue(lcStatusStr);
 
-            widget.itemInfoMap!['item_kind'] = widget.itemKind.name;
-          }
-        }
-        return Padding(
-            padding: const EdgeInsets.only(left: 8.0),
-            child: WgtPagPaymentLcStatusOp(
-              key: _lcStatusOpsKey,
-              appConfig: widget.appConfig,
-              loggedInUser: _loggedInUser!,
-              enableEdit: true,
-              paymentInfo: widget.itemInfoMap!,
-              initialStatus: _lcStatusDisplay,
-              onCommitted: (newStatus) {
-                setState(() {
-                  _lcStatusOpsKey = UniqueKey();
-                  // _bill['lc_status'] = newStatus.value;
-                  field['lc_status'] = newStatus.value;
+  //           widget.itemInfoMap!['item_kind'] = widget.itemKind.name;
+  //         }
+  //       }
+  //       return Padding(
+  //           padding: const EdgeInsets.only(left: 8.0),
+  //           child: WgtPagPaymentLcStatusOp(
+  //             key: _lcStatusOpsKey,
+  //             appConfig: widget.appConfig,
+  //             loggedInUser: _loggedInUser!,
+  //             enableEdit: true,
+  //             paymentInfo: widget.itemInfoMap!,
+  //             initialStatus: _lcStatusDisplay,
+  //             onCommitted: (newStatus) {
+  //               setState(() {
+  //                 _lcStatusOpsKey = UniqueKey();
+  //                 // _bill['lc_status'] = newStatus.value;
+  //                 field['lc_status'] = newStatus.value;
 
-                  _lcStatusDisplay = newStatus;
-                });
-                dev.log('on committed: $newStatus');
-                widget.onUpdate?.call();
-              },
-            ));
-      default:
-        return Container();
-    }
-  }
+  //                 _lcStatusDisplay = newStatus;
+  //               });
+  //               dev.log('on committed: $newStatus');
+  //               widget.onUpdate?.call();
+  //             },
+  //           ));
+  //     default:
+  //       return Container();
+  //   }
+  // }
 
   Widget getPaymentApplies() {
-    return FutureBuilder(
-        future: _getPaymentApplies(),
-        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const WgtPagWait(size: 30);
-          } else if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Text('No applies found');
-          } else {
-            List<Widget> appliesWidgets = snapshot.data!
-                .map((apply) => ListTile(
-                      title: Text('Apply ID: ${apply['id']}'),
-                      subtitle: Text('Amount: ${apply['amount']}'),
-                    ))
-                .toList();
-            return Column(children: appliesWidgets);
-          }
-        });
+    if (widget.itemKind != PagItemKind.finance ||
+        widget.itemType != PagFinanceType.payment) {
+      return Container();
+    }
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Container(
+        width: width,
+        decoration: BoxDecoration(
+          border: Border.all(color: Theme.of(context).hintColor.withAlpha(50)),
+          borderRadius: BorderRadius.circular(5),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 3),
+        child: Center(
+          child: FutureBuilder(
+              future: _getPaymentApplies(),
+              builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const WgtPagWait(size: 30);
+                } else if (snapshot.hasError) {
+                  return getErrorTextPrompt(
+                      context: context, errorText: _getPaymentAppliesErrorText);
+                  // } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  //   return const Text('No Payment Applies found');
+                } else {
+                  if (_paymentApplyList.isEmpty) {
+                    return const Text('No Payment Applies found');
+                  }
+                  List<Widget> appliesWidgets = [];
+                  appliesWidgets.add(Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0, vertical: 5.0),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Payment Applies (${_paymentApplyList.length})',
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Theme.of(context).hintColor),
+                      ),
+                    ),
+                  ));
+                  for (Map<String, dynamic> applyInfo in _paymentApplyList) {
+                    String tenantLabel = applyInfo['tenant_label'] ?? '-';
+                    String billLabel = applyInfo['bill_label'] ?? '-';
+                    String billedTotalCost =
+                        applyInfo['billed_total_cost'] ?? '-';
+                    String appliedTimestamp =
+                        applyInfo['applied_timestamp'] ?? '-';
+                    String appliedByOpName =
+                        applyInfo['applied_by_op_username'] ?? '-';
+                    String appliedUsageAmountStr =
+                        applyInfo['applied_usage_amount'] ?? '-';
+                    String appliedInterestAmountStr =
+                        applyInfo['applied_interest_amount'] ?? '-';
+
+                    double keyWidth1 = 70.0;
+                    double keyWidth2 = 85.0;
+
+                    appliesWidgets.add(Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0, vertical: 5.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: keyWidth1,
+                                    child: const Align(
+                                      alignment: Alignment.centerRight,
+                                      child: Text('Tenant: ',
+                                          style: TextStyle(fontSize: 13.5)),
+                                    ),
+                                  ),
+                                  Text(
+                                    tenantLabel,
+                                    style: const TextStyle(fontSize: 13.5),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: keyWidth1,
+                                    child: const Align(
+                                      alignment: Alignment.centerRight,
+                                      child: Text('Bill: ',
+                                          style: TextStyle(fontSize: 13.5)),
+                                    ),
+                                  ),
+                                  Text(
+                                    billLabel,
+                                    style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: keyWidth1,
+                                    child: const Align(
+                                      alignment: Alignment.centerRight,
+                                      child: Text('Applied by ',
+                                          style: TextStyle(fontSize: 13.5)),
+                                    ),
+                                  ),
+                                  Text(
+                                    appliedByOpName,
+                                    style: const TextStyle(fontSize: 13.5),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: keyWidth1,
+                                    child: const Align(
+                                      alignment: Alignment.centerRight,
+                                      child: Text('Applied on ',
+                                          style: TextStyle(fontSize: 13.5)),
+                                    ),
+                                  ),
+                                  Text(
+                                    appliedTimestamp,
+                                    style: const TextStyle(fontSize: 13.5),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          const Spacer(),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: keyWidth2,
+                                    child: const Align(
+                                      alignment: Alignment.centerRight,
+                                      child: Text('Billed Total ',
+                                          style: TextStyle(fontSize: 13.5)),
+                                    ),
+                                  ),
+                                  Text(billedTotalCost,
+                                      style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold)),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: keyWidth2,
+                                    child: const Align(
+                                      alignment: Alignment.centerRight,
+                                      child: Text('Usage Amt.',
+                                          style: TextStyle(fontSize: 13.5)),
+                                    ),
+                                  ),
+                                  Text(appliedUsageAmountStr,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold)),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: keyWidth2,
+                                    child: const Align(
+                                      alignment: Alignment.centerRight,
+                                      child: Text('Interest Amt.',
+                                          style: TextStyle(fontSize: 13.5)),
+                                    ),
+                                  ),
+                                  Text(appliedInterestAmountStr,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold)),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ));
+                  }
+                  return Column(children: appliesWidgets);
+                }
+              }),
+        ),
+      ),
+    );
   }
 }

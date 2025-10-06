@@ -88,7 +88,12 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
       if (kDebugMode) {
         print('Error committing LC status: $e');
       }
-      _errorText = 'Error committing LC status';
+      _errorText = e.toString();
+      if (_errorText.toLowerCase().contains('total applied amount')) {
+        _errorText = _errorText.replaceAll('Exception: ', '');
+      } else {
+        _errorText = 'Error committing LC status';
+      }
     } finally {
       _isCommitting = false;
       if (mounted) {
