@@ -506,7 +506,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       colTitle: 'Info',
       includeColKeyAsFilter: false,
       showColumn: true,
-      colWidth: addOpColumn ? 55 : 35,
+      colWidth: addOpColumn ? 45 : 35,
       colWidgetType: PagColWidgetType.CUSTOM,
       getCustomWidget: (item, fullList) {
         bool allowEdit = true;
@@ -1003,7 +1003,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         align: 'right',
         useComma: true,
       );
-      listController.listColControllerList.add(appCtxCol);
+      listController.listColControllerList.insert(0, appCtxCol);
     }
 
     MdlListColController appCtxCol = MdlListColController(
@@ -1116,7 +1116,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         );
       },
     );
-    listController.listColControllerList.add(appCtxCol);
+    listController.listColControllerList.insert(0, appCtxCol);
   }
 
   void _addViewBillColumn(MdlPagListController listController) {
@@ -1125,7 +1125,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       colTitle: 'Bill',
       includeColKeyAsFilter: false,
       showColumn: true,
-      colWidth: 55,
+      colWidth: 45,
       colWidgetType: PagColWidgetType.CUSTOM,
       getCustomWidget: (item, fullList) {
         bool showDetail = true;
@@ -1180,7 +1180,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         );
       },
     );
-    listController.listColControllerList.add(appCtxCol);
+    listController.listColControllerList.insert(0, appCtxCol);
   }
 
   void _addViewSoAColumn(MdlPagListController listController) {
@@ -1189,7 +1189,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       colTitle: 'SoA',
       includeColKeyAsFilter: false,
       showColumn: true,
-      colWidth: 55,
+      colWidth: 45,
       colWidgetType: PagColWidgetType.CUSTOM,
       getCustomWidget: (item, fullList) {
         bool showDetail = true;
@@ -1229,7 +1229,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       colTitle: 'Match',
       includeColKeyAsFilter: false,
       showColumn: true,
-      colWidth: 55,
+      colWidth: 45,
       colWidgetType: PagColWidgetType.CUSTOM,
       getCustomWidget: (item, fullList) {
         return WgtPaymentMatchOpItem(
@@ -1572,7 +1572,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         padding: const EdgeInsets.only(left: 0, right: 60),
         child: WgtListPane(
           appConfig: widget.appConfig,
-          // enablePaneModeSwitcher: widget.enablePaneModeSwitcher,
+          enablePaneModeSwitcher: widget.enablePaneModeSwitcher,
           initialItemList: _entityItems,
           queryMap: _queryMap,
           totalItemCount: _totalItemCount,
