@@ -84,45 +84,8 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
   double? _availableExcessiveBalanceToApply;
   double? _availablePaymentAmountToApply;
 
-  // Future<void> _fetchBillList() async {
-  //   if (_isFetchingBillList || _billListFetchTried) return;
-
-  //   _isFetchingBillList = true;
-  //   _errorText = '';
-
-  //   Map<String, dynamic> queryMap = {
-  //     'scope': widget.loggedInUser.selectedScope.toScopeMap(),
-  //     'item_kind': PagItemKind.bill.name,
-  //     't.name': tenantName,
-  //     'sort_by': 'from_timestamp',
-  //     'sort_order': 'DESC',
-  //   };
-
-  //   try {
-  //     final result = await fetchItemList(
-  //         widget.loggedInUser,
-  //         widget.appConfig,
-  //         queryMap,
-  //         MdlPagSvcClaim(
-  //           userId: widget.loggedInUser.id,
-  //           username: widget.loggedInUser.username,
-  //           scope: '',
-  //           target: '',
-  //           operation: '',
-  //         ));
-  //     final itemList = result['item_list'] ?? [];
-  //     _billList.clear();
-  //     _billList.addAll(itemList);
-  //   } catch (e) {
-  //     dev.log('Error fetching bill list: $e');
-  //     _errorText = 'Failed to fetch bills';
-  //   } finally {
-  //     setState(() {
-  //       _isFetchingBillList = false;
-  //       _billListFetchTried = true;
-  //     });
-  //   }
-  // }
+  final Color balColor = Colors.green.shade900.withAlpha(210);
+  final Color paymentColor = Colors.green.shade600.withAlpha(210);
 
   Future<void> _fetchPaymentMatchOpInfo() async {
     if (_isFetchingBillList || _billListFetchTried) return;
@@ -1183,76 +1146,77 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(PagItemKind.tenant.iconData),
-                  Text(' $tenantLabel', style: billLabelStyle),
-                  Icon(Symbols.chevron_forward,
-                      color: Theme.of(context).hintColor),
-                  Text('Payment: ', style: mainLabelStyle),
-                  Text(
-                      _paymentAmount != null
-                          ? _paymentAmount.toStringAsFixed(2)
-                          : '-',
-                      style: mainTextStyle),
-                  // horizontalSpaceSmall,
-                  // Text('Matched at: ', style: mainLabelStyle),
-                  // Text(
-                  //     widget.paymentMatchingInfo?['matched_payment_info']
-                  //                 ?['value_timestamp']
-                  //             .toString()
-                  //             .split(' ')
-                  //             .first ??
-                  //         '',
-                  //     style: mainTextStyle),
-                  // horizontalSpaceSmall,
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
-                          SizedBox(
-                            width: 150,
-                            child: Align(
-                              alignment: Alignment.centerRight,
-                              child: Text('Avail. (Bal): ',
-                                  style: billKeyStyle.copyWith(fontSize: 16)),
-                            ),
-                          ),
-                          SizedBox(
-                            width: 90,
-                            child: Align(
-                              alignment: Alignment.centerRight,
-                              child: Text(
-                                  '${_initialExcessiveBalanceToApply?.toStringAsFixed(2) ?? '0.00'} -> ',
-                                  style: billValStyle.copyWith(fontSize: 16)),
-                            ),
-                          ),
-                          Text(
-                              '${_availableExcessiveBalanceToApply?.toStringAsFixed(2) ?? '0.00'} (${_initialExcessiveBalanceToApply != null && _initialExcessiveBalanceToApply! > 0.0 ? (_initialExcessiveBalanceToApply! - (_availableExcessiveBalanceToApply ?? 0.0)).toStringAsFixed(2) : '0.0'})',
-                              style: mainTextStyle.copyWith(fontSize: 24)),
+                          Icon(PagItemKind.tenant.iconData),
+                          Text(' $tenantLabel', style: billLabelStyle),
                         ],
                       ),
                       Row(
                         children: [
-                          SizedBox(
-                            width: 150,
-                            child: Align(
-                              alignment: Alignment.centerRight,
-                              child: Text('Avail. (Payment): ',
-                                  style: billKeyStyle.copyWith(fontSize: 16)),
-                            ),
-                          ),
-                          SizedBox(
-                            width: 90,
-                            child: Align(
-                              alignment: Alignment.centerRight,
-                              child: Text(
-                                  '${_initialPaymentAmountToApply?.toStringAsFixed(2) ?? '0.00'} -> ',
-                                  style: billValStyle.copyWith(fontSize: 16)),
-                            ),
-                          ),
+                          Icon(Symbols.chevron_forward,
+                              color: Theme.of(context).hintColor),
+                          Text('Payment: ', style: mainLabelStyle),
                           Text(
-                              '${_availablePaymentAmountToApply?.toStringAsFixed(2) ?? '0.00'} (${_initialPaymentAmountToApply != null && _initialPaymentAmountToApply! > 0.0 ? (_initialPaymentAmountToApply! - (_availablePaymentAmountToApply ?? 0.0)).toStringAsFixed(2) : '0.0'})',
-                              style: mainTextStyle.copyWith(fontSize: 24)),
+                              _paymentAmount != null
+                                  ? _paymentAmount.toStringAsFixed(2)
+                                  : '-',
+                              style: mainTextStyle),
+                        ],
+                      ),
+                    ],
+                  ),
+                  horizontalSpaceSmall,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          getTag('Bal', 'From Balance',
+                              color: balColor, width: 39),
+                          horizontalSpaceTiny,
+                          Icon(Icons.chevron_right,
+                              color: Theme.of(context).hintColor),
+                          horizontalSpaceTiny,
+                          getTag('ini', 'Initial Value', color: balColor),
+                          Text(
+                              ' ${_initialExcessiveBalanceToApply?.toStringAsFixed(2) ?? '0.00'}  ',
+                              style: billValStyle),
+                          getTag('applied', 'Applied Value', color: balColor),
+                          Text(
+                              ' ${_initialExcessiveBalanceToApply != null && _initialExcessiveBalanceToApply! > 0.0 ? (_initialExcessiveBalanceToApply! - (_availableExcessiveBalanceToApply ?? 0.0)).toStringAsFixed(2) : '0.0'}  ',
+                              style: billValStyle),
+                          getTag('avail', 'Available Value', color: balColor),
+                          Text(
+                              ' ${_availableExcessiveBalanceToApply?.toStringAsFixed(2) ?? '0.00'} ',
+                              style: billValStyle),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          getTag('Pmt', 'From Payment',
+                              color: paymentColor, width: 39),
+                          horizontalSpaceTiny,
+                          Icon(Icons.chevron_right,
+                              color: Theme.of(context).hintColor),
+                          horizontalSpaceTiny,
+                          getTag('ini', 'Initial Value', color: paymentColor),
+                          Text(
+                              ' ${_initialPaymentAmountToApply?.toStringAsFixed(2) ?? '0.00'}  ',
+                              style: billValStyle),
+                          getTag('applied', 'Applied Value',
+                              color: paymentColor),
+                          Text(
+                              ' ${_initialPaymentAmountToApply != null && _initialPaymentAmountToApply! > 0.0 ? (_initialPaymentAmountToApply! - (_availablePaymentAmountToApply ?? 0.0)).toStringAsFixed(2) : '0.0'}  ',
+                              style: billValStyle),
+                          getTag('avail', 'Available Value',
+                              color: paymentColor),
+                          Text(
+                              ' ${_availablePaymentAmountToApply?.toStringAsFixed(2) ?? '0.00'} ',
+                              style: billValStyle),
                         ],
                       ),
                     ],
@@ -1268,8 +1232,8 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                         key: _lcStatusOpsKey,
                         appConfig: widget.appConfig,
                         loggedInUser: widget.loggedInUser,
-                        // enableEdit: false,
-                        enableEdit: true,
+                        enableEdit: false,
+                        // enableEdit: true,
                         paymentInfo: widget.paymentMatchingInfo ?? {},
                         initialStatus: _lcStatusDisplay,
                         onCommitted: (newStatus) {
@@ -1372,6 +1336,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
         isMatchedBill ? appliedAmountUsage?.toString() : null;
     final initialValueInterest =
         isMatchedBill ? appliedAmountInterest?.toString() : null;
+    final valWidth = 105.0;
 
     return Container(
       decoration: BoxDecoration(
@@ -1387,8 +1352,10 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
+              getTag('Bal', 'From Balance', color: balColor, width: 39),
+              horizontalSpaceRegular, // usage bucket
               SizedBox(
-                width: 95,
+                width: valWidth,
                 child: WgtTextField(
                   key: UniqueKey(),
                   appConfig: widget.appConfig,
@@ -1409,7 +1376,52 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
               ),
               horizontalSpaceSmall, // interest bucket
               SizedBox(
-                width: 95,
+                width: valWidth,
+                child: WgtTextField(
+                  key: UniqueKey(),
+                  appConfig: widget.appConfig,
+                  loggedInUser: widget.loggedInUser,
+                  hintText: 'Interest',
+                  labelText: 'Interest',
+                  enabled: isEnabled,
+                  initialValue: initialValueInterest,
+                  onChanged: (value) {
+                    // setState(() {
+                    //   _paymentApply = value;
+                    // });
+                  },
+                ),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              getTag('Pmt', 'From Payment', color: paymentColor, width: 39),
+              horizontalSpaceRegular, // usage bucket
+              SizedBox(
+                width: valWidth,
+                child: WgtTextField(
+                  key: UniqueKey(),
+                  appConfig: widget.appConfig,
+                  loggedInUser: widget.loggedInUser,
+                  hintText: 'Usage',
+                  labelText: 'Usage',
+                  enabled: isEnabled,
+                  initialValue: initialValueUsage,
+                  onChanged: (value) {
+                    // setState(() {
+                    //   _paymentApply = value;
+                    // });
+                  },
+                  onClear: () {
+                    _updateApplyInfo2(index, 'applied_usage_amount', '');
+                  },
+                ),
+              ),
+              horizontalSpaceSmall, // interest bucket
+              SizedBox(
+                width: valWidth,
                 child: WgtTextField(
                   key: UniqueKey(),
                   appConfig: widget.appConfig,
@@ -1670,6 +1682,26 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
           //         context: context, infoText: 'Release payment to commit'),
           //   ),
         ],
+      ),
+    );
+  }
+
+  Widget getTag(String text, String tooltip, {Color? color, double? width}) {
+    return Tooltip(
+      message: tooltip,
+      child: Container(
+        width: width,
+        decoration: BoxDecoration(
+          color: color ?? Colors.green.shade600.withAlpha(210),
+          borderRadius: BorderRadius.circular(5),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 5),
+        child: Center(
+          child: Text(text,
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSecondary,
+                  fontSize: 13.5)),
+        ),
       ),
     );
   }
