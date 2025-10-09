@@ -96,8 +96,8 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
 
   String _errorText = '';
 
-  UniqueKey? _lcStatusOpsKey;
-  late dynamic _lcStatusDisplay;
+  // UniqueKey? _lcStatusOpsKey;
+  // late dynamic _lcStatusDisplay;
 
   bool _isFetchingPaymentApplies = false;
   bool _paymentAppliesFetched = false;
@@ -433,11 +433,11 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
                 Row(
                   // mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    // Padding(
-                    //   padding: const EdgeInsets.only(bottom: 8.0),
-                    //   child: getLcStatusOp(widget.fields.firstWhere(
-                    //       (element) => element['col_key'] == 'lc_status')),
-                    // ),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: getLcStatusOp(widget.fields.firstWhere(
+                          (element) => element['col_key'] == 'lc_status')),
+                    ),
                     const Spacer(),
                     IconButton(
                       icon: const Icon(Icons.close),
@@ -897,53 +897,55 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
     );
   }
 
-  // Widget getLcStatusOp(Map<String, dynamic> field) {
-  //   if (widget.itemInfoMap == null || widget.itemInfoMap!.isEmpty) {
-  //     return Container();
-  //   }
+  Widget getLcStatusOp(Map<String, dynamic> field) {
+    if (widget.itemInfoMap == null || widget.itemInfoMap!.isEmpty) {
+      return Container();
+    }
 
-  //   String? lcStatusStr = widget.itemInfoMap?['lc_status'];
-  //   if (lcStatusStr == null || lcStatusStr.isEmpty) {
-  //     dev.log('lc status is null or empty');
-  //     return Container();
-  //   }
+    String? lcStatusStr = widget.itemInfoMap?['lc_status'];
+    if (lcStatusStr == null || lcStatusStr.isEmpty) {
+      dev.log('lc status is null or empty');
+      return Container();
+    }
 
-  //   switch (widget.itemKind) {
-  //     case PagItemKind.finance:
-  //       if (widget.itemType is PagFinanceType) {
-  //         if (widget.itemType != PagFinanceType.payment) {
-  //           return Container();
-  //         } else {
-  //           _lcStatusDisplay = PagPaymentLcStatus.byValue(lcStatusStr);
+    PagPaymentLcStatus? lcStatusDisplay;
 
-  //           widget.itemInfoMap!['item_kind'] = widget.itemKind.name;
-  //         }
-  //       }
-  //       return Padding(
-  //           padding: const EdgeInsets.only(left: 8.0),
-  //           child: WgtPagPaymentLcStatusOp(
-  //             key: _lcStatusOpsKey,
-  //             appConfig: widget.appConfig,
-  //             loggedInUser: _loggedInUser!,
-  //             enableEdit: true,
-  //             paymentInfo: widget.itemInfoMap!,
-  //             initialStatus: _lcStatusDisplay,
-  //             onCommitted: (newStatus) {
-  //               setState(() {
-  //                 _lcStatusOpsKey = UniqueKey();
-  //                 // _bill['lc_status'] = newStatus.value;
-  //                 field['lc_status'] = newStatus.value;
+    switch (widget.itemKind) {
+      case PagItemKind.finance:
+        if (widget.itemType is PagFinanceType) {
+          if (widget.itemType != PagFinanceType.payment) {
+            return Container();
+          } else {
+            lcStatusDisplay = PagPaymentLcStatus.byValue(lcStatusStr);
 
-  //                 _lcStatusDisplay = newStatus;
-  //               });
-  //               dev.log('on committed: $newStatus');
-  //               widget.onUpdate?.call();
-  //             },
-  //           ));
-  //     default:
-  //       return Container();
-  //   }
-  // }
+            widget.itemInfoMap!['item_kind'] = widget.itemKind.name;
+          }
+        }
+        return Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: WgtPagPaymentLcStatusOp(
+              // key: _lcStatusOpsKey,
+              appConfig: widget.appConfig,
+              loggedInUser: _loggedInUser!,
+              enableEdit: true,
+              paymentInfo: widget.itemInfoMap!,
+              initialStatus: lcStatusDisplay!,
+              onCommitted: (newStatus) {
+                setState(() {
+                  // _lcStatusOpsKey = UniqueKey();
+                  // _bill['lc_status'] = newStatus.value;
+                  field['lc_status'] = newStatus.value;
+
+                  lcStatusDisplay = newStatus;
+                });
+                dev.log('on committed: $newStatus');
+                widget.onUpdate?.call();
+              },
+            ));
+      default:
+        return Container();
+    }
+  }
 
   Widget getPaymentApplies() {
     if (widget.itemKind != PagItemKind.finance ||

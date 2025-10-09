@@ -1169,32 +1169,10 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                       ),
                     ],
                   ),
-                  horizontalSpaceSmall,
+                  horizontalSpaceRegular,
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          getTag('Bal', 'From Balance',
-                              color: balColor, width: 39),
-                          horizontalSpaceTiny,
-                          Icon(Icons.chevron_right,
-                              color: Theme.of(context).hintColor),
-                          horizontalSpaceTiny,
-                          getTag('ini', 'Initial Value', color: balColor),
-                          Text(
-                              ' ${_initialExcessiveBalanceToApply?.toStringAsFixed(2) ?? '0.00'}  ',
-                              style: billValStyle),
-                          getTag('applied', 'Applied Value', color: balColor),
-                          Text(
-                              ' ${_initialExcessiveBalanceToApply != null && _initialExcessiveBalanceToApply! > 0.0 ? (_initialExcessiveBalanceToApply! - (_availableExcessiveBalanceToApply ?? 0.0)).toStringAsFixed(2) : '0.0'}  ',
-                              style: billValStyle),
-                          getTag('avail', 'Available Value', color: balColor),
-                          Text(
-                              ' ${_availableExcessiveBalanceToApply?.toStringAsFixed(2) ?? '0.00'} ',
-                              style: billValStyle),
-                        ],
-                      ),
                       Row(
                         children: [
                           getTag('Pmt', 'From Payment',
@@ -1216,6 +1194,28 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                               color: paymentColor),
                           Text(
                               ' ${_availablePaymentAmountToApply?.toStringAsFixed(2) ?? '0.00'} ',
+                              style: billValStyle),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          getTag('Bal', 'From Balance',
+                              color: balColor, width: 39),
+                          horizontalSpaceTiny,
+                          Icon(Icons.chevron_right,
+                              color: Theme.of(context).hintColor),
+                          horizontalSpaceTiny,
+                          getTag('ini', 'Initial Value', color: balColor),
+                          Text(
+                              ' ${_initialExcessiveBalanceToApply?.toStringAsFixed(2) ?? '0.00'}  ',
+                              style: billValStyle),
+                          getTag('applied', 'Applied Value', color: balColor),
+                          Text(
+                              ' ${_initialExcessiveBalanceToApply != null && _initialExcessiveBalanceToApply! > 0.0 ? (_initialExcessiveBalanceToApply! - (_availableExcessiveBalanceToApply ?? 0.0)).toStringAsFixed(2) : '0.0'}  ',
+                              style: billValStyle),
+                          getTag('avail', 'Available Value', color: balColor),
+                          Text(
+                              ' ${_availableExcessiveBalanceToApply?.toStringAsFixed(2) ?? '0.00'} ',
                               style: billValStyle),
                         ],
                       ),
@@ -1352,7 +1352,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              getTag('Bal', 'From Balance', color: balColor, width: 39),
+              getTag('Pmt', 'From Payment', color: paymentColor, width: 39),
               horizontalSpaceRegular, // usage bucket
               SizedBox(
                 width: valWidth,
@@ -1397,7 +1397,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              getTag('Pmt', 'From Payment', color: paymentColor, width: 39),
+              getTag('Bal', 'From Balance', color: balColor, width: 39),
               horizontalSpaceRegular, // usage bucket
               SizedBox(
                 width: valWidth,

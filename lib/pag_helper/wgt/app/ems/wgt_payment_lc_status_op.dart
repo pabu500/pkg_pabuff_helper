@@ -80,10 +80,11 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
       dev.log('Payment Lc Status update result: $result');
       final newStatus = result['lc_status'];
       PagPaymentLcStatus updatedStatus = PagPaymentLcStatus.byValue(newStatus);
-      setState(() {
-        _selectedStatus = updatedStatus;
-      });
+
+      _selectedStatus = updatedStatus;
+
       widget.onCommitted?.call(updatedStatus);
+      dev.log('Payment LC status updated to $_selectedStatus');
     } catch (e) {
       if (kDebugMode) {
         print('Error committing LC status: $e');
@@ -96,9 +97,8 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
       }
     } finally {
       _isCommitting = false;
-      if (mounted) {
-        setState(() {});
-      }
+
+      setState(() {});
     }
   }
 
@@ -116,9 +116,9 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
               // horizontalSpaceLarge,
               getLcStatusButton(PagPaymentLcStatus.posted),
               Icon(Symbols.chevron_forward, color: Theme.of(context).hintColor),
-              getLcStatusButton(PagPaymentLcStatus.matched),
-              Icon(Symbols.chevron_forward, color: Theme.of(context).hintColor),
               getLcStatusButton(PagPaymentLcStatus.released),
+              Icon(Symbols.chevron_forward, color: Theme.of(context).hintColor),
+              getLcStatusButton(PagPaymentLcStatus.matched),
               getCommitButton(),
             ],
           ),
@@ -148,13 +148,20 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
       //   }
       //   break;
       case PagPaymentLcStatus.posted:
-        if (status == PagPaymentLcStatus.released) {
+        if (status == PagPaymentLcStatus.matched) {
+          clickEnabled = false;
+        }
+        break;
+      case PagPaymentLcStatus.released:
+        if (status == PagPaymentLcStatus.posted) {
+          clickEnabled = false;
+        }
+        // matched status is auto set
+        if (status == PagPaymentLcStatus.matched) {
           clickEnabled = false;
         }
         break;
       case PagPaymentLcStatus.matched:
-        break;
-      case PagPaymentLcStatus.released:
         clickEnabled = false;
         break;
       default:
