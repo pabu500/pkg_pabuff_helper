@@ -19,6 +19,7 @@ class WgtPagPaymentLcStatusOp extends StatefulWidget {
     required this.loggedInUser,
     required this.paymentInfo,
     required this.initialStatus,
+    this.totalAppliedAmount,
     this.onCommitted,
     this.enableEdit = false,
   });
@@ -27,6 +28,7 @@ class WgtPagPaymentLcStatusOp extends StatefulWidget {
   final MdlPagUser? loggedInUser;
   final Map<String, dynamic> paymentInfo;
   final PagPaymentLcStatus initialStatus;
+  final double? totalAppliedAmount;
   final Function? onCommitted;
   final bool enableEdit;
 
@@ -48,12 +50,14 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
   late PagPaymentLcStatus _selectedStatus = widget.initialStatus;
 
   bool _isCommitting = false;
+  bool _isCommitted = false;
   String _errorText = '';
 
   Future<void> _commit() async {
     if (_isCommitting) return;
 
     _isCommitting = true;
+    _isCommitted = false;
     _errorText = '';
 
     final queryMap = {
@@ -82,6 +86,7 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
       PagPaymentLcStatus updatedStatus = PagPaymentLcStatus.byValue(newStatus);
 
       _selectedStatus = updatedStatus;
+      _isCommitted = true;
 
       widget.onCommitted?.call(updatedStatus);
       dev.log('Payment LC status updated to $_selectedStatus');
@@ -156,9 +161,23 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
         if (status == PagPaymentLcStatus.posted) {
           clickEnabled = false;
         }
-        // matched status is auto set
+        // matched status is auto set or check by backend
         if (status == PagPaymentLcStatus.matched) {
-          clickEnabled = false;
+          // clickEnabled = false;
+          if (widget.totalAppliedAmount != null &&
+              widget.paymentInfo['amount'] != null) {
+            double? amount =
+                double.tryParse(widget.paymentInfo['amount'].toString());
+            if (amount == null) {
+              clickEnabled = false;
+            } else {
+              if (widget.totalAppliedAmount! < amount) {
+                clickEnabled = false;
+              }
+            }
+          } else {
+            clickEnabled = false;
+          }
         }
         break;
       case PagPaymentLcStatus.matched:
@@ -189,6 +208,9 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
 
   Widget getCommitButton() {
     if (_selectedStatus == widget.initialStatus) {
+      return Container();
+    }
+    if (_isCommitted) {
       return Container();
     }
 

@@ -103,6 +103,22 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
   bool _paymentAppliesFetched = false;
   String _getPaymentAppliesErrorText = '';
   List<Map<String, dynamic>> _paymentApplyList = [];
+  double? _totalAppliedAmount;
+
+  double _getTotalAppliedAmount() {
+    double total = 0.0;
+    for (var apply in _paymentApplyList) {
+      double? appliedUsageAmount =
+          double.tryParse(apply['applied_usage_amount']);
+      double? appliedInterestAmount =
+          double.tryParse(apply['applied_interest_amount']);
+      if (appliedInterestAmount == null || appliedUsageAmount == null) {
+        continue;
+      }
+      total += appliedUsageAmount + appliedInterestAmount;
+    }
+    return total;
+  }
 
   Future<List<Map<String, dynamic>>> _updateProfile(String key, String value,
       {String? oldVal, String? scopeProfileIdColName}) async {
@@ -259,6 +275,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
       final paymentApplyList = result['payment_apply_list'];
       if (paymentApplyList is List) {
         _paymentApplyList = List<Map<String, dynamic>>.from(paymentApplyList);
+        _totalAppliedAmount = _getTotalAppliedAmount();
       } else {
         throw Exception('Invalid payment apply list');
       }
@@ -267,8 +284,10 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
       _getPaymentAppliesErrorText = 'Error getting Payment Applies';
       rethrow;
     } finally {
-      _isFetchingPaymentApplies = false;
-      _paymentAppliesFetched = true;
+      setState(() {
+        _isFetchingPaymentApplies = false;
+        _paymentAppliesFetched = true;
+      });
     }
   }
 
@@ -930,6 +949,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
               enableEdit: true,
               paymentInfo: widget.itemInfoMap!,
               initialStatus: lcStatusDisplay!,
+              totalAppliedAmount: _totalAppliedAmount,
               onCommitted: (newStatus) {
                 setState(() {
                   // _lcStatusOpsKey = UniqueKey();
