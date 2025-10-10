@@ -1249,9 +1249,6 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
             });
           },
           onClosed: () async {
-            // Map<String, dynamic> itemFindResult =
-            //     await _getItemList();
-            // widget.onResult?.call(itemFindResult);
             if (_itemUpdated) {
               setState(() {
                 _listContentRefreshKey = UniqueKey();

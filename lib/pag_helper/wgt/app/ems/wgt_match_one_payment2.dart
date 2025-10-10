@@ -1,6 +1,7 @@
 import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
+import 'package:buff_helper/pag_helper/wgt/wgt_comm_button.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/pag_bill_def.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
@@ -87,6 +88,8 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
   final Color balColor = Colors.green.shade900.withAlpha(210);
   final Color paymentColor = Colors.green.shade600.withAlpha(210);
 
+  bool _inManualOverride = false;
+
   Future<void> _fetchPaymentMatchOpInfo() async {
     if (_isFetchingBillList || _billListFetchTried) return;
 
@@ -149,347 +152,21 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
     }
   }
 
-  void _populateApply() {
-    if (_availablePaymentAmountToApply == null ||
-        _availablePaymentAmountToApply! <= 0.0) {
-      return;
-    }
-    if (_billList.isEmpty) {
-      return;
-    }
-
-    // rule 1: payment flows the bill with exact amount first
-    // rule 2: payment from excessive balance first
-    // rule 3: pay oldest bill first
-    // rule 4: pay usage of the usage bucket first, for all bills from oldest to newest
-    // rule 5: pay interest of the interest bucket first, for all bills from oldest to newest
-
-    _paymentApplyInfoListNew.clear();
-
-    double outBucketExcessiveBalance = _initialExcessiveBalanceToApply!;
-    double outBucketThisPayment = _initialPaymentAmountToApply!;
-
-    final billList = [];
-    billList.addAll(_billList);
-
-    // rule 1: payment flows from outBucketThisPayment to the bill with exact amount first
-    for (var bill in billList) {
-      if (outBucketThisPayment <= 0.0) {
-        break;
-      }
-
-      // skip if bill is not released
-      if (bill['lc_status'] != 'released') {
-        continue;
-      }
-
-      final billingRecId = bill['id'] ?? '';
-      final billedTotalCost =
-          double.tryParse(bill['billed_total_cost'] ?? '0.0') ?? 0.0;
-      if (billedTotalCost <= 0.0) {
-        continue;
-      }
-
-      if (outBucketThisPayment == billedTotalCost) {
-        final billedInterestAmount =
-            double.tryParse(bill['billed_interest_amount'] ?? '0.0') ?? 0.0;
-        final billedUsageAmount = billedTotalCost - billedInterestAmount;
-
-        _paymentApplyInfoListNew.add({
-          'billing_rec_id': billingRecId,
-          'applied_interest_amount': billedInterestAmount,
-          'applied_usage_amount': billedUsageAmount,
-        });
-        bill['is_fully_paid_by_current_payment'] = true;
-
-        outBucketThisPayment -= billedTotalCost;
-      }
-    }
-
-    billList.sort((a, b) {
-      final aTimestamp = a['from_timestamp'] ?? '';
-      final bTimestamp = b['from_timestamp'] ?? '';
-      return aTimestamp.compareTo(bTimestamp);
-    });
-
-    double inBucketTotalBilledUsageAmount = 0.0;
-    double inBucketTotalBilledInterestAmount = 0.0;
-    for (var bill in billList) {
-      // skip if bill is not released
-      if (bill['lc_status'] != 'released') {
-        continue;
-      }
-      // skip if bill is already fully paid
-      if (bill['is_fully_paid_by_current_payment'] == true) {
-        continue;
-      }
-
-      final billedTotalCost =
-          double.tryParse(bill['billed_total_cost'] ?? '0.0') ?? 0.0;
-      if (billedTotalCost <= 0.0) {
-        continue;
-      }
-
-      final billedInterestAmount =
-          double.tryParse(bill['billed_interest_amount'] ?? '0.0') ?? 0.0;
-      final billedUsageAmount = billedTotalCost - billedInterestAmount;
-      inBucketTotalBilledUsageAmount += billedUsageAmount;
-      inBucketTotalBilledInterestAmount += billedInterestAmount;
-    }
-
-    // rule 3: flow out from outBucketExcessiveBalance first
-    // rule 3.1: flow to usage bucket first
-    for (var bill in billList) {
-      if (outBucketExcessiveBalance <= 0.0) {
-        break;
-      }
-
-      // skip if bill is not released
-      if (bill['lc_status'] != 'released') {
-        continue;
-      }
-      // skip if bill is already fully paid
-      if (bill['is_fully_paid_by_current_payment'] == true) {
-        continue;
-      }
-
-      //flow to usage bucket first
-      final billingRecId = bill['id'] ?? '';
-      final billedTotalCost =
-          double.tryParse(bill['billed_total_cost'] ?? '0.0') ?? 0.0;
-      if (billedTotalCost <= 0.0) {
-        continue;
-      }
-      final billedInterestAmount =
-          double.tryParse(bill['billed_interest_amount'] ?? '0.0') ?? 0.0;
-      final billedUsageAmount = billedTotalCost - billedInterestAmount;
-      if (billedUsageAmount > 0.0) {
-        double appliedUsage = 0.0;
-        if (outBucketExcessiveBalance >= billedUsageAmount) {
-          appliedUsage = billedUsageAmount;
-          outBucketExcessiveBalance -= billedUsageAmount;
-        } else {
-          appliedUsage = outBucketExcessiveBalance;
-          outBucketExcessiveBalance = 0.0;
-        }
-        if (appliedUsage > 0.0) {
-          bool found = false;
-          for (var item in _paymentApplyInfoListNew) {
-            if (item['billing_rec_id'] == billingRecId) {
-              item['applied_usage_amount'] = appliedUsage;
-              found = true;
-              break;
-            }
-          }
-          if (!found) {
-            _paymentApplyInfoListNew.add({
-              'billing_rec_id': billingRecId,
-              'applied_usage_amount': appliedUsage,
-            });
-          }
-          _checkFullyPaid();
-        }
-      }
-    }
-    // rule 3.2: flow to interest bucket next
-    for (var bill in billList) {
-      if (outBucketExcessiveBalance <= 0.0) {
-        break;
-      }
-
-      // skip if bill is not released
-      if (bill['lc_status'] != 'released') {
-        continue;
-      }
-      // skip if bill is already fully paid
-      if (bill['is_fully_paid_by_current_payment'] == true) {
-        continue;
-      }
-
-      //flow to interest bucket next
-      final billingRecId = bill['id'] ?? '';
-      final billedTotalCost =
-          double.tryParse(bill['billed_total_cost'] ?? '0.0') ?? 0.0;
-      if (billedTotalCost <= 0.0) {
-        continue;
-      }
-      final billedInterestAmount =
-          double.tryParse(bill['billed_interest_amount'] ?? '0.0') ?? 0.0;
-      if (billedInterestAmount > 0.0) {
-        double appliedInterest = 0.0;
-        if (outBucketExcessiveBalance >= billedInterestAmount) {
-          appliedInterest = billedInterestAmount;
-          outBucketExcessiveBalance -= billedInterestAmount;
-        } else {
-          appliedInterest = outBucketExcessiveBalance;
-          outBucketExcessiveBalance = 0.0;
-        }
-        if (appliedInterest > 0.0) {
-          bool found = false;
-          for (var item in _paymentApplyInfoListNew) {
-            if (item['billing_rec_id'] == billingRecId) {
-              item['applied_interest_amount'] = appliedInterest;
-              found = true;
-              break;
-            }
-          }
-          if (!found) {
-            _paymentApplyInfoListNew.add({
-              'billing_rec_id': billingRecId,
-              'applied_interest_amount': appliedInterest,
-            });
-          }
-          _checkFullyPaid();
-        }
-      }
-    }
-
-    // rule 4: flow out from outBucketThisPayment next
-    // rule 4.1: flow to usage bucket first
-    for (var bill in billList) {
-      if (outBucketThisPayment <= 0.0) {
-        break;
-      }
-
-      // skip if bill is not released
-      if (bill['lc_status'] != 'released') {
-        continue;
-      }
-      // skip if bill is already fully paid
-      if (bill['is_fully_paid_by_current_payment'] == true) {
-        continue;
-      }
-
-      //flow to usage bucket first
-      final billingRecId = bill['id'] ?? '';
-      final billedTotalCost =
-          double.tryParse(bill['billed_total_cost'] ?? '0.0') ?? 0.0;
-      if (billedTotalCost <= 0.0) {
-        continue;
-      }
-      final billedInterestAmount =
-          double.tryParse(bill['billed_interest_amount'] ?? '0.0') ?? 0.0;
-      final billedUsageAmount = billedTotalCost - billedInterestAmount;
-      if (billedUsageAmount > 0.0) {
-        double appliedUsage = _paymentApplyInfoListNew.firstWhere(
-              (element) => element['billing_rec_id'] == billingRecId,
-              orElse: () => {'applied_usage_amount': 0.0},
-            )['applied_usage_amount'] ??
-            0.0;
-        double remainingUsageToBePaid = billedUsageAmount - appliedUsage;
-        if (remainingUsageToBePaid <= 0.0) {
-          continue;
-        }
-        if (outBucketThisPayment >= remainingUsageToBePaid) {
-          appliedUsage += remainingUsageToBePaid;
-          outBucketThisPayment -= remainingUsageToBePaid;
-        } else {
-          appliedUsage += outBucketThisPayment;
-          outBucketThisPayment = 0.0;
-        }
-        if (appliedUsage > 0.0) {
-          bool found = false;
-          for (var item in _paymentApplyInfoListNew) {
-            if (item['billing_rec_id'] == billingRecId) {
-              item['applied_usage_amount'] = appliedUsage;
-              found = true;
-              break;
-            }
-          }
-          if (!found) {
-            _paymentApplyInfoListNew.add({
-              'billing_rec_id': billingRecId,
-              'applied_usage_amount': appliedUsage,
-            });
-          }
-          _checkFullyPaid();
-        }
-      }
-    }
-    // rule 4.2: flow to interest bucket next
-    for (var bill in billList) {
-      if (outBucketThisPayment <= 0.0) {
-        break;
-      }
-
-      // skip if bill is not released
-      if (bill['lc_status'] != 'released') {
-        continue;
-      }
-      // skip if bill is already fully paid
-      if (bill['is_fully_paid_by_current_payment'] == true) {
-        continue;
-      }
-
-      //flow to interest bucket next
-      final billingRecId = bill['id'] ?? '';
-      final billedTotalCost =
-          double.tryParse(bill['billed_total_cost'] ?? '0.0') ?? 0.0;
-      if (billedTotalCost <= 0.0) {
-        continue;
-      }
-      final billedInterestAmount =
-          double.tryParse(bill['billed_interest_amount'] ?? '0.0') ?? 0.0;
-      if (billedInterestAmount > 0.0) {
-        double appliedInterest = _paymentApplyInfoListNew.firstWhere(
-              (element) => element['billing_rec_id'] == billingRecId,
-              orElse: () => {'applied_interest_amount': 0.0},
-            )['applied_interest_amount'] ??
-            0.0;
-        double remainingInterestToBePaid =
-            billedInterestAmount - appliedInterest;
-        if (remainingInterestToBePaid <= 0.0) {
-          continue;
-        }
-        if (outBucketThisPayment >= remainingInterestToBePaid) {
-          appliedInterest += remainingInterestToBePaid;
-          outBucketThisPayment -= remainingInterestToBePaid;
-        } else {
-          appliedInterest += outBucketThisPayment;
-          outBucketThisPayment = 0.0;
-        }
-        if (appliedInterest > 0.0) {
-          bool found = false;
-          for (var item in _paymentApplyInfoListNew) {
-            if (item['billing_rec_id'] == billingRecId) {
-              item['applied_interest_amount'] = appliedInterest;
-              found = true;
-              break;
-            }
-          }
-          if (!found) {
-            _paymentApplyInfoListNew.add({
-              'billing_rec_id': billingRecId,
-              'applied_interest_amount': appliedInterest,
-            });
-          }
-          _checkFullyPaid();
-        }
-      }
-    }
-
-    setState(() {
-      _availablePaymentAmountToApply = outBucketThisPayment;
-      _availableExcessiveBalanceToApply = outBucketExcessiveBalance;
-    });
-  }
-
+  // rule 1: payment flows the bill with exact amount first
+  // rule 2: payment from excessive balance first
+  // rule 3: pay oldest bill first
+  // rule 4: pay usage of the usage bucket first, for all bills from oldest to newest
+  // rule 5: pay interest of the interest bucket first, for all bills from oldest to newest
   void _populateApply2() {
-    // if (_availablePaymentAmountToApply == null ||
-    //     _availablePaymentAmountToApply! <= 0.0) {
-    //   return;
-    // }
     if (_billList.isEmpty) {
       return;
     }
-
-    // rule 1: payment flows the bill with exact amount first
-    // rule 2: payment from excessive balance first
-    // rule 3: pay oldest bill first
-    // rule 4: pay usage of the usage bucket first, for all bills from oldest to newest
-    // rule 5: pay interest of the interest bucket first, for all bills from oldest to newest
-
-    // _paymentApplyInfoListNew.clear();
+    if (_initialExcessiveBalanceToApply == null ||
+        _initialPaymentAmountToApply == null) {
+      dev.log(
+          '_initialExcessiveBalanceToApply or _initialPaymentAmountToApply is null');
+      return;
+    }
 
     double outBucketExcessiveBalance = _initialExcessiveBalanceToApply!;
     double outBucketThisPayment = _initialPaymentAmountToApply!;
@@ -525,10 +202,11 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
         for (var item in _paymentApplyInfoListNew) {
           if (item['billing_rec_id'] == billingRecId) {
             if (item['is_custom_apply_interest'] != true) {
-              item['applied_interest_amount'] = billedInterestAmount;
+              item['applied_interest_amount_from_payment'] =
+                  billedInterestAmount;
             }
             if (item['is_custom_apply_usage'] != true) {
-              item['applied_usage_amount'] = billedUsageAmount;
+              item['applied_usage_amount_from_payment'] = billedUsageAmount;
             }
             found = true;
             break;
@@ -537,8 +215,8 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
         if (!found) {
           _paymentApplyInfoListNew.add({
             'billing_rec_id': billingRecId,
-            'applied_interest_amount': billedInterestAmount,
-            'applied_usage_amount': billedUsageAmount,
+            'applied_interest_amount_from_payment': billedInterestAmount,
+            'applied_usage_amount_from_payment': billedUsageAmount,
             'is_exact_match': true,
           });
           bill['is_fully_paid_by_current_payment'] = true;
@@ -554,30 +232,30 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
       return aTimestamp.compareTo(bTimestamp);
     });
 
-    double inBucketTotalBilledUsageAmount = 0.0;
-    double inBucketTotalBilledInterestAmount = 0.0;
-    for (var bill in billList) {
-      // skip if bill is not released
-      if (bill['lc_status'] != 'released') {
-        continue;
-      }
-      // skip if bill is already fully paid
-      if (bill['is_fully_paid_by_current_payment'] == true) {
-        continue;
-      }
+    // double inBucketTotalBilledUsageAmount = 0.0;
+    // double inBucketTotalBilledInterestAmount = 0.0;
+    // for (var bill in billList) {
+    //   // skip if bill is not released
+    //   if (bill['lc_status'] != 'released') {
+    //     continue;
+    //   }
+    //   // skip if bill is already fully paid
+    //   if (bill['is_fully_paid_by_current_payment'] == true) {
+    //     continue;
+    //   }
 
-      final billedTotalCost =
-          double.tryParse(bill['billed_total_cost'] ?? '0.0') ?? 0.0;
-      if (billedTotalCost <= 0.0) {
-        continue;
-      }
+    //   final billedTotalCost =
+    //       double.tryParse(bill['billed_total_cost'] ?? '0.0') ?? 0.0;
+    //   if (billedTotalCost <= 0.0) {
+    //     continue;
+    //   }
 
-      final billedInterestAmount =
-          double.tryParse(bill['billed_interest_amount'] ?? '0.0') ?? 0.0;
-      final billedUsageAmount = billedTotalCost - billedInterestAmount;
-      inBucketTotalBilledUsageAmount += billedUsageAmount;
-      inBucketTotalBilledInterestAmount += billedInterestAmount;
-    }
+    //   final billedInterestAmount =
+    //       double.tryParse(bill['billed_interest_amount'] ?? '0.0') ?? 0.0;
+    //   final billedUsageAmount = billedTotalCost - billedInterestAmount;
+    //   inBucketTotalBilledUsageAmount += billedUsageAmount;
+    //   inBucketTotalBilledInterestAmount += billedInterestAmount;
+    // }
 
     // rule 3: flow out from outBucketExcessiveBalance first
     // rule 3.1: flow to usage bucket first
@@ -619,7 +297,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
           for (var item in _paymentApplyInfoListNew) {
             if (item['billing_rec_id'] == billingRecId) {
               if (item['is_custom_apply_usage'] != true) {
-                item['applied_usage_amount'] = appliedUsage;
+                item['applied_usage_amount_from_bal'] = appliedUsage;
               }
               found = true;
               break;
@@ -628,7 +306,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
           if (!found) {
             _paymentApplyInfoListNew.add({
               'billing_rec_id': billingRecId,
-              'applied_usage_amount': appliedUsage,
+              'applied_usage_amount_from_bal': appliedUsage,
             });
           }
           _checkFullyPaid();
@@ -673,7 +351,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
           for (var item in _paymentApplyInfoListNew) {
             if (item['billing_rec_id'] == billingRecId) {
               if (item['is_custom_apply_interest'] != true) {
-                item['applied_interest_amount'] = appliedInterest;
+                item['applied_interest_amount_from_bal'] = appliedInterest;
               }
               found = true;
               break;
@@ -682,7 +360,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
           if (!found) {
             _paymentApplyInfoListNew.add({
               'billing_rec_id': billingRecId,
-              'applied_interest_amount': appliedInterest,
+              'applied_interest_amount_from_bal': appliedInterest,
             });
           }
           _checkFullyPaid();
@@ -719,8 +397,8 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
       if (billedUsageAmount > 0.0) {
         double appliedUsage = _paymentApplyInfoListNew.firstWhere(
               (element) => element['billing_rec_id'] == billingRecId,
-              orElse: () => {'applied_usage_amount': 0.0},
-            )['applied_usage_amount'] ??
+              orElse: () => {'applied_usage_amount_from_payment': 0.0},
+            )['applied_usage_amount_from_payment'] ??
             0.0;
         double remainingUsageToBePaid = billedUsageAmount - appliedUsage;
         if (remainingUsageToBePaid <= 0.0) {
@@ -738,7 +416,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
           for (var item in _paymentApplyInfoListNew) {
             if (item['billing_rec_id'] == billingRecId) {
               if (item['is_custom_apply_usage'] != true) {
-                item['applied_usage_amount'] = appliedUsage;
+                item['applied_usage_amount_from_payment'] = appliedUsage;
               }
               found = true;
               break;
@@ -747,7 +425,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
           if (!found) {
             _paymentApplyInfoListNew.add({
               'billing_rec_id': billingRecId,
-              'applied_usage_amount': appliedUsage,
+              'applied_usage_amount_from_payment': appliedUsage,
             });
           }
           _checkFullyPaid();
@@ -769,7 +447,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
         continue;
       }
 
-      //flow to interest bucket next
+      // flow to interest bucket next
       final billingRecId = bill['id'] ?? '';
       final billedTotalCost =
           double.tryParse(bill['billed_total_cost'] ?? '0.0') ?? 0.0;
@@ -781,8 +459,8 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
       if (billedInterestAmount > 0.0) {
         double appliedInterest = _paymentApplyInfoListNew.firstWhere(
               (element) => element['billing_rec_id'] == billingRecId,
-              orElse: () => {'applied_interest_amount': 0.0},
-            )['applied_interest_amount'] ??
+              orElse: () => {'applied_interest_amount_from_payment': 0.0},
+            )['applied_interest_amount_from_payment'] ??
             0.0;
         double remainingInterestToBePaid =
             billedInterestAmount - appliedInterest;
@@ -801,7 +479,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
           for (var item in _paymentApplyInfoListNew) {
             if (item['billing_rec_id'] == billingRecId) {
               if (item['is_custom_apply_interest'] != true) {
-                item['applied_interest_amount'] = appliedInterest;
+                item['applied_interest_amount_from_payment'] = appliedInterest;
               }
               found = true;
               break;
@@ -810,7 +488,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
           if (!found) {
             _paymentApplyInfoListNew.add({
               'billing_rec_id': billingRecId,
-              'applied_interest_amount': appliedInterest,
+              'applied_interest_amount_from_payment': appliedInterest,
             });
           }
           _checkFullyPaid();
@@ -849,143 +527,14 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
     }
   }
 
-  void _updateApplyInfo(int index, String fieldKey, String value) {
-    if (index < 0 || index >= _billList.length) {
-      return;
-    }
-    final billInfo = _billList[index];
-    final billingRecId = billInfo['id'] ?? '';
-    final suffix = fieldKey == 'applied_usage_amount' ? 'usage' : 'interest';
-    bool found = false;
-    final newValue = value.isEmpty ? 0.0 : double.tryParse(value) ?? 0.0;
-    for (var item in _paymentApplyInfoListNew) {
-      if (item['billing_rec_id'] == billingRecId) {
-        item[fieldKey] = newValue;
-        item['is_custom_apply_$suffix'] = true;
-        found = true;
-        break;
-      }
-    }
-    if (!found) {
-      // add new entry
-      _paymentApplyInfoListNew.add({
-        'billing_rec_id': billingRecId,
-        fieldKey: newValue,
-        'is_custom_apply_$fieldKey': true,
-      });
-    }
-
-    // recalculate available amount to apply
-    double totalApplied = 0.0;
-    for (var item in _paymentApplyInfoListNew) {
-      final appliedAmountUsage = item['applied_usage_amount'] ?? 0.0;
-      final appliedAmountInterest = item['applied_interest_amount'] ?? 0.0;
-      totalApplied += (appliedAmountUsage + appliedAmountInterest);
-    }
-
-    // if all applied amount is zero, clear the list
-    if (totalApplied <= 0.0) {
-      _paymentApplyInfoListNew.clear();
-    }
-
-    // recalculate available balance to apply
-    // and payment amount to apply
-    double outBucketExcessiveBalance = _initialExcessiveBalanceToApply!;
-    double outBucketThisPayment = _initialPaymentAmountToApply!;
-
-    // for (var item in _paymentApplyInfoListNew) {
-    //   final appliedAmountUsage = item['applied_usage_amount'] ?? 0.0;
-    //   final appliedAmountInterest = item['applied_interest_amount'] ?? 0.0;
-    //   double totalApplied = appliedAmountUsage + appliedAmountInterest;
-
-    //   if (totalApplied <= 0.0) {
-    //     continue;
-    //   }
-
-    //   // first use excessive balance
-    //   if (outBucketExcessiveBalance >= totalApplied) {
-    //     outBucketExcessiveBalance -= totalApplied;
-    //     totalApplied = 0.0;
-    //   } else {
-    //     totalApplied -= outBucketExcessiveBalance;
-    //     outBucketExcessiveBalance = 0.0;
-    //   }
-
-    //   // then use this payment
-    //   if (totalApplied > 0.0) {
-    //     if (outBucketThisPayment >= totalApplied) {
-    //       outBucketThisPayment -= totalApplied;
-    //       totalApplied = 0.0;
-    //     } else {
-    //       // over applied, reset to zero
-    //       outBucketThisPayment = 0.0;
-    //       totalApplied = 0.0;
-    //     }
-    //   }
-    // }
-
-    // rule1: flow back to this payment first unless this payment is exact match
-    // and the flow back amount is equal to the exact match amount
-    for (var item in _paymentApplyInfoListNew) {
-      final appliedAmountUsage = item['applied_usage_amount'] ?? 0.0;
-      final appliedAmountInterest = item['applied_interest_amount'] ?? 0.0;
-      double totalApplied = appliedAmountUsage + appliedAmountInterest;
-      if (totalApplied <= 0.0) {
-        continue;
-      }
-      final billingRecId = item['billing_rec_id'] ?? '';
-      final billInfo = _billList.firstWhere(
-        (element) => element['id'] == billingRecId,
-        orElse: () => {},
-      );
-      final billedTotalCost =
-          double.tryParse(billInfo['billed_total_cost'] ?? '0.0') ?? 0.0;
-      if (billedTotalCost <= 0.0) {
-        continue;
-      }
-      if (totalApplied == billedTotalCost &&
-          _initialPaymentAmountToApply == billedTotalCost) {
-        // do not flow back to this payment
-      } else {
-        // flow back to this payment first
-        if (outBucketThisPayment >= totalApplied) {
-          outBucketThisPayment -= totalApplied;
-          totalApplied = 0.0;
-        } else {
-          totalApplied -= outBucketThisPayment;
-          outBucketThisPayment = 0.0;
-        }
-      }
-      // then flow back to excessive balance
-      if (totalApplied > 0.0) {
-        if (outBucketExcessiveBalance >= totalApplied) {
-          outBucketExcessiveBalance -= totalApplied;
-          totalApplied = 0.0;
-        } else {
-          // over applied, reset to zero
-          outBucketExcessiveBalance = 0.0;
-          totalApplied = 0.0;
-        }
-      }
-    }
-
-    setState(() {
-      _availablePaymentAmountToApply = outBucketThisPayment;
-      _availableExcessiveBalanceToApply = outBucketExcessiveBalance;
-    });
-
-    setState(() {
-      // _availableAmountToApply = (_paymentAmount ?? 0.0) - totalApplied;
-    });
-  }
-
   void _updateApplyInfo2(int index, String fieldKey, String value) {
     if (index < 0 || index >= _billList.length) {
       return;
     }
     final billInfo = _billList[index];
     final billingRecId = billInfo['id'] ?? '';
-    final suffix = fieldKey == 'applied_usage_amount' ? 'usage' : 'interest';
+    final suffix =
+        fieldKey.contains('applied_usage_amount') ? 'usage' : 'interest';
     bool found = false;
     double diff = 0.0;
 
@@ -1013,92 +562,6 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
     // rule1: if diff > 0, means more applied, so reduce from excessive balance first, then from this payment
     // rule2: if diff < 0, means less applied, so add back to this payment first, then to excessive balance
     // rule3: do not flow back to this payment if this payment is exact match, unless it's the exact match amount
-    if (diff > 0) {
-      // more applied
-      if (_availableExcessiveBalanceToApply != null &&
-          _availableExcessiveBalanceToApply! > 0.0) {
-        if (_availableExcessiveBalanceToApply! >= diff) {
-          _availableExcessiveBalanceToApply =
-              _availableExcessiveBalanceToApply! - diff;
-          diff = 0.0;
-        } else {
-          diff = diff - _availableExcessiveBalanceToApply!;
-          _availableExcessiveBalanceToApply = 0.0;
-        }
-      }
-      if (diff > 0.0 &&
-          _availablePaymentAmountToApply != null &&
-          _availablePaymentAmountToApply! > 0.0) {
-        if (_availablePaymentAmountToApply! >= diff) {
-          _availablePaymentAmountToApply =
-              _availablePaymentAmountToApply! - diff;
-          diff = 0.0;
-        } else {
-          // over applied, reset to zero
-          diff = diff - _availablePaymentAmountToApply!;
-          _availablePaymentAmountToApply = 0.0;
-        }
-      }
-    } else if (diff < 0) {
-      // less applied
-      diff = -diff; // make it positive
-
-      String exactMatchBillingRecId = '';
-      for (var item in _paymentApplyInfoListNew) {
-        final bId = item['billing_rec_id'] ?? '';
-        final billInfo = _billList.firstWhere(
-          (element) => element['id'] == bId,
-          orElse: () => {},
-        );
-        final billedTotalCost =
-            double.tryParse(billInfo['billed_total_cost'] ?? '0.0') ?? 0.0;
-        if (billedTotalCost <= 0.0) {
-          continue;
-        }
-        if (item['is_exact_match'] == true &&
-            _initialPaymentAmountToApply == billedTotalCost) {
-          exactMatchBillingRecId = bId;
-          break;
-        }
-      }
-      if (_initialPaymentAmountToApply != null &&
-          _initialPaymentAmountToApply! > 0.0) {
-        // check if this payment is exact match
-        if (exactMatchBillingRecId == billingRecId) {
-          // this payment is exact match, do not flow back to this payment
-        } else {
-          if (_availablePaymentAmountToApply != null) {
-            _availablePaymentAmountToApply =
-                _availablePaymentAmountToApply! + diff;
-            if (_availablePaymentAmountToApply! >
-                _initialPaymentAmountToApply!) {
-              _availablePaymentAmountToApply = _initialPaymentAmountToApply!;
-            }
-            diff = 0.0;
-          }
-        }
-      }
-      if (diff > 0.0 && _availableExcessiveBalanceToApply != null) {
-        _availableExcessiveBalanceToApply =
-            _availableExcessiveBalanceToApply! + diff;
-        if (_availableExcessiveBalanceToApply! >
-            _initialExcessiveBalanceToApply!) {
-          _availableExcessiveBalanceToApply = _initialExcessiveBalanceToApply!;
-        }
-        diff = 0.0;
-      }
-      if (diff > 0.0 &&
-          _availablePaymentAmountToApply != null &&
-          _availablePaymentAmountToApply! > _initialPaymentAmountToApply!) {
-        _availablePaymentAmountToApply = _initialPaymentAmountToApply!;
-      }
-      if (diff > 0.0 &&
-          _availableExcessiveBalanceToApply != null &&
-          _availableExcessiveBalanceToApply! >
-              _initialExcessiveBalanceToApply!) {
-        _availableExcessiveBalanceToApply = _initialExcessiveBalanceToApply!;
-      }
-    }
 
     _populateApply2();
   }
@@ -1116,24 +579,9 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
 
     final tenantLabel = widget.tenantInfo['tenant_label'] ?? '';
 
-    bool showPaymentLcStatusOp = false;
+    bool showPaymentLcStatusOp = true;
     final lcStatusStr = widget.paymentMatchingInfo?['lc_status'] ?? '';
     PagPaymentLcStatus lcStatus = PagPaymentLcStatus.byValue(lcStatusStr);
-
-    bool hasMatchedBill = false;
-    for (var bill in _billList) {
-      if (widget.paymentMatchingInfo != null &&
-          widget.paymentMatchingInfo!['matched_payment_info'] != null &&
-          widget.paymentMatchingInfo!['matched_payment_info']
-                  ['billing_rec_id'] ==
-              bill['id']) {
-        hasMatchedBill = true;
-        break;
-      }
-    }
-    if (hasMatchedBill) {
-      showPaymentLcStatusOp = true;
-    }
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -1170,62 +618,9 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                     ],
                   ),
                   horizontalSpaceRegular,
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          getTag('Pmt', 'From Payment',
-                              color: paymentColor, width: 39),
-                          horizontalSpaceTiny,
-                          Icon(Icons.chevron_right,
-                              color: Theme.of(context).hintColor),
-                          horizontalSpaceTiny,
-                          getTag('ini', 'Initial Value', color: paymentColor),
-                          Text(
-                              ' ${_initialPaymentAmountToApply?.toStringAsFixed(2) ?? '0.00'}  ',
-                              style: billValStyle),
-                          getTag('applied', 'Applied Value',
-                              color: paymentColor),
-                          Text(
-                              ' ${_initialPaymentAmountToApply != null && _initialPaymentAmountToApply! > 0.0 ? (_initialPaymentAmountToApply! - (_availablePaymentAmountToApply ?? 0.0)).toStringAsFixed(2) : '0.0'}  ',
-                              style: billValStyle),
-                          getTag('avail', 'Available Value',
-                              color: paymentColor),
-                          Text(
-                              ' ${_availablePaymentAmountToApply?.toStringAsFixed(2) ?? '0.00'} ',
-                              style: billValStyle),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          getTag('Bal', 'From Balance',
-                              color: balColor, width: 39),
-                          horizontalSpaceTiny,
-                          Icon(Icons.chevron_right,
-                              color: Theme.of(context).hintColor),
-                          horizontalSpaceTiny,
-                          getTag('ini', 'Initial Value', color: balColor),
-                          Text(
-                              ' ${_initialExcessiveBalanceToApply?.toStringAsFixed(2) ?? '0.00'}  ',
-                              style: billValStyle),
-                          getTag('applied', 'Applied Value', color: balColor),
-                          Text(
-                              ' ${_initialExcessiveBalanceToApply != null && _initialExcessiveBalanceToApply! > 0.0 ? (_initialExcessiveBalanceToApply! - (_availableExcessiveBalanceToApply ?? 0.0)).toStringAsFixed(2) : '0.0'}  ',
-                              style: billValStyle),
-                          getTag('avail', 'Available Value', color: balColor),
-                          Text(
-                              ' ${_availableExcessiveBalanceToApply?.toStringAsFixed(2) ?? '0.00'} ',
-                              style: billValStyle),
-                        ],
-                      ),
-                    ],
-                  ),
-                  horizontalSpaceSmall,
-                  getPopulateApply(),
-                  getCommitApply(),
+                  getBucketPopulateApply(),
                   const Spacer(),
-                  if (hasMatchedBill)
+                  if (showPaymentLcStatusOp)
                     Padding(
                       padding: const EdgeInsets.only(left: 8.0),
                       child: WgtPagPaymentLcStatusOp(
@@ -1317,25 +712,33 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
       bool isMatchedBill,
       int index,
       double? availableAmountToApply,
-      double? appliedAmountUsage,
-      double? appliedAmountInterest,
+      double? appliedAmountUsageFromBal,
+      double? appliedAmountInterestFromBal,
+      double? appliedAmountUsageFromPmt,
+      double? appliedAmountInterestFromPmt,
       String? appliedByOpUsername,
       String? appliedTimestampStr) {
-    bool isEnabled = true;
+    bool isEnabled = false;
+    if (_inManualOverride) {
+      isEnabled = true;
+    }
     if (!isMatchedBill) {
       if (availableAmountToApply == null || availableAmountToApply <= 0.0) {
         isEnabled = false;
       }
     }
-
-    if (_lcStatusDisplay == PagPaymentLcStatus.released) {
+    if (_lcStatusDisplay == PagPaymentLcStatus.matched) {
       isEnabled = false;
     }
 
-    final initialValueUsage =
-        isMatchedBill ? appliedAmountUsage?.toString() : null;
-    final initialValueInterest =
-        isMatchedBill ? appliedAmountInterest?.toString() : null;
+    final initialValueUsageFromBal =
+        isMatchedBill ? appliedAmountUsageFromBal?.toString() : null;
+    final initialValueInterestFromBal =
+        isMatchedBill ? appliedAmountInterestFromBal?.toString() : null;
+    final initialValueUsageFromPmt =
+        isMatchedBill ? appliedAmountUsageFromPmt?.toString() : null;
+    final initialValueInterestFromPmt =
+        isMatchedBill ? appliedAmountInterestFromPmt?.toString() : null;
     final valWidth = 105.0;
 
     return Container(
@@ -1363,7 +766,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                   hintText: 'Usage',
                   labelText: 'Usage',
                   enabled: isEnabled,
-                  initialValue: initialValueUsage,
+                  initialValue: initialValueUsageFromPmt,
                   onChanged: (value) {
                     // setState(() {
                     //   _paymentApply = value;
@@ -1384,7 +787,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                   hintText: 'Interest',
                   labelText: 'Interest',
                   enabled: isEnabled,
-                  initialValue: initialValueInterest,
+                  initialValue: initialValueInterestFromPmt,
                   onChanged: (value) {
                     // setState(() {
                     //   _paymentApply = value;
@@ -1408,7 +811,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                   hintText: 'Usage',
                   labelText: 'Usage',
                   enabled: isEnabled,
-                  initialValue: initialValueUsage,
+                  initialValue: initialValueUsageFromBal,
                   onChanged: (value) {
                     // setState(() {
                     //   _paymentApply = value;
@@ -1429,7 +832,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                   hintText: 'Interest',
                   labelText: 'Interest',
                   enabled: isEnabled,
-                  initialValue: initialValueInterest,
+                  initialValue: initialValueInterestFromBal,
                   onChanged: (value) {
                     // setState(() {
                     //   _paymentApply = value;
@@ -1473,8 +876,10 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
     }
 
     double? availableAmountToApply;
-    double? appliedAmountUsage;
-    double? appliedAmountInterest;
+    double? appliedAmountUsageFromBal;
+    double? appliedAmountInterestFromBal;
+    double? appliedAmountUsageFromPmt;
+    double? appliedAmountInterestFromPmt;
     String? appliedByOpUsername;
     String? appliedTimestampStr;
 
@@ -1487,13 +892,43 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
     double balanceAmount = totalAmount;
     for (var item in applyInfoList) {
       if (item['billing_rec_id'] == billingRecId) {
-        appliedAmountUsage = item['applied_usage_amount'] ?? 0.0;
-        appliedAmountInterest = item['applied_interest_amount'] ?? 0.0;
+        appliedAmountUsageFromBal = item['applied_usage_amount_from_bal']
+                is String
+            ? double.tryParse(item['applied_usage_amount_from_bal'] ?? '0.0') ??
+                0.0
+            : item['applied_usage_amount_from_bal'] ?? 0.0;
+        appliedAmountInterestFromBal =
+            item['applied_interest_amount_from_bal'] is String
+                ? double.tryParse(
+                        item['applied_interest_amount_from_bal'] ?? '0.0') ??
+                    0.0
+                : item['applied_interest_amount_from_bal'] ?? 0.0;
+        appliedAmountUsageFromPmt =
+            item['applied_usage_amount_from_payment'] is String
+                ? double.tryParse(
+                        item['applied_usage_amount_from_payment'] ?? '0.0') ??
+                    0.0
+                : item['applied_usage_amount_from_payment'] ?? 0.0;
+        appliedAmountInterestFromPmt =
+            item['applied_interest_amount_from_payment'] is String
+                ? double.tryParse(
+                        item['applied_interest_amount_from_payment'] ??
+                            '0.0') ??
+                    0.0
+                : item['applied_interest_amount_from_payment'] ?? 0.0;
+        availableAmountToApply = (appliedAmountUsageFromBal ?? 0.0) +
+            (appliedAmountInterestFromBal ?? 0.0) +
+            (appliedAmountUsageFromPmt ?? 0.0) +
+            (appliedAmountInterestFromPmt ?? 0.0);
+        final appliedAmountUsage = (appliedAmountUsageFromBal ?? 0.0) +
+            (appliedAmountUsageFromPmt ?? 0.0);
+        final appliedAmountInterest = (appliedAmountInterestFromBal ?? 0.0) +
+            (appliedAmountInterestFromPmt ?? 0.0);
+
         appliedByOpUsername = item['applied_by_op_username'];
         appliedTimestampStr = item['applied_timestamp'];
         isMatchedBill = true;
-        balanceAmount = balanceAmount -
-            (appliedAmountUsage ?? 0.0 + (appliedAmountInterest ?? 0.0));
+        balanceAmount = balanceAmount - appliedAmountUsage;
         break;
       }
     }
@@ -1575,13 +1010,14 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                 ),
               ),
               const Spacer(),
-              // _isApplied ? getAppliedPayment() : getApplyOp(),
               getApplyOp(
                   isMatchedBill,
                   index,
                   availableAmountToApply,
-                  appliedAmountUsage,
-                  appliedAmountInterest,
+                  appliedAmountUsageFromBal,
+                  appliedAmountInterestFromBal,
+                  appliedAmountUsageFromPmt,
+                  appliedAmountInterestFromPmt,
                   appliedByOpUsername,
                   appliedTimestampStr),
               horizontalSpaceSmall,
@@ -1606,8 +1042,71 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
     );
   }
 
+  Widget getBucketPopulateApply() {
+    // if Matched, do not show
+    if (_lcStatusDisplay == PagPaymentLcStatus.matched) {
+      return const SizedBox.shrink();
+    }
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                getTag('Pmt', 'From Payment', color: paymentColor, width: 39),
+                horizontalSpaceTiny,
+                Icon(Icons.chevron_right, color: Theme.of(context).hintColor),
+                horizontalSpaceTiny,
+                getTag('ini', 'Initial Value', color: paymentColor),
+                Text(
+                    ' ${_initialPaymentAmountToApply?.toStringAsFixed(2) ?? '0.00'}  ',
+                    style: billValStyle),
+                getTag('applied', 'Applied Value', color: paymentColor),
+                Text(
+                    ' ${_initialPaymentAmountToApply != null && _initialPaymentAmountToApply! > 0.0 ? (_initialPaymentAmountToApply! - (_availablePaymentAmountToApply ?? 0.0)).toStringAsFixed(2) : '0.0'}  ',
+                    style: billValStyle),
+                getTag('avail', 'Available Value', color: paymentColor),
+                Text(
+                    ' ${_availablePaymentAmountToApply?.toStringAsFixed(2) ?? '0.00'} ',
+                    style: billValStyle),
+              ],
+            ),
+            Row(
+              children: [
+                getTag('Bal', 'From Balance', color: balColor, width: 39),
+                horizontalSpaceTiny,
+                Icon(Icons.chevron_right, color: Theme.of(context).hintColor),
+                horizontalSpaceTiny,
+                getTag('ini', 'Initial Value', color: balColor),
+                Text(
+                    ' ${_initialExcessiveBalanceToApply?.toStringAsFixed(2) ?? '0.00'}  ',
+                    style: billValStyle),
+                getTag('applied', 'Applied Value', color: balColor),
+                Text(
+                    ' ${_initialExcessiveBalanceToApply != null && _initialExcessiveBalanceToApply! > 0.0 ? (_initialExcessiveBalanceToApply! - (_availableExcessiveBalanceToApply ?? 0.0)).toStringAsFixed(2) : '0.0'}  ',
+                    style: billValStyle),
+                getTag('avail', 'Available Value', color: balColor),
+                Text(
+                    ' ${_availableExcessiveBalanceToApply?.toStringAsFixed(2) ?? '0.00'} ',
+                    style: billValStyle),
+              ],
+            ),
+          ],
+        ),
+        horizontalSpaceSmall,
+        getPopulateApply(),
+        horizontalSpaceSmall,
+        getAutoManualApplySwitch(),
+        horizontalSpaceSmall,
+        getCommitApply(),
+      ],
+    );
+  }
+
   Widget getPopulateApply() {
-    if (_lcStatusDisplay == PagPaymentLcStatus.released) {
+    if (_lcStatusDisplay == PagPaymentLcStatus.matched) {
       return const SizedBox.shrink();
     }
     if (_availablePaymentAmountToApply == null ||
@@ -1703,6 +1202,36 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                   fontSize: 13.5)),
         ),
       ),
+    );
+  }
+
+  Widget getAutoManualApplySwitch() {
+    if (_lcStatusDisplay == PagPaymentLcStatus.matched) {
+      return const SizedBox.shrink();
+    }
+    bool isEnabled = true;
+    return Row(
+      children: [
+        Text('Auto ', style: billKeyStyle),
+        Switch(
+          value: _inManualOverride,
+          onChanged: isEnabled
+              ? (value) {
+                  setState(() {
+                    _inManualOverride = value;
+                    if (!_inManualOverride) {
+                      // clear all custom apply info
+                      _paymentApplyInfoListNew.removeWhere((item) =>
+                          item['is_custom_apply_usage'] == true ||
+                          item['is_custom_apply_interest'] == true);
+                      _populateApply2();
+                    }
+                  });
+                }
+              : null,
+        ),
+        Text(' Manual', style: billKeyStyle),
+      ],
     );
   }
 }
