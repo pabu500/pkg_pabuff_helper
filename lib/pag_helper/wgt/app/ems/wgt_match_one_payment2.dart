@@ -114,15 +114,19 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
             target: '',
             operation: '',
           ));
-      final itemList = result['bill_list'] ?? [];
+      final paymentInfo = result['payment_info'];
+      if (paymentInfo == null) {
+        throw Exception("No payment info found in the response");
+      }
+      final billList = result['bill_list'] ?? [];
+      final paymentApplyInfoList = result['payment_apply_info_list'] ?? [];
       // final itemList = result['item_list'] ?? [];
       _billList.clear();
       // _billList.addAll(itemList);
-      for (var item in itemList) {
+      for (var item in billList) {
         Map<String, dynamic> billItem = item;
         _billList.add(billItem);
       }
-      final paymentApplyInfoList = result['payment_apply_info_list'] ?? {};
 
       _initialPaymentAmountToApply = _paymentAmount;
       _availablePaymentAmountToApply = _paymentAmount;
@@ -132,11 +136,22 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
 
       for (var item in paymentApplyInfoList) {
         _paymentApplyInfoListExisting.add(item);
-        final appliedAmountUsage =
-            double.tryParse(item['applied_usage_amount'] ?? '0.0') ?? 0.0;
-        final appliedAmountInterest =
-            double.tryParse(item['applied_interest_amount'] ?? '0.0') ?? 0.0;
-        double totalApplied = appliedAmountUsage + appliedAmountInterest;
+        final appliedAmountUsageFromBal =
+            double.tryParse(item['applied_usage_amount_from_bal'] ?? '0.0') ??
+                0.0;
+        final appliedAmountInterestFromBal = double.tryParse(
+                item['applied_interest_amount_from_bal'] ?? '0.0') ??
+            0.0;
+        final appliedAmountUsageFromPayment = double.tryParse(
+                item['applied_usage_amount_from_payment'] ?? '0.0') ??
+            0.0;
+        final appliedAmountInterestFromPayment = double.tryParse(
+                item['applied_interest_amount_from_payment'] ?? '0.0') ??
+            0.0;
+        double totalApplied = appliedAmountUsageFromBal +
+            appliedAmountInterestFromBal +
+            appliedAmountUsageFromPayment +
+            appliedAmountInterestFromPayment;
 
         _availablePaymentAmountToApply =
             _availablePaymentAmountToApply! - totalApplied;
@@ -538,30 +553,25 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
     bool found = false;
     double diff = 0.0;
 
-    final newValue = value.isEmpty ? 0.0 : double.tryParse(value) ?? 0.0;
-    for (var item in _paymentApplyInfoListNew) {
-      if (item['billing_rec_id'] == billingRecId) {
-        double oldValue = item[fieldKey] ?? 0.0;
-        item[fieldKey] = newValue;
-        diff = newValue - oldValue;
-        item['is_custom_apply_$suffix'] = true;
-        found = true;
-        break;
-      }
-    }
-    if (!found) {
-      // add new entry
-      _paymentApplyInfoListNew.add({
-        'billing_rec_id': billingRecId,
-        fieldKey: newValue,
-        'is_custom_apply_$fieldKey': true,
-      });
-    }
-
     // update _availablePaymentAmountToApply and _availableExcessiveBalanceToApply
     // rule1: if diff > 0, means more applied, so reduce from excessive balance first, then from this payment
     // rule2: if diff < 0, means less applied, so add back to this payment first, then to excessive balance
     // rule3: do not flow back to this payment if this payment is exact match, unless it's the exact match amount
+
+    for (var item in _paymentApplyInfoListNew) {
+      if (item['billing_rec_id'] == billingRecId) {
+        final currentVal =
+            double.tryParse(item[fieldKey]?.toString() ?? '0.0') ?? 0.0;
+        final newVal = double.tryParse(value) ?? 0.0;
+        diff = newVal - currentVal;
+        if (diff == 0.0) {
+          return;
+        }
+        item[fieldKey] = newVal;
+        found = true;
+        break;
+      }
+    }
 
     _populateApply2();
   }
@@ -768,9 +778,10 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                   enabled: isEnabled,
                   initialValue: initialValueUsageFromPmt,
                   onChanged: (value) {
-                    // setState(() {
-                    //   _paymentApply = value;
-                    // });
+                    setState(() {
+                      _updateApplyInfo2(
+                          index, 'applied_usage_amount_from_payment', value);
+                    });
                   },
                   onClear: () {
                     _updateApplyInfo2(index, 'applied_usage_amount', '');
@@ -789,9 +800,13 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                   enabled: isEnabled,
                   initialValue: initialValueInterestFromPmt,
                   onChanged: (value) {
-                    // setState(() {
-                    //   _paymentApply = value;
-                    // });
+                    setState(() {
+                      _updateApplyInfo2(
+                          index, 'applied_interest_amount_from_payment', value);
+                    });
+                  },
+                  onClear: () {
+                    _updateApplyInfo2(index, 'applied_interest_amount', '');
                   },
                 ),
               ),
@@ -813,9 +828,10 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                   enabled: isEnabled,
                   initialValue: initialValueUsageFromBal,
                   onChanged: (value) {
-                    // setState(() {
-                    //   _paymentApply = value;
-                    // });
+                    setState(() {
+                      _updateApplyInfo2(
+                          index, 'applied_usage_amount_from_bal', value);
+                    });
                   },
                   onClear: () {
                     _updateApplyInfo2(index, 'applied_usage_amount', '');
@@ -834,9 +850,13 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                   enabled: isEnabled,
                   initialValue: initialValueInterestFromBal,
                   onChanged: (value) {
-                    // setState(() {
-                    //   _paymentApply = value;
-                    // });
+                    setState(() {
+                      _updateApplyInfo2(
+                          index, 'applied_interest_amount_from_bal', value);
+                    });
+                  },
+                  onClear: () {
+                    _updateApplyInfo2(index, 'applied_interest_amount', '');
                   },
                 ),
               ),
@@ -890,32 +910,35 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
     }
 
     double balanceAmount = totalAmount;
-    for (var item in applyInfoList) {
-      if (item['billing_rec_id'] == billingRecId) {
-        appliedAmountUsageFromBal = item['applied_usage_amount_from_bal']
-                is String
-            ? double.tryParse(item['applied_usage_amount_from_bal'] ?? '0.0') ??
-                0.0
-            : item['applied_usage_amount_from_bal'] ?? 0.0;
+    for (var applyInfo in applyInfoList) {
+      if (applyInfo['billing_rec_id'] == billingRecId) {
+        appliedAmountUsageFromBal =
+            applyInfo['applied_usage_amount_from_bal'] is String
+                ? double.tryParse(
+                        applyInfo['applied_usage_amount_from_bal'] ?? '0.0') ??
+                    0.0
+                : applyInfo['applied_usage_amount_from_bal'] ?? 0.0;
         appliedAmountInterestFromBal =
-            item['applied_interest_amount_from_bal'] is String
+            applyInfo['applied_interest_amount_from_bal'] is String
                 ? double.tryParse(
-                        item['applied_interest_amount_from_bal'] ?? '0.0') ??
-                    0.0
-                : item['applied_interest_amount_from_bal'] ?? 0.0;
-        appliedAmountUsageFromPmt =
-            item['applied_usage_amount_from_payment'] is String
-                ? double.tryParse(
-                        item['applied_usage_amount_from_payment'] ?? '0.0') ??
-                    0.0
-                : item['applied_usage_amount_from_payment'] ?? 0.0;
-        appliedAmountInterestFromPmt =
-            item['applied_interest_amount_from_payment'] is String
-                ? double.tryParse(
-                        item['applied_interest_amount_from_payment'] ??
+                        applyInfo['applied_interest_amount_from_bal'] ??
                             '0.0') ??
                     0.0
-                : item['applied_interest_amount_from_payment'] ?? 0.0;
+                : applyInfo['applied_interest_amount_from_bal'] ?? 0.0;
+        appliedAmountUsageFromPmt =
+            applyInfo['applied_usage_amount_from_payment'] is String
+                ? double.tryParse(
+                        applyInfo['applied_usage_amount_from_payment'] ??
+                            '0.0') ??
+                    0.0
+                : applyInfo['applied_usage_amount_from_payment'] ?? 0.0;
+        appliedAmountInterestFromPmt =
+            applyInfo['applied_interest_amount_from_payment'] is String
+                ? double.tryParse(
+                        applyInfo['applied_interest_amount_from_payment'] ??
+                            '0.0') ??
+                    0.0
+                : applyInfo['applied_interest_amount_from_payment'] ?? 0.0;
         availableAmountToApply = (appliedAmountUsageFromBal ?? 0.0) +
             (appliedAmountInterestFromBal ?? 0.0) +
             (appliedAmountUsageFromPmt ?? 0.0) +
@@ -925,10 +948,11 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
         final appliedAmountInterest = (appliedAmountInterestFromBal ?? 0.0) +
             (appliedAmountInterestFromPmt ?? 0.0);
 
-        appliedByOpUsername = item['applied_by_op_username'];
-        appliedTimestampStr = item['applied_timestamp'];
+        appliedByOpUsername = applyInfo['applied_by_op_username'];
+        appliedTimestampStr = applyInfo['applied_timestamp'];
         isMatchedBill = true;
-        balanceAmount = balanceAmount - appliedAmountUsage;
+        balanceAmount =
+            balanceAmount - appliedAmountUsage - appliedAmountInterest;
         break;
       }
     }
@@ -1109,6 +1133,10 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
     if (_lcStatusDisplay == PagPaymentLcStatus.matched) {
       return const SizedBox.shrink();
     }
+    if (_inManualOverride) {
+      return const SizedBox.shrink();
+    }
+
     if (_availablePaymentAmountToApply == null ||
         _availablePaymentAmountToApply! <= 0.0) {
       return const SizedBox.shrink();
@@ -1221,10 +1249,11 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                     _inManualOverride = value;
                     if (!_inManualOverride) {
                       // clear all custom apply info
-                      _paymentApplyInfoListNew.removeWhere((item) =>
-                          item['is_custom_apply_usage'] == true ||
-                          item['is_custom_apply_interest'] == true);
-                      _populateApply2();
+                      // _paymentApplyInfoListNew.removeWhere((item) =>
+                      //     item['is_custom_apply_usage'] == true ||
+                      //     item['is_custom_apply_interest'] == true);
+                      // _populateApply2();
+                      _paymentApplyInfoListNew.clear();
                     }
                   });
                 }
