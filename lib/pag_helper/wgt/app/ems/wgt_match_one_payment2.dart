@@ -247,31 +247,6 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
       return aTimestamp.compareTo(bTimestamp);
     });
 
-    // double inBucketTotalBilledUsageAmount = 0.0;
-    // double inBucketTotalBilledInterestAmount = 0.0;
-    // for (var bill in billList) {
-    //   // skip if bill is not released
-    //   if (bill['lc_status'] != 'released') {
-    //     continue;
-    //   }
-    //   // skip if bill is already fully paid
-    //   if (bill['is_fully_paid_by_current_payment'] == true) {
-    //     continue;
-    //   }
-
-    //   final billedTotalCost =
-    //       double.tryParse(bill['billed_total_cost'] ?? '0.0') ?? 0.0;
-    //   if (billedTotalCost <= 0.0) {
-    //     continue;
-    //   }
-
-    //   final billedInterestAmount =
-    //       double.tryParse(bill['billed_interest_amount'] ?? '0.0') ?? 0.0;
-    //   final billedUsageAmount = billedTotalCost - billedInterestAmount;
-    //   inBucketTotalBilledUsageAmount += billedUsageAmount;
-    //   inBucketTotalBilledInterestAmount += billedInterestAmount;
-    // }
-
     // rule 3: flow out from outBucketExcessiveBalance first
     // rule 3.1: flow to usage bucket first
     for (var bill in billList) {
@@ -542,38 +517,60 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
     }
   }
 
-  void _updateApplyInfo2(int index, String fieldKey, String value) {
+  void _updateCustomApply(int index, String fieldKey, String value) {
     if (index < 0 || index >= _billList.length) {
       return;
     }
     final billInfo = _billList[index];
     final billingRecId = billInfo['id'] ?? '';
-    final suffix =
+    final inBucket =
         fieldKey.contains('applied_usage_amount') ? 'usage' : 'interest';
+    final outBucket = fieldKey.contains('from_bal') ? 'bal' : 'payment';
     bool found = false;
     double diff = 0.0;
 
-    // update _availablePaymentAmountToApply and _availableExcessiveBalanceToApply
-    // rule1: if diff > 0, means more applied, so reduce from excessive balance first, then from this payment
-    // rule2: if diff < 0, means less applied, so add back to this payment first, then to excessive balance
-    // rule3: do not flow back to this payment if this payment is exact match, unless it's the exact match amount
-
     for (var item in _paymentApplyInfoListNew) {
       if (item['billing_rec_id'] == billingRecId) {
-        final currentVal =
+        final oldValue =
             double.tryParse(item[fieldKey]?.toString() ?? '0.0') ?? 0.0;
-        final newVal = double.tryParse(value) ?? 0.0;
-        diff = newVal - currentVal;
-        if (diff == 0.0) {
-          return;
-        }
-        item[fieldKey] = newVal;
+        final newValue = double.tryParse(value) ?? 0.0;
+        item[fieldKey] = newValue;
+        item['is_custom_apply_$inBucket'] = true;
+        diff = newValue - oldValue;
         found = true;
         break;
       }
     }
 
-    _populateApply2();
+    if (!found) {
+      final newValue = double.tryParse(value) ?? 0.0;
+      diff = newValue;
+      _paymentApplyInfoListNew.add({
+        'billing_rec_id': billingRecId,
+        fieldKey: newValue,
+        'is_custom_apply_$inBucket': true,
+      });
+    }
+
+    if (inBucket == 'usage') {
+      if (outBucket == 'bal') {
+        _availableExcessiveBalanceToApply =
+            (_availableExcessiveBalanceToApply ?? 0.0) - diff;
+      } else {
+        _availablePaymentAmountToApply =
+            (_availablePaymentAmountToApply ?? 0.0) - diff;
+      }
+    } else {
+      if (outBucket == 'bal') {
+        _availableExcessiveBalanceToApply =
+            (_availableExcessiveBalanceToApply ?? 0.0) - diff;
+      } else {
+        _availablePaymentAmountToApply =
+            (_availablePaymentAmountToApply ?? 0.0) - diff;
+      }
+    }
+    _checkFullyPaid();
+    // setState(() {});
   }
 
   @override
@@ -778,13 +775,14 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                   enabled: isEnabled,
                   initialValue: initialValueUsageFromPmt,
                   onChanged: (value) {
-                    setState(() {
-                      _updateApplyInfo2(
-                          index, 'applied_usage_amount_from_payment', value);
-                    });
+                    _updateCustomApply(
+                        index, 'applied_usage_amount_from_payment', value);
+                  },
+                  onEditingComplete: () {
+                    setState(() {});
                   },
                   onClear: () {
-                    _updateApplyInfo2(index, 'applied_usage_amount', '');
+                    _updateCustomApply(index, 'applied_usage_amount', '');
                   },
                 ),
               ),
@@ -800,13 +798,14 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                   enabled: isEnabled,
                   initialValue: initialValueInterestFromPmt,
                   onChanged: (value) {
-                    setState(() {
-                      _updateApplyInfo2(
-                          index, 'applied_interest_amount_from_payment', value);
-                    });
+                    _updateCustomApply(
+                        index, 'applied_interest_amount_from_payment', value);
+                  },
+                  onEditingComplete: () {
+                    setState(() {});
                   },
                   onClear: () {
-                    _updateApplyInfo2(index, 'applied_interest_amount', '');
+                    _updateCustomApply(index, 'applied_interest_amount', '');
                   },
                 ),
               ),
@@ -828,13 +827,14 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                   enabled: isEnabled,
                   initialValue: initialValueUsageFromBal,
                   onChanged: (value) {
-                    setState(() {
-                      _updateApplyInfo2(
-                          index, 'applied_usage_amount_from_bal', value);
-                    });
+                    _updateCustomApply(
+                        index, 'applied_usage_amount_from_bal', value);
+                  },
+                  onEditingComplete: () {
+                    setState(() {});
                   },
                   onClear: () {
-                    _updateApplyInfo2(index, 'applied_usage_amount', '');
+                    _updateCustomApply(index, 'applied_usage_amount', '');
                   },
                 ),
               ),
@@ -850,13 +850,14 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                   enabled: isEnabled,
                   initialValue: initialValueInterestFromBal,
                   onChanged: (value) {
-                    setState(() {
-                      _updateApplyInfo2(
-                          index, 'applied_interest_amount_from_bal', value);
-                    });
+                    _updateCustomApply(
+                        index, 'applied_interest_amount_from_bal', value);
+                  },
+                  onEditingComplete: () {
+                    setState(() {});
                   },
                   onClear: () {
-                    _updateApplyInfo2(index, 'applied_interest_amount', '');
+                    _updateCustomApply(index, 'applied_interest_amount', '');
                   },
                 ),
               ),
@@ -1093,8 +1094,12 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                     style: billValStyle),
                 getTag('avail', 'Available Value', color: paymentColor),
                 Text(
-                    ' ${_availablePaymentAmountToApply?.toStringAsFixed(2) ?? '0.00'} ',
-                    style: billValStyle),
+                  ' ${_availablePaymentAmountToApply?.toStringAsFixed(2) ?? '0.00'} ',
+                  style: (_availablePaymentAmountToApply ?? 0.0) > 0.0
+                      ? billValStyle
+                      : billValStyle.copyWith(
+                          color: Theme.of(context).colorScheme.error),
+                ),
               ],
             ),
             Row(
@@ -1113,8 +1118,12 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                     style: billValStyle),
                 getTag('avail', 'Available Value', color: balColor),
                 Text(
-                    ' ${_availableExcessiveBalanceToApply?.toStringAsFixed(2) ?? '0.00'} ',
-                    style: billValStyle),
+                  ' ${_availableExcessiveBalanceToApply?.toStringAsFixed(2) ?? '0.00'} ',
+                  style: (_availableExcessiveBalanceToApply ?? 0.0) > 0.0
+                      ? billValStyle
+                      : billValStyle.copyWith(
+                          color: Theme.of(context).colorScheme.error),
+                ),
               ],
             ),
           ],
@@ -1171,9 +1180,14 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
     if (_paymentApplyInfoListNew.isEmpty) {
       return Container();
     }
-
-    // bool isPaymentReleased = widget.paymentMatchingInfo != null &&
-    //     widget.paymentMatchingInfo!['lc_status'] == 'released';
+    if ((_availableExcessiveBalanceToApply == null ||
+        _availablePaymentAmountToApply == null)) {
+      return Container();
+    }
+    if (_availableExcessiveBalanceToApply! < 0.0 ||
+        _availablePaymentAmountToApply! < 0.0) {
+      return Container();
+    }
 
     bool okToCommit = true;
 
@@ -1247,7 +1261,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
               ? (value) {
                   setState(() {
                     _inManualOverride = value;
-                    if (!_inManualOverride) {
+                    if (_inManualOverride) {
                       // clear all custom apply info
                       // _paymentApplyInfoListNew.removeWhere((item) =>
                       //     item['is_custom_apply_usage'] == true ||
