@@ -94,6 +94,8 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
   bool _isCommitted = false;
   String _commitErrorText = '';
 
+  bool _showExistingApplies = false;
+
   Future<void> _fetchPaymentMatchOpInfo() async {
     if (_isFetchingBillList || _billListFetchTried) return;
 
@@ -138,19 +140,22 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
       _initialExcessiveBalanceToApply = 50.0; // hard coded for now
       _availableExcessiveBalanceToApply = _initialExcessiveBalanceToApply;
 
-      for (var item in paymentApplyInfoList) {
-        _paymentApplyInfoListExisting.add(item);
-        final appliedAmountUsageFromBal =
-            double.tryParse(item['applied_usage_amount_from_bal'] ?? '0.0') ??
-                0.0;
+      for (var paymentApplyInfo in paymentApplyInfoList) {
+        _paymentApplyInfoListExisting.add(paymentApplyInfo);
+        final appliedAmountUsageFromBal = double.tryParse(
+                paymentApplyInfo['applied_usage_amount_from_bal'] ?? '0.0') ??
+            0.0;
         final appliedAmountInterestFromBal = double.tryParse(
-                item['applied_interest_amount_from_bal'] ?? '0.0') ??
+                paymentApplyInfo['applied_interest_amount_from_bal'] ??
+                    '0.0') ??
             0.0;
         final appliedAmountUsageFromPayment = double.tryParse(
-                item['applied_usage_amount_from_payment'] ?? '0.0') ??
+                paymentApplyInfo['applied_usage_amount_from_payment'] ??
+                    '0.0') ??
             0.0;
         final appliedAmountInterestFromPayment = double.tryParse(
-                item['applied_interest_amount_from_payment'] ?? '0.0') ??
+                paymentApplyInfo['applied_interest_amount_from_payment'] ??
+                    '0.0') ??
             0.0;
         double totalAppliedFromPayment =
             appliedAmountUsageFromPayment + appliedAmountInterestFromPayment;
@@ -671,7 +676,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
 
   @override
   Widget build(BuildContext context) {
-    bool fetchingBillList = _billList.isEmpty && !_billListFetchTried;
+    bool fetchingMatchingOpInfo = _billList.isEmpty && !_billListFetchTried;
 
     final tenantLabel = widget.tenantInfo['tenant_label'] ?? '';
 
@@ -756,7 +761,8 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
             ),
           ],
         ),
-        fetchingBillList
+        getPaymentApplyList(),
+        fetchingMatchingOpInfo
             ? FutureBuilder(
                 // future: _fetchBillList(),
                 future: _fetchPaymentMatchOpInfo(),
@@ -1396,6 +1402,156 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
         ),
         Text(' Manual', style: billKeyStyle),
       ],
+    );
+  }
+
+  Widget getPaymentApplyList() {
+    if (_paymentApplyInfoListExisting.isEmpty) {
+      return Container();
+    }
+    List<Widget> appliesWidgets = [];
+    appliesWidgets.add(Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: InkWell(
+          onTap: () {
+            setState(() {
+              _showExistingApplies = !_showExistingApplies;
+            });
+          },
+          child: Text(
+            'Payment Applies (${_paymentApplyInfoListExisting.length})',
+            style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Theme.of(context).hintColor),
+          ),
+        ),
+      ),
+    ));
+    for (Map<String, dynamic> applyInfo in _paymentApplyInfoListExisting) {
+      if (!_showExistingApplies) {
+        break;
+      }
+      String tenantLabel = applyInfo['tenant_label'] ?? '-';
+      String billLabel = applyInfo['bill_label'] ?? '-';
+      String billedTotalCost = applyInfo['billed_total_cost'] ?? '-';
+      String appliedTimestamp = applyInfo['applied_timestamp'] ?? '-';
+      String appliedByOpName = applyInfo['applied_by_op_username'] ?? '-';
+      String appliedUsageAmountFromBalStr =
+          applyInfo['applied_usage_amount_from_bal'] ?? '-';
+      String appliedInterestAmountFromBalStr =
+          applyInfo['applied_interest_amount_from_bal'] ?? '-';
+      String appliedUsageAmountFromPmtStr =
+          applyInfo['applied_usage_amount_from_payment'] ?? '-';
+      String appliedInterestAmountFromPmtStr =
+          applyInfo['applied_interest_amount_from_payment'] ?? '-';
+
+      double keyWidth1 = 150.0;
+      double keyWidth2 = 85.0;
+
+      appliesWidgets.add(Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Theme.of(context).hintColor.withAlpha(130)),
+          borderRadius: BorderRadius.circular(5),
+        ),
+        margin: const EdgeInsets.only(bottom: 5),
+        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 13),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Text('Bill: ', style: TextStyle(fontSize: 13.5)),
+                    Text(
+                      billLabel,
+                      style: const TextStyle(
+                          fontSize: 15, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                const Text('Billed Total ', style: TextStyle(fontSize: 13.5)),
+                Text(billedTotalCost,
+                    style: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.bold)),
+                Text('Applied by: $appliedByOpName at $appliedTimestamp',
+                    style: const TextStyle(fontSize: 13.5)),
+              ],
+            ),
+            horizontalSpaceRegular,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    SizedBox(
+                      width: keyWidth1,
+                      child: const Align(
+                        alignment: Alignment.centerRight,
+                        child: Text('Usage Amt. from Pmt: ',
+                            style: TextStyle(fontSize: 13.5)),
+                      ),
+                    ),
+                    Text(appliedUsageAmountFromPmtStr,
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
+                  ],
+                ),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: keyWidth1,
+                      child: const Align(
+                        alignment: Alignment.centerRight,
+                        child: Text('Interest Amt. from Pmt: ',
+                            style: TextStyle(fontSize: 13.5)),
+                      ),
+                    ),
+                    Text(appliedInterestAmountFromPmtStr,
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
+                  ],
+                ),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: keyWidth1,
+                      child: const Align(
+                        alignment: Alignment.centerRight,
+                        child: Text('Usage Amt. from Bal: ',
+                            style: TextStyle(fontSize: 13.5)),
+                      ),
+                    ),
+                    Text(appliedUsageAmountFromBalStr,
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
+                  ],
+                ),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: keyWidth1,
+                      child: const Align(
+                        alignment: Alignment.centerRight,
+                        child: Text('Interest Amt. from Bal: ',
+                            style: TextStyle(fontSize: 13.5)),
+                      ),
+                    ),
+                    Text(appliedInterestAmountFromBalStr,
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      ));
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Column(children: appliesWidgets),
     );
   }
 }

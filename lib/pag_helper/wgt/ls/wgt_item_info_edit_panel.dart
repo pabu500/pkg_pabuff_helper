@@ -480,7 +480,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
                 : Column(
                     // alignment: WrapAlignment.center,
                     children: [
-                      getPaymentApplies(),
+                      getPaymentApplyList(),
                       Container(
                         decoration: BoxDecoration(
                           border: Border.all(
@@ -967,7 +967,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
     }
   }
 
-  Widget getPaymentApplies() {
+  Widget getPaymentApplyList() {
     if (widget.itemKind != PagItemKind.finance ||
         widget.itemType != PagFinanceType.payment) {
       return Container();
