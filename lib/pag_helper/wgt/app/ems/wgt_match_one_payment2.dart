@@ -1,7 +1,6 @@
 import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
-import 'package:buff_helper/pag_helper/wgt/wgt_comm_button.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/pag_bill_def.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +8,6 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'dart:developer' as dev;
 
 import '../../../../pagrid_helper/ems_helper/billing_helper/wgt_pag_composite_bill_view.dart';
-import '../../../../xt_ui/wdgt/info/get_error_text_prompt.dart';
 import '../../../../xt_ui/wdgt/wgt_pag_wait.dart';
 import '../../../comm/comm_fin_ops.dart';
 import '../../../def_helper/dh_pag_finance_type.dart';
@@ -88,7 +86,13 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
   final Color balColor = Colors.green.shade900.withAlpha(210);
   final Color paymentColor = Colors.green.shade600.withAlpha(210);
 
+  bool _isPopulated = false;
+
   bool _inManualOverride = false;
+
+  bool _isCommitting = false;
+  bool _isCommitted = false;
+  String _commitErrorText = '';
 
   Future<void> _fetchPaymentMatchOpInfo() async {
     if (_isFetchingBillList || _billListFetchTried) return;
@@ -148,13 +152,15 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
         final appliedAmountInterestFromPayment = double.tryParse(
                 item['applied_interest_amount_from_payment'] ?? '0.0') ??
             0.0;
-        double totalApplied = appliedAmountUsageFromBal +
-            appliedAmountInterestFromBal +
-            appliedAmountUsageFromPayment +
-            appliedAmountInterestFromPayment;
+        double totalAppliedFromPayment =
+            appliedAmountUsageFromPayment + appliedAmountInterestFromPayment;
+        double totalAppliedFromBal =
+            appliedAmountUsageFromBal + appliedAmountInterestFromBal;
 
         _availablePaymentAmountToApply =
-            _availablePaymentAmountToApply! - totalApplied;
+            _availablePaymentAmountToApply! - totalAppliedFromPayment;
+        _availableExcessiveBalanceToApply =
+            _availableExcessiveBalanceToApply! - totalAppliedFromBal;
       }
     } catch (e) {
       dev.log('Error fetching bill list: $e');
@@ -164,6 +170,72 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
         _isFetchingBillList = false;
         _billListFetchTried = true;
       });
+    }
+  }
+
+  Future<dynamic> _commitApply() async {
+    if (_availableExcessiveBalanceToApply == null ||
+        _availablePaymentAmountToApply == null) {
+      dev.log(
+          '_availableExcessiveBalanceToApply or _availablePaymentAmountToApply is null');
+      return;
+    }
+    if (_availableExcessiveBalanceToApply! < 0.0 ||
+        _availablePaymentAmountToApply! < 0.0) {
+      dev.log(
+          '_availableExcessiveBalanceToApply or _availablePaymentAmountToApply is negative');
+      return;
+    }
+
+    final totalAppliedFromBal = (_initialExcessiveBalanceToApply != null &&
+            _availableExcessiveBalanceToApply != null)
+        ? (_initialExcessiveBalanceToApply! -
+            _availableExcessiveBalanceToApply!)
+        : 0.0;
+    final totalAppliedFromPayment = (_initialPaymentAmountToApply != null &&
+            _availablePaymentAmountToApply != null)
+        ? (_initialPaymentAmountToApply! - _availablePaymentAmountToApply!)
+        : 0.0;
+
+    if (totalAppliedFromBal <= 0.0 && totalAppliedFromPayment <= 0.0) {
+      dev.log('No amount applied, nothing to commit');
+      return;
+    }
+
+    Map<String, dynamic> queryMap = {
+      'scope': widget.loggedInUser.selectedScope.toScopeMap(),
+      'payment_id': _paymentInfo['id'] ?? '',
+      'apply_list': _paymentApplyInfoListNew,
+      // 'total_applied_from_bal': totalAppliedFromBal,
+      // 'total_applied_from_payment': totalAppliedFromPayment,
+    };
+
+    _isCommitting = true;
+    _isCommitted = false;
+    _commitErrorText = '';
+    _isPopulated = false;
+
+    try {
+      final result = await commitPaymentApply(
+          widget.appConfig,
+          queryMap,
+          MdlPagSvcClaim(
+            userId: widget.loggedInUser.id,
+            username: widget.loggedInUser.username,
+            scope: '',
+            target: '',
+            operation: '',
+          ));
+      dev.log('Commit payment match apply result: $result');
+      // refresh the payment info
+    } catch (e) {
+      dev.log('Error committing payment match apply: $e');
+      _commitErrorText = 'Error committing payment apply';
+      // rethrow;
+    } finally {
+      _isCommitting = false;
+      _isCommitted = true;
+      setState(() {});
     }
   }
 
@@ -486,9 +558,26 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
       }
     }
 
+    // finally, add 0 if not exist
+    for (var apply in _paymentApplyInfoListNew) {
+      if (!apply.containsKey('applied_usage_amount_from_bal')) {
+        apply['applied_usage_amount_from_bal'] = 0.0;
+      }
+      if (!apply.containsKey('applied_interest_amount_from_bal')) {
+        apply['applied_interest_amount_from_bal'] = 0.0;
+      }
+      if (!apply.containsKey('applied_usage_amount_from_payment')) {
+        apply['applied_usage_amount_from_payment'] = 0.0;
+      }
+      if (!apply.containsKey('applied_interest_amount_from_payment')) {
+        apply['applied_interest_amount_from_payment'] = 0.0;
+      }
+    }
+
     setState(() {
       _availablePaymentAmountToApply = outBucketThisPayment;
       _availableExcessiveBalanceToApply = outBucketExcessiveBalance;
+      _isPopulated = true;
     });
   }
 
@@ -748,6 +837,18 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
         isMatchedBill ? appliedAmountInterestFromPmt?.toString() : null;
     final valWidth = 105.0;
 
+    Color? valueColor;
+    if (_inManualOverride) {
+      valueColor = commitColor;
+      if (_isCommitted && _commitErrorText.isEmpty) {
+        valueColor = Theme.of(context).colorScheme.primary;
+      }
+    } else {
+      if (_isPopulated) {
+        valueColor = commitColor;
+      }
+    }
+
     return Container(
       decoration: BoxDecoration(
         border: Border.all(
@@ -774,6 +875,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                   labelText: 'Usage',
                   enabled: isEnabled,
                   initialValue: initialValueUsageFromPmt,
+                  textStyle: TextStyle(color: valueColor),
                   onChanged: (value) {
                     _updateCustomApply(
                         index, 'applied_usage_amount_from_payment', value);
@@ -782,7 +884,8 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                     setState(() {});
                   },
                   onClear: () {
-                    _updateCustomApply(index, 'applied_usage_amount', '');
+                    _updateCustomApply(
+                        index, 'applied_usage_amount_from_payment', '');
                   },
                 ),
               ),
@@ -797,6 +900,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                   labelText: 'Interest',
                   enabled: isEnabled,
                   initialValue: initialValueInterestFromPmt,
+                  textStyle: TextStyle(color: valueColor),
                   onChanged: (value) {
                     _updateCustomApply(
                         index, 'applied_interest_amount_from_payment', value);
@@ -805,7 +909,8 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                     setState(() {});
                   },
                   onClear: () {
-                    _updateCustomApply(index, 'applied_interest_amount', '');
+                    _updateCustomApply(
+                        index, 'applied_interest_amount_from_payment', '');
                   },
                 ),
               ),
@@ -826,6 +931,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                   labelText: 'Usage',
                   enabled: isEnabled,
                   initialValue: initialValueUsageFromBal,
+                  textStyle: TextStyle(color: valueColor),
                   onChanged: (value) {
                     _updateCustomApply(
                         index, 'applied_usage_amount_from_bal', value);
@@ -834,7 +940,8 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                     setState(() {});
                   },
                   onClear: () {
-                    _updateCustomApply(index, 'applied_usage_amount', '');
+                    _updateCustomApply(
+                        index, 'applied_usage_amount_from_bal', '');
                   },
                 ),
               ),
@@ -849,6 +956,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                   labelText: 'Interest',
                   enabled: isEnabled,
                   initialValue: initialValueInterestFromBal,
+                  textStyle: TextStyle(color: valueColor),
                   onChanged: (value) {
                     _updateCustomApply(
                         index, 'applied_interest_amount_from_bal', value);
@@ -857,7 +965,8 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                     setState(() {});
                   },
                   onClear: () {
-                    _updateCustomApply(index, 'applied_interest_amount', '');
+                    _updateCustomApply(
+                        index, 'applied_interest_amount_from_bal', '');
                   },
                 ),
               ),
@@ -1091,11 +1200,12 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                 getTag('applied', 'Applied Value', color: paymentColor),
                 Text(
                     ' ${_initialPaymentAmountToApply != null && _initialPaymentAmountToApply! > 0.0 ? (_initialPaymentAmountToApply! - (_availablePaymentAmountToApply ?? 0.0)).toStringAsFixed(2) : '0.0'}  ',
-                    style: billValStyle),
+                    style: billValStyle.copyWith(
+                        color: Theme.of(context).colorScheme.primary)),
                 getTag('avail', 'Available Value', color: paymentColor),
                 Text(
                   ' ${_availablePaymentAmountToApply?.toStringAsFixed(2) ?? '0.00'} ',
-                  style: (_availablePaymentAmountToApply ?? 0.0) > 0.0
+                  style: (_availablePaymentAmountToApply ?? 0.0) >= 0.0
                       ? billValStyle
                       : billValStyle.copyWith(
                           color: Theme.of(context).colorScheme.error),
@@ -1115,11 +1225,12 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                 getTag('applied', 'Applied Value', color: balColor),
                 Text(
                     ' ${_initialExcessiveBalanceToApply != null && _initialExcessiveBalanceToApply! > 0.0 ? (_initialExcessiveBalanceToApply! - (_availableExcessiveBalanceToApply ?? 0.0)).toStringAsFixed(2) : '0.0'}  ',
-                    style: billValStyle),
+                    style: billValStyle.copyWith(
+                        color: Theme.of(context).colorScheme.primary)),
                 getTag('avail', 'Available Value', color: balColor),
                 Text(
                   ' ${_availableExcessiveBalanceToApply?.toStringAsFixed(2) ?? '0.00'} ',
-                  style: (_availableExcessiveBalanceToApply ?? 0.0) > 0.0
+                  style: (_availableExcessiveBalanceToApply ?? 0.0) >= 0.0
                       ? billValStyle
                       : billValStyle.copyWith(
                           color: Theme.of(context).colorScheme.error),
@@ -1189,6 +1300,19 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
       return Container();
     }
 
+    if (_isCommitted) {
+      if (_commitErrorText.isEmpty) {
+        return getInfoTextPrompt(
+            context: context,
+            infoText: 'Apply Committed',
+            textColor: Theme.of(context).colorScheme.primary,
+            bgColor: Theme.of(context).colorScheme.primary.withAlpha(80));
+      } else {
+        return getErrorTextPrompt(
+            context: context, errorText: _commitErrorText);
+      }
+    }
+
     bool okToCommit = true;
 
     // payment must be in released status
@@ -1203,25 +1327,21 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
       padding: const EdgeInsets.only(left: 21),
       child: Row(
         children: [
-          Tooltip(
-            message: okToCommit ? 'Commit apply info' : hintMsg,
-            waitDuration: const Duration(milliseconds: 500),
-            child: IconButton(
-              onPressed: okToCommit
-                  ? () {
-                      // commit the apply info
-                    }
-                  : null,
-              icon: Icon(Icons.cloud_upload,
-                  color: okToCommit ? commitColor : null),
-            ),
-          ),
-          // if (!okToCommit)
-          //   Padding(
-          //     padding: const EdgeInsets.only(left: 8),
-          //     child: getInfoTextPrompt(
-          //         context: context, infoText: 'Release payment to commit'),
-          //   ),
+          _isCommitting
+              ? const WgtPagWait()
+              : Tooltip(
+                  message: okToCommit ? 'Commit apply info' : hintMsg,
+                  waitDuration: const Duration(milliseconds: 500),
+                  child: IconButton(
+                    onPressed: okToCommit
+                        ? () {
+                            _commitApply();
+                          }
+                        : null,
+                    icon: Icon(Icons.cloud_upload,
+                        color: okToCommit ? commitColor : null),
+                  ),
+                ),
         ],
       ),
     );
@@ -1267,6 +1387,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                       //     item['is_custom_apply_usage'] == true ||
                       //     item['is_custom_apply_interest'] == true);
                       // _populateApply2();
+                      _isPopulated = false;
                       _paymentApplyInfoListNew.clear();
                     }
                   });

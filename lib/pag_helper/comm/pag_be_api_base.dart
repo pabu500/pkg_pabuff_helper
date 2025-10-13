@@ -334,6 +334,7 @@ class PagUrlBase {
       '/ems/fin/get_payment_apply_info';
   static const String eptGetPaymentMatchOpInfo =
       '/ems/fin/get_payment_match_op_info';
+  static const String eptCommitPaymentApply = '/ems/fin/commit_payment_apply';
 
   // Tariff Package Manager
   static const String eptGetTariffPackageTariffRateInfo =
