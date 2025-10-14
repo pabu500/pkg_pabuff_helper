@@ -614,8 +614,15 @@ Widget getTotal(
   );
 }
 
-Widget getTotal2(BuildContext context, double gst, double? subTotalAmt,
-    double? gstAmt, double? totalAmt, String tenantType,
+Widget getTotal2(
+    BuildContext context,
+    double gst,
+    double? subTotalAmt,
+    double? gstAmt,
+    double? totalAmt,
+    String tenantType,
+    double? balBfUsage,
+    double? balBfInterest,
     {double width = 750.0}) {
   bool applyGst = tenantType != 'cw_nus_internal';
 
@@ -650,10 +657,8 @@ Widget getTotal2(BuildContext context, double gst, double? subTotalAmt,
                   getCommaNumberStr(subTotalAmt, decimal: 2),
                   'SGD',
                   statStrStyle: defStatStyle.copyWith(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withOpacity(0.7),
+                    color:
+                        Theme.of(context).colorScheme.onSurface.withAlpha(210),
                   ),
                 ),
               ],
@@ -679,10 +684,61 @@ Widget getTotal2(BuildContext context, double gst, double? subTotalAmt,
                   getCommaNumberStr(gstAmt, decimal: 2),
                   'SGD',
                   statStrStyle: defStatStyle.copyWith(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withOpacity(0.7),
+                    color:
+                        Theme.of(context).colorScheme.onSurface.withAlpha(210),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        // bal b/f
+        if (balBfUsage != null && balBfUsage.abs() > -0.00001)
+          Padding(
+            padding: const EdgeInsets.only(top: 5),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 210,
+                  child: Text(
+                    'Bal. B/F (Usage)',
+                    style: defStatStyle,
+                  ),
+                ),
+                horizontalSpaceSmall,
+                getStatWithUnit(
+                  getCommaNumberStr(balBfUsage, decimal: 2),
+                  'SGD',
+                  statStrStyle: defStatStyle.copyWith(
+                    color:
+                        Theme.of(context).colorScheme.onSurface.withAlpha(210),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        if (balBfInterest != null && balBfInterest.abs() > -0.00001)
+          Padding(
+            padding: const EdgeInsets.only(top: 5),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 210,
+                  child: Text(
+                    'Bal. B/F (Interest)',
+                    style: defStatStyle,
+                  ),
+                ),
+                horizontalSpaceSmall,
+                getStatWithUnit(
+                  getCommaNumberStr(balBfInterest, decimal: 2),
+                  'SGD',
+                  statStrStyle: defStatStyle.copyWith(
+                    color:
+                        Theme.of(context).colorScheme.onSurface.withAlpha(210),
                   ),
                 ),
               ],
@@ -699,10 +755,8 @@ Widget getTotal2(BuildContext context, double gst, double? subTotalAmt,
                 child: Text(
                   'Total',
                   style: defStatStyleLarge.copyWith(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withOpacity(0.7),
+                    color:
+                        Theme.of(context).colorScheme.onSurface.withAlpha(210),
                   ),
                 ),
               ),
@@ -714,8 +768,7 @@ Widget getTotal2(BuildContext context, double gst, double? subTotalAmt,
                         decimal: 2, isRoundUp: false),
                 'SGD',
                 statStrStyle: defStatStyleLarge.copyWith(
-                  color:
-                      Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                  color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
                 ),
               ),
             ],
@@ -742,7 +795,7 @@ Widget getAutoUsageExcludedInfo(BuildContext context, {double width = 750}) {
         'Auto Usage Excluded',
         style: TextStyle(
           fontSize: 18,
-          color: Theme.of(context).hintColor.withOpacity(0.5),
+          color: Theme.of(context).hintColor.withAlpha(130),
           fontWeight: FontWeight.bold,
         ),
       ),

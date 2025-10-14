@@ -290,6 +290,12 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     String toTimestampStr = _bill['to_timestamp'];
     DateTime toDatetime = getTargetDatetimeFromTargetStr(toTimestampStr);
     String billBarFromMonth = _bill['bill_bar_from_timestamp'] ?? '';
+    final balBf = _bill['balance_bf'] ?? '0';
+    final balBfUsage = _bill['balance_bf_usage'] ?? '0';
+    final balBfInterest = _bill['balance_bf_interest'] ?? '0';
+
+    final Map<String, dynamic> scopeMap =
+        widget.loggedInUser.selectedScope.toScopeMap();
 
     if (_lcStatusDisplay == PagBillingLcStatus.released ||
         _lcStatusDisplay == PagBillingLcStatus.pv) {
@@ -302,7 +308,10 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
           toTimestampStr,
           fromDatetime,
           toDatetime,
-          billBarFromMonth);
+          billBarFromMonth,
+          balBf,
+          balBfUsage,
+          balBfInterest);
     } else {
       return getGeneratedRender(
           tenantName,
@@ -313,7 +322,10 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
           toTimestampStr,
           fromDatetime,
           toDatetime,
-          billBarFromMonth);
+          billBarFromMonth,
+          balBf,
+          balBfUsage,
+          balBfInterest);
     }
   }
 
@@ -327,6 +339,9 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     DateTime fromDatetime,
     DateTime toDatetime,
     String billBarFromMonth,
+    String balBfStr,
+    String balBfUsageStr,
+    String balBfInterestStr,
   ) {
     // sort time
     bool isMonthly = true;
@@ -410,6 +425,10 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       singularUsage['usage_calc'] = emsTypeUsageCalc;
     }
 
+    double? balBf = double.tryParse(balBfStr);
+    double? balBfUsage = double.tryParse(balBfUsageStr);
+    double? balBfInterest = double.tryParse(balBfInterestStr);
+
     PagEmsTypeUsageCalc compositeUsageCalc = PagEmsTypeUsageCalc(
       costDecimals: widget.costDecimals,
       gst: 9.0,
@@ -423,6 +442,9 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       //use billed trending snapshot
       billedTrendingSnapShot: [],
       singularUsageCalcList: singularUsageCalcList,
+      balBf: balBf,
+      balBfUsage: balBfUsage,
+      balBfInterest: balBfInterest,
     );
     compositeUsageCalc.doCompositeCalc();
 
@@ -565,6 +587,9 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     DateTime fromDatetime,
     DateTime toDatetime,
     String billBarFromMonth,
+    String balBfStr,
+    String balBfUsageStr,
+    String balBfInterestStr,
   ) {
     bool isMonthly = true; //_bill['is_monthly'] == 'true' ? true : false;
     String billTimeRangeStr = getTimeRangeStr(
@@ -672,6 +697,10 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       singularUsage['usage_calc'] = emsTypeUsageCalcReleased;
     }
 
+    double balBf = double.tryParse(balBfStr) ?? 0.0;
+    double balBfUsage = double.tryParse(balBfUsageStr) ?? 0.0;
+    double balBfInterest = double.tryParse(balBfInterestStr) ?? 0.0;
+
     PagEmsTypeUsageCalcReleased compositeUsageCalc =
         PagEmsTypeUsageCalcReleased(
       costDecimals: widget.costDecimals,
@@ -705,6 +734,9 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       lineItemList: [],
       billBarFromMonth: billBarFromMonth,
       singularUsageCalcList: singularUsageCalcList,
+      balBf: balBf,
+      balBfUsage: balBfUsage,
+      balBfInterest: balBfInterest,
     );
     compositeUsageCalc.doCompositeCalc();
 
@@ -799,6 +831,9 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     DateTime fromDatetime,
     DateTime toDatetime,
     String billBarFromMonth,
+    String balBf,
+    String balBfUsage,
+    String balBfInterest,
   ) {
     bool isMonthly = true; //_bill['is_monthly'] == 'true' ? true : false;
     String billTimeRangeStr = getTimeRangeStr(

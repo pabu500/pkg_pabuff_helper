@@ -1,5 +1,4 @@
 import 'package:buff_helper/pkg_buff_helper.dart';
-import 'package:flutter/foundation.dart';
 
 import 'mdl_ems_type_usage.dart';
 import 'mdl_ems_type_usage_r2.dart';
@@ -39,6 +38,10 @@ class PagEmsTypeUsageCalc {
 
   List<PagEmsTypeUsageCalc> _singularCalcList = [];
 
+  late final double? _balBf;
+  late final double? _balBfUsage;
+  late final double? _balBfInterest;
+
   EmsTypeUsageR2? get typeUsageE => _typeUsageE;
   EmsTypeUsageR2? get typeUsageW => _typeUsageW;
   EmsTypeUsageR2? get typeUsageB => _typeUsageB;
@@ -64,6 +67,10 @@ class PagEmsTypeUsageCalc {
 
   String? get billBarFromMonth => _billBarFromMonth;
 
+  double? get balBf => _balBf;
+  double? get balBfUsage => _balBfUsage;
+  double? get balBfInterest => _balBfInterest;
+
   List<PagEmsTypeUsageCalc> get singularCalcList => _singularCalcList;
 
   PagEmsTypeUsageCalc({
@@ -78,6 +85,9 @@ class PagEmsTypeUsageCalc {
     billBarFromMonth,
     List<Map<String, dynamic>>? billedTrendingSnapShot,
     List<PagEmsTypeUsageCalc> singularUsageCalcList = const [],
+    double? balBf,
+    double? balBfUsage,
+    double? balBfInterest,
   }) {
     if (usageFactor.isEmpty) {
       throw Exception('usageFactor is empty');
@@ -96,6 +106,10 @@ class PagEmsTypeUsageCalc {
     _billBarFromMonth = billBarFromMonth;
 
     _billedTrendingSnapShot = billedTrendingSnapShot;
+
+    _balBf = balBf;
+    _balBfUsage = balBfUsage;
+    _balBfInterest = balBfInterest;
 
     if (singularUsageCalcList.isNotEmpty) {
       for (var item in singularUsageCalcList) {
@@ -371,6 +385,8 @@ class PagEmsTypeUsageCalc {
       }
       _gstAmount = getRoundUp(_gstAmount!, 2);
       _totalCost = _subTotalCost! + _gstAmount!;
+
+      _totalCost = _totalCost! + _balBfUsage! + _balBfInterest!;
     }
   }
 

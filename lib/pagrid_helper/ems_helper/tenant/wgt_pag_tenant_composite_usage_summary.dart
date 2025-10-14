@@ -199,6 +199,8 @@ class _WgtPagTenantCompositeUsageSummaryState
                   widget.compositeUsageCalc!.gstAmount,
                   widget.compositeUsageCalc!.totalCost,
                   widget.tenantType,
+                  widget.compositeUsageCalc!.balBfUsage,
+                  widget.compositeUsageCalc!.balBfInterest,
                   width: statWidth,
                 ),
             ],

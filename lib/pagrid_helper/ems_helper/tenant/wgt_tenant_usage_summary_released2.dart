@@ -170,6 +170,8 @@ class _WgtTenantUsageSummaryReleased2State
                 widget.usageCalc.gstAmount,
                 widget.usageCalc.totalCost,
                 widget.tenantType,
+                null,
+                null,
               ),
           ],
         ),
