@@ -1237,6 +1237,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           loggedInUser: loggedInUser!,
           paymentMatchInfo: item,
           tenantInfo: {
+            'tenant_id': item['tenant_id'],
             'tenant_name': item['tenant_name'],
             'tenant_label': item['tenant_label'],
           },

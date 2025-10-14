@@ -209,6 +209,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
 
     Map<String, dynamic> queryMap = {
       'scope': widget.loggedInUser.selectedScope.toScopeMap(),
+      'tenant_id': widget.tenantInfo['tenant_id'] ?? '',
       'payment_id': _paymentInfo['id'] ?? '',
       'apply_list': _paymentApplyInfoListNew,
       // 'total_applied_from_bal': totalAppliedFromBal,
@@ -981,7 +982,8 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
           if (appliedTimestampStr != null && appliedByOpUsername != null) ...[
             const SizedBox(height: 5),
             Text('Applied by $appliedByOpUsername at $appliedTimestampStr',
-                style: billKeyStyle.copyWith(fontSize: 12)),
+                style: TextStyle(
+                    fontSize: 13.5, color: Theme.of(context).hintColor)),
           ]
         ],
       ),
@@ -1448,8 +1450,10 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
       String appliedInterestAmountFromPmtStr =
           applyInfo['applied_interest_amount_from_payment'] ?? '-';
 
-      double keyWidth1 = 150.0;
+      double keyWidth1 = 180.0;
       double keyWidth2 = 85.0;
+      final keyStyle =
+          TextStyle(fontSize: 13.5, color: Theme.of(context).hintColor);
 
       appliesWidgets.add(Container(
         decoration: BoxDecoration(
@@ -1466,20 +1470,22 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
               children: [
                 Row(
                   children: [
-                    const Text('Bill: ', style: TextStyle(fontSize: 13.5)),
+                    Text('Bill: ', style: keyStyle),
                     Text(
                       billLabel,
-                      style: const TextStyle(
-                          fontSize: 15, fontWeight: FontWeight.bold),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
-                const Text('Billed Total ', style: TextStyle(fontSize: 13.5)),
-                Text(billedTotalCost,
-                    style: const TextStyle(
-                        fontSize: 15, fontWeight: FontWeight.bold)),
+                Row(
+                  children: [
+                    Text('Billed Total ', style: keyStyle),
+                    Text(billedTotalCost,
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
+                  ],
+                ),
                 Text('Applied by: $appliedByOpName at $appliedTimestamp',
-                    style: const TextStyle(fontSize: 13.5)),
+                    style: keyStyle),
               ],
             ),
             horizontalSpaceRegular,
@@ -1490,10 +1496,10 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                   children: [
                     SizedBox(
                       width: keyWidth1,
-                      child: const Align(
+                      child: Align(
                         alignment: Alignment.centerRight,
-                        child: Text('Usage Amt. from Pmt: ',
-                            style: TextStyle(fontSize: 13.5)),
+                        child:
+                            Text('Usage Amt. from Payment: ', style: keyStyle),
                       ),
                     ),
                     Text(appliedUsageAmountFromPmtStr,
@@ -1504,10 +1510,10 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                   children: [
                     SizedBox(
                       width: keyWidth1,
-                      child: const Align(
+                      child: Align(
                         alignment: Alignment.centerRight,
-                        child: Text('Interest Amt. from Pmt: ',
-                            style: TextStyle(fontSize: 13.5)),
+                        child: Text('Interest Amt. from Payment: ',
+                            style: keyStyle),
                       ),
                     ),
                     Text(appliedInterestAmountFromPmtStr,
@@ -1518,10 +1524,10 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                   children: [
                     SizedBox(
                       width: keyWidth1,
-                      child: const Align(
+                      child: Align(
                         alignment: Alignment.centerRight,
-                        child: Text('Usage Amt. from Bal: ',
-                            style: TextStyle(fontSize: 13.5)),
+                        child:
+                            Text('Usage Amt. from Balance: ', style: keyStyle),
                       ),
                     ),
                     Text(appliedUsageAmountFromBalStr,
@@ -1532,10 +1538,10 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                   children: [
                     SizedBox(
                       width: keyWidth1,
-                      child: const Align(
+                      child: Align(
                         alignment: Alignment.centerRight,
-                        child: Text('Interest Amt. from Bal: ',
-                            style: TextStyle(fontSize: 13.5)),
+                        child: Text('Interest Amt. from Balance: ',
+                            style: keyStyle),
                       ),
                     ),
                     Text(appliedInterestAmountFromBalStr,
