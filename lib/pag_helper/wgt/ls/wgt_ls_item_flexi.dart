@@ -136,6 +136,13 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
 
   int _failedPullListInfo = 0;
 
+  bool _meterUsageColumnExists = false;
+  bool _tenantUsageColumnExists = false;
+  bool _viewBillColumnExists = false;
+  bool _viewSoAColumnExists = false;
+  bool _matchPaymentColumnExists = false;
+  bool _deviceHealthColumnExists = false;
+
   Future<dynamic> _getListInfo() async {
     if (loggedInUser == null) {
       return;
@@ -381,6 +388,8 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         widget.itemKind == PagItemKind.device;
     bool isFhDevice = widget.pagAppContext! == appCtxFh &&
         widget.itemKind == PagItemKind.device;
+    bool isPaymentApply =
+        widget.listContextType == PagListContextType.paymentApply;
     if (isEmsDeviceLs ||
         isEmsMeterUsage ||
         isEmsTenantUsage ||
@@ -389,7 +398,8 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         isSoa ||
         isPp ||
         isCmDeviceLs ||
-        isFhDevice) {
+        isFhDevice ||
+        isPaymentApply) {
       addInfoViewEditColumn = false;
     }
     if (hasInfoViewEditColumn) {
@@ -455,22 +465,30 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     }
 
     if (addMeterUsageColumn) {
-      _addMeterUsageColumn(listController);
+      if (!_meterUsageColumnExists) {
+        _addMeterUsageColumn(listController);
+      }
+      _meterUsageColumnExists = true;
     }
     if (addTenantUsageColumn) {
       _addTenantUsageColumns(listController);
+      _tenantUsageColumnExists = true;
     }
     if (addViewBillColumn) {
       _addViewBillColumn(listController);
+      _viewBillColumnExists = true;
     }
     if (addViewSoAColumn) {
       _addViewSoAColumn(listController);
+      _viewSoAColumnExists = true;
     }
     if (addMatchPaymentColumn) {
       _addMatchPaymentColumn(listController);
+      _matchPaymentColumnExists = true;
     }
     if (addDeviceHealthColumn && !hasDetailColumn) {
       _addDeviceHealthColumn(listController);
+      _deviceHealthColumnExists = true;
     }
   }
 
@@ -488,7 +506,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       colTitle: 'Info',
       includeColKeyAsFilter: false,
       showColumn: true,
-      colWidth: addOpColumn ? 55 : 35,
+      colWidth: addOpColumn ? 45 : 35,
       colWidgetType: PagColWidgetType.CUSTOM,
       getCustomWidget: (item, fullList) {
         bool allowEdit = true;
@@ -576,6 +594,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
 
                       fieldList.add({
                         'show': colController.showColumn,
+                        'show_edit_panel': colController.showEditPanel,
                         'col_key': colController.colKey,
                         'label': colController.colTitle,
                         'value': value, //item[colController.colKey],
@@ -984,7 +1003,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         align: 'right',
         useComma: true,
       );
-      listController.listColControllerList.add(appCtxCol);
+      listController.listColControllerList.insert(0, appCtxCol);
     }
 
     MdlListColController appCtxCol = MdlListColController(
@@ -1097,7 +1116,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         );
       },
     );
-    listController.listColControllerList.add(appCtxCol);
+    listController.listColControllerList.insert(0, appCtxCol);
   }
 
   void _addViewBillColumn(MdlPagListController listController) {
@@ -1106,7 +1125,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       colTitle: 'Bill',
       includeColKeyAsFilter: false,
       showColumn: true,
-      colWidth: 55,
+      colWidth: 45,
       colWidgetType: PagColWidgetType.CUSTOM,
       getCustomWidget: (item, fullList) {
         bool showDetail = true;
@@ -1161,7 +1180,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         );
       },
     );
-    listController.listColControllerList.add(appCtxCol);
+    listController.listColControllerList.insert(0, appCtxCol);
   }
 
   void _addViewSoAColumn(MdlPagListController listController) {
@@ -1170,7 +1189,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       colTitle: 'SoA',
       includeColKeyAsFilter: false,
       showColumn: true,
-      colWidth: 55,
+      colWidth: 45,
       colWidgetType: PagColWidgetType.CUSTOM,
       getCustomWidget: (item, fullList) {
         bool showDetail = true;
@@ -1210,7 +1229,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       colTitle: 'Match',
       includeColKeyAsFilter: false,
       showColumn: true,
-      colWidth: 55,
+      colWidth: 45,
       colWidgetType: PagColWidgetType.CUSTOM,
       getCustomWidget: (item, fullList) {
         return WgtPaymentMatchOpItem(
@@ -1218,6 +1237,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           loggedInUser: loggedInUser!,
           paymentMatchInfo: item,
           tenantInfo: {
+            'tenant_id': item['tenant_id'],
             'tenant_name': item['tenant_name'],
             'tenant_label': item['tenant_label'],
           },
@@ -1230,9 +1250,6 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
             });
           },
           onClosed: () async {
-            // Map<String, dynamic> itemFindResult =
-            //     await _getItemList();
-            // widget.onResult?.call(itemFindResult);
             if (_itemUpdated) {
               setState(() {
                 _listContentRefreshKey = UniqueKey();

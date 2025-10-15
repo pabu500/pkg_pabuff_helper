@@ -6,6 +6,7 @@ import 'enum_helper.dart';
 enum PagFinanceType {
   soa('Statement of Account', 'soa', Symbols.contract),
   payment('Payment', 'pyt', Symbols.attach_money),
+  paymentApply('Payment Apply', 'pya', Symbols.bucket_check),
   ;
 
   const PagFinanceType(

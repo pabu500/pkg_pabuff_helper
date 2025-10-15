@@ -8,6 +8,7 @@ enum PagListContextType {
   none,
   fh,
   paymentMatching,
+  paymentApply,
 }
 
 enum PagListTypeName {

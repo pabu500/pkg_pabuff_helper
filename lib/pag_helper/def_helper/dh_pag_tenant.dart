@@ -1,6 +1,7 @@
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:buff_helper/xt_ui/util/xt_util_InputFieldValidator.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 
 import 'enum_helper.dart';
 
@@ -200,30 +201,32 @@ String? validateBillingAddressLine1(String value) {
     return 'required';
   }
   //length 5-255, alphanumeric, space, /, ', -,  # only
-  String pattern = r"^[-a-zA-Z0-9 ./'#&]{5,255}$";
+  String pattern = r"^[-a-zA-Z0-9 .,/'#&]{5,255}$";
   RegExp regExp = RegExp(pattern);
   if (!regExp.hasMatch(value)) {
-    return 'alphanumeric, space, /, -, #, & only and length 5-255';
+    return 'alphanumeric, space, /, -, #, ,, & only and length 5-255';
   }
   return null;
 }
 
 String? validateBillingAddressLine2(String value) {
   if (value.trim().isEmpty) {
-    return 'required';
+    // return 'required';
+    return null;
   }
-  //length 5-255, alphanumeric, space, /, ', -, # only
-  String pattern = r"^[-a-zA-Z0-9 ./'#&]{5,255}$";
+  //length 5-255, alphanumeric, space, /, ', -, @, #,() only
+  String pattern = r"^[-a-zA-Z0-9 ./'#@&()]{5,255}$";
   RegExp regExp = RegExp(pattern);
   if (!regExp.hasMatch(value)) {
-    return 'alphanumeric, space, /, -, #, & only and length 5-255';
+    return 'alphanumeric, space, /, -, @, #, &,() only and length 5-255';
   }
   return null;
 }
 
 String? validateBillingAddressLine3(String value) {
   if (value.trim().isEmpty) {
-    return 'required';
+    // return 'required';
+    return null;
   }
   //length 5-21, alphanumeric, space, /, ', -, # only
   String pattern = r"^[-a-zA-Z0-9 ./'#&]{5,21}$";
@@ -236,7 +239,8 @@ String? validateBillingAddressLine3(String value) {
 
 String? validateBankAccountNumber(String value) {
   if (value.trim().isEmpty) {
-    return 'required';
+    // return 'required';
+    return null;
   }
 
   // validate number, letter, underscore, and dash,
@@ -340,9 +344,10 @@ String? validateAccountNumber(String value) {
   return null;
 }
 
-String? validateDepositeAmount(String value) {
+String? validateDepositAmount(String value) {
   if (value.trim().isEmpty) {
-    return 'required';
+    // return 'required';
+    return null;
   }
   //must be a number
   if (double.tryParse(value) == null) {
@@ -382,7 +387,8 @@ String? validateBillingContactEmail(String value) {
 
 String? validateSupplyCapKva(String value) {
   if (value.trim().isEmpty) {
-    return 'required';
+    // return 'required';
+    return null;
   }
   double max = 10000;
   //must be a number
@@ -400,7 +406,8 @@ String? validateSupplyCapKva(String value) {
 String? validateSupplyCapV(String value) {
   double max = 1000;
   if (value.trim().isEmpty) {
-    return 'required';
+    // return 'required';
+    return null;
   }
   //must be a number
   if (double.tryParse(value) == null) {
@@ -417,7 +424,8 @@ String? validateSupplyCapV(String value) {
 String? validateSupplyCapAmp(String value) {
   double max = 3000;
   if (value.trim().isEmpty) {
-    return 'required';
+    // return 'required';
+    return null;
   }
   //must be a number
   if (double.tryParse(value) == null) {
@@ -633,6 +641,14 @@ final List<Map<String, dynamic>> listConfigBaseTenant = [
   //   'validator': validateBillingAddress,
   // },
   {
+    'col_key': 'account_number',
+    'title': 'Account Number',
+    'col_type': 'string',
+    'width': 200,
+    'is_mapping_required': false,
+    'validator': validateAccountNumber,
+  },
+  {
     'col_key': 'billing_address_line_1',
     'title': 'Billing Address Line 1',
     'col_type': 'string',
@@ -656,12 +672,20 @@ final List<Map<String, dynamic>> listConfigBaseTenant = [
     'is_mapping_required': false,
     'validator': validateBillingAddressLine3,
   },
+  // {
+  //   'col_key': 'account_number',
+  //   'title': 'Account Number',
+  //   'col_type': 'string',
+  //   'width': 150,
+  //   'is_mapping_required': true,
+  //   'validator': validateBankAccountNumber,
+  // },
   {
-    'col_key': 'account_number',
-    'title': 'Account Number',
+    'col_key': 'giro_account_number',
+    'title': 'Giro',
     'col_type': 'string',
     'width': 150,
-    'is_mapping_required': true,
+    'is_mapping_required': false,
     'validator': validateBankAccountNumber,
   },
   {
@@ -721,7 +745,7 @@ final List<Map<String, dynamic>> listConfigBaseTenant = [
     'col_type': 'double',
     'width': 120,
     'is_mapping_required': true,
-    'validator': validatePaymentAmount,
+    'validator': validateDepositAmount,
   },
   {
     'col_key': 'unit_type',
@@ -816,7 +840,7 @@ final List<Map<String, dynamic>> listConfigBaseTenant = [
     'title': 'Initial Balance',
     'col_type': 'double',
     'width': 150,
-    'is_mapping_required': true,
+    'is_mapping_required': false,
     'validator': validateInitialBalance,
   },
   {
@@ -824,7 +848,7 @@ final List<Map<String, dynamic>> listConfigBaseTenant = [
     'title': 'Initial Balance Date',
     'col_type': 'date',
     'width': 150,
-    'is_mapping_required': true,
+    'is_mapping_required': false,
     'validator': validateDate,
   },
 ];

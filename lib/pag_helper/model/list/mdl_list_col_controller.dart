@@ -197,8 +197,8 @@ class MdlListColController {
     }
     showEditPanel = showColumn;
 
-    if (json['show_edit'] != null) {
-      dynamic showEditPanelValue = json['show_edit'];
+    if (json['show_edit_panel'] != null) {
+      dynamic showEditPanelValue = json['show_edit_panel'];
       if (showEditPanelValue is bool) {
         showEditPanel = showEditPanelValue;
       } else if (showEditPanelValue is String) {

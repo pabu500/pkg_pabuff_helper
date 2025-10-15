@@ -14,6 +14,7 @@ import 'package:buff_helper/pag_helper/model/scope/mdl_pag_location_group_profil
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_scope.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_site_group_profile.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_site_profile.dart';
+import 'package:buff_helper/pag_helper/wgt/app/ems/wgt_payment_lc_status_op.dart';
 import 'package:buff_helper/pagrid_helper/batch_op_helper/wgt_confirm_box.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
@@ -21,8 +22,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:buff_helper/pag_helper/def_helper/def_item_group.dart';
 import 'package:provider/provider.dart';
+import 'dart:developer' as dev;
 
+import '../../comm/comm_fin_ops.dart';
 import '../../def_helper/dh_device.dart';
+import '../../def_helper/dh_pag_finance_type.dart';
 import '../../def_helper/tariff_package_helper.dart';
 import '../../model/mdl_pag_app_config.dart';
 import '../scope/wgt_scope_setter.dart';
@@ -91,6 +95,30 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
   String _deleteResultText = '';
 
   String _errorText = '';
+
+  // UniqueKey? _lcStatusOpsKey;
+  // late dynamic _lcStatusDisplay;
+
+  bool _isFetchingPaymentApplies = false;
+  bool _paymentAppliesFetched = false;
+  String _getPaymentAppliesErrorText = '';
+  List<Map<String, dynamic>> _paymentApplyList = [];
+  double? _totalAppliedAmount;
+
+  double _getTotalAppliedAmount() {
+    double total = 0.0;
+    for (var apply in _paymentApplyList) {
+      double? appliedUsageAmount =
+          double.tryParse(apply['applied_usage_amount']);
+      double? appliedInterestAmount =
+          double.tryParse(apply['applied_interest_amount']);
+      if (appliedInterestAmount == null || appliedUsageAmount == null) {
+        continue;
+      }
+      total += appliedUsageAmount + appliedInterestAmount;
+    }
+    return total;
+  }
 
   Future<List<Map<String, dynamic>>> _updateProfile(String key, String value,
       {String? oldVal, String? scopeProfileIdColName}) async {
@@ -214,6 +242,53 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
     setState(() {
       _isTenantUser = isTenantUser;
     });
+  }
+
+  Future<dynamic> _getPaymentApplies() async {
+    if (_isFetchingPaymentApplies || _paymentAppliesFetched) {
+      return;
+    }
+
+    _isFetchingPaymentApplies = true;
+    _getPaymentAppliesErrorText = '';
+
+    try {
+      Map<String, dynamic> queryMap = {
+        'scope': _loggedInUser!.selectedScope.toScopeMap(),
+        'payment_id': widget.itemIndexStr,
+        'item_kind': widget.itemKind.name,
+        'item_id_type': ItemIdType.id.name,
+      };
+
+      final result = await getPaymentApplyInfo(
+        widget.appConfig,
+        queryMap,
+        MdlPagSvcClaim(
+          username: _loggedInUser!.username,
+          userId: _loggedInUser!.id,
+          scope: '',
+          target: '',
+          operation: '',
+        ),
+      );
+
+      final paymentApplyList = result['payment_apply_list'];
+      if (paymentApplyList is List) {
+        _paymentApplyList = List<Map<String, dynamic>>.from(paymentApplyList);
+        _totalAppliedAmount = _getTotalAppliedAmount();
+      } else {
+        throw Exception('Invalid payment apply list');
+      }
+    } catch (e) {
+      dev.log(e.toString());
+      _getPaymentAppliesErrorText = 'Error getting Payment Applies';
+      rethrow;
+    } finally {
+      setState(() {
+        _isFetchingPaymentApplies = false;
+        _paymentAppliesFetched = true;
+      });
+    }
   }
 
   @override
@@ -375,8 +450,14 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
                   ),
                 ),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  // mainAxisAlignment: MainAxisAlignment.end,
                   children: [
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: getLcStatusOp(widget.fields.firstWhere(
+                          (element) => element['col_key'] == 'lc_status')),
+                    ),
+                    const Spacer(),
                     IconButton(
                       icon: const Icon(Icons.close),
                       onPressed: () {
@@ -399,6 +480,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
                 : Column(
                     // alignment: WrapAlignment.center,
                     children: [
+                      getPaymentApplyList(),
                       Container(
                         decoration: BoxDecoration(
                           border: Border.all(
@@ -625,7 +707,8 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
     }
     if (widget.itemKind == PagItemKind.jobType ||
         widget.itemKind == PagItemKind.user ||
-        widget.itemKind == PagItemKind.role) {
+        widget.itemKind == PagItemKind.role ||
+        widget.itemKind == PagItemKind.finance) {
       return Container();
     }
 
@@ -828,6 +911,259 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
             }
             return 'valid';
           },
+        ),
+      ),
+    );
+  }
+
+  Widget getLcStatusOp(Map<String, dynamic> field) {
+    if (widget.itemInfoMap == null || widget.itemInfoMap!.isEmpty) {
+      return Container();
+    }
+
+    String? lcStatusStr = widget.itemInfoMap?['lc_status'];
+    if (lcStatusStr == null || lcStatusStr.isEmpty) {
+      dev.log('lc status is null or empty');
+      return Container();
+    }
+
+    PagPaymentLcStatus? lcStatusDisplay;
+
+    switch (widget.itemKind) {
+      case PagItemKind.finance:
+        if (widget.itemType is PagFinanceType) {
+          if (widget.itemType != PagFinanceType.payment) {
+            return Container();
+          } else {
+            lcStatusDisplay = PagPaymentLcStatus.byValue(lcStatusStr);
+
+            widget.itemInfoMap!['item_kind'] = widget.itemKind.name;
+          }
+        }
+        return Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: WgtPagPaymentLcStatusOp(
+              // key: _lcStatusOpsKey,
+              appConfig: widget.appConfig,
+              loggedInUser: _loggedInUser!,
+              enableEdit: true,
+              paymentInfo: widget.itemInfoMap!,
+              initialStatus: lcStatusDisplay!,
+              totalAppliedAmount: _totalAppliedAmount,
+              onCommitted: (newStatus) {
+                setState(() {
+                  // _lcStatusOpsKey = UniqueKey();
+                  // _bill['lc_status'] = newStatus.value;
+                  field['lc_status'] = newStatus.value;
+
+                  lcStatusDisplay = newStatus;
+                });
+                dev.log('on committed: $newStatus');
+                widget.onUpdate?.call();
+              },
+            ));
+      default:
+        return Container();
+    }
+  }
+
+  Widget getPaymentApplyList() {
+    if (widget.itemKind != PagItemKind.finance ||
+        widget.itemType != PagFinanceType.payment) {
+      return Container();
+    }
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Container(
+        width: width,
+        decoration: BoxDecoration(
+          border: Border.all(color: Theme.of(context).hintColor.withAlpha(50)),
+          borderRadius: BorderRadius.circular(5),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 3),
+        child: Center(
+          child: FutureBuilder(
+              future: _getPaymentApplies(),
+              builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const WgtPagWait(size: 30);
+                } else if (snapshot.hasError) {
+                  return getErrorTextPrompt(
+                      context: context, errorText: _getPaymentAppliesErrorText);
+                  // } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  //   return const Text('No Payment Applies found');
+                } else {
+                  if (_paymentApplyList.isEmpty) {
+                    return const Text('No Payment Applies found');
+                  }
+                  List<Widget> appliesWidgets = [];
+                  appliesWidgets.add(Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0, vertical: 5.0),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Payment Applies (${_paymentApplyList.length})',
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Theme.of(context).hintColor),
+                      ),
+                    ),
+                  ));
+                  for (Map<String, dynamic> applyInfo in _paymentApplyList) {
+                    String tenantLabel = applyInfo['tenant_label'] ?? '-';
+                    String billLabel = applyInfo['bill_label'] ?? '-';
+                    String billedTotalCost =
+                        applyInfo['billed_total_cost'] ?? '-';
+                    String appliedTimestamp =
+                        applyInfo['applied_timestamp'] ?? '-';
+                    String appliedByOpName =
+                        applyInfo['applied_by_op_username'] ?? '-';
+                    String appliedUsageAmountStr =
+                        applyInfo['applied_usage_amount'] ?? '-';
+                    String appliedInterestAmountStr =
+                        applyInfo['applied_interest_amount'] ?? '-';
+
+                    double keyWidth1 = 70.0;
+                    double keyWidth2 = 85.0;
+
+                    appliesWidgets.add(Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0, vertical: 5.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: keyWidth1,
+                                    child: const Align(
+                                      alignment: Alignment.centerRight,
+                                      child: Text('Tenant: ',
+                                          style: TextStyle(fontSize: 13.5)),
+                                    ),
+                                  ),
+                                  Text(
+                                    tenantLabel,
+                                    style: const TextStyle(fontSize: 13.5),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: keyWidth1,
+                                    child: const Align(
+                                      alignment: Alignment.centerRight,
+                                      child: Text('Bill: ',
+                                          style: TextStyle(fontSize: 13.5)),
+                                    ),
+                                  ),
+                                  Text(
+                                    billLabel,
+                                    style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: keyWidth1,
+                                    child: const Align(
+                                      alignment: Alignment.centerRight,
+                                      child: Text('Applied by ',
+                                          style: TextStyle(fontSize: 13.5)),
+                                    ),
+                                  ),
+                                  Text(
+                                    appliedByOpName,
+                                    style: const TextStyle(fontSize: 13.5),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: keyWidth1,
+                                    child: const Align(
+                                      alignment: Alignment.centerRight,
+                                      child: Text('Applied on ',
+                                          style: TextStyle(fontSize: 13.5)),
+                                    ),
+                                  ),
+                                  Text(
+                                    appliedTimestamp,
+                                    style: const TextStyle(fontSize: 13.5),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          const Spacer(),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: keyWidth2,
+                                    child: const Align(
+                                      alignment: Alignment.centerRight,
+                                      child: Text('Billed Total ',
+                                          style: TextStyle(fontSize: 13.5)),
+                                    ),
+                                  ),
+                                  Text(billedTotalCost,
+                                      style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold)),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: keyWidth2,
+                                    child: const Align(
+                                      alignment: Alignment.centerRight,
+                                      child: Text('Usage Amt.',
+                                          style: TextStyle(fontSize: 13.5)),
+                                    ),
+                                  ),
+                                  Text(appliedUsageAmountStr,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold)),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: keyWidth2,
+                                    child: const Align(
+                                      alignment: Alignment.centerRight,
+                                      child: Text('Interest Amt.',
+                                          style: TextStyle(fontSize: 13.5)),
+                                    ),
+                                  ),
+                                  Text(appliedInterestAmountStr,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold)),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ));
+                  }
+                  return Column(children: appliesWidgets);
+                }
+              }),
         ),
       ),
     );

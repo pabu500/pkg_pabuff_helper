@@ -1,3 +1,4 @@
+import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:developer' as dev;
@@ -18,6 +19,7 @@ class WgtPagPaymentLcStatusOp extends StatefulWidget {
     required this.loggedInUser,
     required this.paymentInfo,
     required this.initialStatus,
+    this.totalAppliedAmount,
     this.onCommitted,
     this.enableEdit = false,
   });
@@ -26,6 +28,7 @@ class WgtPagPaymentLcStatusOp extends StatefulWidget {
   final MdlPagUser? loggedInUser;
   final Map<String, dynamic> paymentInfo;
   final PagPaymentLcStatus initialStatus;
+  final double? totalAppliedAmount;
   final Function? onCommitted;
   final bool enableEdit;
 
@@ -47,12 +50,14 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
   late PagPaymentLcStatus _selectedStatus = widget.initialStatus;
 
   bool _isCommitting = false;
+  bool _isCommitted = false;
   String _errorText = '';
 
   Future<void> _commit() async {
     if (_isCommitting) return;
 
     _isCommitting = true;
+    _isCommitted = false;
     _errorText = '';
 
     final queryMap = {
@@ -64,6 +69,8 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
         'credit_amount': widget.paymentInfo['amount'],
       },
       'target_status': _selectedStatus.value,
+      'item_kind': PagItemKind.finance.name,
+      'item_type': PagFinanceType.payment.name,
     };
     try {
       final result = await updatePaymentLcStatus(
@@ -77,20 +84,26 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
       dev.log('Payment Lc Status update result: $result');
       final newStatus = result['lc_status'];
       PagPaymentLcStatus updatedStatus = PagPaymentLcStatus.byValue(newStatus);
-      setState(() {
-        _selectedStatus = updatedStatus;
-      });
+
+      _selectedStatus = updatedStatus;
+      _isCommitted = true;
+
       widget.onCommitted?.call(updatedStatus);
+      dev.log('Payment LC status updated to $_selectedStatus');
     } catch (e) {
       if (kDebugMode) {
         print('Error committing LC status: $e');
       }
-      _errorText = 'Error committing LC status';
+      _errorText = e.toString();
+      if (_errorText.toLowerCase().contains('total applied amount')) {
+        _errorText = _errorText.replaceAll('Exception: ', '');
+      } else {
+        _errorText = 'Error committing LC status';
+      }
     } finally {
       _isCommitting = false;
-      if (mounted) {
-        setState(() {});
-      }
+
+      setState(() {});
     }
   }
 
@@ -108,9 +121,9 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
               // horizontalSpaceLarge,
               getLcStatusButton(PagPaymentLcStatus.posted),
               Icon(Symbols.chevron_forward, color: Theme.of(context).hintColor),
-              getLcStatusButton(PagPaymentLcStatus.matched),
-              Icon(Symbols.chevron_forward, color: Theme.of(context).hintColor),
               getLcStatusButton(PagPaymentLcStatus.released),
+              Icon(Symbols.chevron_forward, color: Theme.of(context).hintColor),
+              getLcStatusButton(PagPaymentLcStatus.matched),
               getCommitButton(),
             ],
           ),
@@ -140,13 +153,34 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
       //   }
       //   break;
       case PagPaymentLcStatus.posted:
-        if (status == PagPaymentLcStatus.released) {
+        if (status == PagPaymentLcStatus.matched) {
           clickEnabled = false;
         }
         break;
-      case PagPaymentLcStatus.matched:
-        break;
       case PagPaymentLcStatus.released:
+        if (status == PagPaymentLcStatus.posted) {
+          clickEnabled = false;
+        }
+        // matched status is auto set or check by backend
+        if (status == PagPaymentLcStatus.matched) {
+          // clickEnabled = false;
+          if (widget.totalAppliedAmount != null &&
+              widget.paymentInfo['amount'] != null) {
+            double? amount =
+                double.tryParse(widget.paymentInfo['amount'].toString());
+            if (amount == null) {
+              clickEnabled = false;
+            } else {
+              if (widget.totalAppliedAmount! < amount) {
+                clickEnabled = false;
+              }
+            }
+          } else {
+            clickEnabled = false;
+          }
+        }
+        break;
+      case PagPaymentLcStatus.matched:
         clickEnabled = false;
         break;
       default:
@@ -174,6 +208,9 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
 
   Widget getCommitButton() {
     if (_selectedStatus == widget.initialStatus) {
+      return Container();
+    }
+    if (_isCommitted) {
       return Container();
     }
 

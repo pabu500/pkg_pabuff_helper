@@ -338,8 +338,11 @@ class PagUrlBase {
   static const String eptBatchOpFinPostPayment =
       '/ems/fin/batch_op/post_payment';
   static const String eptFinMatchPayment = '/ems/fin/match_payment';
+  static const String eptFinGetPaymentApplyInfo =
+      '/ems/fin/get_payment_apply_info';
   static const String eptGetPaymentMatchOpInfo =
       '/ems/fin/get_payment_match_op_info';
+  static const String eptCommitPaymentApply = '/ems/fin/commit_payment_apply';
 
   // Tariff Package Manager
   static const String eptGetTariffPackageTariffRateInfo =

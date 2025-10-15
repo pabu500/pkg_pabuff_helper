@@ -343,10 +343,16 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
 
   @override
   Widget build(BuildContext context) {
-    bool enablePaneModeSwitcher = (widget.pagAppContext == appCtxEms &&
-            widget.listContextType == PagListContextType.info) ||
-        (widget.pagAppContext == appCtxCm &&
-            widget.listContextType == PagListContextType.info);
+    bool enablePaneModeSwitcher = false;
+    if (widget.pagAppContext == appCtxEms &&
+        widget.itemKind == PagItemKind.device &&
+        widget.listContextType == PagListContextType.info) {
+      enablePaneModeSwitcher = true;
+    }
+    if (widget.pagAppContext == appCtxCm &&
+        widget.listContextType == PagListContextType.info) {
+      enablePaneModeSwitcher = true;
+    }
 
     return SingleChildScrollView(
       child: Column(
@@ -577,7 +583,7 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
         ? getMeterType(itemSubTypeStr)
         : getSensorType(itemSubTypeStr);
 
-    String displayTitle = item[_displayNameKey];
+    String displayTitle = item[_displayNameKey] ?? '-';
     if (item['location_label'] != null) {
       displayTitle = '$displayTitle @ ${item['location_label']}';
     }

@@ -258,7 +258,7 @@ class _WgtListPaneState extends State<WgtListPane> {
           getCustomWidget: (item, fullList) {
             return widget.getSwitcher?.call(item, fullList, _updateDisplayMode);
           });
-      widget.listController.listColControllerList.add(switcherCol);
+      widget.listController.listColControllerList.insert(0, switcherCol);
     }
   }
 

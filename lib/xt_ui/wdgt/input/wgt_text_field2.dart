@@ -38,6 +38,7 @@ class WgtTextField extends StatefulWidget {
     this.isPag = false,
     this.suffix,
     this.unfocusOnEditingComplete = false,
+    this.textStyle,
   });
 
   final dynamic appConfig;
@@ -70,6 +71,7 @@ class WgtTextField extends StatefulWidget {
   final bool isPag;
   final Widget? suffix;
   final bool unfocusOnEditingComplete;
+  final TextStyle? textStyle;
 
   @override
   State<WgtTextField> createState() => _WgtTextFieldState();
@@ -241,6 +243,7 @@ class _WgtTextFieldState extends State<WgtTextField> {
                 FocusScope.of(context).unfocus();
               }
             },
+            style: widget.textStyle,
             decoration: widget.decoration ??
                 InputDecoration(
                   labelText: widget.labelText,
