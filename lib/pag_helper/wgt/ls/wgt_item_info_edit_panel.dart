@@ -454,8 +454,11 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(bottom: 8.0),
-                      child: getLcStatusOp(widget.fields.firstWhere(
-                          (element) => element['col_key'] == 'lc_status')),
+                      child: getLcStatusOp(
+                        widget.fields.firstWhere(
+                            (element) => element['col_key'] == 'lc_status',
+                            orElse: () => {}),
+                      ),
                     ),
                     const Spacer(),
                     IconButton(

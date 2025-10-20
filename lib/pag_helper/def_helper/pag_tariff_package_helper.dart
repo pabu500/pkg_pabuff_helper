@@ -40,3 +40,45 @@ T? enumByTag<T extends Enum>(String? tag, List<T> values) {
   }
   return null;
 }
+
+enum PagInterestDuration {
+  month('Month', 'month', Colors.amberAccent),
+  annum('Annum', 'annum', Colors.greenAccent),
+  ;
+
+  const PagInterestDuration(
+    this.label,
+    this.tag,
+    this.color,
+  );
+
+  final String label;
+  final String tag;
+  final Color color;
+
+  static PagInterestDuration? byLabel(String? label) => enumByLabel(
+        label,
+        values,
+        (e) => (e).label,
+      );
+
+  static PagInterestDuration? byTag(String? tag) => enumByTag(
+        tag,
+        values,
+      );
+}
+
+String? validateInterestRate(String? value) {
+  if (value == null || value.trim().isEmpty) {
+    return 'Interest Rate is required.';
+  }
+  final rate = double.tryParse(value);
+  if (rate == null || rate < 0) {
+    return 'Please enter a valid non-negative number for Interest Rate.';
+  }
+  // 1 to 100 percent
+  if (rate > 100) {
+    return 'Interest Rate cannot exceed 100%.';
+  }
+  return null;
+}
