@@ -3,6 +3,7 @@ import '../../pkg_buff_helper.dart';
 enum ProjectScope {
   EVS2_PA,
   EVS2_NUS,
+  EVS2_NUS_OLD,
   EVS2_SUTD,
   EVS2_NTU,
   EVS2_SMU,
@@ -629,6 +630,7 @@ String getProjectDisplayString(ProjectScope project) {
     case ProjectScope.EVS2_PA:
       return 'PA';
     case ProjectScope.EVS2_NUS:
+    case ProjectScope.EVS2_NUS_OLD:
       return 'NUS';
     case ProjectScope.EVS2_NTU:
       return 'NTU';
@@ -662,6 +664,7 @@ ItemType getProjectMeterType(ProjectScope project) {
     case ProjectScope.EVS2_PA:
       return ItemType.meter;
     case ProjectScope.EVS2_NUS:
+    case ProjectScope.EVS2_NUS_OLD:
       return ItemType.meter;
     case ProjectScope.EVS2_NTU:
       return ItemType.meter;
@@ -697,6 +700,7 @@ AclScope getAclProjectScope(ProjectScope? evs2project) {
     case ProjectScope.SG_ALL:
       return AclScope.global;
     case ProjectScope.EVS2_NUS:
+    case ProjectScope.EVS2_NUS_OLD:
       return AclScope.project_evs2_nus;
     case ProjectScope.EVS2_SUTD:
       return AclScope.project_evs2_sutd;
