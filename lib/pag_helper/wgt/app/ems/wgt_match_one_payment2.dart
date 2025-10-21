@@ -814,7 +814,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
   Widget getApplyOp(
       bool isMatchedBill,
       int index,
-      double? availableAmountToApply,
+      // double? availableAmountToApply,
       double? appliedAmountUsageFromBal,
       double? appliedAmountInterestFromBal,
       double? appliedAmountUsageFromPmt,
@@ -825,11 +825,11 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
     if (_inManualOverride) {
       isEnabled = true;
     }
-    if (!isMatchedBill) {
-      if (availableAmountToApply == null || availableAmountToApply <= 0.0) {
-        isEnabled = false;
-      }
-    }
+    // if (!isMatchedBill) {
+    // if (availableAmountToApply == null || availableAmountToApply <= 0.0) {
+    //   isEnabled = false;
+    // }
+    // }
     if (_lcStatusDisplay == PagPaymentLcStatus.matched) {
       isEnabled = false;
     }
@@ -1013,7 +1013,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
           billingRecId;
     }
 
-    double? availableAmountToApply;
+    // double? availableAmountToApply;
     double? appliedAmountUsageFromBal;
     double? appliedAmountInterestFromBal;
     double? appliedAmountUsageFromPmt;
@@ -1057,10 +1057,10 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                             '0.0') ??
                     0.0
                 : applyInfo['applied_interest_amount_from_payment'] ?? 0.0;
-        availableAmountToApply = (appliedAmountUsageFromBal ?? 0.0) +
-            (appliedAmountInterestFromBal ?? 0.0) +
-            (appliedAmountUsageFromPmt ?? 0.0) +
-            (appliedAmountInterestFromPmt ?? 0.0);
+        // availableAmountToApply = (appliedAmountUsageFromBal ?? 0.0) +
+        //     (appliedAmountInterestFromBal ?? 0.0) +
+        //     (appliedAmountUsageFromPmt ?? 0.0) +
+        //     (appliedAmountInterestFromPmt ?? 0.0);
         final appliedAmountUsage = (appliedAmountUsageFromBal ?? 0.0) +
             (appliedAmountUsageFromPmt ?? 0.0);
         final appliedAmountInterest = (appliedAmountInterestFromBal ?? 0.0) +
@@ -1155,7 +1155,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
               getApplyOp(
                   isMatchedBill,
                   index,
-                  availableAmountToApply,
+                  // availableAmountToApply,
                   appliedAmountUsageFromBal,
                   appliedAmountInterestFromBal,
                   appliedAmountUsageFromPmt,
@@ -1397,6 +1397,18 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                       // _populateApply2();
                       _isPopulated = false;
                       _paymentApplyInfoListNew.clear();
+                      _availablePaymentAmountToApply =
+                          _initialPaymentAmountToApply;
+                      _availableExcessiveBalanceToApply =
+                          _initialExcessiveBalanceToApply;
+                    } else {
+                      _isPopulated = false;
+                      _paymentApplyInfoListNew.clear();
+                      _availablePaymentAmountToApply =
+                          _initialPaymentAmountToApply;
+                      _availableExcessiveBalanceToApply =
+                          _initialExcessiveBalanceToApply;
+                      // _populateApply2();
                     }
                   });
                 }

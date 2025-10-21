@@ -58,7 +58,7 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
     this.identifySingleItem = false,
     this.getCountOnly = false,
     this.showTimeRangePicker = false,
-    this.timeRangePicker,
+    this.timeRangePickerWidget,
     this.initialType,
     this.initialNoR,
     this.iniShowPanel,
@@ -69,6 +69,8 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
     this.validator,
     this.isCompactMode = false,
     this.isSingleItemMode = false,
+    this.initialFilterMap = const {},
+    this.isInitialValueMutable = false,
   });
 
   final MdlPagUser loggedInUser;
@@ -90,7 +92,7 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
   final bool identifySingleItem;
   final bool getCountOnly;
   final bool showTimeRangePicker;
-  final Widget? timeRangePicker;
+  final Widget? timeRangePickerWidget;
   final String? initialType;
   final int? initialNoR;
   final bool? iniShowPanel;
@@ -101,6 +103,8 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
   final String? Function(String)? validator;
   final bool isCompactMode;
   final bool isSingleItemMode;
+  final Map<String, dynamic> initialFilterMap;
+  final bool isInitialValueMutable;
 
   @override
   State<WgtPagItemFinderFlexi> createState() => _WgtPagItemFinderFlexiState();
@@ -746,9 +750,9 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
                 // getItemPropertySelector(330),
                 verticalSpaceTiny,
                 // getScopeSelector(),
-                if (widget.timeRangePicker != null) verticalSpaceTiny,
-                if (widget.timeRangePicker != null)
-                  Row(children: [widget.timeRangePicker!]),
+                if (widget.timeRangePickerWidget != null) verticalSpaceTiny,
+                if (widget.timeRangePickerWidget != null)
+                  Row(children: [widget.timeRangePickerWidget!]),
                 verticalSpaceSmall,
                 getOptions(),
               ],
@@ -990,6 +994,14 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
       if (colController.showColumn == false) continue;
       if (!_isFullPanel && !colController.pinned) continue;
 
+      String? initialValue;
+      for (var entry in widget.initialFilterMap.entries) {
+        if (entry.key == colController.colKey) {
+          initialValue = entry.value.toString();
+          break;
+        }
+      }
+
       if (colController.filterGroupType == PagFilterGroupType.IDENTITY) {
         UniqueKey? resetKey = colController.filterResetKey;
         list.add(
@@ -1011,6 +1023,8 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
                     labelText: colController.filterLabel,
                     hintText: colController.filterLabel,
                     resetKey: resetKey,
+                    initialValue: initialValue,
+                    isInitialValueMutable: widget.isInitialValueMutable,
                     onChanged: (value) {
                       colController.filterValue = {
                         'value': value,
