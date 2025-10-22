@@ -129,7 +129,7 @@ class MdlPagListController /*extends ChangeNotifier*/ {
         case 'bill':
           itemType = PagItemKind.bill;
         case 'soa':
-          itemType = PagFinanceType.soa;
+          itemType = PagFinanceType.tenantSoa;
           break;
         case 'payment':
           itemType = PagFinanceType.payment;

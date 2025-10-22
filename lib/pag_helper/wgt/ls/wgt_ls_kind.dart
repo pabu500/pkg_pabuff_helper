@@ -321,7 +321,7 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
           itemTypeList.add(scopeType.name);
         }
       } else if (widget.itemKind == PagItemKind.finance) {
-        _itemTypeInfoList.add({'item_type': PagFinanceType.soa});
+        _itemTypeInfoList.add({'item_type': PagFinanceType.tenantSoa});
         _itemTypeInfoList.add({'item_type': PagFinanceType.payment});
 
         for (Map<String, dynamic> financeTypeInfo in _itemTypeInfoList) {

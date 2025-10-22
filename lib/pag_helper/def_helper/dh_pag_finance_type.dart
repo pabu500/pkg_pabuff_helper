@@ -4,18 +4,20 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'enum_helper.dart';
 
 enum PagFinanceType {
-  soa('Statement of Account', 'soa', Symbols.contract),
-  payment('Payment', 'pyt', Symbols.attach_money),
-  paymentApply('Payment Apply', 'pya', Symbols.bucket_check),
+  tenantSoa('Statement of Account', 'tenant_soa', 'soa', Symbols.contract),
+  payment('Payment', 'payment', 'pyt', Symbols.attach_money),
+  paymentApply('Payment Apply', 'payment_apply', 'pya', Symbols.bucket_check),
   ;
 
   const PagFinanceType(
     this.label,
+    this.value,
     this.tag,
     this.iconData,
   );
 
   final String label;
+  final String value;
   final String tag;
   final IconData iconData;
 
@@ -25,7 +27,7 @@ enum PagFinanceType {
         values,
         (e) => (e).tag,
       ) ??
-      soa;
+      tenantSoa;
 
   static PagFinanceType? byLabel(String? label) => enumByLabel(
         label,
@@ -51,8 +53,8 @@ T? enumByTag<T extends Enum>(String? tag, List<T> values) {
 
 String getPagFinanceTypeStr(dynamic itemType) {
   switch (itemType) {
-    case PagFinanceType.soa:
-      return PagFinanceType.soa.name;
+    case PagFinanceType.tenantSoa:
+      return PagFinanceType.tenantSoa.name;
     case PagFinanceType.payment:
       return PagFinanceType.payment.name;
     default:

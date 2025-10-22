@@ -231,13 +231,15 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
       pagAppContext: widget.pagAppContext,
       itemKind: PagItemKind.finance,
       // itemType: PagFinanceType.soa,
-      itemTypeListStr: PagFinanceType.soa.name,
+      itemTypeListStr: PagFinanceType.tenantSoa.value,
       prefKey: widget.pagAppContext.route,
       listContextType: PagListContextType.soa,
       showTimeRangePicker: true,
       timeRangePickerWidget: getTimeRangePicker(),
       initialFilterMap: {
         'tenant_id': widget.teneantInfo['id'],
+        'tenant_name': tenantName,
+        'tenant_label': tenantLabel,
       },
     );
   }
