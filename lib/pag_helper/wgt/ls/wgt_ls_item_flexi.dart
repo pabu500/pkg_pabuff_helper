@@ -71,6 +71,9 @@ class WgtListSearchItemFlexi extends StatefulWidget {
     this.isSingleItemMode = false,
     this.showList = true,
     this.width,
+    this.showTimeRangePicker = false,
+    this.timeRangePickerWidget,
+    this.initialFilterMap = const {},
   });
 
   final MdlPagAppConfig appConfig;
@@ -99,6 +102,9 @@ class WgtListSearchItemFlexi extends StatefulWidget {
   final bool isSingleItemMode;
   final bool showList;
   final double? width;
+  final bool showTimeRangePicker;
+  final Widget? timeRangePickerWidget;
+  final Map<String, dynamic> initialFilterMap;
 
   @override
   State<WgtListSearchItemFlexi> createState() => _WgtListSearchItemFlexiState();
@@ -1468,6 +1474,9 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         meterTypeList: meterTypeList,
         // right padding as clerance for context menu
         sidePadding: const EdgeInsets.only(left: 0, right: 60),
+        showTimeRangePicker: widget.showTimeRangePicker,
+        timeRangePickerWidget: widget.timeRangePickerWidget,
+        initialFilterMap: widget.initialFilterMap,
         onSearching: () {
           setState(() {
             _isFetchingItemList = true;

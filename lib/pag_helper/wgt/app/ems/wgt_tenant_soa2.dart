@@ -206,71 +206,13 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
             color: Theme.of(context).hintColor,
           ),
         ),
-        const SizedBox(height: 16),
+        verticalSpaceSmall,
         Text(
           'Tenant: $tenantName ($tenantLabel)',
           style: TextStyle(
             fontSize: 16,
             color: Theme.of(context).colorScheme.onSurface,
           ),
-        ),
-        verticalSpaceSmall,
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            WgtPagDateRangePickerMonthly(
-              // key: _timePickerKey,
-              iniEndDateTime: _toDate,
-              iniStartDateTime: _fromDate,
-              customRangeSelected: _customDateRangeSelected,
-              monthPicked: _pickedMonth,
-              populateDefaultRange: false,
-              onRangeSet: (startDate, endDate) async {
-                if (startDate == null || endDate == null) return;
-                _resetTimeRangPicker(resetDateRange: true);
-                setState(() {
-                  _fromDate = startDate;
-                  _toDate = endDate;
-
-                  _customDateRangeSelected = true;
-                  _isMTD = false;
-                  _pickedMonth = null;
-
-                  // _timePickerKey = UniqueKey();
-                  _enableSearch = _enableSearchButton();
-                });
-                // widget.onModified?.call();
-              },
-              onMonthPicked: (selected) {
-                _resetTimeRangPicker(resetDateRange: true);
-                setState(() {
-                  // _timePickerKey = UniqueKey();
-                  _pickedMonth = selected;
-                  _fromDate = DateTime(selected.year, selected.month, 1);
-                  _toDate = DateTime(selected.year, selected.month + 1, 1);
-                  // _customRange = false;
-                  DateTime localNow = getTargetLocalDatetimeNow(
-                      widget.loggedInUser.selectedScope.getProjectTimezone());
-                  _isMTD = false;
-                  if (localNow.year == selected.year &&
-                      localNow.month == selected.month) {
-                    _isMTD = true;
-                  }
-                  _enableSearch = _enableSearchButton();
-                });
-                // widget.onModified?.call();
-              },
-            ),
-            horizontalSpaceSmall,
-            WgtCommButton(
-                label: 'Fetch SoA',
-                onPressed: !_enableSearch
-                    ? null
-                    : () async {
-                        await _doFetchSoaData();
-                      }),
-          ],
         ),
         verticalSpaceSmall,
         getSoAContainer(),
@@ -280,28 +222,6 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
   }
 
   Widget getSoAContainer() {
-    // Widget wgt = const SizedBox.shrink();
-    // if (!_fetched) {
-    //   return wgt;
-    // } else if (_errorText.isNotEmpty) {
-    //   wgt = getErrorTextPrompt(context: context, errorText: _errorText);
-    // } else if (_fetched && _soaData.isEmpty) {
-    //   wgt = const Text('No SoA data available for this tenant.');
-    // } else {
-    //   wgt = SingleChildScrollView(
-    //       child: Column(
-    //     crossAxisAlignment: CrossAxisAlignment.start,
-    //     children: [getSoA2()],
-    //   ));
-    // }
-    // return Container(
-    //   decoration: BoxDecoration(
-    //     borderRadius: BorderRadius.circular(5.0),
-    //     border: Border.all(color: Theme.of(context).hintColor, width: 1.0),
-    //   ),
-    //   padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
-    //   child: wgt,
-    // );
     return getSoA2();
   }
 
@@ -310,120 +230,61 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
       appConfig: widget.appConfig,
       pagAppContext: widget.pagAppContext,
       itemKind: PagItemKind.finance,
-      itemType: PagFinanceType.soa,
+      // itemType: PagFinanceType.soa,
+      itemTypeListStr: PagFinanceType.soa.name,
       prefKey: widget.pagAppContext.route,
       listContextType: PagListContextType.soa,
+      showTimeRangePicker: true,
+      timeRangePickerWidget: getTimeRangePicker(),
+      initialFilterMap: {
+        'tenant_id': widget.teneantInfo['id'],
+      },
     );
   }
 
-  // Widget getSoA() {
-  //   return Container(
-  //     padding: const EdgeInsets.all(3.0),
-  //     // build list
-  //     child: ListView.builder(
-  //       shrinkWrap: true,
-  //       physics: const NeverScrollableScrollPhysics(),
-  //       itemCount: _soaData.length + (_soaData.isNotEmpty ? 1 : 0),
-  //       itemBuilder: (context, index) {
-  //         // if header
-  //         if (index == 0) {
-  //           return getSoaHeader();
-  //         }
-  //         final item = _soaData[index - 1];
-  //         return getSoaRow(item);
-  //       },
-  //     ),
-  //   );
-  // }
+  Widget getTimeRangePicker() {
+    return WgtPagDateRangePickerMonthly(
+      // key: _timePickerKey,
+      iniEndDateTime: _toDate,
+      iniStartDateTime: _fromDate,
+      customRangeSelected: _customDateRangeSelected,
+      monthPicked: _pickedMonth,
+      populateDefaultRange: false,
+      onRangeSet: (startDate, endDate) async {
+        if (startDate == null || endDate == null) return;
+        _resetTimeRangPicker(resetDateRange: true);
+        setState(() {
+          _fromDate = startDate;
+          _toDate = endDate;
 
-  // Widget getSoaRow(Map<String, dynamic> item) {
-  //   String date = item['entry_timestamp'] ?? '';
-  //   // only show date if it is not empty
-  //   if (date.isNotEmpty) {
-  //     date = DateTime.parse(date).toLocal().toIso8601String().split('T')[0];
-  //   }
+          _customDateRangeSelected = true;
+          _isMTD = false;
+          _pickedMonth = null;
 
-  //   TextStyle rowStyle =
-  //       TextStyle(color: Theme.of(context).colorScheme.onSurface);
-
-  //   return Row(
-  //     mainAxisSize: MainAxisSize.min,
-  //     mainAxisAlignment: MainAxisAlignment.spaceAround,
-  //     children: [
-  //       SizedBox(width: 100, child: Text(date, style: rowStyle)),
-  //       SizedBox(
-  //         width: 100,
-  //         child: Text(
-  //           item['entry_type'] == 'debit'
-  //               ? item['debit_amount'].toString()
-  //               : '',
-  //           style: rowStyle.copyWith(color: Colors.red),
-  //         ),
-  //       ),
-  //       SizedBox(
-  //         width: 100,
-  //         child: Text(
-  //           item['entry_type'] == 'credit'
-  //               ? item['credit_amount'].toString()
-  //               : '',
-  //           style: rowStyle.copyWith(color: Colors.green),
-  //         ),
-  //       ),
-  //       SizedBox(
-  //         width: 100,
-  //         child: Text(item['balance'] ?? '', style: rowStyle),
-  //       ),
-  //       SizedBox(
-  //         width: 200,
-  //         child: Text(item['description'] ?? '', style: rowStyle),
-  //       ),
-  //     ],
-  //   );
-  // }
-
-  // Widget getSoaHeader() {
-  //   TextStyle headerStyle = TextStyle(
-  //     fontSize: 16,
-  //     fontWeight: FontWeight.bold,
-  //     color: Theme.of(context).hintColor,
-  //   );
-  //   return Container(
-  //     // underline
-  //     decoration: BoxDecoration(
-  //       border: Border(
-  //         bottom: BorderSide(
-  //           color: Theme.of(context).hintColor,
-  //           width: 1.0,
-  //         ),
-  //       ),
-  //     ),
-  //     margin: const EdgeInsets.only(bottom: 5.0),
-  //     child: Row(
-  //       mainAxisSize: MainAxisSize.min,
-  //       mainAxisAlignment: MainAxisAlignment.spaceAround,
-  //       children: [
-  //         SizedBox(
-  //           width: 90,
-  //           child: Text('Date', style: headerStyle),
-  //         ),
-  //         SizedBox(
-  //           width: 90,
-  //           child: Text('Debit', style: headerStyle),
-  //         ),
-  //         SizedBox(
-  //           width: 90,
-  //           child: Text('Credit', style: headerStyle),
-  //         ),
-  //         SizedBox(
-  //           width: 90,
-  //           child: Text('Balance', style: headerStyle),
-  //         ),
-  //         SizedBox(
-  //           width: 200,
-  //           child: Text('Description', style: headerStyle),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
+          // _timePickerKey = UniqueKey();
+          _enableSearch = _enableSearchButton();
+        });
+        // widget.onModified?.call();
+      },
+      onMonthPicked: (selected) {
+        _resetTimeRangPicker(resetDateRange: true);
+        setState(() {
+          // _timePickerKey = UniqueKey();
+          _pickedMonth = selected;
+          _fromDate = DateTime(selected.year, selected.month, 1);
+          _toDate = DateTime(selected.year, selected.month + 1, 1);
+          // _customRange = false;
+          DateTime localNow = getTargetLocalDatetimeNow(
+              widget.loggedInUser.selectedScope.getProjectTimezone());
+          _isMTD = false;
+          if (localNow.year == selected.year &&
+              localNow.month == selected.month) {
+            _isMTD = true;
+          }
+          _enableSearch = _enableSearchButton();
+        });
+        // widget.onModified?.call();
+      },
+    );
+  }
 }
