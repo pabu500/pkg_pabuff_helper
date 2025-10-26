@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:buff_helper/pag_helper/comm/comm_pag_item.dart';
-import 'package:buff_helper/pag_helper/def_helper/dh_pag_finance_type.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_pag_finance.dart';
 import 'package:buff_helper/pag_helper/def_helper/list_helper.dart';
 import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
@@ -665,6 +665,21 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     _loadCustomize();
 
     _lastLoadingTime = DateTime.now();
+
+    // set initial filter values if any
+    String initialValue = '';
+    for (var colController in widget.listController.listColControllerList) {
+      for (var entry in widget.initialFilterMap.entries) {
+        if (entry.key == colController.colKey) {
+          initialValue = entry.value.toString();
+          colController.filterValue = {
+            'value': initialValue,
+            'label': initialValue
+          };
+          break;
+        }
+      }
+    }
   }
 
   @override
@@ -998,11 +1013,18 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
       for (var entry in widget.initialFilterMap.entries) {
         if (entry.key == colController.colKey) {
           initialValue = entry.value.toString();
+          // colController.filterValue = {
+          //   'value': initialValue,
+          //   'label': initialValue
+          // };
           break;
         }
       }
 
       if (colController.filterGroupType == PagFilterGroupType.IDENTITY) {
+        if (widget.initialFilterMap.isNotEmpty && initialValue == null) {
+          continue;
+        }
         UniqueKey? resetKey = colController.filterResetKey;
         list.add(
           Padding(
@@ -1074,6 +1096,10 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   }
 
   List<Widget> getItemSpecGroupList() {
+    if (widget.initialFilterMap.isNotEmpty) {
+      return [];
+    }
+
     List<Widget> list = [];
     for (MdlListColController colController
         in widget.listController.listColControllerList) {

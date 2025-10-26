@@ -10,7 +10,7 @@ import 'dart:developer' as dev;
 import '../../../../pagrid_helper/ems_helper/billing_helper/wgt_pag_composite_bill_view.dart';
 import '../../../../xt_ui/wdgt/wgt_pag_wait.dart';
 import '../../../comm/comm_fin_ops.dart';
-import '../../../def_helper/dh_pag_finance_type.dart';
+import '../../../def_helper/dh_pag_finance.dart';
 import 'wgt_payment_lc_status_op.dart';
 
 class WgtMatchOnePayment2 extends StatefulWidget {

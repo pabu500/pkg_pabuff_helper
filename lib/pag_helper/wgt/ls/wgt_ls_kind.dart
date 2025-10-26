@@ -15,7 +15,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:provider/provider.dart';
 import '../../def_helper/dh_device.dart';
-import '../../def_helper/dh_pag_finance_type.dart';
+import '../../def_helper/dh_pag_finance.dart';
 import '../../model/mdl_pag_app_config.dart';
 import '../../wgt/history_presentor/wgt_pag_item_history_presenter.dart';
 import 'wgt_ls_item_flexi.dart';

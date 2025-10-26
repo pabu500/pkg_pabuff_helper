@@ -109,3 +109,43 @@ Widget getPaymentLcStatusTagWidget(
     ),
   );
 }
+
+enum PagSoaEntryType {
+  initialBalance('Initial Balance', 'initial_balance', 'init', Colors.teal),
+  tenantSoa('Bill', 'bill', 'bill', Colors.deepOrangeAccent),
+  payment('Payment', 'payment', 'pmt', Colors.green),
+  paymentApply('Payment Apply', 'payment_apply', 'pya', Colors.orangeAccent),
+  adjustment('Adjustment', 'adjustment', 'adj', Colors.blueAccent),
+  ;
+
+  const PagSoaEntryType(
+    this.label,
+    this.value,
+    this.tag,
+    this.color,
+  );
+
+  final String label;
+  final String value;
+  final String tag;
+  final Color color;
+
+  static PagSoaEntryType byValue(String? value) =>
+      enumByLabel(
+        value,
+        values,
+        (e) => (e).value,
+      ) ??
+      tenantSoa;
+
+  static PagSoaEntryType? byLabel(String? label) => enumByLabel(
+        label,
+        values,
+        (e) => (e).label,
+      );
+
+  static PagSoaEntryType? byTag(String? tag) => enumByTag(
+        tag,
+        values,
+      );
+}
