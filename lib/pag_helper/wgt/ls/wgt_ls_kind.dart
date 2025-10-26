@@ -326,7 +326,7 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
 
         for (Map<String, dynamic> financeTypeInfo in _itemTypeInfoList) {
           PagFinanceType financeType = financeTypeInfo['item_type'];
-          itemTypeList.add(financeType.name);
+          itemTypeList.add(financeType.value);
         }
       } else {
         throw Exception('Unsupported item kind: ${widget.itemKind.name}');
