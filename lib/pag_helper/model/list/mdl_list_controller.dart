@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 
 import '../../def_helper/dh_device.dart';
-import '../../def_helper/dh_pag_finance_type.dart';
+import '../../def_helper/dh_pag_finance.dart';
 
 class MdlPagListController /*extends ChangeNotifier*/ {
   // PagItemKind pagItemKind;
