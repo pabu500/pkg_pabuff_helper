@@ -4,7 +4,6 @@ import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'dart:developer' as dev;
 
@@ -12,7 +11,6 @@ import '../../../comm/comm_fh.dart';
 import '../../../model/acl/mdl_pag_svc_claim.dart';
 import '../../../model/mdl_pag_app_config.dart';
 import '../../ls/wgt_pag_dashboard_list.dart';
-import 'wgt_scope_issue_panel.dart';
 
 class WgtFhDeviceHealth extends StatefulWidget {
   const WgtFhDeviceHealth({
@@ -39,8 +37,9 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
   late final TextStyle valueStyle =
       const TextStyle(fontWeight: FontWeight.bold, fontSize: 18);
   final keyWidth = 30.0;
+  final keyIconSize = 25.0;
   final valueWidth = null;
-  final contentWidth = 365.0;
+  final contentWidth = 375.0;
 
   final okColor = Colors.green.shade700;
   late final errorColor = Theme.of(context).colorScheme.error;
@@ -314,7 +313,7 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
     final signalPercentage = content['s'] == null
         ? '-'
         : '${(int.parse(content['s'] as String) * 100 / 31).clamp(0, 100).toInt()}%';
-    final ping = content['p'] == null ? ' - ' : '${content['p']} ms';
+    final ping = content['p'] == null ? ' - ' : '${content['p']}ms';
 
     return Container(
       decoration: BoxDecoration(
@@ -341,7 +340,7 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
               ],
             ),
           ),
-          verticalSpaceTiny,
+          verticalSpaceSmall,
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
@@ -351,10 +350,9 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
                 waitDuration: const Duration(milliseconds: 500),
                 child: Row(
                   children: [
-                    SizedBox(
-                        width: keyWidth,
-                        child: Icon(Symbols.deployed_code,
-                            color: Theme.of(context).hintColor)),
+                    Icon(Symbols.deployed_code,
+                        size: keyIconSize - 3,
+                        color: Theme.of(context).hintColor),
                     SizedBox(
                         width: valueWidth,
                         child: Text(version, style: valueStyle)),
@@ -367,10 +365,9 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
                 waitDuration: const Duration(milliseconds: 500),
                 child: Wrap(
                   children: [
-                    SizedBox(
-                        width: keyWidth,
-                        child: Icon(Symbols.thermostat,
-                            color: Theme.of(context).hintColor)),
+                    Icon(Symbols.thermostat,
+                        size: keyIconSize - 2,
+                        color: Theme.of(context).hintColor),
                     SizedBox(
                         width: valueWidth,
                         child: Text('$temperature°C', style: valueStyle)),
@@ -383,14 +380,13 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
                 waitDuration: const Duration(milliseconds: 500),
                 child: Wrap(
                   children: [
-                    SizedBox(
-                        width: keyWidth,
-                        child: Icon(Symbols.signal_cellular_alt,
-                            color: Theme.of(context).hintColor)),
+                    Icon(Symbols.signal_cellular_alt,
+                        size: keyIconSize - 2,
+                        color: Theme.of(context).hintColor),
                     // horizontalSpaceTiny,
                     SizedBox(
                         width: valueWidth,
-                        child: Text('$signal ($signalPercentage)',
+                        child: Text('$signal:$signalPercentage',
                             style: valueStyle)),
                   ],
                 ),
@@ -401,15 +397,13 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
                 waitDuration: const Duration(milliseconds: 500),
                 child: Wrap(
                   children: [
-                    SizedBox(
-                        width: keyWidth,
-                        child: Icon(Symbols.info,
-                            color: Theme.of(context).hintColor)),
+                    Icon(Symbols.network_ping,
+                        size: keyIconSize - 2,
+                        color: Theme.of(context).hintColor),
                     // horizontalSpaceTiny,
                     SizedBox(
                         width: valueWidth,
-                        child: Text(ping,
-                            style: valueStyle)),
+                        child: Text(ping, style: valueStyle)),
                   ],
                 ),
               ),
