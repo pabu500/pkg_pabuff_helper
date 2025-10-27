@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../comm/comm_fin_ops.dart';
-import '../../../def_helper/dh_pag_finance_type.dart';
+import '../../../def_helper/dh_pag_finance.dart';
 import '../../../model/acl/mdl_pag_svc_claim.dart';
 import '../../../model/mdl_pag_app_config.dart';
 import '../../wgt_comm_button.dart';

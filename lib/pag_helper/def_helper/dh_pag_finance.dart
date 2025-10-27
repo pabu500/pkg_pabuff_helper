@@ -4,18 +4,20 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'enum_helper.dart';
 
 enum PagFinanceType {
-  soa('Statement of Account', 'soa', Symbols.contract),
-  payment('Payment', 'pyt', Symbols.attach_money),
-  paymentApply('Payment Apply', 'pya', Symbols.bucket_check),
+  tenantSoa('Statement of Account', 'tenant_soa', 'soa', Symbols.contract),
+  payment('Payment', 'payment', 'pyt', Symbols.attach_money),
+  paymentApply('Payment Apply', 'payment_apply', 'pya', Symbols.bucket_check),
   ;
 
   const PagFinanceType(
     this.label,
+    this.value,
     this.tag,
     this.iconData,
   );
 
   final String label;
+  final String value;
   final String tag;
   final IconData iconData;
 
@@ -25,7 +27,7 @@ enum PagFinanceType {
         values,
         (e) => (e).tag,
       ) ??
-      soa;
+      tenantSoa;
 
   static PagFinanceType? byLabel(String? label) => enumByLabel(
         label,
@@ -51,8 +53,8 @@ T? enumByTag<T extends Enum>(String? tag, List<T> values) {
 
 String getPagFinanceTypeStr(dynamic itemType) {
   switch (itemType) {
-    case PagFinanceType.soa:
-      return PagFinanceType.soa.name;
+    case PagFinanceType.tenantSoa:
+      return PagFinanceType.tenantSoa.name;
     case PagFinanceType.payment:
       return PagFinanceType.payment.name;
     default:
@@ -106,4 +108,44 @@ Widget getPaymentLcStatusTagWidget(
           ),
     ),
   );
+}
+
+enum PagSoaEntryType {
+  initialBalance('Initial Balance', 'initial_balance', 'init', Colors.teal),
+  tenantSoa('Bill', 'bill', 'bill', Colors.deepOrangeAccent),
+  payment('Payment', 'payment', 'pmt', Colors.green),
+  paymentApply('Payment Apply', 'payment_apply', 'pya', Colors.orangeAccent),
+  adjustment('Adjustment', 'adjustment', 'adj', Colors.blueAccent),
+  ;
+
+  const PagSoaEntryType(
+    this.label,
+    this.value,
+    this.tag,
+    this.color,
+  );
+
+  final String label;
+  final String value;
+  final String tag;
+  final Color color;
+
+  static PagSoaEntryType byValue(String? value) =>
+      enumByLabel(
+        value,
+        values,
+        (e) => (e).value,
+      ) ??
+      tenantSoa;
+
+  static PagSoaEntryType? byLabel(String? label) => enumByLabel(
+        label,
+        values,
+        (e) => (e).label,
+      );
+
+  static PagSoaEntryType? byTag(String? tag) => enumByTag(
+        tag,
+        values,
+      );
 }

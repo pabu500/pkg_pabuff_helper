@@ -1,11 +1,10 @@
 import 'package:buff_helper/pag_helper/def_helper/list_helper.dart';
-import 'package:buff_helper/pag_helper/wgt/wgt_comm_button.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../../comm/comm_tenant.dart';
-import '../../../def_helper/dh_pag_finance_type.dart';
+import '../../../def_helper/dh_pag_finance.dart';
 import '../../../def_helper/pag_item_helper.dart';
 import '../../../model/acl/mdl_pag_svc_claim.dart';
 import '../../../model/mdl_pag_app_config.dart';
@@ -231,13 +230,15 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
       pagAppContext: widget.pagAppContext,
       itemKind: PagItemKind.finance,
       // itemType: PagFinanceType.soa,
-      itemTypeListStr: PagFinanceType.soa.name,
+      itemTypeListStr: PagFinanceType.tenantSoa.value,
       prefKey: widget.pagAppContext.route,
       listContextType: PagListContextType.soa,
       showTimeRangePicker: true,
       timeRangePickerWidget: getTimeRangePicker(),
       initialFilterMap: {
         'tenant_id': widget.teneantInfo['id'],
+        'tenant_name': tenantName,
+        'tenant_label': tenantLabel,
       },
     );
   }
