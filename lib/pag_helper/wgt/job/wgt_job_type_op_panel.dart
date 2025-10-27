@@ -155,6 +155,8 @@ class _WgtJobTypeOpPanelState extends State<WgtJobTypeOpPanel> {
     });
   }
 
+  void _initOpSettings() {}
+
   @override
   void initState() {
     super.initState();
@@ -162,6 +164,8 @@ class _WgtJobTypeOpPanelState extends State<WgtJobTypeOpPanel> {
     _loggedInUser =
         Provider.of<PagUserProvider>(context, listen: false).currentUser;
     _itemDisplayName = widget.itemDisplayName;
+
+    _initOpSettings();
   }
 
   @override
