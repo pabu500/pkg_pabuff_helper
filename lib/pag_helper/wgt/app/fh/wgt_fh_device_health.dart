@@ -40,7 +40,7 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
       const TextStyle(fontWeight: FontWeight.bold, fontSize: 18);
   final keyWidth = 30.0;
   final valueWidth = null;
-  final contentWidth = 380.0;
+  final contentWidth = 365.0;
 
   final okColor = Colors.green.shade700;
   late final errorColor = Theme.of(context).colorScheme.error;
@@ -262,7 +262,6 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
     final temperature = content['t'];
     final signal = content['s'];
     final errorList = content['el'] ?? [];
-    final ping = content['p'] ?? '-';
 
     final meterGroupLabel =
         _gatewayHealthData['meter_group_label'] ?? 'Unknown';
