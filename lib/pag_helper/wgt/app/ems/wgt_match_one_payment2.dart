@@ -124,6 +124,9 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
       if (paymentInfo == null) {
         throw Exception("No payment info found in the response");
       }
+      final excessiveBalance =
+          double.tryParse(result['excessive_balance']?.toString() ?? '0.0') ??
+              0.0;
       final billList = result['bill_list'] ?? [];
       final paymentApplyInfoList = result['payment_apply_info_list'] ?? [];
       // final itemList = result['item_list'] ?? [];
@@ -137,7 +140,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
       _initialPaymentAmountToApply = _paymentAmount;
       _availablePaymentAmountToApply = _paymentAmount;
 
-      _initialExcessiveBalanceToApply = 50.0; // hard coded for now
+      _initialExcessiveBalanceToApply = excessiveBalance;
       _availableExcessiveBalanceToApply = _initialExcessiveBalanceToApply;
 
       for (var paymentApplyInfo in paymentApplyInfoList) {
@@ -168,8 +171,11 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
             _availableExcessiveBalanceToApply! - totalAppliedFromBal;
       }
     } catch (e) {
-      dev.log('Error fetching bill list: $e');
-      _errorText = 'Failed to fetch bills';
+      dev.log('Error fetching match op info: $e');
+      _errorText = 'Failed to fetch match op info';
+      if (e.toString().toLowerCase().contains('soa not initialized')) {
+        _errorText = 'SoA not initialized for this tenant';
+      }
     } finally {
       setState(() {
         _isFetchingBillList = false;
@@ -717,6 +723,15 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
                               style: mainTextStyle),
                         ],
                       ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                              widget.paymentMatchingInfo?['value_timestamp'] ??
+                                  '',
+                              style: billKeyStyle),
+                        ],
+                      ),
                     ],
                   ),
                   horizontalSpaceRegular,
@@ -1248,9 +1263,13 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
           ],
         ),
         horizontalSpaceSmall,
-        getPopulateApply(),
-        horizontalSpaceSmall,
-        getAutoManualApplySwitch(),
+        Column(
+          children: [
+            getAutoManualApplySwitch(),
+            verticalSpaceTiny,
+            getPopulateApply(),
+          ],
+        ),
         horizontalSpaceSmall,
         getCommitApply(),
       ],
