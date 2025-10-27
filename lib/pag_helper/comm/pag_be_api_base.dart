@@ -225,14 +225,6 @@ class PagUrlBase {
       // 'http://3.1.141.233:8081';
       'http://localhost:8081';
 
-<<<<<<< HEAD
-
-  static const String _rProdUsersvcUrl = 'https://usersvc2.web-ems.com';
-  static const String _rTestUsersvcUrl = 'https://test-usersvc2.web-ems.com';
-  static const String _rDevUsersvcUrl = 'https://dev-usersvc2.evs.com.sg';
-
-=======
->>>>>>> 7b590da0d7ebeeb234e564aa74c15ac1e9d2e1a9
   static get dDestPortalEvs2cp => _dDestPortalEvs2cp;
   static get rDestPortalEvs2cp => _rDestPortalEvs2cp;
 
