@@ -217,7 +217,7 @@ class _WgtPagItemHistoryGetterState extends State<WgtPagItemHistoryGetter> {
       if (duration > const Duration(days: 7) || widget.getByJob) {
         Map<String, dynamic> queryMap = {
           'scope': widget.loggedInUser.selectedScope.toScopeMap(),
-          'item_type': itemTypeStr=="" ? widget.itemType?.value : itemTypeStr,
+          'item_type': itemTypeStr,
           'item_id_value': widget.itemId,
           'item_id_type': widget.itemIdType.name,
           'meter_type_tag': meterTypeTag,
@@ -287,7 +287,7 @@ class _WgtPagItemHistoryGetterState extends State<WgtPagItemHistoryGetter> {
 
       queryMap = {
         'scope': widget.loggedInUser.selectedScope.toScopeMap(),
-        'item_type': itemTypeStr=="" ? widget.itemType?.value : itemTypeStr,
+        'item_type': itemTypeStr,
         'item_id_type': widget.itemIdType.name,
         'item_id_value': widget.itemId,
         'history_type': widget.historyType.name,
