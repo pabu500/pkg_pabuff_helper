@@ -40,7 +40,7 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
       const TextStyle(fontWeight: FontWeight.bold, fontSize: 18);
   final keyWidth = 30.0;
   final valueWidth = null;
-  final contentWidth = 365.0;
+  final contentWidth = 380.0;
 
   final okColor = Colors.green.shade700;
   late final errorColor = Theme.of(context).colorScheme.error;
@@ -262,6 +262,7 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
     final temperature = content['t'];
     final signal = content['s'];
     final errorList = content['el'] ?? [];
+    final ping = content['p'] ?? '-';
 
     final meterGroupLabel =
         _gatewayHealthData['meter_group_label'] ?? 'Unknown';
@@ -314,6 +315,7 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
     final signalPercentage = content['s'] == null
         ? '-'
         : '${(int.parse(content['s'] as String) * 100 / 31).clamp(0, 100).toInt()}%';
+    final ping = content['p'] == null ? ' - ' : '${content['p']} ms';
 
     return Container(
       decoration: BoxDecoration(
@@ -390,6 +392,24 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
                     SizedBox(
                         width: valueWidth,
                         child: Text('$signal ($signalPercentage)',
+                            style: valueStyle)),
+                  ],
+                ),
+              ),
+              horizontalSpaceSmall,
+              Tooltip(
+                message: 'Ping Response Time',
+                waitDuration: const Duration(milliseconds: 500),
+                child: Wrap(
+                  children: [
+                    SizedBox(
+                        width: keyWidth,
+                        child: Icon(Symbols.info,
+                            color: Theme.of(context).hintColor)),
+                    // horizontalSpaceTiny,
+                    SizedBox(
+                        width: valueWidth,
+                        child: Text(ping,
                             style: valueStyle)),
                   ],
                 ),
