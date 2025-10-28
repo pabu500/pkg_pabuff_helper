@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 void xtShowModelBottomSheet(BuildContext context, Widget child,
-    {Function? onClosed}) {
+    {Function? onClosed, EdgeInsetsGeometry? padding}) {
   showModalBottomSheet(
     context: context,
     constraints: BoxConstraints(
@@ -14,7 +14,8 @@ void xtShowModelBottomSheet(BuildContext context, Widget child,
         borderRadius: BorderRadius.vertical(top: Radius.circular(10))),
     builder: (BuildContext context) {
       return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 21.0, vertical: 3),
+        padding: padding ??
+            const EdgeInsets.symmetric(horizontal: 21.0, vertical: 3),
         child: SizedBox(width: double.infinity, child: child),
       );
     },
