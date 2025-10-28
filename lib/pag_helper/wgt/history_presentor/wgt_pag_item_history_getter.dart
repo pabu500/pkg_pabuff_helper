@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:buff_helper/pag_helper/def_helper/dh_device.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_operation.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_target.dart';
@@ -200,7 +201,9 @@ class _WgtPagItemHistoryGetterState extends State<WgtPagItemHistoryGetter> {
         widget.meterType == null ? '' : getMeterTypeTag(widget.meterType!);
 
     String itemTypeStr = "";
-    if (widget.itemType is DeviceCat) {
+    if (widget.itemType is PagDeviceCat) {
+      itemTypeStr = (widget.itemType as PagDeviceCat).value;
+    }else if(widget.itemType is DeviceCat){
       itemTypeStr = (widget.itemType as DeviceCat).name;
     }
 
@@ -284,7 +287,7 @@ class _WgtPagItemHistoryGetterState extends State<WgtPagItemHistoryGetter> {
 
       queryMap = {
         'scope': widget.loggedInUser.selectedScope.toScopeMap(),
-        'item_type': itemTypeStr=="" ? widget.itemType?.value : itemTypeStr,
+        'item_type': itemTypeStr,
         'item_id_type': widget.itemIdType.name,
         'item_id_value': widget.itemId,
         'history_type': widget.historyType.name,
