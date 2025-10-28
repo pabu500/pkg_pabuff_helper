@@ -38,6 +38,7 @@ import '../../model/mdl_pag_app_config.dart';
 import '../app/ems/wgt_match_payment_op_item.dart';
 import '../app/fh/wgt_fh_device_health.dart';
 import '../job/wgt_job_type_op_panel.dart';
+import '../job/wgt_job_type_op_panel2.dart';
 import 'wgt_item_info_edit_panel.dart';
 import 'wgt_list_pane.dart';
 import 'wgt_pag_item_finder_flexi.dart';
@@ -827,7 +828,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                     Widget opWidget = Container();
                     switch (widget.itemKind) {
                       case PagItemKind.jobType:
-                        opWidget = WgtJobTypeOpPanel(
+                        opWidget = WgtJobTypeOpPanel2(
                           appConfig: widget.appConfig,
                           loggedInUser: loggedInUser!,
                           itemDisplayName: item[displayNameKey] ?? '',
