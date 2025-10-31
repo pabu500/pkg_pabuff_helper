@@ -736,10 +736,10 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          getOptions(showPanelModeButton: false),
-          horizontalSpaceTiny,
+          getOptions(),
+          // horizontalSpaceTiny,
           getFileterCore(isCompactMode: true),
-          horizontalSpaceTiny,
+          // horizontalSpaceTiny,
           getSearchButton(),
         ],
       ),
@@ -816,11 +816,17 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
 
   Widget getFileterCore({bool isCompactMode = false}) {
     if (isCompactMode) {
-      _isFullPanel = true;
+      // _isFullPanel = true;
       String? singleIdFilterKey = getSingleIdFilterKey();
       return Column(children: [
         getItemIdFilterGroup(
-            isCompactMode: isCompactMode, singleIdFilterKey: singleIdFilterKey)
+            isCompactMode: isCompactMode,
+            singleIdFilterKey: singleIdFilterKey,
+            inputWidth: 200),
+        Padding(
+          padding: const EdgeInsets.only(top: 5),
+          child: getItemLocationFilterGroup(dropdownWidth: 222),
+        ),
       ]);
     }
     return Column(
@@ -853,9 +859,13 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   }
 
   Widget getItemIdFilterGroup(
-      {bool isCompactMode = false, String? singleIdFilterKey}) {
+      {bool isCompactMode = false,
+      String? singleIdFilterKey,
+      double inputWidth = 160}) {
     List<Widget> list = getItemIdGroupList(
-        singleIdFilter: singleIdFilterKey, showScanner: isCompactMode);
+        singleIdFilter: singleIdFilterKey,
+        showScanner: isCompactMode,
+        inputWidth: inputWidth);
     if (list.isEmpty) {
       return Container();
     }
@@ -902,8 +912,11 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     );
   }
 
-  Widget getItemLocationFilterGroup() {
-    List<Widget> list = getItemLocationGroupList();
+  Widget getItemLocationFilterGroup({double dropdownWidth = 250}) {
+    if (!_isFullPanel) {
+      return Container();
+    }
+    List<Widget> list = getItemLocationGroupList(dropdownWidth: dropdownWidth);
     if (list.isEmpty) {
       return Container();
     }
@@ -999,7 +1012,9 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   }
 
   List<Widget> getItemIdGroupList(
-      {String? singleIdFilter, bool showScanner = false}) {
+      {String? singleIdFilter,
+      bool showScanner = false,
+      double inputWidth = 160}) {
     List<Widget> list = [];
     for (var colController in widget.listController.listColControllerList) {
       if (singleIdFilter != null && colController.colKey != singleIdFilter) {
@@ -1007,7 +1022,9 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
       }
 
       if (colController.showColumn == false) continue;
-      if (!_isFullPanel && !colController.pinned) continue;
+      if (!_isFullPanel && !colController.pinned && !widget.isCompactMode) {
+        continue;
+      }
 
       String? initialValue;
       for (var entry in widget.initialFilterMap.entries) {
@@ -1041,7 +1058,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
                     // key: resetKey,
                     appConfig: widget.appConfig,
                     // listController: _listController,
-                    width: 160,
+                    width: inputWidth,
                     labelText: colController.filterLabel,
                     hintText: colController.filterLabel,
                     resetKey: resetKey,
@@ -1142,7 +1159,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     return list;
   }
 
-  List<Widget> getItemLocationGroupList() {
+  List<Widget> getItemLocationGroupList({double dropdownWidth = 250}) {
     List<Widget> list = [];
 
     for (MdlListColController colController
@@ -1157,14 +1174,16 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
         }
         list.add(
           Padding(
-            padding: const EdgeInsets.only(left: 8, right: 8, bottom: 3),
+            padding: const EdgeInsets.only(left: 5, right: 5, bottom: 3),
             child: Row(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                if (_isFullPanel) getPin(listColController: colController),
-                if (_isFullPanel) horizontalSpaceTiny,
-                getInputDropdown(colController, _isFullPanel)
+                if (_isFullPanel && !widget.isCompactMode)
+                  getPin(listColController: colController),
+                if (_isFullPanel && !widget.isCompactMode) horizontalSpaceTiny,
+                getInputDropdown(colController, _isFullPanel,
+                    dropdownWidth: dropdownWidth)
               ],
             ),
           ),
@@ -1219,14 +1238,15 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     return list;
   }
 
-  Widget getInputDropdown(MdlListColController colController, bool isFull) {
+  Widget getInputDropdown(MdlListColController colController, bool isFull,
+      {double dropdownWidth = 250}) {
     List<Map<String, dynamic>> items = [];
     for (var item in colController.valueList ?? []) {
       items.add(item);
     }
     // TextEditingController controller = TextEditingController();
     return Padding(
-      padding: const EdgeInsets.only(left: 8, right: 8, bottom: 5),
+      padding: const EdgeInsets.only(left: 5, right: 5, bottom: 5),
       child: Row(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -1243,7 +1263,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
             initialValue: colController.filterValue,
             isInitialValueMutable: colController.valueList!.length > 1,
             height: 50,
-            width: 250,
+            width: dropdownWidth,
             onSelected: (Map<String, dynamic>? item) async {
               setState(() {
                 colController.filterValue = item;
@@ -1351,13 +1371,20 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   }
 
   Widget getOptions({showPanelModeButton = true}) {
-    return Row(
-      children: [
-        getClearButton(),
-        horizontalSpaceRegular,
-        if (showPanelModeButton) getPanelModeButton(),
-      ],
-    );
+    return widget.isCompactMode
+        ? Column(
+            children: [
+              getClearButton(),
+              if (showPanelModeButton) getPanelModeButton(),
+            ],
+          )
+        : Row(
+            children: [
+              getClearButton(),
+              horizontalSpaceRegular,
+              if (showPanelModeButton) getPanelModeButton(),
+            ],
+          );
   }
 
   Widget getRowsPerPage() {
@@ -1410,6 +1437,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
       onPressed: () {
         setState(() {
           _isFullPanel = !_isFullPanel;
+          dev.log('Toggle panel mode to: $_isFullPanel');
         });
       },
     );

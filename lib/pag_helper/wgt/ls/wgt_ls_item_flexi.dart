@@ -1289,15 +1289,16 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
             iconSize: 30,
             onPressed: () {
               xtShowModelBottomSheet(
-                context,
-                WgtFhDeviceHealth(
-                  appConfig: widget.appConfig,
-                  loggedInUser: loggedInUser!,
-                  deviceCat: deviceCat!,
-                  deviceInfo: item,
-                ),
-                onClosed: () {},
-              );
+                  context,
+                  WgtFhDeviceHealth(
+                    appConfig: widget.appConfig,
+                    loggedInUser: loggedInUser!,
+                    deviceCat: deviceCat!,
+                    deviceInfo: item,
+                  ),
+                  onClosed: () {},
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 13.0, vertical: 3));
             },
           ),
         );

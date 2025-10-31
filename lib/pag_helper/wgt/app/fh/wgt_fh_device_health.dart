@@ -35,7 +35,7 @@ class WgtFhDeviceHealth extends StatefulWidget {
 class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
   late final TextStyle keyStyle = TextStyle(color: Theme.of(context).hintColor);
   late final TextStyle valueStyle =
-      const TextStyle(fontWeight: FontWeight.bold, fontSize: 18);
+      const TextStyle(fontWeight: FontWeight.bold, fontSize: 16);
   final keyWidth = 30.0;
   final keyIconSize = 25.0;
   final valueWidth = null;
@@ -351,7 +351,7 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
                 child: Row(
                   children: [
                     Icon(Symbols.deployed_code,
-                        size: keyIconSize - 3,
+                        size: keyIconSize - 5,
                         color: Theme.of(context).hintColor),
                     SizedBox(
                         width: valueWidth,
@@ -381,7 +381,7 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
                 child: Wrap(
                   children: [
                     Icon(Symbols.signal_cellular_alt,
-                        size: keyIconSize - 2,
+                        size: keyIconSize - 3,
                         color: Theme.of(context).hintColor),
                     // horizontalSpaceTiny,
                     SizedBox(
@@ -398,7 +398,7 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
                 child: Wrap(
                   children: [
                     Icon(Symbols.network_ping,
-                        size: keyIconSize - 2,
+                        size: keyIconSize - 3,
                         color: Theme.of(context).hintColor),
                     // horizontalSpaceTiny,
                     SizedBox(
