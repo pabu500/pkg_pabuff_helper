@@ -37,7 +37,6 @@ import '../../comm/comm_list.dart';
 import '../../model/mdl_pag_app_config.dart';
 import '../app/ems/wgt_match_payment_op_item.dart';
 import '../app/fh/wgt_fh_device_health.dart';
-import '../job/wgt_job_type_op_panel.dart';
 import '../job/wgt_job_type_op_panel2.dart';
 import 'wgt_item_info_edit_panel.dart';
 import 'wgt_list_pane.dart';
