@@ -1,4 +1,5 @@
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
+import 'package:buff_helper/pagrid_helper/job_helper/job_helper.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -41,7 +42,12 @@ class _WgtPagPostJobState extends State<WgtPagPostJob> {
   Future<dynamic> _postJob() async {
     try {
       Map<String, dynamic> jobRequest = widget.jobRequest;
-      jobRequest['job_task_type'] = PagJobTaskType.itemHistory.name;
+      // jobRequest['job_task_type'] = PagJobTaskType.itemHistory.name;
+      jobRequest['job_task_type'] = getPagJobTaskTypeName(PagJobTaskType.itemHistory);
+      // jobRequest['job_type'] = 'item-history';
+      String projectLabel = widget.loggedInUser.selectedScope.projectProfile?.label ?? '';
+      jobRequest['job_type'] = jobRequest['job_task_type'] + (projectLabel.isNotEmpty ? '-$projectLabel' : '');
+
 
       if ((widget.loggedInUser.emailVerified ?? false) &&
           widget.loggedInUser.email != null) {
