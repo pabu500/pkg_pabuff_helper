@@ -172,6 +172,7 @@ class _WgtTenantUsageSummaryReleased2State
                 widget.tenantType,
                 null,
                 null,
+                {},
               ),
           ],
         ),

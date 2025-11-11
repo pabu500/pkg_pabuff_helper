@@ -28,6 +28,8 @@ class WgtPagTenantUsageSummaryReleased extends StatefulWidget {
     this.showRenderModeSwitch = false,
     this.tenantLabel,
     this.tenantAccountId = '',
+    this.cycleStr = '',
+    this.billDate = '',
     this.isBillMode = false,
     this.meterTypeRates = const {},
     this.gst,
@@ -54,6 +56,8 @@ class WgtPagTenantUsageSummaryReleased extends StatefulWidget {
   final String tenantAccountId;
   final String? tenantLabel;
   final String tenantType;
+  final String cycleStr;
+  final String billDate;
   final bool excludeAutoUsage;
   final bool isBillMode;
   final Map<String, dynamic> meterTypeRates;
@@ -113,6 +117,8 @@ class _WgtPagTenantUsageSummaryReleasedState
                   widget.tenantLabel,
                   widget.tenantName,
                   widget.tenantAccountId,
+                  widget.cycleStr,
+                  widget.billDate,
                 ),
                 getPagUsageTypeTopStat(
                   costDecimals: widget.costDecimals,
@@ -172,6 +178,7 @@ class _WgtPagTenantUsageSummaryReleasedState
                 widget.tenantType,
                 null,
                 null,
+                {},
               ),
           ],
         ),

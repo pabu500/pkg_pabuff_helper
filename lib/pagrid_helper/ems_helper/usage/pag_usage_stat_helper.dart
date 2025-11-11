@@ -95,19 +95,22 @@ Widget getPagTypeUsageStat(
 }
 
 Widget getPagUsageTitle(
-    BuildContext context,
-    DateTime fromDatetime,
-    DateTime toDatetime,
-    bool isMonthly,
-    String? tenantLabel,
-    String tenantName,
-    String? tenantAccountId) {
-  String rangeStr = getTimeRangeStr(
-    fromDatetime,
-    toDatetime,
-    targetInterval: isMonthly ? 'monthly' : 'daily',
-    useMiddle: isMonthly ? true : false,
-  );
+  BuildContext context,
+  DateTime fromDatetime,
+  DateTime toDatetime,
+  bool isMonthly,
+  String? tenantLabel,
+  String tenantName,
+  String? tenantAccountId,
+  String cycleStr,
+  String billDate,
+) {
+  // String rangeStr = getTimeRangeStr(
+  //   fromDatetime,
+  //   toDatetime,
+  //   targetInterval: isMonthly ? 'monthly' : 'daily',
+  //   useMiddle: isMonthly ? true : false,
+  // );
   return ConstrainedBox(
     constraints: const BoxConstraints(maxWidth: 350),
     child: Container(
@@ -153,13 +156,26 @@ Widget getPagUsageTitle(
             ],
           ),
           verticalSpaceSmall,
-          Text(
-            rangeStr,
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).hintColor,
-            ),
+          Row(
+            children: [
+              Text(
+                cycleStr,
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).hintColor,
+                ),
+              ),
+              horizontalSpaceRegular,
+              Text(
+                'Bill Date: ${billDate.substring(0, 10)}',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).hintColor,
+                ),
+              ),
+            ],
           ),
         ],
       ),

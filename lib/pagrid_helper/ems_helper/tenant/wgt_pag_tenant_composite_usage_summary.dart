@@ -28,6 +28,8 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
     required this.tenantType,
     required this.excludeAutoUsage,
     required this.displayContextStr,
+    required this.cycleStr,
+    required this.billDate,
     this.isDisabled = false,
     // this.usageCalc,
     this.showFactoredUsage = true,
@@ -52,6 +54,7 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
     this.rateDecimals = 4,
     this.costDecimals = 3,
     this.onUpdate,
+    this.interestInfo = const {},
   });
 
   final MdlPagAppConfig appConfig;
@@ -68,6 +71,8 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
   final String? tenantLabel;
   final String tenantAccountId;
   final String tenantType;
+  final String cycleStr;
+  final String billDate;
   final bool excludeAutoUsage;
   final List<Map<String, dynamic>> tenantSingularUsageInfoList;
   final PagEmsTypeUsageCalc? compositeUsageCalc;
@@ -86,6 +91,7 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
   final int costDecimals;
   // final Map<String, dynamic> usageFactor;
   // final Map<String, dynamic>? typeRates;
+  final Map<String, dynamic> interestInfo;
   final Function? onUpdate;
 
   @override
@@ -113,6 +119,7 @@ class _WgtPagTenantCompositeUsageSummaryState
   late final _billInfo = Map<String, dynamic>.from(widget.billInfo);
 
   // bool _isDisabled = false;
+  bool _showInterestDetail = false;
 
   @override
   void initState() {
@@ -161,6 +168,8 @@ class _WgtPagTenantCompositeUsageSummaryState
                     widget.tenantLabel,
                     widget.tenantName,
                     widget.tenantAccountId,
+                    widget.cycleStr,
+                    widget.billDate,
                   ),
                   getPagUsageTypeTopStat(
                     costDecimals: widget.costDecimals,
@@ -201,7 +210,14 @@ class _WgtPagTenantCompositeUsageSummaryState
                   widget.tenantType,
                   widget.compositeUsageCalc!.balBfUsage,
                   widget.compositeUsageCalc!.balBfInterest,
+                  widget.interestInfo,
                   width: statWidth,
+                  showInterestDetail: _showInterestDetail,
+                  onCheckInterestDetail: () {
+                    setState(() {
+                      _showInterestDetail = !_showInterestDetail;
+                    });
+                  },
                 ),
             ],
           ),

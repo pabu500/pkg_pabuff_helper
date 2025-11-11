@@ -623,7 +623,10 @@ Widget getTotal2(
     String tenantType,
     double? balBfUsage,
     double? balBfInterest,
-    {double width = 750.0}) {
+    Map<String, dynamic> interestInfo,
+    {Function? onCheckInterestDetail,
+    bool showInterestDetail = false,
+    double width = 750.0}) {
   bool applyGst = tenantType != 'cw_nus_internal';
 
   return Container(
@@ -748,6 +751,20 @@ Widget getTotal2(
           padding: const EdgeInsets.only(top: 5),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              getInterestInfo(
+                interestInfo,
+                context,
+                showInterestDetail,
+                onCheckInterestDetail,
+              )
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 5),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(
@@ -801,4 +818,271 @@ Widget getAutoUsageExcludedInfo(BuildContext context, {double width = 750}) {
       ),
     ),
   );
+}
+
+Widget getInterestInfo(
+  Map<String, dynamic> interestInfo,
+  BuildContext context,
+  bool showInterestDetail,
+  Function? onCheckDetail,
+) {
+  final totalInterestAmount = interestInfo['total_interest_amount'] as double?;
+  final outstandingBillList =
+      interestInfo['outstanding_bill_list'] as List<dynamic>?;
+  List<Widget> billWidgets = [];
+  for (var bill in outstandingBillList ?? []) {
+    // final billId = bill['bill_id'];
+    final billLabel = bill['label'];
+    final billDate = bill['bill_date_timestamp'];
+    final billedTotalCost = bill['billed_total_cost'];
+    final totalTheoreticalInterestToDate =
+        bill['total_theoretical_interest_to_date'];
+    final totalActualInterestToDate = bill['total_actual_interest_to_date'];
+    final paymentTermDays = bill['payment_term_days'];
+    final interestRate = bill['interest_rate'];
+    final dueDate = bill['due_date_timestamp'];
+    final overDueDays = bill['overdue_days'];
+    final paymentApplyList = bill['payment_apply_list'];
+
+    List<Map<String, dynamic>> paymentApplyListCasted = [];
+    if (paymentApplyList != null) {
+      for (var payment in paymentApplyList) {
+        if (payment is Map<String, dynamic>) {
+          paymentApplyListCasted.add(payment);
+        }
+      }
+    }
+
+    double billedTotalCostDouble = 0.0;
+    if (billedTotalCost is String) {
+      billedTotalCostDouble = double.tryParse(billedTotalCost) ?? 0.0;
+    } else if (billedTotalCost is double) {
+      billedTotalCostDouble = billedTotalCost;
+    }
+    double totalTheoreticalInterestToDateDouble = 0.0;
+    if (totalTheoreticalInterestToDate is String) {
+      totalTheoreticalInterestToDateDouble =
+          double.tryParse(totalTheoreticalInterestToDate) ?? 0.0;
+    } else if (totalTheoreticalInterestToDate is double) {
+      totalTheoreticalInterestToDateDouble = totalTheoreticalInterestToDate;
+    }
+    double totalActualInterestToDateDouble = 0.0;
+    if (totalActualInterestToDate is String) {
+      totalActualInterestToDateDouble =
+          double.tryParse(totalActualInterestToDate) ?? 0.0;
+    } else if (totalActualInterestToDate is double) {
+      totalActualInterestToDateDouble = totalActualInterestToDate;
+    }
+    int overDueDaysInt = 0;
+    if (overDueDays is String) {
+      overDueDaysInt = int.tryParse(overDueDays) ?? 0;
+    } else if (overDueDays is int) {
+      overDueDaysInt = overDueDays;
+    }
+
+    int paymentTermDaysInt = 0;
+    if (paymentTermDays is String) {
+      paymentTermDaysInt = int.tryParse(paymentTermDays) ?? 0;
+    } else if (paymentTermDays is int) {
+      paymentTermDaysInt = paymentTermDays;
+    }
+    double interestRateDouble = 0.0;
+    if (interestRate is String) {
+      interestRateDouble = double.tryParse(interestRate) ?? 0.0;
+    } else if (interestRate is double) {
+      interestRateDouble = interestRate;
+    }
+
+    Widget outstandingBillWidget = Container(
+      margin: const EdgeInsets.only(bottom: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      decoration: BoxDecoration(
+        border: Border.all(color: Theme.of(context).hintColor, width: 1),
+        borderRadius: BorderRadius.circular(5.0),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Text('Bill ID: $billId'),
+          Row(
+            children: [
+              Icon(Symbols.request_quote,
+                  size: 16, color: Theme.of(context).colorScheme.error),
+              horizontalSpaceTiny,
+              Text(
+                billLabel,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          Text('Bill Date: ${billDate.substring(0, 10)}'),
+          Text('Payment Term: $paymentTermDaysInt days'),
+          Text('Due Date: ${dueDate.substring(0, 10)}'),
+          Text('Interest Rate: ${interestRateDouble.toStringAsFixed(3)}%'),
+          Text('Overdue Days: $overDueDaysInt'),
+          Text(
+              'Billed Total Cost: SGD${getCommaNumberStr(billedTotalCostDouble, decimal: 2)}'),
+          Text(
+              'Total Theoretical Interest To Date: SGD${getCommaNumberStr(totalTheoreticalInterestToDateDouble, decimal: 2)}'),
+          verticalSpaceTiny,
+          getPaymentApplyList(paymentApplyListCasted, context),
+          Text(
+              'Total Actual Interest To Date: SGD${getCommaNumberStr(totalActualInterestToDateDouble, decimal: 2)}'),
+        ],
+      ),
+    );
+    billWidgets.add(outstandingBillWidget);
+  }
+  return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+    if (totalInterestAmount != null)
+      Row(
+        children: [
+          SizedBox(
+            width: 210,
+            child: Text(
+              'Interest',
+              style: defStatStyle,
+            ),
+          ),
+          horizontalSpaceSmall,
+          getStatWithUnit(
+            getCommaNumberStr(totalInterestAmount, decimal: 2),
+            'SGD',
+            statStrStyle: defStatStyle.copyWith(
+              color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
+            ),
+          ),
+          IconButton(
+              onPressed: () {
+                onCheckDetail?.call();
+              },
+              icon: const Icon(Symbols.info))
+        ],
+      ),
+    // verticalSpaceSmall,
+    if (showInterestDetail) ...billWidgets,
+  ]);
+}
+
+Widget getPaymentApplyList(
+    List<Map<String, dynamic>> paymentApplyList, BuildContext context) {
+  List<Widget> paymentWidgets = [];
+  for (var payment in paymentApplyList) {
+    // final paymentId = payment['payment_id'];
+    final appliedUsageAmountFromBal = payment['usage_amount_from_bal'];
+    final appliedInterestAmountFromBal = payment['interest_amount_from_bal'];
+    final appliedUsageAmountFromPayment = payment['usage_amount_from_payment'];
+    final appliedInterestAmountFromPayment =
+        payment['interest_amount_from_payment'];
+    final valueTimestamp = payment['value_timestamp'];
+    final reducedBilledUsageFromThisApply =
+        payment['reduced_billed_usage_from_this_apply'];
+    final overdueDays = payment['overdue_days'];
+    final paymentTillBillDays = payment['payment_till_bill_days'];
+    final rieFromThisApply = payment['rie_from_this_apply'];
+
+    double appliedUsageAmountFromBalDouble = 0.0;
+    if (appliedUsageAmountFromBal is String) {
+      appliedUsageAmountFromBalDouble =
+          double.tryParse(appliedUsageAmountFromBal) ?? 0.0;
+    } else if (appliedUsageAmountFromBal is double) {
+      appliedUsageAmountFromBalDouble = appliedUsageAmountFromBal;
+    }
+    double appliedInterestAmountFromBalDouble = 0.0;
+    if (appliedInterestAmountFromBal is String) {
+      appliedInterestAmountFromBalDouble =
+          double.tryParse(appliedInterestAmountFromBal) ?? 0.0;
+    } else if (appliedInterestAmountFromBal is double) {
+      appliedInterestAmountFromBalDouble = appliedInterestAmountFromBal;
+    }
+    double appliedUsageAmountFromPaymentDouble = 0.0;
+    if (appliedUsageAmountFromPayment is String) {
+      appliedUsageAmountFromPaymentDouble =
+          double.tryParse(appliedUsageAmountFromPayment) ?? 0.0;
+    } else if (appliedUsageAmountFromPayment is double) {
+      appliedUsageAmountFromPaymentDouble = appliedUsageAmountFromPayment;
+    }
+    double appliedInterestAmountFromPaymentDouble = 0.0;
+    if (appliedInterestAmountFromPayment is String) {
+      appliedInterestAmountFromPaymentDouble =
+          double.tryParse(appliedInterestAmountFromPayment) ?? 0.0;
+    } else if (appliedInterestAmountFromPayment is double) {
+      appliedInterestAmountFromPaymentDouble = appliedInterestAmountFromPayment;
+    }
+    double reducedBilledUsageFromThisApplyDouble = 0.0;
+    if (reducedBilledUsageFromThisApply is String) {
+      reducedBilledUsageFromThisApplyDouble =
+          double.tryParse(reducedBilledUsageFromThisApply) ?? 0.0;
+    } else if (reducedBilledUsageFromThisApply is double) {
+      reducedBilledUsageFromThisApplyDouble = reducedBilledUsageFromThisApply;
+    }
+    int overdueDaysInt = 0;
+    if (overdueDays is String) {
+      overdueDaysInt = int.tryParse(overdueDays) ?? 0;
+    } else if (overdueDays is int) {
+      overdueDaysInt = overdueDays;
+    }
+    int paymentTillBillDaysInt = 0;
+    if (paymentTillBillDays is String) {
+      paymentTillBillDaysInt = int.tryParse(paymentTillBillDays) ?? 0;
+    } else if (paymentTillBillDays is int) {
+      paymentTillBillDaysInt = paymentTillBillDays;
+    }
+    double rieFromThisApplyDouble = 0.0;
+    if (rieFromThisApply is String) {
+      rieFromThisApplyDouble = double.tryParse(rieFromThisApply) ?? 0.0;
+    } else if (rieFromThisApply is double) {
+      rieFromThisApplyDouble = rieFromThisApply;
+    }
+
+    Widget paymentWidget = Container(
+      margin: const EdgeInsets.only(bottom: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      decoration: BoxDecoration(
+        border: Border.all(color: Theme.of(context).hintColor, width: 1),
+        borderRadius: BorderRadius.circular(5.0),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Payment Date: ${valueTimestamp.substring(0, 10)}'),
+          Row(
+            children: [
+              Icon(Symbols.attach_money,
+                  size: 16, color: Theme.of(context).colorScheme.primary),
+              horizontalSpaceTiny,
+              const Text(
+                'Payment Apply:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          if (appliedUsageAmountFromBalDouble.abs() > 0.00001)
+            Text(
+                ' - SGD${getCommaNumberStr(appliedUsageAmountFromBalDouble, decimal: 2)} applied to Usage from Balance B/F'),
+          if (appliedInterestAmountFromBalDouble.abs() > 0.00001)
+            Text(
+                ' - SGD${getCommaNumberStr(appliedInterestAmountFromBalDouble, decimal: 2)} applied to Interest from Balance B/F'),
+          if (appliedUsageAmountFromPaymentDouble.abs() > 0.00001)
+            Text(
+                ' - SGD${getCommaNumberStr(appliedUsageAmountFromPaymentDouble, decimal: 2)} applied to Usage from Payment'),
+          if (appliedInterestAmountFromPaymentDouble.abs() > 0.00001)
+            Text(
+                ' - SGD${getCommaNumberStr(appliedInterestAmountFromPaymentDouble, decimal: 2)} applied to Interest from Payment'),
+          if (reducedBilledUsageFromThisApplyDouble.abs() > 0.00001)
+            Text(
+                ' - SGD${getCommaNumberStr(reducedBilledUsageFromThisApplyDouble, decimal: 2)} reduced Billed Usage from this Apply'),
+          Text(' - Overdue Days at Payment: $overdueDaysInt days'),
+          Text(' - Payment Till Bill Days: $paymentTillBillDaysInt days'),
+          if (rieFromThisApplyDouble.abs() > 0.00001)
+            Text(
+                ' - SGD${getCommaNumberStr(rieFromThisApplyDouble, decimal: 2)} RIE from this Apply',
+                style: const TextStyle(fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
+    paymentWidgets.add(paymentWidget);
+  }
+  return Column(
+      crossAxisAlignment: CrossAxisAlignment.start, children: paymentWidgets);
 }

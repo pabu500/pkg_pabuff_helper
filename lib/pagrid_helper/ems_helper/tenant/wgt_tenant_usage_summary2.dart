@@ -172,6 +172,7 @@ class _WgtTenantUsageSummary2State extends State<WgtTenantUsageSummary2> {
                 widget.tenantType,
                 null,
                 null,
+                {},
               ),
           ],
         ),

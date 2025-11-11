@@ -293,6 +293,9 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     final balBf = _bill['balance_bf'] ?? '0';
     final balBfUsage = _bill['balance_bf_usage'] ?? '0';
     final balBfInterest = _bill['balance_bf_interest'] ?? '0';
+    final interestInfo = _bill['interest_info'] ?? {};
+    String cycleStr = _bill['cycle_str'] ?? '';
+    String billDate = _bill['bill_date_timestamp'] ?? '';
 
     final Map<String, dynamic> scopeMap =
         widget.loggedInUser.selectedScope.toScopeMap();
@@ -322,10 +325,13 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
           toTimestampStr,
           fromDatetime,
           toDatetime,
+          cycleStr,
+          billDate,
           billBarFromMonth,
           balBf,
           balBfUsage,
-          balBfInterest);
+          balBfInterest,
+          interestInfo);
     }
   }
 
@@ -338,20 +344,23 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     String toTimestampStr,
     DateTime fromDatetime,
     DateTime toDatetime,
+    String cycleStr,
+    String billDate,
     String billBarFromMonth,
     String balBfStr,
     String balBfUsageStr,
     String balBfInterestStr,
+    Map<String, dynamic> interestInfo,
   ) {
     // sort time
     bool isMonthly = true;
     // _bill['is_monthly'] == 'true' ? true : false;
-    String billTimeRangeStr = getTimeRangeStr(
-      fromDatetime,
-      toDatetime,
-      targetInterval: 'monthly',
-      useMiddle: isMonthly ? true : false,
-    );
+    // String billTimeRangeStr = getTimeRangeStr(
+    //   fromDatetime,
+    //   toDatetime,
+    //   targetInterval: 'monthly',
+    //   useMiddle: isMonthly ? true : false,
+    // );
 
     // sort usage factor
     Map<String, dynamic> usageFactor = {};
@@ -514,7 +523,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
               'billTo': toTimestampStr,
               'billDate': _bill['released_bill_timestamp'] ??
                   _bill['created_timestamp'],
-              'billTimeRangeStr': billTimeRangeStr,
+              'billTimeRangeStr': cycleStr,
               'tenantUsageSummary': {},
               'subTotalAmount': emsTypeUsageCalc.subTotalCost,
               'gstAmount': emsTypeUsageCalc.gstAmount,
@@ -563,11 +572,14 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             tenantLabel: tenantLabel,
             tenantAccountId: accountId,
             tenantType: tenantType,
+            cycleStr: cycleStr,
+            billDate: billDate,
             subTenantListUsageSummary: subTenantListUsageSummary,
             manualUsages: manualUsage,
             lineItems: lineItems,
             excludeAutoUsage:
                 _bill['exclude_auto_usage'] == 'true' ? true : false,
+            interestInfo: interestInfo,
             onUpdate: () {
               widget.onUpdate?.call();
               setState(() {
