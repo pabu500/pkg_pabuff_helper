@@ -322,15 +322,45 @@ class _WgtPagItemHistoryPresenterState
           });
           break;
         case MeterType.bidirection:
-          _selectedChartReadingTypeKey = 'delivered_total';
+          // _selectedChartReadingTypeKey = 'delivered_total';
+
+          // _readingTypeConfig.clear();
+          // _readingTypeConfig.addAll({
+          //   'delivered_total': {
+          //     'title': 'Delivered Energy (kWh)',
+          //     'dataFields': [
+          //       {
+          //         'field': 'delivered_total',
+          //       }
+          //     ],
+          //     'unit': 'kWh',
+          //     'chartType': ChartType.bar,
+          //     'dataType': DataType.diff,
+          //     'color': Colors.orange.withAlpha(210),
+          //   },
+          //   'received_total': {
+          //     'title': 'Received Energy (kWh)',
+          //     'dataFields': [
+          //       {
+          //         'field': 'received_total',
+          //       }
+          //     ],
+          //     'unit': 'kWh',
+          //     'chartType': ChartType.bar,
+          //     'dataType': DataType.diff,
+          //     'color': Colors.blue.withAlpha(210),
+          //   },
+          // });
+
+          _selectedChartReadingTypeKey = 'import_total';
 
           _readingTypeConfig.clear();
           _readingTypeConfig.addAll({
-            'delivered_total': {
-              'title': 'Delivered Energy (kWh)',
+            'import_total': {
+              'title': 'Import Energy (kWh)',
               'dataFields': [
                 {
-                  'field': 'delivered_total',
+                  'field': 'import_total',
                 }
               ],
               'unit': 'kWh',
@@ -338,11 +368,11 @@ class _WgtPagItemHistoryPresenterState
               'dataType': DataType.diff,
               'color': Colors.orange.withAlpha(210),
             },
-            'received_total': {
-              'title': 'Received Energy (kWh)',
+            'export_total': {
+              'title': 'Exported Energy (kWh)',
               'dataFields': [
                 {
-                  'field': 'received_total',
+                  'field': 'export_total',
                 }
               ],
               'unit': 'kWh',
@@ -362,26 +392,26 @@ class _WgtPagItemHistoryPresenterState
               SensorType.temperature_humidity ||
               SensorType.switchSensor:
           _selectedChartReadingTypeKey = 'val_sensor';
-           String valColName = "val";
-              switch(widget.itemSubType) {
-                  case SensorType.temperature || SensorType.temperature_humidity:
-                    valColName = "temperature_val";
-                    break;
-                  case SensorType.humidity:
-                    valColName = "humidity_val";
-                    break;
-                  case SensorType.ir:
-                    valColName = "ir_val";
-                    break;
-                  case SensorType.co2:
-                    valColName = "co2_val";
-                    break;
-                case SensorType.fan:
-                    valColName = "fan_val";
-                    break;
-              default: 
-                    break;
-              }
+          String valColName = "val";
+          switch (widget.itemSubType) {
+            case SensorType.temperature || SensorType.temperature_humidity:
+              valColName = "temperature_val";
+              break;
+            case SensorType.humidity:
+              valColName = "humidity_val";
+              break;
+            case SensorType.ir:
+              valColName = "ir_val";
+              break;
+            case SensorType.co2:
+              valColName = "co2_val";
+              break;
+            case SensorType.fan:
+              valColName = "fan_val";
+              break;
+            default:
+              break;
+          }
           _readingTypeConfig.clear();
           _readingTypeConfig.addAll({
             'val_sensor': {
