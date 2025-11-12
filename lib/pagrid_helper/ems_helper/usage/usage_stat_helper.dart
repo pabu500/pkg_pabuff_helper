@@ -826,7 +826,13 @@ Widget getInterestInfo(
   bool showInterestDetail,
   Function? onCheckDetail,
 ) {
-  final totalInterestAmount = interestInfo['total_interest_amount'] as double?;
+  final totalInterestAmount = interestInfo['total_interest_amount'];
+  double totalInterestAmountDouble = 0.0;
+  if (totalInterestAmount is String) {
+    totalInterestAmountDouble = double.tryParse(totalInterestAmount) ?? 0.0;
+  } else if (totalInterestAmount is double) {
+    totalInterestAmountDouble = totalInterestAmount;
+  }
   final outstandingBillList =
       interestInfo['outstanding_bill_list'] as List<dynamic>?;
   List<Widget> billWidgets = [];
@@ -946,7 +952,7 @@ Widget getInterestInfo(
           ),
           horizontalSpaceSmall,
           getStatWithUnit(
-            getCommaNumberStr(totalInterestAmount, decimal: 2),
+            getCommaNumberStr(totalInterestAmountDouble, decimal: 2),
             'SGD',
             statStrStyle: defStatStyle.copyWith(
               color: Theme.of(context).colorScheme.onSurface.withAlpha(210),

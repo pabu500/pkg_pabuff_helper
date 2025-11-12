@@ -454,6 +454,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       balBf: balBf,
       balBfUsage: balBfUsage,
       balBfInterest: balBfInterest,
+      interestInfo: interestInfo,
     );
     compositeUsageCalc.doCompositeCalc();
 

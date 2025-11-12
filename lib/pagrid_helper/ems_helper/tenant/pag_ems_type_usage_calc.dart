@@ -42,6 +42,8 @@ class PagEmsTypeUsageCalc {
   late final double? _balBfUsage;
   late final double? _balBfInterest;
 
+  late final Map<String, dynamic>? _interestInfo;
+
   EmsTypeUsageR2? get typeUsageE => _typeUsageE;
   EmsTypeUsageR2? get typeUsageW => _typeUsageW;
   EmsTypeUsageR2? get typeUsageB => _typeUsageB;
@@ -71,6 +73,8 @@ class PagEmsTypeUsageCalc {
   double? get balBfUsage => _balBfUsage;
   double? get balBfInterest => _balBfInterest;
 
+  Map<String, dynamic>? get interestInfo => _interestInfo;
+
   List<PagEmsTypeUsageCalc> get singularCalcList => _singularCalcList;
 
   PagEmsTypeUsageCalc({
@@ -88,6 +92,7 @@ class PagEmsTypeUsageCalc {
     double? balBf,
     double? balBfUsage,
     double? balBfInterest,
+    Map<String, dynamic>? interestInfo,
   }) {
     if (usageFactor.isEmpty) {
       throw Exception('usageFactor is empty');
@@ -110,6 +115,8 @@ class PagEmsTypeUsageCalc {
     _balBf = balBf;
     _balBfUsage = balBfUsage;
     _balBfInterest = balBfInterest;
+
+    _interestInfo = interestInfo;
 
     if (singularUsageCalcList.isNotEmpty) {
       for (var item in singularUsageCalcList) {
@@ -551,6 +558,18 @@ class PagEmsTypeUsageCalc {
       }
       _gstAmount = getRoundUp(_gstAmount!, 2);
       _totalCost = _subTotalCost! + _gstAmount!;
+
+      if (_interestInfo != null) {
+        final totalInterestAmount = _interestInfo['total_interest_amount'];
+        double? interestAmountDouble = 0;
+        if (totalInterestAmount is String) {
+          interestAmountDouble = double.tryParse(totalInterestAmount);
+        } else if (totalInterestAmount is double) {
+          interestAmountDouble = totalInterestAmount;
+        }
+
+        _totalCost = _totalCost! + (interestAmountDouble ?? 0);
+      }
     }
   }
 
