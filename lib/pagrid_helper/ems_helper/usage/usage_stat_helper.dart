@@ -840,15 +840,19 @@ Widget getInterestInfo(
     // final billId = bill['bill_id'];
     final billLabel = bill['label'];
     final billDate = bill['bill_date_timestamp'];
-    final billedTotalCost = bill['billed_total_cost'];
-    final totalTheoreticalInterestToDate =
-        bill['total_theoretical_interest_to_date'];
-    final totalActualInterestToDate = bill['total_actual_interest_to_date'];
+    final billedTotalAmount = bill['billed_total_amount'];
+    final tti = bill['tti'];
+    final ttiDays = bill['tti_days'];
+    final tai = bill['tai'];
     final paymentTermDays = bill['payment_term_days'];
     final interestRate = bill['interest_rate'];
     final dueDate = bill['due_date_timestamp'];
-    final overDueDays = bill['overdue_days'];
+    final totalOverdueDays = bill['total_overdue_days'];
     final paymentApplyList = bill['payment_apply_list'];
+
+    final cycleStartDateTimestamp = bill['cycle_start_date_timestamp'];
+    final cycleEndDateTimestamp = bill['cycle_end_date_timestamp'];
+    final daysInCycle = bill['days_in_cycle'];
 
     List<Map<String, dynamic>> paymentApplyListCasted = [];
     if (paymentApplyList != null) {
@@ -859,31 +863,35 @@ Widget getInterestInfo(
       }
     }
 
-    double billedTotalCostDouble = 0.0;
-    if (billedTotalCost is String) {
-      billedTotalCostDouble = double.tryParse(billedTotalCost) ?? 0.0;
-    } else if (billedTotalCost is double) {
-      billedTotalCostDouble = billedTotalCost;
+    double billedTotalAmountDouble = 0.0;
+    if (billedTotalAmount is String) {
+      billedTotalAmountDouble = double.tryParse(billedTotalAmount) ?? 0.0;
+    } else if (billedTotalAmount is double) {
+      billedTotalAmountDouble = billedTotalAmount;
     }
     double totalTheoreticalInterestToDateDouble = 0.0;
-    if (totalTheoreticalInterestToDate is String) {
-      totalTheoreticalInterestToDateDouble =
-          double.tryParse(totalTheoreticalInterestToDate) ?? 0.0;
-    } else if (totalTheoreticalInterestToDate is double) {
-      totalTheoreticalInterestToDateDouble = totalTheoreticalInterestToDate;
+    if (tti is String) {
+      totalTheoreticalInterestToDateDouble = double.tryParse(tti) ?? 0.0;
+    } else if (tti is double) {
+      totalTheoreticalInterestToDateDouble = tti;
+    }
+    int? ttiDaysInt;
+    if (ttiDays is String) {
+      ttiDaysInt = int.tryParse(ttiDays) ?? 0;
+    } else if (ttiDays is int) {
+      ttiDaysInt = ttiDays;
     }
     double totalActualInterestToDateDouble = 0.0;
-    if (totalActualInterestToDate is String) {
-      totalActualInterestToDateDouble =
-          double.tryParse(totalActualInterestToDate) ?? 0.0;
-    } else if (totalActualInterestToDate is double) {
-      totalActualInterestToDateDouble = totalActualInterestToDate;
+    if (tai is String) {
+      totalActualInterestToDateDouble = double.tryParse(tai) ?? 0.0;
+    } else if (tai is double) {
+      totalActualInterestToDateDouble = tai;
     }
-    int overDueDaysInt = 0;
-    if (overDueDays is String) {
-      overDueDaysInt = int.tryParse(overDueDays) ?? 0;
-    } else if (overDueDays is int) {
-      overDueDaysInt = overDueDays;
+    int totalOverdueDaysInt = 0;
+    if (totalOverdueDays is String) {
+      totalOverdueDaysInt = int.tryParse(totalOverdueDays) ?? 0;
+    } else if (totalOverdueDays is int) {
+      totalOverdueDaysInt = totalOverdueDays;
     }
 
     int paymentTermDaysInt = 0;
@@ -898,6 +906,15 @@ Widget getInterestInfo(
     } else if (interestRate is double) {
       interestRateDouble = interestRate;
     }
+
+    int? daysInCycleInt;
+    if (daysInCycle is String) {
+      daysInCycleInt = int.tryParse(daysInCycle) ?? 0;
+    } else if (daysInCycle is int) {
+      daysInCycleInt = daysInCycle;
+    }
+    assert(daysInCycleInt != null && daysInCycleInt > 0,
+        'Days in cycle should be greater than 0 for bill $billLabel');
 
     Widget outstandingBillWidget = Container(
       margin: const EdgeInsets.only(bottom: 5),
@@ -924,16 +941,25 @@ Widget getInterestInfo(
           Text('Bill Date: ${billDate.substring(0, 10)}'),
           Text('Payment Term: $paymentTermDaysInt days'),
           Text('Due Date: ${dueDate.substring(0, 10)}'),
+          Text('Total Overdue Days: $totalOverdueDaysInt'),
           Text('Interest Rate: ${interestRateDouble.toStringAsFixed(3)}%'),
-          Text('Overdue Days: $overDueDaysInt'),
           Text(
-              'Billed Total Cost: SGD${getCommaNumberStr(billedTotalCostDouble, decimal: 2)}'),
+              'Cycle Start Date: ${cycleStartDateTimestamp.toString().substring(0, 10)}'),
           Text(
-              'Total Theoretical Interest To Date: SGD${getCommaNumberStr(totalTheoreticalInterestToDateDouble, decimal: 2)}'),
+              'Cycle End Date: ${cycleEndDateTimestamp.toString().substring(0, 10)}'),
+          Text('Days in Cycle: $daysInCycleInt days'),
+
+          Text(
+              'Billed Total Amount: SGD${getCommaNumberStr(billedTotalAmountDouble, decimal: 2)}'),
+          Text('TTI Days of This Cycle: ${ttiDaysInt ?? '-'} days'),
+          Text(
+              'TTI of This Cycle: SGD${getCommaNumberStr(totalTheoreticalInterestToDateDouble, decimal: 2)}',
+              style: const TextStyle(fontWeight: FontWeight.bold)),
           verticalSpaceTiny,
           getPaymentApplyList(paymentApplyListCasted, context),
           Text(
-              'Total Actual Interest To Date: SGD${getCommaNumberStr(totalActualInterestToDateDouble, decimal: 2)}'),
+              'TAI of This Cycle: SGD${getCommaNumberStr(totalActualInterestToDateDouble, decimal: 2)}',
+              style: const TextStyle(fontWeight: FontWeight.bold)),
         ],
       ),
     );
@@ -983,8 +1009,8 @@ Widget getPaymentApplyList(
     final valueTimestamp = payment['value_timestamp'];
     final reducedBilledUsageFromThisApply =
         payment['reduced_billed_usage_from_this_apply'];
-    final overdueDays = payment['overdue_days'];
-    final paymentTillBillDays = payment['payment_till_bill_days'];
+    // final overdueDays = payment['overdue_days'];
+    final paymentTillCycleEndDays = payment['payment_till_cycle_end_days'];
     final rieFromThisApply = payment['rie_from_this_apply'];
 
     double appliedUsageAmountFromBalDouble = 0.0;
@@ -1022,17 +1048,17 @@ Widget getPaymentApplyList(
     } else if (reducedBilledUsageFromThisApply is double) {
       reducedBilledUsageFromThisApplyDouble = reducedBilledUsageFromThisApply;
     }
-    int overdueDaysInt = 0;
-    if (overdueDays is String) {
-      overdueDaysInt = int.tryParse(overdueDays) ?? 0;
-    } else if (overdueDays is int) {
-      overdueDaysInt = overdueDays;
-    }
-    int paymentTillBillDaysInt = 0;
-    if (paymentTillBillDays is String) {
-      paymentTillBillDaysInt = int.tryParse(paymentTillBillDays) ?? 0;
-    } else if (paymentTillBillDays is int) {
-      paymentTillBillDaysInt = paymentTillBillDays;
+    // int overdueDaysInt = 0;
+    // if (overdueDays is String) {
+    //   overdueDaysInt = int.tryParse(overdueDays) ?? 0;
+    // } else if (overdueDays is int) {
+    //   overdueDaysInt = overdueDays;
+    // }
+    int paymentTillCycleEndDaysInt = 0;
+    if (paymentTillCycleEndDays is String) {
+      paymentTillCycleEndDaysInt = int.tryParse(paymentTillCycleEndDays) ?? 0;
+    } else if (paymentTillCycleEndDays is int) {
+      paymentTillCycleEndDaysInt = paymentTillCycleEndDays;
     }
     double rieFromThisApplyDouble = 0.0;
     if (rieFromThisApply is String) {
@@ -1078,8 +1104,9 @@ Widget getPaymentApplyList(
           if (reducedBilledUsageFromThisApplyDouble.abs() > 0.00001)
             Text(
                 ' - SGD${getCommaNumberStr(reducedBilledUsageFromThisApplyDouble, decimal: 2)} reduced Billed Usage from this Apply'),
-          Text(' - Overdue Days at Payment: $overdueDaysInt days'),
-          Text(' - Payment Till Bill Days: $paymentTillBillDaysInt days'),
+          // Text(' - Overdue Days at Payment: $overdueDaysInt days'),
+          Text(
+              ' - Payment Till Cycle End Days: $paymentTillCycleEndDaysInt days'),
           if (rieFromThisApplyDouble.abs() > 0.00001)
             Text(
                 ' - SGD${getCommaNumberStr(rieFromThisApplyDouble, decimal: 2)} RIE from this Apply',

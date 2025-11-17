@@ -286,7 +286,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
 
       final billingRecId = bill['id'] ?? '';
       final billedTotalCost =
-          double.tryParse(bill['billed_total_cost'] ?? '0.0') ?? 0.0;
+          double.tryParse(bill['billed_total_amount'] ?? '0.0') ?? 0.0;
       if (billedTotalCost <= 0.0) {
         continue;
       }
@@ -350,7 +350,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
       //flow to usage bucket first
       final billingRecId = bill['id'] ?? '';
       final billedTotalCost =
-          double.tryParse(bill['billed_total_cost'] ?? '0.0') ?? 0.0;
+          double.tryParse(bill['billed_total_amount'] ?? '0.0') ?? 0.0;
       if (billedTotalCost <= 0.0) {
         continue;
       }
@@ -405,7 +405,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
       //flow to interest bucket next
       final billingRecId = bill['id'] ?? '';
       final billedTotalCost =
-          double.tryParse(bill['billed_total_cost'] ?? '0.0') ?? 0.0;
+          double.tryParse(bill['billed_total_amount'] ?? '0.0') ?? 0.0;
       if (billedTotalCost <= 0.0) {
         continue;
       }
@@ -461,7 +461,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
       //flow to usage bucket first
       final billingRecId = bill['id'] ?? '';
       final billedTotalCost =
-          double.tryParse(bill['billed_total_cost'] ?? '0.0') ?? 0.0;
+          double.tryParse(bill['billed_total_amount'] ?? '0.0') ?? 0.0;
       if (billedTotalCost <= 0.0) {
         continue;
       }
@@ -524,7 +524,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
       // flow to interest bucket next
       final billingRecId = bill['id'] ?? '';
       final billedTotalCost =
-          double.tryParse(bill['billed_total_cost'] ?? '0.0') ?? 0.0;
+          double.tryParse(bill['billed_total_amount'] ?? '0.0') ?? 0.0;
       if (billedTotalCost <= 0.0) {
         continue;
       }
@@ -597,7 +597,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
     for (var bill in _billList) {
       final billingRecId = bill['id'] ?? '';
       final billedTotalCost =
-          double.tryParse(bill['billed_total_cost'] ?? '0.0') ?? 0.0;
+          double.tryParse(bill['billed_total_amount'] ?? '0.0') ?? 0.0;
       if (billedTotalCost <= 0.0) {
         continue;
       }
@@ -1010,10 +1010,10 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
     final billingRecId = billInfo['id'] ?? '';
     final billLabel = billInfo['label'] ?? '';
     final cycleStr = billInfo['cycle_str'] ?? '';
-    final billedTotalCost = billInfo['billed_total_cost'] ?? '';
+    final billedTotalCost = billInfo['billed_total_amount'] ?? '';
     final billingLcStatusStr = billInfo['lc_status'] ?? '';
     final usageAmount =
-        double.tryParse(billInfo['billed_total_cost'] ?? '0.0') ?? 0.0;
+        double.tryParse(billInfo['billed_total_amount'] ?? '0.0') ?? 0.0;
     final interestAmount =
         double.tryParse(billInfo['billed_interest_amount'] ?? '0.0') ?? 0.0;
     final totalAmount = usageAmount + interestAmount;
@@ -1469,7 +1469,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
       }
       String tenantLabel = applyInfo['tenant_label'] ?? '-';
       String billLabel = applyInfo['bill_label'] ?? '-';
-      String billedTotalCost = applyInfo['billed_total_cost'] ?? '-';
+      String billedTotalCost = applyInfo['billed_total_amount'] ?? '-';
       String appliedTimestamp = applyInfo['applied_timestamp'] ?? '-';
       String appliedByOpName = applyInfo['applied_by_op_username'] ?? '-';
       String appliedUsageAmountFromBalStr =
