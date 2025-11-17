@@ -45,6 +45,7 @@ class WgtPagTenantCompositeUsageSummaryReleased extends StatefulWidget {
     this.tenantSingularUsageInfoList = const [],
     required this.compositeUsageCalc,
     this.onUpdate,
+    this.interestInfo = const {},
   });
 
   final MdlPagAppConfig appConfig;
@@ -79,6 +80,7 @@ class WgtPagTenantCompositeUsageSummaryReleased extends StatefulWidget {
   final int costDecimals;
   final List<Map<String, dynamic>> tenantSingularUsageInfoList;
   final PagEmsTypeUsageCalcReleased? compositeUsageCalc;
+  final Map<String, dynamic> interestInfo;
   final Function? onUpdate;
 
   @override
@@ -98,6 +100,7 @@ class _WgtPagTenantCompositeUsageSummaryReleasedState
   late final _billInfo = Map<String, dynamic>.from(widget.billInfo);
 
   // bool _isDisabled = false;
+  bool _showInterestDetail = false;
 
   @override
   void initState() {
@@ -201,7 +204,13 @@ class _WgtPagTenantCompositeUsageSummaryReleasedState
                   widget.tenantType,
                   widget.compositeUsageCalc!.balBfUsage,
                   widget.compositeUsageCalc!.balBfInterest,
-                  {},
+                  widget.interestInfo,
+                  showInterestDetail: _showInterestDetail,
+                  onCheckInterestDetail: () {
+                    setState(() {
+                      _showInterestDetail = !_showInterestDetail;
+                    });
+                  },
                 ),
             ],
           ),

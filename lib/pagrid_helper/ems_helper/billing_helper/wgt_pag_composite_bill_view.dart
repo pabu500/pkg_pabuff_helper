@@ -311,10 +311,13 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
           toTimestampStr,
           fromDatetime,
           toDatetime,
+          cycleStr,
+          billDate,
           billBarFromMonth,
           balBf,
           balBfUsage,
-          balBfInterest);
+          balBfInterest,
+          interestInfo);
     } else {
       return getGeneratedRender(
           tenantName,
@@ -599,10 +602,13 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     String toTimestampStr,
     DateTime fromDatetime,
     DateTime toDatetime,
+    String cycleStr,
+    String billDate,
     String billBarFromMonth,
     String balBfStr,
     String balBfUsageStr,
     String balBfInterestStr,
+    Map<String, dynamic> interestInfo,
   ) {
     bool isMonthly = true; //_bill['is_monthly'] == 'true' ? true : false;
     String billTimeRangeStr = getTimeRangeStr(
@@ -750,6 +756,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       balBf: balBf,
       balBfUsage: balBfUsage,
       balBfInterest: balBfInterest,
+      interestInfo: interestInfo,
     );
     compositeUsageCalc.doCompositeCalc();
 
@@ -808,6 +815,8 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             showRenderModeSwitch: true,
             itemType: ItemType.meter_iwow,
             isMonthly: isMonthly,
+            cycleStr: cycleStr,
+            billDate: billDate,
             fromDatetime: fromDatetime,
             toDatetime: toDatetime,
             tenantName: tenantName,
@@ -825,6 +834,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             excludeAutoUsage:
                 _bill['exclude_auto_usage'] == 'true' ? true : false,
             gst: billedGst,
+            interestInfo: interestInfo,
             onUpdate: () {
               widget.onUpdate?.call();
               setState(() {

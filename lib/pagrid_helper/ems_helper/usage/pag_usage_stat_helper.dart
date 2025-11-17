@@ -111,6 +111,9 @@ Widget getPagUsageTitle(
   //   targetInterval: isMonthly ? 'monthly' : 'daily',
   //   useMiddle: isMonthly ? true : false,
   // );
+  assert(cycleStr.isNotEmpty, 'CycleStr is empty');
+  assert(billDate.isNotEmpty, 'BillDate is empty');
+
   return ConstrainedBox(
     constraints: const BoxConstraints(maxWidth: 350),
     child: Container(

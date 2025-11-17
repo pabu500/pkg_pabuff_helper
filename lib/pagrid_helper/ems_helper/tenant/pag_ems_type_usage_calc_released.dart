@@ -50,6 +50,8 @@ class PagEmsTypeUsageCalcReleased {
   late final double? _balBfUsage;
   late final double? _balBfInterest;
 
+  late final Map<String, dynamic>? _interestInfo;
+
   //output
   EmsTypeUsageR2? _typeUsageE;
   EmsTypeUsageR2? _typeUsageW;
@@ -90,6 +92,8 @@ class PagEmsTypeUsageCalcReleased {
   double? get balBfUsage => _balBfUsage;
   double? get balBfInterest => _balBfInterest;
 
+  Map<String, dynamic>? get interestInfo => _interestInfo;
+
   List<PagEmsTypeUsageCalcReleased> get singularCalcList => _singularCalcList;
 
   PagEmsTypeUsageCalcReleased({
@@ -127,6 +131,7 @@ class PagEmsTypeUsageCalcReleased {
     double? balBf,
     double? balBfUsage,
     double? balBfInterest,
+    Map<String, dynamic>? interestInfo,
   }) {
     _costDecimals = costDecimals;
 
@@ -165,6 +170,8 @@ class PagEmsTypeUsageCalcReleased {
     _balBf = balBf;
     _balBfUsage = balBfUsage;
     _balBfInterest = balBfInterest;
+
+    _interestInfo = interestInfo;
 
     if (singularUsageCalcList.isNotEmpty) {
       for (var item in singularUsageCalcList) {
@@ -624,6 +631,18 @@ class PagEmsTypeUsageCalcReleased {
       }
       _gstAmount = getRoundUp(_gstAmount!, 2);
       _totalCost = _subTotalCost! + _gstAmount!;
+
+      if (_interestInfo != null) {
+        final totalInterestAmount = _interestInfo['total_interest_amount'];
+        double? interestAmountDouble = 0;
+        if (totalInterestAmount is String) {
+          interestAmountDouble = double.tryParse(totalInterestAmount);
+        } else if (totalInterestAmount is double) {
+          interestAmountDouble = totalInterestAmount;
+        }
+
+        _totalCost = _totalCost! + (interestAmountDouble ?? 0);
+      }
 
       _totalCost = _totalCost! + _balBfUsage! + _balBfInterest!;
     }
