@@ -1084,7 +1084,10 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
         const Text('View in Gn Mode'),
         horizontalSpaceTiny,
         Switch(
-          value: _lcStatusDisplay == PagBillingLcStatus.released ? true : false,
+          value: _lcStatusDisplay == PagBillingLcStatus.released ||
+                  _lcStatusDisplay == PagBillingLcStatus.pv
+              ? true
+              : false,
           onChanged: _gettingBill
               ? null
               : (value) {
