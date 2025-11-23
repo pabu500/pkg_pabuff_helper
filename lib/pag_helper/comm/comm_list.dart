@@ -44,22 +44,6 @@ Future<dynamic> getListInfoList(
 
     var data = respJson['data'];
     return data;
-    // if (data['list_info_list'] == null) {
-    //   throw Exception('Failed to get list info list');
-    // }
-
-    // final listInfoListJson = data['list_info_list'];
-
-    // List<Map<String, dynamic>> listInfoList = [];
-    // if (listInfoListJson != null) {
-    //   for (var item in listInfoListJson) {
-    //     listInfoList.add(item);
-    //   }
-    // }
-
-    // return {
-    //   'list_info_list': listInfoList,
-    // };
   } else if (response.statusCode == 403) {
     throw Exception("You are not authorized to perform this operation");
   } else {
