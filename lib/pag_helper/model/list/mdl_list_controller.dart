@@ -100,8 +100,10 @@ class MdlPagListController /*extends ChangeNotifier*/ {
           break;
         case 'lock':
           itemType = PagDeviceCat.lock;
+          break;
         case 'camera':
           itemType = PagDeviceCat.camera;
+          break;
         case 'gateway':
           itemType = PagDeviceCat.gateway;
           break;
@@ -131,6 +133,7 @@ class MdlPagListController /*extends ChangeNotifier*/ {
           break;
         case 'bill':
           itemType = PagItemKind.bill;
+          break;
         case 'tenant_soa':
           itemType = PagFinanceType.tenantSoa;
           break;
