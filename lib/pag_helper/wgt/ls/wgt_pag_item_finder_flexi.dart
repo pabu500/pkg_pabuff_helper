@@ -851,6 +851,8 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
           return 'meter_sn';
         case PagDeviceCat.gateway:
           return 'iccid';
+        case PagDeviceCat.motherboard:
+          return 'sn';
         default:
           return null;
       }
