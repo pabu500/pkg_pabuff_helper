@@ -108,6 +108,9 @@ class MdlPagListController /*extends ChangeNotifier*/ {
         case 'mcu':
           itemType = PagDeviceCat.mcu;
           break;
+        case 'motherboard':
+          itemType = PagDeviceCat.motherboard;
+          break;
         case 'project':
           itemType = PagScopeType.project;
           break;
