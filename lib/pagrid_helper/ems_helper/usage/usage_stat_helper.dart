@@ -833,12 +833,16 @@ Widget getInterestInfo(
   } else if (totalInterestAmount is double) {
     totalInterestAmountDouble = totalInterestAmount;
   }
-  final precedingBillInfo =
-      interestInfo['preceding_bill_info'] as Map<String, dynamic>?;
+  final outstandingBillInfoList =
+      interestInfo['outstanding_bill_info_list'] as List<dynamic>?;
   List<Widget> billWidgets = [];
-  Map<String, dynamic> bill = {};
-  bill.addAll(precedingBillInfo ?? {});
-  if (bill.isNotEmpty) {
+  if (outstandingBillInfoList == null) {
+    return const SizedBox.shrink();
+  }
+  for (var bill in outstandingBillInfoList) {
+    if (bill.isEmpty) {
+      continue;
+    }
     // final billId = bill['bill_id'];
     final billLabel = bill['label'];
     final billDate = bill['bill_date_timestamp'];

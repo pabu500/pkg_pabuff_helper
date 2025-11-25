@@ -827,6 +827,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
   }
 
   Widget getApplyOp(
+      String billingRecId,
       bool isMatchedBill,
       int index,
       // double? availableAmountToApply,
@@ -868,6 +869,23 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
     } else {
       if (_isPopulated) {
         valueColor = commitColor;
+      }
+    }
+
+    for (var item in _paymentApplyInfoListNew) {
+      if (item['billing_rec_id'] == billingRecId) {
+        // populate initial values from the new apply list
+
+        item['applied_usage_amount_from_bal'] ??= initialValueUsageFromBal;
+
+        item['applied_interest_amount_from_bal'] ??=
+            initialValueInterestFromBal;
+
+        item['applied_usage_amount_from_payment'] ??= initialValueUsageFromPmt;
+
+        item['applied_interest_amount_from_payment'] ??=
+            initialValueInterestFromPmt;
+        break;
       }
     }
 
@@ -1168,6 +1186,7 @@ class _WgtMatchOnePayment2State extends State<WgtMatchOnePayment2> {
               ),
               const Spacer(),
               getApplyOp(
+                  billingRecId,
                   isMatchedBill,
                   index,
                   // availableAmountToApply,
