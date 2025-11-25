@@ -833,10 +833,12 @@ Widget getInterestInfo(
   } else if (totalInterestAmount is double) {
     totalInterestAmountDouble = totalInterestAmount;
   }
-  final outstandingBillList =
-      interestInfo['outstanding_bill_list'] as List<dynamic>?;
+  final precedingBillInfo =
+      interestInfo['preceding_bill_info'] as Map<String, dynamic>?;
   List<Widget> billWidgets = [];
-  for (var bill in outstandingBillList ?? []) {
+  Map<String, dynamic> bill = {};
+  bill.addAll(precedingBillInfo ?? {});
+  if (bill.isNotEmpty) {
     // final billId = bill['bill_id'];
     final billLabel = bill['label'];
     final billDate = bill['bill_date_timestamp'];
@@ -953,8 +955,7 @@ Widget getInterestInfo(
               'Billed Total Amount: SGD${getCommaNumberStr(billedTotalAmountDouble, decimal: 2)}'),
           Text('TTI Days of This Cycle: ${ttiDaysInt ?? '-'} days'),
           Text(
-              'TTI of This Cycle: SGD${getCommaNumberStr(totalTheoreticalInterestToDateDouble, decimal: 2)}',
-              style: const TextStyle(fontWeight: FontWeight.bold)),
+              'TTI of This Cycle: SGD${getCommaNumberStr(totalTheoreticalInterestToDateDouble, decimal: 2)}'),
           verticalSpaceTiny,
           getPaymentApplyList(paymentApplyListCasted, context),
           Text(
