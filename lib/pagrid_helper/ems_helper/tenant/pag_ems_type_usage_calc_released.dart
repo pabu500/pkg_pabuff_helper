@@ -644,7 +644,7 @@ class PagEmsTypeUsageCalcReleased {
         _totalCost = _totalCost! + (interestAmountDouble ?? 0);
       }
 
-      _totalCost = _totalCost! + _balBfUsage! + _balBfInterest!;
+      // _totalCost = _totalCost! + _balBfUsage! + _balBfInterest!;
     }
   }
 
