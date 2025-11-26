@@ -833,13 +833,13 @@ Widget getInterestInfo(
   } else if (totalInterestAmount is double) {
     totalInterestAmountDouble = totalInterestAmount;
   }
-  final outstandingBillInfoList =
+  final osBillInfoList =
       interestInfo['outstanding_bill_info_list'] as List<dynamic>?;
   List<Widget> billWidgets = [];
-  if (outstandingBillInfoList == null) {
+  if (osBillInfoList == null) {
     return const SizedBox.shrink();
   }
-  for (var bill in outstandingBillInfoList) {
+  for (var bill in osBillInfoList) {
     if (bill.isEmpty) {
       continue;
     }
@@ -847,8 +847,10 @@ Widget getInterestInfo(
     final billLabel = bill['label'];
     final billDate = bill['bill_date_timestamp'];
     final billedTotalAmount = bill['billed_total_amount'];
-    final tti = bill['tti'];
+    final outstandingAmount = bill['outstanding_amount'];
+    final ttiStartRefDateTimestamp = bill['tti_start_ref_date_timestamp'];
     final ttiDays = bill['tti_days'];
+    final tti = bill['tti'];
     final tai = bill['tai'];
     final paymentTermDays = bill['payment_term_days'];
     final interestRate = bill['interest_rate'];
@@ -875,11 +877,22 @@ Widget getInterestInfo(
     } else if (billedTotalAmount is double) {
       billedTotalAmountDouble = billedTotalAmount;
     }
+    double outstandingAmountDouble = 0.0;
+    if (outstandingAmount is String) {
+      outstandingAmountDouble = double.tryParse(outstandingAmount) ?? 0.0;
+    } else if (outstandingAmount is double) {
+      outstandingAmountDouble = outstandingAmount;
+    }
     double totalTheoreticalInterestToDateDouble = 0.0;
     if (tti is String) {
       totalTheoreticalInterestToDateDouble = double.tryParse(tti) ?? 0.0;
     } else if (tti is double) {
       totalTheoreticalInterestToDateDouble = tti;
+    }
+    String ttiStartRefDateTimestampStr = '';
+    if (ttiStartRefDateTimestamp != null &&
+        ttiStartRefDateTimestamp is String) {
+      ttiStartRefDateTimestampStr = ttiStartRefDateTimestamp;
     }
     int? ttiDaysInt;
     if (ttiDays is String) {
@@ -946,6 +959,8 @@ Widget getInterestInfo(
             ],
           ),
           Text('Bill Date: ${billDate.substring(0, 10)}'),
+          Text(
+              'Billed Total Amount: SGD${getCommaNumberStr(billedTotalAmountDouble, decimal: 2)}'),
           Text('Payment Term: $paymentTermDaysInt days'),
           Text('Due Date: ${dueDate.substring(0, 10)}'),
           Text('Total Overdue Days: $totalOverdueDaysInt'),
@@ -954,11 +969,12 @@ Widget getInterestInfo(
               'Cycle Start Date: ${cycleStartDateTimestamp.toString().substring(0, 10)}'),
           Text(
               'Cycle End Date: ${cycleEndDateTimestamp.toString().substring(0, 10)}'),
-          Text('Days in Cycle: $daysInCycleInt days'),
-
+          // Text('Days in Cycle: $daysInCycleInt days'),
           Text(
-              'Billed Total Amount: SGD${getCommaNumberStr(billedTotalAmountDouble, decimal: 2)}'),
-          Text('TTI Days of This Cycle: ${ttiDaysInt ?? '-'} days'),
+              'Outstanding Amount: SGD${getCommaNumberStr(outstandingAmountDouble, decimal: 2)}'),
+          Text(
+              'TTI Start Ref Date: ${ttiStartRefDateTimestampStr.isNotEmpty ? ttiStartRefDateTimestampStr.substring(0, 10) : '-'}'),
+          Text('TTI Days: ${ttiDaysInt ?? '-'} days'),
           Text(
               'TTI of This Cycle: SGD${getCommaNumberStr(totalTheoreticalInterestToDateDouble, decimal: 2)}'),
           verticalSpaceTiny,
