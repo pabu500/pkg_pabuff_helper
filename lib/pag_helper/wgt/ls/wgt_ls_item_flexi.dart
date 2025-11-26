@@ -290,7 +290,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     _queryMap['sort_order'] = _sortOrder;
 
     if (widget.listContextType == PagListContextType.soa) {
-      _queryMap['sort_by'] = 'entry_timestamp';
+      // _queryMap['sort_by'] = 'entry_timestamp';
     }
 
     try {

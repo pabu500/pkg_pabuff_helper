@@ -218,7 +218,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     };
 
     if (widget.listContextType == PagListContextType.soa) {
-      queryMap['sort_by'] = 'entry_timestamp';
+      // queryMap['sort_by'] = 'entry_timestamp';
     }
 
     if (widget.selectedItemInfoList != null) {
