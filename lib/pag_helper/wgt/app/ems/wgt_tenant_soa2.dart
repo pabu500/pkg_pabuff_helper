@@ -9,7 +9,6 @@ import '../../../def_helper/pag_item_helper.dart';
 import '../../../model/acl/mdl_pag_svc_claim.dart';
 import '../../../model/mdl_pag_app_config.dart';
 import '../../../model/mdl_pag_app_context.dart';
-import '../../../model/mdl_pag_user.dart';
 import '../../datetime/wgt_date_range_picker_monthly.dart';
 import '../../ls/wgt_ls_item_flexi.dart';
 
@@ -48,105 +47,105 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
 
   final List<Map<String, dynamic>> _soaData = [];
 
-  Future<dynamic> _doFetchSoaData() async {
-    if (_fetching) {
-      return;
-    }
-    if (_fromDate == null || _toDate == null) {
-      _errorText = 'Please select both From and To dates.';
-      setState(() {});
-      return;
-    }
-    Map<String, dynamic> queryMap = {
-      'scope': widget.loggedInUser.selectedScope.toScopeMap(),
-      'tenant_id': widget.teneantInfo['id'],
-      'from_timestamp': _fromDate?.toIso8601String() ?? '',
-      'to_timestamp': _toDate?.toIso8601String() ?? '',
-    };
+  // Future<dynamic> _doFetchSoaData() async {
+  //   if (_fetching) {
+  //     return;
+  //   }
+  //   if (_fromDate == null || _toDate == null) {
+  //     _errorText = 'Please select both From and To dates.';
+  //     setState(() {});
+  //     return;
+  //   }
+  //   Map<String, dynamic> queryMap = {
+  //     'scope': widget.loggedInUser.selectedScope.toScopeMap(),
+  //     'tenant_id': widget.teneantInfo['id'],
+  //     'from_timestamp': _fromDate?.toIso8601String() ?? '',
+  //     'to_timestamp': _toDate?.toIso8601String() ?? '',
+  //   };
 
-    _errorText = '';
-    _fetched = false;
-    _fetching = true;
+  //   _errorText = '';
+  //   _fetched = false;
+  //   _fetching = true;
 
-    try {
-      final result = await doGetTenantSoa(
-        widget.appConfig,
-        queryMap,
-        MdlPagSvcClaim(
-          username: widget.loggedInUser.username,
-          userId: widget.loggedInUser.id,
-          scope: '',
-          target: '',
-          operation: '',
-        ),
-      );
+  //   try {
+  //     final result = await doGetTenantSoa(
+  //       widget.appConfig,
+  //       queryMap,
+  //       MdlPagSvcClaim(
+  //         username: widget.loggedInUser.username,
+  //         userId: widget.loggedInUser.id,
+  //         scope: '',
+  //         target: '',
+  //         operation: '',
+  //       ),
+  //     );
 
-      // List<Map<String, dynamic>> debitList = [];
-      // List<Map<String, dynamic>> creditList = [];
-      // if (result['debit_list'] != null) {
-      //   debitList = List<Map<String, dynamic>>.from(result['debit_list']);
-      // }
-      // if (result['credit_list'] != null) {
-      //   creditList = List<Map<String, dynamic>>.from(result['credit_list']);
-      // }
-      // _updateSoAData(debitList, creditList);
-      final soaData = result;
-      _soaData.clear();
-      if (soaData is List && soaData.isNotEmpty) {
-        _soaData.addAll(List<Map<String, dynamic>>.from(soaData));
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('error: $e');
-      }
+  //     // List<Map<String, dynamic>> debitList = [];
+  //     // List<Map<String, dynamic>> creditList = [];
+  //     // if (result['debit_list'] != null) {
+  //     //   debitList = List<Map<String, dynamic>>.from(result['debit_list']);
+  //     // }
+  //     // if (result['credit_list'] != null) {
+  //     //   creditList = List<Map<String, dynamic>>.from(result['credit_list']);
+  //     // }
+  //     // _updateSoAData(debitList, creditList);
+  //     final soaData = result;
+  //     _soaData.clear();
+  //     if (soaData is List && soaData.isNotEmpty) {
+  //       _soaData.addAll(List<Map<String, dynamic>>.from(soaData));
+  //     }
+  //   } catch (e) {
+  //     if (kDebugMode) {
+  //       print('error: $e');
+  //     }
 
-      _errorText = 'Error fetching SoA data';
+  //     _errorText = 'Error fetching SoA data';
 
-      return;
-    } finally {
-      setState(() {
-        _fetched = true;
-        _fetching = false;
-        _enableSearch = _enableSearchButton();
-      });
-    }
-  }
+  //     return;
+  //   } finally {
+  //     setState(() {
+  //       _fetched = true;
+  //       _fetching = false;
+  //       _enableSearch = _enableSearchButton();
+  //     });
+  //   }
+  // }
 
-  void _updateSoAData(List<Map<String, dynamic>> debitList,
-      List<Map<String, dynamic>> creditList) {
-    _soaData.clear();
+  // void _updateSoAData(List<Map<String, dynamic>> debitList,
+  //     List<Map<String, dynamic>> creditList) {
+  //   _soaData.clear();
 
-    if (debitList.isNotEmpty) {
-      for (var item in debitList) {
-        _soaData.add({
-          'entry_type': 'debit',
-          'date': item['date'],
-          'amount': item['amount'],
-          'description': item['description'] ?? '',
-        });
-      }
-    }
-    if (creditList.isNotEmpty) {
-      for (var item in creditList) {
-        _soaData.add({
-          'entry_type': 'credit',
-          'date': item['date'],
-          'description': item['description'],
-          'amount': item['amount'],
-        });
-      }
-    }
-    _soaData.sort((a, b) => a['date'].compareTo(b['date']));
-    // insert header
-    if (_soaData.isNotEmpty) {
-      _soaData.insert(0, {
-        'entry_type': 'header',
-        'date': 'Date',
-        'amount': 'Amount',
-        'description': 'Description',
-      });
-    }
-  }
+  //   if (debitList.isNotEmpty) {
+  //     for (var item in debitList) {
+  //       _soaData.add({
+  //         'entry_type': 'debit',
+  //         'date': item['date'],
+  //         'amount': item['amount'],
+  //         'description': item['description'] ?? '',
+  //       });
+  //     }
+  //   }
+  //   if (creditList.isNotEmpty) {
+  //     for (var item in creditList) {
+  //       _soaData.add({
+  //         'entry_type': 'credit',
+  //         'date': item['date'],
+  //         'description': item['description'],
+  //         'amount': item['amount'],
+  //       });
+  //     }
+  //   }
+  //   _soaData.sort((a, b) => a['date'].compareTo(b['date']));
+  //   // insert header
+  //   if (_soaData.isNotEmpty) {
+  //     _soaData.insert(0, {
+  //       'entry_type': 'header',
+  //       'date': 'Date',
+  //       'amount': 'Amount',
+  //       'description': 'Description',
+  //     });
+  //   }
+  // }
 
   bool _enableSearchButton() {
     if (_fetching) {

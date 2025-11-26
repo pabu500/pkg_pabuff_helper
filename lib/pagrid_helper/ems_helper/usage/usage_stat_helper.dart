@@ -923,6 +923,7 @@ Widget getInterestInfo(
         'Days in cycle should be greater than 0 for bill $billLabel');
 
     Widget outstandingBillWidget = Container(
+      width: 395,
       margin: const EdgeInsets.only(bottom: 5),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
       decoration: BoxDecoration(

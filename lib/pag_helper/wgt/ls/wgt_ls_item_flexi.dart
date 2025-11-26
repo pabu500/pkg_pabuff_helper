@@ -289,6 +289,10 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     _queryMap['sort_by'] = _sortBy ?? '';
     _queryMap['sort_order'] = _sortOrder;
 
+    if (widget.listContextType == PagListContextType.soa) {
+      _queryMap['sort_by'] = 'entry_timestamp';
+    }
+
     try {
       itemFindResult = await fetchItemList(
         loggedInUser,

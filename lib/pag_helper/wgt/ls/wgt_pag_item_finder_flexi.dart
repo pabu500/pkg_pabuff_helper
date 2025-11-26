@@ -216,6 +216,11 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
       'get_count_only': widget.getCountOnly ? 'true' : 'false',
       'list_context_type': widget.listContextType.name,
     };
+
+    if (widget.listContextType == PagListContextType.soa) {
+      queryMap['sort_by'] = 'entry_timestamp';
+    }
+
     if (widget.selectedItemInfoList != null) {
       queryMap['selected_item_info_list'] = widget.selectedItemInfoList;
     }
