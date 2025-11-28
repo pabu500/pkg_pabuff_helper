@@ -152,3 +152,43 @@ String? validateSerialNumber(String val) {
   }
   return null;
 }
+
+
+String? validateDeviceIccid(String val) {
+  val = val.trim();
+
+  if (val.isEmpty) {
+    return 'required';
+  }
+
+  // At least 7 digits
+  String pattern = r'^\d{7,}$';
+  RegExp regExp = RegExp(pattern);
+  if (!regExp.hasMatch(val)) {
+    return 'must have at least 7 digits';
+  }
+
+  return null;
+}
+
+String? validateIp(String val) {
+  val = val.trim();
+  
+  if (val.isEmpty) {
+    return 'required';
+  }
+
+  // IPv4 pattern: 0-255.0-255.0-255.0-255
+  String pattern =
+      r'^((25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\.){3}'
+      r'(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)$';
+  
+  RegExp regExp = RegExp(pattern);
+  if (!regExp.hasMatch(val)) {
+    return 'invalid IP address';
+  }
+
+  return null;
+}
+
+

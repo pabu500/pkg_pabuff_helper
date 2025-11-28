@@ -400,6 +400,7 @@ class PagUrlBase {
 
   // AM - Device Manager
   static const String eptPagCreateDevice = '/am/device/create_device';
+    static const String eptPagCreateDevice2 = '/am/device/create_device2';
 
   // AM - Comms Manager
   static const String eptAmCommsUpdateDeviceLinkage =
