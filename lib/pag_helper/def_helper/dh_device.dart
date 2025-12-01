@@ -2,6 +2,8 @@ import 'package:buff_helper/up_helper/helper/device_def.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import 'enum_helper.dart';
+
 enum PagDeviceCat {
   meter('Meter', 'meter', 'm', Symbols.speed),
   meterGroup('Meter Group', 'meter_group', 'mg', Symbols.graph_6),
@@ -26,21 +28,21 @@ enum PagDeviceCat {
   final IconData iconData;
 
   static PagDeviceCat byLabel(String? label) =>
-      enumByLabel(label, values) ?? none;
+      enumByLabel(label, values, (e) => (e).label) ?? none;
 
   static PagDeviceCat byValue(String? value) =>
       enumByValue(value, values) ?? none;
 }
 
-T? enumByLabel<T extends Enum>(String? label, List<T> values) {
-  if (label == null) return null;
-  for (var item in values) {
-    if (item is PagDeviceCat && item.label.replaceAll('.', '') == label) {
-      return item as T;
-    }
-  }
-  return null;
-}
+// T? enumByLabel<T extends Enum>(String? label, List<T> values) {
+//   if (label == null) return null;
+//   for (var item in values) {
+//     if (item is PagDeviceCat && item.label.replaceAll('.', '') == label) {
+//       return item as T;
+//     }
+//   }
+//   return null;
+// }
 
 T? enumByValue<T extends Enum>(String? value, List<T> values) {
   if (value == null) return null;
@@ -153,7 +155,6 @@ String? validateSerialNumber(String val) {
   return null;
 }
 
-
 String? validateDeviceIccid(String val) {
   val = val.trim();
 
@@ -173,16 +174,15 @@ String? validateDeviceIccid(String val) {
 
 String? validateIp(String val) {
   val = val.trim();
-  
+
   if (val.isEmpty) {
     return 'required';
   }
 
   // IPv4 pattern: 0-255.0-255.0-255.0-255
-  String pattern =
-      r'^((25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\.){3}'
+  String pattern = r'^((25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\.){3}'
       r'(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)$';
-  
+
   RegExp regExp = RegExp(pattern);
   if (!regExp.hasMatch(val)) {
     return 'invalid IP address';
@@ -191,4 +191,49 @@ String? validateIp(String val) {
   return null;
 }
 
+String? validateDeviceType(String val) {
+  if (val.trim().isEmpty) {
+    return 'required';
+  }
 
+  // validate number, letter only, 1 to 21 characters
+  String pattern = r'^[a-zA-Z0-9]{1,21}$';
+  RegExp regExp = RegExp(pattern);
+  if (!regExp.hasMatch(val)) {
+    return '1-21 characters, letter and number only';
+  }
+  return null;
+}
+
+enum PagDeviceOps {
+  onboarding,
+  update,
+  none,
+}
+
+final List<Map<String, dynamic>> listConfigBaseDevice = [
+  {
+    'col_key': 'sn',
+    'title': 'S/N',
+    'col_type': 'string',
+    'width': 200,
+    'is_mapping_required': true,
+    'validator': validateSerialNumber,
+  },
+  {
+    'col_key': 'label',
+    'title': 'Label',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': false,
+    'validator': validateDeviceLabel,
+  },
+  {
+    'col_key': 'type',
+    'title': 'Type',
+    'col_type': 'string',
+    'width': 200,
+    'is_mapping_required': false,
+    'validator': validateDeviceType,
+  },
+];

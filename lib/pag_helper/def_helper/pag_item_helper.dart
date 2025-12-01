@@ -1,3 +1,6 @@
+import 'package:buff_helper/pag_helper/def_helper/dh_device.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_pag_finance.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -88,4 +91,17 @@ T? enumByTag<T extends Enum>(
     }
   }
   return null;
+}
+
+String? getItemTypeStr(dynamic itemType) {
+  if (itemType is PagDeviceCat) {
+    // return getPagDeviceTypeStr(itemType);
+    return itemType.name;
+  } else if (itemType is PagScopeType) {
+    return getPagScopeTypeStr(itemType);
+  } else if (itemType is PagFinanceType) {
+    return getPagFinanceTypeStr(itemType);
+  } else {
+    throw Exception('Unsupported item type: ${itemType.runtimeType}');
+  }
 }
