@@ -858,6 +858,8 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
           return 'iccid';
         case PagDeviceCat.motherboard:
           return 'sn';
+        case PagDeviceCat.mcu:
+          return 'sn';
         default:
           return null;
       }

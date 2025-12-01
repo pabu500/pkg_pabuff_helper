@@ -56,7 +56,7 @@ class WgtListSearchItemFlexi extends StatefulWidget {
     this.itemType,
     this.listController,
     this.selectedItemInfoList,
-    this.onListInfoListResult,
+    this.onGetListInfoListResult,
     this.onResult,
     this.additionalColumnConfig,
     this.itemTypeListStr,
@@ -84,7 +84,7 @@ class WgtListSearchItemFlexi extends StatefulWidget {
   final String prefKey;
   final MdlPagListController? listController;
   final List<Map<String, dynamic>>? selectedItemInfoList;
-  final Function(List<MdlPagListController>)? onListInfoListResult;
+  final Function(List<MdlPagListController>)? onGetListInfoListResult;
   final Function(Map<String, dynamic>)? onResult;
   final List<Map<String, dynamic>>? additionalColumnConfig;
   final String? itemTypeListStr;
@@ -250,7 +250,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
 
         _updateCustomize();
 
-        widget.onListInfoListResult?.call(_listControllerList);
+        widget.onGetListInfoListResult?.call(_listControllerList);
       }
     } catch (e) {
       // if (kDebugMode) {

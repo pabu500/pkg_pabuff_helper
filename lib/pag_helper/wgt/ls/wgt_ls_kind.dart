@@ -381,7 +381,7 @@ class _WgtListSearchKindState extends State<WgtListSearchKind> {
               // getSwitcher: getPaneModeSwitcher,
               listController: _selectedListController,
               onScopeTreeUpdate: widget.onScopeTreeUpdate,
-              onListInfoListResult: (lisInfoList) {
+              onGetListInfoListResult: (lisInfoList) {
                 _listControllerList.clear();
                 _listControllerList.addAll(lisInfoList);
                 _updateItemTypeListStatus();

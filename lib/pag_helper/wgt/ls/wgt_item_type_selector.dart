@@ -28,6 +28,7 @@ class WgtItemTypeSelector extends StatefulWidget {
     this.listContextType = PagListContextType.info,
     required this.itemKind,
     required this.prefKey,
+    this.onGetListInfoListResult,
     this.onItemTypeSelected,
   });
 
@@ -37,6 +38,7 @@ class WgtItemTypeSelector extends StatefulWidget {
   final PagListContextType listContextType;
   final PagItemKind itemKind;
   final String prefKey;
+  final Function? onGetListInfoListResult;
   final Function? onItemTypeSelected;
 
   @override
@@ -115,14 +117,9 @@ class _WgtItemTypeSelectorState extends State<WgtItemTypeSelector> {
         }
       }
 
-      if (_listControllerList.isNotEmpty) {
-        // _selectedListController = _listControllerList[0];
-        // _selectedItemType = _listControllerList[0].itemType;
-      }
+      widget.onGetListInfoListResult?.call(_listControllerList);
     } catch (e) {
-      // if (kDebugMode) {
       dev.log(e.toString());
-      // }
       _failedPullListInfo++;
       rethrow;
     } finally {
