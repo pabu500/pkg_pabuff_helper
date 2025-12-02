@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:buff_helper/pag_helper/comm/comm_list.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_device.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_finance.dart';
@@ -28,6 +31,8 @@ class WgtItemTypeSelector extends StatefulWidget {
     this.listContextType = PagListContextType.info,
     required this.itemKind,
     required this.prefKey,
+    this.iniItemType,
+    this.allowChangeItemType = true,
     this.onGetListInfoListResult,
     this.onItemTypeSelected,
   });
@@ -38,6 +43,8 @@ class WgtItemTypeSelector extends StatefulWidget {
   final PagListContextType listContextType;
   final PagItemKind itemKind;
   final String prefKey;
+  final dynamic iniItemType;
+  final bool allowChangeItemType;
   final Function? onGetListInfoListResult;
   final Function? onItemTypeSelected;
 
@@ -158,24 +165,9 @@ class _WgtItemTypeSelectorState extends State<WgtItemTypeSelector> {
   }
 
   void _saveItemTypePref() {
-    String? itemTypeStr = _getItemTypeStr(_selectedListController?.itemType);
+    String? itemTypeStr = getItemTypeStr(_selectedListController?.itemType);
     String itemTypePrefKey = '${widget.prefKey}_${widget.itemKind.name}';
     saveToSharedPref(itemTypePrefKey, itemTypeStr);
-  }
-
-  String? _getItemTypeStr(dynamic itemType) {
-    if (itemType == null) {
-      return null;
-    }
-    if (itemType is PagDeviceCat) {
-      return itemType.name;
-    } else if (itemType is PagScopeType) {
-      return getPagScopeTypeStr(itemType);
-    } else if (itemType is PagFinanceType) {
-      return getPagFinanceTypeStr(itemType);
-    } else {
-      throw Exception('Unsupported item type: ${itemType.runtimeType}');
-    }
   }
 
   @override
@@ -184,6 +176,7 @@ class _WgtItemTypeSelectorState extends State<WgtItemTypeSelector> {
 
     loggedInUser =
         Provider.of<PagUserProvider>(context, listen: false).currentUser;
+    _selectedItemType = widget.iniItemType;
   }
 
   @override
@@ -191,6 +184,21 @@ class _WgtItemTypeSelectorState extends State<WgtItemTypeSelector> {
     bool fetchListInfo = _failedPullListInfo <= 3 &&
         _listControllerList.isEmpty &&
         !_isFetchingListInfo;
+
+    if (_selectedItemType != widget.iniItemType) {
+      if (!widget.allowChangeItemType) {
+        _selectedItemType = widget.iniItemType;
+        Timer(Duration.zero, () {
+          widget.onItemTypeSelected?.call(_selectedItemType);
+        });
+        //   for (var listController in _listControllerList) {
+        //     if (listController.itemType == _selectedItemType) {
+        //       _selectedListController = listController;
+        //       break;
+        //     }
+        //   }
+      }
+    }
 
     return SingleChildScrollView(
       // put the result widget as part of the loading widget
@@ -239,21 +247,34 @@ class _WgtItemTypeSelectorState extends State<WgtItemTypeSelector> {
     if (!_listInfoFetched) {
       return Container();
     }
+    final selectedItemTypeStr = getItemTypeStr(_selectedItemType);
+
     List<Widget> itemTypeList = [];
     if (_itemTypeInfoList.isNotEmpty) {
       for (Map<String, dynamic> itemTypeInfo in _itemTypeInfoList) {
         final itemTypeStr = itemTypeInfo['item_type'];
-        // String selectedItemTypeStr = (_selectedItemType as String);
 
-        Color color = itemTypeStr == _getItemTypeStr(_selectedItemType)
+        Color color = itemTypeStr == selectedItemTypeStr
             ? pag3.withAlpha(230)
             : Theme.of(context)
                 .colorScheme
                 .secondary
                 .withAlpha(210); //Theme.of(context).hintColor;
 
+        bool enabled = true;
+
         bool listInfoAvailable = itemTypeInfo['list_info_available'] ?? true;
-        if (!listInfoAvailable) {
+
+        if (listInfoAvailable == false) {
+          enabled = false;
+        }
+        if (!widget.allowChangeItemType) {
+          if (itemTypeStr != selectedItemTypeStr) {
+            enabled = false;
+          }
+        }
+
+        if (!enabled) {
           color = Theme.of(context).hintColor.withAlpha(50);
         }
 
@@ -270,7 +291,7 @@ class _WgtItemTypeSelectorState extends State<WgtItemTypeSelector> {
 
         itemTypeList.add(
           InkWell(
-            onTap: !listInfoAvailable
+            onTap: !enabled
                 ? null
                 : () {
                     setState(() {

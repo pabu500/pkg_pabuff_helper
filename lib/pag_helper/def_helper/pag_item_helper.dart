@@ -94,6 +94,9 @@ T? enumByTag<T extends Enum>(
 }
 
 String? getItemTypeStr(dynamic itemType) {
+  if (itemType == null) {
+    return null;
+  }
   if (itemType is PagDeviceCat) {
     // return getPagDeviceTypeStr(itemType);
     return itemType.name;

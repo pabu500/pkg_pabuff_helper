@@ -28,7 +28,7 @@ class WgtListSearchKind2 extends StatefulWidget {
     required this.pagAppContext,
     required this.listContextType,
     required this.prefKey,
-    this.itemType,
+    this.iniItemType,
     this.selectedItemInfoList,
     this.onResult,
     this.additionalColumnConfig,
@@ -38,6 +38,7 @@ class WgtListSearchKind2 extends StatefulWidget {
     this.showList = true,
     this.onItemTypeSelected,
     this.width,
+    this.allowChangeItemType = true,
   });
 
   final MdlPagAppConfig appConfig;
@@ -46,7 +47,7 @@ class WgtListSearchKind2 extends StatefulWidget {
   final PagListContextType listContextType;
   final List<Map<String, dynamic>>? selectedItemInfoList;
   final Function(Map<String, dynamic>)? onResult;
-  final dynamic itemType;
+  final dynamic iniItemType;
   final String prefKey;
   final List<Map<String, dynamic>>? additionalColumnConfig;
   final Function? onScopeTreeUpdate;
@@ -55,6 +56,7 @@ class WgtListSearchKind2 extends StatefulWidget {
   final bool showList;
   final Function(dynamic)? onItemTypeSelected;
   final double? width;
+  final bool allowChangeItemType;
 
   @override
   State<WgtListSearchKind2> createState() => _WgtListSearchKind2State();
@@ -172,7 +174,7 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
   }
 
   void _loadColPref() {
-    if (widget.itemType != null) {
+    if (widget.iniItemType != null) {
       return;
     }
 
@@ -277,12 +279,14 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
             appConfig: widget.appConfig,
             itemKind: PagItemKind.device,
             prefKey: 'item_type',
+            iniItemType: widget.iniItemType,
+            allowChangeItemType: widget.allowChangeItemType,
             onGetListInfoListResult: (lisInfoList) {
               _listControllerList.clear();
               _listControllerList.addAll(lisInfoList);
               _updateItemTypeListStatus();
 
-              _updateItemType(itemType: widget.itemType);
+              _updateItemType(itemType: widget.iniItemType);
 
               setState(() {
                 _listInfoFetched = true;
