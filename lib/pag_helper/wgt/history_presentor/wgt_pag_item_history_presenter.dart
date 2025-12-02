@@ -1242,7 +1242,7 @@ class _WgtPagItemHistoryPresenterState
     return WgtPagHistoryRepList(
       loggedInUser: widget.loggedInUser,
       appConfig: widget.appConfig,
-      itemId: widget.itemId,
+      itemId: formatFileName(widget.displayId ?? widget.itemId),
       readingTypeConfig: _readingTypeConfig,
       readingTypes: _selectedMultiFields.map((e) => e.value!).toList(),
       listKey: _intRefreshKey,
