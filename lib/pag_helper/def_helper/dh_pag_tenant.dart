@@ -752,7 +752,7 @@ final List<Map<String, dynamic>> listConfigBaseTenant = [
     'title': 'Unit Type',
     'col_type': 'enum',
     'width': 150,
-    'is_mapping_required': true,
+    'is_mapping_required': false,
     'validator': validateUnitType,
   },
   {

@@ -403,9 +403,9 @@ class PagUrlBase {
   static const String eptPagCreateDevice2 = '/am/device/create_device2';
 
   static const String eptBatchOpDeviceOnboarding =
-      '/ems/device/batch_op/device_onboarding';
+      '/am/device/batch_op/device_onboarding';
   static const String eptBatchOpDeviceUpdate =
-      '/ems/device/batch_op/device_update';
+      '/am/device/batch_op/device_update';
 
   // AM - Comms Manager
   static const String eptAmCommsUpdateDeviceLinkage =
