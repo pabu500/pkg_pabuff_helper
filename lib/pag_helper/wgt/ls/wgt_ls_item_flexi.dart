@@ -646,7 +646,8 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                         listController: _selectedListController,
                         itemScopeMap: itemScopeMap,
                         itemInfoMap: item,
-                        itemType: widget.itemType,
+                        itemType:
+                            widget.itemType ?? widget.listController?.itemType,
                         onScopeTreeUpdate: widget.onScopeTreeUpdate,
                         validateTreeChildren: widget.validateTreeChildren,
                         customProperties: customProperties,
@@ -1331,6 +1332,10 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
 
     if (widget.itemType != null) {
       prefix += '_${widget.itemType}'.toLowerCase();
+    } else if (_selectedListController != null &&
+        _selectedListController!.itemType != null) {
+      prefix +=
+          '_${_selectedListController!.itemType}'.toString().toLowerCase();
     }
 
     prefix += '_${widget.listContextType.name}';
@@ -1593,7 +1598,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           getSwitcher: widget.getSwitcher ?? getPaneModeSwitcher,
           sectionName: widget.prefKey,
           paneHeight: widget.paneHeight,
-          itemType: widget.itemType,
+          itemType: widget.itemType ?? widget.listController?.itemType,
           listPrefix: _getListPrefix(),
           onResult: (Map<String, dynamic> result) {
             widget.onResult?.call(result);

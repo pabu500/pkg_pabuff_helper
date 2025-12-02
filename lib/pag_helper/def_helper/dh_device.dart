@@ -127,8 +127,11 @@ Widget getSensorTypeIcon(SensorType sensorType) {
 }
 
 String? validateDeviceLabel(String val) {
+  // if (val.trim().isEmpty) {
+  //   return 'required';
+  // }
   if (val.trim().isEmpty) {
-    return 'required';
+    return null;
   }
 
   // validate number, letter, underscore, and dash, space,
@@ -192,9 +195,9 @@ String? validateIp(String val) {
 }
 
 String? validateDeviceType(String val) {
-  if (val.trim().isEmpty) {
-    return 'required';
-  }
+  // if (val.trim().isEmpty) {
+  //   return 'required';
+  // }
 
   // validate number, letter only, 1 to 21 characters
   String pattern = r'^[a-zA-Z0-9]{1,21}$';
