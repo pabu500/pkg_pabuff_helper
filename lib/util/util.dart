@@ -149,6 +149,16 @@ String makeReportName(
   return reportName;
 }
 
+String formatFileName(String input) {
+  // Replace all non-alphanumeric characters with '_'
+  String sanitized = input.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '_');
+  // Collapse multiple consecutive '_' into a single '_'
+  sanitized = sanitized.replaceAll(RegExp(r'_+'), '_');
+  // Optionally, trim leading/trailing underscores
+  sanitized = sanitized.replaceAll(RegExp(r'^_|_$'), '');
+  return sanitized;
+}
+
 bool canPullData(bool hasData, DateTime? lastRequst, int? reqInterval,
     DateTime? lastLoad, int? loadInteval) {
   // if (!hasData) {
