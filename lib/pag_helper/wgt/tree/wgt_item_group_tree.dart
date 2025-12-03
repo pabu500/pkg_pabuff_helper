@@ -1327,7 +1327,7 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
       int timezone = widget.loggedInUser.selectedScope.getProjectTimezone();
       DateTime newFromDateTime = getTargetLocalDatetimeNow(timezone);
       int year = newFromDateTime.year;
-      int month = newFromDateTime.month - 2;
+      int month = newFromDateTime.month - 5;
       int day = cycleDay!;
       newFromDateTime = DateTime(year, month, day, 0, 0, 0);
       int nextMonth = month + 1;
