@@ -197,8 +197,12 @@ String? validateBillingAddress(String value) {
 }
 
 String? validateBillingAddressLine1(String value) {
+  // if (value.trim().isEmpty) {
+  //   return 'required';
+  // }
   if (value.trim().isEmpty) {
-    return 'required';
+    // return 'required';
+    return null;
   }
   //length 5-255, alphanumeric, space, /, ', -,  # only
   String pattern = r"^[-a-zA-Z0-9 .,/'#&]{5,255}$";
@@ -331,8 +335,11 @@ String? validateGfa(String value) {
 // }
 
 String? validateAccountNumber(String value) {
+  // if (value.trim().isEmpty) {
+  //   return 'required';
+  // }
   if (value.trim().isEmpty) {
-    return 'required';
+    return null;
   }
   // validate number, letter, underscore, and dash,
   // and minimum 5 characters
@@ -456,8 +463,11 @@ String? validateRequestedTurnOnDate(String value) {
 }
 
 String? validateFtfStartDate(String value) {
+  // if (value.trim().isEmpty) {
+  //   return 'required';
+  // }
   if (value.trim().isEmpty) {
-    return 'required';
+    return null;
   }
   //must be a timestamp
   if (DateTime.tryParse(value) == null) {
@@ -472,8 +482,11 @@ String? validateFtfStartDate(String value) {
 }
 
 String? validateDdaNumber(String value) {
+  // if (value.trim().isEmpty) {
+  //   return 'required';
+  // }
   if (value.trim().isEmpty) {
-    return 'required';
+    return null;
   }
   // validate number, letter, underscore, and dash,
   // and minimum 5 characters

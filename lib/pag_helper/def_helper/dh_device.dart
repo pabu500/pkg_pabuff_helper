@@ -1,3 +1,4 @@
+import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:buff_helper/up_helper/helper/device_def.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -238,5 +239,29 @@ final List<Map<String, dynamic>> listConfigBaseDevice = [
     'width': 200,
     'is_mapping_required': false,
     'validator': validateDeviceType,
+  },
+  {
+    'col_key': 'site_label',
+    'title': 'Site Label',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': false,
+    'validator': validateLabelScope,
+  },
+  {
+    'col_key': 'building_label',
+    'title': 'Building Label',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': true,
+    'validator': validateLabelScope,
+  },
+  {
+    'col_key': 'location_label',
+    'title': 'Location Label',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': true,
+    'validator': validateLabelScope,
   },
 ];

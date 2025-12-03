@@ -299,65 +299,35 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
             },
           ),
           verticalSpaceTiny,
-          _selectedListController == null
-              ? getEmptyInfoBox()
-              : WgtListSearchItemFlexi(
-                  appConfig: widget.appConfig,
-                  width: widget.width,
-                  // key: _itemTypeFreshKey,
-                  isCompactFinder: widget.isCompactFinder,
-                  isSingleItemMode: widget.isSingleItemMode,
-                  showList: widget.showList,
-                  finderRefreshKey: _itemTypeRefreshKey,
-                  pagAppContext: widget.pagAppContext,
-                  itemKind: widget.itemKind,
-                  // itemType: _selectedItemType,
-                  listController: _selectedListController,
-                  selectedItemInfoList: widget.selectedItemInfoList,
-                  prefKey: prefKey,
-                  listContextType: widget.listContextType,
-                  additionalColumnConfig: widget.additionalColumnConfig,
-                  itemTypeListStr: itemTypeListStr,
-                  enablePaneModeSwitcher: enablePaneModeSwitcher,
-                  getPaneWidget: getPaneWidget,
-                  // getSwitcher: getPaneModeSwitcher,
-                  onScopeTreeUpdate: widget.onScopeTreeUpdate,
-                  onResult: (result) {
-                    // Handle the result here
-                    widget.onResult?.call(result);
-                  },
-                ),
+          if (_selectedListController != null && _listTypeErrorText.isEmpty)
+            WgtListSearchItemFlexi(
+              appConfig: widget.appConfig,
+              width: widget.width,
+              // key: _itemTypeFreshKey,
+              isCompactFinder: widget.isCompactFinder,
+              isSingleItemMode: widget.isSingleItemMode,
+              showList: widget.showList,
+              finderRefreshKey: _itemTypeRefreshKey,
+              pagAppContext: widget.pagAppContext,
+              itemKind: widget.itemKind,
+              // itemType: _selectedItemType,
+              listController: _selectedListController,
+              selectedItemInfoList: widget.selectedItemInfoList,
+              prefKey: prefKey,
+              listContextType: widget.listContextType,
+              additionalColumnConfig: widget.additionalColumnConfig,
+              itemTypeListStr: itemTypeListStr,
+              enablePaneModeSwitcher: enablePaneModeSwitcher,
+              getPaneWidget: getPaneWidget,
+              // getSwitcher: getPaneModeSwitcher,
+              onScopeTreeUpdate: widget.onScopeTreeUpdate,
+              onResult: (result) {
+                // Handle the result here
+                widget.onResult?.call(result);
+              },
+            ),
         ],
       ),
-    );
-  }
-
-  Widget getEmptyInfoBox() {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Theme.of(context).hintColor,
-            ),
-            borderRadius: BorderRadius.circular(5),
-          ),
-          margin: const EdgeInsets.symmetric(vertical: 10),
-          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
-          child: Center(
-            child: Text(
-              _listTypeErrorText.isNotEmpty
-                  ? _listTypeErrorText
-                  : 'Select an item type',
-              style: TextStyle(
-                fontSize: 16,
-                color: Theme.of(context).hintColor,
-              ),
-            ),
-          ),
-        ),
-      ],
     );
   }
 

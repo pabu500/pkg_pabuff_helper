@@ -327,8 +327,9 @@ class PagUrlBase {
   static const String eptSetTenantUserList = '/ems/tenant/set_tenant_user_list';
 
   // ems/fin
-  static const String eptBatchOpFinPostPayment =
-      '/ems/fin/batch_op/post_payment';
+  // static const String eptBatchOpFinPostPayment =
+  // '/ems/fin/batch_op/post_payment';
+  // '/batch_op/do_op';
   static const String eptFinMatchPayment = '/ems/fin/match_payment';
   static const String eptFinGetPaymentApplyInfo =
       '/ems/fin/get_payment_apply_info';
@@ -369,10 +370,12 @@ class PagUrlBase {
       '/ems/tenant/get_tenant_meter_assignment';
   static const String eptGetTenantSoA = '/ems/fin/get_tenant_soa';
 
-  static const String eptBatchOpTenantOnboarding =
-      '/ems/tenant/batch_op/tenant_onboarding';
-  static const String eptBatchOpTenantUpdate =
-      '/ems/tenant/batch_op/tenant_update';
+  // static const String eptBatchOpTenantOnboarding =
+  // '/ems/tenant/batch_op/tenant_onboarding';
+  // '/batch_op/do_op';
+  // static const String eptBatchOpTenantUpdate =
+  // '/ems/tenant/batch_op/tenant_update';
+  // '/batch_op/do_op';
 
   //Billing Manager
   static const String eptGetBill = '/ems/billing/get_bill';
@@ -402,10 +405,12 @@ class PagUrlBase {
   static const String eptPagCreateDevice = '/am/device/create_device';
   static const String eptPagCreateDevice2 = '/am/device/create_device2';
 
-  static const String eptBatchOpDeviceOnboarding =
-      '/am/device/batch_op/device_onboarding';
-  static const String eptBatchOpDeviceUpdate =
-      '/am/device/batch_op/device_update';
+  // static const String eptBatchOpDeviceOnboarding =
+  // '/am/device/batch_op/device_onboarding';
+  // '/batch_op/do_op';
+  // static const String eptBatchOpDeviceUpdate =
+  // '/am/device/batch_op/device_update';
+  // '/batch_op/do_op';
 
   // AM - Comms Manager
   static const String eptAmCommsUpdateDeviceLinkage =
@@ -503,6 +508,7 @@ class PagUrlBase {
 
   //batch_op
   static const String eptCheckOpList = '/batch_op/check_op_list';
+  static const String eptDoBatchOp = '/batch_op/do_op';
   static const String eptPollingBatchOpProgress = '/batch_op/progress_update';
   static const String eptPollingAutogenProgress = '/batch_op/progress_update';
   static const String eptPollingBatchCreditOpProgress =

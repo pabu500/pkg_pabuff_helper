@@ -240,6 +240,11 @@ class _WgtItemTypeSelectorState extends State<WgtItemTypeSelector> {
   Widget getCompletedWidget() {
     return Column(children: [
       getItemTypeList(),
+      if (_selectedItemType == null)
+        Padding(
+          padding: const EdgeInsets.only(top: 0.0),
+          child: getEmptyInfoBox(),
+        ),
     ]);
   }
 
@@ -362,6 +367,33 @@ class _WgtItemTypeSelectorState extends State<WgtItemTypeSelector> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         ...itemTypeList,
+      ],
+    );
+  }
+
+  Widget getEmptyInfoBox() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Theme.of(context).hintColor,
+            ),
+            borderRadius: BorderRadius.circular(5),
+          ),
+          margin: const EdgeInsets.symmetric(vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
+          child: Center(
+            child: Text(
+              'Select an item type',
+              style: TextStyle(
+                fontSize: 16,
+                color: Theme.of(context).hintColor,
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }

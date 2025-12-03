@@ -230,12 +230,13 @@ class MdlPagOpController {
       'scope': loggedInUser!.selectedScope.toScopeMap(),
       'op_name': opName,
       'item_kind': itemKind.name,
-      'item_type': itemType.toString(),
+      'item_type': getItemTypeStr(itemType),
       'item_id_type': itemIdType.name,
       'target_fields': targetFields.join(','),
       'op_list': opList,
       'identity_key': identifierField ?? '',
       'update_key': updateKey ?? '',
+      'op_username': loggedInUser?.username ?? '',
     };
     final opResultList = await doOp?.call(
       appConfig,
