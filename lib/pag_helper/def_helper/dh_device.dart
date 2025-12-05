@@ -159,6 +159,26 @@ String? validateSerialNumber(String val) {
   return null;
 }
 
+String? validateModel(String val) {
+  val = val.trim();
+
+  if (val.isEmpty) {
+    return 'required';
+  }
+
+  // Pattern: int.int.int[.alphanumeric] or int.int.int[.int]
+  final pattern = r'^\d{1,3}\.\d{1,3}\.\d{1,3}(\.[A-Za-z0-9]+)?$';
+
+  final regExp = RegExp(pattern);
+
+  if (!regExp.hasMatch(val)) {
+    return 'invalid model format';
+  }
+
+  return null;
+}
+
+
 String? validateDeviceIccid(String val) {
   val = val.trim();
 
