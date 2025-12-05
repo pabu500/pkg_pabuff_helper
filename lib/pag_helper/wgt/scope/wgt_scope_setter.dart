@@ -573,9 +573,9 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
     originalLocationGroupProfile = originalBuildingProfile
         ?.getLocationGroupProfileByName(locationGroupName);
 
-    // originalLocation is always empty becuase it's lazy loaded
-    // String? locationName = widget.itemScopeMap?['location_name'];
-    // originalLocation = originalLocationGroupProfile?.getLocationByName(locationName);
+    String? locationName = widget.itemScopeMap?['location_name'];
+    originalLocation =
+        originalLocationGroupProfile?.getLocationByName(locationName);
 
     _iniScopePreLoad();
   }
