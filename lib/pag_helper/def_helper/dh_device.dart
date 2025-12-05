@@ -229,6 +229,23 @@ String? validateDeviceType(String val) {
   return null;
 }
 
+String? validateTag(String val) {
+
+  val = val.trim();
+
+  if (val.isEmpty) {
+    return null;
+  }
+
+  // tag pattern: letter, number, underscore, dash, space, 0 to 55 characters
+  String pattern = r'^[a-zA-Z0-9_ -]{0,55}$';
+  RegExp regExp = RegExp(pattern);
+  if (!regExp.hasMatch(val)) {
+    return 'max length is 55 and letter, number, space, _, - only';
+  }
+  return null;
+}
+
 enum PagDeviceOps {
   onboarding,
   update,
@@ -283,5 +300,37 @@ final List<Map<String, dynamic>> listConfigBaseDevice = [
     'width': 150,
     'is_mapping_required': true,
     'validator': validateLabelScope,
+  },
+  {
+    'col_key': 'tag',
+    'title': 'tag',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': false,
+    'validator': validateTag,
+  },
+  {
+    'col_key': 'ip',
+    'title': 'ip',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': false,
+    'validator': validateIp,
+  },
+  {
+    'col_key': 'iccid',
+    'title': 'iccid',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': false,
+    'validator': validateDeviceIccid,
+  },
+  {
+    'col_key': 'model',
+    'title': 'model',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': false,
+    'validator': validateModel,
   },
 ];
