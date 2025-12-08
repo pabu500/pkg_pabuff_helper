@@ -178,7 +178,6 @@ String? validateModel(String val) {
   return null;
 }
 
-
 String? validateDeviceIccid(String val) {
   val = val.trim();
 
@@ -230,7 +229,6 @@ String? validateDeviceType(String val) {
 }
 
 String? validateTag(String val) {
-
   val = val.trim();
 
   if (val.isEmpty) {
@@ -270,12 +268,114 @@ final List<Map<String, dynamic>> listConfigBaseDevice = [
     'validator': validateDeviceLabel,
   },
   {
+    'col_key': 'displayname',
+    'title': 'Displayname',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': false,
+    'validator': validateDeviceLabel,
+  },
+  {
+    'col_key': 'tag',
+    'title': 'tag',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': false,
+    'validator': validateTag,
+  },
+  {
     'col_key': 'type',
     'title': 'Type',
     'col_type': 'string',
     'width': 200,
-    'is_mapping_required': false,
+    'is_mapping_required': true,
     'validator': validateDeviceType,
+  },
+  {
+    'col_key': 'model',
+    'title': 'model',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': false,
+    'validator': validateModel,
+  },
+];
+
+final List<Map<String, dynamic>> listConfigBaseMeter = [
+  {
+    'col_key': 'site_label',
+    'title': 'Site Label',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': false,
+    'validator': validateLabelScope,
+  },
+  {
+    'col_key': 'building_label',
+    'title': 'Building Label',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': true,
+    'validator': validateLabelScope,
+  },
+  {
+    'col_key': 'location_label',
+    'title': 'Location Label',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': true,
+    'validator': validateLabelScope,
+  },
+];
+
+final List<Map<String, dynamic>> listConfigBaseGateway = [
+  {
+    'col_key': 'ip',
+    'title': 'ip',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': true,
+    'validator': validateIp,
+  },
+  {
+    'col_key': 'iccid',
+    'title': 'iccid',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': true,
+    'validator': validateDeviceIccid,
+  },
+];
+
+final List<Map<String, dynamic>> listConfigBaseMcu = [
+  {
+    'col_key': 'ip',
+    'title': 'ip',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': false,
+    'validator': validateIp,
+  },
+  {
+    'col_key': 'iccid',
+    'title': 'iccid',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': false,
+    'validator': validateDeviceIccid,
+  },
+];
+
+final List<Map<String, dynamic>> listConfigBaseMotherboard = [];
+
+final List<Map<String, dynamic>> listConfigBaseMeterGroup = [
+  {
+    'col_key': 'service_type',
+    'title': 'Service Type',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': true,
+    'validator': validateIp,
   },
   {
     'col_key': 'site_label',
@@ -301,36 +401,21 @@ final List<Map<String, dynamic>> listConfigBaseDevice = [
     'is_mapping_required': true,
     'validator': validateLabelScope,
   },
-  {
-    'col_key': 'tag',
-    'title': 'tag',
-    'col_type': 'string',
-    'width': 150,
-    'is_mapping_required': false,
-    'validator': validateTag,
-  },
-  {
-    'col_key': 'ip',
-    'title': 'ip',
-    'col_type': 'string',
-    'width': 150,
-    'is_mapping_required': false,
-    'validator': validateIp,
-  },
-  {
-    'col_key': 'iccid',
-    'title': 'iccid',
-    'col_type': 'string',
-    'width': 150,
-    'is_mapping_required': false,
-    'validator': validateDeviceIccid,
-  },
-  {
-    'col_key': 'model',
-    'title': 'model',
-    'col_type': 'string',
-    'width': 150,
-    'is_mapping_required': false,
-    'validator': validateModel,
-  },
 ];
+
+List<Map<String, dynamic>> getDeviceConfigListByCat(PagDeviceCat cat) {
+  switch (cat) {
+    case PagDeviceCat.meter:
+      return listConfigBaseDevice + listConfigBaseMeter;
+    case PagDeviceCat.gateway:
+      return listConfigBaseDevice + listConfigBaseGateway;
+    case PagDeviceCat.mcu:
+      return listConfigBaseDevice + listConfigBaseMcu;
+    case PagDeviceCat.motherboard:
+      return listConfigBaseDevice + listConfigBaseMotherboard;
+    case PagDeviceCat.meterGroup:
+      return listConfigBaseDevice + listConfigBaseMeterGroup;
+    default:
+      return listConfigBaseDevice;
+  }
+}
