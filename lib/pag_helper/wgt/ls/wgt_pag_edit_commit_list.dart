@@ -641,21 +641,26 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
             ? Tooltip(
                 message: originalFullText,
                 waitDuration: const Duration(milliseconds: 500),
-                child: getCellText(
-                  originalFullText: originalFullText,
-                  width: width,
-                  style: _listItemStyle,
-                  clickCopy: true,
-                  alignment: ctrlItem.align == 'right'
-                      ? Alignment.centerRight
-                      : Alignment.centerLeft,
-                  // fieldKey: ctrlItem.colKey,
-                  // modifiedRow: modifiedRow,
-                  // flagModified: flagModified,
-                  // unique: unique,
-                  // listValues: listValues,
-                  // nonSelectable: ctrlItem.isClickCopy,
-                  // clickCopy: ctrlItem.isClickCopy,
+                child: Padding(
+                  padding: ctrlItem.align == 'right'
+                      ? const EdgeInsets.only(right: 13.0)
+                      : const EdgeInsets.only(left: 0.0),
+                  child: getCellText(
+                    originalFullText: originalFullText,
+                    width: width,
+                    style: _listItemStyle,
+                    clickCopy: true,
+                    alignment: ctrlItem.align == 'right'
+                        ? Alignment.centerRight
+                        : Alignment.centerLeft,
+                    // fieldKey: ctrlItem.colKey,
+                    // modifiedRow: modifiedRow,
+                    // flagModified: flagModified,
+                    // unique: unique,
+                    // listValues: listValues,
+                    // nonSelectable: ctrlItem.isClickCopy,
+                    // clickCopy: ctrlItem.isClickCopy,
+                  ),
                 ),
                 // Evs2ListText(
                 //   parentListWgt: null,

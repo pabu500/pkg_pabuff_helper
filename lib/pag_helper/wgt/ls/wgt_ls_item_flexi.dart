@@ -272,9 +272,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
 
   Future<dynamic> _getItemList() async {
     if (_queryMap.isEmpty) {
-      if (kDebugMode) {
-        print('queryMap is empty');
-      }
+      dev.log('queryMap is empty');
       return null;
     }
 
@@ -291,9 +289,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     _queryMap['sort_by'] = _sortBy ?? '';
     _queryMap['sort_order'] = _sortOrder;
 
-    if (widget.listContextType == PagListContextType.soa) {
-      // _queryMap['sort_by'] = 'entry_timestamp';
-    }
+    if (widget.listContextType == PagListContextType.soa) {}
 
     try {
       itemFindResult = await fetchItemList(
@@ -319,12 +315,6 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           _totalItemCount = itemFindResult['count'];
         }
       });
-
-      // widget.onResult?.call({
-      //   'item_list': _entityItems,
-      //   'count': _totalItemCount,
-      //   'current_page': _currentPage,
-      // });
     } catch (e) {
       if (kDebugMode) {
         print(e);
@@ -427,6 +417,10 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     }
     if (widget.itemKind == PagItemKind.tenant &&
         widget.listContextType == PagListContextType.soa) {
+      addOpColumn = false;
+    }
+    if (widget.itemKind == PagItemKind.tenant &&
+        widget.listContextType == PagListContextType.usage) {
       addOpColumn = false;
     }
     bool isAmDeviceMeterManager = widget.pagAppContext! == appCtxAm &&
@@ -1008,7 +1002,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     for (String meterType in meterTypeList) {
       MdlListColController appCtxCol = MdlListColController(
         colKey: 'usage_${meterType.toLowerCase()}',
-        colTitle: 'usage_${meterType.toLowerCase()}',
+        colTitle: 'usage_${meterType.toLowerCase()} ',
         includeColKeyAsFilter: false,
         showColumn: true,
         colWidth: 90,
