@@ -168,6 +168,7 @@ class MdlListColController {
         json['colTitle'] ?? json['col_title'] ?? json['title'] ?? colKey;
 
     String filterLabel = json['filterLabel'] ??
+        json['filter_label_flexi'] ??
         json['filter_label'] ??
         json['label'] ??
         colTitle;

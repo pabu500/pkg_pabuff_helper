@@ -71,6 +71,7 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
     this.isSingleItemMode = false,
     this.initialFilterMap = const {},
     this.isInitialValueMutable = false,
+    this.allowFlexiLabel = false,
   });
 
   final MdlPagUser loggedInUser;
@@ -105,6 +106,7 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
   final bool isSingleItemMode;
   final Map<String, dynamic> initialFilterMap;
   final bool isInitialValueMutable;
+  final bool allowFlexiLabel;
 
   @override
   State<WgtPagItemFinderFlexi> createState() => _WgtPagItemFinderFlexiState();
@@ -215,6 +217,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
       'sort_order': 'desc',
       'get_count_only': widget.getCountOnly ? 'true' : 'false',
       'list_context_type': widget.listContextType.name,
+      'allow_flexi_label': widget.allowFlexiLabel ? 'true' : 'false',
     };
 
     if (widget.listContextType == PagListContextType.soa) {
