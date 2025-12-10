@@ -244,6 +244,19 @@ String? validateTag(String val) {
   return null;
 }
 
+String? validateServiceType(String val) {
+
+  // Service Type pattern: letter, number, underscore, dash, space, 1 to 21 characters
+
+  String pattern = r'^[a-zA-Z0-9_ -]{1,21}$';
+  RegExp regExp = RegExp(pattern);
+  if (!regExp.hasMatch(val)) {
+    return 'invalid IP address';
+  }
+
+  return null;
+}
+
 enum PagDeviceOps {
   onboarding,
   update,
@@ -375,7 +388,7 @@ final List<Map<String, dynamic>> listConfigBaseMeterGroup = [
     'col_type': 'string',
     'width': 150,
     'is_mapping_required': true,
-    'validator': validateIp,
+    'validator': validateServiceType,
   },
   {
     'col_key': 'site_label',
