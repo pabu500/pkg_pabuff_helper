@@ -34,7 +34,7 @@ Future<dynamic> updateDeviceLinkage(
   if (response.statusCode == 200) {
     final respJson = jsonDecode(response.body);
     if (respJson['error'] != null) {
-      throw Exception(respJson['error']);
+      throw Exception(respJson['error']['message']);
     }
     final data = respJson['data'];
     if (data == null) {
