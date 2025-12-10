@@ -82,3 +82,38 @@ String? validateInterestRate(String? value) {
   }
   return null;
 }
+
+enum PagInterestStartDateType {
+  dueDate('Due Date', 'due_date', 'due', Colors.teal),
+  billDate('Bill Date', 'bill_date', 'bill', Colors.red),
+  ;
+
+  const PagInterestStartDateType(
+    this.label,
+    this.value,
+    this.tag,
+    this.color,
+  );
+
+  final String label;
+  final String value;
+  final String tag;
+  final Color color;
+
+  static PagInterestStartDateType? byLabel(String? label) => enumByLabel(
+        label,
+        values,
+        (e) => (e).label,
+      );
+
+  static PagInterestStartDateType? byTag(String? tag) => enumByTag(
+        tag,
+        values,
+      );
+
+  static PagInterestStartDateType? byValue(String? value) => enumByValue(
+        value,
+        values,
+        (e) => (e).value,
+      );
+}
