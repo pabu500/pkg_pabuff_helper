@@ -146,6 +146,7 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
                     widget.tenantLabel,
                     widget.tenantName,
                     widget.tenantAccountId,
+                    widget.isBillMode,
                     widget.cycleStr,
                     widget.billDate,
                   ),

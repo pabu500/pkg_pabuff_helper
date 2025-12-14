@@ -168,6 +168,7 @@ class _WgtPagTenantCompositeUsageSummaryState
                     widget.tenantLabel,
                     widget.tenantName,
                     widget.tenantAccountId,
+                    widget.isBillMode,
                     widget.cycleStr,
                     widget.billDate,
                   ),

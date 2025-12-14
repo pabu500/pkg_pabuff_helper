@@ -105,7 +105,7 @@ class _WgtPagHistoryRepListState extends State<WgtPagHistoryRepList> {
         // }
         listConfig.add({
           'fieldKey': keyName,
-          'title': widget.valTitle ?? fieldKey['field'],
+          'title': fieldKey['field'] ?? widget.valTitle ?? 'val',
           'width': fieldKey['width'] ?? 150,
         });
         listConfig.add({

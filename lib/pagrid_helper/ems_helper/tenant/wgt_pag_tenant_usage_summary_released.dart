@@ -117,6 +117,7 @@ class _WgtPagTenantUsageSummaryReleasedState
                   widget.tenantLabel,
                   widget.tenantName,
                   widget.tenantAccountId,
+                  widget.isBillMode,
                   widget.cycleStr,
                   widget.billDate,
                 ),

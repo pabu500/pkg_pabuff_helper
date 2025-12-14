@@ -102,6 +102,7 @@ Widget getPagUsageTitle(
   String? tenantLabel,
   String tenantName,
   String? tenantAccountId,
+  bool isBillMode,
   String cycleStr,
   String billDate,
 ) {
@@ -111,8 +112,10 @@ Widget getPagUsageTitle(
   //   targetInterval: isMonthly ? 'monthly' : 'daily',
   //   useMiddle: isMonthly ? true : false,
   // );
-  assert(cycleStr.isNotEmpty, 'CycleStr is empty');
-  assert(billDate.isNotEmpty, 'BillDate is empty');
+  if (isBillMode) {
+    assert(cycleStr.isNotEmpty, 'CycleStr is empty');
+    assert(billDate.isNotEmpty, 'BillDate is empty');
+  }
 
   return ConstrainedBox(
     constraints: const BoxConstraints(maxWidth: 350),
@@ -159,27 +162,28 @@ Widget getPagUsageTitle(
             ],
           ),
           verticalSpaceSmall,
-          Row(
-            children: [
-              Text(
-                cycleStr,
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).hintColor,
+          if (isBillMode)
+            Row(
+              children: [
+                Text(
+                  cycleStr,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).hintColor,
+                  ),
                 ),
-              ),
-              horizontalSpaceRegular,
-              Text(
-                'Bill Date: ${billDate.substring(0, 10)}',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).hintColor,
+                horizontalSpaceRegular,
+                Text(
+                  'Bill Date: ${billDate.substring(0, 10)}',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).hintColor,
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
         ],
       ),
     ),
