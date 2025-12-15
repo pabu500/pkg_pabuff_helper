@@ -54,9 +54,11 @@ T? enumByTag<T extends Enum>(String? tag, List<T> values) {
 String getPagFinanceTypeStr(dynamic itemType) {
   switch (itemType) {
     case PagFinanceType.tenantSoa:
-      return PagFinanceType.tenantSoa.name;
+      return PagFinanceType.tenantSoa.value;
     case PagFinanceType.payment:
-      return PagFinanceType.payment.name;
+      return PagFinanceType.payment.value;
+    case PagFinanceType.paymentApply:
+      return PagFinanceType.paymentApply.value;
     default:
       return '';
   }
