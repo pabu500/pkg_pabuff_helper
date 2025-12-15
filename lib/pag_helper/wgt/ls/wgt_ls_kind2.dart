@@ -242,7 +242,7 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
           itemTypeList.add(scopeType.name);
         }
       } else if (widget.itemKind == PagItemKind.finance) {
-        _itemTypeInfoList.add({'item_type': PagFinanceType.tenantSoa});
+        // _itemTypeInfoList.add({'item_type': PagFinanceType.tenantSoa});
         _itemTypeInfoList.add({'item_type': PagFinanceType.payment});
 
         for (Map<String, dynamic> financeTypeInfo in _itemTypeInfoList) {
@@ -279,7 +279,7 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
           WgtItemTypeSelector(
             pagAppContext: appCtxAm,
             appConfig: widget.appConfig,
-            itemKind: PagItemKind.device,
+            itemKind: widget.itemKind, //PagItemKind.device,
             prefKey: 'item_type',
             iniItemType: widget.iniItemType,
             allowChangeItemType: widget.allowChangeItemType,

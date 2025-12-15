@@ -2,9 +2,9 @@ import 'package:buff_helper/pag_helper/def_helper/dh_pag_finance.dart';
 import 'package:buff_helper/pag_helper/def_helper/list_helper.dart';
 import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_context.dart';
+import 'package:buff_helper/pag_helper/wgt/ls/wgt_ls_kind2.dart';
 import 'package:flutter/material.dart';
 import '../../model/mdl_pag_app_config.dart';
-import 'wgt_ls_kind.dart';
 import 'wgt_ls_item_flexi.dart';
 
 class WgtPagLs extends StatefulWidget {
@@ -63,7 +63,7 @@ class _WgtPagLsState extends State<WgtPagLs> {
             validateTreeChildren: widget.validateTreeChildren,
           );
         }
-        return WgtListSearchKind(
+        return WgtListSearchKind2(
           appConfig: widget.appConfig,
           itemKind: widget.itemKind,
           pagAppContext: widget.pagAppContext,

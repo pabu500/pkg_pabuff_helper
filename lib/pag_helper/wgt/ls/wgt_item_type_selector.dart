@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:buff_helper/pag_helper/comm/comm_list.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_device.dart';
@@ -290,6 +289,11 @@ class _WgtItemTypeSelectorState extends State<WgtItemTypeSelector> {
           itemType = PagScopeType.byKey(itemTypeStr);
         } else if (widget.itemKind == PagItemKind.finance) {
           itemType = PagFinanceType.byValue(itemTypeStr);
+          if (itemType == PagFinanceType.none ||
+              itemType == PagFinanceType.tenantSoa) {
+            // soa is not a list item, but in Tenant SoA section
+            continue;
+          }
         } else {
           throw Exception('Unsupported item kind: ${widget.itemKind.name}');
         }

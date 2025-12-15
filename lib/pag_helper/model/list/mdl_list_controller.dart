@@ -140,6 +140,9 @@ class MdlPagListController /*extends ChangeNotifier*/ {
         case 'payment':
           itemType = PagFinanceType.payment;
           break;
+        case 'payment_apply':
+          itemType = PagFinanceType.paymentApply;
+          break;
 
         default:
           itemType = null;

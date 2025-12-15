@@ -7,7 +7,7 @@ enum PagFinanceType {
   tenantSoa('Statement of Account', 'tenant_soa', 'soa', Symbols.contract),
   payment('Payment', 'payment', 'pyt', Symbols.attach_money),
   paymentApply('Payment Apply', 'payment_apply', 'pya', Symbols.bucket_check),
-  ;
+  none('None', 'none', 'none', Symbols.block);
 
   const PagFinanceType(
     this.label,
@@ -25,9 +25,9 @@ enum PagFinanceType {
       enumByLabel(
         value,
         values,
-        (e) => (e).tag,
+        (e) => (e).value,
       ) ??
-      tenantSoa;
+      none;
 
   static PagFinanceType? byLabel(String? label) => enumByLabel(
         label,
