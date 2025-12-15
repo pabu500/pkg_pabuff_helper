@@ -143,7 +143,7 @@ class _WgtMeterGroupAssignment2State extends State<WgtMeterGroupAssignment2> {
     }
   }
 
-  Future<void> _doGetMeterAssignment(Map<String, dynamic> itemInfo) async {
+  Future<void> _getMeterAssignment(Map<String, dynamic> itemInfo) async {
     if (itemInfo['is_fetching'] ?? false) {
       return;
     }
@@ -155,7 +155,7 @@ class _WgtMeterGroupAssignment2State extends State<WgtMeterGroupAssignment2> {
 
     itemInfo['is_fetching'] = true;
     try {
-      final data = await doGetMeterTenantAssignment(
+      final data = await getMeterTenantAssignment(
         widget.appConfig,
         queryMap,
         MdlPagSvcClaim(
@@ -287,7 +287,7 @@ class _WgtMeterGroupAssignment2State extends State<WgtMeterGroupAssignment2> {
 
       bool showResult = false;
       try {
-        await _doGetMeterAssignment(itemInfo);
+        await _getMeterAssignment(itemInfo);
       } catch (e) {
       } finally {
         itemInfo['is_comm']?.call(false, showResult);
@@ -599,7 +599,7 @@ class _WgtMeterGroupAssignment2State extends State<WgtMeterGroupAssignment2> {
             loggedInUser: loggedInUser!,
             itemInfo: itemInfo,
             itemGroupIndexStr: widget.itemGroupIndexStr,
-            getMeterAssignment: _doGetMeterAssignment,
+            getMeterAssignment: _getMeterAssignment,
             onModified: () {
               _checkModified();
             },

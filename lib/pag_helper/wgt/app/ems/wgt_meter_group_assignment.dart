@@ -148,7 +148,7 @@ class _WgtMeterGroupAssignmentState extends State<WgtMeterGroupAssignment> {
 
     itemInfo['is_fetching'] = true;
     try {
-      final data = await doGetMeterTenantAssignment(
+      final data = await getMeterTenantAssignment(
         widget.appConfig,
         queryMap,
         MdlPagSvcClaim(

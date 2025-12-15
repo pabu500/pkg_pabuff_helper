@@ -100,7 +100,7 @@ Future<dynamic> doGetScopeMeterGroupList(
   }
 }
 
-Future<dynamic> doGetMeterTenantAssignment(
+Future<dynamic> getMeterTenantAssignment(
   MdlPagAppConfig appConfig,
   Map<String, dynamic> queryMap,
   MdlPagSvcClaim svcClaim,
