@@ -111,6 +111,7 @@ Widget getInfoTextPrompt(
         borderRadius: BorderRadius.circular(5),
       ),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Symbols.info, color: textColor ?? Theme.of(context).hintColor),
           horizontalSpaceSmall,

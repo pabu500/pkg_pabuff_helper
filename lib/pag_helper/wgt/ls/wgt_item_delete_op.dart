@@ -171,10 +171,10 @@ class _WgtItemDeleteOpState extends State<WgtItemDeleteOp> {
                         message2:
                             'It\'s recommended to double check before proceeding',
                         opName: 'item_delete',
-                        keyInConfirmStrList: [
-                          'delete',
-                          widget.itemDeleteRef,
-                        ],
+                        // keyInConfirmStrList: [
+                        //   'delete',
+                        //   widget.itemDeleteRef,
+                        // ],
                         itemCount: 1,
                         onConfirm: () async {
                           await _doDelete();

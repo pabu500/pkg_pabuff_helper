@@ -6,6 +6,7 @@ import 'dart:developer' as dev;
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../../../pagrid_helper/batch_op_helper/wgt_confirm_box.dart';
 import '../../../comm/comm_pag_billing.dart';
 import '../../../model/acl/mdl_pag_svc_claim.dart';
 import '../../../model/mdl_pag_app_config.dart';
@@ -176,12 +177,41 @@ class _WgtPagBillLcStatusOpState extends State<WgtPagBillLcStatusOp> {
       return Container();
     }
 
+    bool targetIsMfd = _selectedStatus == PagBillingLcStatus.mfd;
+    bool targetIsReleased = _selectedStatus == PagBillingLcStatus.released;
+    String itemRef =
+        widget.billInfo['billing_rec_name'] ?? 'unknown_bill_record';
+
     return Padding(
       padding: const EdgeInsets.only(left: 21),
       child: WgtCommButton(
         label: 'Commit',
         onPressed: () async {
-          await _commit();
+          !targetIsMfd && !targetIsReleased
+              ? await _commit()
+              : showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return WgtConfirmBox(
+                      title: targetIsMfd
+                          ? 'MFD Confirmation'
+                          : 'Release Confirmation',
+                      message1:
+                          'This operation is not reversible. Are you sure to proceed?',
+                      message2:
+                          'It\'s recommended to double check before proceeding',
+                      opName: targetIsMfd ? 'bill_mfd' : 'bill_release',
+                      keyInConfirmStrList: [
+                        targetIsMfd ? 'mfd' : 'release',
+                        itemRef,
+                      ],
+                      itemCount: 1,
+                      onConfirm: () async {
+                        await _commit();
+                      },
+                    );
+                  },
+                );
         },
       ),
     );
