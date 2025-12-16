@@ -1,8 +1,10 @@
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
+import 'package:buff_helper/pag_helper/wgt/ls/wgt_item_delete_op.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../../../pag_helper/def_helper/pag_item_helper.dart';
 import '../../../pag_helper/model/mdl_pag_project_profile.dart';
 import '../tenant/pag_ems_type_usage_calc.dart';
 import '../tenant/pag_ems_type_usage_calc_released.dart';
@@ -67,6 +69,9 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
   UniqueKey? _lcStatusOpsKey;
   bool _isDisabledGn = false;
   bool _isDisabledPvRl = false;
+
+  bool _isDeleting = false;
+  String _deleteResultText = '';
 
   Future<dynamic> _getCompositeBill() async {
     setState(() {
@@ -159,62 +164,108 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       );
     }
 
+    bool isItemMFD = false;
+    if (_bill.isNotEmpty) {
+      String lcStatusStr = _bill['lc_status'] ?? '';
+      if (lcStatusStr == PagBillingLcStatus.mfd.value) {
+        isItemMFD = true;
+      }
+    }
+
     return SingleChildScrollView(
       child: Column(
         children: [
           verticalSpaceSmall,
-          Stack(
-            children: [
-              if (_showRenderModeSwitch && !_gettingBill)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+          isItemMFD && _deleteResultText.isNotEmpty
+              ? _deleteResultText.contains('deleted')
+                  ? getInfoTextPrompt(
+                      context: context, infoText: _deleteResultText)
+                  : getErrorTextPrompt(
+                      context: context, errorText: _deleteResultText)
+              : Stack(
                   children: [
-                    getSwitchRenderMode(),
-                    horizontalSpaceRegular,
-                    // if (_lcStatusDisplay == 'released') getSwitchGenType(),
-                    if (_showGenTypeSwitch) getSwitchGenType(),
+                    if (_showRenderModeSwitch && !_gettingBill)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          getSwitchRenderMode(),
+                          horizontalSpaceRegular,
+                          // if (_lcStatusDisplay == 'released') getSwitchGenType(),
+                          if (_showGenTypeSwitch) getSwitchGenType(),
+                        ],
+                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        horizontalSpaceRegular,
+                        if (_lcStatusDisplay == PagBillingLcStatus.mfd)
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8.0),
+                            child: WgtItemDeleteOp(
+                              appConfig: widget.appConfig,
+                              itemKind: PagItemKind.bill,
+                              itemType: '',
+                              itemIndexStr: widget.billingRecIndexStr,
+                              itemDeleteRef: _bill['billing_rec_name'] ?? '',
+                              onDeleting: () {
+                                setState(() {
+                                  _isDeleting = true;
+                                });
+                              },
+                              onDeleted: (Map<String, dynamic> result) {
+                                setState(() {
+                                  _isDeleting = false;
+                                  if (result['error'] != null) {
+                                    setState(() {
+                                      _deleteResultText = result['error'];
+                                    });
+                                  } else {
+                                    setState(() {
+                                      _deleteResultText = 'Item deleted';
+                                    });
+                                  }
+                                });
+                                widget.onUpdate?.call();
+                              },
+                            ),
+                          ),
+                        WgtPagBillLcStatusOp(
+                          key: _lcStatusOpsKey,
+                          appConfig: widget.appConfig,
+                          loggedInUser: widget.loggedInUser,
+                          enableEdit: widget.displayContextStr == 'bill_view',
+                          billInfo: _bill,
+                          initialStatus: _lcStatusDisplay,
+                          onCommitted: (newStatus) {
+                            setState(() {
+                              _lcStatusOpsKey = UniqueKey();
+                              _bill['lc_status'] = newStatus.value;
+                              _isDisabledGn =
+                                  newStatus == PagBillingLcStatus.pv ||
+                                      newStatus == PagBillingLcStatus.released;
+                              _isDisabledPvRl =
+                                  newStatus == PagBillingLcStatus.generated;
+                              _lcStatusDisplay = newStatus;
+                            });
+                            widget.onUpdate?.call();
+                          },
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                        horizontalSpaceMedium,
+                      ],
+                    ),
                   ],
                 ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  horizontalSpaceRegular,
-                  WgtPagBillLcStatusOp(
-                    key: _lcStatusOpsKey,
-                    appConfig: widget.appConfig,
-                    loggedInUser: widget.loggedInUser,
-                    enableEdit: widget.displayContextStr == 'bill_view',
-                    billInfo: _bill,
-                    initialStatus: _lcStatusDisplay,
-                    onCommitted: (newStatus) {
-                      setState(() {
-                        _lcStatusOpsKey = UniqueKey();
-                        _bill['lc_status'] = newStatus.value;
-                        _isDisabledGn = newStatus == PagBillingLcStatus.pv ||
-                            newStatus == PagBillingLcStatus.released;
-                        _isDisabledPvRl =
-                            newStatus == PagBillingLcStatus.generated;
-                        _lcStatusDisplay = newStatus;
-                      });
-                      widget.onUpdate?.call();
-                    },
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                  horizontalSpaceMedium,
-                ],
-              ),
-            ],
-          ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 13),
             child: Container(

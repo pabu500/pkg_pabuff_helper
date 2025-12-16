@@ -104,8 +104,7 @@ class _WgtPagBillLcStatusOpState extends State<WgtPagBillLcStatusOp> {
         children: [
           Row(
             children: [
-              getBillLcStatusTagWidget(context, PagBillingLcStatus.mfd,
-                  style: tagTextStyle),
+              getLcStatusButton(PagBillingLcStatus.mfd),
               horizontalSpaceLarge,
               getLcStatusButton(PagBillingLcStatus.generated),
               Icon(Symbols.chevron_forward, color: Theme.of(context).hintColor),
@@ -122,7 +121,7 @@ class _WgtPagBillLcStatusOpState extends State<WgtPagBillLcStatusOp> {
     );
   }
 
-  Widget getLcStatusButton(PagBillingLcStatus status) {
+  Widget getLcStatusButton(PagBillingLcStatus targetStatus) {
     final tagTextStyle = TextStyle(
       color: Theme.of(context).colorScheme.onPrimary,
     );
@@ -132,16 +131,14 @@ class _WgtPagBillLcStatusOpState extends State<WgtPagBillLcStatusOp> {
       fontWeight: FontWeight.bold,
     );
 
-    bool clickEnabled = _selectedStatus != status;
-    bool highlighted = _selectedStatus == status;
+    bool clickEnabled = _selectedStatus != targetStatus;
+    bool highlighted = _selectedStatus == targetStatus;
     switch (widget.initialStatus) {
       case PagBillingLcStatus.mfd:
-        if (status == PagBillingLcStatus.released) {
-          clickEnabled = false;
-        }
+        clickEnabled = false;
         break;
       case PagBillingLcStatus.generated:
-        if (status == PagBillingLcStatus.released) {
+        if (targetStatus == PagBillingLcStatus.released) {
           clickEnabled = false;
         }
         break;
@@ -158,16 +155,17 @@ class _WgtPagBillLcStatusOpState extends State<WgtPagBillLcStatusOp> {
           ? null
           : () {
               setState(() {
-                _selectedStatus = status;
+                _selectedStatus = targetStatus;
               });
             },
       child: Opacity(
         opacity: clickEnabled || highlighted ? 1.0 : 0.5,
         child: getBillLcStatusTagWidget(
           context,
-          status,
-          style:
-              status == _selectedStatus ? tagTextStyleHighLight : tagTextStyle,
+          targetStatus,
+          style: targetStatus == _selectedStatus
+              ? tagTextStyleHighLight
+              : tagTextStyle,
         ),
       ),
     );

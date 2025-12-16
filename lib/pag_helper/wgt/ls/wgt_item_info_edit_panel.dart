@@ -310,12 +310,19 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
     isEditableByAcl = isAdmin || isAtProjectLevel;
 
     isDeleteableItem = false;
-    if (widget.itemKind == PagItemKind.device) {
-      if (widget.itemType is PagDeviceCat) {
-        if (widget.itemType == PagDeviceCat.meter) {
-          isDeleteableItem = true;
+    switch (widget.itemKind) {
+      case PagItemKind.device:
+        if (widget.itemType is PagDeviceCat) {
+          if (widget.itemType == PagDeviceCat.meter) {
+            isDeleteableItem = true;
+          }
         }
-      }
+        break;
+      case PagItemKind.bill:
+        isDeleteableItem = true;
+        break;
+      default:
+        break;
     }
 
     isDeleteableByAcl = isAtProjectLevel && isAdmin;
