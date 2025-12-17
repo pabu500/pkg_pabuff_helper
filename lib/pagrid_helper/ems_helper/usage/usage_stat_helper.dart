@@ -694,6 +694,7 @@ Widget getTotal2(
               ],
             ),
           ),
+        getMiniSoA(),
         // bal b/f
         if (balBfUsage != null && balBfUsage.abs() > -0.00001)
           Padding(
@@ -711,7 +712,9 @@ Widget getTotal2(
                 ),
                 horizontalSpaceSmall,
                 getStatWithUnit(
-                  getCommaNumberStr(balBfUsage, decimal: 2),
+                  getCommaNumberStr(
+                      balBfUsage.abs() < 0.0001 ? balBfUsage : -1 * balBfUsage,
+                      decimal: 2),
                   'SGD',
                   statStrStyle: defStatStyle.copyWith(
                     color:
@@ -790,6 +793,21 @@ Widget getTotal2(
               ),
             ],
           ),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget getMiniSoA() {
+  return Padding(
+    padding: const EdgeInsets.only(top: 10, bottom: 10),
+    child: Row(
+      children: [
+        Container(
+          width: 750 - 45,
+          height: 1,
+          color: Colors.grey.shade600,
         ),
       ],
     ),
