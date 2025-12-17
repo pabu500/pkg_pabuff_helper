@@ -1436,6 +1436,7 @@ class _WgtItemHistoryPresenterState extends State<WgtItemHistoryPresenter> {
       endDate: _endDate,
       fullCols: _fullCols,
       jobRequest: _jobRequest,
+      valDiffTitle: 'usage',
     );
   }
 

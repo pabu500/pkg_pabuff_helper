@@ -44,7 +44,9 @@ class _WgtBillRenderPdfState extends State<WgtBillRenderPdf> {
     LayoutCallback build,
     PdfPageFormat pageFormat,
   ) async {
-    String suffix = '';
+    String suffix = widget.billingInfo.containsKey('billingRecName')
+        ? '-${widget.billingInfo['billingRecName']}'
+        : '';
     //if web
     if (kIsWeb) {
       await generateAndSavePdfWeb(
