@@ -643,6 +643,7 @@ Widget getTotal2(
     ),
     child: Column(
       children: [
+        getMiniSoA(miniSoa ?? [], context, contentWidth),
         if (applyGst)
           Padding(
             padding: const EdgeInsets.only(top: 10),
@@ -696,7 +697,7 @@ Widget getTotal2(
               ],
             ),
           ),
-        getMiniSoA(miniSoa ?? [], context, contentWidth),
+
         // bal b/f
         // if (balBfUsage != null && balBfUsage.abs() > -0.00001)
         //   Padding(
