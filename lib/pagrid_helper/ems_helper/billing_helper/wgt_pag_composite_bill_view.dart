@@ -341,12 +341,18 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     String toTimestampStr = _bill['to_timestamp'];
     DateTime toDatetime = getTargetDatetimeFromTargetStr(toTimestampStr);
     String billBarFromMonth = _bill['bill_bar_from_timestamp'] ?? '';
-    final balBf = _bill['balance_bf'] ?? '0';
-    final balBfUsage = _bill['balance_bf_usage'] ?? '0';
-    final balBfInterest = _bill['balance_bf_interest'] ?? '0';
+    // final balBf = _bill['balance_bf'] ?? '0';
+    // final balBfUsage = _bill['balance_bf_usage'] ?? '0';
+    // final balBfInterest = _bill['balance_bf_interest'] ?? '0';
+    final miniSoa = _bill['mini_soa'] ?? [];
     final interestInfo = _bill['interest_info'] ?? {};
     String cycleStr = _bill['cycle_str'] ?? '';
     String billDate = _bill['bill_date_timestamp'] ?? '';
+
+    List<Map<String, dynamic>> minSoaList = [];
+    for (var item in miniSoa) {
+      minSoaList.add(item);
+    }
 
     final Map<String, dynamic> scopeMap =
         widget.loggedInUser.selectedScope.toScopeMap();
@@ -365,9 +371,10 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
           cycleStr,
           billDate,
           billBarFromMonth,
-          balBf,
-          balBfUsage,
-          balBfInterest,
+          // balBf,
+          // balBfUsage,
+          // balBfInterest,
+          minSoaList,
           interestInfo);
     } else {
       return getGeneratedRender(
@@ -382,9 +389,10 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
           cycleStr,
           billDate,
           billBarFromMonth,
-          balBf,
-          balBfUsage,
-          balBfInterest,
+          // balBf,
+          // balBfUsage,
+          // balBfInterest,
+          minSoaList,
           interestInfo);
     }
   }
@@ -401,9 +409,10 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     String cycleStr,
     String billDate,
     String billBarFromMonth,
-    String balBfStr,
-    String balBfUsageStr,
-    String balBfInterestStr,
+    // String balBfStr,
+    // String balBfUsageStr,
+    // String balBfInterestStr,
+    List<Map<String, dynamic>> miniSoa,
     Map<String, dynamic> interestInfo,
   ) {
     // sort time
@@ -488,9 +497,9 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       singularUsage['usage_calc'] = emsTypeUsageCalc;
     }
 
-    double? balBf = double.tryParse(balBfStr);
-    double? balBfUsage = double.tryParse(balBfUsageStr);
-    double? balBfInterest = double.tryParse(balBfInterestStr);
+    // double? balBf = double.tryParse(balBfStr);
+    // double? balBfUsage = double.tryParse(balBfUsageStr);
+    // double? balBfInterest = double.tryParse(balBfInterestStr);
 
     PagEmsTypeUsageCalc compositeUsageCalc = PagEmsTypeUsageCalc(
       costDecimals: widget.costDecimals,
@@ -505,9 +514,10 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       //use billed trending snapshot
       billedTrendingSnapShot: [],
       singularUsageCalcList: singularUsageCalcList,
-      balBf: balBf,
-      balBfUsage: balBfUsage,
-      balBfInterest: balBfInterest,
+      // balBf: balBf,
+      // balBfUsage: balBfUsage,
+      // balBfInterest: balBfInterest,
+      miniSoa: miniSoa,
       interestInfo: interestInfo,
     );
     compositeUsageCalc.doCompositeCalc();
@@ -656,9 +666,10 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     String cycleStr,
     String billDate,
     String billBarFromMonth,
-    String balBfStr,
-    String balBfUsageStr,
-    String balBfInterestStr,
+    // String balBfStr,
+    // String balBfUsageStr,
+    // String balBfInterestStr,
+    List<Map<String, dynamic>> miniSoa,
     Map<String, dynamic> interestInfo,
   ) {
     bool isMonthly = true; //_bill['is_monthly'] == 'true' ? true : false;
@@ -767,9 +778,9 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       singularUsage['usage_calc'] = emsTypeUsageCalcReleased;
     }
 
-    double balBf = double.tryParse(balBfStr) ?? 0.0;
-    double balBfUsage = double.tryParse(balBfUsageStr) ?? 0.0;
-    double balBfInterest = double.tryParse(balBfInterestStr) ?? 0.0;
+    // double balBf = double.tryParse(balBfStr) ?? 0.0;
+    // double balBfUsage = double.tryParse(balBfUsageStr) ?? 0.0;
+    // double balBfInterest = double.tryParse(balBfInterestStr) ?? 0.0;
 
     PagEmsTypeUsageCalcReleased compositeUsageCalc =
         PagEmsTypeUsageCalcReleased(
@@ -804,9 +815,10 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       lineItemList: [],
       billBarFromMonth: billBarFromMonth,
       singularUsageCalcList: singularUsageCalcList,
-      balBf: balBf,
-      balBfUsage: balBfUsage,
-      balBfInterest: balBfInterest,
+      // balBf: balBf,
+      // balBfUsage: balBfUsage,
+      // balBfInterest: balBfInterest,
+      miniSoa: miniSoa,
       interestInfo: interestInfo,
     );
     compositeUsageCalc.doCompositeCalc();

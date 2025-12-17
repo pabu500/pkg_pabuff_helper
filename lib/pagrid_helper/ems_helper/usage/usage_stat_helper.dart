@@ -621,14 +621,16 @@ Widget getTotal2(
     double? gstAmt,
     double? totalAmt,
     String tenantType,
-    double? balBfUsage,
-    double? balBfInterest,
+    // double? balBfUsage,
+    // double? balBfInterest,
+    List<Map<String, dynamic>>? miniSoa,
     Map<String, dynamic> interestInfo,
     {Function? onCheckInterestDetail,
     bool showInterestDetail = false,
     double width = 750.0}) {
   bool applyGst = tenantType != 'cw_nus_internal';
 
+  double contentWidth = 220;
   return Container(
     width: width,
     // height: 80,
@@ -649,7 +651,7 @@ Widget getTotal2(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(
-                  width: 210,
+                  width: contentWidth,
                   child: Text(
                     'Sub Total',
                     style: defStatStyle,
@@ -675,7 +677,7 @@ Widget getTotal2(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(
-                  width: 210,
+                  width: contentWidth,
                   child: Text(
                     'GST ($gst%)',
                     style: defStatStyle,
@@ -694,62 +696,62 @@ Widget getTotal2(
               ],
             ),
           ),
-        getMiniSoA(),
+        getMiniSoA(miniSoa ?? [], context, contentWidth),
         // bal b/f
-        if (balBfUsage != null && balBfUsage.abs() > -0.00001)
-          Padding(
-            padding: const EdgeInsets.only(top: 5),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: 210,
-                  child: Text(
-                    'Bal. B/F (Usage)',
-                    style: defStatStyle,
-                  ),
-                ),
-                horizontalSpaceSmall,
-                getStatWithUnit(
-                  getCommaNumberStr(
-                      balBfUsage.abs() < 0.0001 ? balBfUsage : -1 * balBfUsage,
-                      decimal: 2),
-                  'SGD',
-                  statStrStyle: defStatStyle.copyWith(
-                    color:
-                        Theme.of(context).colorScheme.onSurface.withAlpha(210),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        if (balBfInterest != null && balBfInterest.abs() > -0.00001)
-          Padding(
-            padding: const EdgeInsets.only(top: 5),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: 210,
-                  child: Text(
-                    'Bal. B/F (Interest)',
-                    style: defStatStyle,
-                  ),
-                ),
-                horizontalSpaceSmall,
-                getStatWithUnit(
-                  getCommaNumberStr(balBfInterest, decimal: 2),
-                  'SGD',
-                  statStrStyle: defStatStyle.copyWith(
-                    color:
-                        Theme.of(context).colorScheme.onSurface.withAlpha(210),
-                  ),
-                ),
-              ],
-            ),
-          ),
+        // if (balBfUsage != null && balBfUsage.abs() > -0.00001)
+        //   Padding(
+        //     padding: const EdgeInsets.only(top: 5),
+        //     child: Row(
+        //       mainAxisAlignment: MainAxisAlignment.start,
+        //       crossAxisAlignment: CrossAxisAlignment.center,
+        //       children: [
+        //         SizedBox(
+        //           width: 210,
+        //           child: Text(
+        //             'Bal. B/F (Usage)',
+        //             style: defStatStyle,
+        //           ),
+        //         ),
+        //         horizontalSpaceSmall,
+        //         getStatWithUnit(
+        //           getCommaNumberStr(
+        //               balBfUsage.abs() < 0.0001 ? balBfUsage : -1 * balBfUsage,
+        //               decimal: 2),
+        //           'SGD',
+        //           statStrStyle: defStatStyle.copyWith(
+        //             color:
+        //                 Theme.of(context).colorScheme.onSurface.withAlpha(210),
+        //           ),
+        //         ),
+        //       ],
+        //     ),
+        //   ),
+        // if (balBfInterest != null && balBfInterest.abs() > -0.00001)
+        //   Padding(
+        //     padding: const EdgeInsets.only(top: 5),
+        //     child: Row(
+        //       mainAxisAlignment: MainAxisAlignment.start,
+        //       crossAxisAlignment: CrossAxisAlignment.center,
+        //       children: [
+        //         SizedBox(
+        //           width: 210,
+        //           child: Text(
+        //             'Bal. B/F (Interest)',
+        //             style: defStatStyle,
+        //           ),
+        //         ),
+        //         horizontalSpaceSmall,
+        //         getStatWithUnit(
+        //           getCommaNumberStr(balBfInterest, decimal: 2),
+        //           'SGD',
+        //           statStrStyle: defStatStyle.copyWith(
+        //             color:
+        //                 Theme.of(context).colorScheme.onSurface.withAlpha(210),
+        //           ),
+        //         ),
+        //       ],
+        //     ),
+        //   ),
         Padding(
           padding: const EdgeInsets.only(top: 5),
           child: Row(
@@ -759,6 +761,7 @@ Widget getTotal2(
                 interestInfo,
                 context,
                 showInterestDetail,
+                contentWidth,
                 onCheckInterestDetail,
               )
             ],
@@ -771,7 +774,7 @@ Widget getTotal2(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(
-                width: 210,
+                width: contentWidth,
                 child: Text(
                   'Total',
                   style: defStatStyleLarge.copyWith(
@@ -799,18 +802,141 @@ Widget getTotal2(
   );
 }
 
-Widget getMiniSoA() {
-  return Padding(
-    padding: const EdgeInsets.only(top: 10, bottom: 10),
-    child: Row(
-      children: [
-        Container(
-          width: 750 - 45,
-          height: 1,
-          color: Colors.grey.shade600,
+Widget getMiniSoA(List<Map<String, dynamic>> miniSoa, BuildContext context,
+    double contentWidth) {
+  if (miniSoa.isEmpty) {
+    return Container();
+  }
+  // get last item to get the balance brought forward
+  Map<String, dynamic> lastItem = miniSoa.last;
+  dynamic balBf = lastItem['balance'];
+  if (balBf is String) {
+    balBf = double.tryParse(balBf) ?? 0.0;
+  } else if (balBf is double) {
+    balBf = balBf;
+  } else {
+    balBf = 0.0;
+  }
+  if (balBf.abs() < 0.00001) {
+  } else {
+    balBf = -1 * balBf;
+  }
+
+  List<Map<String, dynamic>> payment = [];
+  for (var item in miniSoa) {
+    String? itemType = item['entry_type'];
+    if (itemType != null && itemType == 'payment') {
+      dynamic creditAmount = item['credit_amount'];
+      if (creditAmount is String) {
+        creditAmount = double.tryParse(creditAmount) ?? 0.0;
+      } else if (creditAmount is double) {
+        creditAmount = creditAmount;
+      } else {
+        creditAmount = 0.0;
+      }
+      String dateStr = item['entry_timestamp'];
+      if (dateStr.isNotEmpty) {
+        //get date only
+        dateStr = dateStr.substring(0, 10);
+      }
+      payment.add({
+        ...item,
+        'amount': creditAmount,
+        'payment_date': dateStr,
+      });
+    }
+  }
+  // get first item to get the balance carried forward
+  Map<String, dynamic> firstItem = miniSoa.first;
+  dynamic balCf = firstItem['balance'];
+  if (balCf is String) {
+    balCf = double.tryParse(balCf) ?? 0.0;
+  } else if (balCf is double) {
+    balCf = balCf;
+  } else {
+    balCf = 0.0;
+  }
+  if (balCf.abs() < 0.00001) {
+  } else {
+    balCf = -1 * balCf;
+  }
+
+  return Column(
+    children: [
+      Padding(
+        padding: const EdgeInsets.only(top: 5),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: contentWidth,
+              child: Text(
+                'Bal. B/F',
+                style: defStatStyle,
+              ),
+            ),
+            horizontalSpaceSmall,
+            getStatWithUnit(
+              getCommaNumberStr(balBf, decimal: 2),
+              'SGD',
+              statStrStyle: defStatStyle.copyWith(
+                color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
+              ),
+            ),
+          ],
         ),
-      ],
-    ),
+      ),
+      for (var pay in payment)
+        Padding(
+          padding: const EdgeInsets.only(top: 5),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: contentWidth,
+                child: Text(
+                  'Payment (${pay['payment_date'] ?? ''})',
+                  style: defStatStyle,
+                ),
+              ),
+              horizontalSpaceSmall,
+              getStatWithUnit(
+                getCommaNumberStr(-(pay['amount'] ?? 0.0), decimal: 2),
+                'SGD',
+                statStrStyle: defStatStyle.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
+                ),
+              ),
+            ],
+          ),
+        ),
+      Padding(
+        padding: const EdgeInsets.only(top: 5),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: contentWidth,
+              child: Text(
+                'Bal. C/F',
+                style: defStatStyle,
+              ),
+            ),
+            horizontalSpaceSmall,
+            getStatWithUnit(
+              getCommaNumberStr(balCf, decimal: 2),
+              'SGD',
+              statStrStyle: defStatStyle.copyWith(
+                color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ],
   );
 }
 
@@ -842,6 +968,7 @@ Widget getInterestInfo(
   Map<String, dynamic> interestInfo,
   BuildContext context,
   bool showInterestDetail,
+  double contentWidth,
   Function? onCheckDetail,
 ) {
   final totalInterestAmount = interestInfo['total_interest_amount'];
@@ -1010,7 +1137,7 @@ Widget getInterestInfo(
       Row(
         children: [
           SizedBox(
-            width: 210,
+            width: contentWidth,
             child: Text(
               'Interest',
               style: defStatStyle,

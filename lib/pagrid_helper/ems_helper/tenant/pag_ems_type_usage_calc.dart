@@ -38,9 +38,10 @@ class PagEmsTypeUsageCalc {
 
   List<PagEmsTypeUsageCalc> _singularCalcList = [];
 
-  late final double? _balBf;
-  late final double? _balBfUsage;
-  late final double? _balBfInterest;
+  // late final double? _balBf;
+  // late final double? _balBfUsage;
+  // late final double? _balBfInterest;
+  late final List<Map<String, dynamic>>? _miniSoa;
 
   late final Map<String, dynamic>? _interestInfo;
 
@@ -69,9 +70,10 @@ class PagEmsTypeUsageCalc {
 
   String? get billBarFromMonth => _billBarFromMonth;
 
-  double? get balBf => _balBf;
-  double? get balBfUsage => _balBfUsage;
-  double? get balBfInterest => _balBfInterest;
+  // double? get balBf => _balBf;
+  // double? get balBfUsage => _balBfUsage;
+  // double? get balBfInterest => _balBfInterest;
+  List<Map<String, dynamic>>? get miniSoa => _miniSoa;
 
   Map<String, dynamic>? get interestInfo => _interestInfo;
 
@@ -89,9 +91,10 @@ class PagEmsTypeUsageCalc {
     billBarFromMonth,
     List<Map<String, dynamic>>? billedTrendingSnapShot,
     List<PagEmsTypeUsageCalc> singularUsageCalcList = const [],
-    double? balBf,
-    double? balBfUsage,
-    double? balBfInterest,
+    // double? balBf,
+    // double? balBfUsage,
+    // double? balBfInterest,
+    List<Map<String, dynamic>>? miniSoa,
     Map<String, dynamic>? interestInfo,
   }) {
     if (usageFactor.isEmpty) {
@@ -112,9 +115,10 @@ class PagEmsTypeUsageCalc {
 
     _billedTrendingSnapShot = billedTrendingSnapShot;
 
-    _balBf = balBf;
-    _balBfUsage = balBfUsage;
-    _balBfInterest = balBfInterest;
+    // _balBf = balBf;
+    // _balBfUsage = balBfUsage;
+    // _balBfInterest = balBfInterest;
+    _miniSoa = miniSoa;
 
     _interestInfo = interestInfo;
 
@@ -393,7 +397,7 @@ class PagEmsTypeUsageCalc {
       _gstAmount = getRoundUp(_gstAmount!, 2);
       _totalCost = _subTotalCost! + _gstAmount!;
 
-      _totalCost = _totalCost! + _balBfUsage! + _balBfInterest!;
+      // _totalCost = _totalCost! + _balBfUsage! + _balBfInterest!;
     }
   }
 

@@ -1,6 +1,5 @@
 import 'package:buff_helper/pagrid_helper/ems_helper/tenant/tenant_usage_calc_released.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
-import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -170,8 +169,7 @@ class _WgtTenantUsageSummaryReleased2State
                 widget.usageCalc.gstAmount,
                 widget.usageCalc.totalCost,
                 widget.tenantType,
-                null,
-                null,
+                [],
                 {},
               ),
           ],

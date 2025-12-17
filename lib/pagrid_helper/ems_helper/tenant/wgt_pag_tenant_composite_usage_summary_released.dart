@@ -203,8 +203,9 @@ class _WgtPagTenantCompositeUsageSummaryReleasedState
                   widget.compositeUsageCalc!.gstAmount,
                   widget.compositeUsageCalc!.totalCost,
                   widget.tenantType,
-                  widget.compositeUsageCalc!.balBfUsage,
-                  widget.compositeUsageCalc!.balBfInterest,
+                  // widget.compositeUsageCalc!.balBfUsage,
+                  // widget.compositeUsageCalc!.balBfInterest,
+                  widget.compositeUsageCalc!.miniSoa,
                   widget.interestInfo,
                   showInterestDetail: _showInterestDetail,
                   onCheckInterestDetail: () {

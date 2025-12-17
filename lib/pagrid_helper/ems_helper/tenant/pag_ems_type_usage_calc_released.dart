@@ -1,6 +1,5 @@
 import 'package:buff_helper/pkg_buff_helper.dart';
 
-import 'mdl_ems_type_usage.dart';
 import 'mdl_ems_type_usage_r2.dart';
 
 class PagEmsTypeUsageCalcReleased {
@@ -46,9 +45,10 @@ class PagEmsTypeUsageCalcReleased {
 
   List<PagEmsTypeUsageCalcReleased> _singularCalcList = [];
 
-  late final double? _balBf;
-  late final double? _balBfUsage;
-  late final double? _balBfInterest;
+  // late final double? _balBf;
+  // late final double? _balBfUsage;
+  // late final double? _balBfInterest;
+  List<Map<String, dynamic>>? _miniSoa;
 
   late final Map<String, dynamic>? _interestInfo;
 
@@ -88,9 +88,10 @@ class PagEmsTypeUsageCalcReleased {
 
   String? get billBarFromMonth => _billBarFromMonth;
 
-  double? get balBf => _balBf;
-  double? get balBfUsage => _balBfUsage;
-  double? get balBfInterest => _balBfInterest;
+  // double? get balBf => _balBf;
+  // double? get balBfUsage => _balBfUsage;
+  // double? get balBfInterest => _balBfInterest;
+  List<Map<String, dynamic>>? get miniSoa => _miniSoa;
 
   Map<String, dynamic>? get interestInfo => _interestInfo;
 
@@ -128,9 +129,10 @@ class PagEmsTypeUsageCalcReleased {
     List<Map<String, dynamic>>? billedTrendingSnapShot,
     String? billBarFromMonth,
     List<PagEmsTypeUsageCalcReleased> singularUsageCalcList = const [],
-    double? balBf,
-    double? balBfUsage,
-    double? balBfInterest,
+    // double? balBf,
+    // double? balBfUsage,
+    // double? balBfInterest,
+    List<Map<String, dynamic>>? miniSoa,
     Map<String, dynamic>? interestInfo,
   }) {
     _costDecimals = costDecimals;
@@ -167,9 +169,10 @@ class PagEmsTypeUsageCalcReleased {
 
     _billBarFromMonth = billBarFromMonth;
 
-    _balBf = balBf;
-    _balBfUsage = balBfUsage;
-    _balBfInterest = balBfInterest;
+    // _balBf = balBf;
+    // _balBfUsage = balBfUsage;
+    // _balBfInterest = balBfInterest;
+    _miniSoa = miniSoa;
 
     _interestInfo = interestInfo;
 
