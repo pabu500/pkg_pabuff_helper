@@ -263,6 +263,15 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
   }
 
   Widget getBillingTaskOptions() {
+    DateTime? leftMostDate;
+    DateTime? rightMostDate;
+    DateTime? initDate;
+    if ((_selectedFromDate == null || _selectedToDate == null)) {
+    } else {
+      leftMostDate = _selectedToDate!.add(const Duration(days: 1));
+      rightMostDate = leftMostDate.add(const Duration(days: 30));
+      initDate = leftMostDate;
+    }
     return Column(
       children: [
         Row(
@@ -280,21 +289,27 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
           ],
         ),
         verticalSpaceSmall,
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            WgtDatePicker(
-              timeZone: widget.loggedInUser.selectedScope.getProjectTimezone(),
-              label: 'Set Bill Date',
-              onDateChanged: (DateTime selectedDate) {
-                setState(() {
-                  _selectedDate = selectedDate;
-                });
-              },
-            ),
-          ],
-        ),
+        (_selectedFromDate == null || _selectedToDate == null)
+            ? const SizedBox()
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  WgtDatePicker(
+                    defaultFirstDate: leftMostDate,
+                    defaultLastDate: rightMostDate,
+                    initialDate: initDate,
+                    timeZone:
+                        widget.loggedInUser.selectedScope.getProjectTimezone(),
+                    label: 'Set Bill Date',
+                    onDateChanged: (DateTime selectedDate) {
+                      setState(() {
+                        _selectedDate = selectedDate;
+                      });
+                    },
+                  ),
+                ],
+              ),
       ],
     );
   }
