@@ -228,8 +228,6 @@ class _WgtHistoryRepListState extends State<WgtHistoryRepList> {
 
     if (kDebugMode) {
       print('list length: ${_list.length}');
-      print('list config length: ${_listConfig.length}');
-      print('list config: $_listConfig');
     }
 
     return SizedBox(
@@ -380,7 +378,6 @@ class _WgtHistoryRepListState extends State<WgtHistoryRepList> {
         ),
       );
     }
-
     return ListTile(
       dense: true,
       // visualDensity: VisualDensity(vertical: -4),
