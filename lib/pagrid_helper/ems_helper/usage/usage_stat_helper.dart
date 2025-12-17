@@ -824,6 +824,10 @@ Widget getMiniSoA(List<Map<String, dynamic>> miniSoa, BuildContext context,
 
   List<Map<String, dynamic>> payment = [];
   for (var item in miniSoa) {
+    String? creditRemark = item['credit_remark'];
+    if ('initial_balance' == (creditRemark ?? '').toString().toLowerCase()) {
+      continue;
+    }
     String? itemType = item['entry_type'];
     if (itemType != null && itemType == 'payment') {
       dynamic creditAmount = item['credit_amount'];
