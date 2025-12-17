@@ -30,6 +30,7 @@ class WgtHistoryRepList extends StatefulWidget {
     this.showIndex = true,
     this.fullCols = false,
     this.jobRequest = const {},
+    this.valDiffTitle,
   });
 
   final PaGridAppConfig appConfig;
@@ -50,6 +51,7 @@ class WgtHistoryRepList extends StatefulWidget {
   final bool showIndex;
   final bool fullCols;
   final Map<String, String> jobRequest;
+  final String? valDiffTitle;
 
   @override
   _WgtHistoryRepListState createState() => _WgtHistoryRepListState();
@@ -106,6 +108,11 @@ class _WgtHistoryRepListState extends State<WgtHistoryRepList> {
         _listConfig.add({
           'fieldKey': keyName,
           'title': fieldKey['display_header'] ?? fieldKey['field'],
+          'width': fieldKey['width'] ?? 150,
+        });
+        _listConfig.add({
+          'fieldKey': '${fieldKey['field']}_diff',
+          'title': widget.valDiffTitle ?? '${fieldKey['field']}_diff',
           'width': fieldKey['width'] ?? 150,
         });
         if (keyName == 'a_imp') {
@@ -221,6 +228,8 @@ class _WgtHistoryRepListState extends State<WgtHistoryRepList> {
 
     if (kDebugMode) {
       print('list length: ${_list.length}');
+      print('list config length: ${_listConfig.length}');
+      print('list config: $_listConfig');
     }
 
     return SizedBox(
@@ -371,6 +380,7 @@ class _WgtHistoryRepListState extends State<WgtHistoryRepList> {
         ),
       );
     }
+
     return ListTile(
       dense: true,
       // visualDensity: VisualDensity(vertical: -4),
