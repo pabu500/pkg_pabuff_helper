@@ -185,24 +185,6 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
   }
 
   Future<dynamic> _commitApply() async {
-    // if (_availableExcessiveBalanceToApply == null ||
-    //     _availablePaymentAmountToApply == null) {
-    //   dev.log(
-    //       '_availableExcessiveBalanceToApply or _availablePaymentAmountToApply is null');
-    //   return;
-    // }
-    // if (_availableExcessiveBalanceToApply! < 0.0 ||
-    //     _availablePaymentAmountToApply! < 0.0) {
-    //   dev.log(
-    //       '_availableExcessiveBalanceToApply or _availablePaymentAmountToApply is negative');
-    //   return;
-    // }
-
-    // final totalAppliedFromBal = (_initialExcessiveBalanceToApply != null &&
-    //         _availableExcessiveBalanceToApply != null)
-    //     ? (_initialExcessiveBalanceToApply! -
-    //         _availableExcessiveBalanceToApply!)
-    //     : 0.0;
     final totalAppliedFromPayment = (_initialPaymentAmountToApply != null &&
             _availablePaymentAmountToApply != null)
         ? (_initialPaymentAmountToApply! - _availablePaymentAmountToApply!)
@@ -572,12 +554,6 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
 
     // finally, add 0 if not exist
     for (var apply in _paymentApplyInfoListNew) {
-      // if (!apply.containsKey('applied_usage_amount_from_bal')) {
-      //   apply['applied_usage_amount_from_bal'] = 0.0;
-      // }
-      // if (!apply.containsKey('applied_interest_amount_from_bal')) {
-      //   apply['applied_interest_amount_from_bal'] = 0.0;
-      // }
       if (!apply.containsKey('applied_usage_amount_from_payment')) {
         apply['applied_usage_amount_from_payment'] = 0.0;
       }
@@ -957,62 +933,6 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
             ],
           ),
           verticalSpaceTiny,
-          // Row(
-          //   mainAxisSize: MainAxisSize.min,
-          //   children: [
-          //     getTag('Bal', 'From Balance', color: balColor, width: 39),
-          //     horizontalSpaceRegular, // usage bucket
-          //     SizedBox(
-          //       width: valWidth,
-          //       child: WgtTextField(
-          //         key: UniqueKey(),
-          //         appConfig: widget.appConfig,
-          //         loggedInUser: widget.loggedInUser,
-          //         hintText: 'Usage',
-          //         labelText: 'Usage',
-          //         enabled: isEnabled,
-          //         initialValue: initialValueUsageFromBal,
-          //         textStyle: TextStyle(color: valueColor),
-          //         onChanged: (value) {
-          //           _updateCustomApply(
-          //               index, 'applied_usage_amount_from_bal', value);
-          //         },
-          //         onEditingComplete: () {
-          //           setState(() {});
-          //         },
-          //         onClear: () {
-          //           _updateCustomApply(
-          //               index, 'applied_usage_amount_from_bal', '');
-          //         },
-          //       ),
-          //     ),
-          //     horizontalSpaceSmall, // interest bucket
-          //     SizedBox(
-          //       width: valWidth,
-          //       child: WgtTextField(
-          //         key: UniqueKey(),
-          //         appConfig: widget.appConfig,
-          //         loggedInUser: widget.loggedInUser,
-          //         hintText: 'Interest',
-          //         labelText: 'Interest',
-          //         enabled: isEnabled,
-          //         initialValue: initialValueInterestFromBal,
-          //         textStyle: TextStyle(color: valueColor),
-          //         onChanged: (value) {
-          //           _updateCustomApply(
-          //               index, 'applied_interest_amount_from_bal', value);
-          //         },
-          //         onEditingComplete: () {
-          //           setState(() {});
-          //         },
-          //         onClear: () {
-          //           _updateCustomApply(
-          //               index, 'applied_interest_amount_from_bal', '');
-          //         },
-          //       ),
-          //     ),
-          //   ],
-          // ),
           if (appliedTimestampStr != null && appliedByOpUsername != null) ...[
             const SizedBox(height: 5),
             Text('Applied by $appliedByOpUsername at $appliedTimestampStr',
@@ -1091,10 +1011,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
                             '0.0') ??
                     0.0
                 : applyInfo['applied_interest_amount_from_payment'] ?? 0.0;
-        // availableAmountToApply = (appliedAmountUsageFromBal ?? 0.0) +
-        //     (appliedAmountInterestFromBal ?? 0.0) +
-        //     (appliedAmountUsageFromPmt ?? 0.0) +
-        //     (appliedAmountInterestFromPmt ?? 0.0);
+
         final appliedAmountUsage = (appliedAmountUsageFromBal ?? 0.0) +
             (appliedAmountUsageFromPmt ?? 0.0);
         final appliedAmountInterest = (appliedAmountInterestFromBal ?? 0.0) +
@@ -1327,12 +1244,10 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
     if (_paymentApplyInfoListNew.isEmpty) {
       return Container();
     }
-    if ((/*_availableExcessiveBalanceToApply == null ||*/
-        _availablePaymentAmountToApply == null)) {
+    if ((_availablePaymentAmountToApply == null)) {
       return Container();
     }
-    if ((/*_availableExcessiveBalanceToApply! < 0.0 ||*/
-        _availablePaymentAmountToApply! < 0.0)) {
+    if ((_availablePaymentAmountToApply! < 0.0)) {
       return Container();
     }
 
@@ -1357,6 +1272,12 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
         widget.paymentMatchingInfo!['lc_status'] != 'released') {
       okToCommit = false;
       hintMsg = 'Payment must be in released status to commit';
+    }
+    // available amount to apply must be at least 0
+    else if (_availablePaymentAmountToApply != null &&
+        _availablePaymentAmountToApply! < 0.0001) {
+      okToCommit = false;
+      hintMsg = 'Available amount to apply must not be negative';
     }
 
     return Padding(
@@ -1560,34 +1481,6 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
                         style: const TextStyle(fontWeight: FontWeight.bold)),
                   ],
                 ),
-                // Row(
-                //   children: [
-                //     SizedBox(
-                //       width: keyWidth1,
-                //       child: Align(
-                //         alignment: Alignment.centerRight,
-                //         child:
-                //             Text('Usage Amt. from Balance: ', style: keyStyle),
-                //       ),
-                //     ),
-                //     Text(appliedUsageAmountFromBalStr,
-                //         style: const TextStyle(fontWeight: FontWeight.bold)),
-                //   ],
-                // ),
-                // Row(
-                //   children: [
-                //     SizedBox(
-                //       width: keyWidth1,
-                //       child: Align(
-                //         alignment: Alignment.centerRight,
-                //         child: Text('Interest Amt. from Balance: ',
-                //             style: keyStyle),
-                //       ),
-                //     ),
-                //     Text(appliedInterestAmountFromBalStr,
-                //         style: const TextStyle(fontWeight: FontWeight.bold)),
-                //   ],
-                // ),
               ],
             ),
           ],
