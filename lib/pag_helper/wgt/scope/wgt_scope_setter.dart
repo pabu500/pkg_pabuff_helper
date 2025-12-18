@@ -1367,23 +1367,29 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
                                 if (widget.updateUiOnly) {
                                   updateUiOnly = true;
                                 }
-                                // get leaf scope
-                                if (_selectedLocation != null &&
-                                    _selectedLocation?.id != -1) {
-                                  scope = _selectedLocation;
-                                } else if (_selectedLocationGroupProfile !=
-                                        null &&
-                                    _selectedLocationGroupProfile?.id != -1) {
-                                  scope = _selectedLocationGroupProfile;
-                                } else if (_selectedBuildingProfile != null &&
-                                    _selectedBuildingProfile?.id != -1) {
-                                  scope = _selectedBuildingProfile;
-                                } else if (_selectedSiteProfile != null &&
-                                    _selectedSiteProfile?.id != -1) {
-                                  scope = _selectedSiteProfile;
-                                } else if (_selectedSiteGroupProfile != null &&
-                                    _selectedSiteGroupProfile?.id != -1) {
-                                  scope = _selectedSiteGroupProfile;
+
+                                // do not get leaf scope if forScopeType is specified
+                                // (the scope setter is used to set for scope, e.g. create scope)
+                                if (widget.forScopeType == null) {
+                                  // get leaf scope
+                                  if (_selectedLocation != null &&
+                                      _selectedLocation?.id != -1) {
+                                    scope = _selectedLocation;
+                                  } else if (_selectedLocationGroupProfile !=
+                                          null &&
+                                      _selectedLocationGroupProfile?.id != -1) {
+                                    scope = _selectedLocationGroupProfile;
+                                  } else if (_selectedBuildingProfile != null &&
+                                      _selectedBuildingProfile?.id != -1) {
+                                    scope = _selectedBuildingProfile;
+                                  } else if (_selectedSiteProfile != null &&
+                                      _selectedSiteProfile?.id != -1) {
+                                    scope = _selectedSiteProfile;
+                                  } else if (_selectedSiteGroupProfile !=
+                                          null &&
+                                      _selectedSiteGroupProfile?.id != -1) {
+                                    scope = _selectedSiteGroupProfile;
+                                  }
                                 }
 
                                 // // always add project id and name to the scope
