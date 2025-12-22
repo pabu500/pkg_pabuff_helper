@@ -19,6 +19,7 @@ class WgtPagLs extends StatefulWidget {
     this.getPaneWidget,
     this.validateTreeChildren,
     this.selectedItemInfoList,
+    this.isSingleItemMode = false,
     this.hint,
   });
 
@@ -33,6 +34,7 @@ class WgtPagLs extends StatefulWidget {
       getPaneWidget;
   final Function? validateTreeChildren;
   final List<Map<String, dynamic>>? selectedItemInfoList;
+  final bool isSingleItemMode;
   final String? hint;
 
   @override
@@ -108,6 +110,7 @@ class _WgtPagLsState extends State<WgtPagLs> {
           additionalColumnConfig: widget.additionalColumnConfig,
           getPaneWidget: widget.getPaneWidget,
           validateTreeChildren: widget.validateTreeChildren,
+          isSingleItemMode: widget.isSingleItemMode,
           hint: widget.hint,
         );
       default:

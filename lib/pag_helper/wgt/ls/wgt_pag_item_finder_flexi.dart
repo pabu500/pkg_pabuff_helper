@@ -802,6 +802,14 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   }
 
   Widget getItemPickerWide(double width) {
+    bool showHint = !_isFullPanel;
+    // if any pinned, don't show hint
+    for (var colController in widget.listController.listColControllerList) {
+      if (colController.pinned) {
+        showHint = false;
+        break;
+      }
+    }
     return Container(
       width: width,
       decoration: BoxDecoration(
@@ -824,7 +832,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
               getSearchButton(),
             ],
           ),
-          _isFullPanel
+          !showHint
               ? Container()
               : Text(
                   widget.hint ?? '',
