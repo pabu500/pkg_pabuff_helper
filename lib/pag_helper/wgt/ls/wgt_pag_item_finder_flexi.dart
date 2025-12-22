@@ -72,6 +72,7 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
     this.initialFilterMap = const {},
     this.isInitialValueMutable = false,
     this.allowFlexiLabel = false,
+    this.hint,
   });
 
   final MdlPagUser loggedInUser;
@@ -107,6 +108,7 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
   final Map<String, dynamic> initialFilterMap;
   final bool isInitialValueMutable;
   final bool allowFlexiLabel;
+  final String? hint;
 
   @override
   State<WgtPagItemFinderFlexi> createState() => _WgtPagItemFinderFlexiState();
@@ -807,16 +809,31 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
         border: Border.all(color: Theme.of(context).hintColor, width: 1),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 5),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        crossAxisAlignment: CrossAxisAlignment.end,
+      child: Stack(
+        alignment: Alignment.center,
         children: [
-          getOptions(),
-          horizontalSpaceTiny,
-          getFileterCore(),
-          horizontalSpaceTiny,
-          getSearchButton(),
+          Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              getOptions(),
+              horizontalSpaceTiny,
+              getFileterCore(),
+              horizontalSpaceTiny,
+              getSearchButton(),
+            ],
+          ),
+          _isFullPanel
+              ? Container()
+              : Text(
+                  widget.hint ?? '',
+                  style: TextStyle(
+                    color: Theme.of(context).hintColor.withAlpha(55),
+                    fontSize: 21,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
         ],
       ),
     );

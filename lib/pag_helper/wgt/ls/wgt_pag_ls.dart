@@ -19,6 +19,7 @@ class WgtPagLs extends StatefulWidget {
     this.getPaneWidget,
     this.validateTreeChildren,
     this.selectedItemInfoList,
+    this.hint,
   });
 
   final MdlPagAppConfig appConfig;
@@ -32,6 +33,7 @@ class WgtPagLs extends StatefulWidget {
       getPaneWidget;
   final Function? validateTreeChildren;
   final List<Map<String, dynamic>>? selectedItemInfoList;
+  final String? hint;
 
   @override
   State<WgtPagLs> createState() => _WgtPagLsState();
@@ -61,6 +63,7 @@ class _WgtPagLsState extends State<WgtPagLs> {
             additionalColumnConfig: widget.additionalColumnConfig,
             getPaneWidget: widget.getPaneWidget,
             validateTreeChildren: widget.validateTreeChildren,
+            hint: widget.hint,
           );
         }
         return WgtListSearchKind2(
@@ -105,6 +108,7 @@ class _WgtPagLsState extends State<WgtPagLs> {
           additionalColumnConfig: widget.additionalColumnConfig,
           getPaneWidget: widget.getPaneWidget,
           validateTreeChildren: widget.validateTreeChildren,
+          hint: widget.hint,
         );
       default:
         return Container();

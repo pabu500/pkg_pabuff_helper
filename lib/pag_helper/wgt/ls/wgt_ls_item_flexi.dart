@@ -75,6 +75,7 @@ class WgtListSearchItemFlexi extends StatefulWidget {
     this.timeRangePickerWidget,
     this.initialFilterMap = const {},
     this.allowFlexiLabel = false,
+    this.hint,
   });
 
   final MdlPagAppConfig appConfig;
@@ -107,6 +108,7 @@ class WgtListSearchItemFlexi extends StatefulWidget {
   final Widget? timeRangePickerWidget;
   final Map<String, dynamic> initialFilterMap;
   final bool allowFlexiLabel;
+  final String? hint;
 
   @override
   State<WgtListSearchItemFlexi> createState() => _WgtListSearchItemFlexiState();
@@ -1484,6 +1486,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         timeRangePickerWidget: widget.timeRangePickerWidget,
         initialFilterMap: widget.initialFilterMap,
         allowFlexiLabel: widget.allowFlexiLabel,
+        hint: widget.hint,
         onSearching: () {
           setState(() {
             _isFetchingItemList = true;
