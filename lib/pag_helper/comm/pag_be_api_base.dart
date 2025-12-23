@@ -607,8 +607,7 @@ class PagUrlBase {
       '/tenant/update_user_tenant_list';
 
   //tenant_usage
-  static const String eptGetTenantListUsageSummary =
-      '/tenant_usage/get_tenant_list_usage_summary';
+  static const String eptGetTenantUsage = '/ems/tenant/get_tenant_usage';
   static const String eptGetTenantListConsolidatedUsageHistory =
       '/tenant_usage/get_tenant_list_consolidated_usage_history';
 
