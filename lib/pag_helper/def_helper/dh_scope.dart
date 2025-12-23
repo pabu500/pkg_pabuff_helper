@@ -111,10 +111,10 @@ String? validateLabelScope(String val) {
 
   // validate alphanumeric, _, -, #, ,, &, slash, back slash and dash, space,
   // and minimum 5 characters
-  String pattern = r"^[a-zA-Z0-9/_ \-,#&().']{5,255}$";
+  String pattern = r"^[a-zA-Z0-9/_ \-,#&().']{3,255}$";
   RegExp regExp = RegExp(pattern);
   if (!regExp.hasMatch(val)) {
-    return 'alphanumeric, space, /, -, ,, ., (), # only and length 5-255';
+    return 'alphanumeric, space, /, -, ,, ., (), # only and length 3-255';
   }
   return null;
 }
