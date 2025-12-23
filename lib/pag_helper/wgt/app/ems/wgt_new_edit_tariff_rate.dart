@@ -167,7 +167,8 @@ class _WgtNewEditTariffRateState extends State<WgtNewEditTariffRate> {
           SizedBox(
             width: 80,
             child: Tooltip(
-              message: isRateApplied ? 'Rate is applied for billing' : '',
+              message:
+                  isRateApplied ? 'This rate has been applied for billing' : '',
               waitDuration: const Duration(milliseconds: 500),
               child: WgtTextField(
                 enabled: !widget.readOnly && !isRateApplied,

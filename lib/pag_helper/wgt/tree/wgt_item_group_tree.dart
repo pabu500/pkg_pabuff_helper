@@ -596,7 +596,12 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
 
           double? rate = double.tryParse(tariffRateInfo['rate']);
           String label =
-              '${fromDateTime.toString().substring(0, 10)} to ${toDateTime.toString().substring(0, 10)} @Rate:${rate?.toStringAsFixed(tariffRateDecimal)}';
+              '${fromDateTime.toString().substring(0, 10)} to ${toDateTime.toString().substring(0, 10)}';
+
+          String? tptCat = widget.initalValueMap?['tpt_cat'] ?? '';
+          if (tptCat != 'system_cycle') {
+            label += ' @Rate:${rate?.toStringAsFixed(tariffRateDecimal)}';
+          }
           final PagTreeNode tariffRateNode = PagTreeNode(
             parent: parantNode,
             name: tariffRateInfo['from_datetime'].toString(),
