@@ -161,10 +161,9 @@ class _WgtNewEditTariffRateState extends State<WgtNewEditTariffRate> {
       throw Exception('No associated billing record found');
     }
 
-    List<Map<String, dynamic>> _rows =
-        List<Map<String, dynamic>>.from(billList);
+    List<Map<String, dynamic>> rows = List<Map<String, dynamic>>.from(billList);
     List<Map<String, dynamic>> listConfig = [];
-    for (var key in _rows[0].keys) {
+    for (var key in rows[0].keys) {
       listConfig.add({
         'col_key': key,
         'title': key,
@@ -179,13 +178,13 @@ class _WgtNewEditTariffRateState extends State<WgtNewEditTariffRate> {
     }
     table.add(header);
 
-    for (var i = 0; i < _rows.length; i++) {
+    for (var i = 0; i < rows.length; i++) {
       Map<String, dynamic> rowToSave = {};
       //j == 0 is checked
       for (var j = 0; j < listConfig.length; j++) {
         // if (j == 0) continue;
         rowToSave[listConfig[j]['col_key']] =
-            _rows[i][listConfig[j]['col_key']] ?? '';
+            rows[i][listConfig[j]['col_key']] ?? '';
       }
       table.add(rowToSave.values.toList());
     }
@@ -512,7 +511,7 @@ class _WgtNewEditTariffRateState extends State<WgtNewEditTariffRate> {
             ? Theme.of(context).colorScheme.primary
             : Theme.of(context).hintColor.withAlpha(135),
         fileName:
-            'tp_${widget.groupItemId}_rate_bill_list_${widget.tariffPackageMeterType.toLowerCase()}',
+            'tp_rate_${widget.groupItemId}_bill_list_${widget.tariffPackageMeterType.toLowerCase()}',
         extension: 'csv',
         tooltip: 'Download Associated Billing Record List',
         getListAsync: _getList,
