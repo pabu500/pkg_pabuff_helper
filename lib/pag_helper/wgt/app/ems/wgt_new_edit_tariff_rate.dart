@@ -1,12 +1,15 @@
 import 'package:buff_helper/pag_helper/comm/comm_app.dart';
+import 'package:buff_helper/pag_helper/comm/comm_tariff_package.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
+import 'package:buff_helper/xt_ui/wdgt/file/wgt_save_table.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
+import 'package:download/download.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import 'package:csv/csv.dart';
 import '../../../model/mdl_pag_app_config.dart';
 import '../../datetime/wgt_pag_date_range_picker2.dart';
 
@@ -118,6 +121,75 @@ class _WgtNewEditTariffRateState extends State<WgtNewEditTariffRate> {
         _gettingGstRate = false;
       });
     }
+  }
+
+  Future<dynamic> _getDownloadAssociatedBillList() async {
+    Map<String, dynamic> queryMap = {
+      'scope': _loggedInUser!.selectedScope.toScopeMap(),
+      'group_item_id': widget.groupItemId,
+      'tariff_package_meter_type': widget.tariffPackageMeterType,
+      'tariff_rate_id': widget.initialValueMap?[
+          'br_id_tariff_rate_id_${widget.tariffPackageMeterType.toLowerCase()}'],
+    };
+    try {
+      final result = await getTpRateBillList(
+        widget.appConfig,
+        queryMap,
+        MdlPagSvcClaim(
+          scope: '',
+          target: '',
+          operation: '',
+        ),
+      );
+      final tpRateBillList = result;
+      if (tpRateBillList == null || tpRateBillList.isEmpty) {
+        throw Exception('No associated billing record found');
+      }
+      return tpRateBillList;
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error: $e');
+      }
+    } finally {
+      // await _download(csv, filename);
+    }
+  }
+
+  Future<dynamic> _getList() async {
+    final billList = await _getDownloadAssociatedBillList();
+    if (billList == null || billList.isEmpty) {
+      throw Exception('No associated billing record found');
+    }
+
+    List<Map<String, dynamic>> _rows =
+        List<Map<String, dynamic>>.from(billList);
+    List<Map<String, dynamic>> listConfig = [];
+    for (var key in _rows[0].keys) {
+      listConfig.add({
+        'col_key': key,
+        'title': key,
+      });
+    }
+
+    List<List<dynamic>> table = [];
+    List<String> header = [];
+    for (var i = 0; i < listConfig.length; i++) {
+      // if (i == 0) continue;
+      header.add(listConfig[i]['title']);
+    }
+    table.add(header);
+
+    for (var i = 0; i < _rows.length; i++) {
+      Map<String, dynamic> rowToSave = {};
+      //j == 0 is checked
+      for (var j = 0; j < listConfig.length; j++) {
+        // if (j == 0) continue;
+        rowToSave[listConfig[j]['col_key']] =
+            _rows[i][listConfig[j]['col_key']] ?? '';
+      }
+      table.add(rowToSave.values.toList());
+    }
+    return table;
   }
 
   @override
@@ -259,7 +331,7 @@ class _WgtNewEditTariffRateState extends State<WgtNewEditTariffRate> {
             onSet: (startDate, endDate) {},
           ),
           SizedBox(
-            width: 150,
+            width: 155,
             child: WgtTextField(
               enabled: !widget.readOnly,
               appConfig: widget.appConfig,
@@ -311,8 +383,9 @@ class _WgtNewEditTariffRateState extends State<WgtNewEditTariffRate> {
               },
             ),
           ),
-          // verticalSpaceSmall,
+          verticalSpaceTiny,
           // getOpButton(),
+          getDownloadAssociatedBillListButton(isRateApplied),
         ],
       ),
     );
@@ -421,6 +494,30 @@ class _WgtNewEditTariffRateState extends State<WgtNewEditTariffRate> {
           },
         );
       },
+    );
+  }
+
+  Widget getDownloadAssociatedBillListButton(bool isRateApplied) {
+    bool enabled = isRateApplied;
+
+    return Tooltip(
+      waitDuration: const Duration(milliseconds: 500),
+      message: enabled
+          ? 'Download Associated Billing Record List'
+          : 'No associated billing record',
+      child: WgtSaveTable(
+        enabled: enabled,
+        icon: Icons.list_alt,
+        color: enabled
+            ? Theme.of(context).colorScheme.primary
+            : Theme.of(context).hintColor.withAlpha(135),
+        fileName:
+            'tp_${widget.groupItemId}_rate_bill_list_${widget.tariffPackageMeterType.toLowerCase()}',
+        extension: 'csv',
+        tooltip: 'Download Associated Billing Record List',
+        getListAsync: _getList,
+        getList: () {},
+      ),
     );
   }
 }

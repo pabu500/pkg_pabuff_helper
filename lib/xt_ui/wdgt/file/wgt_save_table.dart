@@ -20,6 +20,7 @@ class WgtSaveTable extends StatefulWidget {
     this.directory,
     this.extension,
     this.tooltip,
+    this.icon,
     this.color,
     this.iconSize,
     this.enabled = true,
@@ -33,6 +34,7 @@ class WgtSaveTable extends StatefulWidget {
   final Directory? directory;
   final String? extension;
   final String? tooltip;
+  final IconData? icon;
   final bool enabled;
   final double? iconSize;
   final Color? color;
@@ -129,8 +131,8 @@ class _WgtSaveTableState extends State<WgtSaveTable> {
     return IconButton(
       onPressed: widget.enabled ? _saveTable : null,
       icon: Icon(
-        Icons.cloud_download,
-        color: widget.color ?? Theme.of(context).hintColor.withOpacity(0.55),
+        widget.icon ?? Icons.cloud_download,
+        color: widget.color ?? Theme.of(context).hintColor.withAlpha(135),
         size: widget.iconSize,
         // size: 16,
       ),
