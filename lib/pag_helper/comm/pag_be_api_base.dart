@@ -382,7 +382,7 @@ class PagUrlBase {
   //Billing Manager
   static const String eptGetBill = '/ems/billing/get_bill';
   static const String eptGenBill = '/ems/billing/gen_bill';
-  static const String eptCheckTpInfo = '/ems/billing/check_tp_rate_info';
+  static const String eptCheckTpRateInfo = '/ems/billing/check_tp_rate_info';
   static const String eptGetReleaseCandidate = '/ems/billing/get_rc';
   static const String eptReleaseBills = '/ems/billing/release_bills';
   static const String eptGetUsageFactor = '/ems/billing/get_usage_factor';

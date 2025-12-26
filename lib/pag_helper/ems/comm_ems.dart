@@ -275,24 +275,28 @@ Future<dynamic> getTariffPackageTariffRateInfo(
     if (respJson['error'] != null) {
       throw Exception(respJson['error']);
     }
-    if (respJson['data'] == null) {
-      throw Exception('Failed to get tariff rate list');
+    final data = respJson['data'];
+    if (data == null) {
+      throw Exception('Failed to get response data');
     }
-
-    var data = respJson['data'];
-    if (data['tariff_package_tariff_rate_info'] == null) {
-      throw Exception('Failed to get tariff rate info');
+    final info = data['info'];
+    if (info != null) {
+      if (info ?? ('code') == 'RESULT_NOT_FOUND') {
+        throw ItemNotFoundException("item not found");
+      }
     }
-
-    return data;
-    // final itemListJson = data['job_type_sub_list'];
-    // List<Map<String, dynamic>> itemList = [];
-    // if (itemListJson != null) {
-    //   for (var item in itemListJson) {
-    //     itemList.add(item);
-    //   }
-    // }
-    // return {'job_type_sub_list': itemList};
+    final result = data['result'];
+    if (result == null) {
+      throw Exception("No result found in the response");
+    }
+    String? resultKey = data['result_key'];
+    if (resultKey == null && resultKey!.isEmpty) {
+      throw Exception("Error: $resultKey");
+    }
+    if (result[resultKey] == null) {
+      throw Exception("No data found in the response");
+    }
+    return result[resultKey];
   } else if (response.statusCode == 403) {
     throw Exception("You are not authorized to perform this operation");
   } else {
