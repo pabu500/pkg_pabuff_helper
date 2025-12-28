@@ -281,7 +281,7 @@ Future<dynamic> getTariffPackageTariffRateInfo(
     }
     final info = data['info'];
     if (info != null) {
-      if (info ?? ('code') == 'RESULT_NOT_FOUND') {
+      if (info['code'] == 'RESULT_NOT_FOUND') {
         throw ItemNotFoundException("item not found");
       }
     }
