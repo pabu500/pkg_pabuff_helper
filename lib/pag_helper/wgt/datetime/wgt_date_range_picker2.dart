@@ -221,7 +221,7 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
             valueStyle: TextStyle(
                 fontSize: 15,
                 color: fromText == 'Select'
-                    ? Theme.of(context).hintColor.withOpacity(0.34)
+                    ? Theme.of(context).hintColor.withAlpha(89)
                     : Theme.of(context).colorScheme.primary),
           ),
           horizontalSpaceTiny,
@@ -231,7 +231,7 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
             valueStyle: TextStyle(
                 fontSize: 15,
                 color: toText == 'Select'
-                    ? Theme.of(context).hintColor.withOpacity(0.34)
+                    ? Theme.of(context).hintColor.withAlpha(89)
                     : Theme.of(context).colorScheme.primary),
           ),
           horizontalSpaceSmall,
@@ -345,21 +345,6 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
             ),
           ),
         ),
-        // const SizedBox(height: 10),
-        // Row(
-        //   mainAxisSize: MainAxisSize.min,
-        //   children: [
-        //     const Text('Selection(s):  '),
-        //     const SizedBox(width: 10),
-        //     Text(
-        //       _getValueText(
-        //         config.calendarType,
-        //         _rangeDatePickerValueWithDefaultValue,
-        //       ),
-        //     ),
-        //   ],
-        // ),
-        // const SizedBox(height: 25),
       ],
     );
   }
