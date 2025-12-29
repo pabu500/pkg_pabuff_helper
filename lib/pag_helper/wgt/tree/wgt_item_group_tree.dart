@@ -467,7 +467,7 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
 
   Future<dynamic> _getTariffPackageTariffRateList(
       Map<String, dynamic> queryMap) async {
-    var data = await getTariffPackageTariffRateInfo(
+    final tariffPackageRateInfo = await getTariffPackageTariffRateInfo(
       widget.appConfig,
       widget.loggedInUser,
       queryMap,
@@ -479,7 +479,8 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
         operation: '',
       ),
     );
-    return data['tariff_package_tariff_rate_info'];
+    // return data['tariff_package_tariff_rate_info'];
+    return tariffPackageRateInfo;
   }
 
   Future<dynamic> _getTariffPackageTenantList(
