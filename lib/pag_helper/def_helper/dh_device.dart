@@ -1,4 +1,6 @@
+import 'package:buff_helper/pag_helper/def_helper/dh_pag_tenant.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
+import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/up_helper/helper/device_def.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -245,7 +247,6 @@ String? validateTag(String val) {
 }
 
 String? validateServiceType(String val) {
-
   // Service Type pattern: letter, number, underscore, dash, space, 1 to 21 characters
 
   String pattern = r'^[a-zA-Z0-9_ -]{1,21}$';
@@ -430,5 +431,71 @@ List<Map<String, dynamic>> getDeviceConfigListByCat(PagDeviceCat cat) {
       return listConfigBaseDevice + listConfigBaseMeterGroup;
     default:
       return listConfigBaseDevice;
+  }
+}
+
+enum PagMeterOpType {
+  // NONE,
+  none,
+  CPC,
+  BYPASS,
+  UNBYPASS,
+  SET_CONC,
+  SET_SITE,
+  SET_CONC_TARIFF,
+  REPLACEMENT,
+  DETACH_SN,
+  ATTACH_SN,
+  // READING_DATA_INSERT,
+  readingDataInsert,
+  SET_LC_STATUS,
+  MANUAL_READING,
+}
+
+final List<Map<String, dynamic>> listConfigMeterOpsBase = [
+  {
+    'col_key': 'sn',
+    'title': 'S/N',
+    'col_type': 'string',
+    'width': 200,
+    'is_mapping_required': true,
+    'validator': validateSerialNumber,
+  },
+];
+
+final List<Map<String, dynamic>> listConfigMeterOpsInsertReadingSingleVal = [
+  {
+    'col_key': 'dt',
+    'title': 'Reading Time',
+    'col_type': 'string',
+    'width': 200,
+    'is_mapping_required': true,
+    'validator': validateDatTimeStr,
+  },
+  {
+    'col_key': 'val',
+    'title': 'Reading',
+    'col_type': 'double',
+    'width': 150,
+    'is_mapping_required': true,
+    'validator': validateLastReadingValue,
+  },
+];
+
+List<Map<String, dynamic>> getMeterOpsConfigList(PagMeterOpType opType) {
+  switch (opType) {
+    case PagMeterOpType.readingDataInsert:
+      return listConfigMeterOpsBase + listConfigMeterOpsInsertReadingSingleVal;
+    default:
+      return listConfigMeterOpsBase;
+  }
+}
+
+String getMeterOpsFileUploadMessage(PagMeterOpType opType) {
+  switch (opType) {
+    case PagMeterOpType.readingDataInsert:
+      return 'Upload Meter Reading Data';
+    default:
+      return 'Unsupported Meter Operation';
   }
 }

@@ -285,7 +285,10 @@ Future<dynamic> doPagOpMultiKeyValUpdate(
 }
 
 Future<Map<String, dynamic>> updatePagBatchOpProgress(
-    MdlPagAppConfig appConfig, MdlPagUser? loggedInUser, String opName) async {
+  MdlPagAppConfig appConfig,
+  MdlPagUser? loggedInUser,
+  String opName,
+) async {
   try {
     final response = await http.get(
       Uri.parse(

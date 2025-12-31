@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
-
+import 'dart:developer' as dev;
 import '../info/empty_result.dart';
 
 class WgtSubmitTable extends StatefulWidget {
@@ -17,6 +17,7 @@ class WgtSubmitTable extends StatefulWidget {
     required this.getList,
     this.getHeader,
     this.onGetFileInfo,
+    this.onListLoaded,
   });
 
   final String? tooltip;
@@ -25,6 +26,7 @@ class WgtSubmitTable extends StatefulWidget {
   final Function getList;
   final Function(List<String>)? getHeader;
   final Function? onGetFileInfo;
+  final Function? onListLoaded;
 
   @override
   State<WgtSubmitTable> createState() => _WgtSubmitTableState();
@@ -32,6 +34,7 @@ class WgtSubmitTable extends StatefulWidget {
 
 class _WgtSubmitTableState extends State<WgtSubmitTable> {
   List<List> _table = [];
+
   Future<dynamic> _getCsv() async {
     FilePickerResult? result;
     File file;
@@ -68,6 +71,8 @@ class _WgtSubmitTableState extends State<WgtSubmitTable> {
 
         widget.getList(_table);
         widget.getHeader?.call(header);
+
+        widget.onListLoaded?.call();
         // String filename = result.files.first.name;
         // widget.onGetFileInfo?.call(filename);
         if (widget.onGetFileInfo != null) {
@@ -75,9 +80,7 @@ class _WgtSubmitTableState extends State<WgtSubmitTable> {
           widget.onGetFileInfo!(filename);
         }
       } catch (e) {
-        if (kDebugMode) {
-          print(e);
-        }
+        dev.log(e.toString());
       }
     }
 
