@@ -258,7 +258,7 @@ String? validateServiceType(String val) {
   return null;
 }
 
-enum PagDeviceOps {
+enum PagDeviceOpType {
   onboarding,
   update,
   none,
@@ -454,7 +454,7 @@ enum PagMeterOpType {
 
 final List<Map<String, dynamic>> listConfigMeterOpsBase = [
   {
-    'col_key': 'sn',
+    'col_key': 'meter_sn',
     'title': 'S/N',
     'col_type': 'string',
     'width': 200,

@@ -593,7 +593,7 @@ String? validateInitialBalance(String value) {
 //   return null;
 // }
 
-enum PagTenantOps {
+enum PagTenantOpType {
   onboarding,
   update,
   none,

@@ -1,4 +1,3 @@
-import 'package:buff_helper/pag_helper/def_helper/dh_pag_finance.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +30,7 @@ class MdlPagOpController {
   final MdlPagAppConfig appConfig;
   final MdlPagUser? loggedInUser;
   dynamic itemType;
-  PagItemKind itemKind;
+  final PagItemKind itemKind;
   ItemIdType itemIdType;
   List<Map<String, dynamic>> listConfig;
   List<Map<String, dynamic>> opColsConfig;
