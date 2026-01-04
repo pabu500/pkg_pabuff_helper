@@ -1,6 +1,7 @@
 import 'package:buff_helper/xt_ui/xt_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
+import 'dart:developer' as dev;
 
 import '../../../util/date_time_util.dart';
 import 'wgt_date_range_picker2.dart';
@@ -65,9 +66,11 @@ class _WgtPagDateRangePickerMonthlyState
 
     if (selected != null) {
       if (selected.isAfter(DateTime.now())) {
+        dev.log('Selected month is in the future. Ignoring.');
         return;
       }
       if (selected == _monthPicked) {
+        dev.log('Selected month is the same as current. Ignoring.');
         return;
       }
       setState(() {
