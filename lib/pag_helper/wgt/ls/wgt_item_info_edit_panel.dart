@@ -769,9 +769,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
         forScopeType: widget.itemType is PagScopeType ? widget.itemType : null,
         onScopeSet: (dynamic profile) async {
           if (profile == null) {
-            if (kDebugMode) {
-              print('Profile is null');
-            }
+            dev.log('Profile is null');
             return {};
           }
           String scopeIdColName = '';
@@ -792,9 +790,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
           }
 
           if (scopeIdColName.isEmpty) {
-            if (kDebugMode) {
-              print('Invalid profile type');
-            }
+            dev.log('Invalid profile type');
             return {};
           }
           List<Map<String, dynamic>> result = await _updateProfile(

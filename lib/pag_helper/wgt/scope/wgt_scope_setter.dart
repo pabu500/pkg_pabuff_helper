@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:buff_helper/pag_helper/comm/comm_scope.dart';
 import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
@@ -1413,9 +1415,8 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
                                       await widget.onScopeSet?.call(scope);
 
                                   if (result == null) {
-                                    if (kDebugMode) {
-                                      print('Error setting scope');
-                                    }
+                                    dev.log('Error setting scope');
+
                                     return;
                                   }
 
