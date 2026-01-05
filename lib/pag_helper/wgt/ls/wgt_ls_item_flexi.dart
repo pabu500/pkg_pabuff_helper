@@ -1435,15 +1435,13 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                         );
                       default:
                         if (snapshot.hasError) {
-                          if (kDebugMode) {
-                            print(snapshot.error);
-                          }
+                          dev.log(snapshot.error.toString());
+
                           return getErrorTextPrompt(
                               context: context, errorText: 'Serivce Error');
                         } else {
-                          if (kDebugMode) {
-                            print('FutureBuilder -> getCompletedWidget');
-                          }
+                          dev.log('FutureBuilder -> getCompletedWidget');
+
                           return getCompletedWidget();
                         }
                     }

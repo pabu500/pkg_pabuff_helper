@@ -286,7 +286,7 @@ class _WgtItemTypeSelectorState extends State<WgtItemTypeSelector> {
         if (widget.itemKind == PagItemKind.device) {
           itemType = PagDeviceCat.values.byName(itemTypeStr);
         } else if (widget.itemKind == PagItemKind.scope) {
-          itemType = PagScopeType.byKey(itemTypeStr);
+          itemType = PagScopeType.values.byName(itemTypeStr);
         } else if (widget.itemKind == PagItemKind.finance) {
           itemType = PagFinanceType.byValue(itemTypeStr);
           if (itemType == PagFinanceType.none ||

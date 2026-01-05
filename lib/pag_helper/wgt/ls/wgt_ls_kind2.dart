@@ -297,15 +297,16 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
             onItemTypeSelected: (itemType) {
               setState(() {
                 _updateItemType(itemType: itemType);
+                _itemTypeRefreshKey = UniqueKey();
               });
             },
           ),
           verticalSpaceTiny,
           if (_selectedListController != null && _listTypeErrorText.isEmpty)
             WgtListSearchItemFlexi(
+              // key: _itemTypeRefreshKey,
               appConfig: widget.appConfig,
               width: widget.width,
-              // key: _itemTypeFreshKey,
               isCompactFinder: widget.isCompactFinder,
               isSingleItemMode: widget.isSingleItemMode,
               showList: widget.showList,

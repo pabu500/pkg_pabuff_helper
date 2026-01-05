@@ -914,9 +914,8 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
                 );
 
             if (validatedResult != 'valid') {
-              if (kDebugMode) {
-                print('Invalid list');
-              }
+              dev.log('Invalid list');
+
               return validatedResult;
             }
             return 'valid';

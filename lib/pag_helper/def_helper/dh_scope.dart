@@ -186,3 +186,90 @@ Widget getScopeLabel(BuildContext context, MdlPagScope scope) {
     children: scopeWidgets,
   );
 }
+
+enum PagScopeOpType {
+  onboardingLocation,
+  onboardingLocationGroup,
+  update,
+  none,
+}
+
+final List<Map<String, dynamic>> listConfigScopeOpsBase = [
+  {
+    // 'col_key': 'scope_sn',
+    // 'title': 'S/N',
+    // 'col_type': 'string',
+    // 'width': 200,
+    // 'is_mapping_required': true,
+    // 'validator': validateSerialNumber,
+  },
+];
+
+final List<Map<String, dynamic>> listConfigScopeOpOnbLocation = [
+  {
+    'col_key': 'location_label',
+    'title': 'Location Label',
+    'col_type': 'string',
+    'width': 200,
+    'is_mapping_required': true,
+    'validator': validateLabelScope,
+  },
+  {
+    'col_key': 'location_group_label',
+    'title': 'Location Group Label',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': true,
+    'validator': validateLabelScope,
+  },
+  {
+    'col_key': 'building_label',
+    'title': 'Building Label',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': true,
+    'validator': validateLabelScope,
+  },
+];
+final List<Map<String, dynamic>> listConfigScopeOpOnbLocationGroup = [
+  {
+    'col_key': 'location_group_label',
+    'title': 'Location Group Label',
+    'col_type': 'string',
+    'width': 200,
+    'is_mapping_required': true,
+    'validator': validateLabelScope,
+  },
+  {
+    'col_key': 'building_label',
+    'title': 'Building Label',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': true,
+    'validator': validateLabelScope,
+  },
+  {
+    'col_key': 'site_label',
+    'title': 'Site Label',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': true,
+    'validator': validateLabelScope,
+  },
+];
+
+List<Map<String, dynamic>> getScopeOpsConfigList(PagScopeOpType opType) {
+  final List<Map<String, dynamic>> list = [];
+  switch (opType) {
+    case PagScopeOpType.onboardingLocation:
+      list.addAll(listConfigScopeOpsBase + listConfigScopeOpOnbLocation);
+
+    case PagScopeOpType.onboardingLocationGroup:
+      list.addAll(listConfigScopeOpsBase + listConfigScopeOpOnbLocationGroup);
+    default:
+      list.addAll(listConfigScopeOpsBase);
+  }
+  //remove empty maps
+  list.removeWhere((map) => map.isEmpty);
+  return list;
+}
