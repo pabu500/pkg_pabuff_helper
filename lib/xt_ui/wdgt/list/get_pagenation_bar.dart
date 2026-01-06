@@ -16,7 +16,8 @@ Widget getPagenationBar(
     {bool narrow = false,
     List<Map<String, dynamic>>? rows,
     required Function getCsv,
-    String listPrefix = ''}) {
+    String listPrefix = '',
+    Function? onLoaded}) {
   if (rowsPerPage == null || totalRows == null || currentPage == null) {
     return Container();
   }
@@ -35,10 +36,9 @@ Widget getPagenationBar(
                   icon: const Icon(Icons.navigate_before),
                   onPressed: currentPage == 1
                       ? null
-                      : () {
-                          if (onPrev != null) {
-                            onPrev();
-                          }
+                      : () async {
+                          await onPrev?.call();
+                          onLoaded?.call();
                         },
                 ),
               ),
@@ -56,10 +56,9 @@ Widget getPagenationBar(
                   icon: const Icon(Icons.navigate_next),
                   onPressed: currentPage == (totalRows / rowsPerPage).ceil()
                       ? null
-                      : () {
-                          if (onNext != null) {
-                            onNext();
-                          }
+                      : () async {
+                          await onNext?.call();
+                          onLoaded?.call();
                         },
                 ),
               ),
@@ -95,10 +94,9 @@ Widget getPagenationBar(
                       icon: const Icon(Icons.navigate_before),
                       onPressed: currentPage == 1
                           ? null
-                          : () {
-                              if (onPrev != null) {
-                                onPrev();
-                              }
+                          : () async {
+                              await onPrev?.call();
+                              onLoaded?.call();
                             },
                     ),
                   ),
@@ -109,18 +107,18 @@ Widget getPagenationBar(
                   //     color: Theme.of(context).hintColor,
                   //   ),
                   // ),
-                  getPageLinkRow(context, rowsPerPage, totalRows, currentPage,
-                      onClickPage),
+                  getPageLinkRow(
+                      context, rowsPerPage, totalRows, currentPage, onClickPage,
+                      onLoaded: onLoaded),
                   Transform.translate(
                     offset: const Offset(0, -5),
                     child: IconButton(
                       icon: const Icon(Icons.navigate_next),
                       onPressed: currentPage == (totalRows / rowsPerPage).ceil()
                           ? null
-                          : () {
-                              if (onNext != null) {
-                                onNext();
-                              }
+                          : () async {
+                              await onNext?.call();
+                              onLoaded?.call();
                             },
                     ),
                   ),
@@ -133,7 +131,8 @@ Widget getPagenationBar(
 }
 
 Widget getPageLinkRow(BuildContext context, int rowsPerPage, int totalRows,
-    int currentPage, Function? onClickPage) {
+    int currentPage, Function? onClickPage,
+    {Function? onLoaded}) {
   List<Widget> pagesNumbers = [];
   int pages = (totalRows / rowsPerPage).ceil();
   // show link for first and last 3 pages
@@ -146,10 +145,9 @@ Widget getPageLinkRow(BuildContext context, int rowsPerPage, int totalRows,
         InkWell(
           onTap: i == currentPage
               ? null
-              : () {
-                  if (onClickPage != null) {
-                    onClickPage(i);
-                  }
+              : () async {
+                  await onClickPage?.call(i);
+                  onLoaded?.call();
                 },
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
@@ -184,7 +182,7 @@ Widget getPageLinkRow(BuildContext context, int rowsPerPage, int totalRows,
           '...',
           style: TextStyle(
             fontSize: 16,
-            color: Colors.grey.withOpacity(0.7),
+            color: Colors.grey.withAlpha(180),
           ),
         ),
       );

@@ -294,30 +294,30 @@ class _WgtListPaneState extends State<WgtListPane> {
                 _setPaneMode();
               }
             : null,
-        onPreviousPage: () {
+        onPreviousPage: () async {
           setState(() {
             _currentPage--;
           });
-          _getItemList();
+          await _getItemList();
         },
-        onNextPage: () {
+        onNextPage: () async {
           setState(() {
             _currentPage++;
           });
-          _getItemList();
+          await _getItemList();
         },
-        onClickPage: (page) {
+        onClickPage: (page) async {
           setState(() {
             _currentPage = page;
           });
-          _getItemList();
+          await _getItemList();
         },
-        onSort: (sortBy, sortOrder) {
+        onSort: (sortBy, sortOrder) async {
           setState(() {
             _sortBy = sortBy;
             _sortOrder = sortOrder;
           });
-          _getItemList();
+          await _getItemList();
         },
         onRequestRefresh: () {
           setState(() {

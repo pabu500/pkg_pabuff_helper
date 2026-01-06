@@ -112,8 +112,8 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
   bool _modified = false;
   // late double _lastColWidth;
   // late List<Map<String, dynamic>> _listConfig;
-  late List<Map<String, dynamic>> _rows;
-  late List<Map<String, dynamic>> _postCommitRows = [];
+  final List<Map<String, dynamic>> _rows = [];
+  final List<Map<String, dynamic>> _postCommitRows = [];
   final List<Map<String, dynamic>> _modifiedRows = [];
   late double _width;
   late double _listHeight;
@@ -222,16 +222,20 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
     }
   }
 
+  void _loadRows() {
+    _rows.clear();
+    _rows.addAll(widget.listItems);
+    _postCommitRows.clear();
+    _postCommitRows.addAll(_rows);
+  }
+
   @override
   void initState() {
     super.initState();
 
     _currentMode = widget.displayMode;
-    _rows = widget.listItems;
-    //copy the list to _postCommitRows
-    _postCommitRows = List.from(_rows);
-
-    // _listConfig = widget.listController.getListConfig();
+    _rows.addAll(widget.listItems);
+    _postCommitRows.addAll(_rows);
   }
 
   double getListWidth() {
@@ -298,6 +302,8 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
                   return _buildListHeader();
                 } else if (index == _rows.length + 1) {
                   //footer
+                  // _loadRows();
+
                   return ListTile(
                       title: showPagination
                           ? Padding(
@@ -315,6 +321,11 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
                                 rows: _rows,
                                 getCsv: _getCsvList,
                                 listPrefix: widget.listPrefix,
+                                onLoaded: () {
+                                  // setState(() {
+                                  _loadRows();
+                                  // });
+                                },
                               ),
                             )
                           : Container());
