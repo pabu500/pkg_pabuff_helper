@@ -159,6 +159,21 @@ class MdlPagProjectProfile {
     return null;
   }
 
+  List<String> getPortalMeterTypeTagList() {
+    List<String> meterTypeTagList = [];
+    for (var deviceTypeInfo in deviceTypeInfoList) {
+      if ('meter' != deviceTypeInfo.keys.first) {
+        continue;
+      }
+      Map<String, dynamic> meterInfo = deviceTypeInfo['meter'];
+      String? typeTagStr = meterInfo['type_tag_str'];
+      if (typeTagStr != null && typeTagStr.isNotEmpty) {
+        meterTypeTagList.addAll(typeTagStr.split(','));
+      }
+    }
+    return meterTypeTagList;
+  }
+
   void bindFilterColController(MdlListColController? filterColController,
       {MdlPagSiteGroupProfile? defaultSiteGroupProfile,
       bool limitToDefault = false}) {

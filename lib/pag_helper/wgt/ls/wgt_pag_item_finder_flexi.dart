@@ -70,9 +70,11 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
     this.isCompactMode = false,
     this.isSingleItemMode = false,
     this.initialFilterMap = const {},
+    this.initialFilterGroupType,
     this.isInitialValueMutable = false,
     this.allowFlexiLabel = false,
     this.hint,
+    this.widthOffset = 0.0,
   });
 
   final MdlPagUser loggedInUser;
@@ -106,9 +108,11 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
   final bool isCompactMode;
   final bool isSingleItemMode;
   final Map<String, dynamic> initialFilterMap;
+  final PagFilterGroupType? initialFilterGroupType;
   final bool isInitialValueMutable;
   final bool allowFlexiLabel;
   final String? hint;
+  final double widthOffset;
 
   @override
   State<WgtPagItemFinderFlexi> createState() => _WgtPagItemFinderFlexiState();
@@ -709,6 +713,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     _dropDownUnderline =
         Container(height: 1, color: Theme.of(context).hintColor.withAlpha(75));
     double width = widget.width ?? MediaQuery.of(context).size.width - 130;
+    width = width + widget.widthOffset;
 
     blockDecoration = BoxDecoration(
       border: Border.all(
@@ -1151,7 +1156,9 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
 
   List<Widget> getItemSpecGroupList() {
     if (widget.initialFilterMap.isNotEmpty) {
-      return [];
+      if (widget.initialFilterGroupType != PagFilterGroupType.SPEC) {
+        return [];
+      }
     }
 
     List<Widget> list = [];
@@ -1169,15 +1176,13 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
                 builder: (context, AsyncSnapshot<void> snapshot) {
                   switch (snapshot.connectionState) {
                     case ConnectionState.waiting:
-                      if (kDebugMode) {
-                        print('item spec group list waiting...');
-                      }
+                      dev.log('item spec group list waiting...');
+
                       return const WgtPagWait(size: 34);
                     default:
                       if (snapshot.hasError) {
-                        if (kDebugMode) {
-                          print(snapshot.error);
-                        }
+                        dev.log(snapshot.error.toString());
+
                         return getErrorTextPrompt(
                             context: context, errorText: 'list error');
                       } else {

@@ -74,8 +74,10 @@ class WgtListSearchItemFlexi extends StatefulWidget {
     this.showTimeRangePicker = false,
     this.timeRangePickerWidget,
     this.initialFilterMap = const {},
+    this.initialFilterGroupType,
     this.allowFlexiLabel = false,
     this.hint,
+    this.widthOffset = 0.0,
   });
 
   final MdlPagAppConfig appConfig;
@@ -107,8 +109,10 @@ class WgtListSearchItemFlexi extends StatefulWidget {
   final bool showTimeRangePicker;
   final Widget? timeRangePickerWidget;
   final Map<String, dynamic> initialFilterMap;
+  final PagFilterGroupType? initialFilterGroupType;
   final bool allowFlexiLabel;
   final String? hint;
+  final double widthOffset;
 
   @override
   State<WgtListSearchItemFlexi> createState() => _WgtListSearchItemFlexiState();
@@ -318,9 +322,8 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         }
       });
     } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
+      dev.log(e.toString());
+
       rethrow;
     } finally {
       setState(() {
@@ -1468,6 +1471,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       WgtPagItemFinderFlexi(
         key: _finderRefreshKey, //_listContentRefreshKey,
         width: widget.width,
+        widthOffset: widget.widthOffset,
         loggedInUser: loggedInUser!,
         appConfig: widget.appConfig,
         itemKind: widget.itemKind,
@@ -1483,6 +1487,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         showTimeRangePicker: widget.showTimeRangePicker,
         timeRangePickerWidget: widget.timeRangePickerWidget,
         initialFilterMap: widget.initialFilterMap,
+        initialFilterGroupType: widget.initialFilterGroupType,
         allowFlexiLabel: widget.allowFlexiLabel,
         hint: widget.hint,
         onSearching: () {
