@@ -172,6 +172,8 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
         return _selectedFromDate != null &&
             _selectedToDate != null &&
             _selectedDate != null;
+      case 'giro-file':
+        return _selectedFromDate != null && _selectedToDate != null;
       default:
         return false;
     }
@@ -257,6 +259,8 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
         return getTenantUsageReportOptions();
       case 'billing-task':
         return getBillingTaskOptions();
+      case 'giro-file':
+        return getGiroFileOptions();
       default:
         return const SizedBox();
     }
@@ -345,6 +349,28 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
           children: [
             Text(
               'Time Range',
+              style: TextStyle(
+                color: Theme.of(context).hintColor,
+                fontSize: 16,
+              ),
+            ),
+            horizontalSpaceSmall,
+            getTimeRangePicker(),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget getGiroFileOptions() {
+    if ((_selectedFromDate == null || _selectedToDate == null)) {}
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Duration',
               style: TextStyle(
                 color: Theme.of(context).hintColor,
                 fontSize: 16,
