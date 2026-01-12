@@ -461,7 +461,8 @@ String? nusSnValidator(String displayname) {
     bool isRvrc = isRVRC(displayname) == null;
     bool isVh = isVH(displayname) == null;
     bool isNusC = isNUSC(displayname) == null;
-    if(isVh || isRvrc || isNusC) {
+    bool isUtrNorth = isUTRNorth(displayname) == null;
+    if(isVh || isRvrc || isNusC || isUtrNorth) {
       return null;
     }
     return 'Invalid displayname';
@@ -525,6 +526,14 @@ String? isVH(String displayname) {
 String? isNUSC(String displayname) {
   int displaynameInt = int.parse(displayname);
   if (displaynameInt < 10002801  || (displaynameInt > 10003925 && displaynameInt != 10003963 && displaynameInt != 10003982 && displaynameInt != 10003985 && displaynameInt != 10009999)) {
+    return 'Invalid displayname';
+  }
+  return null;
+}
+
+ String? isUTRNorth(String displayname) {
+  int displaynameInt = int.parse(displayname);
+  if ((displaynameInt < 10100700 && !{10000713, 10000744,10000780,10000781,10000782,10000783,10000784}.contains(displaynameInt)) || (displaynameInt > 10101296)) {
     return 'Invalid displayname';
   }
   return null;
