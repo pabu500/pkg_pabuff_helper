@@ -1275,7 +1275,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
     }
     // available amount to apply must be at least 0
     else if (_availablePaymentAmountToApply != null &&
-        _availablePaymentAmountToApply! < 0.0001) {
+        _availablePaymentAmountToApply! < -0.00001) {
       okToCommit = false;
       hintMsg = 'Available amount to apply must not be negative';
     }
