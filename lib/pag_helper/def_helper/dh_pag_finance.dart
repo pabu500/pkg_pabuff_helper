@@ -68,6 +68,7 @@ enum PagPaymentLcStatus {
   posted('posted', 'Posted', 'pt', Colors.lightBlue),
   matched('matched', 'Matched', 'mt', Colors.teal),
   released('released', 'Released', 'rl', Colors.orangeAccent),
+  mfd('mfd', 'MFD', 'mfd', Colors.redAccent),
   unknown('unknown', 'Unknown', 'un', Colors.grey),
   ;
 

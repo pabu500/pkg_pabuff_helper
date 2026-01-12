@@ -185,6 +185,7 @@ class _WgtPagBillLcStatusOpState extends State<WgtPagBillLcStatusOp> {
     return Padding(
       padding: const EdgeInsets.only(left: 21),
       child: WgtCommButton(
+        enabled: !_isCommitting && _errorText.isEmpty,
         label: 'Commit',
         onPressed: () async {
           !targetIsMfd && !targetIsReleased
