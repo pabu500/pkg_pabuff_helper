@@ -591,6 +591,11 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
                         });
                       }
 
+                      // if it's scope update, need to update scope tree
+                      if (widget.itemKind == PagItemKind.scope) {
+                        widget.onScopeTreeUpdate?.call();
+                      }
+
                       return resultMap;
                     },
                     validator: field['validator'],

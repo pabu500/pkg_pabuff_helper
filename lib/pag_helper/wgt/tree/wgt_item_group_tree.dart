@@ -19,7 +19,8 @@ import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 import 'package:buff_helper/xt_ui/xt_helpers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
+import 'package:flutter_fancy_tree_view2/flutter_fancy_tree_view2.dart';
+// import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../comm/comm_ems.dart';
@@ -903,7 +904,7 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
               treeController: treeController,
               nodeBuilder:
                   (BuildContext context, TreeEntry<PagTreeNode> entry) {
-                return TreeTile(
+                return PagTreeTile(
                   entry: entry,
                   indent: 21,
                   match: filter?.matchOf(entry.node),

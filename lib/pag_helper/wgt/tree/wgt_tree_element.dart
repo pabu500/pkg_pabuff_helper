@@ -1,6 +1,7 @@
 import 'package:buff_helper/pag_helper/def_helper/def_tree.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
+// import 'package:flutter_fancy_tree_view/flutter_fancy_tree_view.dart';
+import 'package:flutter_fancy_tree_view2/flutter_fancy_tree_view2.dart';
 // import 'package:two_dimensional_scrollables/two_dimensional_scrollables.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:path_drawing/path_drawing.dart';
@@ -28,8 +29,8 @@ class PagTreeNode {
   final List<PagTreeNode> children;
 }
 
-class TreeTile extends StatefulWidget {
-  const TreeTile({
+class PagTreeTile extends StatefulWidget {
+  const PagTreeTile({
     super.key,
     required this.entry,
     required this.match,
@@ -47,10 +48,10 @@ class TreeTile extends StatefulWidget {
   final double indent;
 
   @override
-  State<TreeTile> createState() => _TreeTileState();
+  State<PagTreeTile> createState() => _PagTreeTileState();
 }
 
-class _TreeTileState extends State<TreeTile> {
+class _PagTreeTileState extends State<PagTreeTile> {
   late InlineSpan titleSpan;
 
   TextStyle? dimStyle;
@@ -78,7 +79,7 @@ class _TreeTileState extends State<TreeTile> {
   }
 
   @override
-  void didUpdateWidget(covariant TreeTile oldWidget) {
+  void didUpdateWidget(covariant PagTreeTile oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.searchPattern != widget.searchPattern ||
         oldWidget.entry.node.label != widget.entry.node.label) {
