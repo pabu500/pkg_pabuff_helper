@@ -94,19 +94,24 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
       widget.onCommitted?.call(updatedStatus);
       dev.log('Payment LC status updated to $_selectedStatus');
     } catch (e) {
-      if (kDebugMode) {
-        print('Error committing LC status: $e');
-      }
-      _errorText = e.toString();
-      if (_errorText.toLowerCase().contains('total applied amount')) {
-        _errorText = _errorText.replaceAll('Exception: ', '');
-      } else {
-        _errorText = 'Error committing LC status';
-      }
+      dev.log('Error committing LC status: $e');
+
+      _errorText = getErrorText(e, defaultErrorText:'Error committing LC status');      
+
+      // _errorText = e.toString();
+      // if (_errorText.toLowerCase().contains('total applied amount')) {
+      //   _errorText = _errorText.replaceAll('Exception: ', '');
+      // } else {
+      //   _errorText = 'Error committing LC status';
+      // }
     } finally {
       _isCommitting = false;
       if (mounted) {
         setState(() {});
+        
+        if (_errorText.isNotEmpty) {
+          showInfoDialog(context, 'Error', _errorText);
+        }
       }
     }
   }
@@ -237,7 +242,8 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
         enabled: !_isCommitting && _errorText.isEmpty,
         label: 'Commit',
         onPressed: () async {
-          !targetIsMfd && !targetIsReleased
+          // !targetIsMfd && !targetIsReleased
+          true
               ? await _commit()
               : showDialog(
                   context: context,

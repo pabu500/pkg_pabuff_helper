@@ -83,14 +83,17 @@ class _WgtPagBillLcStatusOpState extends State<WgtPagBillLcStatusOp> {
       });
       widget.onCommitted?.call(updatedStatus);
     } catch (e) {
-      if (kDebugMode) {
-        print('Error committing LC status: $e');
-      }
-      _errorText = 'Error committing LC status';
+      dev.log('Error committing LC status: $e');
+
+      _errorText =
+          getErrorText(e, defaultErrorText: 'Error committing LC status');
     } finally {
       _isCommitting = false;
       if (mounted) {
         setState(() {});
+        if (_errorText.isNotEmpty) {
+          showInfoDialog(context, 'Error', _errorText);
+        }
       }
     }
   }

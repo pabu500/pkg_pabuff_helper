@@ -98,7 +98,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
   String _errorText = '';
 
   UniqueKey? _lcStatusOpsKey;
-  late dynamic _lcStatusDisplay;
+  dynamic _lcStatusDisplay;
 
   bool _isFetchingPaymentApplies = false;
   bool _paymentAppliesFetched = false;
@@ -946,7 +946,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
           if (widget.itemType != PagFinanceType.payment) {
             return Container();
           } else {
-            _lcStatusDisplay = PagPaymentLcStatus.byValue(lcStatusStr);
+            _lcStatusDisplay ??= PagPaymentLcStatus.byValue(lcStatusStr);
 
             widget.itemInfoMap!['item_kind'] = widget.itemKind.name;
           }
