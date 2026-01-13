@@ -15,6 +15,7 @@ import 'package:buff_helper/pag_helper/model/scope/mdl_pag_scope.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_site_group_profile.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_site_profile.dart';
 import 'package:buff_helper/pag_helper/wgt/app/ems/wgt_payment_lc_status_op.dart';
+import 'package:buff_helper/pag_helper/wgt/ls/wgt_item_delete_op.dart';
 import 'package:buff_helper/pagrid_helper/batch_op_helper/wgt_confirm_box.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
@@ -96,8 +97,8 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
 
   String _errorText = '';
 
-  // UniqueKey? _lcStatusOpsKey;
-  // late dynamic _lcStatusDisplay;
+  UniqueKey? _lcStatusOpsKey;
+  late dynamic _lcStatusDisplay;
 
   bool _isFetchingPaymentApplies = false;
   bool _paymentAppliesFetched = false;
@@ -937,7 +938,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
       return Container();
     }
 
-    PagPaymentLcStatus? lcStatusDisplay;
+    // PagPaymentLcStatus? lcStatusDisplay;
 
     switch (widget.itemKind) {
       case PagItemKind.finance:
@@ -945,33 +946,68 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
           if (widget.itemType != PagFinanceType.payment) {
             return Container();
           } else {
-            lcStatusDisplay = PagPaymentLcStatus.byValue(lcStatusStr);
+            _lcStatusDisplay = PagPaymentLcStatus.byValue(lcStatusStr);
 
             widget.itemInfoMap!['item_kind'] = widget.itemKind.name;
           }
         }
-        return Padding(
-            padding: const EdgeInsets.only(left: 8.0),
-            child: WgtPagPaymentLcStatusOp(
-              // key: _lcStatusOpsKey,
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            horizontalSpaceRegular,
+            if (_lcStatusDisplay == PagPaymentLcStatus.mfd)
+              Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: WgtItemDeleteOp(
+                  appConfig: widget.appConfig,
+                  itemKind: PagItemKind.finance,
+                  itemType: '',
+                  itemIndexStr: widget.itemIndexStr,
+                  itemDeleteRef: widget.itemIndexStr,
+                  onDeleting: () {
+                    setState(() {
+                      _isDeleting = true;
+                    });
+                  },
+                  onDeleted: (Map<String, dynamic> result) {
+                    setState(() {
+                      _isDeleting = false;
+                      if (result['error'] != null) {
+                        setState(() {
+                          _deleteResultText = result['error'];
+                        });
+                      } else {
+                        setState(() {
+                          _deleteResultText = 'Item deleted';
+                        });
+                      }
+                    });
+                    widget.onUpdate?.call();
+                  },
+                ),
+              ),
+            WgtPagPaymentLcStatusOp(
+              key: _lcStatusOpsKey,
               appConfig: widget.appConfig,
               loggedInUser: _loggedInUser!,
               enableEdit: true,
               paymentInfo: widget.itemInfoMap!,
-              initialStatus: lcStatusDisplay!,
+              initialStatus: _lcStatusDisplay!,
               totalAppliedAmount: _totalAppliedAmount,
               onCommitted: (newStatus) {
                 setState(() {
-                  // _lcStatusOpsKey = UniqueKey();
+                  _lcStatusOpsKey = UniqueKey();
                   // _bill['lc_status'] = newStatus.value;
                   field['lc_status'] = newStatus.value;
 
-                  lcStatusDisplay = newStatus;
+                  _lcStatusDisplay = newStatus;
                 });
                 dev.log('on committed: $newStatus');
                 widget.onUpdate?.call();
               },
-            ));
+            ),
+          ],
+        );
       default:
         return Container();
     }

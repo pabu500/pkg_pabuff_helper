@@ -1,3 +1,4 @@
+import 'package:buff_helper/pag_helper/def_helper/dh_pag_finance.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -142,6 +143,12 @@ class _WgtItemDeleteOpState extends State<WgtItemDeleteOp> {
       case PagItemKind.bill:
         isDeleteableItem = true;
         break;
+      case PagItemKind.finance:
+        if (widget.itemType is PagFinanceType) {
+          if (widget.itemType == PagFinanceType.payment) {
+            isDeleteableItem = true;
+          }
+        }
       default:
         break;
     }

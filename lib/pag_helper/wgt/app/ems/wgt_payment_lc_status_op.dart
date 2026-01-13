@@ -6,6 +6,7 @@ import 'dart:developer' as dev;
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../../../pagrid_helper/batch_op_helper/wgt_confirm_box.dart';
 import '../../../comm/comm_fin_ops.dart';
 import '../../../def_helper/dh_pag_finance.dart';
 import '../../../model/acl/mdl_pag_svc_claim.dart';
@@ -47,7 +48,7 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
     fontWeight: FontWeight.bold,
   );
 
-  late PagPaymentLcStatus _selectedStatus = widget.initialStatus;
+  late PagPaymentLcStatus _selectedStatus;
 
   bool _isCommitting = false;
   bool _isCommitted = false;
@@ -85,8 +86,10 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
       final newStatus = result['lc_status'];
       PagPaymentLcStatus updatedStatus = PagPaymentLcStatus.byValue(newStatus);
 
-      _selectedStatus = updatedStatus;
-      _isCommitted = true;
+      setState(() {
+        _selectedStatus = updatedStatus;
+        _isCommitted = true;
+      });
 
       widget.onCommitted?.call(updatedStatus);
       dev.log('Payment LC status updated to $_selectedStatus');
@@ -102,9 +105,16 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
       }
     } finally {
       _isCommitting = false;
-
-      setState(() {});
+      if (mounted) {
+        setState(() {});
+      }
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedStatus = widget.initialStatus;
   }
 
   @override
@@ -117,8 +127,8 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
         children: [
           Row(
             children: [
-              // getPaymentLcStatusTagWidget(context, PagPaymentLcStatus.mfd, style: tagTextStyle),
-              // horizontalSpaceLarge,
+              getLcStatusButton(PagPaymentLcStatus.mfd),
+              horizontalSpaceLarge,
               getLcStatusButton(PagPaymentLcStatus.posted),
               Icon(Symbols.chevron_forward, color: Theme.of(context).hintColor),
               getLcStatusButton(PagPaymentLcStatus.released),
@@ -134,7 +144,7 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
     );
   }
 
-  Widget getLcStatusButton(PagPaymentLcStatus status) {
+  Widget getLcStatusButton(PagPaymentLcStatus targetStatus) {
     final tagTextStyle = TextStyle(
       color: Theme.of(context).colorScheme.onPrimary,
     );
@@ -144,25 +154,26 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
       fontWeight: FontWeight.bold,
     );
 
-    bool clickEnabled = _selectedStatus != status;
-    bool highlighted = _selectedStatus == status;
+    bool clickEnabled = _selectedStatus != targetStatus;
+    bool highlighted = _selectedStatus == targetStatus;
     switch (widget.initialStatus) {
-      // case PagPaymentLcStatus.mfd:
-      //   if (status == PagPaymentLcStatus.released) {
-      //     clickEnabled = false;
-      //   }
-      //   break;
+      case PagPaymentLcStatus.mfd:
+        clickEnabled = false;
+        break;
       case PagPaymentLcStatus.posted:
-        if (status == PagPaymentLcStatus.matched) {
+        if (targetStatus == PagPaymentLcStatus.matched) {
           clickEnabled = false;
         }
         break;
       case PagPaymentLcStatus.released:
-        if (status == PagPaymentLcStatus.posted) {
+        if (targetStatus == PagPaymentLcStatus.posted) {
+          clickEnabled = false;
+        }
+        if (targetStatus == PagPaymentLcStatus.mfd) {
           clickEnabled = false;
         }
         // matched status is auto set or check by backend
-        if (status == PagPaymentLcStatus.matched) {
+        if (targetStatus == PagPaymentLcStatus.matched) {
           // clickEnabled = false;
           if (widget.totalAppliedAmount != null &&
               widget.paymentInfo['amount'] != null) {
@@ -191,16 +202,17 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
           ? null
           : () {
               setState(() {
-                _selectedStatus = status;
+                _selectedStatus = targetStatus;
               });
             },
       child: Opacity(
         opacity: clickEnabled || highlighted ? 1.0 : 0.5,
         child: getPaymentLcStatusTagWidget(
           context,
-          status,
-          style:
-              status == _selectedStatus ? tagTextStyleHighLight : tagTextStyle,
+          targetStatus,
+          style: targetStatus == _selectedStatus
+              ? tagTextStyleHighLight
+              : tagTextStyle,
         ),
       ),
     );
@@ -214,13 +226,42 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
       return Container();
     }
 
+    bool targetIsMfd = _selectedStatus == PagPaymentLcStatus.mfd;
+    bool targetIsReleased = _selectedStatus == PagPaymentLcStatus.released;
+    // bool targetIsMatched = _selectedStatus == PagPaymentLcStatus.matched;
+    String itemRef = widget.paymentInfo['id'] ?? 'payment';
+
     return Padding(
       padding: const EdgeInsets.only(left: 21),
       child: WgtCommButton(
         enabled: !_isCommitting && _errorText.isEmpty,
         label: 'Commit',
         onPressed: () async {
-          await _commit();
+          !targetIsMfd && !targetIsReleased
+              ? await _commit()
+              : showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return WgtConfirmBox(
+                      title: targetIsMfd
+                          ? 'MFD Confirmation'
+                          : 'Release Confirmation',
+                      message1:
+                          'This operation is not reversible. Are you sure to proceed?',
+                      message2:
+                          'It\'s recommended to double check before proceeding',
+                      opName: targetIsMfd ? 'payment_mfd' : 'payment_release',
+                      keyInConfirmStrList: [
+                        targetIsMfd ? 'mfd' : 'release',
+                        itemRef,
+                      ],
+                      itemCount: 1,
+                      onConfirm: () async {
+                        await _commit();
+                      },
+                    );
+                  },
+                );
         },
       ),
     );
