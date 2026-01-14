@@ -156,7 +156,7 @@ String? validateDescription(String val) {
 
   // validate number, letter, _, /, \, -, space, @, #, *, ', "
   // and maximum 255 characters
-  String pattern = r'''^[\w&+:;=?@#|'"<>.^*()%!-/\_]{0,255}$''';
+  String pattern = r'''^[\w&+:;=?@#|'"<>.^ *()%!-/\_]{0,255}$''';
   RegExp regExp = RegExp(pattern);
   if (!regExp.hasMatch(val)) {
     return 'max length is 255 and letter, number, space, _, -, @, #, *, &, +, :, ;, =, ?, \', ", <, >, ., ^, (, ), /, %, !, - only';
@@ -182,7 +182,8 @@ String? validateModel(String val) {
   val = val.trim();
 
   if (val.isEmpty) {
-    return 'required';
+    // return 'required';
+    return null;
   }
 
   // Pattern: int.int.int[.alphanumeric] or int.int.int[.int]
