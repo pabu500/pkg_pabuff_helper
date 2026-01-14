@@ -951,7 +951,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
   void _addMeterUsageColumn(MdlPagListController listController) {
     //add property edit column
     MdlListColController appCtxCol = MdlListColController(
-      colKey: 'first_reading_timestamp',
+      colKey: 'usage_first_reading_timestamp',
       colTitle: 'first reading time',
       includeColKeyAsFilter: false,
       showColumn: true,
@@ -961,7 +961,8 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     listController.listColControllerList.add(appCtxCol);
 
     appCtxCol = MdlListColController(
-      colKey: 'last_reading_timestamp',
+      // add usage_ to avoid conflict with existing last_reading_value (LRT) col
+      colKey: 'usage_last_reading_timestamp',
       colTitle: 'last reading time',
       includeColKeyAsFilter: false,
       showColumn: true,
@@ -971,7 +972,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     listController.listColControllerList.add(appCtxCol);
 
     appCtxCol = MdlListColController(
-      colKey: 'first_reading_value',
+      colKey: 'usage_first_reading_value',
       colTitle: 'first reading',
       includeColKeyAsFilter: false,
       showColumn: true,
@@ -983,7 +984,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     listController.listColControllerList.add(appCtxCol);
 
     appCtxCol = MdlListColController(
-      colKey: 'last_reading_value',
+      colKey: 'usage_last_reading_value',
       colTitle: 'last reading',
       includeColKeyAsFilter: false,
       showColumn: true,

@@ -4,11 +4,12 @@ void populateListItemMeterUsage(Map<String, dynamic> item) {
   if (item['meter_usage_summary'] == null) return;
 
   var meterUsageSummary = item['meter_usage_summary'];
-  item['first_reading_timestamp'] =
+  item['usage_first_reading_timestamp'] =
       meterUsageSummary['first_reading_timestamp'];
-  item['last_reading_timestamp'] = meterUsageSummary['last_reading_timestamp'];
-  item['first_reading_value'] = meterUsageSummary['first_reading_value'];
-  item['last_reading_value'] = meterUsageSummary['last_reading_value'];
+  item['usage_last_reading_timestamp'] =
+      meterUsageSummary['last_reading_timestamp'];
+  item['usage_first_reading_value'] = meterUsageSummary['first_reading_value'];
+  item['usage_last_reading_value'] = meterUsageSummary['last_reading_value'];
   item['usage'] = meterUsageSummary['usage'];
   item['usage_color'] = Colors.green;
 }
