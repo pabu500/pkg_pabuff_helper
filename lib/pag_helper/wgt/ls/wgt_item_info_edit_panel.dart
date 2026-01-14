@@ -165,9 +165,8 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
 
       return result;
     } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
+      dev.log(e.toString());
+
       //return a Map
       Map<String, dynamic> result = {};
       result['error'] = explainException(e, defaultMsg: 'Error updating field');
@@ -753,9 +752,9 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
     }
 
     bool isFlexiScope = false;
-    if (widget.itemKind == PagItemKind.scope ||
+    if (/* widget.itemKind == PagItemKind.scope ||*/
         widget.itemKind == PagItemKind.meterGroup ||
-        widget.itemKind == PagItemKind.tariffPackage) {
+            widget.itemKind == PagItemKind.tariffPackage) {
       isFlexiScope = true;
     }
 
@@ -781,16 +780,16 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
           String scopeIdColName = '';
           if (profile is MdlPagSiteGroupProfile) {
             scopeIdColName = 'site_group_id';
-            widget.onScopeTreeUpdate?.call();
+            // widget.onScopeTreeUpdate?.call();
           } else if (profile is MdlPagSiteProfile) {
             scopeIdColName = 'site_id';
-            widget.onScopeTreeUpdate?.call();
+            // widget.onScopeTreeUpdate?.call();
           } else if (profile is MdlPagBuildingProfile) {
             scopeIdColName = 'building_id';
-            widget.onScopeTreeUpdate?.call();
+            // widget.onScopeTreeUpdate?.call();
           } else if (profile is MdlPagLocationGroupProfile) {
             scopeIdColName = 'location_group_id';
-            widget.onScopeTreeUpdate?.call();
+            // widget.onScopeTreeUpdate?.call();
           } else if (profile is MdlPagLocation) {
             scopeIdColName = 'location_id';
           }
@@ -808,7 +807,17 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
           if (resultMap['error'] == null) {
             setState(() {
               _fieldUpdated = true;
+              widget.onScopeTreeUpdate?.call();
               widget.onUpdate?.call();
+            });
+          } else {
+            dev.log('Error updating scope: ${resultMap['error']}');
+            setState(() {
+              Map<String, dynamic> errorMap = resultMap['error'];
+              String? status = errorMap['status'];
+              _errorText = status != null
+                  ? 'Error updating scope: $status'
+                  : 'Error updating scope';
             });
           }
           return resultMap;
