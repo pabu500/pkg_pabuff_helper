@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -20,13 +22,14 @@ enum PagColWidgetType {
 }
 
 enum PagFilterGroupType {
-  IDENTITY,
-  TYPE,
-  LOCATION,
-  DATETIME,
-  STATUS,
-  SPEC,
-  OTHER,
+  identity,
+  types,
+  location,
+  datetime,
+  status,
+  spec,
+  other,
+  join,
 }
 
 class MdlListColController {
@@ -90,7 +93,7 @@ class MdlListColController {
     this.sortOrder = 'desc',
     this.hidden = false,
     this.filterWidgetType = PagFilterWidgetType.INPUT,
-    this.filterGroupType = PagFilterGroupType.OTHER,
+    this.filterGroupType = PagFilterGroupType.other,
     this.getListEpt,
     this.filterResetKey,
     this.colWidgetType = PagColWidgetType.TEXT,
@@ -237,23 +240,20 @@ class MdlListColController {
             .byName(filterWidgetTypeStr.toUpperCase());
       }
     } catch (e) {
-      if (kDebugMode) {
-        print('Error in parsing filter_widget_type: $e');
-      }
+      dev.log('Error in parsing filter_widget_type: $e');
+
       rethrow;
     }
 
-    PagFilterGroupType filterGroupType = PagFilterGroupType.OTHER;
+    PagFilterGroupType filterGroupType = PagFilterGroupType.other;
     try {
       if (json['filter_group_type'] != null) {
         String filterGroupTypeStr = json['filter_group_type'];
-        filterGroupType =
-            PagFilterGroupType.values.byName(filterGroupTypeStr.toUpperCase());
+        filterGroupType = PagFilterGroupType.values.byName(filterGroupTypeStr);
       }
     } catch (e) {
-      if (kDebugMode) {
-        print('Error in parsing filter_group_type: $e');
-      }
+      dev.log('Error in parsing filter_group_type: $e');
+
       rethrow;
     }
 
@@ -332,7 +332,7 @@ class MdlListColController {
     }
 
     PagScopeType? scopeType;
-    if (filterGroupType == PagFilterGroupType.LOCATION) {
+    if (filterGroupType == PagFilterGroupType.location) {
       String scopeKey = colKey.replaceFirst('_label', '');
       scopeType = PagScopeType.byKey(scopeKey);
     }

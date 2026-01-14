@@ -179,7 +179,7 @@ class _WgtListPaneState extends State<WgtListPane> {
     for (MdlListColController col
         in widget.listController.listColControllerList) {
       bool isShowCol =
-          col.filterGroupType == PagFilterGroupType.IDENTITY && col.showColumn;
+          col.filterGroupType == PagFilterGroupType.identity && col.showColumn;
       bool isSwitcherCol =
           col.colKey == 'info' && col.colWidgetType == PagColWidgetType.CUSTOM;
       bool isPaneListCol = col.isPaneKey;

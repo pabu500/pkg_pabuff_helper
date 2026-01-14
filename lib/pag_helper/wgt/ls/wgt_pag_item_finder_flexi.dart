@@ -250,10 +250,10 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
 
     Map<String, dynamic> fliterMap = widget.listController.getFilterMap(
       getFilterValueKey: (MdlListColController colController) {
-        if (colController.filterGroupType == PagFilterGroupType.SPEC ||
+        if (colController.filterGroupType == PagFilterGroupType.spec ||
             colController.filterGroupType ==
                 PagFilterGroupType
-                    .STATUS /* || colController.filterGroupType == PagFilterGroupType.LOCATION*/) {
+                    .status /* || colController.filterGroupType == PagFilterGroupType.LOCATION*/) {
           return "value";
         }
         return "label";
@@ -301,9 +301,8 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
 
       return result;
     } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
+      dev.log(e.toString());
+
       widget.onResult({'error': 'Error getting item list'});
     } finally {
       if (mounted) {
@@ -875,6 +874,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
             getItemSpecFilterGroup(),
             getItemLocationFilterGroup(),
             getItemStatusFilterGroup(),
+            getItemJoinFilterGroup(),
           ],
         ),
         getItemTimeRangeFilterGroup(),
@@ -1053,6 +1053,95 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     );
   }
 
+  Widget getItemJoinFilterGroup() {
+    List<Widget> list = getItemFilterGroupList();
+    if (list.isEmpty) {
+      return Container();
+    }
+    return Container(
+      decoration: blockDecoration,
+      margin: const EdgeInsets.symmetric(horizontal: 3),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [...list],
+      ),
+    );
+  }
+
+  List<Widget> getItemFilterGroupList() {
+    List<Widget> list = [];
+    for (MdlListColController colController
+        in widget.listController.listColControllerList) {
+      if (colController.showColumn == false) continue;
+      if (!_isFullPanel && !colController.pinned && !widget.isCompactMode) {
+        continue;
+      }
+
+      if (colController.filterGroupType == PagFilterGroupType.join) {
+        String? initialValue;
+        for (var entry in widget.initialFilterMap.entries) {
+          if (entry.key == colController.colKey) {
+            initialValue = entry.value.toString();
+            // colController.filterValue = {
+            //   'value': initialValue,
+            //   'label': initialValue
+            // };
+            break;
+          }
+        }
+
+        UniqueKey? resetKey = colController.filterResetKey;
+        list.add(
+          Padding(
+            padding: const EdgeInsets.only(left: 8, right: 8, bottom: 3),
+            child: SizedBox(
+              height: 55,
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  if (_isFullPanel) getPin(listColController: colController),
+                  if (_isFullPanel) horizontalSpaceTiny,
+                  WgtPagFinderFieldInput(
+                    // key: resetKey,
+                    appConfig: widget.appConfig,
+                    // listController: _listController,
+                    width: 160,
+                    labelText: colController.filterLabel,
+                    hintText: colController.filterLabel,
+                    resetKey: resetKey,
+                    initialValue: initialValue,
+                    isInitialValueMutable: widget.isInitialValueMutable,
+                    onChanged: (value) {
+                      colController.filterValue = {
+                        'value': value,
+                        'label': value
+                      };
+                      if (value.isNotEmpty && !_enableSearch) {
+                        setState(() {
+                          _enableSearch = _enableSearchButton();
+                        });
+                      }
+                    },
+                    onClear: () {
+                      colController.filterValue = null;
+                      widget.onModified?.call();
+                    },
+                    onModified: widget.onModified,
+                    onUpdateEnableSearchButton: _enableSearchButton,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      }
+    }
+
+    return list;
+  }
+
   List<Widget> getItemIdGroupList(
       {String? singleIdFilter,
       bool showScanner = false,
@@ -1080,7 +1169,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
         }
       }
 
-      if (colController.filterGroupType == PagFilterGroupType.IDENTITY) {
+      if (colController.filterGroupType == PagFilterGroupType.identity) {
         if (widget.initialFilterMap.isNotEmpty && initialValue == null) {
           continue;
         }
@@ -1156,7 +1245,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
 
   List<Widget> getItemSpecGroupList() {
     if (widget.initialFilterMap.isNotEmpty) {
-      if (widget.initialFilterGroupType != PagFilterGroupType.SPEC) {
+      if (widget.initialFilterGroupType != PagFilterGroupType.spec) {
         return [];
       }
     }
@@ -1169,29 +1258,73 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
       // because the value list is needed to populate for the info edit panel
       // if (!_isFullPanel && !colController.pinned) continue;
 
-      if (colController.filterGroupType == PagFilterGroupType.SPEC) {
-        Widget wdiget = (colController.valueList!.isEmpty && !_filterListPulled)
-            ? FutureBuilder(
-                future: _getFilterValueList(colController),
-                builder: (context, AsyncSnapshot<void> snapshot) {
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.waiting:
-                      dev.log('item spec group list waiting...');
-
-                      return const WgtPagWait(size: 34);
-                    default:
-                      if (snapshot.hasError) {
-                        dev.log(snapshot.error.toString());
-
-                        return getErrorTextPrompt(
-                            context: context, errorText: 'list error');
-                      } else {
-                        return getDropDownButton(colController, _isFullPanel);
+      if (colController.filterGroupType == PagFilterGroupType.spec) {
+        Widget wdiget;
+        if (colController.filterWidgetType == PagFilterWidgetType.INPUT) {
+          wdiget = Padding(
+            padding: const EdgeInsets.only(left: 8, right: 8, bottom: 3),
+            child: SizedBox(
+              height: 55,
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  if (_isFullPanel) getPin(listColController: colController),
+                  if (_isFullPanel) horizontalSpaceTiny,
+                  WgtPagFinderFieldInput(
+                    appConfig: widget.appConfig,
+                    width: 160,
+                    labelText: colController.filterLabel,
+                    hintText: colController.filterLabel,
+                    initialValue:
+                        colController.filterValue?['label']?.toString(),
+                    isInitialValueMutable: widget.isInitialValueMutable,
+                    onChanged: (value) {
+                      colController.filterValue = {
+                        'value': value,
+                        'label': value
+                      };
+                      if (value.isNotEmpty && !_enableSearch) {
+                        setState(() {
+                          _enableSearch = _enableSearchButton();
+                        });
                       }
-                  }
-                },
-              )
-            : getDropDownButton(colController, _isFullPanel);
+                    },
+                    onClear: () {
+                      colController.filterValue = null;
+                      widget.onModified?.call();
+                    },
+                    onModified: widget.onModified,
+                    onUpdateEnableSearchButton: _enableSearchButton,
+                  ),
+                ],
+              ),
+            ),
+          );
+        } else {
+          wdiget = (colController.valueList!.isEmpty && !_filterListPulled)
+              ? FutureBuilder(
+                  future: _getFilterValueList(colController),
+                  builder: (context, AsyncSnapshot<void> snapshot) {
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.waiting:
+                        dev.log('item spec group list waiting...');
+
+                        return const WgtPagWait(size: 34);
+                      default:
+                        if (snapshot.hasError) {
+                          dev.log(snapshot.error.toString());
+
+                          return getErrorTextPrompt(
+                              context: context, errorText: 'list error');
+                        } else {
+                          return getDropDownButton(colController, _isFullPanel);
+                        }
+                    }
+                  },
+                )
+              : getDropDownButton(colController, _isFullPanel);
+        }
         if (_isFullPanel || colController.pinned) {
           list.add(wdiget);
         }
@@ -1209,7 +1342,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
       if (colController.showColumn == false) continue;
       if (!_isFullPanel && !colController.pinned) continue;
 
-      if (colController.filterGroupType == PagFilterGroupType.LOCATION) {
+      if (colController.filterGroupType == PagFilterGroupType.location) {
         // skip location filter
         if (colController.colKey == 'location_label') {
           continue;
@@ -1245,7 +1378,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
       // because the value list is needed to populate for the info edit panel
       // if (!_isFullPanel && !item.pinned) continue;
 
-      if (item.filterGroupType == PagFilterGroupType.STATUS) {
+      if (item.filterGroupType == PagFilterGroupType.status) {
         //dropdown
         Widget wdiget = (item.valueList!.isEmpty)
             ? FutureBuilder(

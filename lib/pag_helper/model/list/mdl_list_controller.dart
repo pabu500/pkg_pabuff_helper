@@ -309,7 +309,7 @@ class MdlPagListController /*extends ChangeNotifier*/ {
 
   bool isIdentifierSet() {
     for (var colController in listColControllerList) {
-      if (colController.filterGroupType == PagFilterGroupType.IDENTITY) {
+      if (colController.filterGroupType == PagFilterGroupType.identity) {
         if (colController.filterValue != null) {
           return true;
         }

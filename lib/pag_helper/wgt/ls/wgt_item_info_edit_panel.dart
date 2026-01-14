@@ -533,7 +533,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
       }
 
       String? hintText;
-      if (field['type'] == PagFilterGroupType.DATETIME) {
+      if (field['type'] == PagFilterGroupType.datetime) {
         hintText = 'YYYY-MM-DD hh:mm:ss';
         if (field['validator'] == null) {
           field['validator'] = (String? value) {

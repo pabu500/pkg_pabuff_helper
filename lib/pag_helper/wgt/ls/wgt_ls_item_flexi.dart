@@ -560,7 +560,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                       if (colController.isJoinKey) {
                         // populate itemScopeMap for location filter
                         if (colController.filterGroupType ==
-                            PagFilterGroupType.LOCATION) {
+                            PagFilterGroupType.location) {
                           itemScopeMap[colController.colKey] =
                               item[colController.colKey];
                         }
@@ -758,7 +758,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                       if (colController.isJoinKey) {
                         // populate itemScopeMap for location filter
                         if (colController.filterGroupType ==
-                            PagFilterGroupType.LOCATION) {
+                            PagFilterGroupType.location) {
                           itemScopeMap[colController.colKey] =
                               item[colController.colKey];
                         }
