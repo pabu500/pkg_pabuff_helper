@@ -4,13 +4,14 @@ import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_controller.dart';
 import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
 import '../../model/mdl_pag_app_config.dart';
 import 'wgt_pag_edit_commit_list.dart';
+import 'dart:developer' as dev;
 
 enum ListPaneMode { list, pane }
 
@@ -80,9 +81,8 @@ class _WgtListPaneState extends State<WgtListPane> {
 
   Future<dynamic> _getItemList() async {
     if (_queryMap.isEmpty) {
-      if (kDebugMode) {
-        print('queryMap is empty');
-      }
+      dev.log('queryMap is empty');
+
       return null;
     }
 
@@ -131,12 +131,11 @@ class _WgtListPaneState extends State<WgtListPane> {
         'current_page': _currentPage,
       });
     } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
+      dev.log(e.toString());
     } finally {
       setState(() {
         _isFetchingItemList = false;
+        _refreshKey = UniqueKey();
       });
     }
   }
@@ -273,6 +272,7 @@ class _WgtListPaneState extends State<WgtListPane> {
     return SizedBox(
       height: (_listPaneMode == ListPaneMode.pane) ? widget.paneHeight : null,
       child: WgtPagEditCommitList(
+        key: _refreshKey,
         appConfig: widget.appConfig,
         isFetching: _isFetchingItemList,
         loggedInUser: loggedInUser,

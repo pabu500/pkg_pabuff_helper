@@ -216,9 +216,7 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
         _listKey = UniqueKey();
       });
     } else {
-      if (widget.onSort != null) {
-        widget.onSort!(key, ascending ? 'asc' : 'desc');
-      }
+      widget.onSort?.call(key, ascending ? 'asc' : 'desc');
     }
   }
 

@@ -198,6 +198,23 @@ String? validateModel(String val) {
   return null;
 }
 
+String? validatePhaseType(String val) {
+  val = val.trim();
+
+  if (val.isEmpty) {
+    return null;
+  }
+
+  // validate number, letter, underscore, dash, space,
+  // and minimum 1 characters
+  String pattern = r'^[a-zA-Z0-9_ -]{3,}$';
+  RegExp regExp = RegExp(pattern);
+  if (!regExp.hasMatch(val)) {
+    return 'min length is 1 and letter, number, space, _, - only';
+  }
+  return null;
+}
+
 String? validateDeviceIccid(String val) {
   val = val.trim();
 
@@ -342,6 +359,14 @@ final List<Map<String, dynamic>> listConfigBaseDevice = [
 ];
 
 final List<Map<String, dynamic>> listConfigBaseMeter = [
+  {
+    'col_key': 'phase_type',
+    'title': 'Phase',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': false,
+    'validator': validatePhaseType,
+  },
   {
     'col_key': 'site_label',
     'title': 'Site Label',

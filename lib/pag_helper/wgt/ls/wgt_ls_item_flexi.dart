@@ -261,9 +261,8 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         widget.onGetListInfoListResult?.call(_listControllerList);
       }
     } catch (e) {
-      // if (kDebugMode) {
       dev.log(e.toString());
-      // }
+
       _failedPullListInfo++;
       rethrow;
     } finally {
@@ -286,8 +285,6 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       _isFetchingItemList = true;
       _errorText = '';
     });
-
-    _entityItems.clear();
 
     Map<String, dynamic> itemFindResult = {};
     _queryMap['scope'] = loggedInUser!.selectedScope.toScopeMap();
@@ -312,6 +309,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       );
 
       List<Map<String, dynamic>> itemList = itemFindResult['item_list'];
+      _entityItems.clear();
       for (var item in itemList) {
         _entityItems.add(item);
       }
@@ -320,6 +318,12 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         if (_currentPage == 1) {
           _totalItemCount = itemFindResult['count'];
         }
+      });
+
+      widget.onResult?.call({
+        'item_list': _entityItems,
+        'count': _totalItemCount,
+        'current_page': _currentPage,
       });
     } catch (e) {
       dev.log(e.toString());
