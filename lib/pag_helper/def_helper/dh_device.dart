@@ -146,6 +146,24 @@ String? validateDeviceLabel(String val) {
   return null;
 }
 
+String? validateDescription(String val) {
+  // if (val.trim().isEmpty) {
+  //   return 'required';
+  // }
+  if (val.trim().isEmpty) {
+    return null;
+  }
+
+  // validate number, letter, _, /, \, -, space, @, #, *, ', "
+  // and maximum 255 characters
+  String pattern = r'''^[\w&+:;=?@#|'"<>.^*()%!-/\_]{0,255}$''';
+  RegExp regExp = RegExp(pattern);
+  if (!regExp.hasMatch(val)) {
+    return 'max length is 255 and letter, number, space, _, -, @, #, *, &, +, :, ;, =, ?, \', ", <, >, ., ^, (, ), /, %, !, - only';
+  }
+  return null;
+}
+
 String? validateSerialNumber(String val) {
   if (val.trim().isEmpty) {
     return 'required';
@@ -311,6 +329,14 @@ final List<Map<String, dynamic>> listConfigBaseDevice = [
     'width': 150,
     'is_mapping_required': false,
     'validator': validateModel,
+  },
+  {
+    'col_key': 'description',
+    'title': 'Description',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': false,
+    'validator': validateDescription,
   },
 ];
 
