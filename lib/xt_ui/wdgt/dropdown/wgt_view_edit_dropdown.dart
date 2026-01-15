@@ -243,9 +243,32 @@ class _WgtViewEditDropdownState extends State<WgtViewEditDropdown> {
                                     await widget.onSetValue(useMap
                                         ? _currentValueMap!
                                         : _currentValue!);
+                                bool hasError = false;
                                 if (result['error'] != null) {
+                                  hasError = true;
+                                }
+                                if (hasError) {
                                   setState(() {
-                                    _errorText = result['error'];
+                                    if (result['error'] is String) {
+                                      _errorText = result['error'];
+                                    } else if (result['error']
+                                        is Map<String, dynamic>) {
+                                      _errorText = result['error']['status'] ??
+                                          result['error']['message'];
+                                    }
+
+                                    if (_errorText.isNotEmpty) {
+                                      _errorText = _errorText.replaceAll(
+                                          'Exception: ', '');
+                                      if (_errorText.contains('OQG')) {
+                                        if (_errorText
+                                            .contains('duplicate key')) {
+                                          _errorText = 'Duplicated value';
+                                        } else {
+                                          _errorText = 'error updating value';
+                                        }
+                                      }
+                                    }
                                   });
                                 } else {
                                   setState(() {
@@ -302,6 +325,22 @@ class _WgtViewEditDropdownState extends State<WgtViewEditDropdown> {
                 )
             ],
           ),
+          if (_errorText.isNotEmpty)
+            Row(
+              children: [
+                const SizedBox(width: 10),
+                Padding(
+                  padding: const EdgeInsets.only(top: 5),
+                  child: Text(
+                    _errorText,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           if (_showCommitted ?? false)
             Row(
               children: [

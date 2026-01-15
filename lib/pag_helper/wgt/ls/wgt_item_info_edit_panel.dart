@@ -589,6 +589,13 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
                           _fieldUpdated = true;
                           widget.onUpdate?.call();
                         });
+                      } else {
+                        Map<String, dynamic> errorMap = resultMap['error'];
+                        String? status = errorMap['status'];
+                        dev.log('Status: $status');
+                        setState(() {
+                          _errorText = 'Error updating field';
+                        });
                       }
 
                       // if it's scope update, need to update scope tree
@@ -637,12 +644,20 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
                         value,
                       );
                       Map<String, dynamic> resultMap = result[0];
+
                       if (resultMap['error'] == null) {
                         setState(() {
                           field['value'] = newValue;
                           field['val'] = newValue;
                           _fieldUpdated = true;
                           widget.onUpdate?.call();
+                        });
+                      } else {
+                        Map<String, dynamic> errorMap = resultMap['error'];
+                        String? status = errorMap['status'];
+                        dev.log('Status: $status');
+                        setState(() {
+                          _errorText = 'Error updating field';
                         });
                       }
                       return resultMap;
