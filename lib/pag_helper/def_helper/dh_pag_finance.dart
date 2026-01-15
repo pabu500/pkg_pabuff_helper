@@ -113,6 +113,27 @@ Widget getPaymentLcStatusTagWidget(
   );
 }
 
+enum PaymentSoaType {
+  normal('normal', 'normal', 'nm', Colors.green),
+  matched('initial_balance', 'initial_balance', 'ini', Colors.deepOrangeAccent),
+  ;
+
+  const PaymentSoaType(this.value, this.label, this.tag, this.color);
+
+  final String label;
+  final String value;
+  final String tag;
+  final Color color;
+
+  static PaymentSoaType byValue(String? value) =>
+      enumByLabel(
+        value,
+        values,
+        (e) => (e).value,
+      ) ??
+      normal;
+}
+
 enum PagSoaEntryType {
   initialBalance('Initial Balance', 'initial_balance', 'init', Colors.teal),
   tenantSoa('Bill', 'bill', 'bill', Colors.deepOrangeAccent),

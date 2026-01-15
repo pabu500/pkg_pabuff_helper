@@ -1070,6 +1070,10 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
       PagPortalType portalType = PagPortalType.byValue(tagText);
       tagLabel = portalType.tag;
       tagColor = portalType.color;
+    } else if (configItem['col_key'] == 'soa_type') {
+      PaymentSoaType soaType = PaymentSoaType.byValue(tagText);
+      tagLabel = soaType.tag;
+      tagColor = soaType.color.withAlpha(130);
     } else if (configItem['col_key'] == 'lc_status') {
       if (widget.itemType is PagDeviceCat) {
         PagDeviceLsStatus deviceLsStatus = PagDeviceLsStatus.byTag(tagText);
