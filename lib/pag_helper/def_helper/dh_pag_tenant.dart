@@ -186,12 +186,12 @@ String? validateBillingAddress(String value) {
   if (value.trim().isEmpty) {
     return 'required';
   }
-  //length 5-255, alphanumeric, space, /, ', -, &, #, and line break only
+  //length 5-255, alphanumeric, space, /, ', -, &, #,, @ and line break only
   // String pattern = r"^[-a-zA-Z0-9 ./'#]{5,255}$";
-  String pattern = r"^[-a-zA-Z0-9 .,/'&#\n]{5,255}$";
+  String pattern = r"^[-a-zA-Z0-9 .,/'&#@\n]{5,255}$";
   RegExp regExp = RegExp(pattern);
   if (!regExp.hasMatch(value)) {
-    return 'alphanumeric, space, /, &, ., -, #, and line break only and length 5-255';
+    return 'alphanumeric, space, /, &, ., -, #, @, and line break only and length 5-255';
   }
   return null;
 }
@@ -204,11 +204,11 @@ String? validateBillingAddressLine1(String value) {
     // return 'required';
     return null;
   }
-  //length 5-255, alphanumeric, space, /, ', -,  # only
-  String pattern = r"^[-a-zA-Z0-9 .,/'#&]{5,255}$";
+  //length 5-255, alphanumeric, space, /, ', -,  #, @ only
+  String pattern = r"^[-a-zA-Z0-9 .,/'#&@]{5,255}$";
   RegExp regExp = RegExp(pattern);
   if (!regExp.hasMatch(value)) {
-    return 'alphanumeric, space, /, -, #, ,, & only and length 5-255';
+    return 'alphanumeric, space, /, -, #, ,, &, @ only and length 5-255';
   }
   return null;
 }
