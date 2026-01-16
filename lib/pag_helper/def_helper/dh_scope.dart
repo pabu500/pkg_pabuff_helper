@@ -263,9 +263,10 @@ List<Map<String, dynamic>> getScopeOpsConfigList(PagScopeOpType opType) {
   switch (opType) {
     case PagScopeOpType.onboardingLocation:
       list.addAll(listConfigScopeOpsBase + listConfigScopeOpOnbLocation);
-
+      break;
     case PagScopeOpType.onboardingLocationGroup:
       list.addAll(listConfigScopeOpsBase + listConfigScopeOpOnbLocationGroup);
+      break;
     default:
       list.addAll(listConfigScopeOpsBase);
   }

@@ -24,22 +24,20 @@ enum PagTariffPackageTypeCat {
         (e) => (e).label,
       );
 
-  static PagTariffPackageTypeCat? byTag(String? tag) => enumByTag(
-        tag,
-        values,
-      );
+  static PagTariffPackageTypeCat? byTag(String? tag) =>
+      enumByTag(tag, values, (e) => (e).tag);
 }
 
-T? enumByTag<T extends Enum>(String? tag, List<T> values) {
-  if (tag == null) return null;
-  for (var value in values) {
-    if (value is PagTariffPackageTypeCat &&
-        value.tag.replaceAll('.', '') == tag) {
-      return value as T;
-    }
-  }
-  return null;
-}
+// T? enumByTag<T extends Enum>(String? tag, List<T> values) {
+//   if (tag == null) return null;
+//   for (var value in values) {
+//     if (value is PagTariffPackageTypeCat &&
+//         value.tag.replaceAll('.', '') == tag) {
+//       return value as T;
+//     }
+//   }
+//   return null;
+// }
 
 enum PagInterestDuration {
   month('Month', 'month', Colors.amberAccent),
@@ -65,6 +63,7 @@ enum PagInterestDuration {
   static PagInterestDuration? byTag(String? tag) => enumByTag(
         tag,
         values,
+        (e) => (e).tag,
       );
 }
 
@@ -106,10 +105,8 @@ enum PagInterestStartDateType {
         (e) => (e).label,
       );
 
-  static PagInterestStartDateType? byTag(String? tag) => enumByTag(
-        tag,
-        values,
-      );
+  static PagInterestStartDateType? byTag(String? tag) =>
+      enumByTag(tag, values, (e) => (e).tag);
 
   static PagInterestStartDateType? byValue(String? value) => enumByValue(
         value,
