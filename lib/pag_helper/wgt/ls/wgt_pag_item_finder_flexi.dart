@@ -752,7 +752,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
         children: [
           getOptions(),
           // horizontalSpaceTiny,
-          getFileterCore(isCompactMode: true),
+          getFilterCore(isCompactMode: true),
           // horizontalSpaceTiny,
           getSearchButton(),
         ],
@@ -831,7 +831,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
             children: [
               getOptions(),
               horizontalSpaceTiny,
-              getFileterCore(),
+              getFilterCore(),
               horizontalSpaceTiny,
               getSearchButton(),
             ],
@@ -851,7 +851,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     );
   }
 
-  Widget getFileterCore({bool isCompactMode = false}) {
+  Widget getFilterCore({bool isCompactMode = false}) {
     if (isCompactMode) {
       // _isFullPanel = true;
       String? singleIdFilterKey = getSingleIdFilterKey();
@@ -1124,6 +1124,21 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
                         });
                       }
                     },
+                    onEditingComplete: () async {
+                      if (!_enableSearch) {
+                        return;
+                      }
+                      widget.onModified?.call();
+                      if (colController.filterValue == null) {
+                        return null;
+                      }
+                      if (colController.filterValue!['label'].trim().isEmpty) {
+                        return null;
+                      }
+                      Map<String, dynamic> itemFindResult =
+                          await _getItemList();
+                      widget.onResult(itemFindResult);
+                    },
                     onClear: () {
                       colController.filterValue = null;
                       widget.onModified?.call();
@@ -1289,6 +1304,21 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
                           _enableSearch = _enableSearchButton();
                         });
                       }
+                    },
+                    onEditingComplete: () async {
+                      if (!_enableSearch) {
+                        return;
+                      }
+                      widget.onModified?.call();
+                      if (colController.filterValue == null) {
+                        return null;
+                      }
+                      if (colController.filterValue!['label'].trim().isEmpty) {
+                        return null;
+                      }
+                      Map<String, dynamic> itemFindResult =
+                          await _getItemList();
+                      widget.onResult(itemFindResult);
                     },
                     onClear: () {
                       colController.filterValue = null;

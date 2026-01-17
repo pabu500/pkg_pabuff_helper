@@ -272,7 +272,7 @@ Future<dynamic> fetchPaymentMatchOpInfo(
       throw Exception(responseBody['info']);
     }
     if (responseBody['error'] != null) {
-      throw Exception(responseBody['error']);
+      throw Exception(responseBody['error']['message']);
     }
     final data = responseBody['data'];
     if (data == null) {
@@ -327,7 +327,7 @@ Future<dynamic> commitPaymentApply(
       throw Exception(responseBody['info']);
     }
     if (responseBody['error'] != null) {
-      throw Exception(responseBody['error']);
+      throw Exception(responseBody['error']['message']);
     }
     final data = responseBody['data'];
     if (data == null) {

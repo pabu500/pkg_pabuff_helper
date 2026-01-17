@@ -64,6 +64,9 @@ String getErrorText(dynamic e, {String defaultErrorText = 'general error'}) {
         errorText = errorText.substring(2).trim();
       }
     }
+    if (errorText.contains('OQG')) {
+      isForUser = false;
+    }
     if (!isForUser) {
       errorText = defaultErrorText;
     }

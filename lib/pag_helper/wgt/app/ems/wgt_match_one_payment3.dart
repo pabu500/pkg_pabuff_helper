@@ -224,12 +224,19 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
       // refresh the payment info
     } catch (e) {
       dev.log('Error committing payment match apply: $e');
-      _commitErrorText = 'Error committing payment apply';
+      _commitErrorText =
+          getErrorText(e, defaultErrorText: 'Error committing payment apply');
+
       // rethrow;
     } finally {
-      _isCommitting = false;
-      _isCommitted = true;
-      setState(() {});
+      if (mounted) {
+        _isCommitting = false;
+        _isCommitted = true;
+        setState(() {});
+        if (_commitErrorText.isNotEmpty) {
+          showInfoDialog(context, 'Error', _commitErrorText);
+        }
+      }
     }
   }
 
