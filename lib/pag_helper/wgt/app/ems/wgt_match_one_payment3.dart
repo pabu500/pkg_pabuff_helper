@@ -258,6 +258,12 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
 
     // double outBucketExcessiveBalance = _initialExcessiveBalanceToApply!;
     double outBucketThisPayment = _initialPaymentAmountToApply!;
+    if (_availablePaymentAmountToApply != null) {
+      outBucketThisPayment = _availablePaymentAmountToApply!;
+    }
+    // conver to 2 decimal places
+    outBucketThisPayment =
+        double.parse(outBucketThisPayment.toStringAsFixed(2));
 
     final billList = [];
     billList.addAll(_billList);

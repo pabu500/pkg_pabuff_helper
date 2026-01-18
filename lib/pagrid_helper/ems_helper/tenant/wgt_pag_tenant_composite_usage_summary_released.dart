@@ -227,6 +227,7 @@ class _WgtPagTenantCompositeUsageSummaryReleasedState
       return Container();
     }
     String billLabel = widget.billInfo['bill_label'] ?? '';
+    String billingRecName = widget.billInfo['billing_rec_name'] ?? '';
     String billLcStatusStr = widget.billInfo['lc_status'] ?? '';
     PagBillingLcStatus billLcStatus =
         PagBillingLcStatus.values.byName(billLcStatusStr);
@@ -244,11 +245,16 @@ class _WgtPagTenantCompositeUsageSummaryReleasedState
                 color: Theme.of(context).hintColor.withAlpha(180),
                 fontWeight: FontWeight.bold,
               )),
-          Text(billLabel,
-              style: const TextStyle(
-                fontSize: 21,
-                fontWeight: FontWeight.bold,
-              )),
+          Column(
+            children: [
+              Text(billLabel,
+                  style: const TextStyle(
+                    fontSize: 21,
+                    fontWeight: FontWeight.bold,
+                  )),
+              SelectableText(billingRecName),
+            ],
+          ),
         ],
       ),
     );
