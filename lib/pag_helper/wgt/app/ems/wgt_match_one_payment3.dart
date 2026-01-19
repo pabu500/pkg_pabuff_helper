@@ -96,6 +96,8 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
 
   bool _showExistingApplies = false;
 
+  final Map<String, dynamic> _iniBalPaymentInfo = {};
+
   Future<void> _fetchPaymentMatchOpInfo() async {
     if (_isFetchingBillList || _billListFetchTried) return;
 
@@ -129,6 +131,8 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
               0.0;
       final billList = result['bill_list'] ?? [];
       final paymentApplyInfoList = result['payment_apply_info_list'] ?? [];
+      _iniBalPaymentInfo.clear();
+      _iniBalPaymentInfo.addAll(result['initial_balance_payment_info'] ?? {});
       // final itemList = result['item_list'] ?? [];
       _billList.clear();
       // _billList.addAll(itemList);
@@ -767,6 +771,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
           ],
         ),
         getPaymentApplyList(),
+        getIniBalPaymentInfo(),
         fetchingMatchingOpInfo
             ? FutureBuilder(
                 // future: _fetchBillList(),
@@ -1504,6 +1509,68 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Column(children: appliesWidgets),
+    );
+  }
+
+  Widget getIniBalPaymentInfo() {
+    if (_iniBalPaymentInfo.isEmpty) {
+      return Container();
+    }
+
+    final iniBalAmount =
+        double.tryParse(_iniBalPaymentInfo['amount']?.toString() ?? '0.0') ??
+            0.0;
+    final paymentApplyList =
+        _iniBalPaymentInfo['payment_apply_info_list'] ?? [];
+    double iniBalAppliedAmount = 0.0;
+    for (var applyInfo in paymentApplyList) {
+      final usageAmountFromPayment = double.tryParse(
+              applyInfo['used_amount_from_payment']?.toString() ?? '0.0') ??
+          0.0;
+      final interestAmountFromPayment = double.tryParse(
+              applyInfo['interest_amount_from_payment']?.toString() ?? '0.0') ??
+          0.0;
+      iniBalAppliedAmount += usageAmountFromPayment + interestAmountFromPayment;
+    }
+    final iniBalAvailableAmount = iniBalAmount - iniBalAppliedAmount;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          getTag('Ini Bal', 'Initial Balance Payment Info',
+              color: paymentColor, width: 70),
+          horizontalSpaceTiny,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Text('Amount: ', style: billKeyStyle),
+                  Text(iniBalAmount.toStringAsFixed(2), style: billValStyle),
+                ],
+              ),
+              Row(
+                children: [
+                  Text('Applied Amount: ', style: billKeyStyle),
+                  Text(iniBalAppliedAmount.toStringAsFixed(2),
+                      style: billValStyle.copyWith(
+                          color: Theme.of(context).colorScheme.primary)),
+                ],
+              ),
+              Row(
+                children: [
+                  Text('Available Amount: ', style: billKeyStyle),
+                  Text(iniBalAvailableAmount.toStringAsFixed(2),
+                      style: billValStyle),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
