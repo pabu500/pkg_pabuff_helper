@@ -1541,7 +1541,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           getTag('Ini Bal', 'Initial Balance Payment Info',
-              color: paymentColor, width: 70),
+              color: PaymentSoaType.initialBalance.color, width: 70),
           horizontalSpaceTiny,
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1562,7 +1562,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
               ),
               Row(
                 children: [
-                  Text('Available Amount: ', style: billKeyStyle),
+                  Text('Balance: ', style: billKeyStyle),
                   Text(iniBalAvailableAmount.toStringAsFixed(2),
                       style: billValStyle),
                 ],

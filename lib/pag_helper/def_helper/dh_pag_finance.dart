@@ -116,7 +116,8 @@ Widget getPaymentLcStatusTagWidget(
 
 enum PaymentSoaType {
   normal('normal', 'normal', 'nm', Colors.green),
-  matched('initial_balance', 'initial_balance', 'ini', Colors.deepOrangeAccent),
+  initialBalance(
+      'initial_balance', 'initial_balance', 'ini', Colors.deepOrangeAccent),
   ;
 
   const PaymentSoaType(this.value, this.label, this.tag, this.color);
