@@ -1,3 +1,4 @@
+import 'package:buff_helper/pag_helper/def_helper/dh_device.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:buff_helper/xt_ui/util/xt_util_InputFieldValidator.dart';
 import 'package:flutter/material.dart';
@@ -351,6 +352,23 @@ String? validateAccountNumber(String value) {
   return null;
 }
 
+String? validateAccountNumber2(String value) {
+  if (value.trim().isEmpty) {
+    return 'required';
+  }
+  // if (value.trim().isEmpty) {
+  //   return null;
+  // }
+  // validate number, letter, underscore, and dash,
+  // and minimum 5 characters
+  String pattern = r'^[a-zA-Z0-9_ -]{5,}$';
+  RegExp regExp = RegExp(pattern);
+  if (!regExp.hasMatch(value)) {
+    return 'min length is 5 and letter, number, _, - only';
+  }
+  return null;
+}
+
 String? validateDepositAmount(String value) {
   if (value.trim().isEmpty) {
     // return 'required';
@@ -595,6 +613,7 @@ String? validateInitialBalance(String value) {
 
 enum PagTenantOpType {
   onboarding,
+  mgAssign1on1,
   update,
   none,
 }
@@ -630,6 +649,16 @@ initial_balance_timestamp
  */
 final List<Map<String, dynamic>> listConfigBaseTenant = [
   {
+    'col_key': 'account_number',
+    'title': 'Account Number',
+    'col_type': 'string',
+    'width': 200,
+    'is_mapping_required': false,
+    'validator': validateAccountNumber,
+  },
+];
+final List<Map<String, dynamic>> listConfigBaseTenantExt = [
+  {
     'col_key': 'company_trading_name',
     'title': 'Company Trading Name',
     'col_type': 'string',
@@ -653,14 +682,7 @@ final List<Map<String, dynamic>> listConfigBaseTenant = [
   //   'is_mapping_required': false,
   //   'validator': validateBillingAddress,
   // },
-  {
-    'col_key': 'account_number',
-    'title': 'Account Number',
-    'col_type': 'string',
-    'width': 200,
-    'is_mapping_required': false,
-    'validator': validateAccountNumber,
-  },
+
   {
     'col_key': 'billing_address_line_1',
     'title': 'Billing Address Line 1',
@@ -848,20 +870,74 @@ final List<Map<String, dynamic>> listConfigBaseTenant = [
     'is_mapping_required': true,
     'validator': validateLabelScope,
   },
+  // {
+  //   'col_key': 'initial_balance',
+  //   'title': 'Initial Balance',
+  //   'col_type': 'double',
+  //   'width': 150,
+  //   'is_mapping_required': false,
+  //   'validator': validateInitialBalance,
+  // },
+  // {
+  //   'col_key': 'initial_balance_timestamp',
+  //   'title': 'Initial Balance Date',
+  //   'col_type': 'date',
+  //   'width': 150,
+  //   'is_mapping_required': false,
+  //   'validator': validateDate,
+  // },
+];
+
+// must be 'mg-1-on-1'
+String? validateMgAssign1on1Type(dynamic value) {
+  if (value == null || value.toString().isEmpty) {
+    return 'Onb Type is required';
+  }
+  final validTypes = ['auto-1-on-1'];
+  if (!validTypes.contains(value.toString())) {
+    return 'Invalid Onb Type';
+  }
+  return null;
+}
+
+final List<Map<String, dynamic>> listConfigMgAssign1on1 = [
+  // {
+  //   'col_key': 'location_label',
+  //   'title': 'Location Label',
+  //   'col_type': 'string',
+  //   'width': 200,
+  //   'is_mapping_required': true,
+  //   'validator': validateLabelScope,
+  // },
   {
-    'col_key': 'initial_balance',
-    'title': 'Initial Balance',
-    'col_type': 'double',
-    'width': 150,
-    'is_mapping_required': false,
-    'validator': validateInitialBalance,
-  },
-  {
-    'col_key': 'initial_balance_timestamp',
-    'title': 'Initial Balance Date',
-    'col_type': 'date',
-    'width': 150,
-    'is_mapping_required': false,
-    'validator': validateDate,
+    'col_key': 'mg_assign_type',
+    'title': 'MG Type',
+    'col_type': 'string',
+    'width': 200,
+    'is_mapping_required': true,
+    'validator': validateMgAssign1on1Type,
   },
 ];
+
+List<Map<String, dynamic>> getListConfigBaseByOpType(PagTenantOpType opType) {
+  final List<Map<String, dynamic>> list = [];
+  switch (opType) {
+    case PagTenantOpType.onboarding:
+      list.addAll(listConfigBaseTenant + listConfigBaseTenantExt);
+      break;
+    case PagTenantOpType.update:
+      list.addAll(listConfigBaseTenant + listConfigBaseTenantExt);
+      break;
+    case PagTenantOpType.mgAssign1on1:
+      final accountNumberConfig = listConfigBaseTenant
+          .firstWhere((element) => element['col_key'] == 'account_number');
+      accountNumberConfig['validator'] = validateAccountNumber2;
+      list.addAll(listConfigBaseTenant + listConfigMgAssign1on1);
+      break;
+    default:
+      list.addAll(listConfigBaseTenant + []);
+  }
+  //remove empty maps
+  list.removeWhere((map) => map.isEmpty);
+  return list;
+}
