@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:buff_helper/pag_helper/def_helper/def_role.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_finance.dart';
 import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
@@ -449,9 +451,8 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
       ));
     }
 
-    if (kDebugMode) {
-      print('header count ${listHeader.length}');
-    }
+    dev.log('header count ${listHeader.length}');
+
     return ListTile(
       key: _headerRefreshKey,
       dense: true,
@@ -625,9 +626,10 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
       //   originalFullText =
       //       ctrlItem['getDisplayString'](row[ctrlItem.colKey]) ?? '';
       // }
-      if (ctrlItem.useComma) {
-        originalFullText =
-            getCommaNumberStr(double.tryParse(originalFullText), decimal: 2);
+      if (ctrlItem.useComma || ctrlItem.decimal != null) {
+        originalFullText = getCommaNumberStr(double.tryParse(originalFullText),
+            decimal: ctrlItem.decimal ?? 2);
+        originalFullText += ' ';
       }
 
       bool showTag = false;
@@ -652,7 +654,7 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
                 waitDuration: const Duration(milliseconds: 500),
                 child: Padding(
                   padding: ctrlItem.align == 'right'
-                      ? const EdgeInsets.only(right: 13.0)
+                      ? const EdgeInsets.only(right: /*13.0*/ 0.0)
                       : const EdgeInsets.only(left: 0.0),
                   child: getCellText(
                     originalFullText: originalFullText,

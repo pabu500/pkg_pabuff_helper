@@ -73,6 +73,7 @@ class MdlListColController {
   PagScopeType? scopeType;
   String? align;
   bool useComma;
+  int? decimal;
   String? Function(String)? validator;
 
   MdlListColController({
@@ -111,6 +112,7 @@ class MdlListColController {
     this.getCustomWidget,
     this.scopeType,
     this.align,
+    this.decimal,
     this.useComma = false,
     this.validator,
   }) {
@@ -337,6 +339,24 @@ class MdlListColController {
       scopeType = PagScopeType.byKey(scopeKey);
     }
 
+    String? align;
+    if (json['align'] != null) {
+      dynamic alignValue = json['align'];
+      if (alignValue is String) {
+        align = alignValue;
+      }
+    }
+
+    int? decimal;
+    if (json['decimal'] != null) {
+      dynamic decimalValue = json['decimal'];
+      if (decimalValue is int) {
+        decimal = decimalValue;
+      } else if (decimalValue is String) {
+        decimal = int.tryParse(decimalValue);
+      }
+    }
+
     return MdlListColController(
       colKey: colKey,
       joinKey: json['join_key'],
@@ -366,6 +386,8 @@ class MdlListColController {
       getCustomWidget: getCustomWidget,
       isPaneKey: isPaneKey,
       scopeType: scopeType,
+      align: align,
+      decimal: decimal,
     );
   }
 
@@ -392,7 +414,8 @@ class MdlListColController {
     data['filter_widget_type'] = filterWidgetType.name;
     // data['editorWidgetType'] = editorWidgetType.name;
     data['filter_group_type'] = filterGroupType.name;
-
+    data['align'] = align;
+    data['decimal'] = decimal;
     return data;
   }
 }
