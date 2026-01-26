@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer' as dev;
 import 'package:buff_helper/pagrid_helper/pagrid_helper.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
@@ -138,6 +139,10 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
           _totalNumberOfRec = itemFindResult['total_count'];
         }
       });
+
+      dev.log('Billing rec list populated: ${itemList.length} items');
+
+      widget.onListPopulated?.call(itemList);
     } catch (e) {
       if (kDebugMode) {
         print(e);
@@ -563,30 +568,30 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
                             maxRowsPerPage: _maxRowsPerPage,
                             totalCount: _totalNumberOfRec,
                             currentPage: _currentPage,
-                            onPreviousPage: () {
+                            onPreviousPage: () async {
                               setState(() {
                                 _currentPage--;
                               });
-                              _getItemList();
+                              await _getItemList();
                             },
-                            onNextPage: () {
+                            onNextPage: () async {
                               setState(() {
                                 _currentPage++;
                               });
-                              _getItemList();
+                              await _getItemList();
                             },
-                            onClickPage: (page) {
+                            onClickPage: (page) async {
                               setState(() {
                                 _currentPage = page;
                               });
-                              _getItemList();
+                              await _getItemList();
                             },
-                            onSort: (sortBy, sortOrder) {
+                            onSort: (sortBy, sortOrder) async {
                               setState(() {
                                 _sortBy = sortBy;
                                 _sortOrder = sortOrder;
                               });
-                              _getItemList();
+                              await _getItemList();
                             },
                             onRequestRefresh: () {
                               setState(() {
