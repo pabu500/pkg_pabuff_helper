@@ -40,9 +40,8 @@ Future<dynamic> doPagCheckOpList(
   if (response.statusCode == 200) {
     // If the server did return a 200 OK response, parse the JSON.
     final responseBody = jsonDecode(response.body);
-    final error = responseBody['error'];
-    if (error != null) {
-      throw Exception(error);
+    if (responseBody['error'] != null) {
+      throw Exception(responseBody['error']['message']);
     }
     final data = responseBody['data'];
     if (data == null) {
