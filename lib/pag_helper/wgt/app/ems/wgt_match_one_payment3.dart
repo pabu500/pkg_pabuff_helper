@@ -149,20 +149,12 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
 
       for (var paymentApplyInfo in paymentApplyInfoList) {
         _paymentApplyInfoListExisting.add(paymentApplyInfo);
-        // final appliedAmountUsageFromBal = double.tryParse(
-        //         paymentApplyInfo['applied_usage_amount_from_bal'] ?? '0.0') ??
-        //     0.0;
-        // final appliedAmountInterestFromBal = double.tryParse(
-        //         paymentApplyInfo['applied_interest_amount_from_bal'] ??
-        //             '0.0') ??
-        //     0.0;
+
         final appliedAmountUsageFromPayment = double.tryParse(
-                paymentApplyInfo['applied_usage_amount_from_payment'] ??
-                    '0.0') ??
+                paymentApplyInfo['usage_amount_from_payment'] ?? '0.0') ??
             0.0;
         final appliedAmountInterestFromPayment = double.tryParse(
-                paymentApplyInfo['applied_interest_amount_from_payment'] ??
-                    '0.0') ??
+                paymentApplyInfo['interest_amount_from_payment'] ?? '0.0') ??
             0.0;
         double totalAppliedFromPayment =
             appliedAmountUsageFromPayment + appliedAmountInterestFromPayment;
@@ -204,8 +196,6 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
       'tenant_id': widget.tenantInfo['tenant_id'] ?? '',
       'payment_id': _paymentInfo['id'] ?? '',
       'apply_list': _paymentApplyInfoListNew,
-      // 'total_applied_from_bal': totalAppliedFromBal,
-      // 'total_applied_from_payment': totalAppliedFromPayment,
     };
 
     _isCommitting = true;
@@ -226,6 +216,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
           ));
       dev.log('Commit payment match apply result: $result');
       // refresh the payment info
+      widget.onUpdate?.call();
     } catch (e) {
       dev.log('Error committing payment match apply: $e');
       _commitErrorText =
@@ -300,11 +291,10 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
         for (var item in _paymentApplyInfoListNew) {
           if (item['billing_rec_id'] == billingRecId) {
             if (item['is_custom_apply_interest'] != true) {
-              item['applied_interest_amount_from_payment'] =
-                  billedInterestAmount;
+              item['interest_amount_from_payment'] = billedInterestAmount;
             }
             if (item['is_custom_apply_usage'] != true) {
-              item['applied_usage_amount_from_payment'] = billedUsageAmount;
+              item['usage_amount_from_payment'] = billedUsageAmount;
             }
             found = true;
             break;
@@ -313,8 +303,8 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
         if (!found) {
           _paymentApplyInfoListNew.add({
             'billing_rec_id': billingRecId,
-            'applied_interest_amount_from_payment': billedInterestAmount,
-            'applied_usage_amount_from_payment': billedUsageAmount,
+            'interest_amount_from_payment': billedInterestAmount,
+            'usage_amount_from_payment': billedUsageAmount,
             'is_exact_match': true,
           });
           bill['is_fully_paid_by_current_payment'] = true;
@@ -370,7 +360,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
           for (var item in _paymentApplyInfoListNew) {
             if (item['billing_rec_id'] == billingRecId) {
               if (item['is_custom_apply_usage'] != true) {
-                item['applied_usage_amount_from_bal'] = appliedUsage;
+                item['usage_amount_from_bal'] = appliedUsage;
               }
               found = true;
               break;
@@ -379,7 +369,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
           if (!found) {
             _paymentApplyInfoListNew.add({
               'billing_rec_id': billingRecId,
-              'applied_usage_amount_from_bal': appliedUsage,
+              'usage_amount_from_bal': appliedUsage,
             });
           }
           _checkFullyPaid();
@@ -424,7 +414,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
           for (var item in _paymentApplyInfoListNew) {
             if (item['billing_rec_id'] == billingRecId) {
               if (item['is_custom_apply_interest'] != true) {
-                item['applied_interest_amount_from_bal'] = appliedInterest;
+                item['interest_amount_from_bal'] = appliedInterest;
               }
               found = true;
               break;
@@ -433,7 +423,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
           if (!found) {
             _paymentApplyInfoListNew.add({
               'billing_rec_id': billingRecId,
-              'applied_interest_amount_from_bal': appliedInterest,
+              'interest_amount_from_bal': appliedInterest,
             });
           }
           _checkFullyPaid();
@@ -470,8 +460,8 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
       if (billedUsageAmount > 0.0) {
         double appliedUsage = _paymentApplyInfoListNew.firstWhere(
               (element) => element['billing_rec_id'] == billingRecId,
-              orElse: () => {'applied_usage_amount_from_payment': 0.0},
-            )['applied_usage_amount_from_payment'] ??
+              orElse: () => {'usage_amount_from_payment': 0.0},
+            )['usage_amount_from_payment'] ??
             0.0;
         double remainingUsageToBePaid = billedUsageAmount - appliedUsage;
         if (remainingUsageToBePaid <= 0.0) {
@@ -489,7 +479,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
           for (var item in _paymentApplyInfoListNew) {
             if (item['billing_rec_id'] == billingRecId) {
               if (item['is_custom_apply_usage'] != true) {
-                item['applied_usage_amount_from_payment'] = appliedUsage;
+                item['usage_amount_from_payment'] = appliedUsage;
               }
               found = true;
               break;
@@ -498,7 +488,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
           if (!found) {
             _paymentApplyInfoListNew.add({
               'billing_rec_id': billingRecId,
-              'applied_usage_amount_from_payment': appliedUsage,
+              'usage_amount_from_payment': appliedUsage,
             });
           }
           _checkFullyPaid();
@@ -532,8 +522,8 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
       if (billedInterestAmount > 0.0) {
         double appliedInterest = _paymentApplyInfoListNew.firstWhere(
               (element) => element['billing_rec_id'] == billingRecId,
-              orElse: () => {'applied_interest_amount_from_payment': 0.0},
-            )['applied_interest_amount_from_payment'] ??
+              orElse: () => {'interest_amount_from_payment': 0.0},
+            )['interest_amount_from_payment'] ??
             0.0;
         double remainingInterestToBePaid =
             billedInterestAmount - appliedInterest;
@@ -552,7 +542,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
           for (var item in _paymentApplyInfoListNew) {
             if (item['billing_rec_id'] == billingRecId) {
               if (item['is_custom_apply_interest'] != true) {
-                item['applied_interest_amount_from_payment'] = appliedInterest;
+                item['interest_amount_from_payment'] = appliedInterest;
               }
               found = true;
               break;
@@ -561,7 +551,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
           if (!found) {
             _paymentApplyInfoListNew.add({
               'billing_rec_id': billingRecId,
-              'applied_interest_amount_from_payment': appliedInterest,
+              'interest_amount_from_payment': appliedInterest,
             });
           }
           _checkFullyPaid();
@@ -571,11 +561,11 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
 
     // finally, add 0 if not exist
     for (var apply in _paymentApplyInfoListNew) {
-      if (!apply.containsKey('applied_usage_amount_from_payment')) {
-        apply['applied_usage_amount_from_payment'] = 0.0;
+      if (!apply.containsKey('usage_amount_from_payment')) {
+        apply['usage_amount_from_payment'] = 0.0;
       }
-      if (!apply.containsKey('applied_interest_amount_from_payment')) {
-        apply['applied_interest_amount_from_payment'] = 0.0;
+      if (!apply.containsKey('interest_amount_from_payment')) {
+        apply['interest_amount_from_payment'] = 0.0;
       }
     }
 
@@ -597,8 +587,9 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
       double totalApplied = 0.0;
       for (var item in _paymentApplyInfoListNew) {
         if (item['billing_rec_id'] == billingRecId) {
-          final appliedAmountUsage = item['applied_usage_amount'] ?? 0.0;
-          final appliedAmountInterest = item['applied_interest_amount'] ?? 0.0;
+          final appliedAmountUsage = item['usage_amount_from_payment'] ?? 0.0;
+          final appliedAmountInterest =
+              item['interest_amount_from_payment'] ?? 0.0;
           totalApplied = appliedAmountUsage + appliedAmountInterest;
           break;
         }
@@ -617,8 +608,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
     }
     final billInfo = _billList[index];
     final billingRecId = billInfo['id'] ?? '';
-    final inBucket =
-        fieldKey.contains('applied_usage_amount') ? 'usage' : 'interest';
+    final inBucket = fieldKey.contains('usage_amount') ? 'usage' : 'interest';
     final outBucket = fieldKey.contains('from_bal') ? 'bal' : 'payment';
     bool found = false;
     double diff = 0.0;
@@ -770,7 +760,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
             ),
           ],
         ),
-        getPaymentApplyList(),
+        getPaymentApplyListOfThisPayment(),
         getIniBalPaymentInfo(),
         fetchingMatchingOpInfo
             ? FutureBuilder(
@@ -869,16 +859,9 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
     for (var item in _paymentApplyInfoListNew) {
       if (item['billing_rec_id'] == billingRecId) {
         // populate initial values from the new apply list
+        item['usage_amount_from_payment'] ??= initialValueUsageFromPmt;
 
-        // item['applied_usage_amount_from_bal'] ??= initialValueUsageFromBal;
-
-        // item['applied_interest_amount_from_bal'] ??=
-        //     initialValueInterestFromBal;
-
-        item['applied_usage_amount_from_payment'] ??= initialValueUsageFromPmt;
-
-        item['applied_interest_amount_from_payment'] ??=
-            initialValueInterestFromPmt;
+        item['interest_amount_from_payment'] ??= initialValueInterestFromPmt;
         break;
       }
     }
@@ -912,14 +895,13 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
                   textStyle: TextStyle(color: valueColor),
                   onChanged: (value) {
                     _updateCustomApply(
-                        index, 'applied_usage_amount_from_payment', value);
+                        index, 'usage_amount_from_payment', value);
                   },
                   onEditingComplete: () {
                     setState(() {});
                   },
                   onClear: () {
-                    _updateCustomApply(
-                        index, 'applied_usage_amount_from_payment', '');
+                    _updateCustomApply(index, 'usage_amount_from_payment', '');
                   },
                 ),
               ),
@@ -937,14 +919,14 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
                   textStyle: TextStyle(color: valueColor),
                   onChanged: (value) {
                     _updateCustomApply(
-                        index, 'applied_interest_amount_from_payment', value);
+                        index, 'interest_amount_from_payment', value);
                   },
                   onEditingComplete: () {
                     setState(() {});
                   },
                   onClear: () {
                     _updateCustomApply(
-                        index, 'applied_interest_amount_from_payment', '');
+                        index, 'interest_amount_from_payment', '');
                   },
                 ),
               ),
@@ -975,6 +957,25 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
         double.tryParse(billInfo['billed_interest_amount'] ?? '0.0') ?? 0.0;
     final totalAmount = usageAmount + interestAmount;
 
+    final existingPaymentApplyInfoList =
+        billInfo['existing_payment_apply_info_list'] ?? [];
+    double appliedUsageTotal = 0.0;
+    double appliedInterestTotal = 0.0;
+    for (var applyInfo in existingPaymentApplyInfoList) {
+      final appliedUsage = applyInfo['usage_amount_from_payment'] is String
+          ? double.tryParse(applyInfo['usage_amount_from_payment'] ?? '0.0') ??
+              0.0
+          : applyInfo['usage_amount_from_payment'] ?? 0.0;
+      final appliedInterest =
+          applyInfo['interest_amount_from_payment'] is String
+              ? double.tryParse(
+                      applyInfo['interest_amount_from_payment'] ?? '0.0') ??
+                  0.0
+              : applyInfo['interest_amount_from_payment'] ?? 0.0;
+      appliedUsageTotal += appliedUsage;
+      appliedInterestTotal += appliedInterest;
+    }
+
     PagBillingLcStatus billLcStatus =
         PagBillingLcStatus.values.byName(billingLcStatusStr);
 
@@ -999,36 +1000,31 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
       applyInfoList.addAll(_paymentApplyInfoListExisting);
     }
 
-    double balanceAmount = totalAmount;
+    double balanceAmount =
+        totalAmount - appliedUsageTotal - appliedInterestTotal;
     for (var applyInfo in applyInfoList) {
       if (applyInfo['billing_rec_id'] == billingRecId) {
-        appliedAmountUsageFromBal =
-            applyInfo['applied_usage_amount_from_bal'] is String
-                ? double.tryParse(
-                        applyInfo['applied_usage_amount_from_bal'] ?? '0.0') ??
-                    0.0
-                : applyInfo['applied_usage_amount_from_bal'] ?? 0.0;
-        appliedAmountInterestFromBal =
-            applyInfo['applied_interest_amount_from_bal'] is String
-                ? double.tryParse(
-                        applyInfo['applied_interest_amount_from_bal'] ??
-                            '0.0') ??
-                    0.0
-                : applyInfo['applied_interest_amount_from_bal'] ?? 0.0;
+        appliedAmountUsageFromBal = applyInfo['usage_amount_from_bal'] is String
+            ? double.tryParse(applyInfo['usage_amount_from_bal'] ?? '0.0') ??
+                0.0
+            : applyInfo['usage_amount_from_bal'] ?? 0.0;
+        appliedAmountInterestFromBal = applyInfo['interest_amount_from_bal']
+                is String
+            ? double.tryParse(applyInfo['interest_amount_from_bal'] ?? '0.0') ??
+                0.0
+            : applyInfo['interest_amount_from_bal'] ?? 0.0;
         appliedAmountUsageFromPmt =
-            applyInfo['applied_usage_amount_from_payment'] is String
+            applyInfo['usage_amount_from_payment'] is String
                 ? double.tryParse(
-                        applyInfo['applied_usage_amount_from_payment'] ??
-                            '0.0') ??
+                        applyInfo['usage_amount_from_payment'] ?? '0.0') ??
                     0.0
-                : applyInfo['applied_usage_amount_from_payment'] ?? 0.0;
+                : applyInfo['usage_amount_from_payment'] ?? 0.0;
         appliedAmountInterestFromPmt =
-            applyInfo['applied_interest_amount_from_payment'] is String
+            applyInfo['interest_amount_from_payment'] is String
                 ? double.tryParse(
-                        applyInfo['applied_interest_amount_from_payment'] ??
-                            '0.0') ??
+                        applyInfo['interest_amount_from_payment'] ?? '0.0') ??
                     0.0
-                : applyInfo['applied_interest_amount_from_payment'] ?? 0.0;
+                : applyInfo['interest_amount_from_payment'] ?? 0.0;
 
         final appliedAmountUsage = (appliedAmountUsageFromBal ?? 0.0) +
             (appliedAmountUsageFromPmt ?? 0.0);
@@ -1044,113 +1040,118 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
       }
     }
 
-    return Container(
-      decoration: BoxDecoration(
-        border: isMatchedBill
-            ? Border.all(color: commitColor.withAlpha(130), width: 2)
-            : Border.all(color: Theme.of(context).hintColor.withAlpha(130)),
-        borderRadius: BorderRadius.circular(5),
-      ),
-      padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 13),
-      child: Column(
-        children: [
-          Row(
+    return Column(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            border: isMatchedBill
+                ? Border.all(color: commitColor.withAlpha(130), width: 2)
+                : Border.all(color: Theme.of(context).hintColor.withAlpha(130)),
+            borderRadius: BorderRadius.circular(5),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 13),
+          child: Column(
             children: [
-              getBillLcStatusTagWidget(context, billLcStatus),
-              horizontalSpaceSmall,
-              InkWell(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('$billLabel', style: billLabelStyle),
-                    Text('$cycleStr', style: billLabelStyle),
-                  ],
-                ),
-                onTap: () {
-                  setState(() {
-                    _billList[index]['show_bill'] =
-                        !(_billList[index]['show_bill'] ?? false);
-                  });
-                },
-              ),
-              horizontalSpaceSmall,
-              IntrinsicHeight(
-                child: Row(
-                  children: [
-                    Column(
+              Row(
+                children: [
+                  getBillLcStatusTagWidget(context, billLcStatus),
+                  horizontalSpaceSmall,
+                  InkWell(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: [
-                            Text(
-                              'Total: ',
-                              style: billKeyStyle,
-                            ),
-                            Text('$billedTotalCost',
-                                style: billValStyle.copyWith(fontSize: 25)),
-                          ],
-                        ),
-                        verticalSpaceTiny,
-                        Row(
-                          children: [
-                            Text('Usage: ', style: billKeyStyle),
-                            Text(
-                              usageAmount.toStringAsFixed(2),
-                              style: billValStyle,
-                            ),
-                            horizontalSpaceSmall,
-                            Text('Interest: ', style: billKeyStyle),
-                            Text(
-                              interestAmount.toStringAsFixed(2),
-                              style: billValStyle,
-                            ),
-                          ],
-                        ),
+                        Text('$billLabel', style: billLabelStyle),
+                        Text('$cycleStr', style: billLabelStyle),
                       ],
                     ),
-                    VerticalDivider(
-                      color: Theme.of(context).hintColor,
-                      width: 20,
+                    onTap: () {
+                      setState(() {
+                        _billList[index]['show_bill'] =
+                            !(_billList[index]['show_bill'] ?? false);
+                      });
+                    },
+                  ),
+                  horizontalSpaceSmall,
+                  IntrinsicHeight(
+                    child: Row(
+                      children: [
+                        Column(
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  'Total: ',
+                                  style: billKeyStyle,
+                                ),
+                                Text('$billedTotalCost',
+                                    style: billValStyle.copyWith(fontSize: 25)),
+                              ],
+                            ),
+                            verticalSpaceTiny,
+                            Row(
+                              children: [
+                                Text('Usage: ', style: billKeyStyle),
+                                Text(
+                                  usageAmount.toStringAsFixed(2),
+                                  style: billValStyle,
+                                ),
+                                horizontalSpaceSmall,
+                                Text('Interest: ', style: billKeyStyle),
+                                Text(
+                                  interestAmount.toStringAsFixed(2),
+                                  style: billValStyle,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        VerticalDivider(
+                          color: Theme.of(context).hintColor,
+                          width: 20,
+                        ),
+                        Text('Balance: ', style: billKeyStyle),
+                        Text(
+                          balanceAmount.toStringAsFixed(2),
+                          style: billValStyle,
+                        ),
+                        horizontalSpaceSmall,
+                      ],
                     ),
-                    Text('Balance: ', style: billKeyStyle),
-                    Text(
-                      balanceAmount.toStringAsFixed(2),
-                      style: billValStyle,
-                    ),
-                    horizontalSpaceSmall,
-                  ],
-                ),
+                  ),
+                  const Spacer(),
+                  getApplyOp(
+                      billingRecId,
+                      isMatchedBill,
+                      index,
+                      // availableAmountToApply,
+                      // appliedAmountUsageFromBal,
+                      // appliedAmountInterestFromBal,
+                      appliedAmountUsageFromPmt,
+                      appliedAmountInterestFromPmt,
+                      appliedByOpUsername,
+                      appliedTimestampStr),
+                  horizontalSpaceSmall,
+                ],
               ),
-              const Spacer(),
-              getApplyOp(
-                  billingRecId,
-                  isMatchedBill,
-                  index,
-                  // availableAmountToApply,
-                  // appliedAmountUsageFromBal,
-                  // appliedAmountInterestFromBal,
-                  appliedAmountUsageFromPmt,
-                  appliedAmountInterestFromPmt,
-                  appliedByOpUsername,
-                  appliedTimestampStr),
-              horizontalSpaceSmall,
+              if (billInfo['show_bill'] ?? false) const Divider(),
+              if (billInfo['show_bill'] ?? false)
+                WgtPagCompositeBillView(
+                  costDecimals: 2,
+                  appConfig: widget.appConfig,
+                  loggedInUser: widget.loggedInUser,
+                  displayContextStr: 'match_one_paymment',
+                  billingRecIndexStr: billingRecId,
+                  defaultBillLcStatusStr: billingLcStatusStr,
+                  modes: const ['wgt', 'pdf'],
+                  genTypes: billLcStatus == PagBillingLcStatus.generated
+                      ? ['generated']
+                      : ['released'],
+                ),
             ],
           ),
-          if (billInfo['show_bill'] ?? false) const Divider(),
-          if (billInfo['show_bill'] ?? false)
-            WgtPagCompositeBillView(
-              costDecimals: 2,
-              appConfig: widget.appConfig,
-              loggedInUser: widget.loggedInUser,
-              displayContextStr: 'match_one_paymment',
-              billingRecIndexStr: billingRecId,
-              defaultBillLcStatusStr: billingLcStatusStr,
-              modes: const ['wgt', 'pdf'],
-              genTypes: billLcStatus == PagBillingLcStatus.generated
-                  ? ['generated']
-                  : ['released'],
-            ),
-        ],
-      ),
+        ),
+        getPaymentApplyListOfThisBill(existingPaymentApplyInfoList),
+      ],
     );
   }
 
@@ -1386,7 +1387,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
     );
   }
 
-  Widget getPaymentApplyList() {
+  Widget getPaymentApplyListOfThisPayment() {
     if (_paymentApplyInfoListExisting.isEmpty) {
       return Container();
     }
@@ -1420,14 +1421,136 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
       String billedTotalCost = applyInfo['billed_total_amount'] ?? '-';
       String appliedTimestamp = applyInfo['applied_timestamp'] ?? '-';
       String appliedByOpName = applyInfo['applied_by_op_username'] ?? '-';
-      // String appliedUsageAmountFromBalStr =
-      //     applyInfo['applied_usage_amount_from_bal'] ?? '-';
-      // String appliedInterestAmountFromBalStr =
-      //     applyInfo['applied_interest_amount_from_bal'] ?? '-';
+
       String appliedUsageAmountFromPmtStr =
-          applyInfo['applied_usage_amount_from_payment'] ?? '-';
+          applyInfo['usage_amount_from_payment'] ?? '-';
       String appliedInterestAmountFromPmtStr =
-          applyInfo['applied_interest_amount_from_payment'] ?? '-';
+          applyInfo['interest_amount_from_payment'] ?? '-';
+      double keyWidth1 = 180.0;
+      double keyWidth2 = 85.0;
+      final keyStyle =
+          TextStyle(fontSize: 13.5, color: Theme.of(context).hintColor);
+
+      appliesWidgets.add(Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Theme.of(context).hintColor.withAlpha(130)),
+          borderRadius: BorderRadius.circular(5),
+        ),
+        margin: const EdgeInsets.only(bottom: 5),
+        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 13),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text('Bill: ', style: keyStyle),
+                    Text(
+                      billLabel,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Text('Billed Total ', style: keyStyle),
+                    Text(billedTotalCost,
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
+                  ],
+                ),
+                Text('Applied by: $appliedByOpName at $appliedTimestamp',
+                    style: keyStyle),
+              ],
+            ),
+            horizontalSpaceRegular,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    SizedBox(
+                      width: keyWidth1,
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child:
+                            Text('Usage Amt. from Payment: ', style: keyStyle),
+                      ),
+                    ),
+                    Text(appliedUsageAmountFromPmtStr,
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
+                  ],
+                ),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: keyWidth1,
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: Text('Interest Amt. from Payment: ',
+                            style: keyStyle),
+                      ),
+                    ),
+                    Text(appliedInterestAmountFromPmtStr,
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      ));
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Column(children: appliesWidgets),
+    );
+  }
+
+  Widget getPaymentApplyListOfThisBill(dynamic existingPaymentApplyInfoList) {
+    List existingPaymentApplyInfoListTyped = [];
+    if (existingPaymentApplyInfoList is List) {
+      existingPaymentApplyInfoListTyped = existingPaymentApplyInfoList;
+    }
+    if (existingPaymentApplyInfoListTyped.isEmpty) {
+      return Container();
+    }
+    List<Widget> appliesWidgets = [];
+    appliesWidgets.add(Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: InkWell(
+          onTap: () {
+            setState(() {
+              _showExistingApplies = !_showExistingApplies;
+            });
+          },
+          child: Text(
+            'Payment Applies (${existingPaymentApplyInfoListTyped.length})',
+            style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Theme.of(context).hintColor),
+          ),
+        ),
+      ),
+    ));
+    for (Map<String, dynamic> applyInfo in existingPaymentApplyInfoListTyped) {
+      if (!_showExistingApplies) {
+        break;
+      }
+      String tenantLabel = applyInfo['tenant_label'] ?? '-';
+      String billLabel = applyInfo['bill_label'] ?? '-';
+      String billedTotalCost = applyInfo['billed_total_amount'] ?? '-';
+      String appliedTimestamp = applyInfo['applied_timestamp'] ?? '-';
+      String appliedByOpName = applyInfo['applied_by_op_username'] ?? '-';
+      String appliedUsageAmountFromPmtStr =
+          applyInfo['usage_amount_from_payment'] ?? '-';
+      String appliedInterestAmountFromPmtStr =
+          applyInfo['interest_amount_from_payment'] ?? '-';
 
       double keyWidth1 = 180.0;
       double keyWidth2 = 85.0;
