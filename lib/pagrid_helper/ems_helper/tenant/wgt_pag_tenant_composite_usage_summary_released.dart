@@ -246,13 +246,22 @@ class _WgtPagTenantCompositeUsageSummaryReleasedState
                 fontWeight: FontWeight.bold,
               )),
           Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(billLabel,
                   style: const TextStyle(
                     fontSize: 21,
                     fontWeight: FontWeight.bold,
                   )),
-              SelectableText(billingRecName),
+              Row(
+                children: [
+                  SelectableText(billingRecName),
+                  SizedBox(
+                      width: 40,
+                      child: getCopyButton(context, billingRecName,
+                          direction: 'left'))
+                ],
+              ),
             ],
           ),
         ],

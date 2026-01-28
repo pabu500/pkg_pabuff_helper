@@ -78,6 +78,7 @@ class WgtListSearchItemFlexi extends StatefulWidget {
     this.allowFlexiLabel = false,
     this.hint,
     this.widthOffset = 0.0,
+    this.additionalQuery = const {},
   });
 
   final MdlPagAppConfig appConfig;
@@ -113,6 +114,7 @@ class WgtListSearchItemFlexi extends StatefulWidget {
   final bool allowFlexiLabel;
   final String? hint;
   final double widthOffset;
+  final Map<String, dynamic> additionalQuery;
 
   @override
   State<WgtListSearchItemFlexi> createState() => _WgtListSearchItemFlexiState();
@@ -174,6 +176,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           'item_type_list_str': widget.itemTypeListStr ?? 'NOT_SET',
           'list_context_type': widget.listContextType.name,
         };
+        queryMap.addAll(widget.additionalQuery);
 
         _isFetchingListInfo = true;
 
@@ -1433,9 +1436,8 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                   builder: (context, snapshot) {
                     switch (snapshot.connectionState) {
                       case ConnectionState.waiting:
-                        if (kDebugMode) {
-                          print('getListInfo ...');
-                        }
+                        dev.log('getListInfo ...');
+
                         return const SizedBox(
                           height: 130,
                           // width: 130,
@@ -1495,6 +1497,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         initialFilterGroupType: widget.initialFilterGroupType,
         allowFlexiLabel: widget.allowFlexiLabel,
         hint: widget.hint,
+        additionalQuery: widget.additionalQuery,
         onSearching: () {
           setState(() {
             _isFetchingItemList = true;

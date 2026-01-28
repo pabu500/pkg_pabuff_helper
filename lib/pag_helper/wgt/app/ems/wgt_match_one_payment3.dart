@@ -78,9 +78,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
   final List<Map<String, dynamic>> _paymentApplyInfoListExisting = [];
   final List<Map<String, dynamic>> _paymentApplyInfoListNew = [];
 
-  // double? _initialExcessiveBalanceToApply;
   double? _initialPaymentAmountToApply;
-  // double? _availableExcessiveBalanceToApply;
   double? _availablePaymentAmountToApply;
 
   final Color balColor = Colors.green.shade900.withAlpha(210);
@@ -96,7 +94,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
 
   bool _showExistingApplies = false;
 
-  final Map<String, dynamic> _iniBalPaymentInfo = {};
+  final Map<String, dynamic> _initialBalancePaymentInfo = {};
 
   Future<void> _fetchPaymentMatchOpInfo() async {
     if (_isFetchingBillList || _billListFetchTried) return;
@@ -126,16 +124,14 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
       if (paymentInfo == null) {
         throw Exception("No payment info found in the response");
       }
-      final excessiveBalance =
-          double.tryParse(result['excessive_balance']?.toString() ?? '0.0') ??
-              0.0;
+
       final billList = result['bill_list'] ?? [];
       final paymentApplyInfoList = result['payment_apply_info_list'] ?? [];
-      _iniBalPaymentInfo.clear();
-      _iniBalPaymentInfo.addAll(result['initial_balance_payment_info'] ?? {});
-      // final itemList = result['item_list'] ?? [];
+      _initialBalancePaymentInfo.clear();
+      _initialBalancePaymentInfo
+          .addAll(result['initial_balance_payment_info'] ?? {});
+
       _billList.clear();
-      // _billList.addAll(itemList);
       for (var item in billList) {
         Map<String, dynamic> billItem = item;
         _billList.add(billItem);
@@ -143,9 +139,6 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
 
       _initialPaymentAmountToApply = _paymentAmount;
       _availablePaymentAmountToApply = _paymentAmount;
-
-      // _initialExcessiveBalanceToApply = excessiveBalance;
-      // _availableExcessiveBalanceToApply = _initialExcessiveBalanceToApply;
 
       for (var paymentApplyInfo in paymentApplyInfoList) {
         _paymentApplyInfoListExisting.add(paymentApplyInfo);
@@ -158,13 +151,9 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
             0.0;
         double totalAppliedFromPayment =
             appliedAmountUsageFromPayment + appliedAmountInterestFromPayment;
-        // double totalAppliedFromBal =
-        //     appliedAmountUsageFromBal + appliedAmountInterestFromBal;
 
         _availablePaymentAmountToApply =
             _availablePaymentAmountToApply! - totalAppliedFromPayment;
-        // _availableExcessiveBalanceToApply =
-        //     _availableExcessiveBalanceToApply! - totalAppliedFromBal;
       }
     } catch (e) {
       dev.log('Error fetching match op info: $e');
@@ -185,11 +174,6 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
             _availablePaymentAmountToApply != null)
         ? (_initialPaymentAmountToApply! - _availablePaymentAmountToApply!)
         : 0.0;
-
-    // if (totalAppliedFromBal <= 0.0 && totalAppliedFromPayment <= 0.0) {
-    //   dev.log('No amount applied, nothing to commit');
-    //   return;
-    // }
 
     Map<String, dynamic> queryMap = {
       'scope': widget.loggedInUser.selectedScope.toScopeMap(),
@@ -235,35 +219,58 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
     }
   }
 
-  // rule 1: payment flows the bill with exact amount first
-  // rule 2: payment from excessive balance first
-  // rule 3: pay oldest bill first
-  // rule 4: pay usage of the usage bucket first, for all bills from oldest to newest
-  // rule 5: pay interest of the interest bucket first, for all bills from oldest to newest
+  // rule 1: payment flows to fill neg initial payment first
+  // rule 2: payment flows the bill with exact amount first
+  // rule 3: payment flows to the oldest bill first
+  // rule 4: payment flows to usage bucket first, for all bills from oldest to newest
+  // rule 5: payment flows to interest bucket, for all bills from oldest to newest
   void _populateApply2() {
     if (_billList.isEmpty) {
       return;
     }
-    // if (_initialExcessiveBalanceToApply == null ||
-    //     _initialPaymentAmountToApply == null) {
-    //   dev.log(
-    //       '_initialExcessiveBalanceToApply or _initialPaymentAmountToApply is null');
-    //   return;
-    // }
 
-    // double outBucketExcessiveBalance = _initialExcessiveBalanceToApply!;
     double outBucketThisPayment = _initialPaymentAmountToApply!;
     if (_availablePaymentAmountToApply != null) {
       outBucketThisPayment = _availablePaymentAmountToApply!;
     }
-    // conver to 2 decimal places
+    // convert to 2 decimal places
     outBucketThisPayment =
         double.parse(outBucketThisPayment.toStringAsFixed(2));
 
     final billList = [];
     billList.addAll(_billList);
 
-    // rule 1: payment flows from outBucketThisPayment to the bill with exact amount first
+    // rule 1: payment flows to fill neg initial payment first
+    // if (_initialBalancePaymentInfo.isNotEmpty) {
+    //   final initialBalPaymentAmount =
+    //       double.tryParse(_initialBalancePaymentInfo['amount'] ?? '0.0') ?? 0.0;
+    //   if (initialBalPaymentAmount < 0.0) {
+    //     final amountToFill = -initialBalPaymentAmount;
+    //     if (outBucketThisPayment > amountToFill - 0.00001) {
+    //       // fill full
+    //       _paymentApplyInfoListNew.add({
+    //         'billing_rec_id': 'neg_initial_balance_payment',
+    //         // _initialBalancePaymentInfo['billing_rec_id'] ?? '',
+    //         'usage_amount_from_payment': amountToFill,
+    //         'interest_amount_from_payment': 0.0,
+    //         'is_exact_match': true,
+    //       });
+    //       outBucketThisPayment -= amountToFill;
+    //     } else {
+    //       // partial fill
+    //       _paymentApplyInfoListNew.add({
+    //         'billing_rec_id':
+    //             _initialBalancePaymentInfo['billing_rec_id'] ?? '',
+    //         'usage_amount_from_payment': outBucketThisPayment,
+    //         'interest_amount_from_payment': 0.0,
+    //         'is_exact_match': false,
+    //       });
+    //       outBucketThisPayment = 0.0;
+    //     }
+    //   }
+    // }
+
+    // rule 2: payment flows from outBucketThisPayment to the bill with exact amount first
     for (var bill in billList) {
       if (outBucketThisPayment <= 0.0) {
         break;
@@ -314,122 +321,104 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
       }
     }
 
+    //for rule 3: sort bills by from_timestamp ascending so that oldest bills are processed first
     billList.sort((a, b) {
       final aTimestamp = a['from_timestamp'] ?? '';
       final bTimestamp = b['from_timestamp'] ?? '';
       return aTimestamp.compareTo(bTimestamp);
     });
 
-    // rule 3: flow out from outBucketExcessiveBalance first
-    // rule 3.1: flow to usage bucket first
-    for (var bill in billList) {
-      // if (outBucketExcessiveBalance <= 0.0) {
-      //   break;
-      // }
+    // // rule 4: flow to usage bucket first
+    // for (var bill in billList) {
+    //   // skip if bill is not released
+    //   if (bill['lc_status'] != 'released') {
+    //     continue;
+    //   }
+    //   // skip if bill is already fully paid
+    //   if (bill['is_fully_paid_by_current_payment'] == true) {
+    //     continue;
+    //   }
 
-      // skip if bill is not released
-      if (bill['lc_status'] != 'released') {
-        continue;
-      }
-      // skip if bill is already fully paid
-      if (bill['is_fully_paid_by_current_payment'] == true) {
-        continue;
-      }
+    //   final billingRecId = bill['id'] ?? '';
+    //   final billedTotalCost =
+    //       double.tryParse(bill['billed_total_amount'] ?? '0.0') ?? 0.0;
+    //   if (billedTotalCost < 0.00001) {
+    //     continue;
+    //   }
+    //   final billedInterestAmount =
+    //       double.tryParse(bill['billed_interest_amount'] ?? '0.0') ?? 0.0;
+    //   final billedUsageCostWithGstAmount =
+    //       billedTotalCost - billedInterestAmount;
 
-      //flow to usage bucket first
-      final billingRecId = bill['id'] ?? '';
-      final billedTotalCost =
-          double.tryParse(bill['billed_total_amount'] ?? '0.0') ?? 0.0;
-      if (billedTotalCost <= 0.0) {
-        continue;
-      }
-      final billedInterestAmount =
-          double.tryParse(bill['billed_interest_amount'] ?? '0.0') ?? 0.0;
-      final billedUsageAmount = billedTotalCost - billedInterestAmount;
-      if (billedUsageAmount > 0.0) {
-        double appliedUsage = 0.0;
-        // if (outBucketExcessiveBalance >= billedUsageAmount) {
-        //   appliedUsage = billedUsageAmount;
-        //   outBucketExcessiveBalance -= billedUsageAmount;
-        // } else {
-        //   appliedUsage = outBucketExcessiveBalance;
-        //   outBucketExcessiveBalance = 0.0;
-        // }
-        if (appliedUsage > 0.0) {
-          bool found = false;
-          for (var item in _paymentApplyInfoListNew) {
-            if (item['billing_rec_id'] == billingRecId) {
-              if (item['is_custom_apply_usage'] != true) {
-                item['usage_amount_from_bal'] = appliedUsage;
-              }
-              found = true;
-              break;
-            }
-          }
-          if (!found) {
-            _paymentApplyInfoListNew.add({
-              'billing_rec_id': billingRecId,
-              'usage_amount_from_bal': appliedUsage,
-            });
-          }
-          _checkFullyPaid();
-        }
-      }
-    }
-    // rule 3.2: flow to interest bucket next
-    for (var bill in billList) {
-      // if (outBucketExcessiveBalance <= 0.0) {
-      //   break;
-      // }
+    //   if (billedUsageCostWithGstAmount > 0.00001) {
+    //     double appliedUsage = 0.0;
 
-      // skip if bill is not released
-      if (bill['lc_status'] != 'released') {
-        continue;
-      }
-      // skip if bill is already fully paid
-      if (bill['is_fully_paid_by_current_payment'] == true) {
-        continue;
-      }
+    //     if (appliedUsage > 0.0) {
+    //       bool found = false;
+    //       for (var item in _paymentApplyInfoListNew) {
+    //         if (item['billing_rec_id'] == billingRecId) {
+    //           if (item['is_custom_apply_usage'] != true) {
+    //             item['usage_amount_from_bal'] = appliedUsage;
+    //           }
+    //           found = true;
+    //           break;
+    //         }
+    //       }
+    //       if (!found) {
+    //         _paymentApplyInfoListNew.add({
+    //           'billing_rec_id': billingRecId,
+    //           'usage_amount_from_bal': appliedUsage,
+    //         });
+    //       }
+    //       _checkFullyPaid();
+    //     }
+    //   }
+    // }
 
-      //flow to interest bucket next
-      final billingRecId = bill['id'] ?? '';
-      final billedTotalCost =
-          double.tryParse(bill['billed_total_amount'] ?? '0.0') ?? 0.0;
-      if (billedTotalCost <= 0.0) {
-        continue;
-      }
-      final billedInterestAmount =
-          double.tryParse(bill['billed_interest_amount'] ?? '0.0') ?? 0.0;
-      if (billedInterestAmount > 0.0) {
-        double appliedInterest = 0.0;
-        // if (outBucketExcessiveBalance >= billedInterestAmount) {
-        //   appliedInterest = billedInterestAmount;
-        //   outBucketExcessiveBalance -= billedInterestAmount;
-        // } else {
-        //   appliedInterest = outBucketExcessiveBalance;
-        //   outBucketExcessiveBalance = 0.0;
-        // }
-        if (appliedInterest > 0.0) {
-          bool found = false;
-          for (var item in _paymentApplyInfoListNew) {
-            if (item['billing_rec_id'] == billingRecId) {
-              if (item['is_custom_apply_interest'] != true) {
-                item['interest_amount_from_bal'] = appliedInterest;
-              }
-              found = true;
-              break;
-            }
-          }
-          if (!found) {
-            _paymentApplyInfoListNew.add({
-              'billing_rec_id': billingRecId,
-              'interest_amount_from_bal': appliedInterest,
-            });
-          }
-          _checkFullyPaid();
-        }
-      }
-    }
+    // // rule 5: flow to interest bucket next
+    // for (var bill in billList) {
+    //   // skip if bill is not released
+    //   if (bill['lc_status'] != 'released') {
+    //     continue;
+    //   }
+    //   // skip if bill is already fully paid
+    //   if (bill['is_fully_paid_by_current_payment'] == true) {
+    //     continue;
+    //   }
+
+    //   //flow to interest bucket next
+    //   final billingRecId = bill['id'] ?? '';
+    //   final billedTotalCost =
+    //       double.tryParse(bill['billed_total_amount'] ?? '0.0') ?? 0.0;
+    //   if (billedTotalCost <= 0.0) {
+    //     continue;
+    //   }
+    //   final billedInterestAmount =
+    //       double.tryParse(bill['billed_interest_amount'] ?? '0.0') ?? 0.0;
+    //   if (billedInterestAmount > 0.0) {
+    //     double appliedInterest = 0.0;
+
+    //     if (appliedInterest > 0.0) {
+    //       bool found = false;
+    //       for (var item in _paymentApplyInfoListNew) {
+    //         if (item['billing_rec_id'] == billingRecId) {
+    //           if (item['is_custom_apply_interest'] != true) {
+    //             item['interest_amount_from_bal'] = appliedInterest;
+    //           }
+    //           found = true;
+    //           break;
+    //         }
+    //       }
+    //       if (!found) {
+    //         _paymentApplyInfoListNew.add({
+    //           'billing_rec_id': billingRecId,
+    //           'interest_amount_from_bal': appliedInterest,
+    //         });
+    //       }
+    //       _checkFullyPaid();
+    //     }
+    //   }
+    // }
 
     // rule 4: flow out from outBucketThisPayment next
     // rule 4.1: flow to usage bucket first
@@ -449,21 +438,21 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
 
       //flow to usage bucket first
       final billingRecId = bill['id'] ?? '';
-      final billedTotalCost =
+      final billedTotalAmount =
           double.tryParse(bill['billed_total_amount'] ?? '0.0') ?? 0.0;
-      if (billedTotalCost <= 0.0) {
+      if (billedTotalAmount <= 0.0) {
         continue;
       }
       final billedInterestAmount =
           double.tryParse(bill['billed_interest_amount'] ?? '0.0') ?? 0.0;
-      final billedUsageAmount = billedTotalCost - billedInterestAmount;
-      if (billedUsageAmount > 0.0) {
+      final billedUsageWithGstAmt = billedTotalAmount - billedInterestAmount;
+      if (billedUsageWithGstAmt > 0.0) {
         double appliedUsage = _paymentApplyInfoListNew.firstWhere(
               (element) => element['billing_rec_id'] == billingRecId,
               orElse: () => {'usage_amount_from_payment': 0.0},
             )['usage_amount_from_payment'] ??
             0.0;
-        double remainingUsageToBePaid = billedUsageAmount - appliedUsage;
+        double remainingUsageToBePaid = billedUsageWithGstAmt - appliedUsage;
         if (remainingUsageToBePaid <= 0.0) {
           continue;
         }
@@ -512,9 +501,9 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
 
       // flow to interest bucket next
       final billingRecId = bill['id'] ?? '';
-      final billedTotalCost =
+      final billedTotalAmount =
           double.tryParse(bill['billed_total_amount'] ?? '0.0') ?? 0.0;
-      if (billedTotalCost <= 0.0) {
+      if (billedTotalAmount <= 0.0) {
         continue;
       }
       final billedInterestAmount =
@@ -571,7 +560,6 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
 
     setState(() {
       _availablePaymentAmountToApply = outBucketThisPayment;
-      // _availableExcessiveBalanceToApply = outBucketExcessiveBalance;
       _isPopulated = true;
     });
   }
@@ -637,24 +625,13 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
     }
 
     if (inBucket == 'usage') {
-      // if (outBucket == 'bal') {
-      // _availableExcessiveBalanceToApply =
-      //     (_availableExcessiveBalanceToApply ?? 0.0) - diff;
-      // } else {
       _availablePaymentAmountToApply =
           (_availablePaymentAmountToApply ?? 0.0) - diff;
-      // }
     } else {
-      // if (outBucket == 'bal') {
-      // _availableExcessiveBalanceToApply =
-      //     (_availableExcessiveBalanceToApply ?? 0.0) - diff;
-      // } else {
       _availablePaymentAmountToApply =
           (_availablePaymentAmountToApply ?? 0.0) - diff;
-      // }
     }
     _checkFullyPaid();
-    // setState(() {});
   }
 
   @override
@@ -814,9 +791,6 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
       String billingRecId,
       bool isMatchedBill,
       int index,
-      // double? availableAmountToApply,
-      // double? appliedAmountUsageFromBal,
-      // double? appliedAmountInterestFromBal,
       double? appliedAmountUsageFromPmt,
       double? appliedAmountInterestFromPmt,
       String? appliedByOpUsername,
@@ -834,10 +808,6 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
       isEnabled = false;
     }
 
-    // final initialValueUsageFromBal =
-    //     isMatchedBill ? appliedAmountUsageFromBal?.toString() : null;
-    // final initialValueInterestFromBal =
-    //     isMatchedBill ? appliedAmountInterestFromBal?.toString() : null;
     final initialValueUsageFromPmt =
         isMatchedBill ? appliedAmountUsageFromPmt?.toString() : null;
     final initialValueInterestFromPmt =
@@ -860,7 +830,6 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
       if (item['billing_rec_id'] == billingRecId) {
         // populate initial values from the new apply list
         item['usage_amount_from_payment'] ??= initialValueUsageFromPmt;
-
         item['interest_amount_from_payment'] ??= initialValueInterestFromPmt;
         break;
       }
@@ -1004,15 +973,6 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
         totalAmount - appliedUsageTotal - appliedInterestTotal;
     for (var applyInfo in applyInfoList) {
       if (applyInfo['billing_rec_id'] == billingRecId) {
-        appliedAmountUsageFromBal = applyInfo['usage_amount_from_bal'] is String
-            ? double.tryParse(applyInfo['usage_amount_from_bal'] ?? '0.0') ??
-                0.0
-            : applyInfo['usage_amount_from_bal'] ?? 0.0;
-        appliedAmountInterestFromBal = applyInfo['interest_amount_from_bal']
-                is String
-            ? double.tryParse(applyInfo['interest_amount_from_bal'] ?? '0.0') ??
-                0.0
-            : applyInfo['interest_amount_from_bal'] ?? 0.0;
         appliedAmountUsageFromPmt =
             applyInfo['usage_amount_from_payment'] is String
                 ? double.tryParse(
@@ -1123,9 +1083,6 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
                       billingRecId,
                       isMatchedBill,
                       index,
-                      // availableAmountToApply,
-                      // appliedAmountUsageFromBal,
-                      // appliedAmountInterestFromBal,
                       appliedAmountUsageFromPmt,
                       appliedAmountInterestFromPmt,
                       appliedByOpUsername,
@@ -1358,25 +1315,15 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
                   setState(() {
                     _inManualOverride = value;
                     if (_inManualOverride) {
-                      // clear all custom apply info
-                      // _paymentApplyInfoListNew.removeWhere((item) =>
-                      //     item['is_custom_apply_usage'] == true ||
-                      //     item['is_custom_apply_interest'] == true);
-                      // _populateApply2();
                       _isPopulated = false;
                       _paymentApplyInfoListNew.clear();
                       _availablePaymentAmountToApply =
                           _initialPaymentAmountToApply;
-                      // _availableExcessiveBalanceToApply =
-                      //     _initialExcessiveBalanceToApply;
                     } else {
                       _isPopulated = false;
                       _paymentApplyInfoListNew.clear();
                       _availablePaymentAmountToApply =
                           _initialPaymentAmountToApply;
-                      // _availableExcessiveBalanceToApply =
-                      //     _initialExcessiveBalanceToApply;
-                      // _populateApply2();
                     }
                   });
                 }
@@ -1636,15 +1583,15 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
   }
 
   Widget getIniBalPaymentInfo() {
-    if (_iniBalPaymentInfo.isEmpty) {
+    if (_initialBalancePaymentInfo.isEmpty) {
       return Container();
     }
 
-    final iniBalAmount =
-        double.tryParse(_iniBalPaymentInfo['amount']?.toString() ?? '0.0') ??
-            0.0;
+    final iniBalAmount = double.tryParse(
+            _initialBalancePaymentInfo['amount']?.toString() ?? '0.0') ??
+        0.0;
     final paymentApplyList =
-        _iniBalPaymentInfo['payment_apply_info_list'] ?? [];
+        _initialBalancePaymentInfo['payment_apply_info_list'] ?? [];
     double iniBalAppliedAmount = 0.0;
     for (var applyInfo in paymentApplyList) {
       final usageAmountFromPayment = double.tryParse(

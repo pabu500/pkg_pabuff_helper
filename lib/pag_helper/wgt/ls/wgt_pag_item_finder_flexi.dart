@@ -75,6 +75,7 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
     this.allowFlexiLabel = false,
     this.hint,
     this.widthOffset = 0.0,
+    this.additionalQuery = const {},
   });
 
   final MdlPagUser loggedInUser;
@@ -113,6 +114,7 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
   final bool allowFlexiLabel;
   final String? hint;
   final double widthOffset;
+  final Map<String, dynamic> additionalQuery;
 
   @override
   State<WgtPagItemFinderFlexi> createState() => _WgtPagItemFinderFlexiState();
@@ -264,6 +266,8 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     if (widget.listController.isNotEmpty) {
       queryMap['list_info'] = widget.listController.toJson();
     }
+
+    queryMap.addAll(widget.additionalQuery);
 
     // AclTarget aclTarget = getAclTargetFromItemType(widget.itemType);
 
