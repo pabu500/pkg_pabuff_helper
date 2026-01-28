@@ -332,6 +332,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
   }
 
   Widget getBillRender() {
+    String? genType = _bill['gen_type'];
     String tenantName = _bill['tenant_name'];
     String tenantLabel = _bill['tenant_label'];
     String accountId = _bill['tenant_alt_name'] ?? '';
@@ -348,6 +349,59 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     final interestInfo = _bill['interest_info'] ?? {};
     String cycleStr = _bill['cycle_str'] ?? '';
     String billDate = _bill['bill_date_timestamp'] ?? '';
+    String? billedTotalAmountStr = _bill['billed_total_amount'];
+    String billName = _bill['billing_rec_name'] ?? '';
+
+    if ('initial_balance' == genType) {
+      return Container(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        child: Center(
+          child: Column(
+            children: [
+              Text(
+                'Initial Balance Bill',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 21,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).hintColor,
+                ),
+              ),
+              verticalSpaceSmall,
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    billName,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      color: Theme.of(context).hintColor,
+                    ),
+                  ),
+                  SizedBox(
+                      width: 40,
+                      child:
+                          getCopyButton(context, billName, direction: 'left')),
+                ],
+              ),
+              verticalSpaceSmall,
+              Text(
+                'Total Amount: ${billedTotalAmountStr ?? '0.0'}',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                  color: Theme.of(context).hintColor,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
 
     List<Map<String, dynamic>> minSoaList = [];
     for (var item in miniSoa) {
@@ -412,8 +466,8 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     // String balBfStr,
     // String balBfUsageStr,
     // String balBfInterestStr,
-    List<Map<String, dynamic>> miniSoa,
-    Map<String, dynamic> interestInfo,
+    List<Map<String, dynamic>>? miniSoa,
+    Map<String, dynamic>? interestInfo,
   ) {
     // sort time
     bool isMonthly = true;
@@ -644,7 +698,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             lineItems: lineItems,
             excludeAutoUsage:
                 _bill['exclude_auto_usage'] == 'true' ? true : false,
-            interestInfo: interestInfo,
+            interestInfo: interestInfo!,
             onUpdate: () {
               widget.onUpdate?.call();
               setState(() {
