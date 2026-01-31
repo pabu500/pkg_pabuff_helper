@@ -985,7 +985,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
                 child: WgtItemDeleteOp(
                   appConfig: widget.appConfig,
                   itemKind: PagItemKind.finance,
-                  itemType: '',
+                  itemType: PagFinanceType.payment,
                   itemIndexStr: widget.itemIndexStr,
                   itemDeleteRef: widget.itemIndexStr,
                   onDeleting: () {

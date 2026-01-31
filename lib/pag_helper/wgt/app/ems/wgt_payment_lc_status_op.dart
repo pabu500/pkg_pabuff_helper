@@ -1,6 +1,5 @@
 import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
-import 'package:flutter/foundation.dart';
 import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
@@ -96,7 +95,8 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
     } catch (e) {
       dev.log('Error committing LC status: $e');
 
-      _errorText = getErrorText(e, defaultErrorText:'Error committing LC status');      
+      _errorText =
+          getErrorText(e, defaultErrorText: 'Error committing LC status');
 
       // _errorText = e.toString();
       // if (_errorText.toLowerCase().contains('total applied amount')) {
@@ -108,7 +108,7 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
       _isCommitting = false;
       if (mounted) {
         setState(() {});
-        
+
         if (_errorText.isNotEmpty) {
           showInfoDialog(context, 'Error', _errorText);
         }
