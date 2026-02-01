@@ -273,7 +273,7 @@ Future<dynamic> getTariffPackageTariffRateInfo(
   if (response.statusCode == 200) {
     final respJson = jsonDecode(response.body);
     if (respJson['error'] != null) {
-      throw Exception(respJson['error']);
+      throw Exception(respJson['error']['message']);
     }
     final data = respJson['data'];
     if (data == null) {
@@ -290,7 +290,7 @@ Future<dynamic> getTariffPackageTariffRateInfo(
       throw Exception("No result found in the response");
     }
     String? resultKey = data['result_key'];
-    if (resultKey == null && resultKey!.isEmpty) {
+    if (resultKey == null || resultKey.isEmpty) {
       throw Exception("Error: $resultKey");
     }
     if (result[resultKey] == null) {
