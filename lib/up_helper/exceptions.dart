@@ -1,3 +1,4 @@
+import 'package:buff_helper/xt_ui/wdgt/info/get_copy.dart';
 import 'package:flutter/material.dart';
 
 class InvalidCredentialsException implements Exception {
@@ -90,7 +91,14 @@ void showInfoDialog(BuildContext context, String title, String text,
     builder: (BuildContext context) {
       return AlertDialog(
         title: Text(title),
-        content: SelectableText(text, style: defaultStyle),
+        content: Row(
+          children: [
+            SelectableText(text, style: defaultStyle),
+            SizedBox(
+                width: 40,
+                child: getCopyButton(context, text, direction: 'left'))
+          ],
+        ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
         actions: <Widget>[
           TextButton(

@@ -149,7 +149,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
     }
   }
 
-  void _reset({bool resetDateRange = false}) {
+  void _resetDate({bool resetDateRange = false}) {
     setState(() {
       if (resetDateRange) {
         _selectedToDate = null;
@@ -394,7 +394,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
       populateDefaultRange: false,
       onRangeSet: (startDate, endDate) async {
         if (startDate == null || endDate == null) return;
-        _reset(resetDateRange: true);
+        _resetDate(resetDateRange: true);
         setState(() {
           _selectedFromDate = startDate;
           _selectedToDate = endDate;
@@ -407,7 +407,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
         });
       },
       onMonthPicked: (selected) {
-        _reset(resetDateRange: true);
+        _resetDate(resetDateRange: true);
         setState(() {
           // _timePickerKey = UniqueKey();
           _monthPicked = selected;
