@@ -43,7 +43,7 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
     this.tenantSingularUsageInfoList = const [],
     this.compositeUsageCalc,
     this.subTenantListUsageSummary = const [],
-    this.manualUsages = const [],
+    // this.manualUsages = const [],
     this.isBillMode = false,
     this.billInfo = const {},
     // this.meterTypeRates = const {},
@@ -81,7 +81,7 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
   final Map<String, dynamic> billInfo;
   // final Map<String, dynamic> meterTypeRates;
   // final double? gst;
-  final List<Map<String, dynamic>> manualUsages;
+  // final List<Map<String, dynamic>> manualUsages;
   final List<Map<String, dynamic>> lineItems;
   final String renderMode;
   final bool showRenderModeSwitch;
@@ -193,13 +193,13 @@ class _WgtPagTenantCompositeUsageSummaryState
               Divider(color: Theme.of(context).hintColor),
               if (!widget.excludeAutoUsage) ...getStat(),
               if (widget.excludeAutoUsage) getAutoUsageExcludedInfo(context),
-              // verticalSpaceSmall,
-              // getManualUsage(),
-              // verticalSpaceSmall,
+              verticalSpaceSmall,
+              getManualUsage(),
+              verticalSpaceSmall,
               // getSubTenantUsageList(),
               // verticalSpaceSmall,
               // verticalSpaceSmall,
-              // getLineItem(),
+              getLineItem(),
               verticalSpaceSmall,
               if (widget.isBillMode)
                 getTotal2(
@@ -209,8 +209,6 @@ class _WgtPagTenantCompositeUsageSummaryState
                   widget.compositeUsageCalc!.gstAmount,
                   widget.compositeUsageCalc!.totalCost,
                   widget.tenantType,
-                  // widget.compositeUsageCalc!.balBfUsage,
-                  // widget.compositeUsageCalc!.balBfInterest,
                   widget.compositeUsageCalc!.miniSoa,
                   widget.interestInfo,
                   width: statWidth,
@@ -285,58 +283,65 @@ class _WgtPagTenantCompositeUsageSummaryState
       );
       String slotStr =
           '  ${slotFromTimestampStr.substring(0, 10)} - ${slotToTimestampStr.substring(0, 10)}';
-      final tenantUsageSummary = singularUsageInfo['tenant_usage_summary'];
+      String genType = singularUsageInfo['gen_type'] ?? '';
+      String excludeAutoUsageStr =
+          singularUsageInfo['exclude_auto_usage'] ?? '';
 
-      final meterGroupUsageList =
-          tenantUsageSummary['meter_group_usage_list'] ?? [];
-      final typeGroupInfoList = meterGroupUsageList
-          .where((element) => element['meter_type'] == typeStr)
-          .toList();
-      List<Widget> typeGroupList = [];
-      for (var groupInfo in typeGroupInfoList) {
-        String meterTypeTag = groupInfo['meter_type'] ?? '';
-        MeterType? meterType = getMeterType(meterTypeTag);
+      if ('true' == excludeAutoUsageStr) {
+      } else {
+        final tenantUsageSummary = singularUsageInfo['tenant_usage_summary'];
 
-        Map<String, dynamic>? meterTypeRateInfo =
-            singularUsageInfo['meter_type_rate_info'];
-        assert(meterTypeRateInfo != null, 'meterTypeRateInfo cannot be null');
-        PagEmsTypeUsageCalc? usageCalc = singularUsageInfo['usage_calc'];
-        assert(usageCalc != null, 'usageCalc cannot be null');
+        final meterGroupUsageList =
+            tenantUsageSummary['meter_group_usage_list'] ?? [];
+        final typeGroupInfoList = meterGroupUsageList
+            .where((element) => element['meter_type'] == typeStr)
+            .toList();
+        List<Widget> typeGroupList = [];
+        for (var groupInfo in typeGroupInfoList) {
+          String meterTypeTag = groupInfo['meter_type'] ?? '';
+          MeterType? meterType = getMeterType(meterTypeTag);
 
-        typeGroupList.add(Column(
-          children: [
-            verticalSpaceTiny,
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text(slotStr,
-                    style: TextStyle(
-                      // fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).hintColor,
-                    ))
-              ],
-            ),
-            getGroupMeterStat(
-                groupInfo, meterType, meterTypeRateInfo!, usageCalc!)
-          ],
+          Map<String, dynamic>? meterTypeRateInfo =
+              singularUsageInfo['meter_type_rate_info'];
+          assert(meterTypeRateInfo != null, 'meterTypeRateInfo cannot be null');
+          PagEmsTypeUsageCalc? usageCalc = singularUsageInfo['usage_calc'];
+          assert(usageCalc != null, 'usageCalc cannot be null');
+
+          typeGroupList.add(Column(
+            children: [
+              verticalSpaceTiny,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(slotStr,
+                      style: TextStyle(
+                        // fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).hintColor,
+                      ))
+                ],
+              ),
+              getGroupMeterStat(
+                  groupInfo, meterType, meterTypeRateInfo!, usageCalc!)
+            ],
+          ));
+        }
+        if (typeGroupList.isEmpty) {
+          continue;
+        }
+        slotList.add(Container(
+          width: statWidth,
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey.shade600, width: 1),
+            borderRadius: BorderRadius.circular(5.0),
+          ),
+          margin: const EdgeInsets.only(top: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+          child: Column(
+            children: [...typeGroupList],
+          ),
         ));
       }
-      if (typeGroupList.isEmpty) {
-        continue;
-      }
-      slotList.add(Container(
-        width: statWidth,
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade600, width: 1),
-          borderRadius: BorderRadius.circular(5.0),
-        ),
-        margin: const EdgeInsets.only(top: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
-        child: Column(
-          children: [...typeGroupList],
-        ),
-      ));
     }
 
     return Column(
@@ -481,73 +486,84 @@ class _WgtPagTenantCompositeUsageSummaryState
     );
   }
 
-  // Widget getManualUsage() {
-  //   if (widget.manualUsages.isEmpty) {
-  //     return Container();
-  //   }
-  //   List<Widget> manualUsageList = [];
-  //   for (var item in widget.manualUsages) {
-  //     // String usageStr = item['usage'] ?? '';
-  //     // double? usageVal = double.tryParse(usageStr);
-  //     double? usageVal = item['usage'];
-  //     String meterTypeTag = item['meter_type'] ?? '';
-  //     if (usageVal != null) {
-  //       MeterType? meterType = getMeterType(meterTypeTag);
-  //       if (meterType != null) {
-  //         manualUsageList.add(
-  //           Padding(
-  //             padding: const EdgeInsets.only(top: 10),
-  //             child: WgtPagUsageStatCore(
-  //               loggedInUser: widget.loggedInUser,
-  //               appConfig: widget.appConfig,
-  //               displayContextStr: widget.displayContextStr,
-  //               isBillMode: widget.isBillMode,
-  //               rate: widget.typeRates?[meterTypeTag] ?? 0,
-  //               statColor:
-  //                   Theme.of(context).colorScheme.onSurface.withAlpha(180),
-  //               showTrending: false,
-  //               statVirticalStack: false,
-  //               height: 110,
-  //               usageDecimals: widget.usageDecimals,
-  //               rateDecimals: widget.rateDecimals,
-  //               costDecimals: widget.costDecimals,
-  //               meterType: meterType,
-  //               meterId: ' (m.)',
-  //               meterIdType: ItemIdType.name,
-  //               itemType: widget.itemType,
-  //               historyType: PagItemHistoryType.meterListUsageSummary,
-  //               isStaticUsageStat: true,
-  //               meterUsageSummary: {'usage': usageVal},
-  //             ),
-  //           ),
-  //         );
-  //       }
-  //     }
-  //   }
-  //   return SizedBox(
-  //     width: statWidth,
-  //     child: Column(
-  //       children: [
-  //         verticalSpaceSmall,
-  //         Row(
-  //           mainAxisAlignment: MainAxisAlignment.center,
-  //           children: [
-  //             Icon(Symbols.edit,
-  //                 size: 21, color: Theme.of(context).colorScheme.primary),
-  //             horizontalSpaceTiny,
-  //             Text('Manual Usage',
-  //                 style: TextStyle(
-  //                   fontSize: 18,
-  //                   color: Theme.of(context).hintColor.withAlpha(180),
-  //                   fontWeight: FontWeight.bold,
-  //                 )),
-  //           ],
-  //         ),
-  //         ...manualUsageList,
-  //       ],
-  //     ),
-  //   );
-  // }
+  Widget getManualUsage() {
+    List<Widget> manualUsageWidgetList = [];
+    for (Map<String, dynamic> singularUsageInfo
+        in widget.tenantSingularUsageInfoList) {
+      PagEmsTypeUsageCalc? usageCalc = singularUsageInfo['usage_calc'];
+      if (usageCalc == null) {
+        continue;
+      }
+      final manualUsageList = usageCalc.manualUsageList;
+
+      Map<String, dynamic>? meterTypeRateInfo =
+          singularUsageInfo['meter_type_rate_info'];
+
+      for (var item in manualUsageList ?? []) {
+        double? usageVal = item['usage'];
+        String meterTypeTag = item['meter_type'] ?? '';
+        assert(meterTypeRateInfo![meterTypeTag] != null,
+            'meterTypeRateInfo for $meterTypeTag cannot be null');
+        String typeRateStr = meterTypeRateInfo![meterTypeTag]['result']['rate'];
+        double? typeRate = double.tryParse(typeRateStr);
+        if (usageVal != null) {
+          MeterType? meterType = getMeterType(meterTypeTag);
+          if (meterType != null) {
+            manualUsageWidgetList.add(
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: WgtPagUsageStatCore(
+                  loggedInUser: widget.loggedInUser,
+                  appConfig: widget.appConfig,
+                  displayContextStr: widget.displayContextStr,
+                  isBillMode: widget.isBillMode,
+                  rate: typeRate,
+                  statColor:
+                      Theme.of(context).colorScheme.onSurface.withAlpha(180),
+                  showTrending: false,
+                  statVirticalStack: false,
+                  height: 110,
+                  usageDecimals: widget.usageDecimals,
+                  rateDecimals: widget.rateDecimals,
+                  costDecimals: widget.costDecimals,
+                  meterType: meterType,
+                  meterId: ' (m.)',
+                  meterIdType: ItemIdType.name,
+                  itemType: widget.itemType,
+                  historyType: PagItemHistoryType.meterListUsageSummary,
+                  isStaticUsageStat: true,
+                  meterUsageSummary: {'usage': usageVal},
+                ),
+              ),
+            );
+          }
+        }
+      }
+    }
+    return SizedBox(
+      width: statWidth,
+      child: Column(
+        children: [
+          verticalSpaceSmall,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Symbols.edit,
+                  size: 21, color: Theme.of(context).colorScheme.primary),
+              horizontalSpaceTiny,
+              Text('Manual Usage',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Theme.of(context).hintColor.withAlpha(180),
+                    fontWeight: FontWeight.bold,
+                  )),
+            ],
+          ),
+          ...manualUsageWidgetList,
+        ],
+      ),
+    );
+  }
 
   Widget getLineItem() {
     if (widget.lineItems.isEmpty) {

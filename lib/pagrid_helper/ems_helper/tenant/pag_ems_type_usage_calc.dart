@@ -79,6 +79,8 @@ class PagEmsTypeUsageCalc {
 
   List<PagEmsTypeUsageCalc> get singularCalcList => _singularCalcList;
 
+  List<Map<String, dynamic>>? get manualUsageList => _manualUsageList;
+
   PagEmsTypeUsageCalc({
     required int costDecimals,
     double? gst,
@@ -137,9 +139,7 @@ class PagEmsTypeUsageCalc {
     _calcTypeUsage('G');
 
     _calcTotalCost();
-
     _sortSubTenantUsage();
-
     _getUsageTrending();
   }
 
@@ -149,16 +149,11 @@ class PagEmsTypeUsageCalc {
     _calcTypeUsage('B');
     _calcTypeUsage('N');
     _calcTypeUsage('G');
-
-    // _calcTotalCost();
-
-    // _sortSubTenantUsage();
-
-    // _getUsageTrending();
   }
 
   void doCompositeCalc() {
     _calcCompositeTypeUsage();
+    _calcTotalCost();
   }
 
   Map<String, dynamic>? getLineItem(int index) {
@@ -554,27 +549,27 @@ class PagEmsTypeUsageCalc {
       }
     }
 
-    _subTotalCost = subTotalCost;
-    if (_subTotalCost != null) {
-      _subTotalCost = getRound(_subTotalCost!, 2);
-      if (subTotalCost != null && _gst != null) {
-        _gstAmount = subTotalCost * _gst / 100;
-      }
-      _gstAmount = getRoundUp(_gstAmount!, 2);
-      _totalCost = _subTotalCost! + _gstAmount!;
+    // _subTotalCost = subTotalCost;
+    // if (_subTotalCost != null) {
+    //   _subTotalCost = getRound(_subTotalCost!, 2);
+    //   if (subTotalCost != null && _gst != null) {
+    //     _gstAmount = subTotalCost * _gst / 100;
+    //   }
+    //   _gstAmount = getRoundUp(_gstAmount!, 2);
+    //   _totalCost = _subTotalCost! + _gstAmount!;
 
-      if (_interestInfo != null) {
-        final totalInterestAmount = _interestInfo['total_interest_amount'];
-        double? interestAmountDouble = 0;
-        if (totalInterestAmount is String) {
-          interestAmountDouble = double.tryParse(totalInterestAmount);
-        } else if (totalInterestAmount is double) {
-          interestAmountDouble = totalInterestAmount;
-        }
+    //   if (_interestInfo != null) {
+    //     final totalInterestAmount = _interestInfo['total_interest_amount'];
+    //     double? interestAmountDouble = 0;
+    //     if (totalInterestAmount is String) {
+    //       interestAmountDouble = double.tryParse(totalInterestAmount);
+    //     } else if (totalInterestAmount is double) {
+    //       interestAmountDouble = totalInterestAmount;
+    //     }
 
-        _totalCost = _totalCost! + (interestAmountDouble ?? 0);
-      }
-    }
+    //     _totalCost = _totalCost! + (interestAmountDouble ?? 0);
+    //   }
+    // }
   }
 
   double? _calcMeterGroupUsageTotal(

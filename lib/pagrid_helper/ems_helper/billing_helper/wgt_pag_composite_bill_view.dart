@@ -352,6 +352,16 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     String? billedTotalAmountStr = _bill['billed_total_amount'];
     String billName = _bill['billing_rec_name'] ?? '';
 
+    List<Map<String, dynamic>> lineItemList = [];
+    final lineItemInfo = _bill['line_item_info'] ?? {};
+    if (lineItemInfo['line_item_label_1'] != null &&
+        lineItemInfo['line_item_amount_1'] != null) {
+      lineItemList.add({
+        'label': lineItemInfo['line_item_label_1'],
+        'amount': lineItemInfo['line_item_amount_1'],
+      });
+    }
+
     if ('initial_balance' == genType) {
       return Container(
         padding: const EdgeInsets.symmetric(vertical: 20),
@@ -425,9 +435,6 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
           cycleStr,
           billDate,
           billBarFromMonth,
-          // balBf,
-          // balBfUsage,
-          // balBfInterest,
           minSoaList,
           interestInfo);
     } else {
@@ -443,9 +450,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
           cycleStr,
           billDate,
           billBarFromMonth,
-          // balBf,
-          // balBfUsage,
-          // balBfInterest,
+          lineItemList,
           minSoaList,
           interestInfo);
     }
@@ -463,9 +468,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     String cycleStr,
     String billDate,
     String billBarFromMonth,
-    // String balBfStr,
-    // String balBfUsageStr,
-    // String balBfInterestStr,
+    List<Map<String, dynamic>> lineItemList,
     List<Map<String, dynamic>>? miniSoa,
     Map<String, dynamic>? interestInfo,
   ) {
@@ -503,11 +506,11 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     for (Map<String, dynamic> singularUsage in singularUsageList) {
       //sort auto usage
       List<Map<String, dynamic>> meterGroupUsageList = [];
-      final tenantUsageSummary = singularUsage['tenant_usage_summary'];
-      if (tenantUsageSummary != null) {
-        if (tenantUsageSummary['meter_group_usage_list'] != null) {
+      final autoUsageSummary = singularUsage['tenant_usage_summary'];
+      if (autoUsageSummary != null) {
+        if (autoUsageSummary['meter_group_usage_list'] != null) {
           for (var meterGroupUsage
-              in tenantUsageSummary['meter_group_usage_list']) {
+              in autoUsageSummary['meter_group_usage_list']) {
             meterGroupUsageList.add(meterGroupUsage);
           }
         }
@@ -532,15 +535,58 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
         }
       }
 
+      List<Map<String, dynamic>> manualUsageList = [];
+      final manualUsageInfo = singularUsage['manual_usage_info'] ?? {};
+      final manualUsageE = manualUsageInfo['manual_usage_e'];
+      final manualUsageW = manualUsageInfo['manual_usage_w'];
+      final manualUsageB = manualUsageInfo['manual_usage_b'];
+      final manualUsageN = manualUsageInfo['manual_usage_n'];
+      final manualUsageG = manualUsageInfo['manual_usage_g'];
+      if (manualUsageE != null) {
+        double? usage = double.tryParse(manualUsageE);
+        manualUsageList.add({
+          'meter_type': 'E',
+          'usage': usage,
+        });
+      }
+      if (manualUsageW != null) {
+        double? usage = double.tryParse(manualUsageW);
+        manualUsageList.add({
+          'meter_type': 'W',
+          'usage': usage,
+        });
+      }
+      if (manualUsageB != null) {
+        double? usage = double.tryParse(manualUsageB);
+        manualUsageList.add({
+          'meter_type': 'B',
+          'usage': usage,
+        });
+      }
+      if (manualUsageN != null) {
+        double? usage = double.tryParse(manualUsageN);
+        manualUsageList.add({
+          'meter_type': 'N',
+          'usage': usage,
+        });
+      }
+      if (manualUsageG != null) {
+        double? usage = double.tryParse(manualUsageG);
+        manualUsageList.add({
+          'meter_type': 'G',
+          'usage': usage,
+        });
+      }
+
       PagEmsTypeUsageCalc emsTypeUsageCalc = PagEmsTypeUsageCalc(
         costDecimals: widget.costDecimals,
         gst: gst,
         typeRates: typeRates,
         usageFactor: usageFactor,
-        autoUsageSummary: tenantUsageSummary,
+        autoUsageSummary: autoUsageSummary ?? {},
         subTenantUsageSummary: [],
-        manualUsageList: [],
-        lineItemList: [],
+        manualUsageList: manualUsageList,
+        lineItemList: lineItemList,
         billBarFromMonth: billBarFromMonth,
         //use billed trending snapshot
         billedTrendingSnapShot: [],
@@ -551,10 +597,6 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       singularUsage['usage_calc'] = emsTypeUsageCalc;
     }
 
-    // double? balBf = double.tryParse(balBfStr);
-    // double? balBfUsage = double.tryParse(balBfUsageStr);
-    // double? balBfInterest = double.tryParse(balBfInterestStr);
-
     PagEmsTypeUsageCalc compositeUsageCalc = PagEmsTypeUsageCalc(
       costDecimals: widget.costDecimals,
       gst: 9.0,
@@ -563,115 +605,113 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       autoUsageSummary: {},
       subTenantUsageSummary: [],
       manualUsageList: [],
-      lineItemList: [],
+      lineItemList: lineItemList,
       billBarFromMonth: billBarFromMonth,
       //use billed trending snapshot
       billedTrendingSnapShot: [],
       singularUsageCalcList: singularUsageCalcList,
-      // balBf: balBf,
-      // balBfUsage: balBfUsage,
-      // balBfInterest: balBfInterest,
       miniSoa: miniSoa,
       interestInfo: interestInfo,
     );
     compositeUsageCalc.doCompositeCalc();
 
     //sort manual usage
-    List<Map<String, dynamic>> manualUsage = [];
-    for (var typeTag in usageTypeTags) {
-      if (_bill['manual_usage_$typeTag'.toLowerCase()] != null) {
-        String usageStr = _bill['manual_usage_$typeTag'.toLowerCase()];
-        double? usage = double.tryParse(usageStr);
-        manualUsage.add({
-          'meter_type': typeTag,
-          'usage': usage,
-        });
-      }
-    }
+    // List<Map<String, dynamic>> manualUsage = [];
+    // for (var typeTag in usageTypeTags) {
+    //   if (_bill['manual_usage_$typeTag'.toLowerCase()] != null) {
+    //     String usageStr = _bill['manual_usage_$typeTag'.toLowerCase()];
+    //     double? usage = double.tryParse(usageStr);
+    //     manualUsage.add({
+    //       'meter_type': typeTag,
+    //       'usage': usage,
+    //     });
+    //   }
+    // }
 
-    //sort sub tenant usage
+    // //sort sub tenant usage
     List<Map<String, dynamic>> subTenantListUsageSummary = [];
-    if (_bill['sub_tenant_list_usage_summary'] != null) {
-      for (var tenant in _bill['sub_tenant_list_usage_summary']) {
-        subTenantListUsageSummary.add(tenant);
-      }
-    }
+    // if (_bill['sub_tenant_list_usage_summary'] != null) {
+    //   for (var tenant in _bill['sub_tenant_list_usage_summary']) {
+    //     subTenantListUsageSummary.add(tenant);
+    //   }
+    // }
 
-    //sort line items
-    List<Map<String, dynamic>> lineItems = [];
-    if (_bill['line_item_label_1'] != null) {
-      lineItems.add({
-        'label': _bill['line_item_label_1'],
-        'amount': _bill['line_item_amount_1'],
-      });
-    }
+    // //sort line items
+    // List<Map<String, dynamic>> lineItems = [];
+    // if (_bill['line_item_label_1'] != null) {
+    //   lineItems.add({
+    //     'label': _bill['line_item_label_1'],
+    //     'amount': _bill['line_item_amount_1'],
+    //   });
+    // }
 
-    //use billed trending snapshot
-    List<Map<String, dynamic>> billedTrendingSnapShot = [];
-    if (_bill['billed_trending_snapshot'] != null) {
-      for (var item in _bill['billed_trending_snapshot']) {
-        billedTrendingSnapShot.add(item);
-      }
-    }
+    // //use billed trending snapshot
+    // List<Map<String, dynamic>> billedTrendingSnapShot = [];
+    // if (_bill['billed_trending_snapshot'] != null) {
+    //   for (var item in _bill['billed_trending_snapshot']) {
+    //     billedTrendingSnapShot.add(item);
+    //   }
+    // }
 
-    PagEmsTypeUsageCalc emsTypeUsageCalc = PagEmsTypeUsageCalc(
-      costDecimals: widget.costDecimals,
-      gst: 9.0,
-      typeRates: {},
-      usageFactor: usageFactor,
-      autoUsageSummary: {},
-      subTenantUsageSummary: subTenantListUsageSummary,
-      manualUsageList: manualUsage,
-      lineItemList: lineItems,
-      billBarFromMonth: billBarFromMonth,
-      //use billed trending snapshot
-      billedTrendingSnapShot: billedTrendingSnapShot,
-    );
+    // PagEmsTypeUsageCalc emsTypeUsageCalc = PagEmsTypeUsageCalc(
+    //   costDecimals: widget.costDecimals,
+    //   gst: 9.0,
+    //   typeRates: {},
+    //   usageFactor: usageFactor,
+    //   autoUsageSummary: {},
+    //   subTenantUsageSummary: subTenantListUsageSummary,
+    //   manualUsageList: manualUsage,
+    //   lineItemList: lineItems,
+    //   billBarFromMonth: billBarFromMonth,
+    //   //use billed trending snapshot
+    //   billedTrendingSnapShot: billedTrendingSnapShot,
+    // );
     // emsTypeUsageCalc.doCalc();
 
     return _renderMode == 'pdf'
-        ? WgtPagBillRenderPdf(
-            billingInfo: {
-              'customerName': tenantName,
-              'customerAccountId': accountId,
-              'customerLabel': tenantLabel,
-              'customerType': tenantType,
-              'gst': '9',
-              'billingRecName': _bill['billing_rec_name'],
-              'billFrom': fromTimestampStr,
-              'billTo': toTimestampStr,
-              'billDate': _bill['released_bill_timestamp'] ??
-                  _bill['created_timestamp'],
-              'billTimeRangeStr': cycleStr,
-              'tenantUsageSummary': {},
-              'subTotalAmount': emsTypeUsageCalc.subTotalCost,
-              'gstAmount': emsTypeUsageCalc.gstAmount,
-              'totalAmount': emsTypeUsageCalc.totalCost,
-              'typeRateE': emsTypeUsageCalc.typeUsageE?.rate,
-              'typeRateW': emsTypeUsageCalc.typeUsageW?.rate,
-              'typeRateB': emsTypeUsageCalc.typeUsageB?.rate,
-              'typeRateN': emsTypeUsageCalc.typeUsageN?.rate,
-              'typeRateG': emsTypeUsageCalc.typeUsageG?.rate,
-              'typeUsageE': emsTypeUsageCalc.typeUsageE?.usageFactored,
-              'typeUsageW': emsTypeUsageCalc.typeUsageW?.usageFactored,
-              'typeUsageB': emsTypeUsageCalc.typeUsageB?.usageFactored,
-              'typeUsageN': emsTypeUsageCalc.typeUsageN?.usageFactored,
-              'typeUsageG': emsTypeUsageCalc.typeUsageG?.usageFactored,
-              'typeCostE': emsTypeUsageCalc.typeUsageE?.cost,
-              'typeCostW': emsTypeUsageCalc.typeUsageW?.cost,
-              'typeCostB': emsTypeUsageCalc.typeUsageB?.cost,
-              'typeCostN': emsTypeUsageCalc.typeUsageN?.cost,
-              'typeCostG': emsTypeUsageCalc.typeUsageG?.cost,
-              'trendingE': emsTypeUsageCalc.trendingE,
-              'trendingW': emsTypeUsageCalc.trendingW,
-              'trendingB': emsTypeUsageCalc.trendingB,
-              'trendingN': emsTypeUsageCalc.trendingN,
-              'trendingG': emsTypeUsageCalc.trendingG,
-              'lineItemLabel1': emsTypeUsageCalc.getLineItem(0)?['label'],
-              'lineItemValue1': emsTypeUsageCalc.getLineItem(0)?['amount'],
-              'assetFolder': assetFolder,
-            },
-          )
+        ? Container()
+        // WgtPagBillRenderPdf(
+        //     billingInfo: {
+        //       'customerName': tenantName,
+        //       'customerAccountId': accountId,
+        //       'customerLabel': tenantLabel,
+        //       'customerType': tenantType,
+        //       'gst': '9',
+        //       'billingRecName': _bill['billing_rec_name'],
+        //       'billFrom': fromTimestampStr,
+        //       'billTo': toTimestampStr,
+        //       'billDate': _bill['released_bill_timestamp'] ??
+        //           _bill['created_timestamp'],
+        //       'billTimeRangeStr': cycleStr,
+        //       'tenantUsageSummary': {},
+        //       'subTotalAmount': emsTypeUsageCalc.subTotalCost,
+        //       'gstAmount': emsTypeUsageCalc.gstAmount,
+        //       'totalAmount': emsTypeUsageCalc.totalCost,
+        //       'typeRateE': emsTypeUsageCalc.typeUsageE?.rate,
+        //       'typeRateW': emsTypeUsageCalc.typeUsageW?.rate,
+        //       'typeRateB': emsTypeUsageCalc.typeUsageB?.rate,
+        //       'typeRateN': emsTypeUsageCalc.typeUsageN?.rate,
+        //       'typeRateG': emsTypeUsageCalc.typeUsageG?.rate,
+        //       'typeUsageE': emsTypeUsageCalc.typeUsageE?.usageFactored,
+        //       'typeUsageW': emsTypeUsageCalc.typeUsageW?.usageFactored,
+        //       'typeUsageB': emsTypeUsageCalc.typeUsageB?.usageFactored,
+        //       'typeUsageN': emsTypeUsageCalc.typeUsageN?.usageFactored,
+        //       'typeUsageG': emsTypeUsageCalc.typeUsageG?.usageFactored,
+        //       'typeCostE': emsTypeUsageCalc.typeUsageE?.cost,
+        //       'typeCostW': emsTypeUsageCalc.typeUsageW?.cost,
+        //       'typeCostB': emsTypeUsageCalc.typeUsageB?.cost,
+        //       'typeCostN': emsTypeUsageCalc.typeUsageN?.cost,
+        //       'typeCostG': emsTypeUsageCalc.typeUsageG?.cost,
+        //       'trendingE': emsTypeUsageCalc.trendingE,
+        //       'trendingW': emsTypeUsageCalc.trendingW,
+        //       'trendingB': emsTypeUsageCalc.trendingB,
+        //       'trendingN': emsTypeUsageCalc.trendingN,
+        //       'trendingG': emsTypeUsageCalc.trendingG,
+        //       'lineItemLabel1': emsTypeUsageCalc.getLineItem(0)?['label'],
+        //       'lineItemValue1': emsTypeUsageCalc.getLineItem(0)?['amount'],
+        //       'assetFolder': assetFolder,
+        //     },
+        //   )
         : WgtPagTenantCompositeUsageSummary(
             isDisabled: _isDisabledGn,
             costDecimals: widget.costDecimals,
@@ -694,8 +734,8 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             cycleStr: cycleStr,
             billDate: billDate,
             subTenantListUsageSummary: subTenantListUsageSummary,
-            manualUsages: manualUsage,
-            lineItems: lineItems,
+            // manualUsages: manualUsage,
+            lineItems: lineItemList,
             excludeAutoUsage:
                 _bill['exclude_auto_usage'] == 'true' ? true : false,
             interestInfo: interestInfo!,
