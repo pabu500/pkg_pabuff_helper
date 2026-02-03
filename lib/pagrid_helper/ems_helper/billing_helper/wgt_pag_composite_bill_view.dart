@@ -736,8 +736,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             subTenantListUsageSummary: subTenantListUsageSummary,
             // manualUsages: manualUsage,
             lineItems: lineItemList,
-            excludeAutoUsage:
-                _bill['exclude_auto_usage'] == 'true' ? true : false,
+            // excludeAutoUsage: _bill['exclude_auto_usage'] == 'true' ? true : false,
             interestInfo: interestInfo!,
             onUpdate: () {
               widget.onUpdate?.call();

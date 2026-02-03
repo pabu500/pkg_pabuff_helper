@@ -1,7 +1,5 @@
 import 'package:buff_helper/pkg_buff_helper.dart';
-import 'package:flutter/foundation.dart';
 
-import 'mdl_ems_type_usage.dart';
 import 'mdl_ems_type_usage_r2.dart';
 
 class EmsTypeUsageCalcReleasedR2 {

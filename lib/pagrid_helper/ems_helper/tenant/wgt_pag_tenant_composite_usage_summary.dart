@@ -26,7 +26,7 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
     required this.toDatetime,
     required this.tenantName,
     required this.tenantType,
-    required this.excludeAutoUsage,
+    // required this.excludeAutoUsage,
     required this.displayContextStr,
     required this.cycleStr,
     required this.billDate,
@@ -73,7 +73,7 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
   final String tenantType;
   final String cycleStr;
   final String billDate;
-  final bool excludeAutoUsage;
+  // final bool excludeAutoUsage;
   final List<Map<String, dynamic>> tenantSingularUsageInfoList;
   final PagEmsTypeUsageCalc? compositeUsageCalc;
   final List<Map<String, dynamic>> subTenantListUsageSummary;
@@ -191,11 +191,13 @@ class _WgtPagTenantCompositeUsageSummaryState
                 ],
               ),
               Divider(color: Theme.of(context).hintColor),
-              if (!widget.excludeAutoUsage) ...getStat(),
-              if (widget.excludeAutoUsage) getAutoUsageExcludedInfo(context),
+              // if (!widget.excludeAutoUsage)
+              // ...getStat(),
+              // if (widget.excludeAutoUsage) getAutoUsageExcludedInfo(context),
+              getSingluarStat(),
               verticalSpaceSmall,
-              getManualUsage(),
-              verticalSpaceSmall,
+              // getManualUsage(),
+              // verticalSpaceSmall,
               // getSubTenantUsageList(),
               // verticalSpaceSmall,
               // verticalSpaceSmall,
@@ -259,97 +261,120 @@ class _WgtPagTenantCompositeUsageSummaryState
     );
   }
 
-  List<Widget> getStat() {
-    List<Widget> typeStat = [];
-
-    typeStat.add(getTypeStat('E'));
-    typeStat.add(getTypeStat('B'));
-    typeStat.add(getTypeStat('W'));
-    typeStat.add(getTypeStat('N'));
-    typeStat.add(getTypeStat('G'));
-
-    return typeStat;
-  }
-
-  Widget getTypeStat(String typeStr) {
-    List<Widget> slotList = [];
+  Widget getSingluarStat() {
+    List<Widget> singularStatList = [];
     for (Map<String, dynamic> singularUsageInfo
         in widget.tenantSingularUsageInfoList) {
+      List<Widget> typeStatList = [];
       String slotFromTimestampStr = singularUsageInfo['from_timestamp'] ?? '';
       String slotToTimestampStr = singularUsageInfo['to_timestamp'] ?? '';
-      assert(
-        slotFromTimestampStr.isNotEmpty && slotToTimestampStr.isNotEmpty,
-        'from_timestamp and to_timestamp cannot be empty',
-      );
       String slotStr =
           '  ${slotFromTimestampStr.substring(0, 10)} - ${slotToTimestampStr.substring(0, 10)}';
-      String genType = singularUsageInfo['gen_type'] ?? '';
-      String excludeAutoUsageStr =
-          singularUsageInfo['exclude_auto_usage'] ?? '';
-
-      if ('true' == excludeAutoUsageStr) {
-      } else {
-        final tenantUsageSummary = singularUsageInfo['tenant_usage_summary'];
-
-        final meterGroupUsageList =
-            tenantUsageSummary['meter_group_usage_list'] ?? [];
-        final typeGroupInfoList = meterGroupUsageList
-            .where((element) => element['meter_type'] == typeStr)
-            .toList();
-        List<Widget> typeGroupList = [];
-        for (var groupInfo in typeGroupInfoList) {
-          String meterTypeTag = groupInfo['meter_type'] ?? '';
-          MeterType? meterType = getMeterType(meterTypeTag);
-
-          Map<String, dynamic>? meterTypeRateInfo =
-              singularUsageInfo['meter_type_rate_info'];
-          assert(meterTypeRateInfo != null, 'meterTypeRateInfo cannot be null');
-          PagEmsTypeUsageCalc? usageCalc = singularUsageInfo['usage_calc'];
-          assert(usageCalc != null, 'usageCalc cannot be null');
-
-          typeGroupList.add(Column(
-            children: [
-              verticalSpaceTiny,
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(slotStr,
-                      style: TextStyle(
-                        // fontSize: 15,
+      typeStatList.add(getTypeStat(singularUsageInfo, 'E'));
+      typeStatList.add(getTypeStat(singularUsageInfo, 'B'));
+      typeStatList.add(getTypeStat(singularUsageInfo, 'W'));
+      typeStatList.add(getTypeStat(singularUsageInfo, 'N'));
+      typeStatList.add(getTypeStat(singularUsageInfo, 'G'));
+      singularStatList.add(Container(
+        width: statWidth,
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.shade600, width: 1),
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+        margin: const EdgeInsets.only(top: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            verticalSpaceTiny,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(slotStr,
+                    style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Theme.of(context).hintColor,
-                      ))
-                ],
-              ),
-              getGroupMeterStat(
-                  groupInfo, meterType, meterTypeRateInfo!, usageCalc!)
-            ],
-          ));
-        }
-        if (typeGroupList.isEmpty) {
-          continue;
-        }
-        slotList.add(Container(
-          width: statWidth,
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey.shade600, width: 1),
-            borderRadius: BorderRadius.circular(5.0),
-          ),
-          margin: const EdgeInsets.only(top: 8),
-          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
-          child: Column(
-            children: [...typeGroupList],
-          ),
-        ));
-      }
+                        color: Theme.of(context).hintColor))
+              ],
+            ),
+            verticalSpaceSmall,
+            ...typeStatList,
+          ],
+        ),
+      ));
     }
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         // verticalSpaceSmall,
-        ...slotList,
+        ...singularStatList,
       ],
+    );
+  }
+
+  // List<Widget> getStat() {
+  //   List<Widget> typeStat = [];
+  //   typeStat.add(getTypeStat('E'));
+  //   typeStat.add(getTypeStat('B'));
+  //   typeStat.add(getTypeStat('W'));
+  //   typeStat.add(getTypeStat('N'));
+  //   typeStat.add(getTypeStat('G'));
+  //   return typeStat;
+  // }
+
+  Widget getTypeStat(Map<String, dynamic> singularUsageInfo, String typeStr) {
+    List<Widget> slotList = [];
+    // for (Map<String, dynamic> singularUsageInfo in widget.tenantSingularUsageInfoList) {
+    String slotFromTimestampStr = singularUsageInfo['from_timestamp'] ?? '';
+    String slotToTimestampStr = singularUsageInfo['to_timestamp'] ?? '';
+    assert(
+      slotFromTimestampStr.isNotEmpty && slotToTimestampStr.isNotEmpty,
+      'from_timestamp and to_timestamp cannot be empty',
+    );
+    // String slotStr = '  ${slotFromTimestampStr.substring(0, 10)} - ${slotToTimestampStr.substring(0, 10)}';
+    String genType = singularUsageInfo['gen_type'] ?? '';
+    String excludeAutoUsageStr = singularUsageInfo['exclude_auto_usage'] ?? '';
+
+    if ('true' == excludeAutoUsageStr) {
+      return getManualUsage2(singularUsageInfo, typeStr);
+    } else {
+      final tenantUsageSummary = singularUsageInfo['tenant_usage_summary'];
+
+      final meterGroupUsageList =
+          tenantUsageSummary['meter_group_usage_list'] ?? [];
+      final typeGroupInfoList = meterGroupUsageList
+          .where((element) => element['meter_type'] == typeStr)
+          .toList();
+      List<Widget> typeGroupList = [];
+      for (var groupInfo in typeGroupInfoList) {
+        String meterTypeTag = groupInfo['meter_type'] ?? '';
+        MeterType? meterType = getMeterType(meterTypeTag);
+
+        Map<String, dynamic>? meterTypeRateInfo =
+            singularUsageInfo['meter_type_rate_info'];
+        assert(meterTypeRateInfo != null, 'meterTypeRateInfo cannot be null');
+        PagEmsTypeUsageCalc? usageCalc = singularUsageInfo['usage_calc'];
+        assert(usageCalc != null, 'usageCalc cannot be null');
+
+        typeGroupList.add(Column(
+          children: [
+            getGroupMeterStat(
+                groupInfo, meterType, meterTypeRateInfo!, usageCalc!)
+          ],
+        ));
+      }
+      if (typeGroupList.isEmpty) {
+        return Container();
+      }
+      slotList.add(Column(
+        children: [...typeGroupList],
+      ));
+    }
+    // }
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [...slotList],
     );
   }
 
@@ -374,9 +399,7 @@ class _WgtPagTenantCompositeUsageSummaryState
       String usageStr = meterUsageSummary['usage'] ?? '';
       double? usageVal = double.tryParse(usageStr);
       if (usageVal == null) {
-        if (kDebugMode) {
-          print('usageVal is null');
-        }
+        dev.log('usageVal is null');
       }
       if (usageVal != null && usageFactor != null) {
         usageVal = usageVal * usageFactor;
@@ -484,6 +507,66 @@ class _WgtPagTenantCompositeUsageSummaryState
         meterUsageSummary: meterUsage,
       ),
     );
+  }
+
+  Widget getManualUsage2(
+      Map<String, dynamic> singularUsageInfo, String targetMeterTypeTag) {
+    List<Widget> manualUsageWidgetList = [];
+    PagEmsTypeUsageCalc? usageCalc = singularUsageInfo['usage_calc'];
+    if (usageCalc == null) {
+      return Container();
+    }
+    final manualUsageList = usageCalc.manualUsageList;
+
+    Map<String, dynamic>? meterTypeRateInfo =
+        singularUsageInfo['meter_type_rate_info'];
+
+    for (var item in manualUsageList ?? []) {
+      double? usageVal = item['usage'];
+      String meterTypeTag = item['meter_type'] ?? '';
+      if (meterTypeTag != targetMeterTypeTag) {
+        continue;
+      }
+      assert(meterTypeRateInfo![meterTypeTag] != null,
+          'meterTypeRateInfo for $meterTypeTag cannot be null');
+      String typeRateStr = meterTypeRateInfo![meterTypeTag]['result']['rate'];
+      double? typeRate = double.tryParse(typeRateStr);
+      if (usageVal != null) {
+        MeterType? meterType = getMeterType(meterTypeTag);
+        if (meterType != null) {
+          manualUsageWidgetList.add(
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: WgtPagUsageStatCore(
+                loggedInUser: widget.loggedInUser,
+                appConfig: widget.appConfig,
+                displayContextStr: widget.displayContextStr,
+                isBillMode: widget.isBillMode,
+                rate: typeRate,
+                statColor:
+                    Theme.of(context).colorScheme.onSurface.withAlpha(180),
+                showTrending: false,
+                statVirticalStack: false,
+                height: 110,
+                usageDecimals: widget.usageDecimals,
+                rateDecimals: widget.rateDecimals,
+                costDecimals: widget.costDecimals,
+                meterType: meterType,
+                meterId: ' (m.)',
+                meterIdType: ItemIdType.name,
+                itemType: widget.itemType,
+                historyType: PagItemHistoryType.meterListUsageSummary,
+                isStaticUsageStat: true,
+                meterUsageSummary: {'usage': usageVal},
+              ),
+            ),
+          );
+        }
+      }
+    }
+
+    return SizedBox(
+        width: statWidth, child: Column(children: [...manualUsageWidgetList]));
   }
 
   Widget getManualUsage() {
