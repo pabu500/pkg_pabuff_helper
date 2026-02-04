@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:buff_helper/pag_helper/comm/pag_be_api_base.dart';
 import 'package:buff_helper/pag_helper/def_helper/def_role.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_role.dart';
@@ -6,7 +8,6 @@ import 'package:buff_helper/pag_helper/model/mdl_svc_query.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
 import 'package:buff_helper/pagrid_helper/comm_helper/local_storage.dart';
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -34,9 +35,8 @@ Future<MdlPagUser> doLoginPag(
   );
 
   if (response.statusCode == 200) {
-    if (kDebugMode) {
-      print('usersvc comm: getting token from response body');
-    }
+    dev.log('usersvc comm: getting token from response body');
+
     String token = jsonDecode(response.body)['token'];
 
     // try {
@@ -54,17 +54,13 @@ Future<MdlPagUser> doLoginPag(
       try {
         await secStorage.write(key: 'pag_user_token', value: token);
       } catch (err) {
-        if (kDebugMode) {
-          print('usersvc comm: error writing token to secure storage: $err');
-        }
+        dev.log('usersvc comm: error writing token to secure storage: $err');
       }
     }
 
     return user;
   } else {
-    if (kDebugMode) {
-      print('usersvc comm: error: ${response.body}');
-    }
+    dev.log('usersvc comm: error: ${response.body}');
     throw Exception(/*jsonDecode*/ (response.body) /*['err']*/);
   }
 }
