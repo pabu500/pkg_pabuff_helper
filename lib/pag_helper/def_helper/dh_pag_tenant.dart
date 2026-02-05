@@ -44,6 +44,24 @@ enum PagTenantLcStatus {
         values,
       ) ??
       normal;
+
+  static Widget getTagWidget(PagTenantLcStatus status) {
+    Color color = status.color;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withAlpha(210),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Text(
+        status.tag,
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 13,
+        ),
+      ),
+    );
+  }
 }
 
 T? enumByTag<T extends Enum>(String? tag, List<T> values) {

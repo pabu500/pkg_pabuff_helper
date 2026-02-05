@@ -1,6 +1,7 @@
+import 'dart:developer' as dev;
+
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class WgtCommButton extends StatefulWidget {
@@ -10,7 +11,7 @@ class WgtCommButton extends StatefulWidget {
     this.enabled = true,
     this.inComm = false,
     this.width,
-    this.hight,
+    this.height,
     this.faceColor,
     this.labelStyle,
     this.labelWidget,
@@ -22,7 +23,7 @@ class WgtCommButton extends StatefulWidget {
   final bool enabled;
   final bool? inComm;
   final double? width;
-  final double? hight;
+  final double? height;
   final Color? faceColor;
   final TextStyle? labelStyle;
   final Widget? labelWidget;
@@ -39,17 +40,14 @@ class _WgtCommButtonState extends State<WgtCommButton> {
   @override
   void initState() {
     super.initState();
-    if (kDebugMode) {
-      print('WgtCommButton: initState');
-    }
+
+    dev.log('WgtCommButton: initState');
   }
 
   @override
   Widget build(BuildContext context) {
-    if (kDebugMode) {
-      print('WgtCommButton: build');
-      print('WgtCommButton: _isWaiting: $_isWaiting');
-    }
+    dev.log('WgtCommButton: build');
+    dev.log('WgtCommButton: _isWaiting: $_isWaiting');
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -63,18 +61,16 @@ class _WgtCommButtonState extends State<WgtCommButton> {
                   // in which case the _waiting flag is set by the parent widget by isComm
                   // instead of by this below
                   setState(() {
-                    if (kDebugMode) {
-                      print('WgtCommButton: onTap _isWaiting');
-                    }
+                    dev.log('WgtCommButton: onTap _isWaiting');
+
                     _isWaiting = true;
                   });
                   try {
                     var result = await widget.onPressed?.call();
                     widget.onResult?.call(result);
                   } catch (e) {
-                    if (kDebugMode) {
-                      print('WgtCommButton: onTap error: $e');
-                    }
+                    dev.log('WgtCommButton: onTap error: $e');
+
                     widget.onResult?.call(e.toString());
                   } finally {
                     setState(() {
@@ -84,7 +80,7 @@ class _WgtCommButtonState extends State<WgtCommButton> {
                 },
           child: Container(
             width: widget.width,
-            height: widget.hight,
+            height: widget.height,
             padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 5),
             decoration: BoxDecoration(
               color: widget.faceColor ??

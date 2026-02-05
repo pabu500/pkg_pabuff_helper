@@ -131,9 +131,8 @@ class _WgtMeterGroupAssignment2State extends State<WgtMeterGroupAssignment2> {
         itemInfo['meter_type_mismatch'] = hasMeterTypeMismatch;
       }
     } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
+      dev.log(e.toString());
+
       rethrow;
     } finally {
       setState(() {
@@ -223,9 +222,7 @@ class _WgtMeterGroupAssignment2State extends State<WgtMeterGroupAssignment2> {
         itemInfo.remove('is_fetching');
       }
     } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
+      dev.log(e.toString());
       setState(() {
         _commitErrorText = 'Commit Error';
       });
@@ -422,6 +419,11 @@ class _WgtMeterGroupAssignment2State extends State<WgtMeterGroupAssignment2> {
   }
 
   Widget getOpRow() {
+    bool tooManyRows = false;
+    if ((_itemGroupScopeMatchingItemList != null) &&
+        _itemGroupScopeMatchingItemList!.length > 20) {
+      tooManyRows = true;
+    }
     BoxDecoration boxDecoration = BoxDecoration(
       border: Border.all(color: Theme.of(context).hintColor.withAlpha(50)),
       borderRadius: BorderRadius.circular(5),
@@ -431,18 +433,26 @@ class _WgtMeterGroupAssignment2State extends State<WgtMeterGroupAssignment2> {
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        WgtCommButton(
-          label: 'Check All Assignments',
-          hight: 35,
-          labelStyle: TextStyle(
-            color: Theme.of(context).colorScheme.onSecondary,
-            fontSize: 15,
+        Tooltip(
+          message: tooManyRows
+              ? 'Too many rows to check all assignments, please filter the list first'
+              : _isAllAssignmentInfoFetched
+                  ? 'All assignment info fetched'
+                  : 'Check assignment info for all meters',
+          waitDuration: const Duration(milliseconds: 500),
+          child: WgtCommButton(
+            label: 'Check All Assignments',
+            height: 35,
+            labelStyle: TextStyle(
+              color: Theme.of(context).colorScheme.onSecondary,
+              fontSize: 15,
+            ),
+            onPressed: _isAllAssignmentInfoFetched || tooManyRows
+                ? null
+                : () async {
+                    await _checkAllAssignments();
+                  },
           ),
-          onPressed: _isAllAssignmentInfoFetched
-              ? null
-              : () async {
-                  await _checkAllAssignments();
-                },
         ),
         horizontalSpaceSmall,
         Container(
@@ -510,6 +520,8 @@ class _WgtMeterGroupAssignment2State extends State<WgtMeterGroupAssignment2> {
       border: Border.all(color: Theme.of(context).hintColor, width: 1.5),
       borderRadius: BorderRadius.circular(5),
     );
+    PagTenantLcStatus? lcStatus =
+        PagTenantLcStatus.byValue(widget.itemInfo?['tenant_lc_status'] ?? '');
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -571,6 +583,8 @@ class _WgtMeterGroupAssignment2State extends State<WgtMeterGroupAssignment2> {
                   '${widget.itemInfo?['tenant_label']}',
                   style: const TextStyle(fontSize: 16),
                 ),
+                horizontalSpaceTiny,
+                PagTenantLcStatus.getTagWidget(lcStatus),
               ],
             ),
           )
@@ -759,7 +773,7 @@ class _WgtMeterGroupAssignmentItemState
     bool hasAssignmentInfo = assignmentInfo != null;
     bool needToCheck = !hasAssignmentInfo;
 
-    double barWidth = 180;
+    double barWidth = 190;
     double maxAssignedWidth = barWidth - 2;
     double totalTenantPercentage = 0.0;
     String tooltipMessage = '';
@@ -789,6 +803,7 @@ class _WgtMeterGroupAssignmentItemState
           barInfo['tenant_id'] = tenantInfo['id'];
           barInfo['tenant_name'] = tenantInfo['name'];
           barInfo['tenant_label'] = tenantInfo['label'] ?? '';
+          barInfo['tenant_lc_status'] = tenantInfo['lc_status'] ?? '';
           barInfo['tenant_percentage'] = meterPercentage ?? 0.0;
         }
         assignmentBarList.add(barInfo);
@@ -834,8 +849,16 @@ class _WgtMeterGroupAssignmentItemState
       for (Map<String, dynamic> barInfo in assignmentBarList) {
         double? tenantPercentage = barInfo['tenant_percentage'];
         if (tenantPercentage != null) {
+          String tenantLcStatus = barInfo['tenant_lc_status'] ?? '';
+          PagTenantLcStatus? lcStatus =
+              PagTenantLcStatus.byValue(tenantLcStatus);
+          if (lcStatus == PagTenantLcStatus.terminated) {
+            continue; // skip terminated tenants
+          }
+
           String tenantName = barInfo['tenant_name'] ?? 'Unknown Tenant';
           String tenantLabel = barInfo['tenant_label'] ?? '';
+
           double assignedWidth =
               (tenantPercentage / 100.0) * maxAssignedWidth; // Calculate width
 
@@ -1057,8 +1080,8 @@ class _WgtMeterGroupAssignmentItemState
       String tenantLabel = tenantInfo?['label'] ?? '';
       String tenantLcStatus = tenantInfo?['lc_status'] ?? '';
       PagTenantLcStatus? tenantLcStatusEnum =
-          PagTenantLcStatus.byTag(tenantLcStatus);
-      tenantLcStatusEnum ??= PagTenantLcStatus.normal;
+          PagTenantLcStatus.byValue(tenantLcStatus);
+      // tenantLcStatusEnum ??= PagTenantLcStatus.normal;
       if (tenantInfo != null) {
         if (tenantLcStatusEnum == PagTenantLcStatus.normal ||
             tenantLcStatusEnum == PagTenantLcStatus.onbarding ||
