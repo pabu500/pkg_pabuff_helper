@@ -553,10 +553,11 @@ class _WgtTenantpAssignmentState extends State<WgtTenantpAssignment> {
     String meterGroupLabel = itemInfo['label'] ?? '-';
     String tenantName = itemInfo['tenant_name'] ?? '-';
     String tenantLabel = itemInfo['tenant_label'] ?? '-';
-    String tenantLcStatus = itemInfo['lc_status'] ?? '';
+    String? tenantLcStatus = itemInfo['tenant_lc_status'];
+
     PagTenantLcStatus? tenantLcStatusEnum =
-        PagTenantLcStatus.byTag(tenantLcStatus);
-    tenantLcStatusEnum ??= PagTenantLcStatus.normal;
+        PagTenantLcStatus.byValue(tenantLcStatus);
+
     bool assigned = itemInfo['assigned'] ?? false;
 
     BoxDecoration boxDecoration = BoxDecoration(
@@ -568,7 +569,7 @@ class _WgtTenantpAssignmentState extends State<WgtTenantpAssignment> {
       color: Theme.of(context).hintColor.withAlpha(150),
     );
 
-    bool disabled = false; //_hasTptMismatchAssignmentError;
+    bool disabled = tenantLcStatusEnum == PagTenantLcStatus.terminated;
 
     String disabledText = '';
     if (itemInfo['used_for_billing'] == true) {

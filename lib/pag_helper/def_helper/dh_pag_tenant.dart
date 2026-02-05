@@ -1,8 +1,6 @@
-import 'package:buff_helper/pag_helper/def_helper/dh_device.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:buff_helper/xt_ui/util/xt_util_InputFieldValidator.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
 
 import 'enum_helper.dart';
 
@@ -32,7 +30,7 @@ enum PagTenantLcStatus {
         (e) => (e).label,
       );
 
-  static PagTenantLcStatus byValue(String value) =>
+  static PagTenantLcStatus byValue(String? value) =>
       enumByLabel(
         value,
         values,
