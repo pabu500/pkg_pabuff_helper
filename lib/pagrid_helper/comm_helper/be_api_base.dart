@@ -124,7 +124,7 @@ class UrlBase {
   static const String _rDestPortalEvs2cp = 'https://cp2.evs.com.sg';
 
   static const String _dOresvcUrl = 'http://localhost:8018';
-  static const String _rOresvc = 'https://ore.evs.com.sg';
+  static const String _rOresvc = 'https://ore-op2.evs.com.sg';
   static const String _rDevOresvcNTU = _rOresvc;
   static const String _rProdOresvcUrlNTU = 'https://ore-ntu.evs.com.sg';
   static const String _rDevOresvcUrlSMRT = _rOresvc;
