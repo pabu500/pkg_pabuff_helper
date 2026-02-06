@@ -784,6 +784,14 @@ class _WgtMeterGroupAssignmentItemState
       final meterGroupAssignmentList =
           assignmentInfo['meter_tenant_assignment'];
       for (var meterGroupAssignment in meterGroupAssignmentList) {
+        final tenantInfo = meterGroupAssignment['tenant_info'];
+        final tenantLcStatusStr =
+            tenantInfo != null ? (tenantInfo['lc_status'] ?? '') : '';
+        final tenantLcStatus = PagTenantLcStatus.byValue(tenantLcStatusStr);
+        if (tenantLcStatus == PagTenantLcStatus.terminated) {
+          continue; // skip terminated tenants
+        }
+
         Map<String, dynamic> barInfo = {};
 
         if (meterGroupAssignment['meter_group_id'] ==
@@ -793,7 +801,6 @@ class _WgtMeterGroupAssignmentItemState
           barInfo['mg_self_percentage'] = percentageAssignedToThisItemGroup;
         }
 
-        final tenantInfo = meterGroupAssignment['tenant_info'];
         bool isAssignedToTenant = tenantInfo != null && tenantInfo.isNotEmpty;
         if (isAssignedToTenant) {
           tenantAssignmentList.add(tenantInfo);
@@ -815,7 +822,7 @@ class _WgtMeterGroupAssignmentItemState
     }
 
     String assignmentError = '';
-    if (totalTenantPercentage > 100.0) {
+    if (totalTenantPercentage > 99.99999) {
       assignmentError = 'overflow';
       tooltipMessage = '[ Total tenant percentage exceeds 100% ]\n';
       for (Map<String, dynamic> barInfo in assignmentBarList) {
@@ -932,7 +939,7 @@ class _WgtMeterGroupAssignmentItemState
     }
 
     bool disabled =
-        totalTenantPercentage >= 100.0 || itemInfo['is_fetching'] == true;
+        totalTenantPercentage > 99.99999 || itemInfo['is_fetching'] == true;
 
     bool checked = itemInfo['assigned_new'] ??
         itemInfo['assigned'] ??
