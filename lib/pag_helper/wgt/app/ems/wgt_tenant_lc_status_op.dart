@@ -145,8 +145,10 @@ class _WgtPagTenantLcStatusOpState extends State<WgtPagTenantLcStatusOp> {
         clickEnabled = false;
         break;
       case PagTenantLcStatus.normal:
+        clickEnabled = targetStatus != PagTenantLcStatus.onboarding;
         break;
       case PagTenantLcStatus.offboarding:
+        clickEnabled = targetStatus != PagTenantLcStatus.onboarding;
         break;
       case PagTenantLcStatus.terminated:
         clickEnabled = false;
