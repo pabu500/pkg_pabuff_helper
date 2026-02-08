@@ -783,6 +783,26 @@ class _WgtMeterGroupAssignmentItemState
     if (hasAssignmentInfo) {
       final meterGroupAssignmentList =
           assignmentInfo['meter_tenant_assignment'];
+      // sort terminated tenants to the end
+      meterGroupAssignmentList.sort((a, b) {
+        final tenantInfoA = a['tenant_info'];
+        final tenantInfoB = b['tenant_info'];
+        final lcStatusA =
+            tenantInfoA != null ? (tenantInfoA['lc_status'] ?? '') : '';
+        final lcStatusB =
+            tenantInfoB != null ? (tenantInfoB['lc_status'] ?? '') : '';
+        final statusA = PagTenantLcStatus.byValue(lcStatusA);
+        final statusB = PagTenantLcStatus.byValue(lcStatusB);
+        if (statusA == PagTenantLcStatus.terminated &&
+            statusB != PagTenantLcStatus.terminated) {
+          return 1; // A comes after B
+        } else if (statusA != PagTenantLcStatus.terminated &&
+            statusB == PagTenantLcStatus.terminated) {
+          return -1; // A comes before B
+        } else {
+          return 0; // No change in order
+        }
+      });
       for (var meterGroupAssignment in meterGroupAssignmentList) {
         final tenantInfo = meterGroupAssignment['tenant_info'];
         final tenantLcStatusStr =
@@ -822,7 +842,7 @@ class _WgtMeterGroupAssignmentItemState
     }
 
     String assignmentError = '';
-    if (totalTenantPercentage > 99.99999) {
+    if (totalTenantPercentage > 100.00001) {
       assignmentError = 'overflow';
       tooltipMessage = '[ Total tenant percentage exceeds 100% ]\n';
       for (Map<String, dynamic> barInfo in assignmentBarList) {
@@ -1091,7 +1111,7 @@ class _WgtMeterGroupAssignmentItemState
       // tenantLcStatusEnum ??= PagTenantLcStatus.normal;
       if (tenantInfo != null) {
         if (tenantLcStatusEnum == PagTenantLcStatus.normal ||
-            tenantLcStatusEnum == PagTenantLcStatus.onbarding ||
+            tenantLcStatusEnum == PagTenantLcStatus.onboarding ||
             tenantLcStatusEnum == PagTenantLcStatus.offboarding) {
           assignedToActiveTenantCount++;
         }

@@ -658,7 +658,7 @@ class _WgtAmMeterGroupAssignmentState extends State<WgtAmMeterGroupAssignment> {
       tenantLcStatusEnum ??= PagTenantLcStatus.normal;
       if (tenantInfo != null) {
         if (tenantLcStatusEnum == PagTenantLcStatus.normal ||
-            tenantLcStatusEnum == PagTenantLcStatus.onbarding ||
+            tenantLcStatusEnum == PagTenantLcStatus.onboarding ||
             tenantLcStatusEnum == PagTenantLcStatus.offboarding) {
           assignedToActiveTenantCount++;
         }
