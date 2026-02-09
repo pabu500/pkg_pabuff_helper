@@ -1,7 +1,8 @@
+import 'dart:developer' as dev;
+
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pag_helper/wgt/ls/wgt_item_delete_op.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../../pag_helper/def_helper/pag_item_helper.dart';
@@ -102,9 +103,9 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       _bill.addAll(billResult);
     } catch (err) {
       _pullFails++;
-      if (kDebugMode) {
-        print(err);
-      }
+
+      dev.log(err.toString());
+
       String errMsg = err.toString();
       if (errMsg.contains('valid tariff rate entry') ||
           errMsg.toLowerCase().contains('inconsistent usage info') ||
@@ -152,9 +153,8 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     bool pullData = _bill.isEmpty && !_gettingBill;
 
     if (_pullFails > 2) {
-      if (kDebugMode) {
-        print('item_group: pull fails more than $_pullFails times');
-      }
+      dev.log('item_group: pull fails more than $_pullFails times');
+
       pullData = false;
       return SizedBox(
         height: 60,
@@ -246,6 +246,12 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
                               _isDisabledPvRl =
                                   newStatus == PagBillingLcStatus.generated;
                               _lcStatusDisplay = newStatus;
+                              _showGenTypeSwitch =
+                                  newStatus == PagBillingLcStatus.pv ||
+                                      newStatus == PagBillingLcStatus.released;
+                              _showRenderModeSwitch =
+                                  newStatus == PagBillingLcStatus.pv ||
+                                      newStatus == PagBillingLcStatus.released;
                             });
                             widget.onUpdate?.call();
                           },
@@ -283,9 +289,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
                             (BuildContext context, AsyncSnapshot snapshot) {
                           switch (snapshot.connectionState) {
                             case ConnectionState.waiting:
-                              if (kDebugMode) {
-                                print('gen bill: pulling data');
-                              }
+                              dev.log('gen bill: pulling data');
                               return SizedBox(
                                 height: 200,
                                 child: Align(
@@ -957,6 +961,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
               'lineItemLabel1': compositeUsageCalc.getLineItem(0)?['label'],
               'lineItemValue1': compositeUsageCalc.getLineItem(0)?['amount'],
               'assetFolder': assetFolder,
+              'tenantSingularUsageInfoList': singularUsageList,
             },
           )
         : WgtPagTenantCompositeUsageSummaryReleased(

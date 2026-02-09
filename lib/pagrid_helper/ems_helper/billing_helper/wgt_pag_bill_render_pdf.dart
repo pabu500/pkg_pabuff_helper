@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as dev;
 
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
@@ -9,7 +10,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
 import 'dart:io';
 
-// import 'dart:html' as html;
 import 'package:web/web.dart' as web;
 
 import 'cw_bill/pag_pages_cw.dart';
@@ -90,9 +90,7 @@ class _WgtPagBillRenderPdfState extends State<WgtPagBillRenderPdf> {
           color: Theme.of(context).colorScheme.primary,
         ),
         onPrinted: (context) {
-          if (kDebugMode) {
-            print('Printed');
-          }
+          dev.log('Printed');
         },
         onShared: (context) {},
       ),
@@ -113,12 +111,6 @@ Future<void> generateAndSavePdfWeb(
     ..href = 'data:application/pdf;base64,$base64String'
     ..download = '$fileName.pdf'
     ..click();
-
-  // html.AnchorElement(
-  //     href:
-  //         "data:application/octet-stream;charset=utf-16le;base64,${base64.encode(fileInts)}")
-  //   ..setAttribute("download", '$fileName.pdf')
-  //   ..click();
 }
 
 Future<void> generateAndSavePdfMobile(
@@ -141,9 +133,9 @@ Future<void> _saveAsFile(
   final appDocDir = await getApplicationDocumentsDirectory();
   final appDocPath = appDocDir.path;
   final file = File('$appDocPath/document.pdf');
-  if (kDebugMode) {
-    print('Save as file ${file.path} ...');
-  }
+
+  dev.log('Save as file ${file.path} ...');
+
   await file.writeAsBytes(bytes);
   await OpenFile.open(file.path);
 }

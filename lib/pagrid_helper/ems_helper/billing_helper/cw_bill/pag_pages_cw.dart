@@ -63,6 +63,7 @@ Future<Uint8List> generatePagInvoice(
     lineItemLabel1: billInfo['lineItemLabel1'],
     lineItemValue1: billInfo['lineItemValue1'],
     assetFolder: billInfo['assetFolder'],
+    tenantSingularUsageInfoList: billInfo['tenantSingularUsageInfoList'],
     tax: .15,
     baseColor: PdfColors.teal,
     accentColor: PdfColors.blueGrey900,
@@ -114,6 +115,7 @@ class PagBill {
     required this.baseColor,
     required this.accentColor,
     required this.assetFolder,
+    required this.tenantSingularUsageInfoList,
   });
 
   final String customerLabel;
@@ -157,7 +159,7 @@ class PagBill {
   final PdfColor baseColor;
   final PdfColor accentColor;
   final String? assetFolder;
-
+  final List<Map<String, dynamic>> tenantSingularUsageInfoList;
   static const _darkColor = PdfColors.blueGrey800;
   static const _lightColor = PdfColors.white;
 
@@ -183,44 +185,33 @@ class PagBill {
     // _bgShape = await rootBundle.loadString('$assetFolder/invoice.svg');
 
     // Add page to the PDF
-    doc.addPage(
-      pw.MultiPage(
-        // theme: pw.ThemeData.withFont(icons: icons),
-        // theme: pw.ThemeData.withFont(
-        //   base: await PdfGoogleFonts.openSansRegular(),
-        //   bold: await PdfGoogleFonts.openSansBold(),
-        //   icons: await PdfGoogleFonts.materialIcons(), // this line
-        // ),
-        pageTheme: pw.PageTheme(
-          theme: pw.ThemeData.withFont(
-            base: await PdfGoogleFonts.openSansRegular(),
-            bold: await PdfGoogleFonts.openSansBold(),
-            icons: await PdfGoogleFonts.materialSymbolsOutlinedRegular(),
-          ),
-        ),
-        // _buildTheme(
-        //   pageFormat,
-        //   await PdfGoogleFonts.robotoRegular(),
-        //   await PdfGoogleFonts.robotoBold(),
-        //   await PdfGoogleFonts.robotoItalic(),
-        // ),
-        header: _buildHeader,
-        footer: _buildFooter,
-        build: (context) => [
-          _contentHeader(context),
-          _getBillTime(),
-          _getContent(context),
-          pw.SizedBox(height: 10),
-          // _contentFooter(context),
-          _getContentFooter(context),
-          pw.SizedBox(height: 10),
-          _termsAndConditions(context),
-        ],
-      ),
-    );
+    doc.addPage(await getPage1());
 
     // Return the PDF file content
     return doc.save();
+  }
+
+  Future<pw.MultiPage> getPage1() async {
+    return pw.MultiPage(
+      pageTheme: pw.PageTheme(
+        theme: pw.ThemeData.withFont(
+          base: await PdfGoogleFonts.openSansRegular(),
+          bold: await PdfGoogleFonts.openSansBold(),
+          icons: await PdfGoogleFonts.materialSymbolsOutlinedRegular(),
+        ),
+      ),
+      header: _buildHeader,
+      footer: _buildFooter,
+      build: (context) => [
+        _contentHeader(context),
+        _getBillTime(),
+        _getSingularList(),
+        // pw.SizedBox(height: 10),
+        // _getContentFooter(context),
+        // pw.SizedBox(height: 10),
+        // _termsAndConditions(context),
+      ],
+    );
   }
 
   pw.Widget _buildHeader(pw.Context context) {
@@ -676,6 +667,65 @@ class PagBill {
           _getLineItemRow(lineItemLabel1!, lineItemValue1!),
       ],
     );
+  }
+
+  pw.Widget _getSingularList() {
+    List<pw.Widget> singularStatList = [];
+    for (Map<String, dynamic> singularUsageInfo
+        in tenantSingularUsageInfoList) {
+      List<pw.Widget> typeStatList = [];
+      String slotFromTimestampStr = singularUsageInfo['from_timestamp'] ?? '';
+      String slotToTimestampStr = singularUsageInfo['to_timestamp'] ?? '';
+      String slotStr =
+          '  ${slotFromTimestampStr.substring(0, 10)} - ${slotToTimestampStr.substring(0, 10)}';
+      typeStatList.add(
+          _getTypeRow2(boltIcon, 'Electricity', 'kWh', singularUsageInfo, 'E'));
+      typeStatList
+          .add(_getTypeRow2(hvacIcon, 'BTU', 'kWh', singularUsageInfo, 'B'));
+      typeStatList
+          .add(_getTypeRow2(waterIcon, 'Water', 'CuM', singularUsageInfo, 'W'));
+      typeStatList.add(_getTypeRow2(
+          waterDropIcon, 'NeWater', 'CuM', singularUsageInfo, 'N'));
+      typeStatList
+          .add(_getTypeRow2(gasIcon, 'Gas', 'kWh', singularUsageInfo, 'G'));
+      singularStatList.add(pw.Container(
+        width: 500,
+        decoration: pw.BoxDecoration(
+          border: pw.Border.all(color: PdfColors.grey600, width: 1),
+          borderRadius: pw.BorderRadius.circular(5.0),
+        ),
+        margin: const pw.EdgeInsets.only(top: 8),
+        padding: const pw.EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+        child: pw.Column(
+          mainAxisSize: pw.MainAxisSize.min,
+          children: [
+            pw.SizedBox(height: 5),
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.start,
+              children: [
+                pw.Text(slotStr,
+                    style: pw.TextStyle(
+                        fontWeight: pw.FontWeight.bold,
+                        color: PdfColors.grey600,
+                        fontSize: 10)),
+              ],
+            ),
+            pw.SizedBox(height: 5),
+            ...typeStatList,
+          ],
+        ),
+      ));
+    }
+
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: singularStatList,
+    );
+  }
+
+  pw.Widget _getTypeRow2(int codePoint, String typeStr, String typeUnit,
+      Map<String, dynamic> singularUsageInfo, String typeKeyPrefix) {
+    return pw.Container();
   }
 
   pw.Widget _getLineItemRow(String label, double value) {
