@@ -175,7 +175,8 @@ String? validateSerialNumber(String val) {
   }
   // validate number, letter, underscore, and dash,
   // and minimum 5 characters
-  String pattern = r'^[a-zA-Z0-9_ -]{5,}$';
+  // String pattern = r'^[a-zA-Z0-9_ -]{5,}$';
+  String pattern = r'^[a-zA-Z0-9_<>\-/ ]{5,}$';
   RegExp regExp = RegExp(pattern);
   if (!regExp.hasMatch(val)) {
     return 'min length is 5 and letter, number, _, - only';
