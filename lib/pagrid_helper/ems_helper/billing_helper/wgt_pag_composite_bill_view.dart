@@ -339,7 +339,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     String? genType = _bill['gen_type'];
     String tenantName = _bill['tenant_name'];
     String tenantLabel = _bill['tenant_label'];
-    String accountId = _bill['tenant_alt_name'] ?? '';
+    String tenantAccountNumber = _bill['tenant_account_number'] ?? '';
     String tenantType = _bill['tenant_type'] ?? '';
     String fromTimestampStr = _bill['from_timestamp'];
     DateTime fromDatetime = getTargetDatetimeFromTargetStr(fromTimestampStr);
@@ -430,7 +430,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       return getReleaseRender(
           tenantName,
           tenantLabel,
-          accountId,
+          tenantAccountNumber,
           tenantType,
           fromTimestampStr,
           toTimestampStr,
@@ -445,7 +445,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       return getGeneratedRender(
           tenantName,
           tenantLabel,
-          accountId,
+          tenantAccountNumber,
           tenantType,
           fromTimestampStr,
           toTimestampStr,

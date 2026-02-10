@@ -28,7 +28,7 @@ Future<Uint8List> generatePagInvoice(
     billingRecName: billInfo['billingRecName'],
     customerLabel: billInfo['customerLabel'],
     customerName: billInfo['customerName'],
-    customerAccountId: billInfo['customerAccountId'] ?? '',
+    tenantAccountNumber: billInfo['customerAccountId'] ?? '',
     customerAddress: billInfo['customerAddress'] ?? '',
     customerType: billInfo['customerType'] ?? '',
     gst: billInfo['gst'],
@@ -75,7 +75,7 @@ Future<Uint8List> generatePagInvoice(
 class PagBill {
   PagBill({
     required this.customerName,
-    required this.customerAccountId,
+    required this.tenantAccountNumber,
     required this.customerLabel,
     required this.customerAddress,
     required this.customerType,
@@ -120,7 +120,7 @@ class PagBill {
 
   final String customerLabel;
   final String customerName;
-  final String customerAccountId;
+  final String tenantAccountNumber;
   final String customerAddress;
   final String customerType;
   final double? gst;
@@ -223,11 +223,6 @@ class PagBill {
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
             pw.SizedBox(
-              width: 250,
-              child: _getPayerInfo(),
-            ),
-            pw.Expanded(child: pw.Container()),
-            pw.SizedBox(
               width: 210,
               child: pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -235,6 +230,8 @@ class PagBill {
                 children: [_getLogo(), _getBillerInfo()],
               ),
             ),
+            pw.Expanded(child: pw.Container()),
+            pw.SizedBox(width: 250, child: _getPayerInfo()),
           ],
         ),
         if (context.pageNumber > 1) pw.SizedBox(height: 20)
@@ -315,19 +312,14 @@ class PagBill {
           child: pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                pw.Text('Issued on behalf of', style: textStyle),
-                // pw.Text('National University of Singapore', style: textStyle),
                 pw.SizedBox(height: 20),
-                pw.Text(
-                    customerType == 'cw_nus_internal'
-                        ? 'MEMO' //'UTILITES INVOICE'
-                        : 'TAX INVOICE',
+                pw.Text('TAX INVOICE',
                     style: pw.TextStyle(
                         color: _darkColor,
                         fontSize: 12,
                         fontWeight: pw.FontWeight.bold)),
                 pw.SizedBox(height: 5),
-                pw.Text(customerLabel,
+                pw.Text(/*customerLabel,*/ tenantAccountNumber,
                     style: pw.TextStyle(
                         color: _darkColor,
                         fontSize: 11,
@@ -345,45 +337,18 @@ class PagBill {
                 ]),
                 pw.SizedBox(height: 5),
                 pw.Row(children: [
-                  pw.Text('Account ID: ',
+                  pw.Text('Account Number: ',
                       style: pw.TextStyle(
                           fontSize: 10,
                           color: _darkColor,
                           fontWeight: pw.FontWeight.bold)),
-                  pw.Text(customerAccountId,
+                  pw.Text(tenantAccountNumber,
                       style:
                           const pw.TextStyle(color: _darkColor, fontSize: 10)),
                 ]),
                 pw.Text(customerAddress, style: textStyle),
               ]),
         ),
-        // pw.Expanded(child: pw.Container()),
-        // pw.SizedBox(height: 40),
-        // pw.SizedBox(
-        //   height: 40,
-        //   child: pw.Column(
-        //     crossAxisAlignment: pw.CrossAxisAlignment.start,
-        //     children: [
-        //       pw.Row(children: [
-        //         pw.Text('Billing Period: ',
-        //             style: pw.TextStyle(
-        //                 color: _darkColor, fontWeight: pw.FontWeight.bold)),
-        //         pw.Text(_getBillingPeriodStr(),
-        //             style:
-        //                 const pw.TextStyle(color: _darkColor, fontSize: 11)),
-        //       ]),
-        //       pw.SizedBox(height: 5),
-        //       pw.Row(children: [
-        //         pw.Text('Bill Date: ',
-        //             style: pw.TextStyle(
-        //                 color: _darkColor, fontWeight: pw.FontWeight.bold)),
-        //         pw.Text(_getBillDate(),
-        //             style:
-        //                 const pw.TextStyle(color: _darkColor, fontSize: 11)),
-        //       ]),
-        //     ],
-        //   ),
-        // ),
       ],
     );
   }
@@ -448,26 +413,6 @@ class PagBill {
             // pw.Text('750A Chai Chee Road \n#05-01, ESR BizPark @ Chai Chee\nSingapore 469001',style: textStyle),
             pw.Text('www.cwservices.sg', style: textStyle),
             pw.Text('contactcentre-emrs.sgp@cwservices.com', style: textStyle),
-            // pw.SizedBox(height: 5),
-            // pw.Container(
-            //   decoration: pw.BoxDecoration(
-            //     border: pw.Border.all(
-            //       color: accentColor,
-            //       width: 0.5,
-            //     ),
-            //   ),
-            //   padding:
-            //       const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-            //   child: pw.Column(
-            //     crossAxisAlignment: pw.CrossAxisAlignment.start,
-            //     children: [
-            //       // pw.Text('For billing enquiries:', style: textStyle),
-            //       pw.Text(
-            //           'Tel: +65 6354 4919 Fax: +65 6876 6496\ncontactcentre-emrs.sgp@cwservices.com',
-            //           style: textStyle),
-            //     ],
-            //   ),
-            // ),
           ],
         ));
   }

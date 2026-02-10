@@ -12,7 +12,7 @@ import 'dart:io';
 
 import 'package:web/web.dart' as web;
 
-import 'cw_bill/pag_pages_cw.dart';
+import 'cw_bill/pag_bill_pages_cw.dart';
 
 class WgtPagBillRenderPdf extends StatefulWidget {
   const WgtPagBillRenderPdf({
