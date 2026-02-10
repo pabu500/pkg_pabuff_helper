@@ -702,7 +702,7 @@ class _WgtTenantpAssignmentState extends State<WgtTenantpAssignment> {
       tenantLcStatusEnum ??= PagTenantLcStatus.normal;
       if (tenantInfo != null) {
         if (tenantLcStatusEnum == PagTenantLcStatus.normal ||
-            tenantLcStatusEnum == PagTenantLcStatus.onbarding ||
+            tenantLcStatusEnum == PagTenantLcStatus.onboarding ||
             tenantLcStatusEnum == PagTenantLcStatus.offboarding) {
           assignedToActiveTenantCount++;
         }

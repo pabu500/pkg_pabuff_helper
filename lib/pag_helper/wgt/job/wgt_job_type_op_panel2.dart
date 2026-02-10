@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as dev;
 
 import 'package:buff_helper/pag_helper/comm/comm_pag_job.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
@@ -9,7 +10,6 @@ import 'package:buff_helper/pag_helper/wgt/datetime/wgt_date_range_picker_monthl
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/xt_ui/wdgt/datetime/wgt_date_picker.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -70,7 +70,8 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
   bool _mainMeterSelected = true;
   bool _subMeterSelected = true;
 
-  DateTime? _selectedDate;
+  DateTime? _selectedDate1;
+  DateTime? _selectedDate2;
 
   Future<dynamic> _triggerJob() async {
     if (_isPosting) return;
@@ -94,8 +95,11 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
         'job_task_type': widget.jobTaskType,
         'scope_prefix': widget.jobScopeLabel ?? '',
       };
-      if (_selectedDate != null) {
-        jobRequest['selected_timestamp'] = _selectedDate!.toIso8601String();
+      if (_selectedDate1 != null) {
+        jobRequest['selected_timestamp'] = _selectedDate1!.toIso8601String();
+      }
+      if (_selectedDate2 != null) {
+        jobRequest['selected_timestamp_2'] = _selectedDate2!.toIso8601String();
       }
       if ((_selectedFromDate) != null && (_selectedToDate) != null) {
         jobRequest['from_timestamp'] = _selectedFromDate!.toIso8601String();
@@ -128,9 +132,8 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
 
       return result;
     } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
+      dev.log(e.toString());
+
       _postResultErrorText = 'Error posting task';
       if (e is TooManyRequestsException) {
         String remainingMillisStr = e.message;
@@ -158,7 +161,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
         _customDateRangeSelected = false;
         _monthPicked = null;
         _isMTD = false;
-        _selectedDate = null;
+        _selectedDate1 = null;
       }
     });
   }
@@ -171,7 +174,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
       case 'billing-task':
         return _selectedFromDate != null &&
             _selectedToDate != null &&
-            _selectedDate != null;
+            _selectedDate1 != null;
       case 'giro-file':
         return _selectedFromDate != null && _selectedToDate != null;
       default:
@@ -299,6 +302,20 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  SizedBox(
+                    width: 120,
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: Text(
+                        'Bill Date',
+                        style: TextStyle(
+                          color: Theme.of(context).hintColor,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                  horizontalSpaceSmall,
                   WgtDatePicker(
                     defaultFirstDate: leftMostDate,
                     defaultLastDate: rightMostDate,
@@ -308,7 +325,43 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
                     label: 'Set Bill Date',
                     onDateChanged: (DateTime selectedDate) {
                       setState(() {
-                        _selectedDate = selectedDate;
+                        _selectedDate1 = selectedDate;
+                      });
+                    },
+                  ),
+                ],
+              ),
+        verticalSpaceSmall,
+        (_selectedFromDate == null || _selectedToDate == null)
+            ? const SizedBox()
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    width: 120,
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: Text(
+                        'Collection Date',
+                        style: TextStyle(
+                          color: Theme.of(context).hintColor,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                  horizontalSpaceSmall,
+                  WgtDatePicker(
+                    defaultFirstDate: leftMostDate,
+                    defaultLastDate: rightMostDate,
+                    initialDate: initDate,
+                    timeZone:
+                        widget.loggedInUser.selectedScope.getProjectTimezone(),
+                    label: 'Set Collection Date',
+                    onDateChanged: (DateTime selectedDate) {
+                      setState(() {
+                        _selectedDate2 = selectedDate;
                       });
                     },
                   ),

@@ -5,10 +5,11 @@ import 'package:flutter/material.dart';
 import 'enum_helper.dart';
 
 enum PagTenantLcStatus {
-  onbarding('Onboarding', 'onb', 'onb', Colors.lightGreenAccent),
+  onboarding('Onboarding', 'onb', 'onb', Colors.lightGreen),
   normal('Normal', 'normal', 'norm', Colors.teal),
   offboarding('Offboarding', 'offb', 'offb', Colors.orange),
-  terminated('Terminated', 'terminated', 'term', Colors.red),
+  terminated('Terminated', 'terminated', 'term', Colors.brown),
+  mfd('MFD', 'mfd', 'mfd', Colors.red),
   ;
 
   const PagTenantLcStatus(
@@ -274,13 +275,26 @@ String? validateBankAccountNumber(String value) {
   return null;
 }
 
+// String? validatePaymentAmount(String value) {
+//   if (value.isEmpty) {
+//     return 'Payment amount is required';
+//   }
+//   // Add more validation logic if needed
+//   // numeric, 0 to 1 billion, up to 2 decimal places
+//   final RegExp numeric = RegExp(r'^\d{1,9}(\.\d{0,2})?$');
+//   if (!numeric.hasMatch(value)) {
+//     return 'Invalid payment amount format';
+//   }
+//   return null;
+// }
+
 String? validatePaymentAmount(String value) {
   if (value.isEmpty) {
     return 'Payment amount is required';
   }
   // Add more validation logic if needed
-  // numeric, 0 to 1 billion, up to 2 decimal places
-  final RegExp numeric = RegExp(r'^\d{1,9}(\.\d{0,2})?$');
+  // numeric, - 1 million, 0 to 1 billion, up to 2 decimal places
+  final RegExp numeric = RegExp(r'^-?\d{1,9}(\.\d{0,2})?$');
   if (!numeric.hasMatch(value)) {
     return 'Invalid payment amount format';
   }
@@ -956,4 +970,29 @@ List<Map<String, dynamic>> getListConfigBaseByOpType(PagTenantOpType opType) {
   //remove empty maps
   list.removeWhere((map) => map.isEmpty);
   return list;
+}
+
+Widget getTenantLcStatusTagWidget(
+  BuildContext ctx,
+  PagTenantLcStatus status, {
+  TextStyle? style,
+}) {
+  Color bgColor = status.color!;
+  return Container(
+    decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(3),
+        border: Border.all(
+          color: Theme.of(ctx).hintColor,
+        )),
+    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+    child: Text(
+      status.tag!,
+      style: style ??
+          const TextStyle(
+            color: Colors.white,
+            fontSize: 13.5,
+          ),
+    ),
+  );
 }

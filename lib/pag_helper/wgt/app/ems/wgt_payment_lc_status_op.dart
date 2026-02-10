@@ -47,7 +47,7 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
     fontWeight: FontWeight.bold,
   );
 
-  late PagPaymentLcStatus _selectedStatus;
+  late PagPaymentLcStatus _selectedLcStatus;
 
   bool _isCommitting = false;
   bool _isCommitted = false;
@@ -68,7 +68,7 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
         'value_timestamp': widget.paymentInfo['value_timestamp'],
         'credit_amount': widget.paymentInfo['amount'],
       },
-      'target_status': _selectedStatus.value,
+      'target_lc_status': _selectedLcStatus.value,
       'item_kind': PagItemKind.finance.name,
       'item_type': PagFinanceType.payment.name,
     };
@@ -86,12 +86,12 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
       PagPaymentLcStatus updatedStatus = PagPaymentLcStatus.byValue(newStatus);
 
       setState(() {
-        _selectedStatus = updatedStatus;
+        _selectedLcStatus = updatedStatus;
         _isCommitted = true;
       });
 
       widget.onCommitted?.call(updatedStatus);
-      dev.log('Payment LC status updated to $_selectedStatus');
+      dev.log('Payment LC status updated to $_selectedLcStatus');
     } catch (e) {
       dev.log('Error committing LC status: $e');
 
@@ -119,7 +119,7 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
   @override
   void initState() {
     super.initState();
-    _selectedStatus = widget.initialStatus;
+    _selectedLcStatus = widget.initialStatus;
   }
 
   @override
@@ -159,8 +159,8 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
       fontWeight: FontWeight.bold,
     );
 
-    bool clickEnabled = _selectedStatus != targetStatus;
-    bool highlighted = _selectedStatus == targetStatus;
+    bool clickEnabled = _selectedLcStatus != targetStatus;
+    bool highlighted = _selectedLcStatus == targetStatus;
     switch (widget.initialStatus) {
       case PagPaymentLcStatus.mfd:
         clickEnabled = false;
@@ -207,7 +207,7 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
           ? null
           : () {
               setState(() {
-                _selectedStatus = targetStatus;
+                _selectedLcStatus = targetStatus;
               });
             },
       child: Opacity(
@@ -215,7 +215,7 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
         child: getPaymentLcStatusTagWidget(
           context,
           targetStatus,
-          style: targetStatus == _selectedStatus
+          style: targetStatus == _selectedLcStatus
               ? tagTextStyleHighLight
               : tagTextStyle,
         ),
@@ -224,15 +224,15 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
   }
 
   Widget getCommitButton() {
-    if (_selectedStatus == widget.initialStatus) {
+    if (_selectedLcStatus == widget.initialStatus) {
       return Container();
     }
     if (_isCommitted) {
       return Container();
     }
 
-    bool targetIsMfd = _selectedStatus == PagPaymentLcStatus.mfd;
-    bool targetIsReleased = _selectedStatus == PagPaymentLcStatus.released;
+    bool targetIsMfd = _selectedLcStatus == PagPaymentLcStatus.mfd;
+    bool targetIsReleased = _selectedLcStatus == PagPaymentLcStatus.released;
     // bool targetIsMatched = _selectedStatus == PagPaymentLcStatus.matched;
     String itemRef = widget.paymentInfo['id'] ?? 'payment';
 

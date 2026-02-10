@@ -28,8 +28,10 @@ import 'dart:developer' as dev;
 import '../../comm/comm_fin_ops.dart';
 import '../../def_helper/dh_device.dart';
 import '../../def_helper/dh_pag_finance.dart';
+import '../../def_helper/dh_pag_tenant.dart';
 import '../../def_helper/tariff_package_helper.dart';
 import '../../model/mdl_pag_app_config.dart';
+import '../app/ems/wgt_tenant_lc_status_op.dart';
 import '../scope/wgt_scope_setter.dart';
 import '../tree/wgt_item_group_tree.dart';
 import '../user/wgt_op_reset_password.dart';
@@ -453,6 +455,10 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
                             fontWeight: FontWeight.w500,
                             color: Theme.of(context).hintColor),
                       ),
+                      SizedBox(
+                          width: 40,
+                          child: getCopyButton(context, _itemDisplayName ?? '',
+                              direction: 'left'))
                     ],
                   ),
                 ),
@@ -1022,6 +1028,65 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
                 setState(() {
                   _lcStatusOpsKey = UniqueKey();
                   // _bill['lc_status'] = newStatus.value;
+                  field['lc_status'] = newStatus.value;
+
+                  _lcStatusDisplay = newStatus;
+                });
+                dev.log('on committed: $newStatus');
+                widget.onUpdate?.call();
+              },
+            ),
+          ],
+        );
+      case PagItemKind.tenant:
+        _lcStatusDisplay ??= PagTenantLcStatus.byValue(lcStatusStr);
+        widget.itemInfoMap!['item_kind'] = widget.itemKind.name;
+
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            horizontalSpaceRegular,
+            if (_lcStatusDisplay == PagTenantLcStatus.mfd)
+              Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: WgtItemDeleteOp(
+                  appConfig: widget.appConfig,
+                  itemKind: PagItemKind.tenant,
+                  itemType: '',
+                  itemIndexStr: widget.itemIndexStr,
+                  itemDeleteRef: widget.itemIndexStr,
+                  onDeleting: () {
+                    setState(() {
+                      _isDeleting = true;
+                    });
+                  },
+                  onDeleted: (Map<String, dynamic> result) {
+                    setState(() {
+                      _isDeleting = false;
+                      if (result['error'] != null) {
+                        setState(() {
+                          _deleteResultText = result['error'];
+                        });
+                      } else {
+                        setState(() {
+                          _deleteResultText = 'Item deleted';
+                        });
+                      }
+                    });
+                    widget.onUpdate?.call();
+                  },
+                ),
+              ),
+            WgtPagTenantLcStatusOp(
+              key: _lcStatusOpsKey,
+              appConfig: widget.appConfig,
+              loggedInUser: _loggedInUser!,
+              enableEdit: true,
+              tenantInfo: widget.itemInfoMap!,
+              initialStatus: _lcStatusDisplay!,
+              onCommitted: (newStatus) {
+                setState(() {
+                  _lcStatusOpsKey = UniqueKey();
                   field['lc_status'] = newStatus.value;
 
                   _lcStatusDisplay = newStatus;

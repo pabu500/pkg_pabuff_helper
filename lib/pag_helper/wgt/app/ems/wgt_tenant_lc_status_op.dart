@@ -1,4 +1,4 @@
-import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/pag_bill_def.dart';
+import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'dart:developer' as dev;
 
@@ -6,17 +6,18 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../../pagrid_helper/batch_op_helper/wgt_confirm_box.dart';
-import '../../../comm/comm_pag_billing.dart';
+import '../../../comm/comm_tenant.dart';
+import '../../../def_helper/dh_pag_tenant.dart';
 import '../../../model/acl/mdl_pag_svc_claim.dart';
 import '../../../model/mdl_pag_app_config.dart';
 import '../../wgt_comm_button.dart';
 
-class WgtPagBillLcStatusOp extends StatefulWidget {
-  const WgtPagBillLcStatusOp({
+class WgtPagTenantLcStatusOp extends StatefulWidget {
+  const WgtPagTenantLcStatusOp({
     super.key,
     required this.appConfig,
     required this.loggedInUser,
-    required this.billInfo,
+    required this.tenantInfo,
     required this.initialStatus,
     this.onCommitted,
     this.enableEdit = false,
@@ -24,16 +25,16 @@ class WgtPagBillLcStatusOp extends StatefulWidget {
 
   final MdlPagAppConfig appConfig;
   final MdlPagUser? loggedInUser;
-  final Map<String, dynamic> billInfo;
-  final PagBillingLcStatus initialStatus;
+  final Map<String, dynamic> tenantInfo;
+  final PagTenantLcStatus initialStatus;
   final Function? onCommitted;
   final bool enableEdit;
 
   @override
-  State<WgtPagBillLcStatusOp> createState() => _WgtPagBillLcStatusOpState();
+  State<WgtPagTenantLcStatusOp> createState() => _WgtPagTenantLcStatusOpState();
 }
 
-class _WgtPagBillLcStatusOpState extends State<WgtPagBillLcStatusOp> {
+class _WgtPagTenantLcStatusOpState extends State<WgtPagTenantLcStatusOp> {
   late final tagTextStyle = TextStyle(
     color: Theme.of(context).colorScheme.onPrimary,
   );
@@ -43,7 +44,7 @@ class _WgtPagBillLcStatusOpState extends State<WgtPagBillLcStatusOp> {
     fontWeight: FontWeight.bold,
   );
 
-  late PagBillingLcStatus _selectedLcStatus = widget.initialStatus;
+  late PagTenantLcStatus _selectedLcStatus = widget.initialStatus;
 
   bool _isCommitting = false;
   String _errorText = '';
@@ -53,20 +54,18 @@ class _WgtPagBillLcStatusOpState extends State<WgtPagBillLcStatusOp> {
 
     final queryMap = {
       'scope': widget.loggedInUser?.selectedScope.toScopeMap(),
-      'bill_info': {
-        'tenant_id': widget.billInfo['tenant_id'],
-        'billing_rec_id': widget.billInfo['billing_rec_id'],
-        'bill_date_timestamp': widget.billInfo['bill_date_timestamp'],
-        'billed_total_amount': widget.billInfo['billed_total_amount'],
-        'billed_interest_amount': widget.billInfo['billed_interest_amount'],
+      'item_info': {
+        'item_id': widget.tenantInfo['id'],
+        'tenant_lc_status': widget.tenantInfo['lc_status'],
       },
+      'item_kind': PagItemKind.tenant.name,
       'target_lc_status': _selectedLcStatus.value,
     };
     try {
       _isCommitting = true;
       _errorText = '';
 
-      final result = await updateBillLcStatus(
+      final result = await updateTenantLcStatus(
           widget.appConfig,
           queryMap,
           MdlPagSvcClaim(
@@ -74,9 +73,9 @@ class _WgtPagBillLcStatusOpState extends State<WgtPagBillLcStatusOp> {
             target: '',
             operation: '',
           ));
-      dev.log('Bill Lc Status update result: $result');
+      dev.log('Tenant Lc Status update result: $result');
       final newStatus = result['lc_status'];
-      PagBillingLcStatus updatedStatus = PagBillingLcStatus.byValue(newStatus);
+      PagTenantLcStatus updatedStatus = PagTenantLcStatus.byValue(newStatus);
       setState(() {
         _selectedLcStatus = updatedStatus;
       });
@@ -107,13 +106,15 @@ class _WgtPagBillLcStatusOpState extends State<WgtPagBillLcStatusOp> {
         children: [
           Row(
             children: [
-              getLcStatusButton(PagBillingLcStatus.mfd),
+              getLcStatusButton(PagTenantLcStatus.mfd),
               horizontalSpaceLarge,
-              getLcStatusButton(PagBillingLcStatus.generated),
+              getLcStatusButton(PagTenantLcStatus.onboarding),
               Icon(Symbols.chevron_forward, color: Theme.of(context).hintColor),
-              getLcStatusButton(PagBillingLcStatus.pv),
+              getLcStatusButton(PagTenantLcStatus.normal),
               Icon(Symbols.chevron_forward, color: Theme.of(context).hintColor),
-              getLcStatusButton(PagBillingLcStatus.released),
+              getLcStatusButton(PagTenantLcStatus.offboarding),
+              Icon(Symbols.chevron_forward, color: Theme.of(context).hintColor),
+              getLcStatusButton(PagTenantLcStatus.terminated),
               getCommitButton(),
             ],
           ),
@@ -124,7 +125,7 @@ class _WgtPagBillLcStatusOpState extends State<WgtPagBillLcStatusOp> {
     );
   }
 
-  Widget getLcStatusButton(PagBillingLcStatus targetStatus) {
+  Widget getLcStatusButton(PagTenantLcStatus targetStatus) {
     final tagTextStyle = TextStyle(
       color: Theme.of(context).colorScheme.onPrimary,
     );
@@ -137,17 +138,19 @@ class _WgtPagBillLcStatusOpState extends State<WgtPagBillLcStatusOp> {
     bool clickEnabled = _selectedLcStatus != targetStatus;
     bool highlighted = _selectedLcStatus == targetStatus;
     switch (widget.initialStatus) {
-      case PagBillingLcStatus.mfd:
+      case PagTenantLcStatus.mfd:
         clickEnabled = false;
         break;
-      case PagBillingLcStatus.generated:
-        if (targetStatus == PagBillingLcStatus.released) {
-          clickEnabled = false;
-        }
+      case PagTenantLcStatus.onboarding:
+        clickEnabled = false;
         break;
-      case PagBillingLcStatus.pv:
+      case PagTenantLcStatus.normal:
+        clickEnabled = targetStatus != PagTenantLcStatus.onboarding;
         break;
-      case PagBillingLcStatus.released:
+      case PagTenantLcStatus.offboarding:
+        clickEnabled = targetStatus != PagTenantLcStatus.onboarding;
+        break;
+      case PagTenantLcStatus.terminated:
         clickEnabled = false;
         break;
       default:
@@ -163,7 +166,7 @@ class _WgtPagBillLcStatusOpState extends State<WgtPagBillLcStatusOp> {
             },
       child: Opacity(
         opacity: clickEnabled || highlighted ? 1.0 : 0.5,
-        child: getBillLcStatusTagWidget(
+        child: getTenantLcStatusTagWidget(
           context,
           targetStatus,
           style: targetStatus == _selectedLcStatus
@@ -179,10 +182,9 @@ class _WgtPagBillLcStatusOpState extends State<WgtPagBillLcStatusOp> {
       return Container();
     }
 
-    bool targetIsMfd = _selectedLcStatus == PagBillingLcStatus.mfd;
-    bool targetIsReleased = _selectedLcStatus == PagBillingLcStatus.released;
-    String itemRef =
-        widget.billInfo['billing_rec_name'] ?? 'unknown_bill_record';
+    bool targetIsMfd = _selectedLcStatus == PagTenantLcStatus.mfd;
+    bool targetIsTerminated = _selectedLcStatus == PagTenantLcStatus.terminated;
+    String itemRef = widget.tenantInfo['name'] ?? 'unknown_tenant_name';
 
     return Padding(
       padding: const EdgeInsets.only(left: 21),
@@ -190,7 +192,7 @@ class _WgtPagBillLcStatusOpState extends State<WgtPagBillLcStatusOp> {
         enabled: !_isCommitting && _errorText.isEmpty,
         label: 'Commit',
         onPressed: () async {
-          !targetIsMfd && !targetIsReleased
+          !targetIsMfd && !targetIsTerminated
               ? await _commit()
               : showDialog(
                   context: context,
@@ -198,14 +200,14 @@ class _WgtPagBillLcStatusOpState extends State<WgtPagBillLcStatusOp> {
                     return WgtConfirmBox(
                       title: targetIsMfd
                           ? 'MFD Confirmation'
-                          : 'Release Confirmation',
+                          : 'Terminate Confirmation',
                       message1:
                           'This operation is not reversible. Are you sure to proceed?',
                       message2:
                           'It\'s recommended to double check before proceeding',
-                      opName: targetIsMfd ? 'bill_mfd' : 'bill_release',
+                      opName: targetIsMfd ? 'tenant_mfd' : 'tenant_terminate',
                       keyInConfirmStrList: [
-                        targetIsMfd ? 'mfd' : 'release',
+                        targetIsMfd ? 'mfd' : 'terminate',
                         itemRef,
                       ],
                       itemCount: 1,

@@ -1,6 +1,7 @@
 // This file contains all the global variables and constants used in the app
 const int maxLoginNameLength = 30;
 const int maxFullNameLength = 50;
+const int maxRawFullNameLength = 100;
 const int maxEmailLength = 250;
 const int maxPhoneLength = 20;
 const int maxPasswordLength = 30;

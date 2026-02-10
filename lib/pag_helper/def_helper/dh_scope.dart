@@ -116,6 +116,10 @@ String? validateLabelScope(String val) {
   if (!regExp.hasMatch(val)) {
     return 'alphanumeric, space, /, -, ,, ., (), # only and length 3-255';
   }
+  //must contain -, _, or space
+  if (!val.contains('-') && !val.contains('_') && !val.contains(' ')) {
+    return 'must contain at least one of these characters: space, -, _';
+  }
   return null;
 }
 
