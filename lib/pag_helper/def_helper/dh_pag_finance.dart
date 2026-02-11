@@ -136,6 +136,31 @@ enum PaymentSoaType {
       normal;
 }
 
+Widget getPaymentSoaTypeTagWidget(
+  BuildContext ctx,
+  PaymentSoaType type, {
+  TextStyle? style,
+}) {
+  Color bgColor = type.color;
+  return Container(
+    decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(3),
+        border: Border.all(
+          color: Theme.of(ctx).hintColor,
+        )),
+    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+    child: Text(
+      type.tag,
+      style: style ??
+          const TextStyle(
+            color: Colors.white,
+            fontSize: 13.5,
+          ),
+    ),
+  );
+}
+
 enum PagSoaEntryType {
   initialBalance('Initial Balance', 'initial_balance', 'init', Colors.teal),
   tenantSoa('Bill', 'bill', 'bill', Colors.deepOrangeAccent),

@@ -3,6 +3,7 @@ import 'package:buff_helper/up_helper/helper/tenant_def.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../../pag_helper/def_helper/dh_pag_finance.dart';
 import '../../app_helper/pagrid_app_config.dart';
 
 Widget getTypeUsageStat(
@@ -697,62 +698,6 @@ Widget getTotal2(
               ],
             ),
           ),
-
-        // bal b/f
-        // if (balBfUsage != null && balBfUsage.abs() > -0.00001)
-        //   Padding(
-        //     padding: const EdgeInsets.only(top: 5),
-        //     child: Row(
-        //       mainAxisAlignment: MainAxisAlignment.start,
-        //       crossAxisAlignment: CrossAxisAlignment.center,
-        //       children: [
-        //         SizedBox(
-        //           width: 210,
-        //           child: Text(
-        //             'Bal. B/F (Usage)',
-        //             style: defStatStyle,
-        //           ),
-        //         ),
-        //         horizontalSpaceSmall,
-        //         getStatWithUnit(
-        //           getCommaNumberStr(
-        //               balBfUsage.abs() < 0.0001 ? balBfUsage : -1 * balBfUsage,
-        //               decimal: 2),
-        //           'SGD',
-        //           statStrStyle: defStatStyle.copyWith(
-        //             color:
-        //                 Theme.of(context).colorScheme.onSurface.withAlpha(210),
-        //           ),
-        //         ),
-        //       ],
-        //     ),
-        //   ),
-        // if (balBfInterest != null && balBfInterest.abs() > -0.00001)
-        //   Padding(
-        //     padding: const EdgeInsets.only(top: 5),
-        //     child: Row(
-        //       mainAxisAlignment: MainAxisAlignment.start,
-        //       crossAxisAlignment: CrossAxisAlignment.center,
-        //       children: [
-        //         SizedBox(
-        //           width: 210,
-        //           child: Text(
-        //             'Bal. B/F (Interest)',
-        //             style: defStatStyle,
-        //           ),
-        //         ),
-        //         horizontalSpaceSmall,
-        //         getStatWithUnit(
-        //           getCommaNumberStr(balBfInterest, decimal: 2),
-        //           'SGD',
-        //           statStrStyle: defStatStyle.copyWith(
-        //             color:
-        //                 Theme.of(context).colorScheme.onSurface.withAlpha(210),
-        //           ),
-        //         ),
-        //       ],
-        //     ),
-        //   ),
         Padding(
           padding: const EdgeInsets.only(top: 5),
           child: Row(
@@ -825,11 +770,12 @@ Widget getMiniSoA(List<Map<String, dynamic>> miniSoa, BuildContext context,
 
   List<Map<String, dynamic>> payment = [];
   for (var item in miniSoa) {
-    String? creditRemark = item['credit_remark'];
-    if ('initial_balance' == (creditRemark ?? '').toString().toLowerCase()) {
-      continue;
-    }
+    // String? creditRemark = item['credit_remark'];
+    // if ('initial_balance' == (creditRemark ?? '').toString().toLowerCase()) {
+    //   continue;
+    // }
     String? itemType = item['entry_type'];
+    String? paymentType = item['payment_type'] ?? 'normal';
     if (itemType != null && itemType == 'payment') {
       dynamic creditAmount = item['credit_amount'];
       if (creditAmount is String) {
@@ -848,6 +794,7 @@ Widget getMiniSoA(List<Map<String, dynamic>> miniSoa, BuildContext context,
         ...item,
         'amount': creditAmount,
         'payment_date': dateStr,
+        'payment_type': paymentType,
       });
     }
   }
@@ -864,6 +811,20 @@ Widget getMiniSoA(List<Map<String, dynamic>> miniSoa, BuildContext context,
   if (balCf.abs() < 0.00001) {
   } else {
     balCf = -1 * balCf;
+  }
+
+  if (payment.length == 1 &&
+      payment.first['payment_type'] == 'initial_balance') {
+    final paymentAmount = payment.first['amount'];
+    final billedTotalAmount = payment.first['billed_total_amount'];
+    double? billedTotalAmountDouble = 0.0;
+    if (billedTotalAmount is String) {
+      billedTotalAmountDouble = double.tryParse(billedTotalAmount);
+    } else if (billedTotalAmount is double) {
+      billedTotalAmountDouble = billedTotalAmount;
+    }
+    assert(billedTotalAmountDouble != null);
+    balCf = billedTotalAmountDouble! - paymentAmount;
   }
 
   return Column(
@@ -914,6 +875,14 @@ Widget getMiniSoA(List<Map<String, dynamic>> miniSoa, BuildContext context,
                   color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
                 ),
               ),
+              if (pay['payment_type'] == 'initial_balance')
+                Padding(
+                  padding: const EdgeInsets.only(left: 5),
+                  child: getPaymentSoaTypeTagWidget(
+                    context,
+                    PaymentSoaType.initialBalance,
+                  ),
+                ),
             ],
           ),
         ),
