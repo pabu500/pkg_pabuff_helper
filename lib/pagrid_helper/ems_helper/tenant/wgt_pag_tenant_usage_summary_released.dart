@@ -178,6 +178,8 @@ class _WgtPagTenantUsageSummaryReleasedState
                 widget.usageCalc.totalCost,
                 widget.tenantType,
                 [],
+                '',
+                '',
                 {},
               ),
           ],
