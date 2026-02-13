@@ -3,6 +3,7 @@ import 'dart:developer' as dev;
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pag_helper/wgt/ls/wgt_item_delete_op.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
+import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
 
 import '../../../pag_helper/def_helper/pag_item_helper.dart';
@@ -52,6 +53,7 @@ class WgtPagCompositeBillView extends StatefulWidget {
 
 class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
   final List<String> usageTypeTags = ['E', 'W', 'B', 'N', 'G'];
+  final defaultErrorText = 'Error getting bill';
 
   bool _gettingBill = false;
   int _pullFails = 0;
@@ -104,20 +106,26 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     } catch (err) {
       _pullFails++;
 
-      dev.log(err.toString());
+      // dev.log(err.toString());
 
-      String errMsg = err.toString();
-      if (errMsg.contains('valid tariff rate entry') ||
-          errMsg.toLowerCase().contains('inconsistent usage info') ||
-          errMsg.toLowerCase().contains('no tariff found')) {
-        _errorText = err.toString().replaceFirst('Exception: ', '');
-        _errorText = 'Vill Bill Error: $_errorText';
-      } else {
-        _errorText = 'Error getting bill';
-      }
+      // String errMsg = err.toString();
+      // if (errMsg.contains('valid tariff rate entry') ||
+      //     errMsg.toLowerCase().contains('inconsistent usage info') ||
+      //     errMsg.toLowerCase().contains('no tariff found')) {
+      //   _errorText = err.toString().replaceFirst('Exception: ', '');
+      //   _errorText = 'Vill Bill Error: $_errorText';
+      // } else {
+      //   _errorText = 'Error getting bill';
+      // }
+      dev.log('Error generating bill: $err');
+
+      _errorText = getErrorText(err, defaultErrorText: defaultErrorText);
     } finally {
       setState(() {
         _gettingBill = false;
+        if (_errorText.isNotEmpty) {
+          showInfoDialog(context, 'Error', _errorText);
+        }
       });
     }
   }
@@ -159,7 +167,8 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       return SizedBox(
         height: 60,
         child: Center(
-          child: getErrorTextPrompt(context: context, errorText: _errorText),
+          child:
+              getErrorTextPrompt(context: context, errorText: defaultErrorText),
         ),
       );
     }
