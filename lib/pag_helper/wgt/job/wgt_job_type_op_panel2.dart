@@ -174,7 +174,8 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
       case 'billing-task':
         return _selectedFromDate != null &&
             _selectedToDate != null &&
-            _selectedDate1 != null;
+            _selectedDate1 != null &&
+            _selectedDate2 != null;
       case 'giro-file':
         return _selectedFromDate != null && _selectedToDate != null;
       default:

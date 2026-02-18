@@ -46,6 +46,7 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
     fontSize: 25,
     fontWeight: FontWeight.bold,
   );
+  final String defaultErrorText = 'Error committing LC status';
 
   late PagPaymentLcStatus _selectedLcStatus;
 
@@ -95,8 +96,7 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
     } catch (e) {
       dev.log('Error committing LC status: $e');
 
-      _errorText =
-          getErrorText(e, defaultErrorText: 'Error committing LC status');
+      _errorText = getErrorText(e, defaultErrorText: defaultErrorText);
 
       // _errorText = e.toString();
       // if (_errorText.toLowerCase().contains('total applied amount')) {
@@ -143,7 +143,7 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
             ],
           ),
           if (_errorText.isNotEmpty)
-            getErrorTextPrompt(context: context, errorText: _errorText)
+            getErrorTextPrompt(context: context, errorText: defaultErrorText)
         ],
       ),
     );

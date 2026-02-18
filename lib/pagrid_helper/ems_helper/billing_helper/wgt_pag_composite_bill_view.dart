@@ -16,7 +16,7 @@ import '../tenant/tenant_usage_calc_released_r2.dart';
 import '../tenant/wgt_pag_tenant_composite_usage_summary_released.dart';
 import '../tenant/wgt_pag_tenant_usage_summary_released.dart';
 import '../../../pag_helper/model/acl/mdl_pag_svc_claim.dart';
-import 'pag_bill_def.dart';
+import '../../../pag_helper/def_helper/dh_pag_bill.dart';
 import 'wgt_pag_bill_render_pdf.dart';
 
 class WgtPagCompositeBillView extends StatefulWidget {

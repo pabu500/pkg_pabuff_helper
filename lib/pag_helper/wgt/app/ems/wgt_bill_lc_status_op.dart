@@ -1,4 +1,4 @@
-import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/pag_bill_def.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_pag_bill.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'dart:developer' as dev;
 
@@ -45,6 +45,8 @@ class _WgtPagBillLcStatusOpState extends State<WgtPagBillLcStatusOp> {
 
   late PagBillingLcStatus _selectedLcStatus = widget.initialStatus;
 
+  late final String defaultErrorText = 'Error committing LC status';
+
   bool _isCommitting = false;
   String _errorText = '';
 
@@ -55,6 +57,7 @@ class _WgtPagBillLcStatusOpState extends State<WgtPagBillLcStatusOp> {
       'scope': widget.loggedInUser?.selectedScope.toScopeMap(),
       'bill_info': {
         'tenant_id': widget.billInfo['tenant_id'],
+        'gen_type': widget.billInfo['gen_type'],
         'billing_rec_id': widget.billInfo['billing_rec_id'],
         'bill_date_timestamp': widget.billInfo['bill_date_timestamp'],
         'billed_total_amount': widget.billInfo['billed_total_amount'],
@@ -84,8 +87,7 @@ class _WgtPagBillLcStatusOpState extends State<WgtPagBillLcStatusOp> {
     } catch (e) {
       dev.log('Error committing LC status: $e');
 
-      _errorText =
-          getErrorText(e, defaultErrorText: 'Error committing LC status');
+      _errorText = getErrorText(e, defaultErrorText: defaultErrorText);
     } finally {
       _isCommitting = false;
       if (mounted) {
@@ -118,7 +120,7 @@ class _WgtPagBillLcStatusOpState extends State<WgtPagBillLcStatusOp> {
             ],
           ),
           if (_errorText.isNotEmpty)
-            getErrorTextPrompt(context: context, errorText: _errorText)
+            getErrorTextPrompt(context: context, errorText: defaultErrorText),
         ],
       ),
     );
