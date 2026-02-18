@@ -3,6 +3,7 @@ import 'dart:developer' as dev;
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pag_helper/wgt/ls/wgt_item_delete_op.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
+import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
 
 import '../../../pag_helper/def_helper/pag_item_helper.dart';
@@ -52,6 +53,7 @@ class WgtPagCompositeBillView extends StatefulWidget {
 
 class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
   final List<String> usageTypeTags = ['E', 'W', 'B', 'N', 'G'];
+  final defaultErrorText = 'Error getting bill';
 
   bool _gettingBill = false;
   int _pullFails = 0;
@@ -104,20 +106,26 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     } catch (err) {
       _pullFails++;
 
-      dev.log(err.toString());
+      // dev.log(err.toString());
 
-      String errMsg = err.toString();
-      if (errMsg.contains('valid tariff rate entry') ||
-          errMsg.toLowerCase().contains('inconsistent usage info') ||
-          errMsg.toLowerCase().contains('no tariff found')) {
-        _errorText = err.toString().replaceFirst('Exception: ', '');
-        _errorText = 'Vill Bill Error: $_errorText';
-      } else {
-        _errorText = 'Error getting bill';
-      }
+      // String errMsg = err.toString();
+      // if (errMsg.contains('valid tariff rate entry') ||
+      //     errMsg.toLowerCase().contains('inconsistent usage info') ||
+      //     errMsg.toLowerCase().contains('no tariff found')) {
+      //   _errorText = err.toString().replaceFirst('Exception: ', '');
+      //   _errorText = 'Vill Bill Error: $_errorText';
+      // } else {
+      //   _errorText = 'Error getting bill';
+      // }
+      dev.log('Error generating bill: $err');
+
+      _errorText = getErrorText(err, defaultErrorText: defaultErrorText);
     } finally {
       setState(() {
         _gettingBill = false;
+        if (_errorText.isNotEmpty) {
+          showInfoDialog(context, 'Error', _errorText);
+        }
       });
     }
   }
@@ -159,7 +167,8 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       return SizedBox(
         height: 60,
         child: Center(
-          child: getErrorTextPrompt(context: context, errorText: _errorText),
+          child:
+              getErrorTextPrompt(context: context, errorText: defaultErrorText),
         ),
       );
     }
@@ -349,7 +358,12 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     // final balBf = _bill['balance_bf'] ?? '0';
     // final balBfUsage = _bill['balance_bf_usage'] ?? '0';
     // final balBfInterest = _bill['balance_bf_interest'] ?? '0';
-    final miniSoa = _bill['mini_soa'] ?? [];
+    final miniSoaInfo = _bill['mini_soa_info'] ?? {};
+    final miniSoa = miniSoaInfo['mini_soa'] ?? [];
+    final previousCollectionDateTimestampStr =
+        miniSoaInfo['previous_collection_date_timestamp'] ?? '';
+    final currrentCollectionDateTimestampStr =
+        miniSoaInfo['current_collection_date_timestamp'] ?? '';
     final interestInfo = _bill['interest_info'] ?? {};
     String cycleStr = _bill['cycle_str'] ?? '';
     String billDate = _bill['bill_date_timestamp'] ?? '';
@@ -440,6 +454,8 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
           billDate,
           billBarFromMonth,
           minSoaList,
+          previousCollectionDateTimestampStr,
+          currrentCollectionDateTimestampStr,
           interestInfo);
     } else {
       return getGeneratedRender(
@@ -456,6 +472,8 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
           billBarFromMonth,
           lineItemList,
           minSoaList,
+          previousCollectionDateTimestampStr,
+          currrentCollectionDateTimestampStr,
           interestInfo);
     }
   }
@@ -474,6 +492,8 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     String billBarFromMonth,
     List<Map<String, dynamic>> lineItemList,
     List<Map<String, dynamic>>? miniSoa,
+    String previousCollectionDateTimestampStr,
+    String currrentCollectionDateTimestampStr,
     Map<String, dynamic>? interestInfo,
   ) {
     // sort time
@@ -724,6 +744,10 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             displayContextStr: widget.displayContextStr,
             tenantSingularUsageInfoList: singularUsageList,
             compositeUsageCalc: compositeUsageCalc,
+            previousCollectionDateTimestampStr:
+                previousCollectionDateTimestampStr,
+            currentCollectionDateTimestampStr:
+                currrentCollectionDateTimestampStr,
             isBillMode: widget.isBillMode,
             billInfo: _bill,
             showRenderModeSwitch: true,
@@ -767,6 +791,8 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     // String balBfUsageStr,
     // String balBfInterestStr,
     List<Map<String, dynamic>> miniSoa,
+    String previousCollectionDateTimestampStr,
+    String currentCollectionDateTimestampStr,
     Map<String, dynamic> interestInfo,
   ) {
     bool isMonthly = true; //_bill['is_monthly'] == 'true' ? true : false;
@@ -992,6 +1018,10 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             // meterTypeRates: billedRates,
             tenantSingularUsageInfoList: singularUsageList,
             compositeUsageCalc: compositeUsageCalc,
+            previousCollectionDateTimestampStr:
+                previousCollectionDateTimestampStr,
+            currentCollectionDateTimestampStr:
+                currentCollectionDateTimestampStr,
             excludeAutoUsage:
                 _bill['exclude_auto_usage'] == 'true' ? true : false,
             gst: billedGst,
