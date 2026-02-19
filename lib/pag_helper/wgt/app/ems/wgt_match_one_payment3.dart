@@ -1142,7 +1142,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
             ],
           ),
         ),
-        getPaymentApplyListOfThisBill(existingPaymentApplyInfoList),
+        getPaymentApplyListOfThisBill(existingPaymentApplyInfoList, billInfo),
       ],
     );
   }
@@ -1491,7 +1491,8 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
     );
   }
 
-  Widget getPaymentApplyListOfThisBill(dynamic existingPaymentApplyInfoList) {
+  Widget getPaymentApplyListOfThisBill(
+      dynamic existingPaymentApplyInfoList, Map<String, dynamic> billInfo) {
     List existingPaymentApplyInfoListTyped = [];
     if (existingPaymentApplyInfoList is List) {
       existingPaymentApplyInfoListTyped = existingPaymentApplyInfoList;
@@ -1499,6 +1500,10 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
     if (existingPaymentApplyInfoListTyped.isEmpty) {
       return Container();
     }
+
+    String billLabel = billInfo['label'] ?? '-';
+    String billedTotalCost = billInfo['billed_total_amount'] ?? '-';
+
     List<Widget> appliesWidgets = [];
     appliesWidgets.add(Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 5.0),
@@ -1511,7 +1516,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
             });
           },
           child: Text(
-            'Payment Applies (${existingPaymentApplyInfoListTyped.length})',
+            'Payment Applies (${existingPaymentApplyInfoListTyped.length}) for This Bill - $billLabel',
             style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
@@ -1524,11 +1529,10 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
       if (!_showExistingApplies) {
         break;
       }
-      String tenantLabel = applyInfo['tenant_label'] ?? '-';
-      String billLabel = applyInfo['bill_label'] ?? '-';
-      String billedTotalCost = applyInfo['billed_total_amount'] ?? '-';
+      // String tenantLabel = applyInfo['tenant_label'] ?? '-';
+
       String appliedTimestamp = applyInfo['applied_timestamp'] ?? '-';
-      String appliedByOpName = applyInfo['applied_by_op_username'] ?? '-';
+      String appliedByOpName = applyInfo['op_username'] ?? '-';
       String appliedUsageAmountFromPmtStr =
           applyInfo['usage_amount_from_payment'] ?? '-';
       String appliedInterestAmountFromPmtStr =
@@ -1552,22 +1556,22 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Text('Bill: ', style: keyStyle),
-                    Text(
-                      billLabel,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Text('Billed Total ', style: keyStyle),
-                    Text(billedTotalCost,
-                        style: const TextStyle(fontWeight: FontWeight.bold)),
-                  ],
-                ),
+                // Row(
+                //   children: [
+                //     Text('Bill: ', style: keyStyle),
+                //     Text(
+                //       billLabel,
+                //       style: const TextStyle(fontWeight: FontWeight.bold),
+                //     ),
+                //   ],
+                // ),
+                // Row(
+                //   children: [
+                //     Text('Billed Total ', style: keyStyle),
+                //     Text(billedTotalCost,
+                //         style: const TextStyle(fontWeight: FontWeight.bold)),
+                //   ],
+                // ),
                 Text('Applied by: $appliedByOpName at $appliedTimestamp',
                     style: keyStyle),
               ],
