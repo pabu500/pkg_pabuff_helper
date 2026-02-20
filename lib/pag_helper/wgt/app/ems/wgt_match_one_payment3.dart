@@ -434,13 +434,16 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
       if (outBucketThisPayment <= 0.0) {
         break;
       }
-
       // skip if bill is not released
       if (billInfo['lc_status'] != 'released') {
         continue;
       }
       // skip if bill is already fully paid
       if (billInfo['is_fully_paid_by_current_payment'] == true) {
+        continue;
+      }
+      // skip if the bill balance is already 0
+      if (_getBillBalanceToBePaid(billInfo) <= 0.00001) {
         continue;
       }
 
