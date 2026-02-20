@@ -172,6 +172,12 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
   }
 
   Future<dynamic> _commitApply() async {
+    if (_isCommitting ||
+        _isCommitted ||
+        _availablePaymentAmountToApply == null) {
+      return;
+    }
+
     final totalAppliedFromPayment = (_initialPaymentAmountToApply != null &&
             _availablePaymentAmountToApply != null)
         ? (_initialPaymentAmountToApply! - _availablePaymentAmountToApply!)
@@ -183,12 +189,12 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
       'payment_id': _paymentInfo['id'] ?? '',
       'apply_list': _paymentApplyInfoListNew,
     };
-
-    _isCommitting = true;
-    _isCommitted = false;
-    _commitErrorText = '';
-    _isPopulated = false;
-
+    setState(() {
+      _isCommitting = true;
+      _isCommitted = false;
+      _commitErrorText = '';
+      _isPopulated = false;
+    });
     try {
       final result = await commitPaymentApply(
           widget.appConfig,
@@ -1302,8 +1308,8 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
                   waitDuration: const Duration(milliseconds: 500),
                   child: IconButton(
                     onPressed: okToCommit
-                        ? () {
-                            _commitApply();
+                        ? () async {
+                            await _commitApply();
                           }
                         : null,
                     icon: Icon(Icons.cloud_upload,
