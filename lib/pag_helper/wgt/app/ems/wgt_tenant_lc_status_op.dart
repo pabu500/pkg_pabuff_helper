@@ -150,7 +150,7 @@ class _WgtPagTenantLcStatusOpState extends State<WgtPagTenantLcStatusOp> {
         break;
       case PagTenantLcStatus.offboarding:
         // clickEnabled = targetStatus != PagTenantLcStatus.onboarding;
-        clickEnabled = false; // requires offboarding flow
+        clickEnabled = targetStatus == PagTenantLcStatus.normal;
         break;
       case PagTenantLcStatus.terminated:
         clickEnabled = false;
