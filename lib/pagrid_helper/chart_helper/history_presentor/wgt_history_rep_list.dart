@@ -110,11 +110,14 @@ class _WgtHistoryRepListState extends State<WgtHistoryRepList> {
           'title': fieldKey['display_header'] ?? fieldKey['field'],
           'width': fieldKey['width'] ?? 150,
         });
-        _listConfig.add({
-          'fieldKey': '${fieldKey['field']}_diff',
-          'title': widget.valDiffTitle ?? '${fieldKey['field']}_diff',
-          'width': fieldKey['width'] ?? 150,
-        });
+        // only get usage / diff for val and skip usage for flow, power, volume, forward_temp and return_temp by cw nus requirement - yj
+        if (keyName == 'val') {
+          _listConfig.add({
+            'fieldKey': '${fieldKey['field']}_diff',
+            'title': widget.valDiffTitle ?? '${fieldKey['field']}_diff',
+            'width': fieldKey['width'] ?? 150,
+          });
+        }
         if (keyName == 'a_imp') {
           _listConfig.add({
             'fieldKey': 'a_imp_diff',
