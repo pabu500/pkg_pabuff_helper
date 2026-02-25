@@ -3,7 +3,6 @@ import 'dart:developer' as dev;
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pag_helper/wgt/ls/wgt_item_delete_op.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
-import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
 
 import '../../../pag_helper/def_helper/pag_item_helper.dart';
