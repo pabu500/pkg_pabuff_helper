@@ -421,6 +421,7 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
     final content = _gatewayHealthData['content'];
     final errorList = content['el'];
     final meterInfoList = _gatewayHealthData['meter_info_list'] ?? [];
+    final String lastOnlineTimestamp = _gatewayHealthData['gateway_last_online_timestamp'] ?? '';
 
     // sort by tag strings
     meterInfoList.sort((a, b) {
@@ -462,7 +463,7 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
       child: Column(
         children: [
           Tooltip(
-            message: 'Meter Group',
+            message: 'Meter Group, Last online time: $lastOnlineTimestamp',
             waitDuration: const Duration(milliseconds: 500),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -474,7 +475,7 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
                 horizontalSpaceTiny,
                 SizedBox(
                     width: valueWidth,
-                    child: Text(meterGroupLabel, style: valueStyle)),
+                    child: Text(meterGroupLabel + ' ($lastOnlineTimestamp)', style: valueStyle)),
               ],
             ),
           ),
