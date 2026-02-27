@@ -299,6 +299,29 @@ String? validateServiceType(String val) {
   return null;
 }
 
+String? validateMeterReadingValue(String val) {
+  val = val.trim();
+
+  if (val.isEmpty) {
+    return 'required';
+  }
+
+  // validate double value, can have decimal point
+  String pattern = r'^\d+(\.\d+)?$';
+  RegExp regExp = RegExp(pattern);
+  if (!regExp.hasMatch(val)) {
+    return 'invalid reading value';
+  }
+
+  // max value 1 billion
+  double? readingValue = double.tryParse(val);
+  if (readingValue == null || readingValue > 1000000000) {
+    return 'reading value must be less than 1 billion';
+  }
+
+  return null;
+}
+
 enum PagDeviceOpType {
   onboarding,
   update,

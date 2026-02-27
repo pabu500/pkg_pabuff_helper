@@ -1,6 +1,44 @@
 import 'package:flutter/material.dart';
 
-enum PagBillGenType { manual, auto }
+enum PagBillGenType {
+  manual('Manual', 'manual', 'm', Colors.orangeAccent),
+  auto('Auto', 'auto', 'a', Colors.teal),
+  initalBalance('Initial Balance', 'initial_balance', 'ini', Colors.lightGreen);
+
+  const PagBillGenType([this.label, this.value, this.tag, this.color]);
+
+  final String? label;
+  final String? tag;
+  final String? value;
+  final Color? color;
+
+  static PagBillGenType byLabel(String label) {
+    for (var type in values) {
+      if (type.label == label) {
+        return type;
+      }
+    }
+    throw Exception('Invalid label: $label');
+  }
+
+  static PagBillGenType byValue(String value) {
+    for (var type in values) {
+      if (type.value == value) {
+        return type;
+      }
+    }
+    throw Exception('Invalid value: $value');
+  }
+
+  static PagBillGenType byTag(String tag) {
+    for (var type in values) {
+      if (type.tag == tag) {
+        return type;
+      }
+    }
+    throw Exception('Invalid tag: $tag');
+  }
+}
 
 enum PagBillingLcStatus {
   generated('Generated', 'Gn', 'generated', Colors.teal),

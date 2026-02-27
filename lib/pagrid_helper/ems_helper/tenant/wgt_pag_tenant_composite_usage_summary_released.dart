@@ -4,7 +4,7 @@ import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
 
-import '../billing_helper/pag_bill_def.dart';
+import '../../../pag_helper/def_helper/dh_pag_bill.dart';
 import '../usage/pag_usage_stat_helper.dart';
 import '../usage/usage_stat_helper.dart';
 import 'pag_ems_type_usage_calc_released.dart';
@@ -44,6 +44,8 @@ class WgtPagTenantCompositeUsageSummaryReleased extends StatefulWidget {
     this.costDecimals = 3,
     this.tenantSingularUsageInfoList = const [],
     required this.compositeUsageCalc,
+    required this.previousCollectionDateTimestampStr,
+    required this.currentCollectionDateTimestampStr,
     this.onUpdate,
     this.interestInfo = const {},
   });
@@ -80,6 +82,8 @@ class WgtPagTenantCompositeUsageSummaryReleased extends StatefulWidget {
   final int costDecimals;
   final List<Map<String, dynamic>> tenantSingularUsageInfoList;
   final PagEmsTypeUsageCalcReleased? compositeUsageCalc;
+  final String previousCollectionDateTimestampStr;
+  final String currentCollectionDateTimestampStr;
   final Map<String, dynamic> interestInfo;
   final Function? onUpdate;
 
@@ -203,9 +207,9 @@ class _WgtPagTenantCompositeUsageSummaryReleasedState
                   widget.compositeUsageCalc!.gstAmount,
                   widget.compositeUsageCalc!.totalCost,
                   widget.tenantType,
-                  // widget.compositeUsageCalc!.balBfUsage,
-                  // widget.compositeUsageCalc!.balBfInterest,
                   widget.compositeUsageCalc!.miniSoa,
+                  widget.previousCollectionDateTimestampStr,
+                  widget.currentCollectionDateTimestampStr,
                   widget.interestInfo,
                   showInterestDetail: _showInterestDetail,
                   onCheckInterestDetail: () {

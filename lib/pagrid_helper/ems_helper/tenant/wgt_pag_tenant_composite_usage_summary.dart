@@ -1,9 +1,8 @@
 import 'package:buff_helper/pag_helper/model/mdl_history.dart';
-import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/pag_bill_def.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_pag_bill.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_ems_type_usage_calc.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/usage/pag_usage_stat_helper.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
-import 'package:flutter/foundation.dart';
 import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
@@ -42,6 +41,8 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
     // for rendering, not calculation
     this.tenantSingularUsageInfoList = const [],
     this.compositeUsageCalc,
+    this.previousCollectionDateTimestampStr = '',
+    this.currentCollectionDateTimestampStr = '',
     this.subTenantListUsageSummary = const [],
     // this.manualUsages = const [],
     this.isBillMode = false,
@@ -76,6 +77,8 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
   // final bool excludeAutoUsage;
   final List<Map<String, dynamic>> tenantSingularUsageInfoList;
   final PagEmsTypeUsageCalc? compositeUsageCalc;
+  final String previousCollectionDateTimestampStr;
+  final String currentCollectionDateTimestampStr;
   final List<Map<String, dynamic>> subTenantListUsageSummary;
   final bool isBillMode;
   final Map<String, dynamic> billInfo;
@@ -212,6 +215,8 @@ class _WgtPagTenantCompositeUsageSummaryState
                   widget.compositeUsageCalc!.totalCost,
                   widget.tenantType,
                   widget.compositeUsageCalc!.miniSoa,
+                  widget.previousCollectionDateTimestampStr,
+                  widget.currentCollectionDateTimestampStr,
                   widget.interestInfo,
                   width: statWidth,
                   showInterestDetail: _showInterestDetail,

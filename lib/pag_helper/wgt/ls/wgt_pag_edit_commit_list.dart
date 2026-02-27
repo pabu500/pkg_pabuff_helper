@@ -4,7 +4,7 @@ import 'package:buff_helper/pag_helper/def_helper/def_role.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_finance.dart';
 import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_controller.dart';
-import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/pag_bill_def.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_pag_bill.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/xt_ui/wdgt/list/evs2_list_text.dart';
 import 'package:buff_helper/xt_ui/wdgt/list/get_pagenation_bar.dart';
@@ -266,9 +266,7 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
     _width = widget.width ?? getListWidth();
     _listHeight = widget.height ?? widget.listItems.length * itemExt + itemExt;
 
-    if (kDebugMode) {
-      print('list width: $_width list height: $_listHeight');
-    }
+    dev.log('list width: $_width list height: $_listHeight');
 
     bool showPagination = widget.totalCount != null &&
         widget.currentPage != null &&
@@ -1104,6 +1102,13 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
       PagSoaEntryType entryType = PagSoaEntryType.byValue(tagText);
       tagLabel = entryType.tag;
       tagColor = entryType.color;
+    } else if (configItem['col_key'] == 'gen_type') {
+      if (widget.itemType == PagItemKind.bill) {
+        PagBillGenType billingGenType = PagBillGenType.byValue(tagText);
+        tagLabel = billingGenType.tag ?? '';
+        tagColor =
+            billingGenType.color?.withAlpha(130) ?? Colors.grey.withAlpha(130);
+      }
     } else {
       tagLabel = tagText;
     }

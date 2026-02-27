@@ -188,6 +188,8 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
                   widget.usageCalc!.totalCost,
                   widget.tenantType,
                   [],
+                  '',
+                  '',
                   {},
                   width: statWidth,
                 ),

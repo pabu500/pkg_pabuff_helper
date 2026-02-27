@@ -362,6 +362,7 @@ class PagUrlBase {
 
   // Tenant Manager
   static const String eptPagCreateTenant = '/ems/tenant/create_tenant';
+  static const String eptPagOffboardTenant = '/ems/tenant/offboard_tenant';
   static const String eptPagGetTenantMeterGroupList =
       '/ems/tenant/get_tenant_meter_group_list';
   static const String eptPagGetTenantScopeMeterGroupList =

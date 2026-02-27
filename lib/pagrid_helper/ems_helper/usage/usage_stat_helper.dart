@@ -3,6 +3,7 @@ import 'package:buff_helper/up_helper/helper/tenant_def.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../../pag_helper/def_helper/dh_pag_finance.dart';
 import '../../app_helper/pagrid_app_config.dart';
 
 Widget getTypeUsageStat(
@@ -624,6 +625,8 @@ Widget getTotal2(
     // double? balBfUsage,
     // double? balBfInterest,
     List<Map<String, dynamic>>? miniSoa,
+    String previousCollectionDateTimestampStr,
+    String currentCollectionDateTimestampStr,
     Map<String, dynamic> interestInfo,
     {Function? onCheckInterestDetail,
     bool showInterestDetail = false,
@@ -643,7 +646,13 @@ Widget getTotal2(
     ),
     child: Column(
       children: [
-        getMiniSoA(miniSoa ?? [], context, contentWidth),
+        getMiniSoA(
+          miniSoa ?? [],
+          previousCollectionDateTimestampStr,
+          currentCollectionDateTimestampStr,
+          context,
+          contentWidth,
+        ),
         if (applyGst)
           Padding(
             padding: const EdgeInsets.only(top: 10),
@@ -697,62 +706,6 @@ Widget getTotal2(
               ],
             ),
           ),
-
-        // bal b/f
-        // if (balBfUsage != null && balBfUsage.abs() > -0.00001)
-        //   Padding(
-        //     padding: const EdgeInsets.only(top: 5),
-        //     child: Row(
-        //       mainAxisAlignment: MainAxisAlignment.start,
-        //       crossAxisAlignment: CrossAxisAlignment.center,
-        //       children: [
-        //         SizedBox(
-        //           width: 210,
-        //           child: Text(
-        //             'Bal. B/F (Usage)',
-        //             style: defStatStyle,
-        //           ),
-        //         ),
-        //         horizontalSpaceSmall,
-        //         getStatWithUnit(
-        //           getCommaNumberStr(
-        //               balBfUsage.abs() < 0.0001 ? balBfUsage : -1 * balBfUsage,
-        //               decimal: 2),
-        //           'SGD',
-        //           statStrStyle: defStatStyle.copyWith(
-        //             color:
-        //                 Theme.of(context).colorScheme.onSurface.withAlpha(210),
-        //           ),
-        //         ),
-        //       ],
-        //     ),
-        //   ),
-        // if (balBfInterest != null && balBfInterest.abs() > -0.00001)
-        //   Padding(
-        //     padding: const EdgeInsets.only(top: 5),
-        //     child: Row(
-        //       mainAxisAlignment: MainAxisAlignment.start,
-        //       crossAxisAlignment: CrossAxisAlignment.center,
-        //       children: [
-        //         SizedBox(
-        //           width: 210,
-        //           child: Text(
-        //             'Bal. B/F (Interest)',
-        //             style: defStatStyle,
-        //           ),
-        //         ),
-        //         horizontalSpaceSmall,
-        //         getStatWithUnit(
-        //           getCommaNumberStr(balBfInterest, decimal: 2),
-        //           'SGD',
-        //           statStrStyle: defStatStyle.copyWith(
-        //             color:
-        //                 Theme.of(context).colorScheme.onSurface.withAlpha(210),
-        //           ),
-        //         ),
-        //       ],
-        //     ),
-        //   ),
         Padding(
           padding: const EdgeInsets.only(top: 5),
           child: Row(
@@ -803,7 +756,11 @@ Widget getTotal2(
   );
 }
 
-Widget getMiniSoA(List<Map<String, dynamic>> miniSoa, BuildContext context,
+Widget getMiniSoA(
+    List<Map<String, dynamic>> miniSoa,
+    String previousCollectionDateTimestampStr,
+    String currentCollectionDateTimestampStr,
+    BuildContext context,
     double contentWidth) {
   if (miniSoa.isEmpty) {
     return Container();
@@ -823,13 +780,19 @@ Widget getMiniSoA(List<Map<String, dynamic>> miniSoa, BuildContext context,
     balBf = -1 * balBf;
   }
 
-  List<Map<String, dynamic>> payment = [];
+  List<Map<String, dynamic>> paymentList = [];
   for (var item in miniSoa) {
-    String? creditRemark = item['credit_remark'];
-    if ('initial_balance' == (creditRemark ?? '').toString().toLowerCase()) {
+    // String? creditRemark = item['credit_remark'];
+    // if ('initial_balance' == (creditRemark ?? '').toString().toLowerCase()) {
+    //   continue;
+    // }
+    String? itemType = item['entry_type'];
+
+    // do not include initial balance payment (CPE-66)
+    String? paymentType = item['payment_type'] ?? 'normal';
+    if ('initial_balance' == paymentType) {
       continue;
     }
-    String? itemType = item['entry_type'];
     if (itemType != null && itemType == 'payment') {
       dynamic creditAmount = item['credit_amount'];
       if (creditAmount is String) {
@@ -844,10 +807,11 @@ Widget getMiniSoA(List<Map<String, dynamic>> miniSoa, BuildContext context,
         //get date only
         dateStr = dateStr.substring(0, 10);
       }
-      payment.add({
+      paymentList.add({
         ...item,
         'amount': creditAmount,
         'payment_date': dateStr,
+        'payment_type': paymentType,
       });
     }
   }
@@ -865,6 +829,23 @@ Widget getMiniSoA(List<Map<String, dynamic>> miniSoa, BuildContext context,
   } else {
     balCf = -1 * balCf;
   }
+
+  // if (paymentList.length == 1 &&
+  //     paymentList.first['payment_type'] == 'initial_balance') {
+  //   final paymentAmount = paymentList.first['amount'];
+  //   final billedTotalAmount = paymentList.first['billed_total_amount'];
+  //   double? billedTotalAmountDouble = 0.0;
+  //   if (billedTotalAmount is String) {
+  //     billedTotalAmountDouble = double.tryParse(billedTotalAmount);
+  //   } else if (billedTotalAmount is double) {
+  //     billedTotalAmountDouble = billedTotalAmount;
+  //   }
+  //   assert(billedTotalAmountDouble != null);
+  //   balCf = billedTotalAmountDouble! - paymentAmount;
+  // }
+
+  assert(previousCollectionDateTimestampStr.isNotEmpty);
+  assert(currentCollectionDateTimestampStr.isNotEmpty);
 
   return Column(
     children: [
@@ -892,7 +873,28 @@ Widget getMiniSoA(List<Map<String, dynamic>> miniSoa, BuildContext context,
           ],
         ),
       ),
-      for (var pay in payment)
+      Padding(
+        padding: const EdgeInsets.only(top: 5),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: contentWidth,
+              child: Text(
+                'Collection Date From:',
+                style: defStatStyle,
+              ),
+            ),
+            horizontalSpaceSmall,
+            Text(
+              previousCollectionDateTimestampStr.substring(0, 10),
+              style: defStatStyle,
+            ),
+          ],
+        ),
+      ),
+      for (var pay in paymentList)
         Padding(
           padding: const EdgeInsets.only(top: 5),
           child: Row(
@@ -914,9 +916,35 @@ Widget getMiniSoA(List<Map<String, dynamic>> miniSoa, BuildContext context,
                   color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
                 ),
               ),
+              if (pay['payment_type'] == 'initial_balance')
+                Padding(
+                  padding: const EdgeInsets.only(left: 5),
+                  child: getPaymentSoaTypeTagWidget(
+                    context,
+                    PaymentSoaType.initialBalance,
+                  ),
+                ),
             ],
           ),
         ),
+      Padding(
+        padding: const EdgeInsets.only(top: 5),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: contentWidth,
+              child: Text('Collection Date To:', style: defStatStyle),
+            ),
+            horizontalSpaceSmall,
+            Text(
+              currentCollectionDateTimestampStr.substring(0, 10),
+              style: defStatStyle,
+            ),
+          ],
+        ),
+      ),
       Padding(
         padding: const EdgeInsets.only(top: 5),
         child: Row(
