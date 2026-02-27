@@ -209,7 +209,7 @@ class PagUrlBase {
   static const String _rDevPpmsvcUrl = 'https://dev-ppmsvc.evs.com.sg';
 
   static const String _dOresvcUrl = 'http://localhost:8018';
-  static const String _rProdOresvc = 'https://ore-op2.web-ems.com';
+  static const String _rProdOresvc = 'https://oresvc2.web-ems.com';
   static const String _rTestOresvc = 'https://test-oresvc2.web-ems.com';
   static const String _rDevOresvc = 'https://dev-oresvc2.evs.com.sg';
   static const String _rDevOresvcNTU = _rDevOresvc;
