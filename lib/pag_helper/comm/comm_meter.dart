@@ -119,14 +119,14 @@ Future<dynamic> doPagCreateDevice(
   }
 }
 
-Future<dynamic> getMeterTsrReading(
+Future<dynamic> getMeterListAmrReadingInfo(
   MdlPagUser loggedInUser,
   MdlPagAppConfig appConfig,
   Map<String, dynamic> queryMap,
   MdlPagSvcClaim svcClaim,
 ) async {
   svcClaim.svcName = PagSvcType.oresvc2.name;
-  svcClaim.endpoint = PagUrlBase.eptGetMeterTsrReading;
+  svcClaim.endpoint = PagUrlBase.eptGetMeterListAmrInfo;
 
   String svcToken = '';
   // try {
@@ -145,8 +145,7 @@ Future<dynamic> getMeterTsrReading(
     body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
   );
 
-  if (response.statusCode == 201) {
-    // If the server did return a 201 CREATED response, parse the JSON.
+  if (response.statusCode == 200) {
     final responseBody = jsonDecode(response.body);
 
     if (responseBody['info'] != null) {
