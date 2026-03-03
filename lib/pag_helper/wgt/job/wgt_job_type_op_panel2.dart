@@ -306,7 +306,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   SizedBox(
-                    width: 120,
+                    width: 150,
                     child: Align(
                       alignment: Alignment.centerRight,
                       child: Text(
@@ -343,11 +343,11 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   SizedBox(
-                    width: 120,
+                    width: 150,
                     child: Align(
                       alignment: Alignment.centerRight,
                       child: Text(
-                        'Collection Date',
+                        'Collection End Date',
                         style: TextStyle(
                           color: Theme.of(context).hintColor,
                           fontSize: 16,
