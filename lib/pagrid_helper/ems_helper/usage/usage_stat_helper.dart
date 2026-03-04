@@ -625,8 +625,8 @@ Widget getTotal2(
     // double? balBfUsage,
     // double? balBfInterest,
     List<Map<String, dynamic>>? miniSoa,
-    String previousCollectionDateTimestampStr,
-    String currentCollectionDateTimestampStr,
+    String strCollectionStartDateTimestamp,
+    String strCollectionEndDateTimestamp,
     Map<String, dynamic> interestInfo,
     {Function? onCheckInterestDetail,
     bool showInterestDetail = false,
@@ -648,8 +648,8 @@ Widget getTotal2(
       children: [
         getMiniSoA(
           miniSoa ?? [],
-          previousCollectionDateTimestampStr,
-          currentCollectionDateTimestampStr,
+          strCollectionStartDateTimestamp,
+          strCollectionEndDateTimestamp,
           context,
           contentWidth,
         ),
@@ -758,8 +758,8 @@ Widget getTotal2(
 
 Widget getMiniSoA(
     List<Map<String, dynamic>> miniSoa,
-    String previousCollectionDateTimestampStr,
-    String currentCollectionDateTimestampStr,
+    String strCollectionStartDateTimestamp,
+    String strCollectionEndDateTimestamp,
     BuildContext context,
     double contentWidth) {
   if (miniSoa.isEmpty) {
@@ -842,8 +842,8 @@ Widget getMiniSoA(
     balCf = -1 * balCf;
   }
 
-  assert(previousCollectionDateTimestampStr.isNotEmpty);
-  assert(currentCollectionDateTimestampStr.isNotEmpty);
+  assert(strCollectionStartDateTimestamp.isNotEmpty);
+  assert(strCollectionEndDateTimestamp.isNotEmpty);
 
   return Column(
     children: [
@@ -880,13 +880,13 @@ Widget getMiniSoA(
             SizedBox(
               width: contentWidth,
               child: Text(
-                'Collection Date From:',
+                'Collection Date Start:',
                 style: defStatStyle,
               ),
             ),
             horizontalSpaceSmall,
             Text(
-              previousCollectionDateTimestampStr.substring(0, 10),
+              strCollectionStartDateTimestamp.substring(0, 10),
               style: defStatStyle,
             ),
           ],
@@ -937,7 +937,7 @@ Widget getMiniSoA(
             ),
             horizontalSpaceSmall,
             Text(
-              currentCollectionDateTimestampStr.substring(0, 10),
+              strCollectionEndDateTimestamp.substring(0, 10),
               style: defStatStyle,
             ),
           ],
@@ -1205,7 +1205,8 @@ Widget getInterestInfo(
               'TTI Start Ref Date: ${ttiStartRefDateTimestampStr.isNotEmpty ? ttiStartRefDateTimestampStr.substring(0, 10) : '-'}'),
           Text('TTI Days: ${ttiDaysInt ?? '-'} days'),
           Text(
-              'TTI of This Cycle: SGD${getCommaNumberStr(totalTheoreticalInterestToDateDouble, decimal: 2)}'),
+              'TTI of This Cycle: SGD${getCommaNumberStr(totalTheoreticalInterestToDateDouble, decimal: 2)}',
+              style: const TextStyle(fontWeight: FontWeight.bold)),
           verticalSpaceTiny,
           getPaymentApplyList(paymentApplyListCasted, context),
           Text(
