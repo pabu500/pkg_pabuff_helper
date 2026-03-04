@@ -1265,6 +1265,7 @@ Widget getPaymentApplyList(
     // final paymentTillCycleEndDays = payment['payment_till_cycle_end_days'];
     // final paymentTillCollectionEndDays =
     //     payment['payment_till_collection_end_days'];
+    final rieDays = payment['rie_days'];
     final paymentPlusOneDayTillCollectionEndDays =
         payment['payment_plus_one_day_till_collection_end_days'];
     final rieFromThisApply = payment['rie_from_this_apply'];
@@ -1325,6 +1326,12 @@ Widget getPaymentApplyList(
     // } else if (paymentTillCollectionEndDays is int) {
     //   paymentTillCollectionEndDaysInt = paymentTillCollectionEndDays;
     // }
+    int rieDaysInt = 0;
+    if (rieDays is String) {
+      rieDaysInt = int.tryParse(rieDays) ?? 0;
+    } else if (rieDays is int) {
+      rieDaysInt = rieDays;
+    }
     int paymentPlusOneDayTillCollectionEndDaysInt = -1;
     if (paymentPlusOneDayTillCollectionEndDays is String) {
       paymentPlusOneDayTillCollectionEndDaysInt =
@@ -1384,6 +1391,7 @@ Widget getPaymentApplyList(
           // Text( ' - Pmt Date + 1 till Collection End Days: $paymentTillCollectionEndDaysInt days'),
           Text(
               ' - Payment + 1 Day Till Collection End Days: $paymentPlusOneDayTillCollectionEndDaysInt days'),
+          Text(' - RIE Days from this Apply: $rieDaysInt days'),
           if (rieFromThisApplyDouble.abs() > 0.00001)
             Text(
                 ' - SGD${getCommaNumberStr(rieFromThisApplyDouble, decimal: 2)} RIE from this Apply',
