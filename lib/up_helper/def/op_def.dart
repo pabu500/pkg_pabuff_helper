@@ -44,6 +44,13 @@ enum ItemOpLifecycleStatus {
   bypassed,
 }
 
+enum MeterCommType {
+  mms,
+  evs2loop,
+  evs2mcu,
+  unknown,
+}
+
 enum ItemIsMain {
   yes,
   no,
@@ -358,3 +365,95 @@ String? validateTariffPrice(String? value) {
   }
   return null;
 }
+
+Map<String, dynamic> getCommTypeTag(row, fieldKey) {
+  if ((row['esim_id'] ?? '').isEmpty) {
+    return {};
+  }
+  if (row['esim_id'] == '-') {
+    return {};
+  }
+  String valueStr = row['esim_id'].toString().toLowerCase();
+  if (valueStr.length == 18 && valueStr.startsWith('89')) {
+    valueStr = 'mms';
+  }
+  MeterCommType? status = getMeterCommType(valueStr);
+  if (status == MeterCommType.unknown) {
+    return {};
+  }
+
+  return {
+    'tag': getCommTypeTagStr(valueStr),
+    'color': getMeterCommTypeColor(status.name),
+    'tooltip': getMeterCommTypeMessage(status.name),
+  };
+}
+
+String? getCommTypeTagStr(String? statusStr) {
+  // if ((statusStr ?? '').isEmpty) {
+  //   return null;
+  // }
+  MeterCommType? status = getMeterCommType(statusStr);
+
+  return meterCommTypeInfo[status]!['tag'];
+}
+
+String getMeterCommTypeMessage(String? statusStr) {
+  if (statusStr == null) {
+    return 'N/A';
+  }
+  MeterCommType? status = MeterCommType.values.byName(statusStr);
+
+  return meterCommTypeInfo[status]!['tooltip'];
+}
+
+Color getMeterCommTypeColor(String? statusStr) {
+  if (statusStr == null || statusStr.isEmpty) {
+    return Colors.transparent;
+  }
+  MeterCommType? status = MeterCommType.values.byName(statusStr);
+
+  return meterCommTypeInfo[status]!['color'];
+}
+
+MeterCommType getMeterCommType(String? statusStr) {
+  if (statusStr == null || statusStr.isEmpty) {
+    return MeterCommType.unknown;
+  }
+  if (statusStr == '-') {
+    return MeterCommType.unknown;
+  }
+  switch (statusStr) {
+    case 'mms':
+      return MeterCommType.mms;
+    case 'evs2_loop':
+      return MeterCommType.evs2loop;
+    case 'evs2_mcu':
+      return MeterCommType.evs2mcu;
+    default:
+      return MeterCommType.unknown;
+  }
+}
+
+final Map<MeterCommType, dynamic> meterCommTypeInfo = {
+  MeterCommType.mms: {
+    'tag': 'mms',
+    'color': Colors.brown,
+    'tooltip': 'MMS',
+  },
+  MeterCommType.evs2loop: {
+    'tag': 'evs2loop',
+    'color': Colors.orange,
+    'tooltip': 'EVS2-Loop',
+  },
+  MeterCommType.evs2mcu: {
+    'tag': 'evs2mcu',
+    'color': Colors.green,
+    'tooltip': 'EVS2-MCU',
+  },
+  MeterCommType.unknown: {
+    'tag': '',
+    'color': Colors.transparent,
+    'tooltip': '',
+  },
+};
