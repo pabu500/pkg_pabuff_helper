@@ -194,7 +194,7 @@ String? validateModel(String val) {
 
   // Pattern: int.int.int[.alphanumeric] or int.int.int[.int]
   // final pattern = r'^\d{1,3}\.\d{1,3}\.\d{1,3}(\.[A-Za-z0-9]+)?$';
-  final pattern = r'^(\d{1,3}\.\d{1,3}\.\d{1,3}(\.[A-Za-z0-9]+)?|[A-Za-z0-9]+)$';
+  final pattern = r'^(\d{1,3}\.\d{1,3}\.\d{1,3}(\.[A-Za-z0-9]+)?|[A-Za-z0-9]{3})$';
 
   final regExp = RegExp(pattern);
 
