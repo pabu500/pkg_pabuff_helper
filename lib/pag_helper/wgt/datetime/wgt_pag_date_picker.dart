@@ -1,5 +1,6 @@
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 class WgtPagDatePicker extends StatefulWidget {
@@ -17,6 +18,7 @@ class WgtPagDatePicker extends StatefulWidget {
     this.mainAxisAlignment = MainAxisAlignment.start,
     this.labelWhenDateIsSelected,
     this.required = false,
+    this.enableEdit = true,
   });
 
   final int timeZone;
@@ -31,6 +33,7 @@ class WgtPagDatePicker extends StatefulWidget {
   final MainAxisAlignment mainAxisAlignment;
   final String? labelWhenDateIsSelected;
   final bool required;
+  final bool enableEdit;
 
   @override
   State<WgtPagDatePicker> createState() => _WgtPagDatePickerState();
@@ -95,6 +98,11 @@ class _WgtPagDatePickerState extends State<WgtPagDatePicker> {
                     )),
               widget.prefix ?? Container(),
               InkWell(
+                onTap: !widget.enableEdit
+                    ? null
+                    : () {
+                        _selectDate(context);
+                      },
                 child: Text(_selectedDateText,
                     textAlign: TextAlign.center,
                     style: TextStyle(
@@ -103,32 +111,34 @@ class _WgtPagDatePickerState extends State<WgtPagDatePicker> {
                           ? Theme.of(context).hintColor
                           : null,
                     )),
-                onTap: () {
-                  _selectDate(context);
-                },
               ),
               _selectedDateTime == null
                   ? Container()
                   : IconButton(
                       icon: const Icon(Icons.clear),
                       tooltip: 'Tap to clear date',
-                      onPressed: () {
-                        if (widget.onDateCleared != null) {
-                          widget.onDateCleared!();
-                        }
-                        setState(() {
-                          _selectedDateText = widget.label ?? 'Select date';
-                          _selectedDateTime = null;
-                        });
-                      },
+                      onPressed: !widget.enableEdit
+                          ? null
+                          : () {
+                              if (widget.onDateCleared != null) {
+                                widget.onDateCleared!();
+                              }
+                              setState(() {
+                                _selectedDateText =
+                                    widget.label ?? 'Select date';
+                                _selectedDateTime = null;
+                              });
+                            },
                     ),
               IconButton(
                 icon: Icon(Icons.calendar_today,
                     color: Theme.of(context).colorScheme.primary),
                 tooltip: 'Tap to open date picker',
-                onPressed: () {
-                  _selectDate(context);
-                },
+                onPressed: !widget.enableEdit
+                    ? null
+                    : () {
+                        _selectDate(context);
+                      },
               ),
               widget.suffix ?? Container(),
             ],

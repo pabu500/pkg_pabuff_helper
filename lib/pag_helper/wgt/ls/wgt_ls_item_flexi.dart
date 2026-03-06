@@ -56,6 +56,7 @@ class WgtListSearchItemFlexi extends StatefulWidget {
     this.listController,
     this.selectedItemInfoList,
     this.onGetListInfoListResult,
+    this.onSearching,
     this.onResult,
     this.additionalColumnConfig,
     this.itemTypeListStr,
@@ -102,6 +103,7 @@ class WgtListSearchItemFlexi extends StatefulWidget {
   final UniqueKey? finderRefreshKey;
   final Function? onScopeTreeUpdate;
   final Function? validateTreeChildren;
+  final Function? onSearching;
   final bool isCompactFinder;
   final bool isSingleItemMode;
   final bool showList;
@@ -1501,6 +1503,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           setState(() {
             _isFetchingItemList = true;
           });
+          widget.onSearching?.call();
         },
         onClearSearch: () {
           _resetFinder();

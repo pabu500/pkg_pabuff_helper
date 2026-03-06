@@ -41,8 +41,8 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
     // for rendering, not calculation
     this.tenantSingularUsageInfoList = const [],
     this.compositeUsageCalc,
-    this.previousCollectionDateTimestampStr = '',
-    this.currentCollectionDateTimestampStr = '',
+    this.strCollectionStartDateTimestamp = '',
+    this.strCollectionEndDateTimestamp = '',
     this.subTenantListUsageSummary = const [],
     // this.manualUsages = const [],
     this.isBillMode = false,
@@ -77,8 +77,8 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
   // final bool excludeAutoUsage;
   final List<Map<String, dynamic>> tenantSingularUsageInfoList;
   final PagEmsTypeUsageCalc? compositeUsageCalc;
-  final String previousCollectionDateTimestampStr;
-  final String currentCollectionDateTimestampStr;
+  final String strCollectionStartDateTimestamp;
+  final String strCollectionEndDateTimestamp;
   final List<Map<String, dynamic>> subTenantListUsageSummary;
   final bool isBillMode;
   final Map<String, dynamic> billInfo;
@@ -215,8 +215,8 @@ class _WgtPagTenantCompositeUsageSummaryState
                   widget.compositeUsageCalc!.totalCost,
                   widget.tenantType,
                   widget.compositeUsageCalc!.miniSoa,
-                  widget.previousCollectionDateTimestampStr,
-                  widget.currentCollectionDateTimestampStr,
+                  widget.strCollectionStartDateTimestamp,
+                  widget.strCollectionEndDateTimestamp,
                   widget.interestInfo,
                   width: statWidth,
                   showInterestDetail: _showInterestDetail,

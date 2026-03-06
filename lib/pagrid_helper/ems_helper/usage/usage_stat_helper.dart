@@ -625,8 +625,8 @@ Widget getTotal2(
     // double? balBfUsage,
     // double? balBfInterest,
     List<Map<String, dynamic>>? miniSoa,
-    String previousCollectionDateTimestampStr,
-    String currentCollectionDateTimestampStr,
+    String strCollectionStartDateTimestamp,
+    String strCollectionEndDateTimestamp,
     Map<String, dynamic> interestInfo,
     {Function? onCheckInterestDetail,
     bool showInterestDetail = false,
@@ -648,8 +648,8 @@ Widget getTotal2(
       children: [
         getMiniSoA(
           miniSoa ?? [],
-          previousCollectionDateTimestampStr,
-          currentCollectionDateTimestampStr,
+          strCollectionStartDateTimestamp,
+          strCollectionEndDateTimestamp,
           context,
           contentWidth,
         ),
@@ -758,8 +758,8 @@ Widget getTotal2(
 
 Widget getMiniSoA(
     List<Map<String, dynamic>> miniSoa,
-    String previousCollectionDateTimestampStr,
-    String currentCollectionDateTimestampStr,
+    String strCollectionStartDateTimestamp,
+    String strCollectionEndDateTimestamp,
     BuildContext context,
     double contentWidth) {
   if (miniSoa.isEmpty) {
@@ -779,6 +779,18 @@ Widget getMiniSoA(
   } else {
     balBf = -1 * balBf;
   }
+
+  // sort by date ascending
+  for (var item in miniSoa) {
+    String strDate = item['entry_timestamp'] ?? '';
+    DateTime date = DateTime.tryParse(strDate) ?? DateTime(1970);
+    item['parsed_date'] = date;
+  }
+  miniSoa.sort((a, b) {
+    DateTime dateA = a['parsed_date'] ?? DateTime(1970);
+    DateTime dateB = b['parsed_date'] ?? DateTime(1970);
+    return dateA.compareTo(dateB);
+  });
 
   List<Map<String, dynamic>> paymentList = [];
   for (var item in miniSoa) {
@@ -830,22 +842,8 @@ Widget getMiniSoA(
     balCf = -1 * balCf;
   }
 
-  // if (paymentList.length == 1 &&
-  //     paymentList.first['payment_type'] == 'initial_balance') {
-  //   final paymentAmount = paymentList.first['amount'];
-  //   final billedTotalAmount = paymentList.first['billed_total_amount'];
-  //   double? billedTotalAmountDouble = 0.0;
-  //   if (billedTotalAmount is String) {
-  //     billedTotalAmountDouble = double.tryParse(billedTotalAmount);
-  //   } else if (billedTotalAmount is double) {
-  //     billedTotalAmountDouble = billedTotalAmount;
-  //   }
-  //   assert(billedTotalAmountDouble != null);
-  //   balCf = billedTotalAmountDouble! - paymentAmount;
-  // }
-
-  assert(previousCollectionDateTimestampStr.isNotEmpty);
-  assert(currentCollectionDateTimestampStr.isNotEmpty);
+  assert(strCollectionStartDateTimestamp.isNotEmpty);
+  assert(strCollectionEndDateTimestamp.isNotEmpty);
 
   return Column(
     children: [
@@ -882,13 +880,13 @@ Widget getMiniSoA(
             SizedBox(
               width: contentWidth,
               child: Text(
-                'Collection Date From:',
+                'Collection Date Start:',
                 style: defStatStyle,
               ),
             ),
             horizontalSpaceSmall,
             Text(
-              previousCollectionDateTimestampStr.substring(0, 10),
+              strCollectionStartDateTimestamp.substring(0, 10),
               style: defStatStyle,
             ),
           ],
@@ -939,7 +937,7 @@ Widget getMiniSoA(
             ),
             horizontalSpaceSmall,
             Text(
-              currentCollectionDateTimestampStr.substring(0, 10),
+              strCollectionEndDateTimestamp.substring(0, 10),
               style: defStatStyle,
             ),
           ],
@@ -1026,18 +1024,27 @@ Widget getInterestInfo(
     final billDate = bill['bill_date_timestamp'];
     final billedTotalAmount = bill['billed_total_amount'];
     final outstandingAmount = bill['outstanding_amount'];
+    final ttiRefAmount = bill['tti_ref_amount'];
     final ttiStartRefDateTimestamp = bill['tti_start_ref_date_timestamp'];
     final ttiDays = bill['tti_days'];
     final tti = bill['tti'];
     final tai = bill['tai'];
     final paymentTermDays = bill['payment_term_days'];
     final interestRate = bill['interest_rate'];
+    final dailyInterestRate = bill['daily_interest_rate'];
+    final gracePeriodDays = bill['grace_period_days'];
     final dueDate = bill['due_date_timestamp'];
+    final strInterestDurationType = bill['interest_duration_type'];
+    final interestStartDate = bill['interest_start_date_timestamp'];
+    final interestBearingDays = bill['interest_bearing_days'];
+    final strInterestStartDateType = bill['interest_start_date_type'];
     final totalOverdueDays = bill['total_overdue_days'];
     final paymentApplyList = bill['payment_apply_list'];
 
     final cycleStartDateTimestamp = bill['cycle_start_date_timestamp'];
     final cycleEndDateTimestamp = bill['cycle_end_date_timestamp'];
+    final colletionStartDateTimestamp = bill['collection_start_date_timestamp'];
+    final colletionEndDateTimestamp = bill['collection_end_date_timestamp'];
     final daysInCycle = bill['days_in_cycle'];
 
     List<Map<String, dynamic>> paymentApplyListCasted = [];
@@ -1060,6 +1067,12 @@ Widget getInterestInfo(
       outstandingAmountDouble = double.tryParse(outstandingAmount) ?? 0.0;
     } else if (outstandingAmount is double) {
       outstandingAmountDouble = outstandingAmount;
+    }
+    double ttiRefAmountDouble = 0.0;
+    if (ttiRefAmount is String) {
+      ttiRefAmountDouble = double.tryParse(ttiRefAmount) ?? 0.0;
+    } else if (ttiRefAmount is double) {
+      ttiRefAmountDouble = ttiRefAmount;
     }
     double totalTheoreticalInterestToDateDouble = 0.0;
     if (tti is String) {
@@ -1097,11 +1110,33 @@ Widget getInterestInfo(
     } else if (paymentTermDays is int) {
       paymentTermDaysInt = paymentTermDays;
     }
+
+    int gracePeriodDaysInt = 0;
+    if (gracePeriodDays is String) {
+      gracePeriodDaysInt = int.tryParse(gracePeriodDays) ?? 0;
+    } else if (gracePeriodDays is int) {
+      gracePeriodDaysInt = gracePeriodDays;
+    }
+
+    int interestBearingDaysInt = 0;
+    if (interestBearingDays is String) {
+      interestBearingDaysInt = int.tryParse(interestBearingDays) ?? 0;
+    } else if (interestBearingDays is int) {
+      interestBearingDaysInt = interestBearingDays;
+    }
+
     double interestRateDouble = 0.0;
     if (interestRate is String) {
       interestRateDouble = double.tryParse(interestRate) ?? 0.0;
     } else if (interestRate is double) {
       interestRateDouble = interestRate;
+    }
+
+    double dailyInterestRateDouble = 0.0;
+    if (dailyInterestRate is String) {
+      dailyInterestRateDouble = double.tryParse(dailyInterestRate) ?? 0.0;
+    } else if (dailyInterestRate is double) {
+      dailyInterestRateDouble = dailyInterestRate;
     }
 
     int? daysInCycleInt;
@@ -1139,22 +1174,39 @@ Widget getInterestInfo(
           Text('Bill Date: ${billDate.substring(0, 10)}'),
           Text(
               'Billed Total Amount: SGD${getCommaNumberStr(billedTotalAmountDouble, decimal: 2)}'),
-          Text('Payment Term: $paymentTermDaysInt days'),
-          Text('Due Date: ${dueDate.substring(0, 10)}'),
-          Text('Total Overdue Days: $totalOverdueDaysInt'),
-          Text('Interest Rate: ${interestRateDouble.toStringAsFixed(3)}%'),
           Text(
               'Cycle Start Date: ${cycleStartDateTimestamp.toString().substring(0, 10)}'),
           Text(
               'Cycle End Date: ${cycleEndDateTimestamp.toString().substring(0, 10)}'),
+          Text('Payment Term: $paymentTermDaysInt days'),
+          Text('Grace Period: $gracePeriodDaysInt days'),
+          Text('Due Date: ${dueDate.substring(0, 10)}'),
+          Text('Interest Start Date Type: $strInterestStartDateType'),
+          Text('Interest Start Date: ${interestStartDate.substring(0, 10)}'),
+          Text('Total Overdue Days: $totalOverdueDaysInt'),
+
+          Text('Interest Duration Type: $strInterestDurationType'),
+          Text('Interest Bearing Days: $interestBearingDaysInt days'),
+          Text('Interest Rate: ${interestRateDouble.toStringAsFixed(3)}%'),
+
+          Text(
+              'Daily Interest Rate: ${dailyInterestRateDouble.toStringAsFixed(3)}%'),
+
           // Text('Days in Cycle: $daysInCycleInt days'),
           Text(
+              'Collection Start Date: ${colletionStartDateTimestamp.toString().substring(0, 10)}'),
+          Text(
+              'Collection End Date: ${colletionEndDateTimestamp.toString().substring(0, 10)}'),
+          Text(
               'Outstanding Amount: SGD${getCommaNumberStr(outstandingAmountDouble, decimal: 2)}'),
+          Text(
+              'TTI Ref. Amount: SGD${getCommaNumberStr(ttiRefAmountDouble, decimal: 2)}'),
           Text(
               'TTI Start Ref Date: ${ttiStartRefDateTimestampStr.isNotEmpty ? ttiStartRefDateTimestampStr.substring(0, 10) : '-'}'),
           Text('TTI Days: ${ttiDaysInt ?? '-'} days'),
           Text(
-              'TTI of This Cycle: SGD${getCommaNumberStr(totalTheoreticalInterestToDateDouble, decimal: 2)}'),
+              'TTI of This Cycle: SGD${getCommaNumberStr(totalTheoreticalInterestToDateDouble, decimal: 2)}',
+              style: const TextStyle(fontWeight: FontWeight.bold)),
           verticalSpaceTiny,
           getPaymentApplyList(paymentApplyListCasted, context),
           Text(
@@ -1210,7 +1262,12 @@ Widget getPaymentApplyList(
     final reducedBilledUsageFromThisApply =
         payment['reduced_billed_usage_from_this_apply'];
     // final overdueDays = payment['overdue_days'];
-    final paymentTillCycleEndDays = payment['payment_till_cycle_end_days'];
+    // final paymentTillCycleEndDays = payment['payment_till_cycle_end_days'];
+    // final paymentTillCollectionEndDays =
+    //     payment['payment_till_collection_end_days'];
+    final rieDays = payment['rie_days'];
+    final paymentPlusOneDayTillCollectionEndDays =
+        payment['payment_plus_one_day_till_collection_end_days'];
     final rieFromThisApply = payment['rie_from_this_apply'];
 
     double appliedUsageAmountFromBalDouble = 0.0;
@@ -1254,12 +1311,37 @@ Widget getPaymentApplyList(
     // } else if (overdueDays is int) {
     //   overdueDaysInt = overdueDays;
     // }
-    int paymentTillCycleEndDaysInt = 0;
-    if (paymentTillCycleEndDays is String) {
-      paymentTillCycleEndDaysInt = int.tryParse(paymentTillCycleEndDays) ?? 0;
-    } else if (paymentTillCycleEndDays is int) {
-      paymentTillCycleEndDaysInt = paymentTillCycleEndDays;
+
+    // int paymentTillCycleEndDaysInt = 0;
+    // if (paymentTillCycleEndDays is String) {
+    //   paymentTillCycleEndDaysInt = int.tryParse(paymentTillCycleEndDays) ?? 0;
+    // } else if (paymentTillCycleEndDays is int) {
+    //   paymentTillCycleEndDaysInt = paymentTillCycleEndDays;
+    // }
+
+    // int paymentTillCollectionEndDaysInt = -1;
+    // if (paymentTillCollectionEndDays is String) {
+    //   paymentTillCollectionEndDaysInt =
+    //       int.tryParse(paymentTillCollectionEndDays) ?? -1;
+    // } else if (paymentTillCollectionEndDays is int) {
+    //   paymentTillCollectionEndDaysInt = paymentTillCollectionEndDays;
+    // }
+    int rieDaysInt = 0;
+    if (rieDays is String) {
+      rieDaysInt = int.tryParse(rieDays) ?? 0;
+    } else if (rieDays is int) {
+      rieDaysInt = rieDays;
     }
+    int paymentPlusOneDayTillCollectionEndDaysInt = -1;
+    if (paymentPlusOneDayTillCollectionEndDays is String) {
+      paymentPlusOneDayTillCollectionEndDaysInt =
+          int.tryParse(paymentPlusOneDayTillCollectionEndDays) ?? -1;
+    } else if (paymentPlusOneDayTillCollectionEndDays is int) {
+      paymentPlusOneDayTillCollectionEndDaysInt =
+          paymentPlusOneDayTillCollectionEndDays;
+    }
+    // assert(paymentPlusOneDayTillCollectionEndDaysInt > -1,
+    //     'Payment Date + 1 Day Till Collection End Days should be greater than or equal to -1 for payment with value timestamp $valueTimestamp');
     double rieFromThisApplyDouble = 0.0;
     if (rieFromThisApply is String) {
       rieFromThisApplyDouble = double.tryParse(rieFromThisApply) ?? 0.0;
@@ -1305,8 +1387,11 @@ Widget getPaymentApplyList(
             Text(
                 ' - SGD${getCommaNumberStr(reducedBilledUsageFromThisApplyDouble, decimal: 2)} reduced Billed Usage from this Apply'),
           // Text(' - Overdue Days at Payment: $overdueDaysInt days'),
+          // Text(' - Payment Till Cycle End Days: $paymentTillCycleEndDaysInt days'),
+          // Text( ' - Pmt Date + 1 till Collection End Days: $paymentTillCollectionEndDaysInt days'),
           Text(
-              ' - Payment Till Cycle End Days: $paymentTillCycleEndDaysInt days'),
+              ' - Payment + 1 Day Till Collection End Days: $paymentPlusOneDayTillCollectionEndDaysInt days'),
+          Text(' - RIE Days from this Apply: $rieDaysInt days'),
           if (rieFromThisApplyDouble.abs() > 0.00001)
             Text(
                 ' - SGD${getCommaNumberStr(rieFromThisApplyDouble, decimal: 2)} RIE from this Apply',

@@ -3,7 +3,6 @@ import 'dart:developer' as dev;
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pag_helper/wgt/ls/wgt_item_delete_op.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
-import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
 
 import '../../../pag_helper/def_helper/pag_item_helper.dart';
@@ -360,10 +359,10 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     // final balBfInterest = _bill['balance_bf_interest'] ?? '0';
     final miniSoaInfo = _bill['mini_soa_info'] ?? {};
     final miniSoa = miniSoaInfo['mini_soa'] ?? [];
-    final previousCollectionDateTimestampStr =
-        miniSoaInfo['previous_collection_date_timestamp'] ?? '';
-    final currrentCollectionDateTimestampStr =
-        miniSoaInfo['current_collection_date_timestamp'] ?? '';
+    final strCollectionStartDateTimestamp =
+        miniSoaInfo['collection_start_date_timestamp'] ?? '';
+    final strCollectionEndDateTimestamp =
+        miniSoaInfo['collection_end_date_timestamp'] ?? '';
     final interestInfo = _bill['interest_info'] ?? {};
     String cycleStr = _bill['cycle_str'] ?? '';
     String billDate = _bill['bill_date_timestamp'] ?? '';
@@ -454,8 +453,8 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
           billDate,
           billBarFromMonth,
           minSoaList,
-          previousCollectionDateTimestampStr,
-          currrentCollectionDateTimestampStr,
+          strCollectionStartDateTimestamp,
+          strCollectionEndDateTimestamp,
           interestInfo);
     } else {
       return getGeneratedRender(
@@ -472,8 +471,8 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
           billBarFromMonth,
           lineItemList,
           minSoaList,
-          previousCollectionDateTimestampStr,
-          currrentCollectionDateTimestampStr,
+          strCollectionStartDateTimestamp,
+          strCollectionEndDateTimestamp,
           interestInfo);
     }
   }
@@ -492,8 +491,8 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     String billBarFromMonth,
     List<Map<String, dynamic>> lineItemList,
     List<Map<String, dynamic>>? miniSoa,
-    String previousCollectionDateTimestampStr,
-    String currrentCollectionDateTimestampStr,
+    String strCollectionStartDateTimestamp,
+    String strCollectionEndDateTimestamp,
     Map<String, dynamic>? interestInfo,
   ) {
     // sort time
@@ -744,10 +743,8 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             displayContextStr: widget.displayContextStr,
             tenantSingularUsageInfoList: singularUsageList,
             compositeUsageCalc: compositeUsageCalc,
-            previousCollectionDateTimestampStr:
-                previousCollectionDateTimestampStr,
-            currentCollectionDateTimestampStr:
-                currrentCollectionDateTimestampStr,
+            strCollectionStartDateTimestamp: strCollectionStartDateTimestamp,
+            strCollectionEndDateTimestamp: strCollectionEndDateTimestamp,
             isBillMode: widget.isBillMode,
             billInfo: _bill,
             showRenderModeSwitch: true,

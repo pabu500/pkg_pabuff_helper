@@ -72,6 +72,8 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
 
   DateTime? _selectedDate1;
   DateTime? _selectedDate2;
+  UniqueKey? _date1PickerKey;
+  UniqueKey? _date2PickerKey;
 
   Future<dynamic> _triggerJob() async {
     if (_isPosting) return;
@@ -304,7 +306,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   SizedBox(
-                    width: 120,
+                    width: 150,
                     child: Align(
                       alignment: Alignment.centerRight,
                       child: Text(
@@ -318,6 +320,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
                   ),
                   horizontalSpaceSmall,
                   WgtDatePicker(
+                    key: _date1PickerKey,
                     defaultFirstDate: leftMostDate,
                     defaultLastDate: rightMostDate,
                     initialDate: initDate,
@@ -340,11 +343,11 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   SizedBox(
-                    width: 120,
+                    width: 150,
                     child: Align(
                       alignment: Alignment.centerRight,
                       child: Text(
-                        'Collection Date',
+                        'Collection End Date',
                         style: TextStyle(
                           color: Theme.of(context).hintColor,
                           fontSize: 16,
@@ -354,6 +357,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
                   ),
                   horizontalSpaceSmall,
                   WgtDatePicker(
+                    key: _date2PickerKey,
                     defaultFirstDate: leftMostDate,
                     defaultLastDate: rightMostDate,
                     initialDate: initDate,
@@ -458,6 +462,10 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
           _monthPicked = null;
 
           // _timePickerKey = UniqueKey();
+          _selectedDate1 = null;
+          _selectedDate2 = null;
+          _date1PickerKey = UniqueKey();
+          _date2PickerKey = UniqueKey();
         });
       },
       onMonthPicked: (selected) {
@@ -475,6 +483,11 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
               localNow.month == selected.month) {
             _isMTD = true;
           }
+
+          _selectedDate1 = null;
+          _selectedDate2 = null;
+          _date1PickerKey = UniqueKey();
+          _date2PickerKey = UniqueKey();
         });
       },
     );
