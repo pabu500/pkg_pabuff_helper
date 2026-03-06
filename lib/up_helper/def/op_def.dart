@@ -416,14 +416,17 @@ Color getMeterCommTypeColor(String? statusStr) {
   return meterCommTypeInfo[status]!['color'];
 }
 
-MeterCommType getMeterCommType(String? statusStr) {
-  if (statusStr == null || statusStr.isEmpty) {
+MeterCommType getMeterCommType(String? typeStr) {
+  if (typeStr == null || typeStr.isEmpty) {
     return MeterCommType.unknown;
   }
-  if (statusStr == '-') {
+  if (typeStr == '-') {
     return MeterCommType.unknown;
   }
-  switch (statusStr) {
+  if (typeStr.length == 18 && typeStr.startsWith('89')) {
+    return MeterCommType.mms;
+  }
+  switch (typeStr) {
     case 'mms':
       return MeterCommType.mms;
     case 'evs2_loop':
@@ -457,3 +460,26 @@ final Map<MeterCommType, dynamic> meterCommTypeInfo = {
     'tooltip': '',
   },
 };
+
+Widget getCommTypeTagWidget(MeterCommType commType) {
+  Map<String, dynamic> tagInfo = meterCommTypeInfo[commType] ?? {};
+
+  if (tagInfo.isEmpty) {
+    return Container();
+  }
+  return Container(
+    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+    decoration: BoxDecoration(
+      color: tagInfo['color'],
+      borderRadius: BorderRadius.circular(4),
+    ),
+    child: Text(
+      tagInfo['tag'],
+      style: const TextStyle(
+        color: Colors.white,
+        fontSize: 10,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+  );
+}
