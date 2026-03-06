@@ -446,7 +446,7 @@ final Map<MeterCommType, dynamic> meterCommTypeInfo = {
   },
   MeterCommType.evs2loop: {
     'tag': 'evs2loop',
-    'color': Colors.orange,
+    'color': Colors.orangeAccent.withAlpha(210),
     'tooltip': 'EVS2-Loop',
   },
   MeterCommType.evs2mcu: {
