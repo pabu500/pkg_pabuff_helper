@@ -33,7 +33,7 @@ dependencies:
   http: ^1.4.0
   shared_preferences: ^2.3.2
   flutter_secure_storage: ^9.2.2
-  flutter_signin_button: ^2.0.0
+  flutter_signin_button: ^2.1.1
   go_router: ^16.2.2
   url_launcher: ^6.3.2
   local_auth: ^2.2.0
