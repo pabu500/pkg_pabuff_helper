@@ -367,13 +367,13 @@ String? validateTariffPrice(String? value) {
 }
 
 Map<String, dynamic> getCommTypeTag(row, fieldKey) {
-  if ((row['esim_id'] ?? '').isEmpty) {
+  if ((row['comm_type'] ?? '').isEmpty) {
     return {};
   }
-  if (row['esim_id'] == '-') {
+  if (row['comm_type'] == '-') {
     return {};
   }
-  String valueStr = row['esim_id'].toString().toLowerCase();
+  String valueStr = row['comm_type'].toString().toLowerCase();
   if (valueStr.length == 18 && valueStr.startsWith('89')) {
     valueStr = 'mms';
   }
