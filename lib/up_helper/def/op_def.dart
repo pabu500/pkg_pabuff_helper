@@ -374,9 +374,9 @@ Map<String, dynamic> getCommTypeTag(row, fieldKey) {
     return {};
   }
   String valueStr = row['comm_type'].toString().toLowerCase();
-  if (valueStr.length == 18 && valueStr.startsWith('89')) {
-    valueStr = 'mms';
-  }
+  // if (valueStr.length == 18 && valueStr.startsWith('89')) {
+  //   valueStr = 'mms';
+  // }
   MeterCommType? status = getMeterCommType(valueStr);
   if (status == MeterCommType.unknown) {
     return {};
@@ -446,7 +446,7 @@ final Map<MeterCommType, dynamic> meterCommTypeInfo = {
   },
   MeterCommType.evs2loop: {
     'tag': 'evs2loop',
-    'color': Colors.orangeAccent.withAlpha(210),
+    'color': Colors.deepPurple.shade600,
     'tooltip': 'EVS2-Loop',
   },
   MeterCommType.evs2mcu: {
