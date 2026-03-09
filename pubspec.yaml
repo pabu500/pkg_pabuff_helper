@@ -32,8 +32,8 @@ dependencies:
   open_file: ^3.5.10
   http: ^1.4.0
   shared_preferences: ^2.3.2
-  # flutter_secure_storage: ^9.2.2
-  flutter_secure_storage: ^10.0.0
+  flutter_secure_storage: ^9.2.2
+  # flutter_secure_storage: ^10.0.0
   flutter_signin_button: ^2.0.0
   go_router: ^16.2.2
   url_launcher: ^6.3.2
