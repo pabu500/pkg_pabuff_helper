@@ -670,7 +670,115 @@ class PagBill {
 
   pw.Widget _getTypeRow2(int codePoint, String typeStr, String typeUnit,
       Map<String, dynamic> singularUsageInfo, String typeKeyPrefix) {
-    return pw.Container();
+    // return pw.Container();
+    pw.TextStyle textStyle = const pw.TextStyle(
+      color: _darkColor,
+      fontSize: 10,
+    );
+
+    double usage = singularUsageInfo['typeUsage$typeKeyPrefix'] ?? 0;
+    double rate = singularUsageInfo['typeRate$typeKeyPrefix'] ?? 0;
+    double cost = singularUsageInfo['typeCost$typeKeyPrefix'] ?? 0;
+
+    List<Map<String, dynamic>>? trending;
+
+    return pw.Container(
+        height: 95,
+        padding: const pw.EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+        decoration: pw.BoxDecoration(
+          border: pw.Border.all(
+            color: PdfColors.grey500,
+            width: 0.5,
+          ),
+        ),
+        child: pw.Row(
+          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: pw.CrossAxisAlignment.center,
+          children: [
+            pw.Padding(
+              padding: const pw.EdgeInsets.only(top: 10),
+              child: pw.SizedBox(
+                width: 350,
+                height: 95,
+                child: pw.Container(), //_getTrending(trending),
+              ),
+            ),
+            pw.SizedBox(
+              width: 100,
+              child: pw.Column(
+                mainAxisAlignment: pw.MainAxisAlignment.center,
+                children: [
+                  pw.Row(
+                    children: [
+                      pw.Icon(
+                        pw.IconData(codePoint),
+                        color: PdfColors.grey,
+                        size: 25,
+                      ),
+                      pw.Text(
+                        typeStr,
+                        style: pw.TextStyle(
+                          color: _darkColor,
+                          fontWeight: pw.FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  pw.Column(
+                    children: [
+                      pw.Row(
+                        mainAxisAlignment: pw.MainAxisAlignment.start,
+                        children: [
+                          pw.SizedBox(width: 3),
+                          // pw.Text(
+                          //   ' Usage: ',
+                          //   style: textStyle,
+                          // ),
+                          pw.Text(
+                            '${usage.toStringAsFixed(usageDecimals)} $typeUnit',
+                            style: textStyle,
+                          ),
+                        ],
+                      ),
+                      pw.Row(
+                        mainAxisAlignment: pw.MainAxisAlignment.start,
+                        children: [
+                          pw.Text(
+                            ' Rate: ',
+                            style: textStyle,
+                          ),
+                          pw.Text(
+                            '\$${rate.toStringAsFixed(rateDecimals)}',
+                            style: textStyle,
+                          ),
+                        ],
+                      ),
+                      pw.Row(
+                        mainAxisAlignment: pw.MainAxisAlignment.start,
+                        children: [
+                          pw.Text(
+                            ' Cost: ${_formatCurrency(cost)}',
+                            style: textStyle,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  // pw.SizedBox(
+                  //   width: 80,
+                  //   child: pw.Align(
+                  //     alignment: pw.Alignment.centerRight,
+                  //     child: pw.Text(
+                  //       _formatCurrency(cost),
+                  //       style: const pw.TextStyle(color: _darkColor),
+                  //     ),
+                  //   ),
+                  // ),
+                ],
+              ),
+            ),
+          ],
+        ));
   }
 
   pw.Widget _getLineItemRow(String label, double value) {
