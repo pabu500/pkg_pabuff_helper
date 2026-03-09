@@ -57,7 +57,7 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
   String _checkMeterErrorText = '';
   String _checkMeterMessage = '';
 
-  final Map<String, dynamic> _gatewayHealthData = {};
+  final Map<String, dynamic> _deviceHealthData = {};
   final Map<String, dynamic> _meterHealthData = {};
 
   Future<void> _fetchDeviceHealth() async {
@@ -87,9 +87,10 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
       if (result['info'] != null) {
         _message = result['message'];
       } else {
-        final gatewayHealthInfo = result['gateway_health_info'];
-        _gatewayHealthData.clear();
-        _gatewayHealthData.addAll(gatewayHealthInfo);
+        String healthInfoKey = '${widget.deviceCat.name}_health_info';
+        final healthInfo = result[healthInfoKey];
+        _deviceHealthData.clear();
+        _deviceHealthData.addAll(healthInfo);
       }
     } catch (e) {
       _errorText = 'Error getting device health info';
@@ -115,15 +116,31 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
       _checkMeterMessage = '';
     });
 
+    Map<String, dynamic> deviceInfo = {};
+    deviceInfo['meter_sn'] = _selectedMeterInfo['meter_sn'];
+    deviceInfo['meter_tag'] = _selectedMeterInfo['meter_tag'];
+    deviceInfo['device_cat'] = widget.deviceCat.name;
+
+    if(widget.deviceCat == PagDeviceCat.gateway){
+      deviceInfo['gateway_id'] = widget.deviceInfo['id'];
+      deviceInfo['gateway_tag'] = widget.deviceInfo['tag'];
+    } else if(widget.deviceCat == PagDeviceCat.mcu){
+      deviceInfo['mcu_id'] = widget.deviceInfo['id'];
+      deviceInfo['iccid'] = widget.deviceInfo['iccid'];
+    } else {
+      return ;
+    }
+
     Map<String, dynamic> queryMap = {
       'scope': widget.loggedInUser.selectedScope.toScopeMap(),
       'device_cat': PagDeviceCat.meter.name,
-      'device_info': {
-        'meter_sn': _selectedMeterInfo['meter_sn'],
-        'meter_tag': _selectedMeterInfo['meter_tag'],
-        'gateway_id': widget.deviceInfo['id'],
-        'gateway_tag': widget.deviceInfo['tag'],
-      },
+      'device_info': deviceInfo,
+      // {
+      //   'meter_sn': _selectedMeterInfo['meter_sn'],
+      //   'meter_tag': _selectedMeterInfo['meter_tag'],
+      //   'gateway_id': widget.deviceInfo['id'],
+      //   'gateway_tag': widget.deviceInfo['tag'],
+      // },
     };
 
     try {
@@ -148,7 +165,7 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
         String commCheckResult = _meterHealthData['comm_check_result'] ?? '';
         if (commCheckResult == 'ok') {
           // remove the meter tag from the error list
-          final content = _gatewayHealthData['content'];
+          final content = _deviceHealthData['content'];
           final errorList = content['el'] ?? [];
           for (var errMeterTag in errorList) {
             if (errMeterTag == _selectedMeterInfo['meter_tag']) {
@@ -159,7 +176,7 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
         }
         if (commCheckResult == 'fail') {
           // add the meter tag to the error list if not already there
-          final content = _gatewayHealthData['content'];
+          final content = _deviceHealthData['content'];
           final errorList = content['el'] ?? [];
           bool alreadyInList = false;
           for (var errMeterTag in errorList) {
@@ -186,7 +203,7 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
 
   @override
   Widget build(BuildContext context) {
-    bool fetch = _gatewayHealthData.isEmpty && !_isFetched;
+    bool fetch = _deviceHealthData.isEmpty && !_isFetched;
 
     if (_errorText.isNotEmpty) {
       return getErrorTextPrompt(context: context, errorText: _errorText);
@@ -251,21 +268,21 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
   }
 
   Widget completedWidget() {
-    if (_gatewayHealthData.isEmpty) {
+    if (_deviceHealthData.isEmpty) {
       return const SizedBox.shrink();
     }
 
-    String submittedTimestamp = _gatewayHealthData['submitted_timestamp'] ?? '';
-    final content = _gatewayHealthData['content'];
+    String submittedTimestamp = _deviceHealthData['submitted_timestamp'] ?? '';
+    final content = _deviceHealthData['content'];
     final version = content['v'];
     final temperature = content['t'];
     final signal = content['s'];
     final errorList = content['el'] ?? [];
 
     final meterGroupLabel =
-        _gatewayHealthData['meter_group_label'] ?? 'Unknown';
+        _deviceHealthData['meter_group_label'] ?? 'Unknown';
 
-    final meterInfoList = _gatewayHealthData['meter_info_list'] ?? [];
+    final meterInfoList = _deviceHealthData['meter_info_list'] ?? [];
 
     List<Map<String, dynamic>> issueList = [];
     for (var error in errorList) {
@@ -305,8 +322,8 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
   }
 
   Widget getTopStatPnl() {
-    String submittedTimestamp = _gatewayHealthData['submitted_timestamp'] ?? '';
-    final content = _gatewayHealthData['content'];
+    String submittedTimestamp = _deviceHealthData['submitted_timestamp'] ?? '';
+    final content = _deviceHealthData['content'];
     final version = content['v'];
     final temperature = content['t'];
     final signal = content['s'];
@@ -416,12 +433,12 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
 
   Widget getMeterGroupStatus() {
     final meterGroupLabel =
-        _gatewayHealthData['meter_group_label'] ?? 'Unknown';
+        _deviceHealthData['meter_group_label'] ?? 'Unknown';
 
-    final content = _gatewayHealthData['content'];
+    final content = _deviceHealthData['content'];
     final errorList = content['el'];
-    final meterInfoList = _gatewayHealthData['meter_info_list'] ?? [];
-    final String lastOnlineTimestamp = _gatewayHealthData['gateway_last_online_timestamp'] ?? '';
+    final meterInfoList = _deviceHealthData['meter_info_list'] ?? [];
+    final String lastOnlineTimestamp = _deviceHealthData['gateway_last_online_timestamp'] ?? '';
 
     // sort by tag strings
     meterInfoList.sort((a, b) {
@@ -541,12 +558,12 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
       return const SizedBox.shrink();
     }
 
-    final content = _gatewayHealthData['content'];
+    final content = _deviceHealthData['content'];
     final errorList = content['el'] ?? [];
-    final meterInfoList = _gatewayHealthData['meter_info_list'] ?? [];
+    final meterInfoList = _deviceHealthData['meter_info_list'] ?? [];
 
     String gatewayLastStatusQueryTimestampStr =
-        _gatewayHealthData['gateway_last_status_query_timestamp'] ?? '';
+        _deviceHealthData['gateway_last_status_query_timestamp'] ?? '';
     String meterLastStatusQueryTimestampStr =
         _meterHealthData['last_status_query_timestamp'] ?? '';
     if (meterLastStatusQueryTimestampStr.isEmpty) {
