@@ -1,5 +1,6 @@
 import 'package:buff_helper/pag_helper/model/mdl_history.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
+import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_ems_type_usage_calc_released.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 
 import 'package:flutter/material.dart';
@@ -8,7 +9,6 @@ import 'package:material_symbols_icons/symbols.dart';
 import '../usage/pag_usage_stat_helper.dart';
 import '../usage/usage_stat_helper.dart';
 import '../usage/wgt_pag_meter_stat_core.dart';
-import 'tenant_usage_calc_released_r2.dart';
 
 class WgtPagTenantUsageSummaryReleased extends StatefulWidget {
   const WgtPagTenantUsageSummaryReleased({
@@ -47,7 +47,7 @@ class WgtPagTenantUsageSummaryReleased extends StatefulWidget {
   final MdlPagUser loggedInUser;
   final Map<String, dynamic> billedUsageFactor;
   final String displayContextStr;
-  final EmsTypeUsageCalcReleasedR2 usageCalc;
+  final PagEmsTypeUsageCalcReleased usageCalc;
   final ItemType itemType;
   final bool isMonthly;
   final DateTime fromDatetime;
@@ -170,14 +170,15 @@ class _WgtPagTenantUsageSummaryReleasedState
             getLineItem(),
             verticalSpaceSmall,
             if (widget.isBillMode)
-              getTotal2(
+              getPagTotal(
                 context,
                 widget.gst!,
                 widget.usageCalc.subTotalCost,
                 widget.usageCalc.gstAmount,
                 widget.usageCalc.totalCost,
+                widget.usageCalc.payableAmount,
                 widget.tenantType,
-                [],
+                {},
                 '',
                 '',
                 {},

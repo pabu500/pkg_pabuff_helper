@@ -1,8 +1,10 @@
+import 'package:buff_helper/pagrid_helper/ems_helper/usage/usage_stat_helper.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/up_helper/helper/tenant_def.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../../pag_helper/def_helper/dh_pag_finance.dart';
 import '../../../pag_helper/model/mdl_history.dart';
 import '../../../pag_helper/model/mdl_pag_app_config.dart';
 import '../../../up_helper/helper/pag_meter_type_helper.dart';
@@ -480,169 +482,296 @@ Widget getPagTypeUsageNet(
   );
 }
 
+// Widget getPagTotal(
+//     BuildContext context,
+//     double? costE,
+//     double? costW,
+//     double? costB,
+//     double? costN,
+//     double? costG,
+//     double? costLineItems,
+//     double gst,
+//     String tenantType,
+//     {double width = 750.0}) {
+//   double? totalCost;
+//   if (costE != null) {
+//     totalCost = (totalCost ?? 0) + costE;
+//   }
+//   if (costW != null) {
+//     totalCost = (totalCost ?? 0) + costW;
+//   }
+//   if (costB != null) {
+//     totalCost = (totalCost ?? 0) + costB;
+//   }
+//   if (costN != null) {
+//     totalCost = (totalCost ?? 0) + costN;
+//   }
+//   if (costG != null) {
+//     totalCost = (totalCost ?? 0) + costG;
+//   }
+//   if (costLineItems != null) {
+//     totalCost = (totalCost ?? 0) + costLineItems;
+//   }
+//   double? subTotalAmt = totalCost;
+//   if (subTotalAmt != null) {
+//     // subTotalAmt = getRoundUp(subTotalAmt, 2);
+//     // subTotalAmt = getRound(subTotalAmt, 2);
+//   }
+//   double? totalAmt = subTotalAmt;
+//   bool applyGst = false;
+//   double? gstAmt;
+//   if (TenantType.cw_nus_internal != getTenantType(tenantType)) {
+//     applyGst = true;
+//     if (subTotalAmt != null && gst != null) {
+//       subTotalAmt = getRound(subTotalAmt, 2);
+//       gstAmt = subTotalAmt * gst / 100;
+//       gstAmt = getRoundUp(gstAmt, 2);
+//       // total = subTotal + subTotal * (gst / 100);
+//       totalAmt = subTotalAmt + gstAmt;
+//     }
+//   } else {
+//     applyGst = false;
+//     if (subTotalAmt != null) {
+//       totalAmt = getRoundUp(subTotalAmt, 2);
+//     }
+//   }
+//   return Container(
+//     width: width,
+//     // height: 80,
+//     padding: const EdgeInsets.symmetric(horizontal: 21),
+//     // constraints: const BoxConstraints(maxHeight: 130),
+//     decoration: BoxDecoration(
+//       border:
+//           Border.all(color: Theme.of(context).colorScheme.primary, width: 1),
+//       borderRadius: BorderRadius.circular(5.0),
+//     ),
+//     child: Column(
+//       children: [
+//         if (applyGst)
+//           Padding(
+//             padding: const EdgeInsets.only(top: 10),
+//             child: Row(
+//               mainAxisAlignment: MainAxisAlignment.start,
+//               crossAxisAlignment: CrossAxisAlignment.center,
+//               children: [
+//                 SizedBox(
+//                   width: 210,
+//                   child: Text(
+//                     'Sub Total',
+//                     style: defStatStyle,
+//                   ),
+//                 ),
+//                 horizontalSpaceSmall,
+//                 getStatWithUnit(
+//                   getCommaNumberStr(subTotalAmt, decimal: 2),
+//                   'SGD',
+//                   statStrStyle: defStatStyle.copyWith(
+//                     color: Theme.of(context)
+//                         .colorScheme
+//                         .onSurface
+//                         .withOpacity(0.7),
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//         if (applyGst)
+//           Padding(
+//             padding: const EdgeInsets.only(top: 5),
+//             child: Row(
+//               mainAxisAlignment: MainAxisAlignment.start,
+//               crossAxisAlignment: CrossAxisAlignment.center,
+//               children: [
+//                 SizedBox(
+//                   width: 210,
+//                   child: Text(
+//                     'GST ($gst%)',
+//                     style: defStatStyle,
+//                   ),
+//                 ),
+//                 horizontalSpaceSmall,
+//                 getStatWithUnit(
+//                   // getCommaNumberStr(subTotal * (gst / 100), decimal: 2),
+//                   getCommaNumberStr(gstAmt, decimal: 2),
+//                   'SGD',
+//                   statStrStyle: defStatStyle.copyWith(
+//                     color: Theme.of(context)
+//                         .colorScheme
+//                         .onSurface
+//                         .withOpacity(0.7),
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//         Padding(
+//           padding: const EdgeInsets.only(top: 5),
+//           child: Row(
+//             mainAxisAlignment: MainAxisAlignment.start,
+//             crossAxisAlignment: CrossAxisAlignment.center,
+//             children: [
+//               SizedBox(
+//                 width: 210,
+//                 child: Text(
+//                   'Total',
+//                   style: defStatStyleLarge.copyWith(
+//                     color: Theme.of(context)
+//                         .colorScheme
+//                         .onSurface
+//                         .withOpacity(0.7),
+//                   ),
+//                 ),
+//               ),
+//               horizontalSpaceSmall,
+//               getStatWithUnit(
+//                 // getCommaNumberStr(total, decimal: 2),
+//                 getCommaNumberStr(totalAmt, decimal: 2, isRoundUp: false),
+//                 'SGD',
+//                 statStrStyle: defStatStyleLarge.copyWith(
+//                   color:
+//                       Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ],
+//     ),
+//   );
+// }
+
+// Widget getPagTotal2(BuildContext context, double gst, double? subTotalAmt,
+//     double? gstAmt, double? totalAmt, String tenantType,
+//     {double width = 750.0}) {
+//   bool applyGst = tenantType != 'cw_nus_internal';
+
+//   return Container(
+//     width: width,
+//     // height: 80,
+//     padding: const EdgeInsets.symmetric(horizontal: 21),
+//     // constraints: const BoxConstraints(maxHeight: 130),
+//     decoration: BoxDecoration(
+//       border:
+//           Border.all(color: Theme.of(context).colorScheme.primary, width: 1),
+//       borderRadius: BorderRadius.circular(5.0),
+//     ),
+//     child: Column(
+//       children: [
+//         if (applyGst)
+//           Padding(
+//             padding: const EdgeInsets.only(top: 10),
+//             child: Row(
+//               mainAxisAlignment: MainAxisAlignment.start,
+//               crossAxisAlignment: CrossAxisAlignment.center,
+//               children: [
+//                 SizedBox(
+//                   width: 210,
+//                   child: Text(
+//                     'Sub Total',
+//                     style: defStatStyle,
+//                   ),
+//                 ),
+//                 horizontalSpaceSmall,
+//                 getStatWithUnit(
+//                   getCommaNumberStr(subTotalAmt, decimal: 2),
+//                   'SGD',
+//                   statStrStyle: defStatStyle.copyWith(
+//                     color: Theme.of(context)
+//                         .colorScheme
+//                         .onSurface
+//                         .withOpacity(0.7),
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//         if (applyGst)
+//           Padding(
+//             padding: const EdgeInsets.only(top: 5),
+//             child: Row(
+//               mainAxisAlignment: MainAxisAlignment.start,
+//               crossAxisAlignment: CrossAxisAlignment.center,
+//               children: [
+//                 SizedBox(
+//                   width: 210,
+//                   child: Text(
+//                     'GST ($gst%)',
+//                     style: defStatStyle,
+//                   ),
+//                 ),
+//                 horizontalSpaceSmall,
+//                 getStatWithUnit(
+//                   // getCommaNumberStr(subTotal * (gst / 100), decimal: 2),
+//                   getCommaNumberStr(gstAmt, decimal: 2),
+//                   'SGD',
+//                   statStrStyle: defStatStyle.copyWith(
+//                     color: Theme.of(context)
+//                         .colorScheme
+//                         .onSurface
+//                         .withOpacity(0.7),
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//         Padding(
+//           padding: const EdgeInsets.only(top: 5),
+//           child: Row(
+//             mainAxisAlignment: MainAxisAlignment.start,
+//             crossAxisAlignment: CrossAxisAlignment.center,
+//             children: [
+//               SizedBox(
+//                 width: 210,
+//                 child: Text(
+//                   'Total',
+//                   style: defStatStyleLarge.copyWith(
+//                     color: Theme.of(context)
+//                         .colorScheme
+//                         .onSurface
+//                         .withOpacity(0.7),
+//                   ),
+//                 ),
+//               ),
+//               horizontalSpaceSmall,
+//               getStatWithUnit(
+//                 applyGst
+//                     ? getCommaNumberStr(totalAmt, decimal: 2, isRoundUp: false)
+//                     : getCommaNumberStr(subTotalAmt,
+//                         decimal: 2, isRoundUp: false),
+//                 'SGD',
+//                 statStrStyle: defStatStyleLarge.copyWith(
+//                   color:
+//                       Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ],
+//     ),
+//   );
+// }
+
 Widget getPagTotal(
     BuildContext context,
-    double? costE,
-    double? costW,
-    double? costB,
-    double? costN,
-    double? costG,
-    double? costLineItems,
     double gst,
+    double? subTotalAmt,
+    double? gstAmt,
+    double? totalAmt,
+    double? payableAmt,
     String tenantType,
-    {double width = 750.0}) {
-  double? totalCost;
-  if (costE != null) {
-    totalCost = (totalCost ?? 0) + costE;
-  }
-  if (costW != null) {
-    totalCost = (totalCost ?? 0) + costW;
-  }
-  if (costB != null) {
-    totalCost = (totalCost ?? 0) + costB;
-  }
-  if (costN != null) {
-    totalCost = (totalCost ?? 0) + costN;
-  }
-  if (costG != null) {
-    totalCost = (totalCost ?? 0) + costG;
-  }
-  if (costLineItems != null) {
-    totalCost = (totalCost ?? 0) + costLineItems;
-  }
-  double? subTotalAmt = totalCost;
-  if (subTotalAmt != null) {
-    // subTotalAmt = getRoundUp(subTotalAmt, 2);
-    // subTotalAmt = getRound(subTotalAmt, 2);
-  }
-  double? totalAmt = subTotalAmt;
-  bool applyGst = false;
-  double? gstAmt;
-  if (TenantType.cw_nus_internal != getTenantType(tenantType)) {
-    applyGst = true;
-    if (subTotalAmt != null && gst != null) {
-      subTotalAmt = getRound(subTotalAmt, 2);
-      gstAmt = subTotalAmt * gst / 100;
-      gstAmt = getRoundUp(gstAmt, 2);
-      // total = subTotal + subTotal * (gst / 100);
-      totalAmt = subTotalAmt + gstAmt;
-    }
-  } else {
-    applyGst = false;
-    if (subTotalAmt != null) {
-      totalAmt = getRoundUp(subTotalAmt, 2);
-    }
-  }
-  return Container(
-    width: width,
-    // height: 80,
-    padding: const EdgeInsets.symmetric(horizontal: 21),
-    // constraints: const BoxConstraints(maxHeight: 130),
-    decoration: BoxDecoration(
-      border:
-          Border.all(color: Theme.of(context).colorScheme.primary, width: 1),
-      borderRadius: BorderRadius.circular(5.0),
-    ),
-    child: Column(
-      children: [
-        if (applyGst)
-          Padding(
-            padding: const EdgeInsets.only(top: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: 210,
-                  child: Text(
-                    'Sub Total',
-                    style: defStatStyle,
-                  ),
-                ),
-                horizontalSpaceSmall,
-                getStatWithUnit(
-                  getCommaNumberStr(subTotalAmt, decimal: 2),
-                  'SGD',
-                  statStrStyle: defStatStyle.copyWith(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withOpacity(0.7),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        if (applyGst)
-          Padding(
-            padding: const EdgeInsets.only(top: 5),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: 210,
-                  child: Text(
-                    'GST ($gst%)',
-                    style: defStatStyle,
-                  ),
-                ),
-                horizontalSpaceSmall,
-                getStatWithUnit(
-                  // getCommaNumberStr(subTotal * (gst / 100), decimal: 2),
-                  getCommaNumberStr(gstAmt, decimal: 2),
-                  'SGD',
-                  statStrStyle: defStatStyle.copyWith(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withOpacity(0.7),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        Padding(
-          padding: const EdgeInsets.only(top: 5),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(
-                width: 210,
-                child: Text(
-                  'Total',
-                  style: defStatStyleLarge.copyWith(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withOpacity(0.7),
-                  ),
-                ),
-              ),
-              horizontalSpaceSmall,
-              getStatWithUnit(
-                // getCommaNumberStr(total, decimal: 2),
-                getCommaNumberStr(totalAmt, decimal: 2, isRoundUp: false),
-                'SGD',
-                statStrStyle: defStatStyleLarge.copyWith(
-                  color:
-                      Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
-Widget getPagTotal2(BuildContext context, double gst, double? subTotalAmt,
-    double? gstAmt, double? totalAmt, String tenantType,
-    {double width = 750.0}) {
+    // List<Map<String, dynamic>>? miniSoa,
+    Map<String, dynamic>? miniSoaInfo,
+    String strCollectionStartDateTimestamp,
+    String strCollectionEndDateTimestamp,
+    Map<String, dynamic> interestInfo,
+    {Function? onCheckInterestDetail,
+    bool showInterestDetail = false,
+    double width = 750.0}) {
   bool applyGst = tenantType != 'cw_nus_internal';
 
+  double contentWidth = 235;
+
   return Container(
     width: width,
     // height: 80,
@@ -655,6 +784,14 @@ Widget getPagTotal2(BuildContext context, double gst, double? subTotalAmt,
     ),
     child: Column(
       children: [
+        getMiniSoA(
+          miniSoaInfo ?? {},
+          strCollectionStartDateTimestamp,
+          strCollectionEndDateTimestamp,
+          context,
+          contentWidth,
+        ),
+        const Divider(height: 21),
         if (applyGst)
           Padding(
             padding: const EdgeInsets.only(top: 10),
@@ -663,7 +800,7 @@ Widget getPagTotal2(BuildContext context, double gst, double? subTotalAmt,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(
-                  width: 210,
+                  width: contentWidth,
                   child: Text(
                     'Sub Total',
                     style: defStatStyle,
@@ -674,10 +811,8 @@ Widget getPagTotal2(BuildContext context, double gst, double? subTotalAmt,
                   getCommaNumberStr(subTotalAmt, decimal: 2),
                   'SGD',
                   statStrStyle: defStatStyle.copyWith(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withOpacity(0.7),
+                    color:
+                        Theme.of(context).colorScheme.onSurface.withAlpha(210),
                   ),
                 ),
               ],
@@ -691,7 +826,7 @@ Widget getPagTotal2(BuildContext context, double gst, double? subTotalAmt,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(
-                  width: 210,
+                  width: contentWidth,
                   child: Text(
                     'GST ($gst%)',
                     style: defStatStyle,
@@ -703,10 +838,8 @@ Widget getPagTotal2(BuildContext context, double gst, double? subTotalAmt,
                   getCommaNumberStr(gstAmt, decimal: 2),
                   'SGD',
                   statStrStyle: defStatStyle.copyWith(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withOpacity(0.7),
+                    color:
+                        Theme.of(context).colorScheme.onSurface.withAlpha(210),
                   ),
                 ),
               ],
@@ -719,14 +852,12 @@ Widget getPagTotal2(BuildContext context, double gst, double? subTotalAmt,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(
-                width: 210,
+                width: contentWidth,
                 child: Text(
-                  'Total',
+                  'Current Total',
                   style: defStatStyleLarge.copyWith(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withOpacity(0.7),
+                    color:
+                        Theme.of(context).colorScheme.onSurface.withAlpha(210),
                   ),
                 ),
               ),
@@ -738,15 +869,263 @@ Widget getPagTotal2(BuildContext context, double gst, double? subTotalAmt,
                         decimal: 2, isRoundUp: false),
                 'SGD',
                 statStrStyle: defStatStyleLarge.copyWith(
-                  color:
-                      Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                  color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
                 ),
               ),
             ],
           ),
         ),
+        const Divider(height: 21),
+        Padding(
+          padding: const EdgeInsets.only(top: 5),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              getInterestInfo(
+                interestInfo,
+                context,
+                showInterestDetail,
+                contentWidth,
+                onCheckInterestDetail,
+              )
+            ],
+          ),
+        ),
+        const Divider(height: 21),
+        if (payableAmt != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 5),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: contentWidth,
+                  child: Text(
+                    'Total Payable',
+                    style: defStatStyleLarge.copyWith(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withAlpha(210),
+                    ),
+                  ),
+                ),
+                horizontalSpaceSmall,
+                getStatWithUnit(
+                  getCommaNumberStr(payableAmt, decimal: 2, isRoundUp: false),
+                  'SGD',
+                  statStrStyle: defStatStyleLarge.copyWith(
+                    color:
+                        Theme.of(context).colorScheme.onSurface.withAlpha(210),
+                  ),
+                ),
+              ],
+            ),
+          ),
       ],
     ),
+  );
+}
+
+Widget getMiniSoA(
+    Map<String, dynamic> miniSoaInfo,
+    String strCollectionStartDateTimestamp,
+    String strCollectionEndDateTimestamp,
+    BuildContext context,
+    double contentWidth) {
+  if (miniSoaInfo.isEmpty) {
+    return Container();
+  }
+  // get last item to get the balance brought forward
+  dynamic balBf = miniSoaInfo['opening_balance'];
+  if (balBf is String) {
+    balBf = double.tryParse(balBf) ?? 0.0;
+  } else if (balBf is double) {
+    balBf = balBf;
+  } else {
+    balBf = 0.0;
+  }
+  if (balBf.abs() < 0.00001) {
+  } else {
+    balBf = -1 * balBf;
+  }
+
+  List<Map<String, dynamic>> paymentList = [];
+  for (var paymentInfo in miniSoaInfo['payment_list'] ?? []) {
+    // String? creditRemark = item['credit_remark'];
+    // if ('initial_balance' == (creditRemark ?? '').toString().toLowerCase()) {
+    //   continue;
+    // }
+    String? itemType = paymentInfo['entry_type'];
+
+    // do not include initial balance payment (CPE-66)
+    String? paymentType = paymentInfo['payment_type'] ?? 'normal';
+    if ('initial_balance' == paymentType) {
+      continue;
+    }
+    if (itemType != null && itemType == 'payment') {
+      dynamic creditAmount = paymentInfo['credit_amount'];
+      if (creditAmount is String) {
+        creditAmount = double.tryParse(creditAmount) ?? 0.0;
+      } else if (creditAmount is double) {
+        creditAmount = creditAmount;
+      } else {
+        creditAmount = 0.0;
+      }
+      String dateStr = paymentInfo['entry_timestamp'];
+      if (dateStr.isNotEmpty) {
+        //get date only
+        dateStr = dateStr.substring(0, 10);
+      }
+      paymentList.add({
+        ...paymentInfo,
+        'amount': creditAmount,
+        'payment_date': dateStr,
+        'payment_type': paymentType,
+      });
+    }
+  }
+
+  dynamic balCf = miniSoaInfo['closing_balance'];
+  if (balCf is String) {
+    balCf = double.tryParse(balCf) ?? 0.0;
+  } else if (balCf is double) {
+    balCf = balCf;
+  } else {
+    balCf = 0.0;
+  }
+  if (balCf.abs() < 0.00001) {
+  } else {
+    balCf = -1 * balCf;
+  }
+
+  assert(strCollectionStartDateTimestamp.isNotEmpty);
+  assert(strCollectionEndDateTimestamp.isNotEmpty);
+
+  return Column(
+    children: [
+      Padding(
+        padding: const EdgeInsets.only(top: 5),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: contentWidth,
+              child: Text(
+                'Bal. B/F',
+                style: defStatStyle,
+              ),
+            ),
+            horizontalSpaceSmall,
+            getStatWithUnit(
+              getCommaNumberStr(balBf, decimal: 2),
+              'SGD',
+              statStrStyle: defStatStyle.copyWith(
+                color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
+              ),
+            ),
+          ],
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.only(top: 5),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: contentWidth,
+              child: Text(
+                'Collection Date Start:',
+                style: defStatStyle,
+              ),
+            ),
+            horizontalSpaceSmall,
+            Text(
+              strCollectionStartDateTimestamp.substring(0, 10),
+              style: defStatStyle,
+            ),
+          ],
+        ),
+      ),
+      for (var pay in paymentList)
+        Padding(
+          padding: const EdgeInsets.only(top: 5),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: contentWidth,
+                child: Text(
+                  'Payment (${pay['payment_date'] ?? ''})',
+                  style: defStatStyle,
+                ),
+              ),
+              horizontalSpaceSmall,
+              getStatWithUnit(
+                getCommaNumberStr(-(pay['amount'] ?? 0.0), decimal: 2),
+                'SGD',
+                statStrStyle: defStatStyle.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
+                ),
+              ),
+              if (pay['payment_type'] == 'initial_balance')
+                Padding(
+                  padding: const EdgeInsets.only(left: 5),
+                  child: getPaymentSoaTypeTagWidget(
+                    context,
+                    PaymentSoaType.initialBalance,
+                  ),
+                ),
+            ],
+          ),
+        ),
+      Padding(
+        padding: const EdgeInsets.only(top: 5),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: contentWidth,
+              child: Text('Collection Date To:', style: defStatStyle),
+            ),
+            horizontalSpaceSmall,
+            Text(
+              strCollectionEndDateTimestamp.substring(0, 10),
+              style: defStatStyle,
+            ),
+          ],
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.only(top: 5),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: contentWidth,
+              child: Text(
+                'Bal. C/F',
+                style: defStatStyle,
+              ),
+            ),
+            horizontalSpaceSmall,
+            getStatWithUnit(
+              getCommaNumberStr(balCf, decimal: 2),
+              'SGD',
+              statStrStyle: defStatStyle.copyWith(
+                color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ],
   );
 }
 

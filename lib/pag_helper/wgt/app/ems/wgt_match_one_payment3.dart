@@ -715,8 +715,8 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
                       ),
                       Row(
                         children: [
-                          Icon(Symbols.chevron_forward,
-                              color: Theme.of(context).hintColor),
+                          getPaymentLcStatusTagWidget(context, lcStatus),
+                          horizontalSpaceSmall,
                           Text('Payment: ', style: mainLabelStyle),
                           Text(
                               _paymentAmount != null
@@ -851,9 +851,9 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
     }
 
     final initialValueUsageFromPmt =
-        isMatchedBill ? appliedAmountUsageFromPmt?.toString() : null;
+        isMatchedBill ? appliedAmountUsageFromPmt?.toStringAsFixed(2) : null;
     final initialValueInterestFromPmt =
-        isMatchedBill ? appliedAmountInterestFromPmt?.toString() : null;
+        isMatchedBill ? appliedAmountInterestFromPmt?.toStringAsFixed(2) : null;
     final valWidth = 105.0;
 
     Color? valueColor;

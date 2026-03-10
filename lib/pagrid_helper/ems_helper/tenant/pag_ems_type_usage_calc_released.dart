@@ -45,10 +45,7 @@ class PagEmsTypeUsageCalcReleased {
 
   List<PagEmsTypeUsageCalcReleased> _singularCalcList = [];
 
-  // late final double? _balBf;
-  // late final double? _balBfUsage;
-  // late final double? _balBfInterest;
-  List<Map<String, dynamic>>? _miniSoa;
+  late final Map<String, dynamic>? _miniSoaInfo;
 
   late final Map<String, dynamic>? _interestInfo;
 
@@ -68,6 +65,7 @@ class PagEmsTypeUsageCalcReleased {
   double? _subTotalCost;
   double? _gstAmount;
   double? _totalCost;
+  double? _payableAmount;
 
   EmsTypeUsageR2? get typeUsageE => _typeUsageE;
   EmsTypeUsageR2? get typeUsageW => _typeUsageW;
@@ -85,13 +83,11 @@ class PagEmsTypeUsageCalcReleased {
   double? get subTotalCost => _subTotalCost;
   double? get gstAmount => _gstAmount;
   double? get totalCost => _totalCost;
+  double? get payableAmount => _payableAmount;
 
   String? get billBarFromMonth => _billBarFromMonth;
 
-  // double? get balBf => _balBf;
-  // double? get balBfUsage => _balBfUsage;
-  // double? get balBfInterest => _balBfInterest;
-  List<Map<String, dynamic>>? get miniSoa => _miniSoa;
+  Map<String, dynamic>? get miniSoaInfo => _miniSoaInfo;
 
   Map<String, dynamic>? get interestInfo => _interestInfo;
 
@@ -132,7 +128,7 @@ class PagEmsTypeUsageCalcReleased {
     // double? balBf,
     // double? balBfUsage,
     // double? balBfInterest,
-    List<Map<String, dynamic>>? miniSoa,
+    Map<String, dynamic>? miniSoaInfo,
     Map<String, dynamic>? interestInfo,
   }) {
     _costDecimals = costDecimals;
@@ -172,7 +168,7 @@ class PagEmsTypeUsageCalcReleased {
     // _balBf = balBf;
     // _balBfUsage = balBfUsage;
     // _balBfInterest = balBfInterest;
-    _miniSoa = miniSoa;
+    _miniSoaInfo = miniSoaInfo;
 
     _interestInfo = interestInfo;
 
@@ -471,6 +467,28 @@ class PagEmsTypeUsageCalcReleased {
     _subTotalCost = getRound(subTotalCost, 2);
     _gstAmount = getRoundUp(gstAmount, 2);
     _totalCost = _subTotalCost! + _gstAmount!;
+
+    _payableAmount = _totalCost;
+
+    if (_interestInfo != null) {
+      final totalInterestAmount = _interestInfo['total_interest_amount'];
+      double? interestAmountDouble = 0;
+      if (totalInterestAmount is String) {
+        interestAmountDouble = double.tryParse(totalInterestAmount);
+      } else if (totalInterestAmount is double) {
+        interestAmountDouble = totalInterestAmount;
+      }
+
+      _payableAmount = _totalCost! + (interestAmountDouble ?? 0);
+    }
+
+    if (_miniSoaInfo != null) {
+      final closingBalanceStr = _miniSoaInfo['closing_balance'];
+      double? closingBalance = double.tryParse(closingBalanceStr ?? '');
+      if (closingBalance != null) {
+        _payableAmount = -1 * closingBalance + (_payableAmount ?? 0);
+      }
+    }
   }
 
   void _calcCompositeTypeUsage() {

@@ -200,14 +200,15 @@ class _WgtPagTenantCompositeUsageSummaryReleasedState
               // getLineItem(),
               // verticalSpaceSmall,
               if (widget.isBillMode)
-                getTotal2(
+                getPagTotal(
                   context,
                   widget.gst!,
                   widget.compositeUsageCalc!.subTotalCost,
                   widget.compositeUsageCalc!.gstAmount,
                   widget.compositeUsageCalc!.totalCost,
+                  widget.compositeUsageCalc!.payableAmount,
                   widget.tenantType,
-                  widget.compositeUsageCalc!.miniSoa,
+                  widget.compositeUsageCalc!.miniSoaInfo,
                   widget.previousCollectionDateTimestampStr,
                   widget.currentCollectionDateTimestampStr,
                   widget.interestInfo,

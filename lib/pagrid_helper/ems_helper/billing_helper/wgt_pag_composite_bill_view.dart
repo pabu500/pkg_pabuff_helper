@@ -430,11 +430,6 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       );
     }
 
-    List<Map<String, dynamic>> minSoaList = [];
-    for (var item in miniSoa) {
-      minSoaList.add(item);
-    }
-
     final Map<String, dynamic> scopeMap =
         widget.loggedInUser.selectedScope.toScopeMap();
 
@@ -452,7 +447,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
           cycleStr,
           billDate,
           billBarFromMonth,
-          minSoaList,
+          miniSoaInfo,
           strCollectionStartDateTimestamp,
           strCollectionEndDateTimestamp,
           interestInfo);
@@ -470,7 +465,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
           billDate,
           billBarFromMonth,
           lineItemList,
-          minSoaList,
+          miniSoaInfo,
           strCollectionStartDateTimestamp,
           strCollectionEndDateTimestamp,
           interestInfo);
@@ -490,7 +485,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     String billDate,
     String billBarFromMonth,
     List<Map<String, dynamic>> lineItemList,
-    List<Map<String, dynamic>>? miniSoa,
+    Map<String, dynamic>? miniSoaInfo,
     String strCollectionStartDateTimestamp,
     String strCollectionEndDateTimestamp,
     Map<String, dynamic>? interestInfo,
@@ -633,7 +628,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       //use billed trending snapshot
       billedTrendingSnapShot: [],
       singularUsageCalcList: singularUsageCalcList,
-      miniSoa: miniSoa,
+      miniSoaInfo: miniSoaInfo,
       interestInfo: interestInfo,
     );
     compositeUsageCalc.doCompositeCalc();
@@ -784,10 +779,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     String cycleStr,
     String billDate,
     String billBarFromMonth,
-    // String balBfStr,
-    // String balBfUsageStr,
-    // String balBfInterestStr,
-    List<Map<String, dynamic>> miniSoa,
+    Map<String, dynamic> miniSoaInfo,
     String previousCollectionDateTimestampStr,
     String currentCollectionDateTimestampStr,
     Map<String, dynamic> interestInfo,
@@ -938,7 +930,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       // balBf: balBf,
       // balBfUsage: balBfUsage,
       // balBfInterest: balBfInterest,
-      miniSoa: miniSoa,
+      miniSoaInfo: miniSoaInfo,
       interestInfo: interestInfo,
     );
     compositeUsageCalc.doCompositeCalc();
@@ -1136,8 +1128,8 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       }
     }
 
-    EmsTypeUsageCalcReleasedR2 emsTypeUsageCalcReleased =
-        EmsTypeUsageCalcReleasedR2(
+    PagEmsTypeUsageCalcReleased emsTypeUsageCalcReleased =
+        PagEmsTypeUsageCalcReleased(
       costDecimals: widget.costDecimals,
       billedAutoUsageE: billedAutoUsages['billed_auto_usage_e'],
       billedAutoUsageW: billedAutoUsages['billed_auto_usage_w'],

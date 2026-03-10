@@ -621,10 +621,10 @@ Widget getTotal2(
     double? subTotalAmt,
     double? gstAmt,
     double? totalAmt,
+    // double? payableAmt,
     String tenantType,
-    // double? balBfUsage,
-    // double? balBfInterest,
-    List<Map<String, dynamic>>? miniSoa,
+    // List<Map<String, dynamic>>? miniSoa,
+    // Map<String, dynamic>? miniSoaInfo,
     String strCollectionStartDateTimestamp,
     String strCollectionEndDateTimestamp,
     Map<String, dynamic> interestInfo,
@@ -634,6 +634,7 @@ Widget getTotal2(
   bool applyGst = tenantType != 'cw_nus_internal';
 
   double contentWidth = 220;
+
   return Container(
     width: width,
     // height: 80,
@@ -646,13 +647,13 @@ Widget getTotal2(
     ),
     child: Column(
       children: [
-        getMiniSoA(
-          miniSoa ?? [],
-          strCollectionStartDateTimestamp,
-          strCollectionEndDateTimestamp,
-          context,
-          contentWidth,
-        ),
+        // getMiniSoA(
+        //   miniSoaInfo ?? {},
+        //   strCollectionStartDateTimestamp,
+        //   strCollectionEndDateTimestamp,
+        //   context,
+        //   contentWidth,
+        // ),
         if (applyGst)
           Padding(
             padding: const EdgeInsets.only(top: 10),
@@ -751,223 +752,39 @@ Widget getTotal2(
             ],
           ),
         ),
+        // if (payableAmt != null)
+        //   Padding(
+        //     padding: const EdgeInsets.only(top: 5),
+        //     child: Row(
+        //       mainAxisAlignment: MainAxisAlignment.start,
+        //       crossAxisAlignment: CrossAxisAlignment.center,
+        //       children: [
+        //         SizedBox(
+        //           width: contentWidth,
+        //           child: Text(
+        //             'Payable Amount',
+        //             style: defStatStyleLarge.copyWith(
+        //               color: Theme.of(context)
+        //                   .colorScheme
+        //                   .onSurface
+        //                   .withAlpha(210),
+        //             ),
+        //           ),
+        //         ),
+        //         horizontalSpaceSmall,
+        //         getStatWithUnit(
+        //           getCommaNumberStr(payableAmt, decimal: 2, isRoundUp: false),
+        //           'SGD',
+        //           statStrStyle: defStatStyleLarge.copyWith(
+        //             color:
+        //                 Theme.of(context).colorScheme.onSurface.withAlpha(210),
+        //           ),
+        //         ),
+        //       ],
+        //     ),
+        //   ),
       ],
     ),
-  );
-}
-
-Widget getMiniSoA(
-    List<Map<String, dynamic>> miniSoa,
-    String strCollectionStartDateTimestamp,
-    String strCollectionEndDateTimestamp,
-    BuildContext context,
-    double contentWidth) {
-  if (miniSoa.isEmpty) {
-    return Container();
-  }
-  // get last item to get the balance brought forward
-  Map<String, dynamic> lastItem = miniSoa.last;
-  dynamic balBf = lastItem['balance'];
-  if (balBf is String) {
-    balBf = double.tryParse(balBf) ?? 0.0;
-  } else if (balBf is double) {
-    balBf = balBf;
-  } else {
-    balBf = 0.0;
-  }
-  if (balBf.abs() < 0.00001) {
-  } else {
-    balBf = -1 * balBf;
-  }
-
-  // sort by date ascending
-  for (var item in miniSoa) {
-    String strDate = item['entry_timestamp'] ?? '';
-    DateTime date = DateTime.tryParse(strDate) ?? DateTime(1970);
-    item['parsed_date'] = date;
-  }
-  miniSoa.sort((a, b) {
-    DateTime dateA = a['parsed_date'] ?? DateTime(1970);
-    DateTime dateB = b['parsed_date'] ?? DateTime(1970);
-    return dateA.compareTo(dateB);
-  });
-
-  List<Map<String, dynamic>> paymentList = [];
-  for (var item in miniSoa) {
-    // String? creditRemark = item['credit_remark'];
-    // if ('initial_balance' == (creditRemark ?? '').toString().toLowerCase()) {
-    //   continue;
-    // }
-    String? itemType = item['entry_type'];
-
-    // do not include initial balance payment (CPE-66)
-    String? paymentType = item['payment_type'] ?? 'normal';
-    if ('initial_balance' == paymentType) {
-      continue;
-    }
-    if (itemType != null && itemType == 'payment') {
-      dynamic creditAmount = item['credit_amount'];
-      if (creditAmount is String) {
-        creditAmount = double.tryParse(creditAmount) ?? 0.0;
-      } else if (creditAmount is double) {
-        creditAmount = creditAmount;
-      } else {
-        creditAmount = 0.0;
-      }
-      String dateStr = item['entry_timestamp'];
-      if (dateStr.isNotEmpty) {
-        //get date only
-        dateStr = dateStr.substring(0, 10);
-      }
-      paymentList.add({
-        ...item,
-        'amount': creditAmount,
-        'payment_date': dateStr,
-        'payment_type': paymentType,
-      });
-    }
-  }
-  // get first item to get the balance carried forward
-  Map<String, dynamic> firstItem = miniSoa.first;
-  dynamic balCf = firstItem['balance'];
-  if (balCf is String) {
-    balCf = double.tryParse(balCf) ?? 0.0;
-  } else if (balCf is double) {
-    balCf = balCf;
-  } else {
-    balCf = 0.0;
-  }
-  if (balCf.abs() < 0.00001) {
-  } else {
-    balCf = -1 * balCf;
-  }
-
-  assert(strCollectionStartDateTimestamp.isNotEmpty);
-  assert(strCollectionEndDateTimestamp.isNotEmpty);
-
-  return Column(
-    children: [
-      Padding(
-        padding: const EdgeInsets.only(top: 5),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: contentWidth,
-              child: Text(
-                'Bal. B/F',
-                style: defStatStyle,
-              ),
-            ),
-            horizontalSpaceSmall,
-            getStatWithUnit(
-              getCommaNumberStr(balBf, decimal: 2),
-              'SGD',
-              statStrStyle: defStatStyle.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
-              ),
-            ),
-          ],
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.only(top: 5),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: contentWidth,
-              child: Text(
-                'Collection Date Start:',
-                style: defStatStyle,
-              ),
-            ),
-            horizontalSpaceSmall,
-            Text(
-              strCollectionStartDateTimestamp.substring(0, 10),
-              style: defStatStyle,
-            ),
-          ],
-        ),
-      ),
-      for (var pay in paymentList)
-        Padding(
-          padding: const EdgeInsets.only(top: 5),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(
-                width: contentWidth,
-                child: Text(
-                  'Payment (${pay['payment_date'] ?? ''})',
-                  style: defStatStyle,
-                ),
-              ),
-              horizontalSpaceSmall,
-              getStatWithUnit(
-                getCommaNumberStr(-(pay['amount'] ?? 0.0), decimal: 2),
-                'SGD',
-                statStrStyle: defStatStyle.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
-                ),
-              ),
-              if (pay['payment_type'] == 'initial_balance')
-                Padding(
-                  padding: const EdgeInsets.only(left: 5),
-                  child: getPaymentSoaTypeTagWidget(
-                    context,
-                    PaymentSoaType.initialBalance,
-                  ),
-                ),
-            ],
-          ),
-        ),
-      Padding(
-        padding: const EdgeInsets.only(top: 5),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: contentWidth,
-              child: Text('Collection Date To:', style: defStatStyle),
-            ),
-            horizontalSpaceSmall,
-            Text(
-              strCollectionEndDateTimestamp.substring(0, 10),
-              style: defStatStyle,
-            ),
-          ],
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.only(top: 5),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: contentWidth,
-              child: Text(
-                'Bal. C/F',
-                style: defStatStyle,
-              ),
-            ),
-            horizontalSpaceSmall,
-            getStatWithUnit(
-              getCommaNumberStr(balCf, decimal: 2),
-              'SGD',
-              statStrStyle: defStatStyle.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
-              ),
-            ),
-          ],
-        ),
-      ),
-    ],
   );
 }
 

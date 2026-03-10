@@ -170,7 +170,6 @@ class _WgtTenantUsageSummary2State extends State<WgtTenantUsageSummary2> {
                 widget.usageCalc!.gstAmount,
                 widget.usageCalc!.totalCost,
                 widget.tenantType,
-                [],
                 '',
                 '',
                 {},

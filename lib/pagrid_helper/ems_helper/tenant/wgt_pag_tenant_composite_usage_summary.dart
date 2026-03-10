@@ -82,9 +82,6 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
   final List<Map<String, dynamic>> subTenantListUsageSummary;
   final bool isBillMode;
   final Map<String, dynamic> billInfo;
-  // final Map<String, dynamic> meterTypeRates;
-  // final double? gst;
-  // final List<Map<String, dynamic>> manualUsages;
   final List<Map<String, dynamic>> lineItems;
   final String renderMode;
   final bool showRenderModeSwitch;
@@ -207,14 +204,15 @@ class _WgtPagTenantCompositeUsageSummaryState
               getLineItem(),
               verticalSpaceSmall,
               if (widget.isBillMode)
-                getTotal2(
+                getPagTotal(
                   context,
                   widget.compositeUsageCalc!.gst!,
                   widget.compositeUsageCalc!.subTotalCost,
                   widget.compositeUsageCalc!.gstAmount,
                   widget.compositeUsageCalc!.totalCost,
+                  widget.compositeUsageCalc!.payableAmount,
                   widget.tenantType,
-                  widget.compositeUsageCalc!.miniSoa,
+                  widget.compositeUsageCalc!.miniSoaInfo,
                   widget.strCollectionStartDateTimestamp,
                   widget.strCollectionEndDateTimestamp,
                   widget.interestInfo,

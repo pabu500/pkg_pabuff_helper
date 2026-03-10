@@ -180,14 +180,15 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
               getLineItem(),
               verticalSpaceSmall,
               if (widget.isBillMode)
-                getTotal2(
+                getPagTotal(
                   context,
                   widget.usageCalc!.gst!,
                   widget.usageCalc!.subTotalCost,
                   widget.usageCalc!.gstAmount,
                   widget.usageCalc!.totalCost,
+                  widget.usageCalc!.payableAmount,
                   widget.tenantType,
-                  [],
+                  {},
                   '',
                   '',
                   {},
