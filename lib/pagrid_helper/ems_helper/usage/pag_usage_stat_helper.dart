@@ -855,7 +855,7 @@ Widget getPagTotal(
                 width: contentWidth,
                 child: Text(
                   'Current Total',
-                  style: defStatStyleLarge.copyWith(
+                  style: defStatStyle.copyWith(
                     color:
                         Theme.of(context).colorScheme.onSurface.withAlpha(210),
                   ),
@@ -868,7 +868,7 @@ Widget getPagTotal(
                     : getCommaNumberStr(subTotalAmt,
                         decimal: 2, isRoundUp: false),
                 'SGD',
-                statStrStyle: defStatStyleLarge.copyWith(
+                statStrStyle: defStatStyle.copyWith(
                   color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
                 ),
               ),
