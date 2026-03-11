@@ -6,11 +6,10 @@ import 'package:flutter/material.dart';
 
 import '../../../pag_helper/def_helper/dh_pag_bill.dart';
 import '../usage/pag_usage_stat_helper.dart';
-import '../usage/usage_stat_helper.dart';
-import 'pag_ems_type_usage_calc_released.dart';
+import 'pag_ems_type_usage_calc_rl.dart';
 
-class WgtPagTenantCompositeUsageSummaryReleased extends StatefulWidget {
-  const WgtPagTenantCompositeUsageSummaryReleased({
+class WgtPagTenantCompositeUsageSummaryRl extends StatefulWidget {
+  const WgtPagTenantCompositeUsageSummaryRl({
     super.key,
     required this.appConfig,
     required this.loggedInUser,
@@ -81,19 +80,19 @@ class WgtPagTenantCompositeUsageSummaryReleased extends StatefulWidget {
   final int rateDecimals;
   final int costDecimals;
   final List<Map<String, dynamic>> tenantSingularUsageInfoList;
-  final PagEmsTypeUsageCalcReleased? compositeUsageCalc;
+  final PagEmsTypeUsageCalcRl? compositeUsageCalc;
   final String previousCollectionDateTimestampStr;
   final String currentCollectionDateTimestampStr;
   final Map<String, dynamic> interestInfo;
   final Function? onUpdate;
 
   @override
-  State<WgtPagTenantCompositeUsageSummaryReleased> createState() =>
-      _WgtPagTenantCompositeUsageSummaryReleasedState();
+  State<WgtPagTenantCompositeUsageSummaryRl> createState() =>
+      _WgtPagTenantCompositeUsageSummaryRlState();
 }
 
-class _WgtPagTenantCompositeUsageSummaryReleasedState
-    extends State<WgtPagTenantCompositeUsageSummaryReleased> {
+class _WgtPagTenantCompositeUsageSummaryRlState
+    extends State<WgtPagTenantCompositeUsageSummaryRl> {
   final List<String> usageTypeList = ['E', 'B', 'W', 'N', 'G'];
 
   final widgetWidth = 750.0;
@@ -278,7 +277,7 @@ class _WgtPagTenantCompositeUsageSummaryReleasedState
     List<Widget> slotList = [];
     for (Map<String, dynamic> singularUsageInfo
         in widget.tenantSingularUsageInfoList) {
-      PagEmsTypeUsageCalcReleased? usageCalc = singularUsageInfo['usage_calc'];
+      PagEmsTypeUsageCalcRl? usageCalc = singularUsageInfo['usage_calc'];
 
       slotList.add(getPagTypeUsageNet(
         context,

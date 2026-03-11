@@ -1,6 +1,6 @@
 import 'package:buff_helper/pag_helper/model/mdl_history.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
-import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_ems_type_usage_calc_released.dart';
+import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_ems_type_usage_calc_rl.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 
 import 'package:flutter/material.dart';
@@ -47,7 +47,7 @@ class WgtPagTenantUsageSummaryReleased extends StatefulWidget {
   final MdlPagUser loggedInUser;
   final Map<String, dynamic> billedUsageFactor;
   final String displayContextStr;
-  final PagEmsTypeUsageCalcReleased usageCalc;
+  final PagEmsTypeUsageCalcRl usageCalc;
   final ItemType itemType;
   final bool isMonthly;
   final DateTime fromDatetime;

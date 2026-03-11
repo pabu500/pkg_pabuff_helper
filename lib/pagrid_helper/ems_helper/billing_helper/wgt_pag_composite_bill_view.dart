@@ -8,13 +8,13 @@ import 'package:flutter/material.dart';
 import '../../../pag_helper/def_helper/pag_item_helper.dart';
 import '../../../pag_helper/model/mdl_pag_project_profile.dart';
 import '../tenant/pag_ems_type_usage_calc.dart';
-import '../tenant/pag_ems_type_usage_calc_released.dart';
+import '../tenant/pag_ems_type_usage_calc_rl.dart';
 import '../../../pag_helper/wgt/app/ems/wgt_bill_lc_status_op.dart';
 import '../tenant/wgt_pag_tenant_composite_usage_summary.dart';
 import '../../../pag_helper/comm/comm_pag_billing.dart';
 import '../tenant/tenant_usage_calc_released_r2.dart';
-import '../tenant/wgt_pag_tenant_composite_usage_summary_released.dart';
-import '../tenant/wgt_pag_tenant_usage_summary_released.dart';
+import '../tenant/wgt_pag_tenant_composite_usage_summary_rl.dart';
+import '../tenant/wgt_pag_tenant_usage_summary_rl.dart';
 import '../../../pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import '../../../pag_helper/def_helper/dh_pag_bill.dart';
 import 'wgt_pag_bill_render_pdf.dart';
@@ -800,7 +800,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       }
     }
 
-    List<PagEmsTypeUsageCalcReleased> singularUsageCalcList = [];
+    List<PagEmsTypeUsageCalcRl> singularUsageCalcList = [];
 
     List<String> usageTypeTags = ['E', 'W', 'B', 'N', 'G'];
 
@@ -846,8 +846,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
         billedGst = double.tryParse(singularUsage['billed_gst']);
       }
 
-      PagEmsTypeUsageCalcReleased emsTypeUsageCalcReleased =
-          PagEmsTypeUsageCalcReleased(
+      PagEmsTypeUsageCalcRl emsTypeUsageCalcReleased = PagEmsTypeUsageCalcRl(
         costDecimals: widget.costDecimals,
         billedAutoUsageE: billedAutoUsageInfo['billed_auto_usage_e'],
         billedAutoUsageW: billedAutoUsageInfo['billed_auto_usage_w'],
@@ -894,8 +893,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     // double balBfUsage = double.tryParse(balBfUsageStr) ?? 0.0;
     // double balBfInterest = double.tryParse(balBfInterestStr) ?? 0.0;
 
-    PagEmsTypeUsageCalcReleased compositeUsageCalc =
-        PagEmsTypeUsageCalcReleased(
+    PagEmsTypeUsageCalcRl compositeUsageCalcRl = PagEmsTypeUsageCalcRl(
       costDecimals: widget.costDecimals,
       billedGst: 9.0,
       billedRateE: _bill['billed_rate_e'],
@@ -933,7 +931,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       miniSoaInfo: miniSoaInfo,
       interestInfo: interestInfo,
     );
-    compositeUsageCalc.doCompositeCalc();
+    compositeUsageCalcRl.doCompositeCalc();
 
     return _renderMode == 'pdf'
         ? WgtPagBillRenderPdf(
@@ -950,36 +948,36 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
                   _bill['created_timestamp'],
               'billTimeRangeStr': billTimeRangeStr,
               'tenantUsageSummary': const [],
-              'subTotalAmount': compositeUsageCalc.subTotalCost,
-              'gstAmount': compositeUsageCalc.gstAmount,
-              'totalAmount': compositeUsageCalc.totalCost,
-              'typeRateE': compositeUsageCalc.typeUsageE?.rate,
-              'typeRateW': compositeUsageCalc.typeUsageW?.rate,
-              'typeRateB': compositeUsageCalc.typeUsageB?.rate,
-              'typeRateN': compositeUsageCalc.typeUsageN?.rate,
-              'typeRateG': compositeUsageCalc.typeUsageG?.rate,
-              'typeUsageE': compositeUsageCalc.typeUsageE?.usageFactored,
-              'typeUsageW': compositeUsageCalc.typeUsageW?.usageFactored,
-              'typeUsageB': compositeUsageCalc.typeUsageB?.usageFactored,
-              'typeUsageN': compositeUsageCalc.typeUsageN?.usageFactored,
-              'typeUsageG': compositeUsageCalc.typeUsageG?.usageFactored,
-              'typeCostE': compositeUsageCalc.typeUsageE?.cost,
-              'typeCostW': compositeUsageCalc.typeUsageW?.cost,
-              'typeCostB': compositeUsageCalc.typeUsageB?.cost,
-              'typeCostN': compositeUsageCalc.typeUsageN?.cost,
-              'typeCostG': compositeUsageCalc.typeUsageG?.cost,
-              'trendingE': compositeUsageCalc.trendingE,
-              'trendingW': compositeUsageCalc.trendingW,
-              'trendingB': compositeUsageCalc.trendingB,
-              'trendingN': compositeUsageCalc.trendingN,
-              'trendingG': compositeUsageCalc.trendingG,
-              'lineItemLabel1': compositeUsageCalc.getLineItem(0)?['label'],
-              'lineItemValue1': compositeUsageCalc.getLineItem(0)?['amount'],
+              'subTotalAmount': compositeUsageCalcRl.subTotalCost,
+              'gstAmount': compositeUsageCalcRl.gstAmount,
+              'totalAmount': compositeUsageCalcRl.totalCost,
+              'typeRateE': compositeUsageCalcRl.typeUsageE?.rate,
+              'typeRateW': compositeUsageCalcRl.typeUsageW?.rate,
+              'typeRateB': compositeUsageCalcRl.typeUsageB?.rate,
+              'typeRateN': compositeUsageCalcRl.typeUsageN?.rate,
+              'typeRateG': compositeUsageCalcRl.typeUsageG?.rate,
+              'typeUsageE': compositeUsageCalcRl.typeUsageE?.usageFactored,
+              'typeUsageW': compositeUsageCalcRl.typeUsageW?.usageFactored,
+              'typeUsageB': compositeUsageCalcRl.typeUsageB?.usageFactored,
+              'typeUsageN': compositeUsageCalcRl.typeUsageN?.usageFactored,
+              'typeUsageG': compositeUsageCalcRl.typeUsageG?.usageFactored,
+              'typeCostE': compositeUsageCalcRl.typeUsageE?.cost,
+              'typeCostW': compositeUsageCalcRl.typeUsageW?.cost,
+              'typeCostB': compositeUsageCalcRl.typeUsageB?.cost,
+              'typeCostN': compositeUsageCalcRl.typeUsageN?.cost,
+              'typeCostG': compositeUsageCalcRl.typeUsageG?.cost,
+              'trendingE': compositeUsageCalcRl.trendingE,
+              'trendingW': compositeUsageCalcRl.trendingW,
+              'trendingB': compositeUsageCalcRl.trendingB,
+              'trendingN': compositeUsageCalcRl.trendingN,
+              'trendingG': compositeUsageCalcRl.trendingG,
+              'lineItemLabel1': compositeUsageCalcRl.getLineItem(0)?['label'],
+              'lineItemValue1': compositeUsageCalcRl.getLineItem(0)?['amount'],
               'assetFolder': assetFolder,
               'tenantSingularUsageInfoList': singularUsageList,
             },
           )
-        : WgtPagTenantCompositeUsageSummaryReleased(
+        : WgtPagTenantCompositeUsageSummaryRl(
             isDisabled: _isDisabledPvRl,
             costDecimals: widget.costDecimals,
             appConfig: widget.appConfig,
@@ -1006,7 +1004,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             // lineItems: [lineItem],
             // meterTypeRates: billedRates,
             tenantSingularUsageInfoList: singularUsageList,
-            compositeUsageCalc: compositeUsageCalc,
+            compositeUsageCalc: compositeUsageCalcRl,
             previousCollectionDateTimestampStr:
                 previousCollectionDateTimestampStr,
             currentCollectionDateTimestampStr:
@@ -1128,8 +1126,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       }
     }
 
-    PagEmsTypeUsageCalcReleased emsTypeUsageCalcReleased =
-        PagEmsTypeUsageCalcReleased(
+    PagEmsTypeUsageCalcRl emsTypeUsageCalcReleased = PagEmsTypeUsageCalcRl(
       costDecimals: widget.costDecimals,
       billedAutoUsageE: billedAutoUsages['billed_auto_usage_e'],
       billedAutoUsageW: billedAutoUsages['billed_auto_usage_w'],

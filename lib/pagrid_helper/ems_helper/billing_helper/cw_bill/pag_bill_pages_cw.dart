@@ -1,5 +1,8 @@
 import 'dart:math';
 import 'dart:typed_data';
+import 'package:buff_helper/pagrid_helper/ems_helper/tenant/mdl_ems_type_usage.dart';
+import 'package:buff_helper/pagrid_helper/ems_helper/tenant/mdl_ems_type_usage_r2.dart';
+import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_ems_type_usage_calc_rl.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/up_helper/helper/tenant_def.dart';
 import 'package:flutter/material.dart' as mt;
@@ -8,6 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import 'dart:developer' as dev;
 
 const int boltIcon = 0xea0b;
 const int waterIcon = 0xf084;
@@ -670,15 +674,37 @@ class PagBill {
 
   pw.Widget _getTypeRow2(int codePoint, String typeStr, String typeUnit,
       Map<String, dynamic> singularUsageInfo, String typeKeyPrefix) {
-    // return pw.Container();
+    PagEmsTypeUsageCalcRl usageCalc = singularUsageInfo['usage_calc'];
+
+    EmsTypeUsageR2? typeUsage;
+    if (typeStr == 'Electricity') {
+      typeUsage = usageCalc.getTypeUsage('E');
+    } else if (typeStr == 'BTU') {
+      typeUsage = usageCalc.getTypeUsage('B');
+    } else if (typeStr == 'Water') {
+      typeUsage = usageCalc.getTypeUsage('W');
+    } else if (typeStr == 'NeWater') {
+      typeUsage = usageCalc.getTypeUsage('N');
+    } else if (typeStr == 'Gas') {
+      typeUsage = usageCalc.getTypeUsage('G');
+    }
+
+    if (typeUsage == null) {
+      dev.log('Usage is null for type $typeStr');
+      return pw.Container();
+    }
+    if (typeUsage.usage == null) {
+      return pw.Container();
+    }
+
     pw.TextStyle textStyle = const pw.TextStyle(
       color: _darkColor,
       fontSize: 10,
     );
 
-    double usage = singularUsageInfo['typeUsage$typeKeyPrefix'] ?? 0;
-    double rate = singularUsageInfo['typeRate$typeKeyPrefix'] ?? 0;
-    double cost = singularUsageInfo['typeCost$typeKeyPrefix'] ?? 0;
+    double usage = typeUsage.usage!;
+    double rate = typeUsage.rate!;
+    double cost = typeUsage.cost!;
 
     List<Map<String, dynamic>>? trending;
 

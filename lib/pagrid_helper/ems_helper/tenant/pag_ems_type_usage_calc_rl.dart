@@ -2,7 +2,7 @@ import 'package:buff_helper/pkg_buff_helper.dart';
 
 import 'mdl_ems_type_usage_r2.dart';
 
-class PagEmsTypeUsageCalcReleased {
+class PagEmsTypeUsageCalcRl {
   late final int _costDecimals;
   //input
   late final double? _billedAutoUsageE;
@@ -43,7 +43,7 @@ class PagEmsTypeUsageCalcReleased {
 
   late final String? _billBarFromMonth;
 
-  List<PagEmsTypeUsageCalcReleased> _singularCalcList = [];
+  List<PagEmsTypeUsageCalcRl> _singularCalcList = [];
 
   late final Map<String, dynamic>? _miniSoaInfo;
 
@@ -91,9 +91,9 @@ class PagEmsTypeUsageCalcReleased {
 
   Map<String, dynamic>? get interestInfo => _interestInfo;
 
-  List<PagEmsTypeUsageCalcReleased> get singularCalcList => _singularCalcList;
+  List<PagEmsTypeUsageCalcRl> get singularCalcList => _singularCalcList;
 
-  PagEmsTypeUsageCalcReleased({
+  PagEmsTypeUsageCalcRl({
     required int costDecimals,
     double? billedAutoUsageE,
     double? billedAutoUsageW,
@@ -124,7 +124,7 @@ class PagEmsTypeUsageCalcReleased {
     required List<Map<String, dynamic>>? lineItemList,
     List<Map<String, dynamic>>? billedTrendingSnapShot,
     String? billBarFromMonth,
-    List<PagEmsTypeUsageCalcReleased> singularUsageCalcList = const [],
+    List<PagEmsTypeUsageCalcRl> singularUsageCalcList = const [],
     // double? balBf,
     // double? balBfUsage,
     // double? balBfInterest,
@@ -213,6 +213,7 @@ class PagEmsTypeUsageCalcReleased {
 
   void doCompositeCalc() {
     _calcCompositeTypeUsage();
+    _calcTotalCost();
   }
 
   EmsTypeUsageR2 getTypeUsage(String usageType) {
