@@ -490,6 +490,10 @@ class PagEmsTypeUsageCalcRl {
         _payableAmount = -1 * closingBalance + (_payableAmount ?? 0);
       }
     }
+
+    if (_payableAmount != null) {
+      _payableAmount = getRound(_payableAmount!, 2);
+    }
   }
 
   void _calcCompositeTypeUsage() {

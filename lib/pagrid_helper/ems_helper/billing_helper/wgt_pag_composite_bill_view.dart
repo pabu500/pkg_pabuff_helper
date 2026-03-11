@@ -349,6 +349,14 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     String tenantLabel = _bill['tenant_label'];
     String tenantAccountNumber = _bill['tenant_account_number'] ?? '';
     String tenantType = _bill['tenant_type'] ?? '';
+    String depositAmountStr = _bill['deposit_amount'] ?? '';
+    String paymentMethod = _bill['payment_method'] ?? '';
+    if (paymentMethod.toLowerCase() != 'giro') {
+      paymentMethod = 'Non-Giro';
+    }
+    String billingAddressLine1 = _bill['billing_address_line_1'] ?? '';
+    String billingAddressLine2 = _bill['billing_address_line_2'] ?? '';
+    String billingAddressLine3 = _bill['billing_address_line_3'] ?? '';
     String fromTimestampStr = _bill['from_timestamp'];
     DateTime fromDatetime = getTargetDatetimeFromTargetStr(fromTimestampStr);
     String toTimestampStr = _bill['to_timestamp'];
@@ -440,6 +448,11 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
           tenantLabel,
           tenantAccountNumber,
           tenantType,
+          billingAddressLine1,
+          billingAddressLine2,
+          billingAddressLine3,
+          depositAmountStr,
+          paymentMethod,
           fromTimestampStr,
           toTimestampStr,
           fromDatetime,
@@ -772,6 +785,11 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     String tenantLabel,
     String accountId,
     String tenantType,
+    String billingAddressLine1,
+    String billingAddressLine2,
+    String billingAddressLine3,
+    String depositAmountStr,
+    String paymentMethod,
     String fromTimestampStr,
     String toTimestampStr,
     DateTime fromDatetime,
@@ -846,7 +864,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
         billedGst = double.tryParse(singularUsage['billed_gst']);
       }
 
-      PagEmsTypeUsageCalcRl emsTypeUsageCalcReleased = PagEmsTypeUsageCalcRl(
+      PagEmsTypeUsageCalcRl emsTypeUsageCalcRl = PagEmsTypeUsageCalcRl(
         costDecimals: widget.costDecimals,
         billedAutoUsageE: billedAutoUsageInfo['billed_auto_usage_e'],
         billedAutoUsageW: billedAutoUsageInfo['billed_auto_usage_w'],
@@ -883,10 +901,10 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
         billedTrendingSnapShot: billedTrendingSnapShot,
         billBarFromMonth: billBarFromMonth,
       );
-      emsTypeUsageCalcReleased.doSingularCalc();
-      singularUsageCalcList.add(emsTypeUsageCalcReleased);
+      emsTypeUsageCalcRl.doSingularCalc();
+      singularUsageCalcList.add(emsTypeUsageCalcRl);
 
-      singularUsage['usage_calc'] = emsTypeUsageCalcReleased;
+      singularUsage['usage_calc'] = emsTypeUsageCalcRl;
     }
 
     // double balBf = double.tryParse(balBfStr) ?? 0.0;
@@ -940,17 +958,25 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
               'customerAccountId': accountId,
               'customerLabel': tenantLabel,
               'customerType': tenantType,
+              'depositAmountStr': depositAmountStr,
+              'paymentMethod': paymentMethod,
+              'billingAddressLine1': billingAddressLine1,
+              'billingAddressLine2': billingAddressLine2,
+              'billingAddressLine3': billingAddressLine3,
               'gst': billedGst,
               'billingRecName': _bill['billing_rec_name'],
+              'billLabel': _bill['bill_label'],
               'billFrom': fromTimestampStr,
               'billTo': toTimestampStr,
               'billDate': _bill['released_bill_timestamp'] ??
                   _bill['created_timestamp'],
+              'dueDate': _bill['billed_due_date_timestamp'] ?? '',
               'billTimeRangeStr': billTimeRangeStr,
               'tenantUsageSummary': const [],
               'subTotalAmount': compositeUsageCalcRl.subTotalCost,
               'gstAmount': compositeUsageCalcRl.gstAmount,
               'totalAmount': compositeUsageCalcRl.totalCost,
+              'payableAmount': compositeUsageCalcRl.payableAmount,
               'typeRateE': compositeUsageCalcRl.typeUsageE?.rate,
               'typeRateW': compositeUsageCalcRl.typeUsageW?.rate,
               'typeRateB': compositeUsageCalcRl.typeUsageB?.rate,
@@ -1167,6 +1193,9 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
               'customerAccountId': accountId,
               'customerLabel': tenantLabel,
               'customerType': tenantType,
+              'billingAddressLine1': _bill['billing_address_line_1'] ?? '',
+              'billingAddressLine2': _bill['billing_address_line_2'] ?? '',
+              'billingAddressLine3': _bill['billing_address_line_3'] ?? '',
               'gst': billedGst,
               'billingRecName': _bill['billing_rec_name'],
               'billFrom': fromTimestampStr,

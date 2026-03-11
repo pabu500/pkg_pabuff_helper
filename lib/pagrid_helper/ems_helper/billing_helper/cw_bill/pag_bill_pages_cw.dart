@@ -1,11 +1,9 @@
 import 'dart:math';
 import 'dart:typed_data';
-import 'package:buff_helper/pagrid_helper/ems_helper/tenant/mdl_ems_type_usage.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/tenant/mdl_ems_type_usage_r2.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_ems_type_usage_calc_rl.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/up_helper/helper/tenant_def.dart';
-import 'package:flutter/material.dart' as mt;
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
@@ -30,10 +28,15 @@ Future<Uint8List> generatePagInvoice(
 ) async {
   final invoice = PagBill(
     billingRecName: billInfo['billingRecName'],
+    billLabel: billInfo['billLabel'],
     customerLabel: billInfo['customerLabel'],
     customerName: billInfo['customerName'],
     tenantAccountNumber: billInfo['customerAccountId'] ?? '',
-    customerAddress: billInfo['customerAddress'] ?? '',
+    depositAmountStr: billInfo['depositAmountStr'] ?? '',
+    paymentMethod: billInfo['paymentMethod'] ?? '',
+    billingAddressLine1: billInfo['billingAddressLine1'] ?? '',
+    billingAddressLine2: billInfo['billingAddressLine2'] ?? '',
+    billingAddressLine3: billInfo['billingAddressLine3'] ?? '',
     customerType: billInfo['customerType'] ?? '',
     gst: billInfo['gst'],
     paymentInfo: billInfo['paymentInfo'] ?? '',
@@ -44,6 +47,8 @@ Future<Uint8List> generatePagInvoice(
     subTotalAmount: billInfo['subTotalAmount'],
     gstAmount: billInfo['gstAmount'],
     totalAmount: billInfo['totalAmount'],
+    payableAmount: billInfo['payableAmount'],
+    dueDate: billInfo['dueDate'],
     typeRateE: billInfo['typeRateE'],
     typeRateW: billInfo['typeRateW'],
     typeRateB: billInfo['typeRateB'],
@@ -81,10 +86,15 @@ class PagBill {
     required this.customerName,
     required this.tenantAccountNumber,
     required this.customerLabel,
-    required this.customerAddress,
+    required this.billingAddressLine1,
+    required this.billingAddressLine2,
+    required this.billingAddressLine3,
     required this.customerType,
+    required this.depositAmountStr,
+    required this.paymentMethod,
     required this.gst,
     required this.billingRecName,
+    required this.billLabel,
     required this.billFromStr,
     required this.billToStr,
     required this.billDateStr,
@@ -116,6 +126,8 @@ class PagBill {
     required this.paymentInfo,
     required this.lineItemLabel1,
     required this.lineItemValue1,
+    required this.payableAmount,
+    required this.dueDate,
     required this.baseColor,
     required this.accentColor,
     required this.assetFolder,
@@ -125,17 +137,24 @@ class PagBill {
   final String customerLabel;
   final String customerName;
   final String tenantAccountNumber;
-  final String customerAddress;
+  final String billingAddressLine1;
+  final String billingAddressLine2;
+  final String billingAddressLine3;
   final String customerType;
+  final String depositAmountStr;
+  final String paymentMethod;
   final double? gst;
   final String billingRecName;
+  final String billLabel;
   final String billFromStr;
   final String billToStr;
   final String billDateStr;
+  final String dueDate;
   final String billTimeRangeStr;
   final double? subTotalAmount;
   final double? gstAmount;
   final double? totalAmount;
+  final double? payableAmount;
   final double? typeRateE;
   final double? typeRateW;
   final double? typeRateB;
@@ -208,6 +227,7 @@ class PagBill {
       footer: _buildFooter,
       build: (context) => [
         _contentHeader(context),
+        pw.SizedBox(height: 5),
         _getBillTime(),
         _getSingularList(),
         // pw.SizedBox(height: 10),
@@ -219,7 +239,7 @@ class PagBill {
   }
 
   pw.Widget _buildHeader(pw.Context context) {
-    int codePoint = mt.Icons.abc.codePoint;
+    // int codePoint = mt.Icons.abc.codePoint;
     //hex
     return pw.Column(
       children: [
@@ -235,6 +255,12 @@ class PagBill {
               ),
             ),
             pw.Expanded(child: pw.Container()),
+            pw.SizedBox(width: 250, child: _getPaymentInfo()),
+          ],
+        ),
+        pw.Row(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
             pw.SizedBox(width: 250, child: _getPayerInfo()),
           ],
         ),
@@ -275,7 +301,7 @@ class PagBill {
         //   ),
         // ),
         pw.Text(
-          'Bill Number:$billingRecName',
+          'Bill Number: $billingRecName',
           style: const pw.TextStyle(color: _darkColor, fontSize: 9),
         ),
       ],
@@ -303,16 +329,47 @@ class PagBill {
   }
 
   pw.Widget _getPayerInfo() {
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        pw.Text(customerLabel,
+            style: pw.TextStyle(
+                color: _darkColor,
+                fontSize: 11,
+                fontWeight: pw.FontWeight.bold)),
+        pw.SizedBox(height: 5),
+        pw.Row(children: [
+          pw.Text(billingAddressLine1,
+              style: const pw.TextStyle(color: _darkColor, fontSize: 10)),
+        ]),
+        pw.Row(children: [
+          pw.Text(billingAddressLine2,
+              style: const pw.TextStyle(color: _darkColor, fontSize: 10)),
+        ]),
+        pw.Row(children: [
+          pw.Text(billingAddressLine3,
+              style: const pw.TextStyle(color: _darkColor, fontSize: 10)),
+        ]),
+      ],
+    );
+  }
+
+  pw.Widget _getPaymentInfo() {
     pw.TextStyle textStyle = const pw.TextStyle(
       color: _darkColor,
       fontSize: 9,
+    );
+    pw.TextStyle textStyleLarge = pw.TextStyle(
+      color: _darkColor,
+      fontSize: 13,
+      fontWeight: pw.FontWeight.bold,
     );
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       // mainAxisAlignment: pw.MainAxisAlignment.spaceAround,
       children: [
         pw.SizedBox(
-          height: 150,
+          height: 160,
           child: pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
@@ -320,37 +377,62 @@ class PagBill {
                 pw.Text('TAX INVOICE',
                     style: pw.TextStyle(
                         color: _darkColor,
-                        fontSize: 12,
+                        fontSize: 13.5,
                         fontWeight: pw.FontWeight.bold)),
                 pw.SizedBox(height: 5),
-                pw.Text(/*customerLabel,*/ tenantAccountNumber,
-                    style: pw.TextStyle(
-                        color: _darkColor,
-                        fontSize: 11,
-                        fontWeight: pw.FontWeight.bold)),
-                pw.SizedBox(height: 5),
-                pw.Row(children: [
-                  pw.Text('Tenant ID: ',
-                      style: pw.TextStyle(
-                          fontSize: 10,
-                          color: _darkColor,
-                          fontWeight: pw.FontWeight.bold)),
-                  pw.Text(customerName,
-                      style:
-                          const pw.TextStyle(color: _darkColor, fontSize: 10)),
-                ]),
-                pw.SizedBox(height: 5),
-                pw.Row(children: [
-                  pw.Text('Account Number: ',
-                      style: pw.TextStyle(
-                          fontSize: 10,
-                          color: _darkColor,
-                          fontWeight: pw.FontWeight.bold)),
-                  pw.Text(tenantAccountNumber,
-                      style:
-                          const pw.TextStyle(color: _darkColor, fontSize: 10)),
-                ]),
-                pw.Text(customerAddress, style: textStyle),
+                pw.Table(
+                    border: pw.TableBorder.all(
+                        color: PdfColors.grey600, width: 0.5),
+                    columnWidths: {
+                      0: const pw.FixedColumnWidth(35),
+                      1: const pw.FixedColumnWidth(35),
+                    },
+                    defaultVerticalAlignment:
+                        pw.TableCellVerticalAlignment.middle,
+                    children: [
+                      pw.TableRow(children: [
+                        pw.Text(' Account Number:', style: textStyle),
+                        pw.Text(' $tenantAccountNumber', style: textStyle)
+                      ]),
+                      pw.TableRow(children: [
+                        pw.Text(' Invoice Number:', style: textStyle),
+                        pw.Text(' $billLabel', style: textStyle),
+                      ]),
+                      pw.TableRow(children: [
+                        pw.Text(' Date of Invoice:', style: textStyle),
+                        pw.Text(' ${billDateStr.substring(0, 10)}',
+                            style: textStyle),
+                      ]),
+                      pw.TableRow(children: [
+                        pw.Text(' Deposit Amount:', style: textStyle),
+                        pw.Text(' $depositAmountStr', style: textStyle),
+                      ]),
+                      pw.TableRow(children: [
+                        pw.Text(' Mode of Payment:', style: textStyle),
+                        pw.Text(' $paymentMethod', style: textStyle),
+                      ]),
+                    ]),
+                pw.SizedBox(height: 15),
+                pw.Table(
+                    border: pw.TableBorder.all(
+                        color: PdfColors.grey600, width: 0.5),
+                    columnWidths: {
+                      0: const pw.FixedColumnWidth(35),
+                      1: const pw.FixedColumnWidth(35),
+                    },
+                    defaultVerticalAlignment:
+                        pw.TableCellVerticalAlignment.middle,
+                    children: [
+                      pw.TableRow(children: [
+                        pw.Text(' Total Amount Payable:', style: textStyle),
+                        pw.Text(' $payableAmount', style: textStyleLarge),
+                      ]),
+                      pw.TableRow(children: [
+                        pw.Text(' Due Date:', style: textStyle),
+                        pw.Text(' ${dueDate.substring(0, 10)}',
+                            style: textStyleLarge),
+                      ]),
+                    ]),
               ]),
         ),
       ],
