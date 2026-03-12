@@ -40,6 +40,7 @@ class WgtListSearchKind2 extends StatefulWidget {
     this.width,
     this.allowChangeItemType = true,
     this.allowFlexiLabel = false,
+    this.additionalQuery = const {},
   });
 
   final MdlPagAppConfig appConfig;
@@ -59,6 +60,7 @@ class WgtListSearchKind2 extends StatefulWidget {
   final double? width;
   final bool allowChangeItemType;
   final bool allowFlexiLabel;
+  final Map<String, dynamic> additionalQuery;
 
   @override
   State<WgtListSearchKind2> createState() => _WgtListSearchKind2State();
@@ -319,6 +321,7 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
               prefKey: prefKey,
               listContextType: widget.listContextType,
               additionalColumnConfig: widget.additionalColumnConfig,
+              additionalQuery: widget.additionalQuery,
               itemTypeListStr: itemTypeListStr,
               enablePaneModeSwitcher: enablePaneModeSwitcher,
               allowFlexiLabel: widget.isCompactFinder
