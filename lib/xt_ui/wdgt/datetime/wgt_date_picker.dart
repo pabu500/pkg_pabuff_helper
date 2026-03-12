@@ -14,6 +14,7 @@ class WgtDatePicker extends StatefulWidget {
     this.onDateCleared,
     this.label,
     this.initialDate,
+    this.enabled = true,
   });
 
   final int timeZone;
@@ -25,6 +26,7 @@ class WgtDatePicker extends StatefulWidget {
   final Function()? onDateCleared;
   final String? label;
   final DateTime? initialDate;
+  final bool enabled;
 
   @override
   State<WgtDatePicker> createState() => _WgtDatePickerState();
@@ -83,6 +85,11 @@ class _WgtDatePickerState extends State<WgtDatePicker> {
             children: <Widget>[
               widget.prefix ?? Container(),
               InkWell(
+                onTap: widget.enabled
+                    ? () {
+                        _selectDate(context);
+                      }
+                    : null,
                 child: Text(_selectedDateText,
                     textAlign: TextAlign.center,
                     style: TextStyle(
@@ -91,32 +98,33 @@ class _WgtDatePickerState extends State<WgtDatePicker> {
                           ? Theme.of(context).hintColor
                           : null,
                     )),
-                onTap: () {
-                  _selectDate(context);
-                },
               ),
               _selectedDateTime == null
                   ? Container()
                   : IconButton(
                       icon: const Icon(Icons.clear),
                       tooltip: 'Tap to clear date',
-                      onPressed: () {
-                        if (widget.onDateCleared != null) {
-                          widget.onDateCleared!();
-                        }
-                        setState(() {
-                          _selectedDateText = 'Select date';
-                          _selectedDateTime = null;
-                        });
-                      },
+                      onPressed: widget.enabled
+                          ? () {
+                              if (widget.onDateCleared != null) {
+                                widget.onDateCleared!();
+                              }
+                              setState(() {
+                                _selectedDateText = 'Select date';
+                                _selectedDateTime = null;
+                              });
+                            }
+                          : null,
                     ),
               IconButton(
                 icon: Icon(Icons.calendar_today,
                     color: Theme.of(context).colorScheme.primary),
                 tooltip: 'Tap to open date picker',
-                onPressed: () {
-                  _selectDate(context);
-                },
+                onPressed: widget.enabled
+                    ? () {
+                        _selectDate(context);
+                      }
+                    : null,
               ),
               widget.suffix ?? Container(),
             ],
