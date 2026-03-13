@@ -115,9 +115,9 @@ class WgtPieChartState extends State<WgtPieChart> {
   @override
   void initState() {
     super.initState();
-    if (widget.chartData.isEmpty) {
-      return;
-    }
+    // if (widget.chartData.isEmpty) {
+    //   return;
+    // }
     if (widget.chartData[0].containsKey('color')) {
       _listColor = widget.chartData.map((e) => e['color'] as Color).toList();
     } else {
