@@ -43,6 +43,7 @@ enum PagTenantLcStatus {
       enumByTag(
         tag,
         values,
+        (e) => (e).tag,
       ) ??
       normal;
 
@@ -65,15 +66,15 @@ enum PagTenantLcStatus {
   }
 }
 
-T? enumByTag<T extends Enum>(String? tag, List<T> values) {
-  if (tag == null) return null;
-  for (var value in values) {
-    if (value is PagTenantLcStatus && value.tag.replaceAll('.', '') == tag) {
-      return value as T;
-    }
-  }
-  return null;
-}
+// T? enumByTag<T extends Enum>(String? tag, List<T> values) {
+//   if (tag == null) return null;
+//   for (var value in values) {
+//     if (value is PagTenantLcStatus && value.tag.replaceAll('.', '') == tag) {
+//       return value as T;
+//     }
+//   }
+//   return null;
+// }
 
 enum PagTenantUnitType {
   beautyWellness(
@@ -127,6 +128,7 @@ enum PagTenantUnitType {
       enumByTag(
         tag,
         values,
+        (e) => (e).tag,
       ) ??
       others;
 }
@@ -168,6 +170,7 @@ enum PagTenantPaymentMethod {
       enumByTag(
         tag,
         values,
+        (e) => (e).tag,
       ) ??
       other;
 }

@@ -15,6 +15,7 @@ enum PagDeviceCat {
   gateway('Gateway', 'gateway', 'gw', Symbols.switch_access),
   mcu('MCU', 'mcu', 'mcu', Symbols.memory),
   motherboard('Motherboard', 'motherboard', 'mb', Symbols.developer_board),
+  sim('SIM', 'sim', 'sim', Symbols.sim_card),
   none('None', 'none', 'non', Symbols.help);
 
   const PagDeviceCat(
@@ -33,7 +34,7 @@ enum PagDeviceCat {
       enumByLabel(label, values, (e) => (e).label) ?? none;
 
   static PagDeviceCat byValue(String? value) =>
-      enumByValue(value, values) ?? none;
+      enumByValue(value, values, (e) => (e).value) ?? none;
 }
 
 // T? enumByLabel<T extends Enum>(String? label, List<T> values) {
@@ -46,15 +47,15 @@ enum PagDeviceCat {
 //   return null;
 // }
 
-T? enumByValue<T extends Enum>(String? value, List<T> values) {
-  if (value == null) return null;
-  for (var item in values) {
-    if (item is PagDeviceCat && item.value.replaceAll('.', '') == value) {
-      return item as T;
-    }
-  }
-  return null;
-}
+// T? enumByValue<T extends Enum>(String? value, List<T> values) {
+//   if (value == null) return null;
+//   for (var item in values) {
+//     if (item is PagDeviceCat && item.value.replaceAll('.', '') == value) {
+//       return item as T;
+//     }
+//   }
+//   return null;
+// }
 
 // T? enumByTag<T extends Enum>(String? tag, List<T> values) {
 //   if (tag == null) return null;
@@ -194,7 +195,8 @@ String? validateModel(String val) {
 
   // Pattern: int.int.int[.alphanumeric] or int.int.int[.int]
   // final pattern = r'^\d{1,3}\.\d{1,3}\.\d{1,3}(\.[A-Za-z0-9]+)?$';
-  final pattern = r'^(\d{1,3}\.\d{1,3}\.\d{1,3}(\.[A-Za-z0-9]+)?|[A-Za-z0-9]{3})$';
+  final pattern =
+      r'^(\d{1,3}\.\d{1,3}\.\d{1,3}(\.[A-Za-z0-9]+)?|[A-Za-z0-9]{3})$';
 
   final regExp = RegExp(pattern);
 
@@ -443,22 +445,22 @@ final List<Map<String, dynamic>> listConfigBaseGateway = [
 ];
 
 final List<Map<String, dynamic>> listConfigBaseMcu = [
-  {
-    'col_key': 'ip',
-    'title': 'ip',
-    'col_type': 'string',
-    'width': 150,
-    'is_mapping_required': false,
-    'validator': validateIp,
-  },
-  {
-    'col_key': 'iccid',
-    'title': 'iccid',
-    'col_type': 'string',
-    'width': 150,
-    'is_mapping_required': false,
-    'validator': validateDeviceIccid,
-  },
+  // {
+  //   'col_key': 'ip',
+  //   'title': 'ip',
+  //   'col_type': 'string',
+  //   'width': 150,
+  //   'is_mapping_required': false,
+  //   'validator': validateIp,
+  // },
+  // {
+  //   'col_key': 'iccid',
+  //   'title': 'iccid',
+  //   'col_type': 'string',
+  //   'width': 150,
+  //   'is_mapping_required': false,
+  //   'validator': validateDeviceIccid,
+  // },
 ];
 
 final List<Map<String, dynamic>> listConfigBaseMotherboard = [];
@@ -498,6 +500,25 @@ final List<Map<String, dynamic>> listConfigBaseMeterGroup = [
   },
 ];
 
+final List<Map<String, dynamic>> listConfigBaseSim = [
+  {
+    'col_key': 'ip',
+    'title': 'ip',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': true,
+    'validator': validateIp,
+  },
+  {
+    'col_key': 'iccid',
+    'title': 'ICCID',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': true,
+    'validator': validateDeviceIccid,
+  },
+];
+
 List<Map<String, dynamic>> getDeviceConfigListByCat(PagDeviceCat cat) {
   switch (cat) {
     case PagDeviceCat.meter:
@@ -510,6 +531,8 @@ List<Map<String, dynamic>> getDeviceConfigListByCat(PagDeviceCat cat) {
       return listConfigBaseDevice + listConfigBaseMotherboard;
     case PagDeviceCat.meterGroup:
       return listConfigBaseDevice + listConfigBaseMeterGroup;
+    case PagDeviceCat.sim:
+      return listConfigBaseDevice + listConfigBaseSim;
     default:
       return listConfigBaseDevice;
   }
@@ -578,5 +601,63 @@ String getMeterOpsFileUploadMessage(PagMeterOpType opType) {
       return 'Upload Meter Reading Data';
     default:
       return 'Unsupported Meter Operation';
+  }
+}
+
+enum PagMeterCommType {
+  mms('mms', 'mms', 'mms', Colors.brown),
+  evs2loop('evs2loop', 'evs2_loop', 'evs2loop', Colors.deepPurple),
+  evs2mcu('evs2mcu', 'evs2_mcu', 'evs2mcu', Colors.green),
+  unknown('unknown', 'unknown', 'unknown', Colors.grey);
+
+  const PagMeterCommType(
+    this.label,
+    this.value, // the value that is stored in the database
+    this.tag,
+    this.color,
+  );
+
+  final String label;
+  final String value;
+  final String tag;
+
+  final Color color;
+
+  static PagMeterCommType? byLabel(String? label) => enumByLabel(
+        label,
+        values,
+        (e) => (e).label,
+      );
+
+  static PagMeterCommType byValue(String? value) =>
+      enumByValue(
+        value,
+        values,
+        (e) => (e).value,
+      ) ??
+      unknown;
+
+  static PagMeterCommType? byTag(String? tag) => enumByTag(
+        tag,
+        values,
+        (e) => (e).tag,
+      );
+
+  static Widget getTagWidget(PagMeterCommType status) {
+    Color color = status.color;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withAlpha(210),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Text(
+        status.tag,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 13,
+        ),
+      ),
+    );
   }
 }

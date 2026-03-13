@@ -501,7 +501,7 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
         : Container();
     // for (Map<String, dynamic> configItem in _listConfig) {
     for (var ctrlItem in widget.listController.listColControllerList) {
-      if (!(ctrlItem.showColumn)) {
+      if (!ctrlItem.showColumn) {
         continue;
       }
       if (widget.colKeyShowList.isNotEmpty &&
@@ -1109,6 +1109,10 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
         tagColor =
             billingGenType.color?.withAlpha(130) ?? Colors.grey.withAlpha(130);
       }
+    } else if (configItem['col_key'] == 'comm_type') {
+      PagMeterCommType commType = PagMeterCommType.byValue(tagText);
+      tagLabel = commType.tag;
+      tagColor = commType.color.withAlpha(130);
     } else {
       tagLabel = tagText;
     }

@@ -13,13 +13,14 @@ import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_popup_button.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
+import 'dart:developer' as dev;
 
 import '../../def_helper/dh_device.dart';
 import '../../def_helper/dh_pag_tenant.dart';
 import '../wgt_list_column_customize.dart';
-import 'dart:developer' as dev;
 
 class WgtPagEditCommitList2 extends StatefulWidget {
   const WgtPagEditCommitList2({
@@ -1064,6 +1065,10 @@ class _WgtPagEditCommitList2State extends State<WgtPagEditCommitList2> {
           tagColor = tenantLcStatus.color.withAlpha(130);
         }
       }
+    } else if (configItem['col_key'] == 'comm_type') {
+      PagMeterCommType commType = PagMeterCommType.byValue(tagText);
+      tagLabel = commType.tag;
+      tagColor = commType.color.withAlpha(130);
     } else {
       tagLabel = tagText;
     }
