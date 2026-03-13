@@ -324,9 +324,11 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
   Widget getTopStatPnl() {
     String submittedTimestamp = _deviceHealthData['submitted_timestamp'] ?? '';
     final content = _deviceHealthData['content'];
-    final version = content['v'];
-    final temperature = content['t'];
-    final signal = content['s'];
+    final version = content['v'] ?? '-';
+    final temperature = content['t'] == null ?
+        '-' :
+        '${content['t']}°C';
+    final signal = content['s'] ?? '-';
     final signalPercentage = content['s'] == null
         ? '-'
         : '${(int.parse(content['s'] as String) * 100 / 31).clamp(0, 100).toInt()}%';
@@ -387,7 +389,7 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
                         color: Theme.of(context).hintColor),
                     SizedBox(
                         width: valueWidth,
-                        child: Text('$temperature°C', style: valueStyle)),
+                        child: Text(temperature, style: valueStyle)),
                   ],
                 ),
               ),
@@ -433,12 +435,15 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
 
   Widget getMeterGroupStatus() {
     final meterGroupLabel =
-        _deviceHealthData['meter_group_label'] ?? 'Unknown';
+        _deviceHealthData['meter_group_label'];
 
     final content = _deviceHealthData['content'];
     final errorList = content['el'];
     final meterInfoList = _deviceHealthData['meter_info_list'] ?? [];
-    final String lastOnlineTimestamp = _deviceHealthData['gateway_last_online_timestamp'] ?? '';
+    final String lastOnlineTimestamp = _deviceHealthData['${widget.deviceCat.name}_last_online_timestamp'] ?? '';
+
+    bool isMeterGroupExist = meterGroupLabel != null && meterGroupLabel.isNotEmpty;
+    String labelToShow = isMeterGroupExist ? meterGroupLabel + ' ($lastOnlineTimestamp)' : lastOnlineTimestamp;
 
     // sort by tag strings
     meterInfoList.sort((a, b) {
@@ -485,14 +490,16 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(
-                    width: keyWidth,
-                    child: Icon(PagDeviceCat.meterGroup.iconData,
-                        color: Theme.of(context).hintColor)),
+                isMeterGroupExist
+                        ? SizedBox(
+                            width: keyWidth,
+                            child:  Icon(PagDeviceCat.meterGroup.iconData,
+                                    color: Theme.of(context).hintColor))
+                        : const SizedBox.shrink(),
                 horizontalSpaceTiny,
                 SizedBox(
                     width: valueWidth,
-                    child: Text(meterGroupLabel + ' ($lastOnlineTimestamp)', style: valueStyle)),
+                    child: Text(labelToShow, style: valueStyle)),
               ],
             ),
           ),
