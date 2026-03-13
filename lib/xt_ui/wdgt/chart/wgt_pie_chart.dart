@@ -136,6 +136,9 @@ class WgtPieChartState extends State<WgtPieChart> {
     double rightWidth = widget.showIndicator ? widget.indicatorWidth : 0;
     double widgetWidth =
         pieWidth + middleWidth + rightWidth + widget.indicatorOffset;
+
+    print('widget.chartData.length: ${widget.chartData.length}');
+
     return Container(
       width: widget.width ?? widgetWidth,
       height: widget.height ?? pieWidth + 20,
