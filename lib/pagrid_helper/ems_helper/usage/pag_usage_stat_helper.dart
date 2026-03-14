@@ -1,6 +1,5 @@
 import 'package:buff_helper/pagrid_helper/ems_helper/usage/usage_stat_helper.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
-import 'package:buff_helper/up_helper/helper/tenant_def.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -107,6 +106,7 @@ Widget getPagUsageTitle(
   bool isBillMode,
   String cycleStr,
   String billDate,
+  String dueDate,
 ) {
   // String rangeStr = getTimeRangeStr(
   //   fromDatetime,
@@ -119,8 +119,11 @@ Widget getPagUsageTitle(
     assert(billDate.isNotEmpty, 'BillDate is empty');
   }
 
+  final strDueDate =
+      dueDate.isNotEmpty ? 'Due Date: ${dueDate.substring(0, 10)}' : '';
+
   return ConstrainedBox(
-    constraints: const BoxConstraints(maxWidth: 350),
+    constraints: const BoxConstraints(maxWidth: 380),
     child: Container(
       padding: const EdgeInsets.only(right: 8),
       decoration: BoxDecoration(
@@ -152,7 +155,7 @@ Widget getPagUsageTitle(
                   color: Theme.of(context).hintColor.withAlpha(210),
                 ),
               ),
-              horizontalSpaceRegular,
+              horizontalSpaceSmall,
               Text(
                 tenantAccountId ?? '',
                 style: TextStyle(
@@ -175,9 +178,18 @@ Widget getPagUsageTitle(
                     color: Theme.of(context).hintColor,
                   ),
                 ),
-                horizontalSpaceRegular,
+                horizontalSpaceTiny,
                 Text(
                   'Bill Date: ${billDate.substring(0, 10)}',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).hintColor,
+                  ),
+                ),
+                horizontalSpaceTiny,
+                Text(
+                  strDueDate,
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,

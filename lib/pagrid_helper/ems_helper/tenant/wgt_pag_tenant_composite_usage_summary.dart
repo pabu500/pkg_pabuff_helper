@@ -171,6 +171,7 @@ class _WgtPagTenantCompositeUsageSummaryState
                     widget.isBillMode,
                     widget.cycleStr,
                     widget.billDate,
+                    widget.billInfo['billed_due_date_timestamp'] ?? '',
                   ),
                   getPagUsageTypeTopStat(
                     costDecimals: widget.costDecimals,

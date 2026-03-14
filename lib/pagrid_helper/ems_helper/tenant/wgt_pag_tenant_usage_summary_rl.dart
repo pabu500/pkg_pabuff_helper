@@ -10,8 +10,8 @@ import '../usage/pag_usage_stat_helper.dart';
 import '../usage/usage_stat_helper.dart';
 import '../usage/wgt_pag_meter_stat_core.dart';
 
-class WgtPagTenantUsageSummaryReleased extends StatefulWidget {
-  const WgtPagTenantUsageSummaryReleased({
+class WgtPagTenantUsageSummaryRl extends StatefulWidget {
+  const WgtPagTenantUsageSummaryRl({
     super.key,
     required this.appConfig,
     required this.loggedInUser,
@@ -30,6 +30,7 @@ class WgtPagTenantUsageSummaryReleased extends StatefulWidget {
     this.tenantAccountId = '',
     this.cycleStr = '',
     this.billDate = '',
+    this.dueDate = '',
     this.isBillMode = false,
     this.meterTypeRates = const {},
     this.gst,
@@ -58,6 +59,7 @@ class WgtPagTenantUsageSummaryReleased extends StatefulWidget {
   final String tenantType;
   final String cycleStr;
   final String billDate;
+  final String dueDate;
   final bool excludeAutoUsage;
   final bool isBillMode;
   final Map<String, dynamic> meterTypeRates;
@@ -73,12 +75,12 @@ class WgtPagTenantUsageSummaryReleased extends StatefulWidget {
   final int costDecimals;
 
   @override
-  State<WgtPagTenantUsageSummaryReleased> createState() =>
-      _WgtPagTenantUsageSummaryReleasedState();
+  State<WgtPagTenantUsageSummaryRl> createState() =>
+      _WgtPagTenantUsageSummaryRlState();
 }
 
-class _WgtPagTenantUsageSummaryReleasedState
-    extends State<WgtPagTenantUsageSummaryReleased> {
+class _WgtPagTenantUsageSummaryRlState
+    extends State<WgtPagTenantUsageSummaryRl> {
   final List<String> usageTypeList = ['E', 'B', 'W', 'N', 'G'];
 
   final widgetWidth = 750.0;
@@ -120,6 +122,7 @@ class _WgtPagTenantUsageSummaryReleasedState
                   widget.isBillMode,
                   widget.cycleStr,
                   widget.billDate,
+                  widget.dueDate,
                 ),
                 getPagUsageTypeTopStat(
                   costDecimals: widget.costDecimals,

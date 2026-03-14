@@ -27,8 +27,8 @@ class WgtPagTenantCompositeUsageSummaryRl extends StatefulWidget {
     this.showRenderModeSwitch = false,
     this.tenantLabel,
     this.tenantAccountId = '',
-    this.cycleStr = '',
-    this.billDate = '',
+    // this.cycleStr = '',
+    // this.billDate = '',
     this.isBillMode = true,
     this.billInfo = const {},
     this.gst,
@@ -63,8 +63,8 @@ class WgtPagTenantCompositeUsageSummaryRl extends StatefulWidget {
   final String tenantAccountId;
   final String? tenantLabel;
   final String tenantType;
-  final String cycleStr;
-  final String billDate;
+  // final String cycleStr;
+  // final String billDate;
   final bool excludeAutoUsage;
   final bool isBillMode;
   final Map<String, dynamic> billInfo;
@@ -146,8 +146,9 @@ class _WgtPagTenantCompositeUsageSummaryRlState
                     widget.tenantName,
                     widget.tenantAccountId,
                     widget.isBillMode,
-                    widget.cycleStr,
-                    widget.billDate,
+                    widget.billInfo['cycle_str'] ?? '',
+                    widget.billInfo['bill_date_timestamp'] ?? '',
+                    widget.billInfo['billed_due_date_timestamp'] ?? '',
                   ),
                   getPagUsageTypeTopStat(
                     costDecimals: widget.costDecimals,

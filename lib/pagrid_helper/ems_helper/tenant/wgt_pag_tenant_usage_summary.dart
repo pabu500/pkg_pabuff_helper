@@ -28,7 +28,7 @@ class WgtPagTenantUsageSummary extends StatefulWidget {
     required this.excludeAutoUsage,
     required this.displayContextStr,
     this.cycleStr = '',
-    this.billDate = '',
+    // this.billDate = '',
     this.usageCalc,
     this.showFactoredUsage = true,
     // required this.usageFactor,
@@ -66,7 +66,7 @@ class WgtPagTenantUsageSummary extends StatefulWidget {
   final String tenantAccountId;
   final String tenantType;
   final String cycleStr;
-  final String billDate;
+  // final String billDate;
   final bool excludeAutoUsage;
   final Map<String, dynamic> tenantUsageSummary;
   final List<Map<String, dynamic>> subTenantListUsageSummary;
@@ -117,6 +117,9 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
           context: context, errorText: 'Usage calc not available');
     }
 
+    final String billDate = widget.billInfo['bill_date_timestamp'] ?? '';
+    final String dueDate = widget.billInfo['billed_due_date_timestamp'] ?? '';
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 13),
       child: Container(
@@ -148,7 +151,8 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
                     widget.tenantAccountId,
                     widget.isBillMode,
                     widget.cycleStr,
-                    widget.billDate,
+                    billDate,
+                    dueDate,
                   ),
                   getPagUsageTypeTopStat(
                     costDecimals: widget.costDecimals,
