@@ -92,9 +92,6 @@ class PagEmsTypeUsageCalc {
     billBarFromMonth,
     List<Map<String, dynamic>>? billedTrendingSnapShot,
     List<PagEmsTypeUsageCalc> singularUsageCalcList = const [],
-    // double? balBf,
-    // double? balBfUsage,
-    // double? balBfInterest,
     Map<String, dynamic>? miniSoaInfo,
     Map<String, dynamic>? interestInfo,
   }) {
@@ -387,6 +384,7 @@ class PagEmsTypeUsageCalc {
       }
       _gstAmount = getRoundUp(_gstAmount!, 2);
       _totalCost = _subTotalCost! + _gstAmount!;
+
       _payableAmount = _totalCost;
 
       if (_interestInfo != null) {
@@ -402,11 +400,15 @@ class PagEmsTypeUsageCalc {
       }
 
       if (_miniSoaInfo != null) {
-        final closingBalanceStr = _miniSoaInfo['closing_balance'];
-        double? closingBalance = double.tryParse(closingBalanceStr ?? '');
+        final strClosingBalance = _miniSoaInfo['closing_balance'];
+        double? closingBalance = double.tryParse(strClosingBalance ?? '');
         if (closingBalance != null) {
           _payableAmount = -1 * closingBalance + (_payableAmount ?? 0);
         }
+      }
+
+      if (_payableAmount != null) {
+        _payableAmount = getRound(_payableAmount!, 2);
       }
     }
   }
@@ -611,7 +613,7 @@ class PagEmsTypeUsageCalc {
   }
 
   void _getUsageTrending() {
-    _getUsageTrendingReleased(_usageFactor);
+    _getUsageTrendingRl(_usageFactor);
     //   for (var item in _autoUsageSummary) {
     //     List<Map<String, dynamic>> conlidatedHistoryList = [];
     //     String meterType = item['meter_type'] ?? '';
@@ -690,7 +692,7 @@ class PagEmsTypeUsageCalc {
     // }
   }
 
-  void _getUsageTrendingReleased(Map<String, dynamic> usageFactor) {
+  void _getUsageTrendingRl(Map<String, dynamic> usageFactor) {
     if (_billedTrendingSnapShot == null) {
       return;
     }

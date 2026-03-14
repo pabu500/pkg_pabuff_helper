@@ -460,6 +460,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
           cycleStr,
           billDate,
           billBarFromMonth,
+          lineItemList,
           miniSoaInfo,
           strCollectionStartDateTimestamp,
           strCollectionEndDateTimestamp,
@@ -797,6 +798,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     String cycleStr,
     String billDate,
     String billBarFromMonth,
+    List<Map<String, dynamic>> lineItemList,
     Map<String, dynamic> miniSoaInfo,
     String previousCollectionDateTimestampStr,
     String currentCollectionDateTimestampStr,
@@ -897,7 +899,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
         billedRateN: billedRateInfo['billed_rate_n'],
         billedRateG: billedRateInfo['billed_rate_g'],
         billedGst: billedGst,
-        lineItemList: [],
+        lineItemList: [], //lineItemList,
         billedTrendingSnapShot: billedTrendingSnapShot,
         billBarFromMonth: billBarFromMonth,
       );
@@ -940,12 +942,9 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       billedUsageFactorN: _bill['billed_usage_factor_n'],
       billedUsageFactorG: _bill['billed_usage_factor_g'],
       billedTrendingSnapShot: _bill['billed_trending_snapshot'] ?? [],
-      lineItemList: [],
+      lineItemList: lineItemList,
       billBarFromMonth: billBarFromMonth,
       singularUsageCalcList: singularUsageCalcList,
-      // balBf: balBf,
-      // balBfUsage: balBfUsage,
-      // balBfInterest: balBfInterest,
       miniSoaInfo: miniSoaInfo,
       interestInfo: interestInfo,
     );
@@ -1045,219 +1044,6 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
                 // _lcStatusDisplay = _bill['lc_status'];
               });
             },
-          );
-  }
-
-  Widget getReleaseRenderOld(
-    String tenantName,
-    String tenantLabel,
-    String accountId,
-    String tenantType,
-    String fromTimestampStr,
-    String toTimestampStr,
-    DateTime fromDatetime,
-    DateTime toDatetime,
-    String billBarFromMonth,
-    String balBf,
-    String balBfUsage,
-    String balBfInterest,
-  ) {
-    bool isMonthly = true; //_bill['is_monthly'] == 'true' ? true : false;
-    String billTimeRangeStr = getTimeRangeStr(
-      fromDatetime,
-      toDatetime,
-      targetInterval: 'monthly',
-      useMiddle: isMonthly ? true : false,
-    );
-
-    Map<String, dynamic> billedAutoUsages = _bill['billed_auto_usages'] ?? {};
-    Map<String, dynamic> billedSubTenantUsages =
-        _bill['billed_sub_tenant_usages'] ?? {};
-    Map<String, dynamic> billedManualUsages =
-        _bill['billed_manual_usages'] ?? {};
-    Map<String, dynamic> billedUsageFactors =
-        _bill['billed_usage_factors'] ?? {};
-    Map<String, dynamic> billedRates = _bill['billed_rates'] ?? {};
-    double? billedGst;
-    for (String typeTag in usageTypeTags) {
-      typeTag = typeTag.toLowerCase();
-
-      var valueObj = billedAutoUsages['billed_auto_usage_$typeTag'] ?? '';
-      double? value;
-      if (valueObj is String) {
-        value = double.tryParse(valueObj);
-        billedAutoUsages['billed_auto_usage_$typeTag'] = value;
-      }
-
-      valueObj =
-          billedSubTenantUsages['billed_sub_tenant_usage_$typeTag'] ?? '';
-      if (valueObj is String) {
-        value = double.tryParse(valueObj);
-        billedSubTenantUsages['billed_sub_tenant_usage_$typeTag'] = value;
-      }
-
-      valueObj = billedManualUsages['manual_usage_$typeTag'] ?? '';
-      if (valueObj is String) {
-        value = double.tryParse(valueObj);
-        billedManualUsages['manual_usage_$typeTag'] = value;
-      }
-
-      valueObj = billedUsageFactors['billed_usage_factor_$typeTag'] ?? '';
-      if (valueObj is String) {
-        value = double.tryParse(valueObj);
-        billedUsageFactors['billed_usage_factor_$typeTag'] = value;
-      }
-
-      valueObj = billedRates['billed_rate_$typeTag'] ?? '';
-      if (valueObj is String) {
-        value = double.tryParse(valueObj);
-        billedRates['billed_rate_$typeTag'] = value;
-      }
-
-      if (billedGst == null) {
-        var gstObj = billedRates['billed_gst'] ?? '';
-        if (gstObj is String) {
-          billedGst = double.tryParse(gstObj);
-          if (billedGst == null) {
-            throw Exception('billed gst is null');
-          } else {
-            billedRates['billed_gst'] = billedGst;
-          }
-        } else if (gstObj is double) {
-          billedGst = gstObj;
-        }
-      }
-    }
-
-    Map<String, dynamic> lineItem = {};
-    Map<String, dynamic> lineItemInfo = _bill['line_item_info'];
-    if (lineItemInfo['line_item_label_1'] != null) {
-      lineItem['label'] = lineItemInfo['line_item_label_1'];
-    }
-    if (lineItemInfo['line_item_amount_1'] != null) {
-      lineItem['amount'] = lineItemInfo['line_item_amount_1'];
-    }
-
-    List<Map<String, dynamic>> subTenantListUsageSummary = [];
-    if (_bill['sub_tenant_list_usage_summary'] != null) {
-      for (var item in _bill['sub_tenant_list_usage_summary']) {
-        subTenantListUsageSummary.add(item);
-      }
-    }
-
-    List<Map<String, dynamic>> billedTrendingSnapShot = [];
-    if (_bill['billed_trending_snapshot'] != null) {
-      for (var item in _bill['billed_trending_snapshot']) {
-        billedTrendingSnapShot.add(item);
-      }
-    }
-
-    PagEmsTypeUsageCalcRl emsTypeUsageCalcReleased = PagEmsTypeUsageCalcRl(
-      costDecimals: widget.costDecimals,
-      billedAutoUsageE: billedAutoUsages['billed_auto_usage_e'],
-      billedAutoUsageW: billedAutoUsages['billed_auto_usage_w'],
-      billedAutoUsageB: billedAutoUsages['billed_auto_usage_b'],
-      billedAutoUsageN: billedAutoUsages['billed_auto_usage_n'],
-      billedAutoUsageG: billedAutoUsages['billed_auto_usage_g'],
-      billedSubTenantUsageE: billedSubTenantUsages['billed_sub_tenant_usage_e'],
-      billedSubTenantUsageW: billedSubTenantUsages['billed_sub_tenant_usage_w'],
-      billedSubTenantUsageB: billedSubTenantUsages['billed_sub_tenant_usage_b'],
-      billedSubTenantUsageN: billedSubTenantUsages['billed_sub_tenant_usage_n'],
-      billedSubTenantUsageG: billedSubTenantUsages['billed_sub_tenant_usage_g'],
-      billedManualUsageE: billedManualUsages['manual_usage_e'],
-      billedManualUsageW: billedManualUsages['manual_usage_w'],
-      billedManualUsageB: billedManualUsages['manual_usage_b'],
-      billedManualUsageN: billedManualUsages['manual_usage_n'],
-      billedManualUsageG: billedManualUsages['manual_usage_g'],
-      billedUsageFactorE: billedUsageFactors['billed_usage_factor_e'],
-      billedUsageFactorW: billedUsageFactors['billed_usage_factor_w'],
-      billedUsageFactorB: billedUsageFactors['billed_usage_factor_b'],
-      billedUsageFactorN: billedUsageFactors['billed_usage_factor_n'],
-      billedUsageFactorG: billedUsageFactors['billed_usage_factor_g'],
-      billedRateE: billedRates['billed_rate_e'],
-      billedRateW: billedRates['billed_rate_w'],
-      billedRateB: billedRates['billed_rate_b'],
-      billedRateN: billedRates['billed_rate_n'],
-      billedRateG: billedRates['billed_rate_g'],
-      billedGst: billedGst,
-      lineItemList: [lineItem],
-      billedTrendingSnapShot: billedTrendingSnapShot,
-      billBarFromMonth: billBarFromMonth,
-    );
-    emsTypeUsageCalcReleased.doCalc();
-
-    return _renderMode == 'pdf'
-        ? WgtBillRenderPdf(
-            billingInfo: {
-              'customerName': tenantName,
-              'customerAccountId': accountId,
-              'customerLabel': tenantLabel,
-              'customerType': tenantType,
-              'billingAddressLine1': _bill['billing_address_line_1'] ?? '',
-              'billingAddressLine2': _bill['billing_address_line_2'] ?? '',
-              'billingAddressLine3': _bill['billing_address_line_3'] ?? '',
-              'gst': billedGst,
-              'billingRecName': _bill['billing_rec_name'],
-              'billFrom': fromTimestampStr,
-              'billTo': toTimestampStr,
-              'billDate': _bill['released_bill_timestamp'] ??
-                  _bill['created_timestamp'],
-              'billTimeRangeStr': billTimeRangeStr,
-              'tenantUsageSummary': const [],
-              'subTotalAmount': emsTypeUsageCalcReleased.subTotalCost,
-              'gstAmount': emsTypeUsageCalcReleased.gstAmount,
-              'totalAmount': emsTypeUsageCalcReleased.totalCost,
-              'typeRateE': emsTypeUsageCalcReleased.typeUsageE?.rate,
-              'typeRateW': emsTypeUsageCalcReleased.typeUsageW?.rate,
-              'typeRateB': emsTypeUsageCalcReleased.typeUsageB?.rate,
-              'typeRateN': emsTypeUsageCalcReleased.typeUsageN?.rate,
-              'typeRateG': emsTypeUsageCalcReleased.typeUsageG?.rate,
-              'typeUsageE': emsTypeUsageCalcReleased.typeUsageE?.usageFactored,
-              'typeUsageW': emsTypeUsageCalcReleased.typeUsageW?.usageFactored,
-              'typeUsageB': emsTypeUsageCalcReleased.typeUsageB?.usageFactored,
-              'typeUsageN': emsTypeUsageCalcReleased.typeUsageN?.usageFactored,
-              'typeUsageG': emsTypeUsageCalcReleased.typeUsageG?.usageFactored,
-              'typeCostE': emsTypeUsageCalcReleased.typeUsageE?.cost,
-              'typeCostW': emsTypeUsageCalcReleased.typeUsageW?.cost,
-              'typeCostB': emsTypeUsageCalcReleased.typeUsageB?.cost,
-              'typeCostN': emsTypeUsageCalcReleased.typeUsageN?.cost,
-              'typeCostG': emsTypeUsageCalcReleased.typeUsageG?.cost,
-              'trendingE': emsTypeUsageCalcReleased.trendingE,
-              'trendingW': emsTypeUsageCalcReleased.trendingW,
-              'trendingB': emsTypeUsageCalcReleased.trendingB,
-              'trendingN': emsTypeUsageCalcReleased.trendingN,
-              'trendingG': emsTypeUsageCalcReleased.trendingG,
-              'lineItemLabel1':
-                  emsTypeUsageCalcReleased.getLineItem(0)?['label'],
-              'lineItemValue1':
-                  emsTypeUsageCalcReleased.getLineItem(0)?['amount'],
-            },
-          )
-        : WgtPagTenantUsageSummaryReleased(
-            costDecimals: widget.costDecimals,
-            appConfig: widget.appConfig,
-            loggedInUser: widget.loggedInUser,
-            displayContextStr: '',
-            isBillMode: widget.isBillMode,
-            usageCalc: emsTypeUsageCalcReleased,
-            showRenderModeSwitch: true,
-            itemType: ItemType.meter_iwow,
-            isMonthly: isMonthly,
-            fromDatetime: fromDatetime,
-            toDatetime: toDatetime,
-            tenantName: tenantName,
-            tenantLabel: tenantLabel,
-            tenantAccountId: accountId,
-            tenantType: tenantType,
-            billedAutoUsages: billedAutoUsages,
-            billedSubTenantUsages: billedSubTenantUsages,
-            billedUsageFactor: billedUsageFactors,
-            manualUsages: billedManualUsages,
-            lineItems: [lineItem],
-            excludeAutoUsage:
-                _bill['exclude_auto_usage'] == 'true' ? true : false,
-            meterTypeRates: billedRates,
-            gst: billedGst,
           );
   }
 

@@ -125,9 +125,6 @@ class PagEmsTypeUsageCalcRl {
     List<Map<String, dynamic>>? billedTrendingSnapShot,
     String? billBarFromMonth,
     List<PagEmsTypeUsageCalcRl> singularUsageCalcList = const [],
-    // double? balBf,
-    // double? balBfUsage,
-    // double? balBfInterest,
     Map<String, dynamic>? miniSoaInfo,
     Map<String, dynamic>? interestInfo,
   }) {
@@ -484,8 +481,8 @@ class PagEmsTypeUsageCalcRl {
     }
 
     if (_miniSoaInfo != null) {
-      final closingBalanceStr = _miniSoaInfo['closing_balance'];
-      double? closingBalance = double.tryParse(closingBalanceStr ?? '');
+      final strClosingBalance = _miniSoaInfo['closing_balance'];
+      double? closingBalance = double.tryParse(strClosingBalance ?? '');
       if (closingBalance != null) {
         _payableAmount = -1 * closingBalance + (_payableAmount ?? 0);
       }
