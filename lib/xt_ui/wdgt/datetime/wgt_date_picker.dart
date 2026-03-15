@@ -45,7 +45,7 @@ class _WgtDatePickerState extends State<WgtDatePicker> {
       context: context,
       locale: const Locale('en', 'GB'),
       initialDate:
-          widget.initialDate ?? getTargetLocalDatetimeNow(widget.timeZone),
+          widget.initialDate, //?? getTargetLocalDatetimeNow(widget.timeZone),
       // fieldHintText: sDateFormate,
       firstDate: widget.defaultFirstDate ?? DateTime(2020),
       lastDate: widget.defaultLastDate ??
@@ -95,8 +95,12 @@ class _WgtDatePickerState extends State<WgtDatePicker> {
                     style: TextStyle(
                       fontSize: 18,
                       color: _selectedDateTime == null
-                          ? Theme.of(context).hintColor
-                          : null,
+                          ? widget.enabled
+                              ? Theme.of(context).hintColor
+                              : Theme.of(context).hintColor.withAlpha(120)
+                          : widget.enabled
+                              ? null
+                              : Theme.of(context).hintColor.withAlpha(120),
                     )),
               ),
               _selectedDateTime == null

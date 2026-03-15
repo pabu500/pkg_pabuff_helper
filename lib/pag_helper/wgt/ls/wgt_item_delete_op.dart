@@ -68,6 +68,8 @@ class _WgtItemDeleteOpState extends State<WgtItemDeleteOp> {
         itemTypeStr = (widget.itemType as PagDeviceCat).name;
       } else if (widget.itemType is PagFinanceType) {
         itemTypeStr = (widget.itemType as PagFinanceType).name;
+      } else if (widget.itemKind == PagItemKind.bill) {
+        itemTypeStr = widget.itemKind.name;
       } else {
         itemTypeStr = widget.itemType.toString();
       }
