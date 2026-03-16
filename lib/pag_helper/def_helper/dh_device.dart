@@ -369,7 +369,7 @@ final List<Map<String, dynamic>> listConfigBaseDevice = [
     'title': 'Type',
     'col_type': 'string',
     'width': 200,
-    'is_mapping_required': true,
+    'is_mapping_required': false,
     'validator': validateDeviceType,
   },
   {
@@ -461,6 +461,14 @@ final List<Map<String, dynamic>> listConfigBaseMcu = [
   //   'is_mapping_required': false,
   //   'validator': validateDeviceIccid,
   // },
+  {
+    'col_key': 'motherboard_sn',
+    'title': 'Motherboard S/N',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': false,
+    'validator': validateSerialNumber,
+  },
 ];
 
 final List<Map<String, dynamic>> listConfigBaseMotherboard = [];
@@ -516,6 +524,14 @@ final List<Map<String, dynamic>> listConfigBaseSim = [
     'width': 150,
     'is_mapping_required': true,
     'validator': validateDeviceIccid,
+  },
+  {
+    'col_key': 'package',
+    'title': 'Package',
+    'col_type': 'string',
+    'width': 200,
+    'is_mapping_required': true,
+    'validator': validateDeviceType,
   },
 ];
 
