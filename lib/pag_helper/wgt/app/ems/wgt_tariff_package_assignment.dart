@@ -114,17 +114,17 @@ class _WgtTariffPackageAssignmentState
       });
 
       for (Map<String, dynamic> tenant in _itemGroupScopeMatchingItemList!) {
-        String tenantMeterTypeTpKey =
-            'tp_name_${widget.meterType.toLowerCase()}';
-        String tenantMeterTypeTpTypeName =
-            tenant['tpt_name_${widget.meterType.toLowerCase()}'] ?? '';
+        String tenantMeterTypeTpKey = 'tp_name';
+        // 'tp_name_${widget.meterType.toLowerCase()}';
+        String tenantMeterTypeTptName = tenant['tpt_name'] ?? '';
+        // tenant['tpt_name_${widget.meterType.toLowerCase()}'] ?? '';
 
         String? tpName = tenant[tenantMeterTypeTpKey];
         bool isUnassigned = tpName == null;
 
         bool isAsignedToOtherTps = tpName != null && tpName != widget.itemName;
         bool hasTptMismatch =
-            tenantMeterTypeTpTypeName != widget.tariffPackageTypeName;
+            tenantMeterTypeTptName != widget.tariffPackageTypeName;
         tenant['assigned'] = false;
         if (!isUnassigned && !isAsignedToOtherTps) {
           tenant['assigned'] = true;
@@ -552,8 +552,8 @@ class _WgtTariffPackageAssignmentState
     String tenantLabel = itemInfo['label'] ?? '';
     bool assigned = itemInfo['assigned'] ?? false;
 
-    String? meterTypeTptLabel =
-        itemInfo['tpt_label_${widget.meterType.toLowerCase()}'];
+    String? meterTypeTptLabel = itemInfo['tpt_label'];
+    // itemInfo['tpt_label_${widget.meterType.toLowerCase()}'];
     if (meterTypeTptLabel == null) {
       // if (kDebugMode) {
       // meter type tpt is not assigned for this tenant
