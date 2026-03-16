@@ -27,6 +27,8 @@ class WgtPagDateRangePicker2 extends StatefulWidget {
     this.onMaxDurationExceeded,
     // this.allowSameDay = false,
     this.layout = 'horizontal',
+    this.calSize = 30,
+    this.width = 350,
   });
 
   final int timezone;
@@ -38,10 +40,7 @@ class WgtPagDateRangePicker2 extends StatefulWidget {
   final bool history;
   final bool useEdgeTime;
   final bool showHHmm;
-  final void Function(
-    DateTime? startDate,
-    DateTime? endDate,
-  ) onSet;
+  final void Function(DateTime? startDate, DateTime? endDate) onSet;
   final bool singleDate;
   // final double width;
   final bool updateRangeByParent;
@@ -49,6 +48,8 @@ class WgtPagDateRangePicker2 extends StatefulWidget {
   final void Function()? onMaxDurationExceeded;
   // final bool allowSameDay;
   final String layout;
+  final double calSize;
+  final double width;
 
   @override
   State<WgtPagDateRangePicker2> createState() => _WgtPagDateRangePicker2State();
@@ -218,7 +219,7 @@ class _WgtPagDateRangePicker2State extends State<WgtPagDateRangePicker2> {
 
   Widget getHorizontalLayout(String fromText, String toText) {
     return SizedBox(
-      width: 350,
+      width: widget.width,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
@@ -242,7 +243,7 @@ class _WgtPagDateRangePicker2State extends State<WgtPagDateRangePicker2> {
                     ? Theme.of(context).hintColor.withAlpha(80)
                     : Theme.of(context).colorScheme.primary),
           ),
-          horizontalSpaceSmall,
+          // horizontalSpaceTiny,
           getDateRangePickerPopupButton(),
         ],
       ),
@@ -467,7 +468,7 @@ class _WgtPagDateRangePicker2State extends State<WgtPagDateRangePicker2> {
               // disabled: disabled,
               child: Icon(
                 Icons.date_range,
-                size: 35,
+                size: widget.calSize,
                 color: Theme.of(context).colorScheme.primary,
               ),
             ),

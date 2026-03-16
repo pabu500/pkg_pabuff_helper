@@ -129,7 +129,7 @@ Widget getScopeLabel(BuildContext context, MdlPagScope scope) {
     borderRadius: BorderRadius.circular(5),
   );
   BoxDecoration boxDecorationLeaf = BoxDecoration(
-    border: Border.all(color: Theme.of(context).hintColor, width: 1.5),
+    border: Border.all(color: Theme.of(context).hintColor, width: 1.2),
     borderRadius: BorderRadius.circular(5),
   );
   List<Map<String, dynamic>> scopeChain = scope.getScopeChain();

@@ -6,8 +6,8 @@ class WgtDatePicker extends StatefulWidget {
   const WgtDatePicker({
     super.key,
     required this.timeZone,
-    this.prefix = const Icon(Icons.arrow_right),
-    this.suffix = const Icon(Icons.arrow_drop_down),
+    this.prefix, //= const Icon(Icons.arrow_right),
+    this.suffix, // = const Icon(Icons.arrow_drop_down),
     this.defaultFirstDate,
     this.defaultLastDate,
     this.onDateChanged,
@@ -15,11 +15,15 @@ class WgtDatePicker extends StatefulWidget {
     this.label,
     this.initialDate,
     this.enabled = true,
+    this.labelFontSize,
+    this.iconSize = 30,
+    this.boarderColor,
   });
 
   final int timeZone;
   final Icon? prefix;
-  final Icon suffix;
+  final Icon? suffix;
+  final double? labelFontSize;
   final DateTime? defaultFirstDate;
   final DateTime? defaultLastDate;
   final Function(DateTime)? onDateChanged;
@@ -27,6 +31,8 @@ class WgtDatePicker extends StatefulWidget {
   final String? label;
   final DateTime? initialDate;
   final bool enabled;
+  final double iconSize;
+  final Color? boarderColor;
 
   @override
   State<WgtDatePicker> createState() => _WgtDatePickerState();
@@ -73,7 +79,7 @@ class _WgtDatePickerState extends State<WgtDatePicker> {
 
   @override
   Widget build(BuildContext context) {
-    Color boarderColor = Theme.of(context).hintColor;
+    Color boarderColor = widget.boarderColor ?? Theme.of(context).hintColor;
     return SizedBox(
       // width: 80,
       child: Container(
@@ -93,7 +99,7 @@ class _WgtDatePickerState extends State<WgtDatePicker> {
                 child: Text(_selectedDateText,
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: widget.labelFontSize ?? 18,
                       color: _selectedDateTime == null
                           ? widget.enabled
                               ? Theme.of(context).hintColor
@@ -105,30 +111,30 @@ class _WgtDatePickerState extends State<WgtDatePicker> {
               ),
               _selectedDateTime == null
                   ? Container()
-                  : IconButton(
-                      icon: const Icon(Icons.clear),
-                      tooltip: 'Tap to clear date',
-                      onPressed: widget.enabled
+                  : InkWell(
+                      onTap: widget.enabled
                           ? () {
-                              if (widget.onDateCleared != null) {
-                                widget.onDateCleared!();
-                              }
                               setState(() {
-                                _selectedDateText = 'Select date';
+                                _selectedDateText =
+                                    widget.label ?? 'Select date';
                                 _selectedDateTime = null;
                               });
+                              widget.onDateCleared?.call();
                             }
                           : null,
+                      child: Icon(Icons.close,
+                          size: widget.iconSize,
+                          color: Theme.of(context).hintColor.withAlpha(120)),
                     ),
-              IconButton(
-                icon: Icon(Icons.calendar_today,
-                    color: Theme.of(context).colorScheme.primary),
-                tooltip: 'Tap to open date picker',
-                onPressed: widget.enabled
+              InkWell(
+                onTap: widget.enabled
                     ? () {
                         _selectDate(context);
                       }
                     : null,
+                child: Icon(Icons.calendar_today,
+                    size: widget.iconSize,
+                    color: Theme.of(context).colorScheme.primary),
               ),
               widget.suffix ?? Container(),
             ],
