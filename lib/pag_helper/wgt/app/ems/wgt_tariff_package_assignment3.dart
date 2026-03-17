@@ -1,15 +1,10 @@
-import 'package:buff_helper/pag_helper/def_helper/dh_device.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_tenant.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
-import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_scope.dart';
-import 'package:buff_helper/xt_ui/style/evs2_colors.dart';
-import 'package:buff_helper/xt_ui/wdgt/info/get_error_text_prompt.dart';
+import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
-import 'package:buff_helper/xt_ui/xt_helpers.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'dart:developer' as dev;
@@ -68,8 +63,13 @@ class _WgtTariffPackageAssignment3State
   bool _isFetchingAllAssignmentInfo = false;
   bool _isAllAssignmentInfoFetched = false;
 
-  final TextEditingController _itemSnFilterController = TextEditingController();
-  String _itemSnFilterStr = '';
+  final TextEditingController _itemLabelFilterController =
+      TextEditingController();
+  String _itemLabelFilterStr = '';
+
+  final TextEditingController _tenantAccountNumberFilterController =
+      TextEditingController();
+  String _tenantAccountNumberFilterStr = '';
 
   Future<void> _doAutoPopulate() async {
     if (_isScopeMatchingListFetching) {
@@ -140,7 +140,7 @@ class _WgtTariffPackageAssignment3State
     }
   }
 
-  Future<void> _getTenantAssignment(Map<String, dynamic> itemInfo) async {
+  Future<void> _getTpAssignment(Map<String, dynamic> itemInfo) async {
     if (itemInfo['is_fetching'] ?? false) {
       return;
     }
@@ -169,9 +169,8 @@ class _WgtTariffPackageAssignment3State
       }
       itemInfo['assignment_info'] = data;
     } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
+      dev.log(e.toString());
+
       rethrow;
     } finally {
       setState(() {
@@ -251,11 +250,19 @@ class _WgtTariffPackageAssignment3State
   }
 
   bool _showItem(Map<String, dynamic> item) {
-    if (_itemSnFilterStr.isNotEmpty) {
-      String? sn = item['meter_sn'];
-      bool snMatches = (sn ?? '').isNotEmpty &&
-          (sn ?? '').toLowerCase().contains(_itemSnFilterStr);
-      return snMatches;
+    if (_itemLabelFilterStr.isNotEmpty) {
+      String? label = item['label'];
+      bool labelMatches = (label ?? '').isNotEmpty &&
+          (label ?? '').toLowerCase().contains(_itemLabelFilterStr);
+      return labelMatches;
+    }
+    if (_tenantAccountNumberFilterStr.isNotEmpty) {
+      String? accountNumber = item['account_number'];
+      bool accountNumberMatches = (accountNumber ?? '').isNotEmpty &&
+          (accountNumber ?? '')
+              .toLowerCase()
+              .contains(_tenantAccountNumberFilterStr);
+      return accountNumberMatches;
     }
 
     return true; // Include item if no filter is applied
@@ -282,7 +289,7 @@ class _WgtTariffPackageAssignment3State
 
       bool showResult = false;
       try {
-        await _getTenantAssignment(itemInfo);
+        await _getTpAssignment(itemInfo);
       } catch (e) {
       } finally {
         itemInfo['is_comm']?.call(false, showResult);
@@ -454,25 +461,49 @@ class _WgtTariffPackageAssignment3State
             width: 180,
             height: 39,
             child: TextField(
-              controller: _itemSnFilterController,
+              controller: _itemLabelFilterController,
               readOnly: _isCommitting ||
                   _isCommitted ||
                   {_itemGroupScopeMatchingItemList ?? []}.isEmpty,
               decoration: InputDecoration(
-                  hintText: 'Meter S/N',
+                  hintText: 'Tenant Label',
                   hintStyle: TextStyle(
                       color: Theme.of(context)
                           .hintColor) // prefixIcon: Icon(Icons.search),
                   ),
               onChanged: (value) {
                 setState(() {
-                  _itemSnFilterStr = value.trim().toLowerCase();
+                  _itemLabelFilterStr = value.trim().toLowerCase();
                 });
               },
             ),
           ),
         ),
         horizontalSpaceSmall,
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 5),
+          child: SizedBox(
+            width: 180,
+            height: 39,
+            child: TextField(
+              controller: _tenantAccountNumberFilterController,
+              readOnly: _isCommitting ||
+                  _isCommitted ||
+                  {_itemGroupScopeMatchingItemList ?? []}.isEmpty,
+              decoration: InputDecoration(
+                  hintText: 'Account Number',
+                  hintStyle: TextStyle(
+                      color: Theme.of(context)
+                          .hintColor) // prefixIcon: Icon(Icons.search),
+                  ),
+              onChanged: (value) {
+                setState(() {
+                  _tenantAccountNumberFilterStr = value.trim().toLowerCase();
+                });
+              },
+            ),
+          ),
+        ),
         InkWell(
           onTap: !_modified ||
                   _isCommitting ||
@@ -601,12 +632,12 @@ class _WgtTariffPackageAssignment3State
       itemWidgetList.add(
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 3),
-          child: WgtMeterGroupAssignmentItem(
+          child: WgtTariffPackagepAssignmentItem(
             appConfig: widget.appConfig,
             loggedInUser: widget.loggedInUser!,
             itemInfo: itemInfo,
             itemGroupIndexStr: widget.itemGroupIndexStr,
-            getMeterAssignment: _getTenantAssignment,
+            getTpAssignment: _getTpAssignment,
             onModified: () {
               _checkModified();
             },
@@ -626,13 +657,13 @@ class _WgtTariffPackageAssignment3State
   }
 }
 
-class WgtMeterGroupAssignmentItem extends StatefulWidget {
-  const WgtMeterGroupAssignmentItem({
+class WgtTariffPackagepAssignmentItem extends StatefulWidget {
+  const WgtTariffPackagepAssignmentItem({
     super.key,
     required this.appConfig,
     required this.loggedInUser,
     required this.itemInfo,
-    required this.getMeterAssignment,
+    required this.getTpAssignment,
     required this.itemGroupIndexStr,
     this.regFresh,
     this.onModified,
@@ -643,16 +674,16 @@ class WgtMeterGroupAssignmentItem extends StatefulWidget {
   final Map<String, dynamic> itemInfo;
   final String itemGroupIndexStr;
   final void Function(void Function(bool isComm, bool isEnabled))? regFresh;
-  final Future<void> Function(Map<String, dynamic> itemInfo) getMeterAssignment;
+  final Future<void> Function(Map<String, dynamic> itemInfo) getTpAssignment;
   final void Function()? onModified;
 
   @override
-  State<WgtMeterGroupAssignmentItem> createState() =>
-      _WgtMeterGroupAssignmentItemState();
+  State<WgtTariffPackagepAssignmentItem> createState() =>
+      _WgtTariffPackagepAssignmentItemState();
 }
 
-class _WgtMeterGroupAssignmentItemState
-    extends State<WgtMeterGroupAssignmentItem> {
+class _WgtTariffPackagepAssignmentItemState
+    extends State<WgtTariffPackagepAssignmentItem> {
   bool _assignmentInfoFetched = false;
   bool _isComm = false;
   bool _isEnabled = false;
@@ -689,7 +720,7 @@ class _WgtMeterGroupAssignmentItemState
     int index = itemInfo['index'] ?? 0;
     String itemName = itemInfo['name'] ?? '-';
     String itemLabel = itemInfo['label'] ?? '-';
-    String meterSn = itemInfo['meter_sn'] ?? '-';
+    String tenantAccountNumber = itemInfo['account_number'] ?? '-';
     bool assigned = itemInfo['assigned'] ?? false;
 
     BoxDecoration boxDecoration = BoxDecoration(
@@ -710,7 +741,7 @@ class _WgtMeterGroupAssignmentItemState
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
-              width: 30,
+              width: 50,
               child: Align(
                 alignment: Alignment.centerRight,
                 child: SelectableText(
@@ -720,11 +751,11 @@ class _WgtMeterGroupAssignmentItemState
               ),
             ),
             horizontalSpaceTiny,
-            Icon(PagDeviceCat.meter.iconData,
+            Icon(PagItemKind.tenant.iconData,
                 color: Theme.of(context).hintColor, size: 18),
             horizontalSpaceTiny,
             Container(
-              width: 135,
+              width: 180,
               decoration: boxDecoration,
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
               child: SelectableText(
@@ -733,26 +764,31 @@ class _WgtMeterGroupAssignmentItemState
               ),
             ),
             horizontalSpaceSmall,
+            Tooltip(
+              message: itemLabel,
+              waitDuration: const Duration(milliseconds: 500),
+              child: Container(
+                width: 180,
+                decoration: boxDecoration,
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                child: SelectableText(
+                  convertToDisplayString(
+                      itemLabel, 170, disabled ? disabledTextStyle : null),
+                  style: disabled ? disabledTextStyle : null,
+                ),
+              ),
+            ),
+            horizontalSpaceTiny,
             Container(
-              width: 135,
+              width: 120,
               decoration: boxDecoration,
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
               child: SelectableText(
-                meterSn,
+                tenantAccountNumber,
                 style: disabled ? disabledTextStyle : null,
               ),
             ),
             horizontalSpaceSmall,
-            Container(
-              width: 160,
-              decoration: boxDecoration,
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-              child: SelectableText(
-                itemLabel,
-                style: disabled ? disabledTextStyle : null,
-              ),
-            ),
-            horizontalSpaceTiny,
             getAssignmentBox(itemInfo),
           ],
         ),
@@ -1011,7 +1047,7 @@ class _WgtMeterGroupAssignmentItemState
                   return;
                 }
                 if (itemInfo['assignment_info'] == null) {
-                  await widget.getMeterAssignment(itemInfo);
+                  await widget.getTpAssignment(itemInfo);
                 }
 
                 setState(() {

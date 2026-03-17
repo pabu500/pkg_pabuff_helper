@@ -48,7 +48,7 @@ bool isAlphaNumeric(String input) {
 //   return displayLength;
 // }
 
-Size getStringDisplaySize(String text, TextStyle style) {
+Size getStringDisplaySize(String text, TextStyle? style) {
   final TextPainter textPainter = TextPainter(
       text: TextSpan(text: text, style: style),
       maxLines: 1,
@@ -115,7 +115,7 @@ String lengthyString(String input, int length) {
 }
 
 String convertToDisplayString(
-    String input, double containerWidth, TextStyle style) {
+    String input, double containerWidth, TextStyle? style) {
   if (input.isEmpty) {
     return '';
   }
