@@ -6,16 +6,16 @@ import 'package:buff_helper/xt_ui/style/evs2_colors.dart';
 import 'package:buff_helper/xt_ui/wdgt/info/get_error_text_prompt.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 import 'package:buff_helper/xt_ui/xt_helpers.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../../../xt_ui/wdgt/datetime/wgt_date_picker.dart';
 import '../../../comm/comm_tariff_package.dart';
 import '../../../model/mdl_pag_app_config.dart';
 import 'dart:developer' as dev;
 
-class WgtTariffPackageAssignment extends StatefulWidget {
-  const WgtTariffPackageAssignment({
+class WgtTariffPackageAssignment2 extends StatefulWidget {
+  const WgtTariffPackageAssignment2({
     super.key,
     required this.appConfig,
     required this.loggedInUser,
@@ -31,7 +31,7 @@ class WgtTariffPackageAssignment extends StatefulWidget {
   });
 
   final MdlPagAppConfig appConfig;
-  final MdlPagUser? loggedInUser;
+  final MdlPagUser loggedInUser;
   final String itemGroupIndexStr;
   final String itemName;
   final String itemLabel;
@@ -43,12 +43,12 @@ class WgtTariffPackageAssignment extends StatefulWidget {
   final Function? onUpdate;
 
   @override
-  State<WgtTariffPackageAssignment> createState() =>
-      _WgtTariffPackageAssignmentState();
+  State<WgtTariffPackageAssignment2> createState() =>
+      _WgtTariffPackageAssignment2State();
 }
 
-class _WgtTariffPackageAssignmentState
-    extends State<WgtTariffPackageAssignment> {
+class _WgtTariffPackageAssignment2State
+    extends State<WgtTariffPackageAssignment2> {
   final double width = 395.0;
 
   bool _isFetching = false;
@@ -76,7 +76,7 @@ class _WgtTariffPackageAssignmentState
     }
 
     Map<String, dynamic> queryMap = {
-      'scope': widget.loggedInUser!.selectedScope.toScopeMap(),
+      'scope': widget.loggedInUser.selectedScope.toScopeMap(),
       'tariff_package_id': widget.itemGroupIndexStr,
     };
 
@@ -86,8 +86,8 @@ class _WgtTariffPackageAssignmentState
         widget.appConfig,
         queryMap,
         MdlPagSvcClaim(
-          username: widget.loggedInUser!.username,
-          userId: widget.loggedInUser!.id,
+          username: widget.loggedInUser.username,
+          userId: widget.loggedInUser.id,
           scope: '',
           target: '',
           operation: 'read',
@@ -114,17 +114,17 @@ class _WgtTariffPackageAssignmentState
       });
 
       for (Map<String, dynamic> tenant in _itemGroupScopeMatchingItemList!) {
-        String tenantMeterTypeTpKey =
-            'tp_name_${widget.meterType.toLowerCase()}';
-        String tenantMeterTypeTpTypeName =
-            tenant['tpt_name_${widget.meterType.toLowerCase()}'] ?? '';
+        String tenantMeterTypeTpKey = 'tp_name';
+        // 'tp_name_${widget.meterType.toLowerCase()}';
+        String tenantMeterTypeTptName = tenant['tpt_name'] ?? '';
+        // tenant['tpt_name_${widget.meterType.toLowerCase()}'] ?? '';
 
         String? tpName = tenant[tenantMeterTypeTpKey];
         bool isUnassigned = tpName == null;
 
         bool isAsignedToOtherTps = tpName != null && tpName != widget.itemName;
         bool hasTptMismatch =
-            tenantMeterTypeTpTypeName != widget.tariffPackageTypeName;
+            tenantMeterTypeTptName != widget.tariffPackageTypeName;
         tenant['assigned'] = false;
         if (!isUnassigned && !isAsignedToOtherTps) {
           tenant['assigned'] = true;
@@ -143,9 +143,8 @@ class _WgtTariffPackageAssignmentState
         }
       }
     } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
+      dev.log(e.toString());
+
       rethrow;
     } finally {
       setState(() {
@@ -162,10 +161,13 @@ class _WgtTariffPackageAssignmentState
     // filter out items that are not modified
     final List<Map<String, dynamic>> assignmentList =
         _itemGroupScopeMatchingItemList!
-            .where((tenant) => tenant['assigned_new'] != null)
+            .where((tenant) =>
+                tenant['assigned_new'] != null ||
+                tenant['effective_from_timestamp_new'] != null ||
+                tenant['effective_to_timestamp_new'] != null)
             .toList();
     Map<String, dynamic> queryMap = {
-      'scope': widget.loggedInUser!.selectedScope.toScopeMap(),
+      'scope': widget.loggedInUser.selectedScope.toScopeMap(),
       'tariff_package_id': widget.itemGroupIndexStr,
       'tenant_assignment_list': assignmentList,
     };
@@ -176,8 +178,8 @@ class _WgtTariffPackageAssignmentState
         widget.appConfig,
         queryMap,
         MdlPagSvcClaim(
-          username: widget.loggedInUser!.username,
-          userId: widget.loggedInUser!.id,
+          username: widget.loggedInUser.username,
+          userId: widget.loggedInUser.id,
           scope: '',
           target: '',
           operation: 'update',
@@ -188,9 +190,8 @@ class _WgtTariffPackageAssignmentState
         throw Exception(data['error']);
       }
     } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
+      dev.log(e.toString());
+
       setState(() {
         _commitErrorText = 'Commit Error';
       });
@@ -219,9 +220,26 @@ class _WgtTariffPackageAssignmentState
     return true; // Include item if no filter is applied
   }
 
+  void _checkUpdateModified(Map<String, dynamic> itemInfo) {
+    bool isAssignedModified = itemInfo['assigned_new'] != null &&
+        itemInfo['assigned'] != itemInfo['assigned_new'];
+    bool isEffFromModified = itemInfo['effective_from_timestamp_new'] != null &&
+        itemInfo['effective_from_timestamp'] !=
+            itemInfo['effective_from_timestamp_new'];
+    bool isEffToModified = itemInfo['effective_to_timestamp_new'] != null &&
+        itemInfo['effective_to_timestamp'] !=
+            itemInfo['effective_to_timestamp_new'];
+    if (isAssignedModified || isEffFromModified || isEffToModified) {
+      _modified = true;
+    } else {
+      _modified = false;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+    // loggedInUser = Provider.of<PagUserProvider>(context, listen: false).currentUser;
   }
 
   @override
@@ -275,8 +293,7 @@ class _WgtTariffPackageAssignmentState
                 default:
                   if (snapshot.hasError) {
                     return getErrorTextPrompt(
-                        context: context,
-                        errorText: 'Error fetching tree data');
+                        context: context, errorText: 'Error fetching tp data');
                   } else {
                     return completedWidget();
                   }
@@ -293,6 +310,7 @@ class _WgtTariffPackageAssignmentState
         border: Border.all(color: Theme.of(context).hintColor.withAlpha(50)),
         borderRadius: BorderRadius.circular(5),
       ),
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
       margin: const EdgeInsets.symmetric(horizontal: 5),
       child: getScopeItemList(),
     );
@@ -438,7 +456,7 @@ class _WgtTariffPackageAssignmentState
     PagScopeType itemScopeType = widget.itemScope.getScopeType();
     Widget scopeIcon = getScopeIcon(context, itemScopeType, size: 21);
     BoxDecoration boxDecoration = BoxDecoration(
-      border: Border.all(color: Theme.of(context).hintColor, width: 1.5),
+      border: Border.all(color: Theme.of(context).hintColor, width: 1.2),
       borderRadius: BorderRadius.circular(5),
     );
     return Row(
@@ -534,8 +552,8 @@ class _WgtTariffPackageAssignmentState
     String tenantLabel = itemInfo['label'] ?? '';
     bool assigned = itemInfo['assigned'] ?? false;
 
-    String? meterTypeTptLabel =
-        itemInfo['tpt_label_${widget.meterType.toLowerCase()}'];
+    String? meterTypeTptLabel = itemInfo['tpt_label'];
+    // itemInfo['tpt_label_${widget.meterType.toLowerCase()}'];
     if (meterTypeTptLabel == null) {
       // if (kDebugMode) {
       // meter type tpt is not assigned for this tenant
@@ -627,9 +645,10 @@ class _WgtTariffPackageAssignmentState
                   setState(() {
                     if (value == null) return;
                     itemInfo['assigned_new'] = value;
-                    if (itemInfo['assigned'] != itemInfo['assigned_new']) {
-                      _modified = true;
-                    }
+                    // if (itemInfo['assigned'] != itemInfo['assigned_new']) {
+                    //   _modified = true;
+                    // }
+                    _checkUpdateModified(itemInfo);
                   });
                   widget.onScopeTreeUpdate?.call();
                 },
@@ -645,6 +664,71 @@ class _WgtTariffPackageAssignmentState
                 ),
               )
             : const SizedBox(width: 18),
+        horizontalSpaceSmall,
+        getEffetiveTimeRange(itemInfo),
+      ],
+    );
+  }
+
+  Widget getEffetiveTimeRange(Map<String, dynamic> itemInfo) {
+    return Row(
+      children: [
+        const Text('Eff. '),
+        WgtDatePicker(
+          // key: _timePickerKey,
+          labelFontSize: 15,
+          iconSize: 20,
+          boarderColor: Theme.of(context).hintColor.withAlpha(50),
+          timeZone: widget.loggedInUser.selectedScope.getProjectTimezone(),
+          label: 'From ',
+          initialDate: DateTime.tryParse(
+                  itemInfo['effective_from_timestamp'] ?? '') ??
+              DateTime.tryParse(itemInfo['effective_from_timestamp_new'] ?? ''),
+          onDateChanged: (DateTime? selectedDate) {
+            setState(() {
+              itemInfo['effective_from_timestamp_new'] =
+                  selectedDate?.toIso8601String();
+            });
+            _checkUpdateModified(itemInfo);
+          },
+          onDateCleared: () {
+            setState(() {
+              itemInfo['effective_from_timestamp_new'] = null;
+              if (itemInfo['effective_from_timestamp'] != null) {
+                itemInfo['effective_from_timestamp_new'] = 'unset';
+              }
+            });
+            _checkUpdateModified(itemInfo);
+          },
+        ),
+        horizontalSpaceTiny,
+        WgtDatePicker(
+          // key: _timePickerKey,
+          labelFontSize: 15,
+          iconSize: 20,
+          boarderColor: Theme.of(context).hintColor.withAlpha(50),
+          timeZone: widget.loggedInUser.selectedScope.getProjectTimezone(),
+          label: 'To ',
+          initialDate: DateTime.tryParse(
+                  itemInfo['effective_to_timestamp'] ?? '') ??
+              DateTime.tryParse(itemInfo['effective_to_timestamp_new'] ?? ''),
+          onDateChanged: (DateTime? selectedDate) {
+            setState(() {
+              itemInfo['effective_to_timestamp_new'] =
+                  selectedDate?.toIso8601String();
+            });
+            _checkUpdateModified(itemInfo);
+          },
+          onDateCleared: () {
+            setState(() {
+              itemInfo['effective_to_timestamp_new'] = null;
+              if (itemInfo['effective_to_timestamp'] != null) {
+                itemInfo['effective_to_timestamp_new'] = 'unset';
+              }
+            });
+            _checkUpdateModified(itemInfo);
+          },
+        ),
       ],
     );
   }
