@@ -107,6 +107,10 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
       if (_selectedDate2 != null) {
         jobRequest['selected_timestamp_2'] = _selectedDate2!.toIso8601String();
       }
+      if (_collectionStartDate != null) {
+        jobRequest['collection_start_date_timestamp'] =
+            _collectionStartDate!.toIso8601String();
+      }
       if ((_selectedFromDate) != null && (_selectedToDate) != null) {
         jobRequest['from_timestamp'] = _selectedFromDate!.toIso8601String();
         jobRequest['to_timestamp'] = _selectedToDate!.toIso8601String();
@@ -382,6 +386,10 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
                     onDateChanged: (DateTime selectedDate) {
                       setState(() {
                         _selectedDate2 = selectedDate;
+                        _collectionStartDate = DateTime(_selectedDate2!.year,
+                            _selectedDate2!.month - 1, _selectedDate2!.day + 1);
+                        _useCustomCollectionStartDate = false;
+                        _timePickerKeyCollectionStartDate = UniqueKey();
                       });
                     },
                   ),
@@ -418,7 +426,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
     if (_selectedDate2 == null) {
       return Container();
     }
-    DateTime? leftMostDate = _selectedDate2?.subtract(const Duration(days: 25));
+    DateTime? leftMostDate = _selectedDate2?.subtract(const Duration(days: 55));
 
     return Column(
       children: [
@@ -463,7 +471,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
               defaultFirstDate: leftMostDate,
               defaultLastDate:
                   _selectedDate2!.subtract(const Duration(days: 1)),
-              initialDate: _selectedDate2,
+              initialDate: _collectionStartDate,
               timeZone: widget.loggedInUser.selectedScope.getProjectTimezone(),
               label: 'Set Collection Start Date',
               onDateChanged: (DateTime selectedDate) {
