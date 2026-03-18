@@ -5,7 +5,7 @@ import '../../app_helper/pagrid_app_config.dart';
 import '../tenant/tenant_usage_calc_r2.dart';
 import '../tenant/tenant_usage_calc_released_r2.dart';
 import '../tenant/wgt_tenant_usage_summary2r2.dart';
-import '../tenant/wgt_tenant_usage_summary_released2r2.dart';
+import '../tenant/wgt_tenant_usage_summary_rl2r2.dart';
 
 class WgtBillViewR2 extends StatefulWidget {
   const WgtBillViewR2({

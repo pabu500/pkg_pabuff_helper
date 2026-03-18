@@ -75,6 +75,10 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
   UniqueKey? _date1PickerKey;
   UniqueKey? _date2PickerKey;
 
+  DateTime? _collectionStartDate;
+  bool _useCustomCollectionStartDate = false;
+  UniqueKey? _timePickerKeyCollectionStartDate;
+
   Future<dynamic> _triggerJob() async {
     if (_isPosting) return;
 
@@ -174,10 +178,16 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
       case 'tenant-usage-report':
         return _selectedFromDate != null && _selectedToDate != null;
       case 'billing-task':
-        return _selectedFromDate != null &&
+        bool ok = _selectedFromDate != null &&
             _selectedToDate != null &&
             _selectedDate1 != null &&
             _selectedDate2 != null;
+        if (_useCustomCollectionStartDate) {
+          if (_collectionStartDate == null) {
+            ok = false;
+          }
+        }
+        return ok;
       case 'giro-file':
         return _selectedFromDate != null && _selectedToDate != null;
       default:
@@ -306,7 +316,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   SizedBox(
-                    width: 150,
+                    width: 160,
                     child: Align(
                       alignment: Alignment.centerRight,
                       child: Text(
@@ -321,9 +331,10 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
                   horizontalSpaceSmall,
                   WgtDatePicker(
                     key: _date1PickerKey,
+                    labelFontSize: 15,
                     defaultFirstDate: leftMostDate,
                     defaultLastDate: rightMostDate,
-                    initialDate: initDate,
+                    initialDate: _selectedDate1,
                     timeZone:
                         widget.loggedInUser.selectedScope.getProjectTimezone(),
                     label: 'Set Bill Date',
@@ -336,6 +347,8 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
                 ],
               ),
         verticalSpaceSmall,
+        getCollectionStartDate(),
+        verticalSpaceSmall,
         (_selectedFromDate == null || _selectedToDate == null)
             ? const SizedBox()
             : Row(
@@ -343,7 +356,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   SizedBox(
-                    width: 150,
+                    width: 160,
                     child: Align(
                       alignment: Alignment.centerRight,
                       child: Text(
@@ -358,12 +371,14 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
                   horizontalSpaceSmall,
                   WgtDatePicker(
                     key: _date2PickerKey,
+                    labelFontSize: 15,
+                    enabled: true,
                     defaultFirstDate: leftMostDate,
                     defaultLastDate: rightMostDate,
-                    initialDate: initDate,
+                    initialDate: _selectedDate2,
                     timeZone:
                         widget.loggedInUser.selectedScope.getProjectTimezone(),
-                    label: 'Set Collection Date',
+                    label: 'Set Collection End Date',
                     onDateChanged: (DateTime selectedDate) {
                       setState(() {
                         _selectedDate2 = selectedDate;
@@ -395,6 +410,70 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
         ),
         verticalSpaceSmall,
         getMainMeterSwitcher(),
+      ],
+    );
+  }
+
+  Widget getCollectionStartDate() {
+    if (_selectedDate2 == null) {
+      return Container();
+    }
+    DateTime? leftMostDate = _selectedDate2?.subtract(const Duration(days: 25));
+
+    return Column(
+      children: [
+        // check box to enable custom collection start date
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Checkbox(
+              value: _useCustomCollectionStartDate,
+              onChanged: (bool? value) {
+                setState(() {
+                  _useCustomCollectionStartDate = value ?? false;
+                });
+              },
+            ),
+            const Text('Set Custom Collection Start Date'),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: 160,
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: Text(
+                  'Collection Start Date',
+                  style: TextStyle(
+                    color: Theme.of(context).hintColor,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ),
+            horizontalSpaceSmall,
+            WgtDatePicker(
+              key: _timePickerKeyCollectionStartDate,
+              labelFontSize: 15,
+              enabled: _useCustomCollectionStartDate,
+              defaultFirstDate: leftMostDate,
+              defaultLastDate:
+                  _selectedDate2!.subtract(const Duration(days: 1)),
+              initialDate: _selectedDate2,
+              timeZone: widget.loggedInUser.selectedScope.getProjectTimezone(),
+              label: 'Set Collection Start Date',
+              onDateChanged: (DateTime selectedDate) {
+                setState(() {
+                  _collectionStartDate = selectedDate;
+                });
+              },
+            ),
+          ],
+        ),
       ],
     );
   }
