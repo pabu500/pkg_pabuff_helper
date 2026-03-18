@@ -274,6 +274,20 @@ String? validateDeviceType(String val) {
   return null;
 }
 
+String? validateAdapterType(String? val) {
+  if (val == null || val.trim().isEmpty) {
+    return 'required';
+  }
+
+  String value = val.toLowerCase();
+
+  if (!value.contains('jbs2') && !value.contains('evs2sim')) {
+    return 'Value must contain "jbs2" or "evs2sim"';
+  }
+
+  return null;
+}
+
 String? validateTag(String val) {
   val = val.trim();
 
@@ -532,6 +546,14 @@ final List<Map<String, dynamic>> listConfigBaseSim = [
     'width': 200,
     'is_mapping_required': true,
     'validator': validateDeviceType,
+  },
+  {
+    'col_key': 'adapter_type',
+    'title': 'Adapter Type',
+    'col_type': 'string',
+    'width': 200,
+    'is_mapping_required': true,
+    'validator': validateAdapterType,
   },
 ];
 

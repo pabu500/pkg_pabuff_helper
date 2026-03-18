@@ -67,6 +67,20 @@ enum PagDeviceLsStatus {
       normal;
 }
 
+enum PagSimPackageEnum {
+  nano("Nano"),
+  micro("Micro"),
+  standard("Standard"),
+  ;
+
+  const PagSimPackageEnum(this.label);
+
+  final String label;
+
+  static PagSimPackageEnum? byLabel(String? label) =>
+      enumByLabel(label, values, (e) => e.label);
+}
+
 // T? enumByLabel<T extends Enum>(
 //   String? label,
 //   List<T> values,
