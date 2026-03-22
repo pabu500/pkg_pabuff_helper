@@ -202,7 +202,7 @@ class _WgtPagTenantCompositeUsageSummaryState
               // getSubTenantUsageList(),
               // verticalSpaceSmall,
               // verticalSpaceSmall,
-              getLineItem(),
+              getLineItemSubjectToTax(),
               verticalSpaceSmall,
               if (widget.isBillMode)
                 getPagTotal(
@@ -213,6 +213,7 @@ class _WgtPagTenantCompositeUsageSummaryState
                   widget.compositeUsageCalc!.totalCost,
                   widget.compositeUsageCalc!.payableAmount,
                   widget.tenantType,
+                  widget.lineItems,
                   widget.compositeUsageCalc!.miniSoaInfo,
                   widget.strCollectionStartDateTimestamp,
                   widget.strCollectionEndDateTimestamp,
@@ -239,6 +240,7 @@ class _WgtPagTenantCompositeUsageSummaryState
     }
     String billLabel = widget.billInfo['bill_label'] ?? '';
     String billLcStatusStr = widget.billInfo['lc_status'] ?? '';
+    String billingRecName = widget.billInfo['billing_rec_name'] ?? '';
     PagBillingLcStatus billLcStatus =
         PagBillingLcStatus.values.byName(billLcStatusStr);
 
@@ -255,11 +257,25 @@ class _WgtPagTenantCompositeUsageSummaryState
                 color: Theme.of(context).hintColor.withAlpha(180),
                 fontWeight: FontWeight.bold,
               )),
-          Text(billLabel,
-              style: const TextStyle(
-                fontSize: 21,
-                fontWeight: FontWeight.bold,
-              )),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(billLabel,
+                  style: const TextStyle(
+                    fontSize: 21,
+                    fontWeight: FontWeight.bold,
+                  )),
+              Row(
+                children: [
+                  SelectableText(billingRecName),
+                  SizedBox(
+                      width: 40,
+                      child: getCopyButton(context, billingRecName,
+                          direction: 'left'))
+                ],
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -652,7 +668,7 @@ class _WgtPagTenantCompositeUsageSummaryState
     );
   }
 
-  Widget getLineItem() {
+  Widget getLineItemSubjectToTax() {
     if (widget.lineItems.isEmpty) {
       return Container();
     }
@@ -661,6 +677,10 @@ class _WgtPagTenantCompositeUsageSummaryState
     }
     List<Widget> lineItemList = [];
     for (var lineItem in widget.lineItems) {
+      bool subjectToTax = lineItem['subjectToTax'] as bool;
+      if (!subjectToTax) {
+        continue;
+      }
       String label = lineItem['label'] ?? '';
       String valueStr = lineItem['amount'] ?? '';
       double? valueVal = double.tryParse(valueStr) ?? 0;
@@ -715,7 +735,7 @@ class _WgtPagTenantCompositeUsageSummaryState
           width: statWidth,
           padding: const EdgeInsets.symmetric(horizontal: 3),
           constraints: const BoxConstraints(
-            maxHeight: 55,
+            maxHeight: 50,
           ),
           decoration: BoxDecoration(
             border: Border.all(color: Colors.grey.shade600, width: 1),

@@ -34,7 +34,7 @@ class WgtPagTenantCompositeUsageSummaryRl extends StatefulWidget {
     this.gst,
     // this.meterTypeRates = const {},
     // this.manualUsages = const {},
-    // this.lineItems = const [],
+    this.lineItems = const [],
     // this.billedAutoUsages = const {},
     // this.billedSubTenantUsages = const {},
     // required this.billedUsageFactor,
@@ -73,7 +73,7 @@ class WgtPagTenantCompositeUsageSummaryRl extends StatefulWidget {
   final bool showRenderModeSwitch;
   // final Map<String, dynamic> meterTypeRates;
   // final Map<String, dynamic> manualUsages;
-  // final List<Map<String, dynamic>> lineItems;
+  final List<Map<String, dynamic>> lineItems;
   // final Map<String, dynamic> billedAutoUsages;
   // final Map<String, dynamic> billedSubTenantUsages;
   final int usageDecimals;
@@ -208,6 +208,7 @@ class _WgtPagTenantCompositeUsageSummaryRlState
                   widget.compositeUsageCalc!.totalCost,
                   widget.compositeUsageCalc!.payableAmount,
                   widget.tenantType,
+                  widget.lineItems,
                   widget.compositeUsageCalc!.miniSoaInfo,
                   widget.previousCollectionDateTimestampStr,
                   widget.currentCollectionDateTimestampStr,

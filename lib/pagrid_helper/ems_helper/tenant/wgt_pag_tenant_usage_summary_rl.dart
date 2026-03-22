@@ -170,7 +170,7 @@ class _WgtPagTenantUsageSummaryRlState
               costDecimals: widget.costDecimals,
             ),
             verticalSpaceSmall,
-            getLineItem(),
+            getLineItemSubjectToTax(),
             verticalSpaceSmall,
             if (widget.isBillMode)
               getPagTotal(
@@ -181,6 +181,7 @@ class _WgtPagTenantUsageSummaryRlState
                 widget.usageCalc.totalCost,
                 widget.usageCalc.payableAmount,
                 widget.tenantType,
+                widget.lineItems,
                 {},
                 '',
                 '',
@@ -230,8 +231,7 @@ class _WgtPagTenantUsageSummaryRlState
               displayContextStr: widget.displayContextStr,
               isBillMode: widget.isBillMode,
               rate: widget.meterTypeRates[meterTypeTag],
-              statColor:
-                  Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+              statColor: Theme.of(context).colorScheme.onSurface.withAlpha(210),
               showTrending: false,
               statVirticalStack: false,
               height: 110,
@@ -264,7 +264,7 @@ class _WgtPagTenantUsageSummaryRlState
               Text('Auto Usage',
                   style: TextStyle(
                     fontSize: 18,
-                    color: Theme.of(context).hintColor.withOpacity(0.7),
+                    color: Theme.of(context).hintColor.withAlpha(210),
                     fontWeight: FontWeight.bold,
                   )),
             ],
@@ -317,8 +317,7 @@ class _WgtPagTenantUsageSummaryRlState
               displayContextStr: widget.displayContextStr,
               isBillMode: widget.isBillMode,
               rate: widget.meterTypeRates[meterTypeTag],
-              statColor:
-                  Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+              statColor: Theme.of(context).colorScheme.onSurface.withAlpha(210),
               showTrending: false,
               statVirticalStack: false,
               height: 110,
@@ -353,7 +352,7 @@ class _WgtPagTenantUsageSummaryRlState
               Text('Sub Tenant Usage',
                   style: TextStyle(
                     fontSize: 18,
-                    color: Theme.of(context).hintColor.withOpacity(0.7),
+                    color: Theme.of(context).hintColor.withAlpha(210),
                     fontWeight: FontWeight.bold,
                   )),
             ],
@@ -389,7 +388,7 @@ class _WgtPagTenantUsageSummaryRlState
                 isBillMode: widget.isBillMode,
                 rate: widget.meterTypeRates[meterTypeTag],
                 statColor:
-                    Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                    Theme.of(context).colorScheme.onSurface.withAlpha(210),
                 showTrending: false,
                 statVirticalStack: false,
                 height: 110,
@@ -431,7 +430,7 @@ class _WgtPagTenantUsageSummaryRlState
               Text('Manual Usage',
                   style: TextStyle(
                     fontSize: 18,
-                    color: Theme.of(context).hintColor.withOpacity(0.7),
+                    color: Theme.of(context).hintColor.withAlpha(210),
                     fontWeight: FontWeight.bold,
                   )),
             ],
@@ -442,7 +441,7 @@ class _WgtPagTenantUsageSummaryRlState
     );
   }
 
-  Widget getLineItem() {
+  Widget getLineItemSubjectToTax() {
     if (widget.lineItems.isEmpty) {
       return Container();
     }
@@ -451,6 +450,10 @@ class _WgtPagTenantUsageSummaryRlState
     }
     List<Widget> lineItemList = [];
     for (var lineItem in widget.lineItems) {
+      bool subjectToTax = lineItem['subjectToTax'] as bool;
+      if (!subjectToTax) {
+        continue;
+      }
       String label = lineItem['label'] ?? '';
       String valueStr = lineItem['amount'] ?? '';
       double? valueVal = double.tryParse(valueStr);
@@ -459,12 +462,12 @@ class _WgtPagTenantUsageSummaryRlState
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
-              width: 210,
+              width: 75,
               child: Text(
                 label,
                 style: TextStyle(
                   fontSize: 15,
-                  color: Theme.of(context).hintColor.withOpacity(0.7),
+                  color: Theme.of(context).hintColor.withAlpha(210),
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -474,7 +477,7 @@ class _WgtPagTenantUsageSummaryRlState
               getCommaNumberStr(valueVal, decimal: 2),
               'SGD',
               statStrStyle: defStatStyle.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
               ),
             ),
           ],
@@ -494,7 +497,7 @@ class _WgtPagTenantUsageSummaryRlState
               'Line Item',
               style: TextStyle(
                 fontSize: 18,
-                color: Theme.of(context).hintColor.withOpacity(0.7),
+                color: Theme.of(context).hintColor.withAlpha(210),
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -505,7 +508,7 @@ class _WgtPagTenantUsageSummaryRlState
           width: widgetWidth,
           padding: const EdgeInsets.symmetric(horizontal: 3),
           constraints: const BoxConstraints(
-            maxHeight: 55,
+            maxHeight: 50,
           ),
           decoration: BoxDecoration(
             border: Border.all(color: Colors.grey.shade600, width: 1),

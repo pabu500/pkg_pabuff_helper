@@ -772,6 +772,7 @@ Widget getPagTotal(
     double? totalAmt,
     double? payableAmt,
     String tenantType,
+    List<Map<String, dynamic>>? lineItems,
     // List<Map<String, dynamic>>? miniSoa,
     Map<String, dynamic>? miniSoaInfo,
     String strCollectionStartDateTimestamp,
@@ -903,6 +904,7 @@ Widget getPagTotal(
             ],
           ),
         ),
+        getLineItemNotSubjectToTax(lineItems, context, contentWidth),
         const Divider(height: 21),
         if (payableAmt != null)
           Padding(
@@ -937,6 +939,84 @@ Widget getPagTotal(
           ),
       ],
     ),
+  );
+}
+
+Widget getLineItemNotSubjectToTax(
+    List<Map<String, dynamic>>? lineItems, BuildContext context, double width) {
+  if (lineItems == null || lineItems.isEmpty) {
+    return Container();
+  }
+
+  List<Widget> lineItemList = [];
+  for (var lineItem in lineItems) {
+    bool subjectToTax = lineItem['subjectToTax'] as bool;
+    if (subjectToTax) {
+      continue;
+    }
+    String label = lineItem['label'] ?? '';
+    String valueStr = lineItem['amount'] ?? '';
+    double? valueVal = double.tryParse(valueStr) ?? 0;
+    lineItemList.add(
+      Padding(
+        padding: const EdgeInsets.only(top: 5),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: width,
+              child: Text(
+                label,
+                style: defStatStyle.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
+                ),
+              ),
+            ),
+            horizontalSpaceSmall,
+            getStatWithUnit(
+              getCommaNumberStr(valueVal, decimal: 2, isRoundUp: false),
+              'SGD',
+              statStrStyle: defStatStyle.copyWith(
+                color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  return Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      const Divider(height: 21),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Symbols.edit,
+              size: 21, color: Theme.of(context).colorScheme.primary),
+          horizontalSpaceTiny,
+          Text(
+            'Line Item (NOT subject to tax)',
+            style: TextStyle(
+              fontSize: 18,
+              color: Theme.of(context).hintColor.withAlpha(180),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+      // verticalSpaceSmall,
+      Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ...lineItemList,
+          ],
+        ),
+      ),
+    ],
   );
 }
 

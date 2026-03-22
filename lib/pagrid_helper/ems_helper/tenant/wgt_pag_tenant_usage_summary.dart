@@ -192,6 +192,7 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
                   widget.usageCalc!.totalCost,
                   widget.usageCalc!.payableAmount,
                   widget.tenantType,
+                  widget.lineItems,
                   {},
                   '',
                   '',

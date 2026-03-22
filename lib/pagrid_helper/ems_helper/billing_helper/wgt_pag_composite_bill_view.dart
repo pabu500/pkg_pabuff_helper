@@ -157,7 +157,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
   Widget build(BuildContext context) {
     bool pullData = _bill.isEmpty && !_gettingBill;
 
-    if (_pullFails > 2) {
+    if (_pullFails > 0) {
       dev.log('item_group: pull fails more than $_pullFails times');
 
       pullData = false;
@@ -382,6 +382,15 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       lineItemList.add({
         'label': lineItemInfo['line_item_label_1'],
         'amount': lineItemInfo['line_item_amount_1'],
+        'subjectToTax': true,
+      });
+    }
+    if (lineItemInfo['line_item_label_2'] != null &&
+        lineItemInfo['line_item_amount_2'] != null) {
+      lineItemList.add({
+        'label': lineItemInfo['line_item_label_2'],
+        'amount': lineItemInfo['line_item_amount_2'],
+        'subjectToTax': false,
       });
     }
 
@@ -1024,7 +1033,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             // billedSubTenantUsages: billedSubTenantUsages,
             // billedUsageFactor: billedUsageFactors,
             // manualUsages: billedManualUsages,
-            // lineItems: [lineItem],
+            lineItems: lineItemList,
             // meterTypeRates: billedRates,
             tenantSingularUsageInfoList: singularUsageList,
             compositeUsageCalc: compositeUsageCalcRl,

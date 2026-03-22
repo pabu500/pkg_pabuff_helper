@@ -368,12 +368,21 @@ class PagEmsTypeUsageCalc {
       subTotalCost += _typeUsageG!.cost!;
     }
 
+    double lineItemCostNotSubjectToTax = 0.0;
     for (var item in _lineItemList) {
       String? costStr = item['amount'];
       double? cost = double.tryParse(costStr ?? '');
-      if (cost != null) {
-        subTotalCost ??= 0;
-        subTotalCost += cost;
+      bool subjectToTax = item['subjectToTax'] as bool;
+
+      if (subjectToTax) {
+        if (cost != null) {
+          subTotalCost ??= 0;
+          subTotalCost += cost;
+        }
+      } else {
+        if (cost != null) {
+          lineItemCostNotSubjectToTax += cost;
+        }
       }
     }
     _subTotalCost = subTotalCost;
@@ -397,6 +406,10 @@ class PagEmsTypeUsageCalc {
         }
 
         _payableAmount = _totalCost! + (interestAmountDouble ?? 0);
+      }
+
+      if (lineItemCostNotSubjectToTax > 0.0000001) {
+        _payableAmount = _payableAmount! + lineItemCostNotSubjectToTax;
       }
 
       if (_miniSoaInfo != null) {
