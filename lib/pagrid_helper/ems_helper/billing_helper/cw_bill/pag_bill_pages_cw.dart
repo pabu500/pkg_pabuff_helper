@@ -4,6 +4,7 @@ import 'package:buff_helper/pagrid_helper/ems_helper/tenant/mdl_ems_type_usage_r
 import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_ems_type_usage_calc_rl.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/up_helper/helper/tenant_def.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
@@ -215,6 +216,9 @@ class PagBill {
   }
 
   Future<pw.MultiPage> getPage1() async {
+    double pageWidth = PdfPageFormat.a4.width;
+    dev.log('Page width: $pageWidth');
+
     return pw.MultiPage(
       pageTheme: pw.PageTheme(
         theme: pw.ThemeData.withFont(
@@ -230,7 +234,8 @@ class PagBill {
         pw.SizedBox(height: 5),
         _getBillTime(),
         _getSingularList(),
-        // pw.SizedBox(height: 10),
+        pw.SizedBox(height: 5),
+        _getTotal(),
         // _getContentFooter(context),
         // pw.SizedBox(height: 10),
         // _termsAndConditions(context),
@@ -670,36 +675,6 @@ class PagBill {
     );
   }
 
-  pw.Widget _getContent(pw.Context context) {
-    return pw.Column(
-      crossAxisAlignment: pw.CrossAxisAlignment.start,
-      children: [
-        if (typeCostE != null)
-          _getTypeRow(boltIcon, 'Electricity', 'kWh', typeRateE!, typeUsageE!,
-              typeCostE!,
-              trending: trendingE),
-        if (typeCostB != null)
-          _getTypeRow(
-              hvacIcon, 'BTU', 'kWh', typeRateB!, typeUsageB!, typeCostB!,
-              trending: trendingB),
-        if (typeCostW != null)
-          _getTypeRow(
-              waterIcon, 'Water', 'CuM', typeRateW!, typeUsageW!, typeCostW!,
-              trending: trendingW),
-        if (typeCostN != null)
-          _getTypeRow(waterDropIcon, 'NeWater', 'CuM', typeRateN!, typeUsageN!,
-              typeCostN!,
-              trending: trendingN),
-        if (typeCostG != null)
-          _getTypeRow(
-              gasIcon, 'Gas', 'kWh', typeRateG!, typeUsageG!, typeCostG!,
-              trending: trendingG),
-        if (lineItemValue1 != null)
-          _getLineItemRow(lineItemLabel1!, lineItemValue1!),
-      ],
-    );
-  }
-
   pw.Widget _getSingularList() {
     List<pw.Widget> singularStatList = [];
     for (Map<String, dynamic> singularUsageInfo
@@ -788,105 +763,101 @@ class PagBill {
     double rate = typeUsage.rate!;
     double cost = typeUsage.cost!;
 
-    List<Map<String, dynamic>>? trending;
-
-    return pw.Container(
-        height: 95,
-        padding: const pw.EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-        decoration: pw.BoxDecoration(
-          border: pw.Border.all(
-            color: PdfColors.grey500,
-            width: 0.5,
-          ),
-        ),
-        child: pw.Row(
-          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: pw.CrossAxisAlignment.center,
+    return pw.Table(
+      border: pw.TableBorder.all(color: PdfColors.grey600, width: 0.5),
+      columnWidths: {
+        0: const pw.FixedColumnWidth(90),
+        1: const pw.FixedColumnWidth(55),
+        2: const pw.FixedColumnWidth(20),
+        3: const pw.FixedColumnWidth(35),
+      },
+      defaultVerticalAlignment: pw.TableCellVerticalAlignment.middle,
+      children: [
+        pw.TableRow(
           children: [
-            pw.Padding(
-              padding: const pw.EdgeInsets.only(top: 10),
-              child: pw.SizedBox(
-                width: 350,
-                height: 95,
-                child: pw.Container(), //_getTrending(trending),
-              ),
+            pw.Text('  Item', style: textStyle),
+            pw.Text('  Usage', style: textStyle),
+            pw.Text('  Rate', style: textStyle),
+            pw.Text('  Sub-total', style: textStyle),
+          ],
+        ),
+        pw.TableRow(
+          children: [
+            pw.Row(
+              children: [
+                pw.Icon(
+                  pw.IconData(codePoint),
+                  color: PdfColors.grey,
+                  size: 16,
+                ),
+                pw.Text(
+                  typeStr,
+                  style: const pw.TextStyle(color: _darkColor),
+                ),
+              ],
             ),
-            pw.SizedBox(
-              width: 100,
-              child: pw.Column(
-                mainAxisAlignment: pw.MainAxisAlignment.center,
-                children: [
-                  pw.Row(
-                    children: [
-                      pw.Icon(
-                        pw.IconData(codePoint),
-                        color: PdfColors.grey,
-                        size: 25,
-                      ),
-                      pw.Text(
-                        typeStr,
-                        style: pw.TextStyle(
-                          color: _darkColor,
-                          fontWeight: pw.FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  pw.Column(
-                    children: [
-                      pw.Row(
-                        mainAxisAlignment: pw.MainAxisAlignment.start,
-                        children: [
-                          pw.SizedBox(width: 3),
-                          // pw.Text(
-                          //   ' Usage: ',
-                          //   style: textStyle,
-                          // ),
-                          pw.Text(
-                            '${usage.toStringAsFixed(usageDecimals)} $typeUnit',
-                            style: textStyle,
-                          ),
-                        ],
-                      ),
-                      pw.Row(
-                        mainAxisAlignment: pw.MainAxisAlignment.start,
-                        children: [
-                          pw.Text(
-                            ' Rate: ',
-                            style: textStyle,
-                          ),
-                          pw.Text(
-                            '\$${rate.toStringAsFixed(rateDecimals)}',
-                            style: textStyle,
-                          ),
-                        ],
-                      ),
-                      pw.Row(
-                        mainAxisAlignment: pw.MainAxisAlignment.start,
-                        children: [
-                          pw.Text(
-                            ' Cost: ${_formatCurrency(cost)}',
-                            style: textStyle,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  // pw.SizedBox(
-                  //   width: 80,
-                  //   child: pw.Align(
-                  //     alignment: pw.Alignment.centerRight,
-                  //     child: pw.Text(
-                  //       _formatCurrency(cost),
-                  //       style: const pw.TextStyle(color: _darkColor),
-                  //     ),
-                  //   ),
-                  // ),
-                ],
-              ),
+            pw.Row(
+              children: [
+                pw.SizedBox(width: 5),
+                pw.Text(
+                  '${usage.toStringAsFixed(usageDecimals)} ($typeUnit)',
+                  style: textStyle,
+                ),
+              ],
+            ),
+            pw.Row(
+              children: [
+                pw.SizedBox(width: 5),
+                pw.Text(
+                  '\$${rate.toStringAsFixed(rateDecimals)}',
+                  style: textStyle,
+                ),
+              ],
+            ),
+            pw.Row(
+              children: [
+                pw.SizedBox(width: 5),
+                pw.Text(
+                  _formatCurrency(cost),
+                  style: textStyle,
+                ),
+              ],
             ),
           ],
-        ));
+        ),
+      ],
+    );
+  }
+
+  pw.Widget _getTotal() {
+    return pw.Container(
+      width: 500,
+      padding: const pw.EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      decoration: pw.BoxDecoration(
+        border: pw.Border.all(color: PdfColors.grey600, width: 1),
+        borderRadius: pw.BorderRadius.circular(5.0),
+      ),
+      child: pw.Row(
+        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: pw.CrossAxisAlignment.center,
+        children: [
+          pw.Text(
+            'Total Amount',
+            style: pw.TextStyle(
+              color: _darkColor,
+              fontWeight: pw.FontWeight.bold,
+            ),
+          ),
+          pw.Text(
+            _formatCurrency(totalAmount),
+            style: pw.TextStyle(
+              color: _darkColor,
+              fontWeight: pw.FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   pw.Widget _getLineItemRow(String label, double value) {
@@ -917,112 +888,6 @@ class PagBill {
         ],
       ),
     );
-  }
-
-  pw.Widget _getTypeRow(int codePoint, String typeStr, String typeUnit,
-      double rate, double usage, double cost,
-      {List<Map<String, dynamic>>? trending}) {
-    pw.TextStyle textStyle = const pw.TextStyle(
-      color: _darkColor,
-      fontSize: 10,
-    );
-    return pw.Container(
-        height: 95,
-        padding: const pw.EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-        decoration: pw.BoxDecoration(
-          border: pw.Border.all(
-            color: PdfColors.grey500,
-            width: 0.5,
-          ),
-        ),
-        child: pw.Row(
-          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: pw.CrossAxisAlignment.center,
-          children: [
-            pw.Padding(
-              padding: const pw.EdgeInsets.only(top: 10),
-              child: pw.SizedBox(
-                width: 350,
-                height: 95,
-                child: _getTrending(trending),
-              ),
-            ),
-            pw.SizedBox(
-              width: 100,
-              child: pw.Column(
-                mainAxisAlignment: pw.MainAxisAlignment.center,
-                children: [
-                  pw.Row(
-                    children: [
-                      pw.Icon(
-                        pw.IconData(codePoint),
-                        color: PdfColors.grey,
-                        size: 25,
-                      ),
-                      pw.Text(
-                        typeStr,
-                        style: pw.TextStyle(
-                          color: _darkColor,
-                          fontWeight: pw.FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  pw.Column(
-                    children: [
-                      pw.Row(
-                        mainAxisAlignment: pw.MainAxisAlignment.start,
-                        children: [
-                          pw.SizedBox(width: 3),
-                          // pw.Text(
-                          //   ' Usage: ',
-                          //   style: textStyle,
-                          // ),
-                          pw.Text(
-                            '${usage.toStringAsFixed(usageDecimals)} $typeUnit',
-                            style: textStyle,
-                          ),
-                        ],
-                      ),
-                      pw.Row(
-                        mainAxisAlignment: pw.MainAxisAlignment.start,
-                        children: [
-                          pw.Text(
-                            ' Rate: ',
-                            style: textStyle,
-                          ),
-                          pw.Text(
-                            '\$${rate.toStringAsFixed(rateDecimals)}',
-                            style: textStyle,
-                          ),
-                        ],
-                      ),
-                      pw.Row(
-                        mainAxisAlignment: pw.MainAxisAlignment.start,
-                        children: [
-                          pw.Text(
-                            ' Cost: ${_formatCurrency(cost)}',
-                            style: textStyle,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  // pw.SizedBox(
-                  //   width: 80,
-                  //   child: pw.Align(
-                  //     alignment: pw.Alignment.centerRight,
-                  //     child: pw.Text(
-                  //       _formatCurrency(cost),
-                  //       style: const pw.TextStyle(color: _darkColor),
-                  //     ),
-                  //   ),
-                  // ),
-                ],
-              ),
-            ),
-          ],
-        ));
   }
 
   pw.Widget _getTrending(List<Map<String, dynamic>>? trending) {
