@@ -44,9 +44,7 @@ class _WgtSubmitTableState extends State<WgtSubmitTable> {
           allowMultiple: false,
           allowedExtensions: widget.fileExtensions ?? ['csv']);
     } catch (e) {
-      if (kDebugMode) {
-        print('piceker error: $e');
-      }
+      dev.log('picker error: $e');
     }
     if (result != null && result.files.isNotEmpty) {
       try {
@@ -59,7 +57,8 @@ class _WgtSubmitTableState extends State<WgtSubmitTable> {
         }
 
         final bytes = utf8.decode(uploadfile.toList());
-        final csv = const CsvToListConverter(eol: "\r\n", fieldDelimiter: ",")
+        final csv = const CsvToListConverter(
+                shouldParseNumbers: false, eol: "\r\n", fieldDelimiter: ",")
             .convert(bytes);
 
         List<String> header = csv[0].map((e) => e.toString()).toList();
