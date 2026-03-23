@@ -866,7 +866,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                         );
                         break;
                       case PagItemKind.tariffPackage:
-                        opWidget = WgtTariffPackageAssignment3(
+                        opWidget = WgtTariffPackageAssignment(
                           appConfig: widget.appConfig,
                           loggedInUser: loggedInUser!,
                           itemGroupIndexStr: item['id'],

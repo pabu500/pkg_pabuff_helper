@@ -4,7 +4,6 @@ import 'package:buff_helper/pagrid_helper/ems_helper/tenant/mdl_ems_type_usage_r
 import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_ems_type_usage_calc_rl.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/up_helper/helper/tenant_def.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
@@ -48,6 +47,7 @@ Future<Uint8List> generatePagInvoice(
     subTotalAmount: billInfo['subTotalAmount'],
     gstAmount: billInfo['gstAmount'],
     totalAmount: billInfo['totalAmount'],
+    interestInfo: billInfo['interestInfo'],
     payableAmount: billInfo['payableAmount'],
     dueDate: billInfo['dueDate'],
     typeRateE: billInfo['typeRateE'],
@@ -72,6 +72,8 @@ Future<Uint8List> generatePagInvoice(
     trendingG: billInfo['trendingG'],
     lineItemLabel1: billInfo['lineItemLabel1'],
     lineItemValue1: billInfo['lineItemValue1'],
+    lineItemLabel2: billInfo['lineItemLabel2'],
+    lineItemValue2: billInfo['lineItemValue2'],
     assetFolder: billInfo['assetFolder'],
     tenantSingularUsageInfoList: billInfo['tenantSingularUsageInfoList'],
     tax: .15,
@@ -125,8 +127,11 @@ class PagBill {
     required this.trendingG,
     required this.tax,
     required this.paymentInfo,
+    required this.interestInfo,
     required this.lineItemLabel1,
     required this.lineItemValue1,
+    required this.lineItemLabel2,
+    required this.lineItemValue2,
     required this.payableAmount,
     required this.dueDate,
     required this.baseColor,
@@ -155,6 +160,7 @@ class PagBill {
   final double? subTotalAmount;
   final double? gstAmount;
   final double? totalAmount;
+  final Map<String, dynamic>? interestInfo;
   final double? payableAmount;
   final double? typeRateE;
   final double? typeRateW;
@@ -173,6 +179,8 @@ class PagBill {
   final double? typeCostG;
   final String? lineItemLabel1;
   final double? lineItemValue1;
+  final String? lineItemLabel2;
+  final double? lineItemValue2;
   final List<Map<String, dynamic>>? trendingE;
   final List<Map<String, dynamic>>? trendingW;
   final List<Map<String, dynamic>>? trendingB;
@@ -831,33 +839,76 @@ class PagBill {
 
   pw.Widget _getTotal() {
     return pw.Container(
-      width: 500,
-      padding: const pw.EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-      decoration: pw.BoxDecoration(
-        border: pw.Border.all(color: PdfColors.grey600, width: 1),
-        borderRadius: pw.BorderRadius.circular(5.0),
-      ),
-      child: pw.Row(
-        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: pw.CrossAxisAlignment.center,
-        children: [
-          pw.Text(
-            'Total Amount',
-            style: pw.TextStyle(
-              color: _darkColor,
-              fontWeight: pw.FontWeight.bold,
+        width: 500,
+        padding: const pw.EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+        decoration: pw.BoxDecoration(
+          border: pw.Border.all(color: PdfColors.grey600, width: 1),
+          borderRadius: pw.BorderRadius.circular(5.0),
+        ),
+        child: pw.Column(
+          children: [
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: pw.CrossAxisAlignment.center,
+              children: [
+                pw.Text(
+                  'Total Amount',
+                  style: pw.TextStyle(
+                    color: _darkColor,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+                pw.Text(
+                  _formatCurrency(totalAmount),
+                  style: pw.TextStyle(
+                    color: _darkColor,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+              ],
             ),
-          ),
-          pw.Text(
-            _formatCurrency(totalAmount),
-            style: pw.TextStyle(
-              color: _darkColor,
-              fontWeight: pw.FontWeight.bold,
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: pw.CrossAxisAlignment.center,
+              children: [
+                pw.Text(
+                  'Interest Amount',
+                  style: pw.TextStyle(
+                    color: _darkColor,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+                pw.Text(
+                  _formatCurrency(0),
+                  style: pw.TextStyle(
+                    color: _darkColor,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
-    );
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: pw.CrossAxisAlignment.center,
+              children: [
+                pw.Text(
+                  'Payable Amount',
+                  style: pw.TextStyle(
+                    color: _darkColor,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+                pw.Text(
+                  _formatCurrency(payableAmount),
+                  style: pw.TextStyle(
+                    color: _darkColor,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ));
   }
 
   pw.Widget _getLineItemRow(String label, double value) {

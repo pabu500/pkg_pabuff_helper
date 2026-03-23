@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../comm/comm_tariff_package.dart';
+import '../../../def_helper/pag_item_helper.dart';
 import '../../../model/mdl_pag_app_config.dart';
 import 'dart:developer' as dev;
 
@@ -24,8 +25,9 @@ class WgtTariffPackageAssignment extends StatefulWidget {
     required this.itemLabel,
     required this.itemScope,
     required this.meterType,
-    required this.tariffPackageTypeName,
-    required this.tariffPackageTypeLabel,
+    // required this.tariffPackageTypeName,
+    // required this.tariffPackageTypeLabel,
+    required this.itemInfo,
     this.onScopeTreeUpdate,
     this.onUpdate,
   });
@@ -36,8 +38,9 @@ class WgtTariffPackageAssignment extends StatefulWidget {
   final String itemName;
   final String itemLabel;
   final String meterType;
-  final String tariffPackageTypeName;
-  final String tariffPackageTypeLabel;
+  final Map<String, dynamic> itemInfo;
+  // final String tariffPackageTypeName;
+  // final String tariffPackageTypeLabel;
   final MdlPagScope itemScope;
   final Function? onScopeTreeUpdate;
   final Function? onUpdate;
@@ -123,8 +126,11 @@ class _WgtTariffPackageAssignmentState
         bool isUnassigned = tpName == null;
 
         bool isAsignedToOtherTps = tpName != null && tpName != widget.itemName;
-        bool hasTptMismatch =
-            tenantMeterTypeTpTypeName != widget.tariffPackageTypeName;
+        final tptName = tenant['tpt_name_${widget.meterType.toLowerCase()}'] ??
+            'Unknown TPT';
+
+        bool hasTptMismatch = tenantMeterTypeTpTypeName != tptName;
+
         tenant['assigned'] = false;
         if (!isUnassigned && !isAsignedToOtherTps) {
           tenant['assigned'] = true;
@@ -441,6 +447,7 @@ class _WgtTariffPackageAssignmentState
       border: Border.all(color: Theme.of(context).hintColor, width: 1.5),
       borderRadius: BorderRadius.circular(5),
     );
+    final tptLabel = widget.itemInfo['tpt_label'] ?? 'Unknown TPT';
     return Row(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -451,6 +458,8 @@ class _WgtTariffPackageAssignmentState
               fontWeight: FontWeight.bold, color: Theme.of(context).hintColor),
         ),
         horizontalSpaceSmall,
+        Icon(PagItemKind.tariffPackage.iconData, size: 21),
+        horizontalSpaceTiny,
         Text(
           widget.itemName,
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -487,7 +496,7 @@ class _WgtTariffPackageAssignmentState
           // width: 60,
           decoration: boxDecoration,
           padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-          child: Text(widget.tariffPackageTypeLabel,
+          child: Text(tptLabel,
               style: const TextStyle(fontWeight: FontWeight.bold)),
         ),
       ],
