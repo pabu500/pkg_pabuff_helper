@@ -186,6 +186,7 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
               if (widget.isBillMode)
                 getPagTotal(
                   context,
+                  widget.usageCalc!.totalUsageCost,
                   widget.usageCalc!.gst!,
                   widget.usageCalc!.subTotalCost,
                   widget.usageCalc!.gstAmount,

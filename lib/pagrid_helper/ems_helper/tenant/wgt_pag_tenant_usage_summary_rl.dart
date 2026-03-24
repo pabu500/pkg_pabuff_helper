@@ -175,6 +175,7 @@ class _WgtPagTenantUsageSummaryRlState
             if (widget.isBillMode)
               getPagTotal(
                 context,
+                widget.usageCalc.totalUsageCost,
                 widget.gst!,
                 widget.usageCalc.subTotalCost,
                 widget.usageCalc.gstAmount,

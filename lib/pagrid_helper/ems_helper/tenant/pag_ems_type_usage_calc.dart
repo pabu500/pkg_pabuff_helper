@@ -30,6 +30,7 @@ class PagEmsTypeUsageCalc {
   final List<Map<String, dynamic>> _trendingN = [];
   final List<Map<String, dynamic>> _trendingG = [];
 
+  double? _totalUsageCost;
   double? _subTotalCost;
   double? _gstAmount;
   double? _totalCost;
@@ -37,7 +38,7 @@ class PagEmsTypeUsageCalc {
 
   String? _billBarFromMonth;
 
-  List<PagEmsTypeUsageCalc> _singularCalcList = [];
+  final List<PagEmsTypeUsageCalc> _singularCalcList = [];
 
   late final Map<String, dynamic>? _miniSoaInfo;
 
@@ -62,6 +63,7 @@ class PagEmsTypeUsageCalc {
   late final List<Map<String, dynamic>>? _billedTrendingSnapShot;
 
   double? get gst => _gst;
+  double? get totalUsageCost => _totalUsageCost;
   double? get subTotalCost => _subTotalCost;
   double? get gstAmount => _gstAmount;
   double? get totalCost => _totalCost;
@@ -345,28 +347,32 @@ class PagEmsTypeUsageCalc {
   }
 
   void _calcTotalCost() {
-    double? subTotalCost;
+    double? totalUsageCost;
 
     if (_typeUsageE?.hasCost() ?? false) {
-      subTotalCost ??= 0;
-      subTotalCost += _typeUsageE!.cost!;
+      totalUsageCost ??= 0;
+      totalUsageCost += _typeUsageE!.cost!;
     }
     if (_typeUsageW?.hasCost() ?? false) {
-      subTotalCost ??= 0;
-      subTotalCost += _typeUsageW!.cost!;
+      totalUsageCost ??= 0;
+      totalUsageCost += _typeUsageW!.cost!;
     }
     if (_typeUsageB?.hasCost() ?? false) {
-      subTotalCost ??= 0;
-      subTotalCost += _typeUsageB!.cost!;
+      totalUsageCost ??= 0;
+      totalUsageCost += _typeUsageB!.cost!;
     }
     if (_typeUsageN?.hasCost() ?? false) {
-      subTotalCost ??= 0;
-      subTotalCost += _typeUsageN!.cost!;
+      totalUsageCost ??= 0;
+      totalUsageCost += _typeUsageN!.cost!;
     }
     if (_typeUsageG?.hasCost() ?? false) {
-      subTotalCost ??= 0;
-      subTotalCost += _typeUsageG!.cost!;
+      totalUsageCost ??= 0;
+      totalUsageCost += _typeUsageG!.cost!;
     }
+
+    _totalUsageCost = totalUsageCost;
+
+    double? subTotalCost = totalUsageCost;
 
     double lineItemCostNotSubjectToTax = 0.0;
     for (var item in _lineItemList) {
@@ -385,7 +391,9 @@ class PagEmsTypeUsageCalc {
         }
       }
     }
+
     _subTotalCost = subTotalCost;
+
     if (_subTotalCost != null) {
       _subTotalCost = getRound(_subTotalCost!, 2);
       if (subTotalCost != null && _gst != null) {
@@ -397,7 +405,7 @@ class PagEmsTypeUsageCalc {
       _payableAmount = _totalCost;
 
       if (_interestInfo != null) {
-        final totalInterestAmount = _interestInfo!['total_interest_amount'];
+        final totalInterestAmount = _interestInfo['total_interest_amount'];
         double? interestAmountDouble = 0;
         if (totalInterestAmount is String) {
           interestAmountDouble = double.tryParse(totalInterestAmount);
@@ -554,30 +562,30 @@ class PagEmsTypeUsageCalc {
       costDecimals: _costDecimals,
     );
 
-    double? subTotalCost;
+    // double? totalUsageCost;
 
-    for (var singularCalc in _singularCalcList) {
-      if (singularCalc.typeUsageE?.hasCost() ?? false) {
-        subTotalCost ??= 0;
-        subTotalCost += singularCalc.typeUsageE!.cost!;
-      }
-      if (singularCalc.typeUsageW?.hasCost() ?? false) {
-        subTotalCost ??= 0;
-        subTotalCost += singularCalc.typeUsageW!.cost!;
-      }
-      if (singularCalc.typeUsageB?.hasCost() ?? false) {
-        subTotalCost ??= 0;
-        subTotalCost += singularCalc.typeUsageB!.cost!;
-      }
-      if (singularCalc.typeUsageN?.hasCost() ?? false) {
-        subTotalCost ??= 0;
-        subTotalCost += singularCalc.typeUsageN!.cost!;
-      }
-      if (singularCalc.typeUsageG?.hasCost() ?? false) {
-        subTotalCost ??= 0;
-        subTotalCost += singularCalc.typeUsageG!.cost!;
-      }
-    }
+    // for (var singularCalc in _singularCalcList) {
+    //   if (singularCalc.typeUsageE?.hasCost() ?? false) {
+    //     totalUsageCost ??= 0;
+    //     totalUsageCost += singularCalc.typeUsageE!.cost!;
+    //   }
+    //   if (singularCalc.typeUsageW?.hasCost() ?? false) {
+    //     totalUsageCost ??= 0;
+    //     totalUsageCost += singularCalc.typeUsageW!.cost!;
+    //   }
+    //   if (singularCalc.typeUsageB?.hasCost() ?? false) {
+    //     totalUsageCost ??= 0;
+    //     totalUsageCost += singularCalc.typeUsageB!.cost!;
+    //   }
+    //   if (singularCalc.typeUsageN?.hasCost() ?? false) {
+    //     totalUsageCost ??= 0;
+    //     totalUsageCost += singularCalc.typeUsageN!.cost!;
+    //   }
+    //   if (singularCalc.typeUsageG?.hasCost() ?? false) {
+    //     totalUsageCost ??= 0;
+    //     totalUsageCost += singularCalc.typeUsageG!.cost!;
+    //   }
+    // }
 
     // _subTotalCost = subTotalCost;
     // if (_subTotalCost != null) {

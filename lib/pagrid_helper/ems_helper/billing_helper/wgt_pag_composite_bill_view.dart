@@ -983,6 +983,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
               'gstAmount': compositeUsageCalcRl.gstAmount,
               'totalAmount': compositeUsageCalcRl.totalCost,
               'payableAmount': compositeUsageCalcRl.payableAmount,
+              'miniSoaInfo': compositeUsageCalcRl.miniSoaInfo,
               'typeRateE': compositeUsageCalcRl.typeUsageE?.rate,
               'typeRateW': compositeUsageCalcRl.typeUsageW?.rate,
               'typeRateB': compositeUsageCalcRl.typeUsageB?.rate,

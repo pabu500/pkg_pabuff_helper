@@ -766,6 +766,7 @@ Widget getPagTypeUsageNet(
 
 Widget getPagTotal(
     BuildContext context,
+    double? totalUsageCost,
     double gst,
     double? subTotalAmt,
     double? gstAmt,
@@ -784,6 +785,35 @@ Widget getPagTotal(
   bool applyGst = tenantType != 'cw_nus_internal';
 
   double contentWidth = 235;
+
+  String lineItemSubjectToTaxLabel = '';
+  String strLineItemSubjectToTaxAmount = '';
+  String lineItemNotSubjectToTaxLabel = '';
+  String strLineItemNotSubjectToTaxAmount = '';
+  if (lineItems != null && lineItems.isNotEmpty) {
+    for (var lineItem in lineItems) {
+      bool subjectToTax = lineItem['subjectToTax'];
+      String label = lineItem['label'] ?? '';
+      final amountObj = lineItem['amount'];
+      double? amount;
+      if (amountObj is String) {
+        amount = double.tryParse(amountObj);
+      } else if (amountObj is double) {
+        amount = amountObj;
+      } else {
+        throw Exception('Invalid amount type');
+      }
+      if (subjectToTax) {
+        lineItemSubjectToTaxLabel += '$label\n';
+        strLineItemSubjectToTaxAmount +=
+            '${getCommaNumberStr(amount, decimal: 2)}\n';
+      } else {
+        lineItemNotSubjectToTaxLabel += '$label\n';
+        strLineItemNotSubjectToTaxAmount +=
+            '${getCommaNumberStr(amount, decimal: 2)}\n';
+      }
+    }
+  }
 
   return Container(
     width: width,
@@ -804,32 +834,77 @@ Widget getPagTotal(
           context,
           contentWidth,
         ),
-        const Divider(height: 21),
-        if (applyGst)
-          Padding(
-            padding: const EdgeInsets.only(top: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: contentWidth,
-                  child: Text(
-                    'Sub Total',
-                    style: defStatStyle,
-                  ),
+        const Divider(height: 13),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: contentWidth,
+              child: Text(
+                'Total Usage Cost',
+                style: defStatStyle.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
                 ),
-                horizontalSpaceSmall,
-                getStatWithUnit(
-                  getCommaNumberStr(subTotalAmt, decimal: 2),
-                  'SGD',
-                  statStrStyle: defStatStyle.copyWith(
-                    color:
-                        Theme.of(context).colorScheme.onSurface.withAlpha(210),
-                  ),
-                ),
-              ],
+              ),
             ),
+            horizontalSpaceSmall,
+            getStatWithUnit(
+              getCommaNumberStr(totalUsageCost, decimal: 2),
+              'SGD',
+              statStrStyle: defStatStyle.copyWith(
+                color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
+              ),
+            ),
+          ],
+        ),
+        const Divider(height: 13),
+        // line item 1
+        if (strLineItemSubjectToTaxAmount.isNotEmpty)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: contentWidth,
+                child: Text(
+                  lineItemSubjectToTaxLabel.trim(),
+                  style: defStatStyle,
+                ),
+              ),
+              horizontalSpaceSmall,
+              getStatWithUnit(
+                strLineItemSubjectToTaxAmount.trim(),
+                'SGD',
+                statStrStyle: defStatStyle.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
+                ),
+                showUnit: false,
+              ),
+            ],
+          ),
+
+        if (applyGst)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: contentWidth,
+                child: Text(
+                  'Sub Total',
+                  style: defStatStyle,
+                ),
+              ),
+              horizontalSpaceSmall,
+              getStatWithUnit(
+                getCommaNumberStr(subTotalAmt, decimal: 2),
+                'SGD',
+                statStrStyle: defStatStyle.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface.withAlpha(130),
+                ),
+              ),
+            ],
           ),
         if (applyGst)
           Padding(
@@ -842,7 +917,12 @@ Widget getPagTotal(
                   width: contentWidth,
                   child: Text(
                     'GST ($gst%)',
-                    style: defStatStyle,
+                    style: defStatStyle.copyWith(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withAlpha(210),
+                    ),
                   ),
                 ),
                 horizontalSpaceSmall,
@@ -888,24 +968,21 @@ Widget getPagTotal(
             ],
           ),
         ),
-        const Divider(height: 21),
-        Padding(
-          padding: const EdgeInsets.only(top: 5),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              getInterestInfo(
-                interestInfo,
-                context,
-                showInterestDetail,
-                contentWidth,
-                onCheckInterestDetail,
-              )
-            ],
-          ),
+        const Divider(height: 13),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            getInterestInfo(
+              interestInfo,
+              context,
+              showInterestDetail,
+              contentWidth,
+              onCheckInterestDetail,
+            )
+          ],
         ),
         getLineItemNotSubjectToTax(lineItems, context, contentWidth),
-        const Divider(height: 21),
+        const Divider(height: 13),
         if (payableAmt != null)
           Padding(
             padding: const EdgeInsets.only(top: 5),
@@ -958,31 +1035,28 @@ Widget getLineItemNotSubjectToTax(
     String valueStr = lineItem['amount'] ?? '';
     double? valueVal = double.tryParse(valueStr) ?? 0;
     lineItemList.add(
-      Padding(
-        padding: const EdgeInsets.only(top: 5),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: width,
-              child: Text(
-                label,
-                style: defStatStyle.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
-                ),
-              ),
-            ),
-            horizontalSpaceSmall,
-            getStatWithUnit(
-              getCommaNumberStr(valueVal, decimal: 2, isRoundUp: false),
-              'SGD',
-              statStrStyle: defStatStyle.copyWith(
+      Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: width,
+            child: Text(
+              label,
+              style: defStatStyle.copyWith(
                 color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
               ),
             ),
-          ],
-        ),
+          ),
+          horizontalSpaceSmall,
+          getStatWithUnit(
+            getCommaNumberStr(valueVal, decimal: 2, isRoundUp: false),
+            'SGD',
+            statStrStyle: defStatStyle.copyWith(
+              color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -990,23 +1064,23 @@ Widget getLineItemNotSubjectToTax(
   return Column(
     mainAxisSize: MainAxisSize.min,
     children: [
-      const Divider(height: 21),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Symbols.edit,
-              size: 21, color: Theme.of(context).colorScheme.primary),
-          horizontalSpaceTiny,
-          Text(
-            'Line Item (NOT subject to tax)',
-            style: TextStyle(
-              fontSize: 18,
-              color: Theme.of(context).hintColor.withAlpha(180),
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
+      const Divider(height: 13),
+      // Row(
+      //   mainAxisAlignment: MainAxisAlignment.center,
+      //   children: [
+      //     Icon(Symbols.edit,
+      //         size: 21, color: Theme.of(context).colorScheme.primary),
+      //     horizontalSpaceTiny,
+      //     Text(
+      //       'Line Item (NOT subject to tax)',
+      //       style: TextStyle(
+      //         fontSize: 18,
+      //         color: Theme.of(context).hintColor.withAlpha(180),
+      //         fontWeight: FontWeight.bold,
+      //       ),
+      //     ),
+      //   ],
+      // ),
       // verticalSpaceSmall,
       Center(
         child: Column(
@@ -1115,7 +1189,7 @@ Widget getMiniSoA(
               getCommaNumberStr(balBf, decimal: 2),
               'SGD',
               statStrStyle: defStatStyle.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
+                color: Theme.of(context).colorScheme.onSurface.withAlpha(130),
               ),
             ),
           ],
@@ -1203,7 +1277,9 @@ Widget getMiniSoA(
               width: contentWidth,
               child: Text(
                 'Bal. C/F',
-                style: defStatStyle,
+                style: defStatStyle.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
+                ),
               ),
             ),
             horizontalSpaceSmall,
@@ -1237,7 +1313,7 @@ Widget getPagAutoUsageExcludedInfo(BuildContext context, {double width = 750}) {
         'Auto Usage Excluded',
         style: TextStyle(
           fontSize: 18,
-          color: Theme.of(context).hintColor.withOpacity(0.5),
+          color: Theme.of(context).hintColor.withAlpha(128),
           fontWeight: FontWeight.bold,
         ),
       ),

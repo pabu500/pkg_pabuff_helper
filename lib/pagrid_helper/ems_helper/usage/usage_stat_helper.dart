@@ -1042,7 +1042,9 @@ Widget getInterestInfo(
             width: contentWidth,
             child: Text(
               'Interest',
-              style: defStatStyle,
+              style: defStatStyle.copyWith(
+                color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
+              ),
             ),
           ),
           horizontalSpaceSmall,

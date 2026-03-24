@@ -49,6 +49,7 @@ Future<Uint8List> generatePagInvoice(
     totalAmount: billInfo['totalAmount'],
     interestInfo: billInfo['interestInfo'],
     payableAmount: billInfo['payableAmount'],
+    miniSoaInfo: billInfo['miniSoaInfo'],
     dueDate: billInfo['dueDate'],
     typeRateE: billInfo['typeRateE'],
     typeRateW: billInfo['typeRateW'],
@@ -138,6 +139,7 @@ class PagBill {
     required this.accentColor,
     required this.assetFolder,
     required this.tenantSingularUsageInfoList,
+    required this.miniSoaInfo,
   });
 
   final String customerLabel;
@@ -192,6 +194,7 @@ class PagBill {
   final PdfColor accentColor;
   final String? assetFolder;
   final List<Map<String, dynamic>> tenantSingularUsageInfoList;
+  final Map<String, dynamic>? miniSoaInfo;
   static const _darkColor = PdfColors.blueGrey800;
   static const _lightColor = PdfColors.white;
 
@@ -838,6 +841,28 @@ class PagBill {
   }
 
   pw.Widget _getTotal() {
+    final interestAmountObj =
+        interestInfo != null ? interestInfo!['total_interest_amount'] : null;
+    double interestAmount = 0;
+    if (interestAmountObj != null) {
+      if (interestAmountObj is double) {
+        interestAmount = interestAmountObj;
+      } else if (interestAmountObj is String) {
+        interestAmount = double.tryParse(interestAmountObj) ?? 0;
+      }
+    }
+
+    final closingBal =
+        miniSoaInfo != null ? miniSoaInfo!['closing_balance'] : null;
+    double closingBalAmount = 0;
+    if (closingBal != null) {
+      if (closingBal is double) {
+        closingBalAmount = closingBal;
+      } else if (closingBal is String) {
+        closingBalAmount = double.tryParse(closingBal) ?? 0;
+      }
+    }
+
     return pw.Container(
         width: 500,
         padding: const pw.EdgeInsets.symmetric(vertical: 5, horizontal: 10),
@@ -847,6 +872,90 @@ class PagBill {
         ),
         child: pw.Column(
           children: [
+            //cf
+            if (closingBal != null)
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: pw.CrossAxisAlignment.center,
+                children: [
+                  pw.Text(
+                    'Closing Balance from Previous Bill',
+                    style: pw.TextStyle(
+                      color: _darkColor,
+                      fontWeight: pw.FontWeight.bold,
+                    ),
+                  ),
+                  pw.Text(
+                    _formatCurrency(closingBalAmount),
+                    style: pw.TextStyle(
+                      color: _darkColor,
+                      fontWeight: pw.FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            if (lineItemLabel1 != null && lineItemValue1 != null)
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: pw.CrossAxisAlignment.center,
+                children: [
+                  pw.Text(
+                    lineItemLabel1!,
+                    style: pw.TextStyle(
+                      color: _darkColor,
+                      fontWeight: pw.FontWeight.bold,
+                    ),
+                  ),
+                  pw.Text(
+                    _formatCurrency(lineItemValue1!),
+                    style: pw.TextStyle(
+                      color: _darkColor,
+                      fontWeight: pw.FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: pw.CrossAxisAlignment.center,
+              children: [
+                pw.Text(
+                  'Sub Total',
+                  style: pw.TextStyle(
+                    color: _darkColor,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+                pw.Text(
+                  _formatCurrency(subTotalAmount),
+                  style: pw.TextStyle(
+                    color: _darkColor,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: pw.CrossAxisAlignment.center,
+              children: [
+                pw.Text(
+                  'GST (${gst ?? 0}%)',
+                  style: pw.TextStyle(
+                    color: _darkColor,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+                pw.Text(
+                  _formatCurrency(gstAmount),
+                  style: pw.TextStyle(
+                    color: _darkColor,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
             pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
               crossAxisAlignment: pw.CrossAxisAlignment.center,
@@ -867,6 +976,7 @@ class PagBill {
                 ),
               ],
             ),
+            pw.Divider(color: PdfColors.grey600, thickness: 0.5),
             pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
               crossAxisAlignment: pw.CrossAxisAlignment.center,
@@ -879,7 +989,7 @@ class PagBill {
                   ),
                 ),
                 pw.Text(
-                  _formatCurrency(0),
+                  _formatCurrency(interestAmount),
                   style: pw.TextStyle(
                     color: _darkColor,
                     fontWeight: pw.FontWeight.bold,
@@ -887,6 +997,30 @@ class PagBill {
                 ),
               ],
             ),
+            pw.Divider(color: PdfColors.grey600, thickness: 0.5),
+            // line item 2
+            if (lineItemLabel2 != null && lineItemValue2 != null)
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: pw.CrossAxisAlignment.center,
+                children: [
+                  pw.Text(
+                    lineItemLabel2!,
+                    style: pw.TextStyle(
+                      color: _darkColor,
+                      fontWeight: pw.FontWeight.bold,
+                    ),
+                  ),
+                  pw.Text(
+                    _formatCurrency(lineItemValue2!),
+                    style: pw.TextStyle(
+                      color: _darkColor,
+                      fontWeight: pw.FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+
             pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
               crossAxisAlignment: pw.CrossAxisAlignment.center,

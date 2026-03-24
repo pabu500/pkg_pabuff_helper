@@ -43,7 +43,7 @@ class PagEmsTypeUsageCalcRl {
 
   late final String? _billBarFromMonth;
 
-  List<PagEmsTypeUsageCalcRl> _singularCalcList = [];
+  final List<PagEmsTypeUsageCalcRl> _singularCalcList = [];
 
   late final Map<String, dynamic>? _miniSoaInfo;
 
@@ -62,6 +62,7 @@ class PagEmsTypeUsageCalcRl {
   final List<Map<String, dynamic>> _trendingN = [];
   final List<Map<String, dynamic>> _trendingG = [];
 
+  double? _totalUsageCost;
   double? _subTotalCost;
   double? _gstAmount;
   double? _totalCost;
@@ -80,6 +81,7 @@ class PagEmsTypeUsageCalcRl {
   List<Map<String, dynamic>> get trendingG => _trendingG;
 
   double? get billedGst => _billedGst;
+  double? get totalUsageCost => _totalUsageCost;
   double? get subTotalCost => _subTotalCost;
   double? get gstAmount => _gstAmount;
   double? get totalCost => _totalCost;
@@ -410,51 +412,60 @@ class PagEmsTypeUsageCalcRl {
   }
 
   void _calcTotalCost() {
-    double? subTotalCost;
-    double? gstAmount;
+    double? totalUsageCost;
 
     if (_typeUsageE != null) {
       if (_typeUsageE!.cost != null) {
-        subTotalCost ??= 0;
-        subTotalCost = subTotalCost + _typeUsageE!.cost!;
+        totalUsageCost ??= 0;
+        totalUsageCost = totalUsageCost + _typeUsageE!.cost!;
       }
     }
     if (_typeUsageW != null) {
       if (_typeUsageW!.cost != null) {
-        subTotalCost ??= 0;
-        subTotalCost = subTotalCost + _typeUsageW!.cost!;
+        totalUsageCost ??= 0;
+        totalUsageCost = totalUsageCost + _typeUsageW!.cost!;
       }
     }
     if (_typeUsageB != null) {
       if (_typeUsageB!.cost != null) {
-        subTotalCost ??= 0;
-        subTotalCost = subTotalCost + _typeUsageB!.cost!;
+        totalUsageCost ??= 0;
+        totalUsageCost = totalUsageCost + _typeUsageB!.cost!;
       }
     }
     if (_typeUsageN != null) {
       if (_typeUsageN!.cost != null) {
-        subTotalCost ??= 0;
-        subTotalCost = subTotalCost + _typeUsageN!.cost!;
+        totalUsageCost ??= 0;
+        totalUsageCost = totalUsageCost + _typeUsageN!.cost!;
       }
     }
     if (_typeUsageG != null) {
       if (_typeUsageG!.cost != null) {
-        subTotalCost ??= 0;
-        subTotalCost = subTotalCost + _typeUsageG!.cost!;
+        totalUsageCost ??= 0;
+        totalUsageCost = totalUsageCost + _typeUsageG!.cost!;
       }
     }
+
+    _totalUsageCost = totalUsageCost;
+
+    double? subTotalCost;
 
     //line items
     if (_lineItemList != null) {
       for (var item in _lineItemList) {
-        String amtStr = item['amount'] ?? '';
-        double? amt = double.tryParse(amtStr);
-        if (amt != null) {
+        if (!item['subjectToTax']) {
+          continue;
+        }
+        String strLineItemSubjectToTax = item['amount'] ?? '';
+        double? lineItemAmountSubjectToTax =
+            double.tryParse(strLineItemSubjectToTax);
+        if (lineItemAmountSubjectToTax != null) {
           subTotalCost ??= 0;
-          subTotalCost = subTotalCost + amt;
+          subTotalCost = totalUsageCost! + lineItemAmountSubjectToTax;
         }
       }
     }
+
+    double? gstAmount;
 
     if (_billedGst != null) {
       gstAmount = subTotalCost! * _billedGst / 100;
@@ -666,8 +677,6 @@ class PagEmsTypeUsageCalcRl {
 
         _totalCost = _totalCost! + (interestAmountDouble ?? 0);
       }
-
-      // _totalCost = _totalCost! + _balBfUsage! + _balBfInterest!;
     }
   }
 

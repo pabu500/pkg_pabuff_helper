@@ -202,6 +202,7 @@ class _WgtPagTenantCompositeUsageSummaryRlState
               if (widget.isBillMode)
                 getPagTotal(
                   context,
+                  widget.compositeUsageCalc!.totalUsageCost,
                   widget.gst!,
                   widget.compositeUsageCalc!.subTotalCost,
                   widget.compositeUsageCalc!.gstAmount,
