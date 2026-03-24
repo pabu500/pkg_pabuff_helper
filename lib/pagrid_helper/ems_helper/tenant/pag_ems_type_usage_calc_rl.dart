@@ -447,7 +447,7 @@ class PagEmsTypeUsageCalcRl {
 
     _totalUsageCost = totalUsageCost;
 
-    double? subTotalCost;
+    double? subTotalCost = totalUsageCost;
 
     //line items
     if (_lineItemList != null) {
@@ -460,7 +460,7 @@ class PagEmsTypeUsageCalcRl {
             double.tryParse(strLineItemSubjectToTax);
         if (lineItemAmountSubjectToTax != null) {
           subTotalCost ??= 0;
-          subTotalCost = totalUsageCost! + lineItemAmountSubjectToTax;
+          subTotalCost = _totalUsageCost! + lineItemAmountSubjectToTax;
         }
       }
     }
