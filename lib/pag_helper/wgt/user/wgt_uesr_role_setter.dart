@@ -198,6 +198,16 @@ class _WgtUesrRoleSetterState extends State<WgtUesrRoleSetter> {
         in widget.loggedInUser.selectedScope.projectProfile!.visibleRoleList) {
       roleInfoList.add(role.toJson());
     }
+    // remove duplicate roles based on name
+    roleInfoList = roleInfoList.fold<List<Map<String, dynamic>>>(
+      [],
+      (previousValue, element) {
+        if (!previousValue.any((e) => e['name'] == element['name'])) {
+          previousValue.add(element);
+        }
+        return previousValue;
+      },
+    );
     for (var role in roleInfoList) {
       for (var userRoleInfo in _userRoleList) {
         if (role['name'] == userRoleInfo['name']) {

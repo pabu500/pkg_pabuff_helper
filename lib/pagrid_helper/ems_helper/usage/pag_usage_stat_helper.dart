@@ -869,7 +869,10 @@ Widget getPagTotal(
                 width: contentWidth,
                 child: Text(
                   lineItemSubjectToTaxLabel.trim(),
-                  style: defStatStyle,
+                  style: defStatStyle.copyWith(
+                    color:
+                        Theme.of(context).colorScheme.onSurface.withAlpha(210),
+                  ),
                 ),
               ),
               horizontalSpaceSmall,

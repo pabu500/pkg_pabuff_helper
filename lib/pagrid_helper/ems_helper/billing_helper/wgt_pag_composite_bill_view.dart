@@ -979,6 +979,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
               'dueDate': _bill['billed_due_date_timestamp'] ?? '',
               'billTimeRangeStr': billTimeRangeStr,
               'tenantUsageSummary': const [],
+              'totalUsageCost': compositeUsageCalcRl.totalUsageCost,
               'subTotalAmount': compositeUsageCalcRl.subTotalCost,
               'gstAmount': compositeUsageCalcRl.gstAmount,
               'totalAmount': compositeUsageCalcRl.totalCost,

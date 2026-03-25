@@ -44,6 +44,7 @@ Future<Uint8List> generatePagInvoice(
     billFromStr: billInfo['billFrom'],
     billToStr: billInfo['billTo'],
     billDateStr: billInfo['billDate'],
+    totalUsageCost: billInfo['totalUsageCost'],
     subTotalAmount: billInfo['subTotalAmount'],
     gstAmount: billInfo['gstAmount'],
     totalAmount: billInfo['totalAmount'],
@@ -106,6 +107,7 @@ class PagBill {
     required this.subTotalAmount,
     required this.gstAmount,
     required this.totalAmount,
+    required this.totalUsageCost,
     required this.typeRateE,
     required this.typeRateW,
     required this.typeRateB,
@@ -159,6 +161,7 @@ class PagBill {
   final String billDateStr;
   final String dueDate;
   final String billTimeRangeStr;
+  final double? totalUsageCost;
   final double? subTotalAmount;
   final double? gstAmount;
   final double? totalAmount;
@@ -862,6 +865,7 @@ class PagBill {
         closingBalAmount = double.tryParse(closingBal) ?? 0;
       }
     }
+    closingBalAmount = -1 * closingBalAmount;
 
     return pw.Container(
         width: 500,
@@ -915,6 +919,26 @@ class PagBill {
                   ),
                 ],
               ),
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: pw.CrossAxisAlignment.center,
+              children: [
+                pw.Text(
+                  'Usage Total',
+                  style: pw.TextStyle(
+                    color: _darkColor,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+                pw.Text(
+                  _formatCurrency(totalUsageCost ?? 0),
+                  style: pw.TextStyle(
+                    color: _darkColor,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
             pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
               crossAxisAlignment: pw.CrossAxisAlignment.center,
