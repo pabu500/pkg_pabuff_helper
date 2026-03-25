@@ -11,7 +11,19 @@ void populateListItemMeterUsage(Map<String, dynamic> item) {
   item['usage_first_reading_value'] = meterUsageSummary['first_reading_value'];
   item['usage_last_reading_value'] = meterUsageSummary['last_reading_value'];
   item['usage'] = meterUsageSummary['usage'];
+  item['usage_first_reading_value_import'] =
+      meterUsageSummary['first_reading_value_import'];
+  item['usage_last_reading_value_import'] =
+      meterUsageSummary['last_reading_value_import'];
+  item['usage_import'] = meterUsageSummary['usage_import'];
+  item['usage_first_reading_value_export'] =
+      meterUsageSummary['first_reading_value_export'];
+  item['usage_last_reading_value_export'] =
+      meterUsageSummary['last_reading_value_export'];
+  item['usage_export'] = meterUsageSummary['usage_export'];
   item['usage_color'] = Colors.green;
+  item['usage_import_color'] = Colors.orange.shade600;
+  item['usage_export_color'] = Colors.green;
 }
 
 void populateListItemTenantUsage(Map<String, dynamic> item, var meterTypeList) {

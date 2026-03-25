@@ -156,6 +156,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
   int _failedPullListInfo = 0;
 
   bool _meterUsageColumnExists = false;
+  bool _meterUsageSeColumnExists = false;
   bool _tenantUsageColumnExists = false;
   bool _viewBillColumnExists = false;
   bool _viewSoAColumnExists = false;
@@ -1012,6 +1013,102 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     listController.listColControllerList.add(appCtxCol);
   }
 
+  void _addMeterUsageColumnSE(MdlPagListController listController) {
+    //add property edit column
+    // MdlListColController appCtxCol = MdlListColController(
+    //   colKey: 'usage_first_reading_timestamp',
+    //   colTitle: 'first reading time',
+    //   includeColKeyAsFilter: false,
+    //   showColumn: true,
+    //   colWidth: 150,
+    //   colWidgetType: PagColWidgetType.TEXT,
+    // );
+    // listController.listColControllerList.add(appCtxCol);
+
+    // appCtxCol = MdlListColController(
+    //   // add usage_ to avoid conflict with existing last_reading_value (LRT) col
+    //   colKey: 'usage_last_reading_timestamp',
+    //   colTitle: 'last reading time',
+    //   includeColKeyAsFilter: false,
+    //   showColumn: true,
+    //   colWidth: 150,
+    //   colWidgetType: PagColWidgetType.TEXT,
+    // );
+    // listController.listColControllerList.add(appCtxCol);
+
+    MdlListColController appCtxCol = MdlListColController(
+      colKey: 'usage_first_reading_value_import',
+      colTitle: 'first reading (imp.)',
+      includeColKeyAsFilter: false,
+      showColumn: true,
+      colWidth: 150,
+      colWidgetType: PagColWidgetType.TEXT,
+      align: 'right',
+      useComma: true,
+    );
+    listController.listColControllerList.add(appCtxCol);
+
+    appCtxCol = MdlListColController(
+      colKey: 'usage_last_reading_value_import',
+      colTitle: 'last reading (imp.)',
+      includeColKeyAsFilter: false,
+      showColumn: true,
+      colWidth: 150,
+      colWidgetType: PagColWidgetType.TEXT,
+      align: 'right',
+      useComma: true,
+    );
+    listController.listColControllerList.add(appCtxCol);
+
+    appCtxCol = MdlListColController(
+      colKey: 'usage_import',
+      colTitle: 'usage (imp.)',
+      includeColKeyAsFilter: false,
+      showColumn: true,
+      colWidth: 120,
+      colWidgetType: PagColWidgetType.TEXT,
+      align: 'right',
+      useComma: true,
+    );
+    listController.listColControllerList.add(appCtxCol);
+
+    appCtxCol = MdlListColController(
+      colKey: 'usage_first_reading_value_export',
+      colTitle: 'first reading (exp.)',
+      includeColKeyAsFilter: false,
+      showColumn: true,
+      colWidth: 150,
+      colWidgetType: PagColWidgetType.TEXT,
+      align: 'right',
+      useComma: true,
+    );
+    listController.listColControllerList.add(appCtxCol);
+
+    appCtxCol = MdlListColController(
+      colKey: 'usage_last_reading_value_export',
+      colTitle: 'last reading (exp.)',
+      includeColKeyAsFilter: false,
+      showColumn: true,
+      colWidth: 150,
+      colWidgetType: PagColWidgetType.TEXT,
+      align: 'right',
+      useComma: true,
+    );
+    listController.listColControllerList.add(appCtxCol);
+
+    appCtxCol = MdlListColController(
+      colKey: 'usage_export',
+      colTitle: 'usage (exp.)',
+      includeColKeyAsFilter: false,
+      showColumn: true,
+      colWidth: 120,
+      colWidgetType: PagColWidgetType.TEXT,
+      align: 'right',
+      useComma: true,
+    );
+    listController.listColControllerList.add(appCtxCol);
+  }
+
   void _addTenantUsageColumns(MdlPagListController listController) {
     for (String meterType in meterTypeList) {
       MdlListColController appCtxCol = MdlListColController(
@@ -1595,6 +1692,26 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     // if (widget.finderRefreshKey != null) {
     //   return Container();
     // }
+    if (widget.itemKind == PagItemKind.device &&
+        widget.itemTypeListStr == 'meter' &&
+        widget.listContextType == PagListContextType.usage) {
+      if (_queryMap['meter_type'] == 'SE1') {
+        // remove from list col controller in list controller, the usage_first_reading_timestamp, usage_last_reading_timestamp, usage_first_reading_value, usage_last_reading_value, usage
+        _selectedListController?.listColControllerList.removeWhere(
+            (colController) =>
+                // colController.colKey == 'usage_first_reading_timestamp' ||
+                // colController.colKey == 'usage_last_reading_timestamp' ||
+                colController.colKey == 'usage_first_reading_value' ||
+                colController.colKey == 'usage_last_reading_value' ||
+                colController.colKey == 'usage');
+
+        // add in usage_first_reading_value_import, usage_last_reading_value_import, usage_import
+        if (!_meterUsageSeColumnExists) {
+          _addMeterUsageColumnSE(_selectedListController!);
+          _meterUsageSeColumnExists = true;
+        }
+      }
+    }
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
