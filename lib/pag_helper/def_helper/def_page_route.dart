@@ -102,11 +102,7 @@ enum PagPageRoute {
     'payment_manager',
     Symbols.attach_money,
   ),
-  orgManager(
-    'Org Manager',
-    'org_manager',
-    Symbols.corporate_fare,
-  ),
+
   // landlordManager(
   //   'Landlord Manager',
   //   'landlord_manager',
@@ -241,6 +237,11 @@ enum PagPageRoute {
     'Device Manager',
     'am_device_manager',
     Symbols.home_iot_device,
+  ),
+  amOrgManager(
+    'Org Manager',
+    'am_org_manager',
+    Symbols.corporate_fare,
   ),
   pqDashboard(
     'PQ',

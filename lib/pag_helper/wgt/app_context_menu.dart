@@ -187,7 +187,7 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
                   pr == PagPageRoute.paymentManager ||
                   // pr == PagPageRoute.amgrManager ||
                   // pr == PagPageRoute.landlordManager
-                  pr == PagPageRoute.orgManager
+                  pr == PagPageRoute.amOrgManager
               // pr == PagPageRoute.meterManager
               ) {
             isDisabled = true;
@@ -203,7 +203,7 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
               pr == PagPageRoute.paymentManager ||
               // pr == PagPageRoute.amgrManager ||
               // pr == PagPageRoute.landlordManager
-              pr == PagPageRoute.orgManager) {
+              pr == PagPageRoute.amOrgManager) {
             if (!widget.loggedInUser.selectedScope
                 .isAtScopeType(PagScopeType.project)) {
               isDisabled = true;
@@ -222,7 +222,7 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
               pr != PagPageRoute.tariffManager &&
               // pr != PagPageRoute.amgrManager &&
               // pr != PagPageRoute.landlordManager &&
-              pr != PagPageRoute.orgManager &&
+              pr != PagPageRoute.amOrgManager &&
               pr != PagPageRoute.meterManager) {
             isDisabled = true;
           }

@@ -19,7 +19,6 @@ import 'package:buff_helper/pag_helper/wgt/ls/wgt_item_delete_op.dart';
 import 'package:buff_helper/pagrid_helper/batch_op_helper/wgt_confirm_box.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:buff_helper/pag_helper/def_helper/def_item_group.dart';
 import 'package:provider/provider.dart';
@@ -139,6 +138,9 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
         'scope': _loggedInUser!.selectedScope.toScopeMap(),
         'id': widget.itemIndexStr,
         'item_kind': widget.itemKind.name,
+        'item_type': widget.itemType is Enum
+            ? (widget.itemType as Enum).name
+            : widget.itemType ?? '',
         'item_id_type': ItemIdType.id.name,
         'item_id_key': 'id',
         'item_id': widget.itemIndexStr,
@@ -222,9 +224,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
 
       return data;
     } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
+      dev.log(e.toString());
       return {'error': explainException(e, defaultMsg: 'Error deleting item')};
     } finally {
       setState(() {

@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:flutter/foundation.dart';
@@ -156,9 +158,8 @@ class MdlPagListController /*extends ChangeNotifier*/ {
 
         default:
           itemType = null;
-          if (kDebugMode) {
-            print('Unknown item type: $itemTypeStr');
-          }
+
+          dev.log('Unknown item type: $itemTypeStr');
       }
     }
 

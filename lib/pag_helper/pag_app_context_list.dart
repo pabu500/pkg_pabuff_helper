@@ -52,7 +52,6 @@ MdlPagAppContext appCtxEms = MdlPagAppContext(
     PagPageRoute.paymentManager,
     // PagPageRoute.amgrManager,
     // PagPageRoute.landlordManager,
-    PagPageRoute.orgManager,
     // PagPageRoute.emsTaskReportManager,
   ],
 );
@@ -170,6 +169,7 @@ MdlPagAppContext appCtxAm = MdlPagAppContext(
     PagPageRoute.amDashboard,
     PagPageRoute.amDeviceManager,
     PagPageRoute.amScopeManager,
+    PagPageRoute.amOrgManager,
     PagPageRoute.amCommsManager,
   ],
 );

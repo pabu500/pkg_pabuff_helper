@@ -35,8 +35,6 @@ import 'package:provider/provider.dart';
 import '../../comm/comm_list.dart';
 import '../../model/mdl_pag_app_config.dart';
 import '../app/ems/wgt_match_payment_op_item.dart';
-import '../app/ems/wgt_tariff_package_assignment2.dart';
-import '../app/ems/wgt_tariff_package_assignment3.dart';
 import '../app/fh/wgt_fh_device_health.dart';
 import '../job/wgt_job_type_op_panel2.dart';
 import 'wgt_item_info_edit_panel.dart';
@@ -571,9 +569,12 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                           itemScopeMap[colController.colKey] =
                               item[colController.colKey];
                         }
+
                         // join key is not directly editable
                         // therefore exlude from the field list
-                        continue;
+                        if (colController.colKey != 'amgr_name') {
+                          continue;
+                        }
                       }
 
                       if (colController.colKey == 'op_timestamp' ||
@@ -631,7 +632,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                       }
                     }
 
-                    String itemDisplayName = item[displayNameKey] ?? '';
+                    String itemDisplayName = item[displayNameKey] ?? '-';
                     // if (widget.itemKind == PagItemKind.tariffPackage) {
                     //   itemDisplayName = item['label'];
                     // }
