@@ -66,9 +66,9 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
 
     PagAppProvider appModel = Provider.of<PagAppProvider>(context);
 
-    if (kDebugMode) {
-      print(_position.dy);
-    }
+    // if (kDebugMode) {
+    //   print(_position.dy);
+    // }
 
     return _isPhone
         ? Container(
@@ -185,7 +185,9 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
                   pr == PagPageRoute.tenantManager ||
                   pr == PagPageRoute.tariffManager ||
                   pr == PagPageRoute.paymentManager ||
-                  pr == PagPageRoute.landlordManager
+                  // pr == PagPageRoute.amgrManager ||
+                  // pr == PagPageRoute.landlordManager
+                  pr == PagPageRoute.orgManager
               // pr == PagPageRoute.meterManager
               ) {
             isDisabled = true;
@@ -199,7 +201,9 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
               pr == PagPageRoute.billingManager ||
               pr == PagPageRoute.tariffManager ||
               pr == PagPageRoute.paymentManager ||
-              pr == PagPageRoute.landlordManager) {
+              // pr == PagPageRoute.amgrManager ||
+              // pr == PagPageRoute.landlordManager
+              pr == PagPageRoute.orgManager) {
             if (!widget.loggedInUser.selectedScope
                 .isAtScopeType(PagScopeType.project)) {
               isDisabled = true;
@@ -216,7 +220,9 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
               pr != PagPageRoute.paymentManager &&
               pr != PagPageRoute.tenantManager &&
               pr != PagPageRoute.tariffManager &&
-              pr != PagPageRoute.landlordManager &&
+              // pr != PagPageRoute.amgrManager &&
+              // pr != PagPageRoute.landlordManager &&
+              pr != PagPageRoute.orgManager &&
               pr != PagPageRoute.meterManager) {
             isDisabled = true;
           }
@@ -273,7 +279,7 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
               width: _isPhone ? 50 : 35,
               height: _isPhone ? 50 : 35,
               margin: EdgeInsets.only(
-                  left: 8, right: 8, top: 8, bottom: _isPhone ? 8 : 0),
+                  left: 5, right: 5, top: 5, bottom: _isPhone ? 8 : 0),
               decoration: BoxDecoration(
                 color: getToggledTileColor(pr, isDisabled),
                 borderRadius: BorderRadius.circular(3),

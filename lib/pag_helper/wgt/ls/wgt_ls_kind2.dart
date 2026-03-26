@@ -15,6 +15,7 @@ import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:provider/provider.dart';
 import '../../def_helper/dh_device.dart';
 import '../../def_helper/dh_pag_finance.dart';
+import '../../def_helper/dh_pag_org.dart';
 import '../../model/mdl_pag_app_config.dart';
 import '../../wgt/history_presentor/wgt_pag_item_history_presenter.dart';
 import 'wgt_ls_item_flexi.dart';
@@ -151,6 +152,10 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
           itemTypeStr = itemType.name;
           listControllerItemTypeStr =
               (listController.itemType as PagFinanceType).name;
+        } else if (itemType is PagOrgType) {
+          itemTypeStr = itemType.value;
+          listControllerItemTypeStr =
+              (listController.itemType as PagOrgType).value;
         } else {
           throw Exception('Unsupported item type: ${itemType.runtimeType}');
         }
@@ -210,6 +215,8 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
       return getPagScopeTypeStr(itemType);
     } else if (itemType is PagFinanceType) {
       return getPagFinanceTypeStr(itemType);
+    } else if (itemType is PagOrgType) {
+      return itemType.value;
     } else {
       throw Exception('Unsupported item type: ${itemType.runtimeType}');
     }
@@ -250,6 +257,14 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
         for (Map<String, dynamic> financeTypeInfo in _itemTypeInfoList) {
           PagFinanceType financeType = financeTypeInfo['item_type'];
           itemTypeList.add(financeType.value);
+        }
+      } else if (widget.itemKind == PagItemKind.org) {
+        _itemTypeInfoList.add({'item_type': PagOrgType.amgr});
+        _itemTypeInfoList.add({'item_type': PagOrgType.landlord});
+
+        for (Map<String, dynamic> orgTypeInfo in _itemTypeInfoList) {
+          PagOrgType orgType = orgTypeInfo['item_type'];
+          itemTypeList.add(orgType.value);
         }
       } else {
         throw Exception('Unsupported item kind: ${widget.itemKind.name}');

@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:buff_helper/pag_helper/comm/comm_pag_item.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_finance.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_pag_org.dart';
 import 'package:buff_helper/pag_helper/def_helper/list_helper.dart';
 import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
@@ -626,6 +627,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
         widget.itemType is PagScopeType ||
         widget.itemType is PagItemKind ||
         widget.itemType is PagFinanceType ||
+        widget.itemType is PagOrgType ||
         widget.itemType == null);
     // switch (widget.itemType.runtimeType) {
     //   case const (DeviceType):
@@ -648,6 +650,8 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
       itemTypeStr = (widget.itemType as PagItemKind).name.toLowerCase();
     } else if (widget.itemType is PagFinanceType) {
       itemTypeStr = (widget.itemType as PagFinanceType).name.toLowerCase();
+    } else if (widget.itemType is PagOrgType) {
+      itemTypeStr = (widget.itemType as PagOrgType).name.toLowerCase();
     } else {
       itemTypeStr = 'unknown_item_type';
     }

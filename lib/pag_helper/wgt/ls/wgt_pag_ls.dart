@@ -52,7 +52,10 @@ class _WgtPagLsState extends State<WgtPagLs> {
   @override
   Widget build(BuildContext context) {
     switch (widget.itemKind) {
-      case PagItemKind.device || PagItemKind.scope || PagItemKind.finance:
+      case PagItemKind.device ||
+            PagItemKind.scope ||
+            PagItemKind.finance ||
+            PagItemKind.org:
         if (widget.listContextType == PagListContextType.paymentMatching) {
           return WgtListSearchItemFlexi(
             appConfig: widget.appConfig,
@@ -84,7 +87,8 @@ class _WgtPagLsState extends State<WgtPagLs> {
             PagItemKind.meterGroup ||
             PagItemKind.tariffPackage ||
             PagItemKind.bill ||
-            PagItemKind.landlord ||
+            // PagItemKind.amgr ||
+            // PagItemKind.landlord ||
             PagItemKind.role:
         // || PagItemKind.finance:
         dynamic itemType;

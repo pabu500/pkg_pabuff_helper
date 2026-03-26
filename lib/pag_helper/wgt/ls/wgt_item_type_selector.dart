@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:buff_helper/pag_helper/comm/comm_list.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_device.dart';
@@ -20,6 +21,8 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'dart:developer' as dev;
+
+import '../../def_helper/dh_pag_org.dart';
 
 class WgtItemTypeSelector extends StatefulWidget {
   const WgtItemTypeSelector({
@@ -294,6 +297,8 @@ class _WgtItemTypeSelectorState extends State<WgtItemTypeSelector> {
             // soa is not a list item, but in Tenant SoA section
             continue;
           }
+        } else if (widget.itemKind == PagItemKind.org) {
+          itemType = PagOrgType.byValue(itemTypeStr);
         } else {
           throw Exception('Unsupported item kind: ${widget.itemKind.name}');
         }
@@ -334,21 +339,28 @@ class _WgtItemTypeSelectorState extends State<WgtItemTypeSelector> {
                                 color:
                                     Theme.of(context).colorScheme.onSecondary,
                               )
-                            : widget.itemKind is String
-                                ? Text(
-                                    itemType,
-                                    style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSecondary,
-                                    ),
-                                  )
-                                : Icon(
-                                    Symbols.help,
+                            : itemType is PagOrgType
+                                ? Icon(
+                                    itemType.iconData,
                                     color: Theme.of(context)
                                         .colorScheme
                                         .onSecondary,
-                                  ),
+                                  )
+                                : widget.itemKind is String
+                                    ? Text(
+                                        itemType,
+                                        style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSecondary,
+                                        ),
+                                      )
+                                    : Icon(
+                                        Symbols.help,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSecondary,
+                                      ),
               ),
             ),
           ),

@@ -1,5 +1,6 @@
 import 'package:buff_helper/pag_helper/def_helper/dh_device.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_finance.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_pag_org.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -12,7 +13,9 @@ enum PagItemKind {
   user('User', Symbols.person),
   role('Role', Symbols.badge),
   tenant('Tenant', Symbols.location_away),
-  landlord('Landlord', Symbols.home_work),
+  // landlord('Landlord', Symbols.home_work),
+  // amgr('Asset Manager', Symbols.apartment),
+  org('Organization', Symbols.corporate_fare),
   jobType('Job Type', Symbols.energy_program_time_used),
   jobTypeSub('Job Type Sub', Symbols.group),
   tariffPackage('Tariff Package', Symbols.price_change),
@@ -118,6 +121,8 @@ String? getItemTypeStr(dynamic itemType) {
     return getPagScopeTypeStr(itemType);
   } else if (itemType is PagFinanceType) {
     return getPagFinanceTypeStr(itemType);
+  } else if (itemType is PagOrgType) {
+    return itemType.value;
   } else {
     throw Exception('Unsupported item type: ${itemType.runtimeType}');
   }

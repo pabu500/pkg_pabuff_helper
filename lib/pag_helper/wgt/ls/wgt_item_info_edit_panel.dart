@@ -755,7 +755,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
     MdlPagScope? initialScope;
     if (widget.itemKind == PagItemKind.tariffPackage ||
         /*widget.itemKind == PagItemKind.meterGroup ||*/
-        widget.itemKind == PagItemKind.landlord) {
+        widget.itemKind == PagItemKind.org) {
       isSingleLabel = true;
       isEditableByKind = false;
 

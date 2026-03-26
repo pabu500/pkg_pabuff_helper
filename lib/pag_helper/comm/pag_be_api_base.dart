@@ -426,6 +426,8 @@ class PagUrlBase {
   static const String eptAmCommsCheckDeviceLinkage =
       '/am/comms/check_device_linkage';
 
+  static const String eptPagCreateOrg = '/am/org/create_org';
+
   // AM - Meter Group
   // static const String eptPagAmCreateMeterGroup = '/am/create_meter_group';
   // static const String eptPagAmGetMeterGroupMetertList =

@@ -72,7 +72,6 @@ enum PagPageRoute {
     'meter_group_manager',
     Symbols.atr,
   ),
-
   creditTransaction(
     'Credit Transaction',
     'credit_transaction',
@@ -103,11 +102,21 @@ enum PagPageRoute {
     'payment_manager',
     Symbols.attach_money,
   ),
-  landlordManager(
-    'Landlord Manager',
-    'landlord_manager',
-    Symbols.home_work,
+  orgManager(
+    'Org Manager',
+    'org_manager',
+    Symbols.corporate_fare,
   ),
+  // landlordManager(
+  //   'Landlord Manager',
+  //   'landlord_manager',
+  //   Symbols.home_work,
+  // ),
+  // amgrManager(
+  //   'AM Manager',
+  //   'amgr_manager',
+  //   Symbols.corporate_fare,
+  // ),
   evsDashboard(
     'EVS',
     'evs_dashboard',

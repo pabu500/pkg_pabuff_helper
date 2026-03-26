@@ -5,6 +5,7 @@ import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 
 import '../../def_helper/dh_device.dart';
 import '../../def_helper/dh_pag_finance.dart';
+import '../../def_helper/dh_pag_org.dart';
 
 class MdlPagListController /*extends ChangeNotifier*/ {
   // PagItemKind pagItemKind;
@@ -145,6 +146,12 @@ class MdlPagListController /*extends ChangeNotifier*/ {
           break;
         case 'payment_apply':
           itemType = PagFinanceType.paymentApply;
+          break;
+        case 'amgr':
+          itemType = PagOrgType.amgr;
+          break;
+        case 'landlord':
+          itemType = PagOrgType.landlord;
           break;
 
         default:
