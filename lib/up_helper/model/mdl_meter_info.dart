@@ -25,6 +25,7 @@ enum PingStatus {
 class MeterInfoModel {
   String? meterSn;
   String? meterDisplayname;
+  String? siteTag;
   String? address;
   String? status;
   String? rlsStatus;
@@ -39,6 +40,7 @@ class MeterInfoModel {
   MeterInfoModel(
       {this.meterSn,
       this.meterDisplayname,
+      this.siteTag,
       this.address,
       this.status,
       this.rlsStatus,
@@ -54,6 +56,7 @@ class MeterInfoModel {
     return MeterInfoModel(
       meterSn: json['meter_sn'],
       meterDisplayname: json['meter_displayname'],
+      siteTag: json['site_tag'] ?? '',
       address: json['address'],
       status: json['status'] ?? '',
       rlsStatus: json['rls_status'] ?? '',
@@ -75,6 +78,7 @@ class MeterInfoModel {
     return {
       'meter_sn': meterSn,
       'meter_displayname': meterDisplayname,
+      'site_tag': siteTag,
       'address': address,
       'status': status,
       'comm_type': commType,
