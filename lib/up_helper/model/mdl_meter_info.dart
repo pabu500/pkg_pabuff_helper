@@ -27,6 +27,7 @@ class MeterInfoModel {
   String? meterDisplayname;
   String? siteTag;
   String? address;
+  String? block;
   String? status;
   String? rlsStatus;
   String? kwhTimestamp;
@@ -42,6 +43,7 @@ class MeterInfoModel {
       this.meterDisplayname,
       this.siteTag,
       this.address,
+      this.block,
       this.status,
       this.rlsStatus,
       this.kwhTimestamp,
@@ -58,6 +60,7 @@ class MeterInfoModel {
       meterDisplayname: json['meter_displayname'],
       siteTag: json['site_tag'] ?? '',
       address: json['address'],
+      block: json['block'] ?? '',
       status: json['status'] ?? '',
       rlsStatus: json['rls_status'] ?? '',
       kwhTimestamp: json['kwh_timestamp'] ?? '',
@@ -80,6 +83,7 @@ class MeterInfoModel {
       'meter_displayname': meterDisplayname,
       'site_tag': siteTag,
       'address': address,
+      'block': block,
       'status': status,
       'comm_type': commType,
       'rls_status': rlsStatus,
