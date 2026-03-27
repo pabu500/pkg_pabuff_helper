@@ -133,14 +133,14 @@ enum PagTenantUnitType {
       others;
 }
 
-enum PagTenantPaymentMethod {
+enum PagPaymentMethod {
   giro('GIRO', 'giro', 'giro', Colors.green),
-  nonGiro('None GIRO', 'non_giro', 'ngiro', Colors.red),
+  nonGiro('Non-GIRO', 'non_giro', 'ngiro', Colors.orange),
   cheque('Cheque', 'cheque', 'chq', Colors.blue),
   other('Other', 'other', 'oth', Colors.grey),
   ;
 
-  const PagTenantPaymentMethod(
+  const PagPaymentMethod(
     this.label,
     this.value, // the value that is stored in the database
     this.tag,
@@ -152,13 +152,13 @@ enum PagTenantPaymentMethod {
   final String tag;
   final Color color;
 
-  static PagTenantPaymentMethod? byLabel(String? label) => enumByLabel(
+  static PagPaymentMethod? byLabel(String? label) => enumByLabel(
         label,
         values,
         (e) => (e).label,
       );
 
-  static PagTenantPaymentMethod byValue(String value) =>
+  static PagPaymentMethod byValue(String value) =>
       enumByLabel(
         value,
         values,
@@ -166,7 +166,7 @@ enum PagTenantPaymentMethod {
       ) ??
       other;
 
-  static PagTenantPaymentMethod byTag(String? tag) =>
+  static PagPaymentMethod byTag(String? tag) =>
       enumByTag(
         tag,
         values,
@@ -322,7 +322,7 @@ String? validatePaymentMethod(String value) {
     return 'Payment method is required';
   }
   // PagTenantPaymentMethod.values
-  if (!PagTenantPaymentMethod.values.any((e) => e.value == value)) {
+  if (!PagPaymentMethod.values.any((e) => e.value == value)) {
     return 'Invalid payment method';
   }
   return null;

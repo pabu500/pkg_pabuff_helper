@@ -1069,6 +1069,10 @@ class _WgtPagEditCommitList2State extends State<WgtPagEditCommitList2> {
       PagMeterCommType commType = PagMeterCommType.byValue(tagText);
       tagLabel = commType.tag;
       tagColor = commType.color.withAlpha(130);
+    } else if (configItem['col_key'] == 'payment_method') {
+      PagPaymentMethod paymentMethod = PagPaymentMethod.byValue(tagText);
+      tagLabel = paymentMethod.tag;
+      tagColor = paymentMethod.color.withAlpha(130);
     } else {
       tagLabel = tagText;
     }
