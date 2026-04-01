@@ -135,7 +135,7 @@ enum PagTenantUnitType {
 
 enum PagPaymentMethod {
   giro('GIRO', 'giro', 'giro', Colors.green),
-  nonGiro('Non-GIRO', 'non_giro', 'ngiro', Colors.orange),
+  nonGiro('Non-GIRO', 'non_giro', 'n-giro', Colors.orange),
   cheque('Cheque', 'cheque', 'chq', Colors.blue),
   other('Other', 'other', 'oth', Colors.grey),
   ;

@@ -376,18 +376,18 @@ class PagEmsTypeUsageCalc {
 
     double lineItemCostNotSubjectToTax = 0.0;
     for (var item in _lineItemList) {
-      String? costStr = item['amount'];
-      double? cost = double.tryParse(costStr ?? '');
+      String? strLineAmount = item['amount'];
+      double? lineAmount = double.tryParse(strLineAmount ?? '');
       bool subjectToTax = item['subjectToTax'] as bool;
 
       if (subjectToTax) {
-        if (cost != null) {
+        if (lineAmount != null) {
           subTotalCost ??= 0;
-          subTotalCost += cost;
+          subTotalCost += lineAmount;
         }
       } else {
-        if (cost != null) {
-          lineItemCostNotSubjectToTax += cost;
+        if (lineAmount != null) {
+          lineItemCostNotSubjectToTax += lineAmount;
         }
       }
     }

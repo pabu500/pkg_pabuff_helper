@@ -37,7 +37,7 @@ class PagEmsTypeUsageCalcRl {
 
   late final double? _billedGst;
 
-  late final List<Map<String, dynamic>>? _lineItemList;
+  late final List<Map<String, dynamic>> _lineItemList;
 
   late final List<Map<String, dynamic>>? _billedTrendingSnapShot;
 
@@ -123,7 +123,7 @@ class PagEmsTypeUsageCalcRl {
     double? billedRateN,
     double? billedRateG,
     double? billedGst,
-    required List<Map<String, dynamic>>? lineItemList,
+    required List<Map<String, dynamic>> lineItemList,
     List<Map<String, dynamic>>? billedTrendingSnapShot,
     String? billBarFromMonth,
     List<PagEmsTypeUsageCalcRl> singularUsageCalcList = const [],
@@ -450,17 +450,20 @@ class PagEmsTypeUsageCalcRl {
     double? subTotalCost = totalUsageCost;
 
     //line items
-    if (_lineItemList != null) {
-      for (var item in _lineItemList) {
-        if (!item['subjectToTax']) {
-          continue;
-        }
-        String strLineItemSubjectToTax = item['amount'] ?? '';
-        double? lineItemAmountSubjectToTax =
-            double.tryParse(strLineItemSubjectToTax);
-        if (lineItemAmountSubjectToTax != null) {
+    double lineItemCostNotSubjectToTax = 0.0;
+    for (var item in _lineItemList) {
+      String? strLineAmount = item['amount'];
+      double? lineAmount = double.tryParse(strLineAmount ?? '');
+      bool subjectToTax = item['subjectToTax'] as bool;
+
+      if (subjectToTax) {
+        if (lineAmount != null) {
           subTotalCost ??= 0;
-          subTotalCost = _totalUsageCost! + lineItemAmountSubjectToTax;
+          subTotalCost += lineAmount;
+        }
+      } else {
+        if (lineAmount != null) {
+          lineItemCostNotSubjectToTax += lineAmount;
         }
       }
     }
@@ -489,6 +492,10 @@ class PagEmsTypeUsageCalcRl {
       }
 
       _payableAmount = _totalCost! + (interestAmountDouble ?? 0);
+    }
+
+    if (lineItemCostNotSubjectToTax > 0.0000001) {
+      _payableAmount = _payableAmount! + lineItemCostNotSubjectToTax;
     }
 
     if (_miniSoaInfo != null) {
