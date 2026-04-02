@@ -1,3 +1,4 @@
+import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pag_helper/model/mdl_history.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_bill.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_ems_type_usage_calc.dart';
@@ -8,7 +9,10 @@ import 'dart:developer' as dev;
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../../pag_helper/comm/comm_batch_op.dart';
+import '../../../pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import '../../../pag_helper/model/mdl_pag_app_config.dart';
+import '../../../pag_helper/wgt/app/ems/wgt_line_item.dart';
 import '../usage/usage_stat_helper.dart';
 import '../../../pag_helper/wgt/app/ems/wgt_pag_group_stat_core.dart';
 import '../usage/wgt_pag_meter_stat_core.dart';
@@ -19,8 +23,8 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
     super.key,
     required this.loggedInUser,
     required this.appConfig,
-    required this.itemType,
     required this.isMonthly,
+    required this.tenantLcs,
     required this.fromDatetime,
     required this.toDatetime,
     required this.effectiveToDatetime,
@@ -30,6 +34,7 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
     required this.displayContextStr,
     required this.cycleStr,
     required this.billDate,
+    this.itemType,
     this.isDisabled = false,
     // this.usageCalc,
     this.showFactoredUsage = true,
@@ -65,8 +70,9 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
   final String displayContextStr;
   // final PagEmsTypeUsageCalc? usageCalc;
   final bool showFactoredUsage;
-  final ItemType itemType;
+  final dynamic itemType;
   final bool isMonthly;
+  final String? tenantLcs;
   final DateTime fromDatetime;
   final DateTime toDatetime;
   final DateTime? effectiveToDatetime;
@@ -104,6 +110,7 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
 class _WgtPagTenantCompositeUsageSummaryState
     extends State<WgtPagTenantCompositeUsageSummary> {
   final double statWidth = 850;
+  late final String strBillingRecId;
 
   final List<String> _meterTypes = ['E', 'W', 'B', 'N', 'G'];
 
@@ -123,10 +130,81 @@ class _WgtPagTenantCompositeUsageSummaryState
   // bool _isDisabled = false;
   bool _showInterestDetail = false;
 
+  String _line1Label = '';
+  String _currentField = '';
+  bool _fieldUpdated = false;
+  String _errorText = '';
+
+  Future<List<Map<String, dynamic>>> _updateProfile(String key, String value,
+      {String? oldVal, String? scopeProfileIdColName}) async {
+    try {
+      Map<String, dynamic> opItem = {
+        'id': strBillingRecId,
+        key: value,
+        'checked': true,
+      };
+      if (scopeProfileIdColName != null) {
+        opItem['scope_profile_id_column_name'] = scopeProfileIdColName;
+      }
+
+      Map<String, dynamic> queryMap = {
+        'scope': widget.loggedInUser.selectedScope.toScopeMap(),
+        'id': strBillingRecId,
+        'item_kind': PagItemKind.bill.name,
+        // 'item_type': widget.itemType is Enum
+        //     ? (widget.itemType as Enum).name
+        //     : widget.itemType,
+        'item_id_type': ItemIdType.id.name,
+        'item_id_key': 'id',
+        'item_id': strBillingRecId,
+        // 'key1, key2, key3, ...'
+        'update_key_str': key,
+        'op_name': 'multi_key_val_update',
+        'op_list': [opItem],
+      };
+
+      List<Map<String, dynamic>> result = await doPagOpMultiKeyValUpdate(
+        widget.appConfig,
+        widget.loggedInUser,
+        queryMap,
+        MdlPagSvcClaim(
+          username: widget.loggedInUser!.username,
+          userId: widget.loggedInUser!.id,
+          scope: '',
+          target: '',
+          operation: '',
+        ),
+      );
+
+      return result;
+    } catch (e) {
+      dev.log(e.toString());
+
+      //return a Map
+      Map<String, dynamic> result = {};
+      result['error'] = explainException(e, defaultMsg: 'Error updating field');
+
+      //result is a List
+      return [result];
+    }
+  }
+
+  String? lineItemLabelValidator(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Label cannot be empty';
+    }
+    if (value.length > 50) {
+      return 'Label cannot exceed 50 characters';
+    }
+    return null;
+  }
+
   @override
   void initState() {
     super.initState();
     _renderMode = widget.renderMode;
+
+    strBillingRecId = widget.billInfo['billing_rec_id'] ?? '';
   }
 
   @override
@@ -210,6 +288,10 @@ class _WgtPagTenantCompositeUsageSummaryState
               if (widget.isBillMode)
                 getPagTotal(
                   context,
+                  widget.loggedInUser,
+                  widget.appConfig,
+                  strBillingRecId,
+                  'generated',
                   widget.compositeUsageCalc!.totalUsageCost,
                   widget.compositeUsageCalc!.gst!,
                   widget.compositeUsageCalc!.subTotalCost,
@@ -248,6 +330,13 @@ class _WgtPagTenantCompositeUsageSummaryState
     PagBillingLcStatus billLcStatus =
         PagBillingLcStatus.values.byName(billLcStatusStr);
 
+    String tenantLcsText = '';
+    if (widget.tenantLcs != null) {
+      if (widget.tenantLcs == 'final_bill') {
+        tenantLcsText = 'FINAL BILL';
+      }
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 13),
       child: Row(
@@ -280,6 +369,22 @@ class _WgtPagTenantCompositeUsageSummaryState
               ),
             ],
           ),
+          horizontalSpaceSmall,
+          if (tenantLcsText.isNotEmpty)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.brown,
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Text(
+                tenantLcsText,
+                style: const TextStyle(
+                    fontSize: 18,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
         ],
       ),
     );
@@ -679,6 +784,8 @@ class _WgtPagTenantCompositeUsageSummaryState
   }
 
   Widget getLineItemSubjectToTax() {
+    bool isEditableByAcl = true;
+
     if (widget.lineItems.isEmpty) {
       return Container();
     }
@@ -691,23 +798,79 @@ class _WgtPagTenantCompositeUsageSummaryState
       if (!subjectToTax) {
         continue;
       }
-      String label = lineItem['label'] ?? '';
+      String label =
+          _line1Label.isEmpty ? lineItem['label'] ?? '' : _line1Label;
       String valueStr = lineItem['amount'] ?? '';
       double? valueVal = double.tryParse(valueStr) ?? 0;
       lineItemList.add(
         Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            SizedBox(
-              width: 210,
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontSize: 15,
-                  color: Theme.of(context).hintColor.withAlpha(180),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+            horizontalSpaceRegular,
+            // SizedBox(
+            //   width: 210,
+            //   child: Text(
+            //     label,
+            //     style: TextStyle(
+            //       fontSize: 15,
+            //       color: Theme.of(context).hintColor.withAlpha(180),
+            //       fontWeight: FontWeight.bold,
+            //     ),
+            //   ),
+            // ),
+            // WgtViewEditField(
+            //   width: 250,
+            //   editable: isEditableByAcl,
+            //   showCopy: false,
+            //   useDatePicker: false,
+            //   showLabel: true,
+            //   labelWidth: 0,
+            //   hintText: 'line item label',
+            //   labelText: '',
+            //   originalValue: label,
+            //   onFocus: (hasFocus) {
+            //     setState(() {
+            //       _currentField = 'line_item_label_1';
+            //     });
+            //   },
+            //   hasFocus: _currentField == 'line_item_label_1',
+            //   onSetValue: (newValue) async {
+            //     List<Map<String, dynamic>> result = await _updateProfile(
+            //       'line_item_label_1',
+            //       newValue,
+            //     );
+            //     Map<String, dynamic> resultMap = result[0];
+            //     if (resultMap['error'] == null) {
+            //       setState(() {
+            //         _line1Label = newValue;
+
+            //         _fieldUpdated = true;
+            //         widget.onUpdate?.call();
+            //       });
+            //     } else {
+            //       Map<String, dynamic> errorMap = resultMap['error'] is Map?
+            //           ? resultMap['error']
+            //           : {'status': resultMap['error'].toString()};
+            //       String? status = errorMap['status'];
+            //       dev.log('Status: $status');
+            //       setState(() {
+            //         _errorText = 'Error updating field';
+            //       });
+            //     }
+
+            //     return resultMap;
+            //   },
+            //   validator: lineItemLabelValidator,
+            //   textStyle: null,
+            // ),
+            WgtBillLineItemLabel(
+              loggedInUser: widget.loggedInUser,
+              appConfig: widget.appConfig,
+              strBillingRecId: strBillingRecId,
+              itemKeyName: 'line_item_label_1',
+              lineItem: lineItem,
+              width: 250,
+              isEditableByAcl: false,
             ),
             horizontalSpaceSmall,
             getStatWithUnit(
@@ -745,7 +908,7 @@ class _WgtPagTenantCompositeUsageSummaryState
           width: statWidth,
           padding: const EdgeInsets.symmetric(horizontal: 3),
           constraints: const BoxConstraints(
-            maxHeight: 50,
+            maxHeight: 80,
           ),
           decoration: BoxDecoration(
             border: Border.all(color: Colors.grey.shade600, width: 1),

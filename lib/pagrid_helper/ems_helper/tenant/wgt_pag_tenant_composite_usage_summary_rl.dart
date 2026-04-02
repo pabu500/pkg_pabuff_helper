@@ -16,6 +16,7 @@ class WgtPagTenantCompositeUsageSummaryRl extends StatefulWidget {
     // required this.usageCalc,
     required this.itemType,
     required this.isMonthly,
+    required this.tenantLcs,
     required this.fromDatetime,
     required this.toDatetime,
     required this.effectiveToDatetime,
@@ -58,6 +59,7 @@ class WgtPagTenantCompositeUsageSummaryRl extends StatefulWidget {
   final ItemType itemType;
   final bool isDisabled;
   final bool isMonthly;
+  final String? tenantLcs;
   final DateTime fromDatetime;
   final DateTime toDatetime;
   final DateTime? effectiveToDatetime;
@@ -180,24 +182,6 @@ class _WgtPagTenantCompositeUsageSummaryRlState
               // getSubTenantUsage(),
               // verticalSpaceSmall,
               verticalSpaceSmall,
-              // getPagTypeUsageNet(
-              //   context,
-              //   widget.loggedInUser,
-              //   widget.appConfig,
-              //   widget.compositeUsageCalc!.typeUsageE!.usageFactored,
-              //   widget.compositeUsageCalc!.typeUsageE!.rate,
-              //   widget.compositeUsageCalc!.typeUsageW!.usageFactored,
-              //   widget.compositeUsageCalc!.typeUsageW!.rate,
-              //   widget.compositeUsageCalc!.typeUsageB!.usageFactored,
-              //   widget.compositeUsageCalc!.typeUsageB!.rate,
-              //   widget.compositeUsageCalc!.typeUsageN!.usageFactored,
-              //   widget.compositeUsageCalc!.typeUsageN!.rate,
-              //   widget.compositeUsageCalc!.typeUsageG!.usageFactored,
-              //   widget.compositeUsageCalc!.typeUsageG!.rate,
-              //   usageDecimals: widget.usageDecimals,
-              //   rateDecimals: widget.rateDecimals,
-              //   costDecimals: widget.costDecimals,
-              // ),
               getTypeStat(),
               verticalSpaceSmall,
               // getLineItem(),
@@ -205,6 +189,10 @@ class _WgtPagTenantCompositeUsageSummaryRlState
               if (widget.isBillMode)
                 getPagTotal(
                   context,
+                  widget.loggedInUser,
+                  widget.appConfig,
+                  widget.billInfo['billing_rec_id'] ?? '',
+                  'released',
                   widget.compositeUsageCalc!.totalUsageCost,
                   widget.gst!,
                   widget.compositeUsageCalc!.subTotalCost,
@@ -242,6 +230,13 @@ class _WgtPagTenantCompositeUsageSummaryRlState
     PagBillingLcStatus billLcStatus =
         PagBillingLcStatus.values.byName(billLcStatusStr);
 
+    String tenantLcsText = '';
+    if (widget.tenantLcs != null) {
+      if (widget.tenantLcs == 'final_bill') {
+        tenantLcsText = 'FINAL BILL';
+      }
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 13),
       child: Row(
@@ -274,6 +269,22 @@ class _WgtPagTenantCompositeUsageSummaryRlState
               ),
             ],
           ),
+          horizontalSpaceSmall,
+          if (tenantLcsText.isNotEmpty)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.brown,
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Text(
+                tenantLcsText,
+                style: const TextStyle(
+                    fontSize: 18,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
         ],
       ),
     );
