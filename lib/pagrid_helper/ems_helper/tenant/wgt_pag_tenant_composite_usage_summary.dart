@@ -23,6 +23,7 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
     required this.isMonthly,
     required this.fromDatetime,
     required this.toDatetime,
+    required this.effectiveToDatetime,
     required this.tenantName,
     required this.tenantType,
     // required this.excludeAutoUsage,
@@ -68,6 +69,7 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
   final bool isMonthly;
   final DateTime fromDatetime;
   final DateTime toDatetime;
+  final DateTime? effectiveToDatetime;
   final String tenantName;
   final String? tenantLabel;
   final String tenantAccountId;
@@ -164,6 +166,7 @@ class _WgtPagTenantCompositeUsageSummaryState
                     context,
                     widget.fromDatetime,
                     widget.toDatetime,
+                    widget.effectiveToDatetime,
                     widget.isMonthly,
                     widget.tenantLabel,
                     widget.tenantName,
@@ -289,6 +292,12 @@ class _WgtPagTenantCompositeUsageSummaryState
       List<Widget> typeStatList = [];
       String slotFromTimestampStr = singularUsageInfo['from_timestamp'] ?? '';
       String slotToTimestampStr = singularUsageInfo['to_timestamp'] ?? '';
+      if (widget.effectiveToDatetime != null) {
+        slotToTimestampStr = widget.effectiveToDatetime!
+            .toIso8601String()
+            .replaceAll('T', ' ')
+            .replaceAll('Z', '');
+      }
       String slotStr =
           '  ${slotFromTimestampStr.substring(0, 10)} - ${slotToTimestampStr.substring(0, 10)}';
       typeStatList.add(getTypeStat(singularUsageInfo, 'E'));

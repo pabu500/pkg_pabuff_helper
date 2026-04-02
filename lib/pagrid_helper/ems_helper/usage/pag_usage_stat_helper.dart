@@ -99,6 +99,7 @@ Widget getPagUsageTitle(
   BuildContext context,
   DateTime fromDatetime,
   DateTime toDatetime,
+  DateTime? effectiveToDatetime,
   bool isMonthly,
   String? tenantLabel,
   String tenantName,

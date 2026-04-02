@@ -217,9 +217,9 @@ class _WgtBillViewR2State extends State<WgtBillViewR2> {
     String accountId = _bill['tenant_alt_name'] ?? '';
     String tenantType = _bill['tenant_type'];
     String fromTimestampStr = _bill['from_timestamp'];
-    DateTime fromDatetime = getTargetDatetimeFromTargetStr(fromTimestampStr);
+    DateTime? fromDatetime = getTargetDatetimeFromTargetStr(fromTimestampStr);
     String toTimestampStr = _bill['to_timestamp'];
-    DateTime toDatetime = getTargetDatetimeFromTargetStr(toTimestampStr);
+    DateTime? toDatetime = getTargetDatetimeFromTargetStr(toTimestampStr);
     String billBarFromMonth = _bill['bill_bar_from_timestamp'] ?? '';
 
     if (_lcStatusDisplay == 'released') {
@@ -230,8 +230,8 @@ class _WgtBillViewR2State extends State<WgtBillViewR2> {
           tenantType,
           fromTimestampStr,
           toTimestampStr,
-          fromDatetime,
-          toDatetime,
+          fromDatetime!,
+          toDatetime!,
           billBarFromMonth);
     } else {
       return getGeneratedRender(
@@ -241,8 +241,8 @@ class _WgtBillViewR2State extends State<WgtBillViewR2> {
           tenantType,
           fromTimestampStr,
           toTimestampStr,
-          fromDatetime,
-          toDatetime,
+          fromDatetime!,
+          toDatetime!,
           billBarFromMonth);
     }
   }

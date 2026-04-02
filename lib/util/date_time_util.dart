@@ -264,8 +264,8 @@ DateTime getTargetDatetime(int targetTimestamp) {
   return DateTime.fromMillisecondsSinceEpoch(targetTimestamp);
 }
 
-DateTime getTargetDatetimeFromTargetStr(String targetDateTimeStr) {
-  DateTime targetDateTime = DateTime.parse(targetDateTimeStr);
+DateTime? getTargetDatetimeFromTargetStr(String targetDateTimeStr) {
+  DateTime? targetDateTime = DateTime.tryParse(targetDateTimeStr);
 
   return targetDateTime;
 }

@@ -355,16 +355,16 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     String billingAddressLine1 = _bill['billing_address_line_1'] ?? '';
     String billingAddressLine2 = _bill['billing_address_line_2'] ?? '';
     String billingAddressLine3 = _bill['billing_address_line_3'] ?? '';
-    String fromTimestampStr = _bill['from_timestamp'];
-    DateTime fromDatetime = getTargetDatetimeFromTargetStr(fromTimestampStr);
-    String toTimestampStr = _bill['to_timestamp'];
-    DateTime toDatetime = getTargetDatetimeFromTargetStr(toTimestampStr);
+    String strFromTimestamp = _bill['from_timestamp'];
+    DateTime? fromDatetime = getTargetDatetimeFromTargetStr(strFromTimestamp);
+    String strToTimestamp = _bill['to_timestamp'];
+    DateTime? toDatetime = getTargetDatetimeFromTargetStr(strToTimestamp);
+    String strEffectiveToTimestamp = _bill['effective_to_timestamp'] ?? '';
+    DateTime? effectiveToDatetime =
+        getTargetDatetimeFromTargetStr(strEffectiveToTimestamp);
     String billBarFromMonth = _bill['bill_bar_from_timestamp'] ?? '';
-    // final balBf = _bill['balance_bf'] ?? '0';
-    // final balBfUsage = _bill['balance_bf_usage'] ?? '0';
-    // final balBfInterest = _bill['balance_bf_interest'] ?? '0';
+
     final miniSoaInfo = _bill['mini_soa_info'] ?? {};
-    final miniSoa = miniSoaInfo['mini_soa'] ?? [];
     final strCollectionStartDateTimestamp =
         miniSoaInfo['collection_start_date_timestamp'] ?? '';
     final strCollectionEndDateTimestamp =
@@ -372,8 +372,23 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     final interestInfo = _bill['interest_info'] ?? {};
     String cycleStr = _bill['cycle_str'] ?? '';
     String billDate = _bill['bill_date_timestamp'] ?? '';
-    String? billedTotalAmountStr = _bill['billed_total_amount'];
+    String? strBilledTotalAmount = _bill['billed_total_amount'];
     String billName = _bill['billing_rec_name'] ?? '';
+
+    String tenantLcs = _bill['tenant_lcs'] ?? '';
+
+    String strBilledUsageCostAmount = _bill['billed_usage_cost_amount'] ?? '';
+    String strBilledInterestAmount = _bill['billed_interest_amount'] ?? '';
+    String strBilledPayableAmount = _bill['billed_payable_amount'] ?? '';
+
+    String billedAmgrCompanyTradingName =
+        _bill['billed_amgr_company_trading_name'] ?? '';
+    String billedAmgrCompanyRegNumber =
+        _bill['billed_amgr_company_reg_number'] ?? '';
+    String billedAmgrGstRegNumber = _bill['billed_amgr_gst_reg_number'] ?? '';
+    String amgrAddressLine1 = _bill['amgr_address_line_1'] ?? '';
+    String amgrAddressLine2 = _bill['amgr_address_line_2'] ?? '';
+    String amgrAddressLine3 = _bill['amgr_address_line_3'] ?? '';
 
     List<Map<String, dynamic>> lineItemList = [];
     final lineItemInfo = _bill['line_item_info'] ?? {};
@@ -431,7 +446,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
               ),
               verticalSpaceSmall,
               Text(
-                'Total Amount: ${billedTotalAmountStr ?? '0.0'}',
+                'Total Amount: ${strBilledTotalAmount ?? '0.0'}',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 18,
@@ -460,10 +475,9 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
           billingAddressLine3,
           depositAmountStr,
           paymentMethod,
-          fromTimestampStr,
-          toTimestampStr,
-          fromDatetime,
-          toDatetime,
+          fromDatetime!,
+          toDatetime!,
+          effectiveToDatetime,
           cycleStr,
           billDate,
           billBarFromMonth,
@@ -478,10 +492,9 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
           tenantLabel,
           tenantAccountNumber,
           tenantType,
-          fromTimestampStr,
-          toTimestampStr,
-          fromDatetime,
-          toDatetime,
+          fromDatetime!,
+          toDatetime!,
+          effectiveToDatetime,
           cycleStr,
           billDate,
           billBarFromMonth,
@@ -498,10 +511,9 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     String tenantLabel,
     String accountId,
     String tenantType,
-    String fromTimestampStr,
-    String toTimestampStr,
     DateTime fromDatetime,
     DateTime toDatetime,
+    DateTime? effectiveToDatetime,
     String cycleStr,
     String billDate,
     String billBarFromMonth,
@@ -709,48 +721,6 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
 
     return _renderMode == 'pdf'
         ? Container()
-        // WgtPagBillRenderPdf(
-        //     billingInfo: {
-        //       'customerName': tenantName,
-        //       'customerAccountId': accountId,
-        //       'customerLabel': tenantLabel,
-        //       'customerType': tenantType,
-        //       'gst': '9',
-        //       'billingRecName': _bill['billing_rec_name'],
-        //       'billFrom': fromTimestampStr,
-        //       'billTo': toTimestampStr,
-        //       'billDate': _bill['released_bill_timestamp'] ??
-        //           _bill['created_timestamp'],
-        //       'billTimeRangeStr': cycleStr,
-        //       'tenantUsageSummary': {},
-        //       'subTotalAmount': emsTypeUsageCalc.subTotalCost,
-        //       'gstAmount': emsTypeUsageCalc.gstAmount,
-        //       'totalAmount': emsTypeUsageCalc.totalCost,
-        //       'typeRateE': emsTypeUsageCalc.typeUsageE?.rate,
-        //       'typeRateW': emsTypeUsageCalc.typeUsageW?.rate,
-        //       'typeRateB': emsTypeUsageCalc.typeUsageB?.rate,
-        //       'typeRateN': emsTypeUsageCalc.typeUsageN?.rate,
-        //       'typeRateG': emsTypeUsageCalc.typeUsageG?.rate,
-        //       'typeUsageE': emsTypeUsageCalc.typeUsageE?.usageFactored,
-        //       'typeUsageW': emsTypeUsageCalc.typeUsageW?.usageFactored,
-        //       'typeUsageB': emsTypeUsageCalc.typeUsageB?.usageFactored,
-        //       'typeUsageN': emsTypeUsageCalc.typeUsageN?.usageFactored,
-        //       'typeUsageG': emsTypeUsageCalc.typeUsageG?.usageFactored,
-        //       'typeCostE': emsTypeUsageCalc.typeUsageE?.cost,
-        //       'typeCostW': emsTypeUsageCalc.typeUsageW?.cost,
-        //       'typeCostB': emsTypeUsageCalc.typeUsageB?.cost,
-        //       'typeCostN': emsTypeUsageCalc.typeUsageN?.cost,
-        //       'typeCostG': emsTypeUsageCalc.typeUsageG?.cost,
-        //       'trendingE': emsTypeUsageCalc.trendingE,
-        //       'trendingW': emsTypeUsageCalc.trendingW,
-        //       'trendingB': emsTypeUsageCalc.trendingB,
-        //       'trendingN': emsTypeUsageCalc.trendingN,
-        //       'trendingG': emsTypeUsageCalc.trendingG,
-        //       'lineItemLabel1': emsTypeUsageCalc.getLineItem(0)?['label'],
-        //       'lineItemValue1': emsTypeUsageCalc.getLineItem(0)?['amount'],
-        //       'assetFolder': assetFolder,
-        //     },
-        //   )
         : WgtPagTenantCompositeUsageSummary(
             isDisabled: _isDisabledGn,
             costDecimals: widget.costDecimals,
@@ -768,6 +738,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             isMonthly: isMonthly,
             fromDatetime: fromDatetime,
             toDatetime: toDatetime,
+            effectiveToDatetime: effectiveToDatetime,
             tenantName: tenantName,
             tenantLabel: tenantLabel,
             tenantAccountId: accountId,
@@ -798,10 +769,9 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     String billingAddressLine3,
     String depositAmountStr,
     String paymentMethod,
-    String fromTimestampStr,
-    String toTimestampStr,
     DateTime fromDatetime,
     DateTime toDatetime,
+    DateTime? effectiveToDatetime,
     String cycleStr,
     String billDate,
     String billBarFromMonth,
@@ -972,8 +942,9 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
               'gst': billedGst,
               'billingRecName': _bill['billing_rec_name'],
               'billLabel': _bill['bill_label'],
-              'billFrom': fromTimestampStr,
-              'billTo': toTimestampStr,
+              'billFrom': fromDatetime,
+              'billTo': toDatetime,
+              'effectiveTo': effectiveToDatetime,
               'billDate': _bill['released_bill_timestamp'] ??
                   _bill['created_timestamp'],
               'dueDate': _bill['billed_due_date_timestamp'] ?? '',
@@ -1030,6 +1001,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             // billDate: billDate,
             fromDatetime: fromDatetime,
             toDatetime: toDatetime,
+            effectiveToDatetime: effectiveToDatetime,
             tenantName: tenantName,
             tenantLabel: tenantLabel,
             tenantAccountId: accountId,

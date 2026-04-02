@@ -20,6 +20,7 @@ class WgtPagTenantUsageSummaryRl extends StatefulWidget {
     required this.isMonthly,
     required this.fromDatetime,
     required this.toDatetime,
+    required this.effectiveToDatetime,
     required this.tenantName,
     required this.tenantType,
     required this.excludeAutoUsage,
@@ -53,6 +54,7 @@ class WgtPagTenantUsageSummaryRl extends StatefulWidget {
   final bool isMonthly;
   final DateTime fromDatetime;
   final DateTime toDatetime;
+  final DateTime? effectiveToDatetime;
   final String tenantName;
   final String tenantAccountId;
   final String? tenantLabel;
@@ -115,6 +117,7 @@ class _WgtPagTenantUsageSummaryRlState
                   context,
                   widget.fromDatetime,
                   widget.toDatetime,
+                  widget.effectiveToDatetime,
                   widget.isMonthly,
                   widget.tenantLabel,
                   widget.tenantName,

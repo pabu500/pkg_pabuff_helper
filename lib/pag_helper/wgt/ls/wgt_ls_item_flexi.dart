@@ -1214,6 +1214,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                         isMonthly: false,
                         fromDatetime: fromDatetime,
                         toDatetime: toDatetime,
+                        effectiveToDatetime: null,
                         tenantName: item['name'],
                         tenantLabel: item['label'],
                         tenantAccountId: item['account_number'],
