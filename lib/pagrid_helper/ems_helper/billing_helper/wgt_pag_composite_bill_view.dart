@@ -57,10 +57,12 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
   bool _isSwitching = false;
   String _errorText = '';
 
+  // the actual lc status of the bill
+  late PagBillingLcStatus _billLcStatusActual;
   final Map<String, dynamic> _bill = {};
   String _renderMode = 'wgt'; // wgt, pdf
   // late String _lcStatusDisplay; // released, generated
-  late PagBillingLcStatus _lcStatusDisplay;
+  late PagBillingLcStatus _billLcStatusDisplay;
   bool _showGenTypeSwitch = false;
   bool _showRenderModeSwitch = false;
 
@@ -82,8 +84,9 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     Map<String, dynamic> queryMap = {
       'scope': widget.loggedInUser.selectedScope.toScopeMap(),
       'billing_rec_index': widget.billingRecIndexStr,
-      'is_released_mode':
-          _lcStatusDisplay == PagBillingLcStatus.released ? 'true' : 'false',
+      'is_released_mode': _billLcStatusDisplay == PagBillingLcStatus.released
+          ? 'true'
+          : 'false',
       'show_release_in_pv_mode': 'true',
     };
 
@@ -132,7 +135,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     super.initState();
 
     _pullFails = 0;
-    _lcStatusDisplay =
+    _billLcStatusActual =
         PagBillingLcStatus.byValue(widget.defaultBillLcStatusStr);
     // if (_lcStatusDisplay == PagBillingLcStatus.pv) {
     //   _lcStatusDisplay = PagBillingLcStatus.released;
@@ -142,7 +145,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     _showRenderModeSwitch = widget.modes.length > 1;
     _renderMode = widget.modes[0];
 
-    if (_lcStatusDisplay == PagBillingLcStatus.released) {
+    if (_billLcStatusDisplay == PagBillingLcStatus.released) {
       // _renderMode = 'pdf';
       // temp to put wgt till pdf template is ready
       _renderMode = 'wgt';
@@ -204,7 +207,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         horizontalSpaceRegular,
-                        if (_lcStatusDisplay == PagBillingLcStatus.mfd)
+                        if (_billLcStatusDisplay == PagBillingLcStatus.mfd)
                           Padding(
                             padding: const EdgeInsets.only(right: 8.0),
                             child: WgtItemDeleteOp(
@@ -241,7 +244,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
                           loggedInUser: widget.loggedInUser,
                           enableEdit: widget.displayContextStr == 'bill_view',
                           billInfo: _bill,
-                          initialStatus: _lcStatusDisplay,
+                          initialStatus: _billLcStatusActual,
                           onCommitted: (newStatus) {
                             setState(() {
                               _lcStatusOpsKey = UniqueKey();
@@ -251,7 +254,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
                                       newStatus == PagBillingLcStatus.released;
                               _isDisabledPvRl =
                                   newStatus == PagBillingLcStatus.generated;
-                              _lcStatusDisplay = newStatus;
+                              _billLcStatusActual = newStatus;
                               _showGenTypeSwitch =
                                   newStatus == PagBillingLcStatus.pv ||
                                       newStatus == PagBillingLcStatus.released;
@@ -463,8 +466,9 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     final Map<String, dynamic> scopeMap =
         widget.loggedInUser.selectedScope.toScopeMap();
 
-    if (_lcStatusDisplay == PagBillingLcStatus.released ||
-        _lcStatusDisplay == PagBillingLcStatus.pv) {
+    if (_billLcStatusDisplay == PagBillingLcStatus.released
+        // ||  _billLcStatusDisplay == PagBillingLcStatus.pv
+        ) {
       return getReleaseRender(
           tenantName,
           tenantLabel,
@@ -1067,8 +1071,8 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
         const Text('View in Gn Mode'),
         horizontalSpaceTiny,
         Switch(
-          value: _lcStatusDisplay == PagBillingLcStatus.released ||
-                  _lcStatusDisplay == PagBillingLcStatus.pv
+          value: _billLcStatusDisplay == PagBillingLcStatus.released ||
+                  _billLcStatusDisplay == PagBillingLcStatus.pv
               ? true
               : false,
           onChanged: _gettingBill
@@ -1076,9 +1080,10 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
               : (value) {
                   setState(() {
                     _isSwitching = true;
+                    _lcStatusOpsKey = UniqueKey();
                     value
-                        ? _lcStatusDisplay = PagBillingLcStatus.released
-                        : _lcStatusDisplay = PagBillingLcStatus.generated;
+                        ? _billLcStatusDisplay = PagBillingLcStatus.released
+                        : _billLcStatusDisplay = PagBillingLcStatus.generated;
                     _bill.clear();
                   });
                 },

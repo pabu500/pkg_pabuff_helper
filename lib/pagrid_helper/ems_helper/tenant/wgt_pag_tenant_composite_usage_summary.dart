@@ -239,7 +239,6 @@ class _WgtPagTenantCompositeUsageSummaryState
                 children: [
                   // getUsageTitle(),
                   // getUsageTypeStat(),
-
                   getPagUsageTitle(
                     context,
                     widget.fromDatetime,
@@ -283,7 +282,7 @@ class _WgtPagTenantCompositeUsageSummaryState
               // getSubTenantUsageList(),
               // verticalSpaceSmall,
               // verticalSpaceSmall,
-              getLineItemSubjectToTax(),
+              // getLineItemSubjectToTax(),
               verticalSpaceSmall,
               if (widget.isBillMode)
                 getPagTotal(
@@ -908,7 +907,7 @@ class _WgtPagTenantCompositeUsageSummaryState
           width: statWidth,
           padding: const EdgeInsets.symmetric(horizontal: 3),
           constraints: const BoxConstraints(
-            maxHeight: 80,
+            maxHeight: 60,
           ),
           decoration: BoxDecoration(
             border: Border.all(color: Colors.grey.shade600, width: 1),

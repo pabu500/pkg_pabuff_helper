@@ -870,33 +870,46 @@ Widget getPagTotal(
         ),
         const Divider(height: 13),
         // line item 1
-        if (strLineItemSubjectToTaxAmount.isNotEmpty)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(
-                width: contentWidth,
-                child: Text(
-                  lineItemSubjectToTaxLabel.trim(),
-                  style: defStatStyle.copyWith(
-                    color:
-                        Theme.of(context).colorScheme.onSurface.withAlpha(210),
-                  ),
-                ),
-              ),
-              horizontalSpaceSmall,
-              getStatWithUnit(
-                strLineItemSubjectToTaxAmount.trim(),
-                'SGD',
-                statStrStyle: defStatStyle.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
-                ),
-                showUnit: false,
-              ),
-            ],
-          ),
-
+        // if (strLineItemSubjectToTaxAmount.isNotEmpty)
+        //   Row(
+        //     mainAxisAlignment: MainAxisAlignment.start,
+        //     crossAxisAlignment: CrossAxisAlignment.center,
+        //     children: [
+        //       SizedBox(
+        //         width: contentWidth,
+        //         child: Text(
+        //           lineItemSubjectToTaxLabel.trim(),
+        //           style: defStatStyle.copyWith(
+        //             color:
+        //                 Theme.of(context).colorScheme.onSurface.withAlpha(210),
+        //           ),
+        //         ),
+        //       ),
+        //       horizontalSpaceSmall,
+        //       getStatWithUnit(
+        //         strLineItemSubjectToTaxAmount.trim(),
+        //         'SGD',
+        //         statStrStyle: defStatStyle.copyWith(
+        //           color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
+        //         ),
+        //         showUnit: false,
+        //       ),
+        //     ],
+        //   ),
+        getLineItem(
+          true,
+          loggedInUser,
+          appConfig,
+          strBillingRecId,
+          genType,
+          {
+            'label': lineItemSubjectToTaxLabel.trim(),
+            'amount': strLineItemSubjectToTaxAmount.trim(),
+            'subjectToTax': true,
+          },
+          context,
+          contentWidth,
+        ),
         if (applyGst)
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -994,19 +1007,20 @@ Widget getPagTotal(
             )
           ],
         ),
-        getLineItemNotSubjectToTax(
-            loggedInUser,
-            appConfig,
-            strBillingRecId,
-            genType,
-            {
-              'label': lineItemNotSubjectToTaxLabel.trim(),
-              'amount': strLineItemNotSubjectToTaxAmount.trim(),
-              'subjectToTax': false,
-            },
-            context,
-            contentWidth),
-
+        getLineItem(
+          false,
+          loggedInUser,
+          appConfig,
+          strBillingRecId,
+          genType,
+          {
+            'label': lineItemNotSubjectToTaxLabel.trim(),
+            'amount': strLineItemNotSubjectToTaxAmount.trim(),
+            'subjectToTax': false,
+          },
+          context,
+          contentWidth,
+        ),
         const Divider(height: 13),
         if (payableAmt != null)
           Padding(
@@ -1044,7 +1058,8 @@ Widget getPagTotal(
   );
 }
 
-Widget getLineItemNotSubjectToTax(
+Widget getLineItem(
+    bool showSubjectToTax,
     MdlPagUser? loggedInUser,
     MdlPagAppConfig? appConfig,
     String? strBillingRecId,
@@ -1056,8 +1071,17 @@ Widget getLineItemNotSubjectToTax(
     return Container();
   }
   bool subjectToTax = lineItem['subjectToTax'] as bool;
-  if (subjectToTax) {
-    return Container();
+  String itemKeyName = '';
+  if (showSubjectToTax) {
+    itemKeyName = 'line_item_label_1';
+    if (!subjectToTax) {
+      return Container();
+    }
+  } else {
+    itemKeyName = 'line_item_label_2';
+    if (subjectToTax) {
+      return Container();
+    }
   }
 
   String label = lineItem['label'] ?? '';
@@ -1080,7 +1104,7 @@ Widget getLineItemNotSubjectToTax(
                 loggedInUser: loggedInUser!,
                 appConfig: appConfig!,
                 strBillingRecId: strBillingRecId ?? '',
-                itemKeyName: 'line_item_label_2',
+                itemKeyName: itemKeyName,
                 lineItem: lineItem,
                 width: 250,
                 isEditableByAcl: false,
@@ -1097,6 +1121,60 @@ Widget getLineItemNotSubjectToTax(
     ],
   );
 }
+
+// Widget getLineItemNotSubjectToTax(
+//     MdlPagUser? loggedInUser,
+//     MdlPagAppConfig? appConfig,
+//     String? strBillingRecId,
+//     String genType,
+//     Map<String, dynamic> lineItem,
+//     BuildContext context,
+//     double width) {
+//   if (lineItem.isEmpty) {
+//     return Container();
+//   }
+//   bool subjectToTax = lineItem['subjectToTax'] as bool;
+//   if (subjectToTax) {
+//     return Container();
+//   }
+
+//   String label = lineItem['label'] ?? '';
+//   String valueStr = lineItem['amount'] ?? '';
+//   double? valueVal = double.tryParse(valueStr) ?? 0;
+//   return Row(
+//     mainAxisAlignment: MainAxisAlignment.start,
+//     crossAxisAlignment: CrossAxisAlignment.center,
+//     children: [
+//       SizedBox(
+//         width: width,
+//         child: genType != 'generated'
+//             ? Text(
+//                 label,
+//                 style: defStatStyle.copyWith(
+//                   color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
+//                 ),
+//               )
+//             : WgtBillLineItemLabel(
+//                 loggedInUser: loggedInUser!,
+//                 appConfig: appConfig!,
+//                 strBillingRecId: strBillingRecId ?? '',
+//                 itemKeyName: 'line_item_label_2',
+//                 lineItem: lineItem,
+//                 width: 250,
+//                 isEditableByAcl: false,
+//               ),
+//       ),
+//       horizontalSpaceSmall,
+//       getStatWithUnit(
+//         getCommaNumberStr(valueVal, decimal: 2, isRoundUp: false),
+//         'SGD',
+//         statStrStyle: defStatStyle.copyWith(
+//           color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
+//         ),
+//       ),
+//     ],
+//   );
+// }
 
 Widget getMiniSoA(
     Map<String, dynamic> miniSoaInfo,
