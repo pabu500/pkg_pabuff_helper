@@ -1,3 +1,4 @@
+import 'package:buff_helper/pag_helper/def_helper/dh_pag_tenant.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/up_helper/helper/tenant_def.dart';
 import 'package:flutter/material.dart';
@@ -1072,6 +1073,7 @@ Widget getPaymentApplyList(
   List<Widget> paymentWidgets = [];
   for (var payment in paymentApplyList) {
     // final paymentId = payment['payment_id'];
+    final paymentMethod = payment['payment_method'];
     final appliedUsageAmountFromBal = payment['usage_amount_from_bal'];
     final appliedInterestAmountFromBal = payment['interest_amount_from_bal'];
     final appliedUsageAmountFromPayment = payment['usage_amount_from_payment'];
@@ -1088,6 +1090,9 @@ Widget getPaymentApplyList(
     final paymentPlusOneDayTillCollectionEndDays =
         payment['payment_plus_one_day_till_collection_end_days'];
     final rieFromThisApply = payment['rie_from_this_apply'];
+
+    PagPaymentMethod paymentMethodEnum =
+        PagPaymentMethod.byValue(paymentMethod);
 
     double appliedUsageAmountFromBalDouble = 0.0;
     if (appliedUsageAmountFromBal is String) {
@@ -1178,13 +1183,17 @@ Widget getPaymentApplyList(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Payment Date: ${valueTimestamp.substring(0, 10)}'),
           Row(
             children: [
-              Icon(Symbols.attach_money,
-                  size: 16, color: Theme.of(context).colorScheme.primary),
+              PagPaymentMethod.getTagWidget(paymentMethodEnum),
               horizontalSpaceTiny,
-              const Text(
+              Text('Payment Date: ${valueTimestamp.substring(0, 10)}'),
+            ],
+          ),
+          verticalSpaceTiny,
+          const Row(
+            children: [
+              Text(
                 'Payment Apply:',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),

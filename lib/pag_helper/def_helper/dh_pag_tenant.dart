@@ -173,6 +173,24 @@ enum PagPaymentMethod {
         (e) => (e).tag,
       ) ??
       other;
+
+  static Widget getTagWidget(PagPaymentMethod status) {
+    Color color = status.color;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withAlpha(210),
+        borderRadius: BorderRadius.circular(2),
+      ),
+      child: Text(
+        status.tag,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 13,
+        ),
+      ),
+    );
+  }
 }
 
 String? validateTenantLabel(String value) {

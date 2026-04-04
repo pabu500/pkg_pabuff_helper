@@ -254,8 +254,10 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
                               _lcStatusOpsKey = UniqueKey();
                               _bill['lc_status'] = newStatus.value;
                               _isDisabledGn =
+                                      false /*
                                   newStatus == PagBillingLcStatus.pv ||
-                                      newStatus == PagBillingLcStatus.released;
+                                      newStatus == PagBillingLcStatus.released*/
+                                  ;
                               _isDisabledPvRl =
                                   newStatus == PagBillingLcStatus.generated;
                               _billLcStatusActual = newStatus;
