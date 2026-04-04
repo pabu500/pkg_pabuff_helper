@@ -46,8 +46,8 @@ class _WgtCommButtonState extends State<WgtCommButton> {
 
   @override
   Widget build(BuildContext context) {
-    dev.log('WgtCommButton: build');
-    dev.log('WgtCommButton: _isWaiting: $_isWaiting');
+    // dev.log('WgtCommButton: build');
+    // dev.log('WgtCommButton: _isWaiting: $_isWaiting');
 
     return Row(
       mainAxisSize: MainAxisSize.min,

@@ -140,9 +140,13 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     // if (_lcStatusDisplay == PagBillingLcStatus.pv) {
     //   _lcStatusDisplay = PagBillingLcStatus.released;
     // }
+    _billLcStatusDisplay = _billLcStatusActual == PagBillingLcStatus.pv
+        ? PagBillingLcStatus.released
+        : _billLcStatusActual;
 
     _showGenTypeSwitch = widget.genTypes.length > 1;
-    _showRenderModeSwitch = widget.modes.length > 1;
+    _showRenderModeSwitch = widget.modes.length > 1 &&
+        _billLcStatusDisplay == PagBillingLcStatus.released;
     _renderMode = widget.modes[0];
 
     if (_billLcStatusDisplay == PagBillingLcStatus.released) {
@@ -193,16 +197,16 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
                       context: context, errorText: _deleteResultText)
               : Stack(
                   children: [
-                    if (_showRenderModeSwitch && !_gettingBill)
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (_showRenderModeSwitch && !_gettingBill)
                           getSwitchRenderMode(),
-                          horizontalSpaceRegular,
-                          // if (_lcStatusDisplay == 'released') getSwitchGenType(),
-                          if (_showGenTypeSwitch) getSwitchGenType(),
-                        ],
-                      ),
+                        horizontalSpaceRegular,
+                        // if (_lcStatusDisplay == 'released') getSwitchGenType(),
+                        if (_showGenTypeSwitch) getSwitchGenType(),
+                      ],
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
@@ -951,9 +955,9 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
               'gst': billedGst,
               'billingRecName': _bill['billing_rec_name'],
               'billLabel': _bill['bill_label'],
-              'billFrom': fromDatetime,
-              'billTo': toDatetime,
-              'effectiveTo': effectiveToDatetime,
+              'billFrom': fromDatetime.toIso8601String(),
+              'billTo': toDatetime.toIso8601String(),
+              'effectiveTo': effectiveToDatetime?.toIso8601String(),
               'tenantLcs': tenantLcs,
               'billDate': _bill['released_bill_timestamp'] ??
                   _bill['created_timestamp'],
@@ -1084,6 +1088,11 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
                     value
                         ? _billLcStatusDisplay = PagBillingLcStatus.released
                         : _billLcStatusDisplay = PagBillingLcStatus.generated;
+                    if (_billLcStatusDisplay == PagBillingLcStatus.generated) {
+                      _showRenderModeSwitch = false;
+                    } else {
+                      _showRenderModeSwitch = true;
+                    }
                     _bill.clear();
                   });
                 },
