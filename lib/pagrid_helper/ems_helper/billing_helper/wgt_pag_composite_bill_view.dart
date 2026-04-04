@@ -1060,6 +1060,11 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
                   setState(() {
                     _isSwitching = true;
                     value ? _renderMode = 'pdf' : _renderMode = 'wgt';
+                    if (_renderMode == 'pdf') {
+                      _showGenTypeSwitch = false;
+                    } else {
+                      _showGenTypeSwitch = true;
+                    }
                   });
                 },
         ),
