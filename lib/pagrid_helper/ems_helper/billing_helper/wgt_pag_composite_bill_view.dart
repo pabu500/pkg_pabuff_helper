@@ -361,9 +361,12 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     if (paymentMethod.toLowerCase() != 'giro') {
       paymentMethod = 'Non-Giro';
     }
-    String billingAddressLine1 = _bill['billing_address_line_1'] ?? '';
-    String billingAddressLine2 = _bill['billing_address_line_2'] ?? '';
-    String billingAddressLine3 = _bill['billing_address_line_3'] ?? '';
+    String tenantBillingAddressLine1 =
+        _bill['tenant_billing_address_line_1'] ?? '';
+    String tenantBillingAddressLine2 =
+        _bill['tenant_billing_address_line_2'] ?? '';
+    String tenantBillingAddressLine3 =
+        _bill['tenant_billing_address_line_3'] ?? '';
     String strFromTimestamp = _bill['from_timestamp'];
     DateTime? fromDatetime = getTargetDatetimeFromTargetStr(strFromTimestamp);
     String strToTimestamp = _bill['to_timestamp'];
@@ -480,9 +483,9 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
           tenantLabel,
           tenantAccountNumber,
           tenantType,
-          billingAddressLine1,
-          billingAddressLine2,
-          billingAddressLine3,
+          tenantBillingAddressLine1,
+          tenantBillingAddressLine2,
+          tenantBillingAddressLine3,
           depositAmountStr,
           paymentMethod,
           tenantLcs,
@@ -496,7 +499,13 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
           miniSoaInfo,
           strCollectionStartDateTimestamp,
           strCollectionEndDateTimestamp,
-          interestInfo);
+          interestInfo,
+          billedAmgrCompanyTradingName,
+          billedAmgrCompanyRegNumber,
+          billedAmgrGstRegNumber,
+          amgrAddressLine1,
+          amgrAddressLine2,
+          amgrAddressLine3);
     } else {
       return getGeneratedRender(
           tenantName,
@@ -778,9 +787,9 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     String tenantLabel,
     String accountId,
     String tenantType,
-    String billingAddressLine1,
-    String billingAddressLine2,
-    String billingAddressLine3,
+    String tenantBillingAddressLine1,
+    String tenantBillingAddressLine2,
+    String tenantBillingAddressLine3,
     String depositAmountStr,
     String paymentMethod,
     String? tenantLcs,
@@ -795,6 +804,12 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     String previousCollectionDateTimestampStr,
     String currentCollectionDateTimestampStr,
     Map<String, dynamic> interestInfo,
+    String? billedAmgrCompanyTradingName,
+    String? billedAmgrCompanyRegNumber,
+    String? billedAmgrGstRegNumber,
+    String? amgrAddressLine1,
+    String? amgrAddressLine2,
+    String? amgrAddressLine3,
   ) {
     bool isMonthly = true; //_bill['is_monthly'] == 'true' ? true : false;
     String billTimeRangeStr = getTimeRangeStr(
@@ -951,9 +966,9 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
               'customerType': tenantType,
               'depositAmountStr': depositAmountStr,
               'paymentMethod': paymentMethod,
-              'billingAddressLine1': billingAddressLine1,
-              'billingAddressLine2': billingAddressLine2,
-              'billingAddressLine3': billingAddressLine3,
+              'tenantBillingAddressLine1': tenantBillingAddressLine1,
+              'tenantBillingAddressLine2': tenantBillingAddressLine2,
+              'tenantBillingAddressLine3': tenantBillingAddressLine3,
               'gst': billedGst,
               'billingRecName': _bill['billing_rec_name'],
               'billLabel': _bill['bill_label'],
@@ -999,6 +1014,12 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
               'lineItemValue2': compositeUsageCalcRl.getLineItem(1)?['amount'],
               'assetFolder': assetFolder,
               'tenantSingularUsageInfoList': singularUsageList,
+              'billedAmgrCompanyTradingName': billedAmgrCompanyTradingName,
+              'billedAmgrCompanyRegNumber': billedAmgrCompanyRegNumber,
+              'billedAmgrGstRegNumber': billedAmgrGstRegNumber,
+              'amgrAddressLine1': amgrAddressLine1,
+              'amgrAddressLine2': amgrAddressLine2,
+              'amgrAddressLine3': amgrAddressLine3,
             },
           )
         : WgtPagTenantCompositeUsageSummaryRl(

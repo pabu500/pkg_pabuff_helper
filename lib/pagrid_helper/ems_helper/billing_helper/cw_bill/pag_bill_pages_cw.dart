@@ -34,9 +34,9 @@ Future<Uint8List> generatePagInvoice(
     tenantAccountNumber: billInfo['customerAccountId'] ?? '',
     depositAmountStr: billInfo['depositAmountStr'] ?? '',
     paymentMethod: billInfo['paymentMethod'] ?? '',
-    billingAddressLine1: billInfo['billingAddressLine1'] ?? '',
-    billingAddressLine2: billInfo['billingAddressLine2'] ?? '',
-    billingAddressLine3: billInfo['billingAddressLine3'] ?? '',
+    tenantBillingAddressLine1: billInfo['tenantBillingAddressLine1'] ?? '',
+    tenantBillingAddressLine2: billInfo['tenantBillingAddressLine2'] ?? '',
+    tenantBillingAddressLine3: billInfo['tenantBillingAddressLine3'] ?? '',
     customerType: billInfo['customerType'] ?? '',
     gst: billInfo['gst'],
     paymentInfo: billInfo['paymentInfo'] ?? '',
@@ -78,6 +78,12 @@ Future<Uint8List> generatePagInvoice(
     lineItemValue2: billInfo['lineItemValue2'],
     assetFolder: billInfo['assetFolder'],
     tenantSingularUsageInfoList: billInfo['tenantSingularUsageInfoList'],
+    billedAmgrCompanyTradingName: billInfo['billedAmgrCompanyTradingName'],
+    billedAmgrCompanyRegNumber: billInfo['billedAmgrCompanyRegNumber'],
+    billedAmgrGstRegNumber: billInfo['billedAmgrGstRegNumber'],
+    amgrAddressLine1: billInfo['amgrAddressLine1'],
+    amgrAddressLine2: billInfo['amgrAddressLine2'],
+    amgrAddressLine3: billInfo['amgrAddressLine3'],
     tax: .15,
     baseColor: PdfColors.teal,
     accentColor: PdfColors.blueGrey900,
@@ -91,9 +97,9 @@ class PagBill {
     required this.customerName,
     required this.tenantAccountNumber,
     required this.customerLabel,
-    required this.billingAddressLine1,
-    required this.billingAddressLine2,
-    required this.billingAddressLine3,
+    required this.tenantBillingAddressLine1,
+    required this.tenantBillingAddressLine2,
+    required this.tenantBillingAddressLine3,
     required this.customerType,
     required this.depositAmountStr,
     required this.paymentMethod,
@@ -142,14 +148,20 @@ class PagBill {
     required this.assetFolder,
     required this.tenantSingularUsageInfoList,
     required this.miniSoaInfo,
+    required this.billedAmgrCompanyTradingName,
+    required this.billedAmgrCompanyRegNumber,
+    required this.billedAmgrGstRegNumber,
+    required this.amgrAddressLine1,
+    required this.amgrAddressLine2,
+    required this.amgrAddressLine3,
   });
 
   final String customerLabel;
   final String customerName;
   final String tenantAccountNumber;
-  final String billingAddressLine1;
-  final String billingAddressLine2;
-  final String billingAddressLine3;
+  final String tenantBillingAddressLine1;
+  final String tenantBillingAddressLine2;
+  final String tenantBillingAddressLine3;
   final String customerType;
   final String depositAmountStr;
   final String paymentMethod;
@@ -198,6 +210,12 @@ class PagBill {
   final String? assetFolder;
   final List<Map<String, dynamic>> tenantSingularUsageInfoList;
   final Map<String, dynamic>? miniSoaInfo;
+  final String? billedAmgrCompanyTradingName;
+  final String? billedAmgrCompanyRegNumber;
+  final String? billedAmgrGstRegNumber;
+  final String? amgrAddressLine1;
+  final String? amgrAddressLine2;
+  final String? amgrAddressLine3;
   static const _darkColor = PdfColors.blueGrey800;
   static const _lightColor = PdfColors.white;
 
@@ -216,7 +234,8 @@ class PagBill {
     // mt.AssetImage logoImage = const mt.AssetImage("assets/images/cw_logo_r_s.png");
     _logo = //await rootBundle.loadString('assets/images/C&W_Services_Logo_Color.png');
         pw.MemoryImage(
-      (await rootBundle.load('$assetFolder/cw_logo_r_s.png'))
+      // (await rootBundle.load('$assetFolder/cw_logo_r_s.png'))
+      (await rootBundle.load('$assetFolder/transparent_32x32.png'))
           .buffer
           .asUint8List(),
     );
@@ -358,15 +377,15 @@ class PagBill {
                 fontWeight: pw.FontWeight.bold)),
         pw.SizedBox(height: 5),
         pw.Row(children: [
-          pw.Text(billingAddressLine1,
+          pw.Text(tenantBillingAddressLine1,
               style: const pw.TextStyle(color: _darkColor, fontSize: 10)),
         ]),
         pw.Row(children: [
-          pw.Text(billingAddressLine2,
+          pw.Text(tenantBillingAddressLine2,
               style: const pw.TextStyle(color: _darkColor, fontSize: 10)),
         ]),
         pw.Row(children: [
-          pw.Text(billingAddressLine3,
+          pw.Text(tenantBillingAddressLine3,
               style: const pw.TextStyle(color: _darkColor, fontSize: 10)),
         ]),
       ],
@@ -508,16 +527,16 @@ class PagBill {
         child: pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            pw.Text('Authorized Agent', style: textStyle),
-            pw.Text(
-              'C&W Services (S) Pte Ltd',
-              style: pw.TextStyle(
-                  color: _darkColor, fontWeight: pw.FontWeight.bold),
-            ),
-            // pw.Text('Reg. No: 199805375C', style: textStyle),
-            // pw.Text('750A Chai Chee Road \n#05-01, ESR BizPark @ Chai Chee\nSingapore 469001',style: textStyle),
-            pw.Text('www.cwservices.sg', style: textStyle),
-            pw.Text('contactcentre-emrs.sgp@cwservices.com', style: textStyle),
+            pw.Text(billedAmgrCompanyTradingName ?? '',
+                style: pw.TextStyle(
+                    color: _darkColor, fontWeight: pw.FontWeight.bold)),
+            pw.Text('Company Reg No: ${billedAmgrCompanyRegNumber ?? ''}',
+                style: textStyle),
+            pw.Text('GST Reg No: ${billedAmgrGstRegNumber ?? ''}',
+                style: textStyle),
+            pw.Text(amgrAddressLine1 ?? '', style: textStyle),
+            pw.Text(amgrAddressLine2 ?? '', style: textStyle),
+            pw.Text(amgrAddressLine3 ?? '', style: textStyle),
           ],
         ));
   }
