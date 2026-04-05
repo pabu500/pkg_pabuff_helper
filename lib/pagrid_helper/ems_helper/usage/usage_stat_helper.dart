@@ -1074,6 +1074,7 @@ Widget getPaymentApplyList(
   for (var payment in paymentApplyList) {
     // final paymentId = payment['payment_id'];
     final paymentMethod = payment['payment_method'];
+    final giroDelayDays = payment['giro_delay_days'];
     final appliedUsageAmountFromBal = payment['usage_amount_from_bal'];
     final appliedInterestAmountFromBal = payment['interest_amount_from_bal'];
     final appliedUsageAmountFromPayment = payment['usage_amount_from_payment'];
@@ -1199,6 +1200,8 @@ Widget getPaymentApplyList(
               ),
             ],
           ),
+          if (giroDelayDays != null)
+            Text(' - GIRO Delay Days: $giroDelayDays days'),
           if (appliedUsageAmountFromBalDouble.abs() > 0.00001)
             Text(
                 ' - SGD${getCommaNumberStr(appliedUsageAmountFromBalDouble, decimal: 2)} applied to Usage from Balance B/F'),
