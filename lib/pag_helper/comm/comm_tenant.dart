@@ -105,6 +105,114 @@ Future<dynamic> doPagOffboardTenant(
   }
 }
 
+Future<dynamic> getTenantOffboardingInfo(
+  MdlPagAppConfig appConfig,
+  Map<String, dynamic> queryMap,
+  MdlPagSvcClaim svcClaim,
+) async {
+  svcClaim.svcName = PagSvcType.oresvc2.name;
+  svcClaim.endpoint = PagUrlBase.eptPagGetTenantOffbInfo;
+
+  String svcToken = '';
+  // try {
+  //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
+  // } catch (err) {
+  //   throw Exception(err);
+  // }
+
+  try {
+    final response = await http.post(
+      Uri.parse(PagUrlController(null, appConfig)
+          .getUrl(PagSvcType.oresvc2, svcClaim.endpoint!)),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $svcToken',
+      },
+      body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      // If the server did return a 200 OK response, parse the JSON.
+      final respJson = jsonDecode(response.body);
+      if (respJson['error'] != null) {
+        throw Exception(respJson['error']['message']);
+      }
+      final data = respJson['data'];
+      if (data == null) {
+        throw Exception("No data found in the response");
+      }
+      final result = data['result'];
+      if (result == null) {
+        throw Exception("No result found in the response");
+      }
+      String? resultKey = data['result_key'];
+      if (resultKey == null || resultKey.isEmpty) {
+        throw Exception("Error: $resultKey");
+      }
+      return result[resultKey];
+    } else {
+      Map<String, dynamic> responseBody = jsonDecode(response.body);
+      throw Exception(responseBody['error']);
+    }
+  } catch (err) {
+    rethrow;
+  }
+}
+
+Future<dynamic> updateTenantOffboardingInfo(
+  MdlPagAppConfig appConfig,
+  Map<String, dynamic> queryMap,
+  MdlPagSvcClaim svcClaim,
+) async {
+  svcClaim.svcName = PagSvcType.oresvc2.name;
+  svcClaim.endpoint = PagUrlBase.eptPagUpdateTenantOffbInfo;
+
+  String svcToken = '';
+  // try {
+  //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
+  // } catch (err) {
+  //   throw Exception(err);
+  // }
+
+  try {
+    final response = await http.post(
+      Uri.parse(PagUrlController(null, appConfig)
+          .getUrl(PagSvcType.oresvc2, svcClaim.endpoint!)),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $svcToken',
+      },
+      body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      // If the server did return a 200 OK response, parse the JSON.
+      final respJson = jsonDecode(response.body);
+      if (respJson['error'] != null) {
+        throw Exception(respJson['error']['message']);
+      }
+      final data = respJson['data'];
+      if (data == null) {
+        throw Exception("No data found in the response");
+      }
+      final result = data['result'];
+      if (result == null) {
+        throw Exception("No result found in the response");
+      }
+      String? resultKey = data['result_key'];
+      if (resultKey == null || resultKey.isEmpty) {
+        throw Exception("Error: $resultKey");
+      }
+      return result[resultKey];
+    } else {
+      Map<String, dynamic> responseBody = jsonDecode(response.body);
+      throw Exception(responseBody['error']);
+    }
+  } catch (err) {
+    rethrow;
+  }
+}
+
 Future<dynamic> doGetScopeMeterGroupList(
   MdlPagAppConfig appConfig,
   Map<String, dynamic> queryMap,
