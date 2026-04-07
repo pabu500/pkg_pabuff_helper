@@ -25,6 +25,7 @@ class WgtPagDateRangePickerMonthly extends StatefulWidget {
     this.monthPicked,
     this.maxDurationDays = 180,
     this.maxSelectionDurationDays = 180,
+    this.allowCustomRange = true,
   });
 
   // final BuildContext context;
@@ -43,6 +44,7 @@ class WgtPagDateRangePickerMonthly extends StatefulWidget {
   final bool showMonthly;
   final int maxDurationDays;
   final int maxSelectionDurationDays;
+  final bool allowCustomRange;
 
   @override
   State<WgtPagDateRangePickerMonthly> createState() =>
@@ -134,41 +136,45 @@ class _WgtPagDateRangePickerMonthlyState
         horizontalSpaceSmall,
         Container(
           height: 45,
-          decoration: BoxDecoration(
-            border: _isCustomRange
-                ? Border.all(
-                    color: Theme.of(context).colorScheme.primary,
-                    width: 2,
-                  )
-                : Border.all(
-                    color: Theme.of(context).hintColor.withAlpha(50),
-                    width: 1,
-                  ),
-            borderRadius: BorderRadius.circular(5),
-          ),
-          child: WgtDateRangePicker2(
-            timezone: widget.timeZone,
-            populateDefaultRange: widget.populateDefaultRange,
-            width: 290,
-            updateRangeByParent: true,
-            startDateTime: _selectedStartDate,
-            endDateTime: _selectedEndDate,
-            lastDate: widget.lastDate,
-            onSet: (DateTime? start, DateTime? end) {
-              setState(() {
-                _selectedStartDate = start;
-                _selectedEndDate = end;
-                _isCustomRange = true;
-                _isMTD = false;
-                _monthPicked = null;
-              });
-              widget.onRangeSet.call(start, end);
-            },
-            maxDuration: Duration(days: widget.maxDurationDays),
-            maxSelectionDuration:
-                Duration(days: widget.maxSelectionDurationDays),
-            onMaxDurationExceeded: () {},
-          ),
+          decoration: !widget.allowCustomRange
+              ? null
+              : BoxDecoration(
+                  border: _isCustomRange
+                      ? Border.all(
+                          color: Theme.of(context).colorScheme.primary,
+                          width: 2,
+                        )
+                      : Border.all(
+                          color: Theme.of(context).hintColor.withAlpha(50),
+                          width: 1,
+                        ),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+          child: !widget.allowCustomRange
+              ? Container()
+              : WgtDateRangePicker2(
+                  timezone: widget.timeZone,
+                  populateDefaultRange: widget.populateDefaultRange,
+                  width: 290,
+                  updateRangeByParent: true,
+                  startDateTime: _selectedStartDate,
+                  endDateTime: _selectedEndDate,
+                  lastDate: widget.lastDate,
+                  onSet: (DateTime? start, DateTime? end) {
+                    setState(() {
+                      _selectedStartDate = start;
+                      _selectedEndDate = end;
+                      _isCustomRange = true;
+                      _isMTD = false;
+                      _monthPicked = null;
+                    });
+                    widget.onRangeSet.call(start, end);
+                  },
+                  maxDuration: Duration(days: widget.maxDurationDays),
+                  maxSelectionDuration:
+                      Duration(days: widget.maxSelectionDurationDays),
+                  onMaxDurationExceeded: () {},
+                ),
         ),
       ],
     );

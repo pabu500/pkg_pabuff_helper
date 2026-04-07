@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_popup_button.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
@@ -327,9 +329,7 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
                 widget.onSet(_selectedStartDate, _selectedEndDate);
               }
 
-              if (kDebugMode) {
-                print('onValueChanged: $dates');
-              }
+              dev.log('onValueChanged: $dates');
             },
           ),
         ),

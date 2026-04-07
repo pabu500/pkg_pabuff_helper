@@ -1,6 +1,7 @@
+import 'dart:developer' as dev;
+
 import 'package:buff_helper/pagrid_helper/pagrid_helper.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -67,9 +68,8 @@ class _WgtPostJobState extends State<WgtPostJob> {
 
       return result;
     } catch (err) {
-      if (kDebugMode) {
-        print('post job error: $err');
-      }
+      dev.log('post job error: $err');
+
       return 'Job post failed';
     } finally {}
   }

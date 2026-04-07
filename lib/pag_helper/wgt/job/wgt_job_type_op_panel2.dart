@@ -194,6 +194,9 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
         return ok;
       case 'giro-file':
         return _selectedFromDate != null && _selectedToDate != null;
+      case 'billing-report':
+      case 'bill-release':
+        return _selectedFromDate != null && _selectedToDate != null;
       default:
         return false;
     }
@@ -281,6 +284,10 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
         return getBillingTaskOptions();
       case 'giro-file':
         return getGiroFileOptions();
+      case 'billing-report':
+        return getBillingReportOptions();
+      case 'bill-release':
+        return getBillReleaseOptions();
       default:
         return const SizedBox();
     }
@@ -529,7 +536,49 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
     );
   }
 
-  Widget getTimeRangePicker() {
+  Widget getBillingReportOptions() {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Billing Month',
+              style: TextStyle(
+                color: Theme.of(context).hintColor,
+                fontSize: 16,
+              ),
+            ),
+            horizontalSpaceSmall,
+            getTimeRangePicker(forceMonthly: true),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget getBillReleaseOptions() {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Billing Month',
+              style: TextStyle(
+                color: Theme.of(context).hintColor,
+                fontSize: 16,
+              ),
+            ),
+            horizontalSpaceSmall,
+            getTimeRangePicker(forceMonthly: true),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget getTimeRangePicker({bool forceMonthly = false}) {
     return WgtPagDateRangePickerMonthly(
       // key: _timePickerKey,
       iniEndDateTime: _selectedToDate,
@@ -537,6 +586,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
       customRangeSelected: _customDateRangeSelected,
       monthPicked: _monthPicked,
       populateDefaultRange: false,
+      allowCustomRange: !forceMonthly,
       onRangeSet: (startDate, endDate) async {
         if (startDate == null || endDate == null) return;
         _resetDate(resetDateRange: true);
