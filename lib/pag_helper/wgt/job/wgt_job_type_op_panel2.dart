@@ -196,6 +196,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
         return _selectedFromDate != null && _selectedToDate != null;
       case 'billing-report':
       case 'bill-release':
+      case 'payment-release':
         return _selectedFromDate != null && _selectedToDate != null;
       default:
         return false;
@@ -288,6 +289,8 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
         return getBillingReportOptions();
       case 'bill-release':
         return getBillReleaseOptions();
+      case 'payment-release':
+        return getPaymentReleaseOptions();
       default:
         return const SizedBox();
     }
@@ -572,6 +575,27 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
             ),
             horizontalSpaceSmall,
             getTimeRangePicker(forceMonthly: true),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget getPaymentReleaseOptions() {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Payment Date Range',
+              style: TextStyle(
+                color: Theme.of(context).hintColor,
+                fontSize: 16,
+              ),
+            ),
+            horizontalSpaceSmall,
+            getTimeRangePicker(),
           ],
         ),
       ],
