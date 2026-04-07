@@ -86,11 +86,9 @@ class _WgtPagLsState extends State<WgtPagLs> {
             PagItemKind.jobType ||
             PagItemKind.meterGroup ||
             PagItemKind.tariffPackage ||
+            PagItemKind.tariffPackageType ||
             PagItemKind.bill ||
-            // PagItemKind.amgr ||
-            // PagItemKind.landlord ||
             PagItemKind.role:
-        // || PagItemKind.finance:
         dynamic itemType;
         if (widget.itemKind == PagItemKind.bill) {
           itemType = PagItemKind.bill;

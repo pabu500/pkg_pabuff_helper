@@ -84,6 +84,7 @@ Future<Uint8List> generatePagInvoice(
     amgrAddressLine1: billInfo['amgrAddressLine1'],
     amgrAddressLine2: billInfo['amgrAddressLine2'],
     amgrAddressLine3: billInfo['amgrAddressLine3'],
+    billedTptNote: billInfo['billedTptNote'],
     tax: .15,
     baseColor: PdfColors.teal,
     accentColor: PdfColors.blueGrey900,
@@ -154,6 +155,7 @@ class PagBill {
     required this.amgrAddressLine1,
     required this.amgrAddressLine2,
     required this.amgrAddressLine3,
+    required this.billedTptNote,
   });
 
   final String customerLabel;
@@ -216,6 +218,7 @@ class PagBill {
   final String? amgrAddressLine1;
   final String? amgrAddressLine2;
   final String? amgrAddressLine3;
+  final String? billedTptNote;
   static const _darkColor = PdfColors.blueGrey800;
   static const _lightColor = PdfColors.white;
 

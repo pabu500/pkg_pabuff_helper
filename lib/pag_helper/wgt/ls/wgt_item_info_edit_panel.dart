@@ -744,7 +744,8 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
     if (widget.itemKind == PagItemKind.jobType ||
         widget.itemKind == PagItemKind.user ||
         widget.itemKind == PagItemKind.role ||
-        widget.itemKind == PagItemKind.finance) {
+        widget.itemKind == PagItemKind.finance ||
+        widget.itemKind == PagItemKind.tariffPackageType) {
       return Container();
     }
 

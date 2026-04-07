@@ -401,6 +401,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     String amgrAddressLine1 = _bill['amgr_address_line_1'] ?? '';
     String amgrAddressLine2 = _bill['amgr_address_line_2'] ?? '';
     String amgrAddressLine3 = _bill['amgr_address_line_3'] ?? '';
+    String billedTptNote = _bill['billed_tpt_note'] ?? '';
 
     List<Map<String, dynamic>> lineItemList = [];
     final lineItemInfo = _bill['line_item_info'] ?? {};
@@ -505,7 +506,8 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
           billedAmgrGstRegNumber,
           amgrAddressLine1,
           amgrAddressLine2,
-          amgrAddressLine3);
+          amgrAddressLine3,
+          billedTptNote);
     } else {
       return getGeneratedRender(
           tenantName,
@@ -810,6 +812,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     String? amgrAddressLine1,
     String? amgrAddressLine2,
     String? amgrAddressLine3,
+    String? billedTptNote,
   ) {
     bool isMonthly = true; //_bill['is_monthly'] == 'true' ? true : false;
     String billTimeRangeStr = getTimeRangeStr(
@@ -1020,6 +1023,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
               'amgrAddressLine1': amgrAddressLine1,
               'amgrAddressLine2': amgrAddressLine2,
               'amgrAddressLine3': amgrAddressLine3,
+              'billedTptNote': billedTptNote,
             },
           )
         : WgtPagTenantCompositeUsageSummaryRl(
