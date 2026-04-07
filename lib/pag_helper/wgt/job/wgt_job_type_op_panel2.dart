@@ -196,6 +196,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
         return _selectedFromDate != null && _selectedToDate != null;
       case 'billing-report':
       case 'bill-release':
+        return _selectedDate1 != null;
       case 'payment-release':
         return _selectedFromDate != null && _selectedToDate != null;
       default:
