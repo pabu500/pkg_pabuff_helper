@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'package:buff_helper/pagrid_helper/ems_helper/tenant/mdl_ems_type_usage_r2.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_ems_type_usage_calc_rl.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
-import 'package:buff_helper/up_helper/helper/tenant_def.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
@@ -84,7 +83,7 @@ Future<Uint8List> generatePagInvoice(
     amgrAddressLine1: billInfo['amgrAddressLine1'],
     amgrAddressLine2: billInfo['amgrAddressLine2'],
     amgrAddressLine3: billInfo['amgrAddressLine3'],
-    billedTptNote: billInfo['billedTptNote'],
+    // billedTptNote: billInfo['billedTptNote'],
     tax: .15,
     baseColor: PdfColors.teal,
     accentColor: PdfColors.blueGrey900,
@@ -155,7 +154,7 @@ class PagBill {
     required this.amgrAddressLine1,
     required this.amgrAddressLine2,
     required this.amgrAddressLine3,
-    required this.billedTptNote,
+    // required this.billedTptNote,
   });
 
   final String customerLabel;
@@ -218,7 +217,7 @@ class PagBill {
   final String? amgrAddressLine1;
   final String? amgrAddressLine2;
   final String? amgrAddressLine3;
-  final String? billedTptNote;
+  // final String? billedTptNote;
   static const _darkColor = PdfColors.blueGrey800;
   static const _lightColor = PdfColors.white;
 
@@ -272,7 +271,7 @@ class PagBill {
         _getSingularList(),
         pw.SizedBox(height: 5),
         _getTotal(),
-        // _getContentFooter(context),
+        _getContentFooter(context),
         // pw.SizedBox(height: 10),
         // _termsAndConditions(context),
       ],
@@ -546,126 +545,7 @@ class PagBill {
 
   pw.Widget _getContentFooter(pw.Context context) {
     double width = 130;
-
-    // double? subTotalAmt = totalAmount;
-    // if (subTotalAmt != null) {
-    //   // subTotalAmt = getRoundUp(subTotalAmt, 2);
-    //   // subTotalAmt = getRound(subTotalAmt, 2);
-    // }
-    // double? totalAmt = subTotalAmt;
-    bool applyGst = false;
-    // double? gstAmt;
-    if (TenantType.cw_nus_internal != getTenantType(customerType)) {
-      applyGst = true;
-      //   if (subTotalAmt != null && gst != null) {
-      //     subTotalAmt = getRound(subTotalAmt, 2);
-      //     gstAmt = subTotalAmt * gst! / 100;
-      //     gstAmt = getRoundUp(gstAmt, 2);
-      //     // total = subTotal + subTotal * (gst / 100);
-      //     totalAmt = subTotalAmt + gstAmt;
-      // }
-    } else {
-      applyGst = false;
-      //   if (subTotalAmt != null) {
-      //     totalAmt = getRoundUp(subTotalAmt, 2);
-      //   }
-    }
-    return applyGst
-        ? pw.Container(
-            padding: const pw.EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-            child: pw.Row(
-              children: [
-                pw.Expanded(child: pw.Container()),
-                pw.Container(
-                  width: width,
-                  child: pw.Column(
-                    children: [
-                      pw.Row(
-                        children: [
-                          pw.Text(
-                            'Sub Total:',
-                            style: pw.TextStyle(
-                              fontWeight: pw.FontWeight.bold,
-                            ),
-                          ),
-                          pw.Expanded(child: pw.Container()),
-                          pw.Text(
-                            _formatCurrency(subTotalAmount),
-                            style: pw.TextStyle(
-                              fontWeight: pw.FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      pw.Row(
-                        children: [
-                          pw.Text(
-                            'GST ($gst%)',
-                            style: pw.TextStyle(
-                              fontWeight: pw.FontWeight.bold,
-                            ),
-                          ),
-                          pw.Expanded(child: pw.Container()),
-                          pw.Text(
-                            // _formatCurrency(subTotalAmt * (gst / 100)),
-                            _formatCurrency(gstAmount),
-                            style: pw.TextStyle(
-                              fontWeight: pw.FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      pw.Row(
-                        children: [
-                          pw.Text(
-                            'Total:',
-                            style: pw.TextStyle(
-                              fontWeight: pw.FontWeight.bold,
-                            ),
-                          ),
-                          pw.Expanded(child: pw.Container()),
-                          pw.Text(
-                            _formatCurrency(totalAmount),
-                            style: pw.TextStyle(
-                              fontWeight: pw.FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          )
-        : pw.Container(
-            padding: const pw.EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-            child: pw.Row(
-              children: [
-                pw.Expanded(child: pw.Container()),
-                pw.Container(
-                  width: width,
-                  child: pw.Row(
-                    children: [
-                      pw.Text(
-                        'Total:',
-                        style: pw.TextStyle(
-                          fontWeight: pw.FontWeight.bold,
-                        ),
-                      ),
-                      pw.Expanded(child: pw.Container()),
-                      pw.Text(
-                        _formatCurrency(subTotalAmount, isRoundUp: false),
-                        style: pw.TextStyle(
-                          fontWeight: pw.FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          );
+    return pw.SizedBox();
   }
 
   pw.Widget _termsAndConditions(pw.Context context) {
@@ -716,6 +596,7 @@ class PagBill {
     for (Map<String, dynamic> singularUsageInfo
         in tenantSingularUsageInfoList) {
       List<pw.Widget> typeStatList = [];
+      String billedTptNote = singularUsageInfo['billed_tpt_note'] ?? '';
       String slotFromTimestampStr = singularUsageInfo['from_timestamp'] ?? '';
       String slotToTimestampStr = singularUsageInfo['to_timestamp'] ?? '';
       String slotStr =
@@ -754,6 +635,19 @@ class PagBill {
             ),
             pw.SizedBox(height: 5),
             ...typeStatList,
+            pw.SizedBox(height: 5),
+            pw.Row(
+              children: [
+                pw.Text(' Note: ',
+                    style: pw.TextStyle(
+                        fontWeight: pw.FontWeight.bold,
+                        color: _darkColor,
+                        fontSize: 9)),
+                pw.Text(billedTptNote,
+                    style: const pw.TextStyle(color: _darkColor, fontSize: 9)),
+              ],
+            ),
+            pw.SizedBox(height: 3),
           ],
         ),
       ));

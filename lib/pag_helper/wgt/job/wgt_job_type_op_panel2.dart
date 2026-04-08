@@ -79,6 +79,8 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
   bool _useCustomCollectionStartDate = false;
   UniqueKey? _timePickerKeyCollectionStartDate;
 
+  String? _selectedLcStatusStr;
+
   Future<dynamic> _triggerJob() async {
     if (_isPosting) return;
 
@@ -120,6 +122,9 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
           : _mainMeterSelected
               ? 'main'
               : 'sub';
+      if (_selectedLcStatusStr != null) {
+        jobRequest['target_lc_status'] = _selectedLcStatusStr!;
+      }
 
       Map<String, dynamic> queryMap = {
         'scope': jobScope,
@@ -194,10 +199,13 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
         return ok;
       case 'giro-file':
         return _selectedFromDate != null && _selectedToDate != null;
-      case 'billing-report':
+
       case 'bill-release':
-        return _selectedDate1 != null;
+        return _selectedFromDate != null &&
+            _selectedToDate != null &&
+            _selectedLcStatusStr != null;
       case 'payment-release':
+      case 'billing-report':
         return _selectedFromDate != null && _selectedToDate != null;
       default:
         return false;
@@ -577,6 +585,40 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
             horizontalSpaceSmall,
             getTimeRangePicker(forceMonthly: true),
           ],
+        ),
+        verticalSpaceSmall,
+        getTargetBillLcStatusSelector(),
+      ],
+    );
+  }
+
+  Widget getTargetBillLcStatusSelector() {
+    List<String> targetBilllcStatusOptions = ['pv', 'released'];
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          'Target Bill LC Status',
+          style: TextStyle(
+            color: Theme.of(context).hintColor,
+            fontSize: 16,
+          ),
+        ),
+        horizontalSpaceSmall,
+        DropdownButton<String>(
+          value: _selectedLcStatusStr,
+          items: targetBilllcStatusOptions
+              .map((status) => DropdownMenuItem<String>(
+                    value: status,
+                    child: Text(status),
+                  ))
+              .toList(),
+          onChanged: (String? newValue) {
+            setState(() {
+              _selectedLcStatusStr = newValue;
+            });
+          },
         ),
       ],
     );

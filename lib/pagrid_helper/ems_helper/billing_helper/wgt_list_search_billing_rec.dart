@@ -144,9 +144,7 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
 
       widget.onListPopulated?.call(itemList);
     } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
+      dev.log(e.toString());
     } finally {
       setState(() {
         _isItemListLoading = false;
