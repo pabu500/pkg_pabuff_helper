@@ -289,16 +289,21 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
       }
 
       final billingRecId = bill['id'] ?? '';
-      final billedTotalCost =
-          double.tryParse(bill['billed_total_amount'] ?? '0.0') ?? 0.0;
-      if (billedTotalCost <= 0.0) {
-        continue;
-      }
+      // final billedTotalCost =
+      //     double.tryParse(bill['billed_total_amount'] ?? '0.0') ?? 0.0;
+      // if (billedTotalCost <= 0.0) {
+      //   continue;
+      // }
+      final billedPayableAmount =
+          double.tryParse(bill['billed_payable_amount'] ?? '0.0') ?? 0.0;
+      final billedClosingBalance =
+          double.tryParse(bill['billed_closing_balance'] ?? '0.0') ?? 0.0;
+      final cycleTotal = billedPayableAmount + billedClosingBalance;
 
-      if (outBucketThisPayment == billedTotalCost) {
+      if ((outBucketThisPayment - cycleTotal).abs() < 0.00001) {
         final billedInterestAmount =
             double.tryParse(bill['billed_interest_amount'] ?? '0.0') ?? 0.0;
-        final billedUsageAmount = billedTotalCost - billedInterestAmount;
+        final nonInterestAmount = cycleTotal - billedInterestAmount;
 
         //check if already in the list
         bool found = false;
@@ -308,7 +313,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
               item['interest_amount_from_payment'] = billedInterestAmount;
             }
             if (item['is_custom_apply_usage'] != true) {
-              item['usage_amount_from_payment'] = billedUsageAmount;
+              item['usage_amount_from_payment'] = nonInterestAmount;
             }
             found = true;
             break;
@@ -319,12 +324,12 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
             'billing_rec_id': billingRecId,
             'billing_rec_gen_type': bill['gen_type'] ?? '',
             'interest_amount_from_payment': billedInterestAmount,
-            'usage_amount_from_payment': billedUsageAmount,
+            'usage_amount_from_payment': nonInterestAmount,
             'is_exact_match': true,
           });
           bill['is_fully_paid_by_current_payment'] = true;
 
-          outBucketThisPayment -= billedTotalCost;
+          outBucketThisPayment -= cycleTotal;
         }
       }
     }
@@ -449,21 +454,29 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
 
       //flow to usage bucket first
       final billingRecId = billInfo['id'] ?? '';
-      final billedTotalAmount =
-          double.tryParse(billInfo['billed_total_amount'] ?? '0.0') ?? 0.0;
-      if (billedTotalAmount <= 0.0) {
-        continue;
-      }
+      // final billedTotalAmount = double.tryParse(billInfo['billed_total_amount'] ?? '0.0') ?? 0.0;
+      // if (billedTotalAmount <= 0.0) {
+      //   continue;
+      // }
+      // final billedInterestAmount = double.tryParse(billInfo['billed_interest_amount'] ?? '0.0') ?? 0.0;
+      // final billedUsageWithGstAmt = billedTotalAmount - billedInterestAmount;
+      // if (billedUsageWithGstAmt > 0.0) {
+      final billedPayableAmount =
+          double.tryParse(billInfo['billed_payable_amount'] ?? '0.0') ?? 0.0;
+      final billedClosingBalance =
+          double.tryParse(billInfo['billed_closing_balance'] ?? '0.0') ?? 0.0;
       final billedInterestAmount =
           double.tryParse(billInfo['billed_interest_amount'] ?? '0.0') ?? 0.0;
-      final billedUsageWithGstAmt = billedTotalAmount - billedInterestAmount;
-      if (billedUsageWithGstAmt > 0.0) {
+      final nonInterestAmount =
+          billedPayableAmount + billedClosingBalance - billedInterestAmount;
+      if (nonInterestAmount > 0.00001) {
         double appliedUsage = _paymentApplyInfoListNew.firstWhere(
               (element) => element['billing_rec_id'] == billingRecId,
               orElse: () => {'usage_amount_from_payment': 0.0},
             )['usage_amount_from_payment'] ??
             0.0;
-        double remainingUsageToBePaid = _getBillBalanceToBePaid(billInfo);
+        double remainingUsageToBePaid =
+            _getBillBalanceToBePaid(billInfo, bucket: 'usage');
         if (remainingUsageToBePaid <= 0.0) {
           continue;
         }
@@ -513,11 +526,10 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
 
       // flow to interest bucket next
       final billingRecId = bill['id'] ?? '';
-      final billedTotalAmount =
-          double.tryParse(bill['billed_total_amount'] ?? '0.0') ?? 0.0;
-      if (billedTotalAmount <= 0.0) {
-        continue;
-      }
+      // final billedTotalAmount = double.tryParse(bill['billed_total_amount'] ?? '0.0') ?? 0.0;
+      // if (billedTotalAmount <= 0.0) {
+      //   continue;
+      // }
       final billedInterestAmount =
           double.tryParse(bill['billed_interest_amount'] ?? '0.0') ?? 0.0;
       if (billedInterestAmount > 0.0) {
@@ -580,11 +592,15 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
   void _checkFullyPaid() {
     for (var bill in _billList) {
       final billingRecId = bill['id'] ?? '';
-      final billedTotalCost =
-          double.tryParse(bill['billed_total_amount'] ?? '0.0') ?? 0.0;
-      if (billedTotalCost <= 0.0) {
-        continue;
-      }
+      // final billedTotalCost = double.tryParse(bill['billed_total_amount'] ?? '0.0') ?? 0.0;
+      // if (billedTotalCost <= 0.0) {
+      //   continue;
+      // }
+      final billedPayableAmount =
+          double.tryParse(bill['billed_payable_amount'] ?? '0.0') ?? 0.0;
+      final billedClosingBalance =
+          double.tryParse(bill['billed_closing_balance'] ?? '0.0') ?? 0.0;
+      final cycleTotal = billedPayableAmount + billedClosingBalance;
       double totalApplied = 0.0;
       for (var item in _paymentApplyInfoListNew) {
         if (item['billing_rec_id'] == billingRecId) {
@@ -595,7 +611,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
           break;
         }
       }
-      if (totalApplied >= billedTotalCost) {
+      if ((totalApplied - cycleTotal).abs() < 0.00001) {
         bill['is_fully_paid_by_current_payment'] = true;
       } else {
         bill['is_fully_paid_by_current_payment'] = false;
@@ -648,9 +664,17 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
     _checkFullyPaid();
   }
 
-  double _getBillBalanceToBePaid(Map<String, dynamic> billInfo) {
-    final billedTotalAmount =
-        double.tryParse(billInfo['billed_total_amount'] ?? '0.0') ?? 0.0;
+  double _getBillBalanceToBePaid(Map<String, dynamic> billInfo,
+      {String? bucket}) {
+    // final billedTotalAmount = double.tryParse(billInfo['billed_total_amount'] ?? '0.0') ?? 0.0;
+    final billedPayableAmount =
+        double.tryParse(billInfo['billed_payable_amount'] ?? '0.0') ?? 0.0;
+    final billedClosingBalance =
+        double.tryParse(billInfo['billed_closing_balance'] ?? '0.0') ?? 0.0;
+    final cycleTotal = billedPayableAmount + billedClosingBalance;
+    final billedInterestAmount =
+        double.tryParse(billInfo['billed_interest_amount'] ?? '0.0') ?? 0.0;
+    final nonInterestAmount = cycleTotal - billedInterestAmount;
 
     double appliedUsageTotal = 0.0;
     double appliedInterestTotal = 0.0;
@@ -671,7 +695,13 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
       appliedInterestTotal += appliedInterest;
     }
     double remainingBalanceToBePaid =
-        billedTotalAmount - (appliedUsageTotal + appliedInterestTotal);
+        cycleTotal - (appliedUsageTotal + appliedInterestTotal);
+
+    if (bucket == 'usage') {
+      remainingBalanceToBePaid = nonInterestAmount - appliedUsageTotal;
+    } else if (bucket == 'interest') {
+      remainingBalanceToBePaid = billedInterestAmount - appliedInterestTotal;
+    }
 
     return remainingBalanceToBePaid;
   }
@@ -899,8 +929,8 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
                   key: UniqueKey(),
                   appConfig: widget.appConfig,
                   loggedInUser: widget.loggedInUser,
-                  hintText: 'Usage',
-                  labelText: 'Usage',
+                  hintText: 'Non-interest',
+                  labelText: 'Non-interest',
                   enabled: isEnabled,
                   initialValue: initialValueUsageFromPmt,
                   textStyle: TextStyle(color: valueColor),
@@ -960,35 +990,24 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
     final billingRecId = billInfo['id'] ?? '';
     final billLabel = billInfo['label'] ?? '';
     final cycleStr = billInfo['cycle_str'] ?? '';
-    final billedTotalCost = billInfo['billed_total_amount'] ?? '';
+    final strBilledPayableAmount = billInfo['billed_payable_amount'] ?? '';
+    final strBilledClosingBalance = billInfo['billed_closing_balance'] ?? '';
+    // final billedTotalCost = billInfo['billed_total_amount'] ?? '';
     final billingLcStatusStr = billInfo['lc_status'] ?? '';
-    final billedTotalCostAmount =
-        double.tryParse(billInfo['billed_total_amount'] ?? '0.0') ?? 0.0;
-    final usageAmount =
-        double.tryParse(billInfo['billed_usage_cost_amount'] ?? '0.0') ?? 0.0;
+
+    final billedPayableAmount = double.tryParse(strBilledPayableAmount) ?? 0.0;
+    final billedClosingBalance =
+        double.tryParse(strBilledClosingBalance) ?? 0.0;
+    // final billedTotalCostAmount = double.tryParse(billInfo['billed_total_amount'] ?? '0.0') ?? 0.0;
+    // final usageAmount = double.tryParse(billInfo['billed_usage_cost_amount'] ?? '0.0') ?? 0.0;
     final interestAmount =
         double.tryParse(billInfo['billed_interest_amount'] ?? '0.0') ?? 0.0;
-    final billedUsageAmountWithGst = billedTotalCostAmount - interestAmount;
+    final cycleTotal = billedPayableAmount + billedClosingBalance;
+    final nonInterest = cycleTotal - interestAmount;
     // final totalAmount = usageAmount + interestAmount;
 
     final existingPaymentApplyInfoList =
         billInfo['existing_payment_apply_info_list'] ?? [];
-    // double appliedUsageTotal = 0.0;
-    // double appliedInterestTotal = 0.0;
-    // for (var applyInfo in existingPaymentApplyInfoList) {
-    //   final appliedUsage = applyInfo['usage_amount_from_payment'] is String
-    //       ? double.tryParse(applyInfo['usage_amount_from_payment'] ?? '0.0') ??
-    //           0.0
-    //       : applyInfo['usage_amount_from_payment'] ?? 0.0;
-    //   final appliedInterest =
-    //       applyInfo['interest_amount_from_payment'] is String
-    //           ? double.tryParse(
-    //                   applyInfo['interest_amount_from_payment'] ?? '0.0') ??
-    //               0.0
-    //           : applyInfo['interest_amount_from_payment'] ?? 0.0;
-    //   appliedUsageTotal += appliedUsage;
-    //   appliedInterestTotal += appliedInterest;
-    // }
 
     PagBillingLcStatus billLcStatus =
         PagBillingLcStatus.values.byName(billingLcStatusStr);
@@ -1086,17 +1105,17 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
                                   'Total: ',
                                   style: billKeyStyle,
                                 ),
-                                Text('$billedTotalCost',
+                                Text(cycleTotal.toStringAsFixed(2),
                                     style: billValStyle.copyWith(fontSize: 25)),
                               ],
                             ),
                             verticalSpaceTiny,
                             Row(
                               children: [
-                                Text('Usage: ', style: billKeyStyle),
+                                Text('Non-interest: ', style: billKeyStyle),
                                 Text(
                                   // usageAmount.toStringAsFixed(2),
-                                  billedUsageAmountWithGst.toStringAsFixed(2),
+                                  nonInterest.toStringAsFixed(2),
                                   style: billValStyle,
                                 ),
                                 horizontalSpaceSmall,
