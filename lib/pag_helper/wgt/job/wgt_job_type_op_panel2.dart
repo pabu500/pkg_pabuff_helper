@@ -51,7 +51,7 @@ class WgtJobTypeOpPanel2 extends StatefulWidget {
 class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
   late MdlPagUser? _loggedInUser;
 
-  final double _width = 500;
+  final double width = 550;
 
   String? _itemDisplayName;
   final List<Widget> fields = [];
@@ -224,7 +224,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: _width,
+      width: width,
       child: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -270,7 +270,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
                 borderRadius: BorderRadius.circular(5),
               ),
               padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 3),
-              width: _width,
+              width: width,
               child: getOptions(),
             ),
             verticalSpaceSmall,
