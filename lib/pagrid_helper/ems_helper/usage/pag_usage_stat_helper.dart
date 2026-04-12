@@ -1,13 +1,8 @@
-import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
-import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/usage/usage_stat_helper.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-import 'dart:developer' as dev;
-
-import '../../../pag_helper/comm/comm_batch_op.dart';
 import '../../../pag_helper/def_helper/dh_pag_finance.dart';
 import '../../../pag_helper/model/mdl_history.dart';
 import '../../../pag_helper/model/mdl_pag_app_config.dart';
@@ -782,6 +777,8 @@ Widget getPagTotal(
     double? subTotalAmt,
     double? gstAmt,
     double? totalAmt,
+    double? principalAmt,
+    double? cycleTotalAmt,
     double? payableAmt,
     String tenantType,
     List<Map<String, dynamic>>? lineItems,
@@ -796,13 +793,16 @@ Widget getPagTotal(
 
   double contentWidth = 235;
 
-  String lineItemSubjectToTaxLabel = '';
-  String strLineItemSubjectToTaxAmount = '';
-  String lineItemNotSubjectToTaxLabel = '';
-  String strLineItemNotSubjectToTaxAmount = '';
+  String lineItemSubjectToTaxSubjectToInterestLabel = ''; // line 1
+  String strLineItemSubjectToTaxSubjectToInterestAmount = '';
+  String lineItemNotSubjectToTaxSubjectToInterestLabel = ''; // line 2
+  String strLineItemNotSubjectToTaxSubjectToInterestAmount = '';
+  String lineItemIntestAdjLabel = ''; // line 3
+  String strLineItemIntestAdjAmount = '';
   if (lineItems != null && lineItems.isNotEmpty) {
     for (var lineItem in lineItems) {
       bool subjectToTax = lineItem['subjectToTax'];
+      bool subjectToInterest = lineItem['subjectToInterest'];
       String label = lineItem['label'] ?? '';
       final amountObj = lineItem['amount'];
       double? amount;
@@ -813,13 +813,17 @@ Widget getPagTotal(
       } else {
         throw Exception('Invalid amount type');
       }
-      if (subjectToTax) {
-        lineItemSubjectToTaxLabel += '$label\n';
-        strLineItemSubjectToTaxAmount +=
+      if (subjectToTax && subjectToInterest) {
+        lineItemSubjectToTaxSubjectToInterestLabel += '$label\n';
+        strLineItemSubjectToTaxSubjectToInterestAmount +=
             '${getCommaNumberStr(amount, decimal: 2)}\n';
-      } else {
-        lineItemNotSubjectToTaxLabel += '$label\n';
-        strLineItemNotSubjectToTaxAmount +=
+      } else if (!subjectToTax && subjectToInterest) {
+        lineItemNotSubjectToTaxSubjectToInterestLabel += '$label\n';
+        strLineItemNotSubjectToTaxSubjectToInterestAmount +=
+            '${getCommaNumberStr(amount, decimal: 2)}\n';
+      } else if (!subjectToTax && !subjectToInterest) {
+        lineItemIntestAdjLabel += '$label\n';
+        strLineItemIntestAdjAmount +=
             '${getCommaNumberStr(amount, decimal: 2)}\n';
       }
     }
@@ -851,61 +855,27 @@ Widget getPagTotal(
           children: [
             SizedBox(
               width: contentWidth,
-              child: Text(
-                'Total Usage Cost',
-                style: defStatStyle.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
-                ),
-              ),
+              child: Text('Total Usage Cost', style: defStatStyle),
             ),
             horizontalSpaceSmall,
             getStatWithUnit(
-              getCommaNumberStr(totalUsageCost, decimal: 2),
-              'SGD',
-              statStrStyle: defStatStyle.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
-              ),
-            ),
+                getCommaNumberStr(totalUsageCost, decimal: 2), 'SGD',
+                statStrStyle: defStatStyle),
           ],
         ),
         const Divider(height: 13),
-        // line item 1
-        // if (strLineItemSubjectToTaxAmount.isNotEmpty)
-        //   Row(
-        //     mainAxisAlignment: MainAxisAlignment.start,
-        //     crossAxisAlignment: CrossAxisAlignment.center,
-        //     children: [
-        //       SizedBox(
-        //         width: contentWidth,
-        //         child: Text(
-        //           lineItemSubjectToTaxLabel.trim(),
-        //           style: defStatStyle.copyWith(
-        //             color:
-        //                 Theme.of(context).colorScheme.onSurface.withAlpha(210),
-        //           ),
-        //         ),
-        //       ),
-        //       horizontalSpaceSmall,
-        //       getStatWithUnit(
-        //         strLineItemSubjectToTaxAmount.trim(),
-        //         'SGD',
-        //         statStrStyle: defStatStyle.copyWith(
-        //           color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
-        //         ),
-        //         showUnit: false,
-        //       ),
-        //     ],
-        //   ),
         getLineItem(
+          true,
           true,
           loggedInUser,
           appConfig,
           strBillingRecId,
           genType,
           {
-            'label': lineItemSubjectToTaxLabel.trim(),
-            'amount': strLineItemSubjectToTaxAmount.trim(),
+            'label': lineItemSubjectToTaxSubjectToInterestLabel.trim(),
+            'amount': strLineItemSubjectToTaxSubjectToInterestAmount.trim(),
             'subjectToTax': true,
+            'subjectToInterest': true,
           },
           context,
           contentWidth,
@@ -941,26 +911,14 @@ Widget getPagTotal(
               children: [
                 SizedBox(
                   width: contentWidth,
-                  child: Text(
-                    'GST ($gst%)',
-                    style: defStatStyle.copyWith(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withAlpha(210),
-                    ),
-                  ),
+                  child: Text('GST ($gst%)', style: defStatStyle),
                 ),
                 horizontalSpaceSmall,
                 getStatWithUnit(
-                  // getCommaNumberStr(subTotal * (gst / 100), decimal: 2),
-                  getCommaNumberStr(gstAmt, decimal: 2),
-                  'SGD',
-                  statStrStyle: defStatStyle.copyWith(
-                    color:
-                        Theme.of(context).colorScheme.onSurface.withAlpha(210),
-                  ),
-                ),
+                    // getCommaNumberStr(subTotal * (gst / 100), decimal: 2),
+                    getCommaNumberStr(gstAmt, decimal: 2),
+                    'SGD',
+                    statStrStyle: defStatStyle),
               ],
             ),
           ),
@@ -972,34 +930,80 @@ Widget getPagTotal(
             children: [
               SizedBox(
                 width: contentWidth,
-                child: Text(
-                  'Current Total',
-                  style: defStatStyle.copyWith(
+                child: Text('Current Total', style: defStatStyle),
+              ),
+              horizontalSpaceSmall,
+              getStatWithUnit(
+                  applyGst
+                      ? getCommaNumberStr(totalAmt,
+                          decimal: 2, isRoundUp: false)
+                      : getCommaNumberStr(subTotalAmt,
+                          decimal: 2, isRoundUp: false),
+                  'SGD',
+                  statStrStyle: defStatStyle),
+            ],
+          ),
+        ),
+        const Divider(height: 13),
+        getLineItem(
+          false,
+          true,
+          loggedInUser,
+          appConfig,
+          strBillingRecId,
+          genType,
+          {
+            'label': lineItemNotSubjectToTaxSubjectToInterestLabel.trim(),
+            'amount': strLineItemNotSubjectToTaxSubjectToInterestAmount.trim(),
+            'subjectToTax': false,
+            'subjectToInterest': true,
+          },
+          context,
+          contentWidth,
+        ),
+        if (payableAmt != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 5),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: contentWidth,
+                  child: Text(
+                    'Principal Amount',
+                    style: defStatStyle.copyWith(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withAlpha(210),
+                    ),
+                  ),
+                ),
+                horizontalSpaceSmall,
+                getStatWithUnit(
+                  getCommaNumberStr(principalAmt, decimal: 2, isRoundUp: false),
+                  'SGD',
+                  statStrStyle: defStatStyle.copyWith(
                     color:
                         Theme.of(context).colorScheme.onSurface.withAlpha(210),
                   ),
                 ),
-              ),
-              horizontalSpaceSmall,
-              getStatWithUnit(
-                applyGst
-                    ? getCommaNumberStr(totalAmt, decimal: 2, isRoundUp: false)
-                    : getCommaNumberStr(subTotalAmt,
-                        decimal: 2, isRoundUp: false),
-                'SGD',
-                statStrStyle: defStatStyle.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
         const Divider(height: 13),
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             getInterestInfo(
               interestInfo,
+              {
+                'label': lineItemIntestAdjLabel.trim(),
+                'amount': strLineItemIntestAdjAmount.trim(),
+                'subjectToTax': false,
+                'subjectToInterest': false,
+              },
               context,
               showInterestDetail,
               contentWidth,
@@ -1007,20 +1011,27 @@ Widget getPagTotal(
             )
           ],
         ),
-        getLineItem(
-          false,
-          loggedInUser,
-          appConfig,
-          strBillingRecId,
-          genType,
-          {
-            'label': lineItemNotSubjectToTaxLabel.trim(),
-            'amount': strLineItemNotSubjectToTaxAmount.trim(),
-            'subjectToTax': false,
-          },
-          context,
-          contentWidth,
-        ),
+        const Divider(height: 13),
+        if (payableAmt != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 5),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: contentWidth,
+                  child: Text('Cycle Total', style: defStatStyle),
+                ),
+                horizontalSpaceSmall,
+                getStatWithUnit(
+                    getCommaNumberStr(cycleTotalAmt,
+                        decimal: 2, isRoundUp: false),
+                    'SGD',
+                    statStrStyle: defStatStyle),
+              ],
+            ),
+          ),
         const Divider(height: 13),
         if (payableAmt != null)
           Padding(
@@ -1060,6 +1071,7 @@ Widget getPagTotal(
 
 Widget getLineItem(
     bool showSubjectToTax,
+    bool showSubjectToInterest,
     MdlPagUser? loggedInUser,
     MdlPagAppConfig? appConfig,
     String? strBillingRecId,
@@ -1072,13 +1084,18 @@ Widget getLineItem(
   }
   bool subjectToTax = lineItem['subjectToTax'] as bool;
   String itemKeyName = '';
-  if (showSubjectToTax) {
+  if (showSubjectToTax && showSubjectToInterest) {
     itemKeyName = 'line_item_label_1';
     if (!subjectToTax) {
       return Container();
     }
-  } else {
+  } else if (!showSubjectToTax && showSubjectToInterest) {
     itemKeyName = 'line_item_label_2';
+    if (subjectToTax) {
+      return Container();
+    }
+  } else {
+    itemKeyName = 'line_item_label_3';
     if (subjectToTax) {
       return Container();
     }
@@ -1094,12 +1111,7 @@ Widget getLineItem(
       SizedBox(
         width: width,
         child: genType != 'generated'
-            ? Text(
-                label,
-                style: defStatStyle.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
-                ),
-              )
+            ? Text(label, style: defStatStyle)
             : WgtBillLineItemLabel(
                 loggedInUser: loggedInUser!,
                 appConfig: appConfig!,
@@ -1112,12 +1124,8 @@ Widget getLineItem(
       ),
       horizontalSpaceSmall,
       getStatWithUnit(
-        getCommaNumberStr(valueVal, decimal: 2, isRoundUp: false),
-        'SGD',
-        statStrStyle: defStatStyle.copyWith(
-          color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
-        ),
-      ),
+          getCommaNumberStr(valueVal, decimal: 2, isRoundUp: false), 'SGD',
+          statStrStyle: defStatStyle),
     ],
   );
 }

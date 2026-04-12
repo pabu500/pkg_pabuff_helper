@@ -929,8 +929,8 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
                   key: UniqueKey(),
                   appConfig: widget.appConfig,
                   loggedInUser: widget.loggedInUser,
-                  hintText: 'Non-interest',
-                  labelText: 'Non-interest',
+                  hintText: 'Principal',
+                  labelText: 'Principal',
                   enabled: isEnabled,
                   initialValue: initialValueUsageFromPmt,
                   textStyle: TextStyle(color: valueColor),
@@ -990,20 +990,25 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
     final billingRecId = billInfo['id'] ?? '';
     final billLabel = billInfo['label'] ?? '';
     final cycleStr = billInfo['cycle_str'] ?? '';
+    final billingLcStatusStr = billInfo['lc_status'] ?? '';
+
+    final strBilledPrincipalAmount = billInfo['billed_principal_amount'] ?? '';
+    final strBilledInterestAmount = billInfo['billed_interest_amount'] ?? '';
+    final strBilledCycleTotalAmount =
+        billInfo['billed_cycle_total_amount'] ?? '';
     final strBilledPayableAmount = billInfo['billed_payable_amount'] ?? '';
     final strBilledClosingBalance = billInfo['billed_closing_balance'] ?? '';
-    // final billedTotalCost = billInfo['billed_total_amount'] ?? '';
-    final billingLcStatusStr = billInfo['lc_status'] ?? '';
 
     final billedPayableAmount = double.tryParse(strBilledPayableAmount) ?? 0.0;
     final billedClosingBalance =
         double.tryParse(strBilledClosingBalance) ?? 0.0;
-    // final billedTotalCostAmount = double.tryParse(billInfo['billed_total_amount'] ?? '0.0') ?? 0.0;
-    // final usageAmount = double.tryParse(billInfo['billed_usage_cost_amount'] ?? '0.0') ?? 0.0;
-    final interestAmount =
-        double.tryParse(billInfo['billed_interest_amount'] ?? '0.0') ?? 0.0;
-    final cycleTotal = billedPayableAmount + billedClosingBalance;
-    final nonInterest = cycleTotal - interestAmount;
+    final billedPrincipalAmount =
+        double.tryParse(strBilledPrincipalAmount ?? '0.0') ?? 0.0;
+    final billedInterestAmount =
+        double.tryParse(strBilledInterestAmount ?? '0.0') ?? 0.0;
+    final billedCycleTotalAmount =
+        double.tryParse(strBilledCycleTotalAmount ?? '0.0') ?? 0.0;
+
     // final totalAmount = usageAmount + interestAmount;
 
     final existingPaymentApplyInfoList =
@@ -1019,9 +1024,6 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
           billingRecId;
     }
 
-    // double? availableAmountToApply;
-    double? appliedAmountUsageFromBal;
-    double? appliedAmountInterestFromBal;
     double? appliedAmountUsageFromPmt;
     double? appliedAmountInterestFromPmt;
     String? appliedByOpUsername;
@@ -1105,23 +1107,23 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
                                   'Total: ',
                                   style: billKeyStyle,
                                 ),
-                                Text(cycleTotal.toStringAsFixed(2),
+                                Text(billedCycleTotalAmount.toStringAsFixed(2),
                                     style: billValStyle.copyWith(fontSize: 25)),
                               ],
                             ),
                             verticalSpaceTiny,
                             Row(
                               children: [
-                                Text('Non-interest: ', style: billKeyStyle),
+                                Text('Principal: ', style: billKeyStyle),
                                 Text(
                                   // usageAmount.toStringAsFixed(2),
-                                  nonInterest.toStringAsFixed(2),
+                                  billedPrincipalAmount.toStringAsFixed(2),
                                   style: billValStyle,
                                 ),
                                 horizontalSpaceSmall,
                                 Text('Interest: ', style: billKeyStyle),
                                 Text(
-                                  interestAmount.toStringAsFixed(2),
+                                  billedInterestAmount.toStringAsFixed(2),
                                   style: billValStyle,
                                 ),
                               ],

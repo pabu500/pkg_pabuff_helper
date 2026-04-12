@@ -3,8 +3,6 @@ import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/up_helper/helper/tenant_def.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
-
-import '../../../pag_helper/def_helper/dh_pag_finance.dart';
 import '../../app_helper/pagrid_app_config.dart';
 
 Widget getTypeUsageStat(
@@ -715,6 +713,7 @@ Widget getTotal2(
             children: [
               getInterestInfo(
                 interestInfo,
+                {},
                 context,
                 showInterestDetail,
                 contentWidth,
@@ -815,11 +814,19 @@ Widget getAutoUsageExcludedInfo(BuildContext context, {double width = 750}) {
 
 Widget getInterestInfo(
   Map<String, dynamic> interestInfo,
+  Map<String, dynamic> lineItem,
   BuildContext context,
   bool showInterestDetail,
   double contentWidth,
   Function? onCheckDetail,
 ) {
+  final lineItemAmount3 = lineItem['amount'];
+  double lineItemAmount3Double = 0.0;
+  if (lineItemAmount3 is String) {
+    lineItemAmount3Double = double.tryParse(lineItemAmount3) ?? 0.0;
+  } else if (lineItemAmount3 is double) {
+    lineItemAmount3Double = lineItemAmount3;
+  }
   final totalInterestAmount = interestInfo['total_interest_amount'];
   double totalInterestAmountDouble = 0.0;
   if (totalInterestAmount is String) {
@@ -830,10 +837,10 @@ Widget getInterestInfo(
   final osBillInfoList =
       interestInfo['outstanding_bill_info_list'] as List<dynamic>?;
   List<Widget> billWidgets = [];
-  if (osBillInfoList == null) {
+  if (osBillInfoList == null && lineItemAmount3Double == 0.0) {
     return const SizedBox.shrink();
   }
-  for (var bill in osBillInfoList) {
+  for (var bill in osBillInfoList ?? []) {
     if (bill.isEmpty) {
       continue;
     }
@@ -1035,6 +1042,7 @@ Widget getInterestInfo(
     );
     billWidgets.add(outstandingBillWidget);
   }
+
   return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
     if (totalInterestAmount != null)
       Row(
@@ -1065,6 +1073,18 @@ Widget getInterestInfo(
       ),
     // verticalSpaceSmall,
     if (showInterestDetail) ...billWidgets,
+    verticalSpaceTiny,
+    if (showInterestDetail)
+      Row(
+        children: [
+          SizedBox(
+            width: contentWidth,
+            child: const Text('Interest Adjustment'),
+          ),
+          horizontalSpaceSmall,
+          Text('SGD${getCommaNumberStr(lineItemAmount3Double, decimal: 2)}'),
+        ],
+      ),
   ]);
 }
 

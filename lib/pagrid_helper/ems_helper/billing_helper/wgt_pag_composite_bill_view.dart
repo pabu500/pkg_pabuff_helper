@@ -411,6 +411,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
         'label': lineItemInfo['line_item_label_1'],
         'amount': lineItemInfo['line_item_amount_1'],
         'subjectToTax': true,
+        'subjectToInterest': true,
       });
     }
     if (lineItemInfo['line_item_label_2'] != null &&
@@ -419,6 +420,16 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
         'label': lineItemInfo['line_item_label_2'],
         'amount': lineItemInfo['line_item_amount_2'],
         'subjectToTax': false,
+        'subjectToInterest': true,
+      });
+    }
+    if (lineItemInfo['line_item_label_3'] != null &&
+        lineItemInfo['line_item_amount_3'] != null) {
+      lineItemList.add({
+        'label': lineItemInfo['line_item_label_3'],
+        'amount': lineItemInfo['line_item_amount_3'],
+        'subjectToTax': false,
+        'subjectToInterest': false,
       });
     }
 

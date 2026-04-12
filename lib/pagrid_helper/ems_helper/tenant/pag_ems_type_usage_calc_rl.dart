@@ -66,6 +66,8 @@ class PagEmsTypeUsageCalcRl {
   double? _subTotalCost;
   double? _gstAmount;
   double? _totalCost;
+  double? _principalAmount;
+  double? _cycleTotalAmount;
   double? _payableAmount;
 
   EmsTypeUsageR2? get typeUsageE => _typeUsageE;
@@ -85,6 +87,8 @@ class PagEmsTypeUsageCalcRl {
   double? get subTotalCost => _subTotalCost;
   double? get gstAmount => _gstAmount;
   double? get totalCost => _totalCost;
+  double? get principalAmount => _principalAmount;
+  double? get cycleTotalAmount => _cycleTotalAmount;
   double? get payableAmount => _payableAmount;
 
   String? get billBarFromMonth => _billBarFromMonth;
@@ -480,7 +484,14 @@ class PagEmsTypeUsageCalcRl {
     _gstAmount = getRoundUp(gstAmount, 2);
     _totalCost = _subTotalCost! + _gstAmount!;
 
-    _payableAmount = _totalCost;
+    // _payableAmount = _totalCost;
+    _principalAmount = _totalCost;
+
+    if (lineItemCostNotSubjectToTax > 0.0000001) {
+      _payableAmount = _payableAmount! + lineItemCostNotSubjectToTax;
+    }
+
+    _cycleTotalAmount = _principalAmount;
 
     if (_interestInfo != null) {
       final totalInterestAmount = _interestInfo['total_interest_amount'];
@@ -491,12 +502,10 @@ class PagEmsTypeUsageCalcRl {
         interestAmountDouble = totalInterestAmount;
       }
 
-      _payableAmount = _totalCost! + (interestAmountDouble ?? 0);
+      _cycleTotalAmount = _principalAmount! + (interestAmountDouble ?? 0);
     }
 
-    if (lineItemCostNotSubjectToTax > 0.0000001) {
-      _payableAmount = _payableAmount! + lineItemCostNotSubjectToTax;
-    }
+    _payableAmount = _cycleTotalAmount;
 
     if (_miniSoaInfo != null) {
       final strClosingBalance = _miniSoaInfo['closing_balance'];
