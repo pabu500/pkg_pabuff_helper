@@ -185,7 +185,7 @@ class _WgtPagTenantUsageSummaryRlState
                 widget.usageCalc.totalUsageCost,
                 widget.gst!,
                 widget.usageCalc.subTotalCost,
-                widget.usageCalc.gstAmount,
+                widget.usageCalc.billedGstAmount,
                 widget.usageCalc.totalCost,
                 widget.usageCalc.principalAmount,
                 widget.usageCalc.cycleTotalAmount,

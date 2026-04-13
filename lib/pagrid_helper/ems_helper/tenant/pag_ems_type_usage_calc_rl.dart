@@ -64,7 +64,7 @@ class PagEmsTypeUsageCalcRl {
 
   double? _totalUsageCost;
   double? _subTotalCost;
-  double? _gstAmount;
+  double? _billedGstAmount;
   double? _totalCost;
   double? _principalAmount;
   double? _cycleTotalAmount;
@@ -85,7 +85,7 @@ class PagEmsTypeUsageCalcRl {
   double? get billedGst => _billedGst;
   double? get totalUsageCost => _totalUsageCost;
   double? get subTotalCost => _subTotalCost;
-  double? get gstAmount => _gstAmount;
+  double? get billedGstAmount => _billedGstAmount;
   double? get totalCost => _totalCost;
   double? get principalAmount => _principalAmount;
   double? get cycleTotalAmount => _cycleTotalAmount;
@@ -127,6 +127,7 @@ class PagEmsTypeUsageCalcRl {
     double? billedRateN,
     double? billedRateG,
     double? billedGst,
+    double? billedGstAmount,
     required List<Map<String, dynamic>> lineItemList,
     List<Map<String, dynamic>>? billedTrendingSnapShot,
     String? billBarFromMonth,
@@ -162,6 +163,7 @@ class PagEmsTypeUsageCalcRl {
     _billedRateN = billedRateN;
     _billedRateG = billedRateG;
     _billedGst = billedGst;
+    _billedGstAmount = billedGstAmount;
     _billedTrendingSnapShot = billedTrendingSnapShot;
 
     _lineItemList = lineItemList;
@@ -472,51 +474,48 @@ class PagEmsTypeUsageCalcRl {
       }
     }
 
-    double? gstAmount;
+    _subTotalCost = subTotalCost;
 
-    if (_billedGst != null) {
-      gstAmount = subTotalCost! * _billedGst / 100;
-    } else {
-      throw Exception('GST is not defined');
-    }
+    if (_subTotalCost != null) {
+      _subTotalCost = getRound(_subTotalCost!, 2);
 
-    _subTotalCost = getRound(subTotalCost, 2);
-    _gstAmount = getRoundUp(gstAmount, 2);
-    _totalCost = _subTotalCost! + _gstAmount!;
+      _billedGstAmount = getRoundUp(_billedGstAmount!, 2);
+      _totalCost = _subTotalCost! + _billedGstAmount!;
 
-    // _payableAmount = _totalCost;
-    _principalAmount = _totalCost;
+      // _payableAmount = _totalCost;
+      _principalAmount = _totalCost;
 
-    if (lineItemCostNotSubjectToTax > 0.0000001) {
-      _payableAmount = _payableAmount! + lineItemCostNotSubjectToTax;
-    }
-
-    _cycleTotalAmount = _principalAmount;
-
-    if (_interestInfo != null) {
-      final totalInterestAmount = _interestInfo['total_interest_amount'];
-      double? interestAmountDouble = 0;
-      if (totalInterestAmount is String) {
-        interestAmountDouble = double.tryParse(totalInterestAmount);
-      } else if (totalInterestAmount is double) {
-        interestAmountDouble = totalInterestAmount;
+      if (lineItemCostNotSubjectToTax > 0.0000001) {
+        _principalAmount = _principalAmount! + lineItemCostNotSubjectToTax;
       }
 
-      _cycleTotalAmount = _principalAmount! + (interestAmountDouble ?? 0);
-    }
+      _cycleTotalAmount = _principalAmount;
 
-    _payableAmount = _cycleTotalAmount;
+      if (_interestInfo != null) {
+        final totalInterestAmount = _interestInfo['total_interest_amount'];
+        double? interestAmountDouble = 0;
+        if (totalInterestAmount is String) {
+          interestAmountDouble = double.tryParse(totalInterestAmount);
+        } else if (totalInterestAmount is double) {
+          interestAmountDouble = totalInterestAmount;
+        }
 
-    if (_miniSoaInfo != null) {
-      final strClosingBalance = _miniSoaInfo['closing_balance'];
-      double? closingBalance = double.tryParse(strClosingBalance ?? '');
-      if (closingBalance != null) {
-        _payableAmount = -1 * closingBalance + (_payableAmount ?? 0);
+        _cycleTotalAmount = _principalAmount! + (interestAmountDouble ?? 0);
       }
-    }
 
-    if (_payableAmount != null) {
-      _payableAmount = getRound(_payableAmount!, 2);
+      _payableAmount = _cycleTotalAmount;
+
+      if (_miniSoaInfo != null) {
+        final strClosingBalance = _miniSoaInfo['closing_balance'];
+        double? closingBalance = double.tryParse(strClosingBalance ?? '');
+        if (closingBalance != null) {
+          _payableAmount = -1 * closingBalance + (_payableAmount ?? 0);
+        }
+      }
+
+      if (_payableAmount != null) {
+        _payableAmount = getRound(_payableAmount!, 2);
+      }
     }
   }
 
@@ -648,52 +647,50 @@ class PagEmsTypeUsageCalcRl {
       costDecimals: _costDecimals,
     );
 
-    double? subTotalCost;
+    // double? subTotalCost;
 
-    for (var singularCalc in _singularCalcList) {
-      if (singularCalc.typeUsageE?.hasCost() ?? false) {
-        subTotalCost ??= 0;
-        subTotalCost += singularCalc.typeUsageE!.cost!;
-      }
-      if (singularCalc.typeUsageW?.hasCost() ?? false) {
-        subTotalCost ??= 0;
-        subTotalCost += singularCalc.typeUsageW!.cost!;
-      }
-      if (singularCalc.typeUsageB?.hasCost() ?? false) {
-        subTotalCost ??= 0;
-        subTotalCost += singularCalc.typeUsageB!.cost!;
-      }
-      if (singularCalc.typeUsageN?.hasCost() ?? false) {
-        subTotalCost ??= 0;
-        subTotalCost += singularCalc.typeUsageN!.cost!;
-      }
-      if (singularCalc.typeUsageG?.hasCost() ?? false) {
-        subTotalCost ??= 0;
-        subTotalCost += singularCalc.typeUsageG!.cost!;
-      }
-    }
+    // for (var singularCalc in _singularCalcList) {
+    //   if (singularCalc.typeUsageE?.hasCost() ?? false) {
+    //     subTotalCost ??= 0;
+    //     subTotalCost += singularCalc.typeUsageE!.cost!;
+    //   }
+    //   if (singularCalc.typeUsageW?.hasCost() ?? false) {
+    //     subTotalCost ??= 0;
+    //     subTotalCost += singularCalc.typeUsageW!.cost!;
+    //   }
+    //   if (singularCalc.typeUsageB?.hasCost() ?? false) {
+    //     subTotalCost ??= 0;
+    //     subTotalCost += singularCalc.typeUsageB!.cost!;
+    //   }
+    //   if (singularCalc.typeUsageN?.hasCost() ?? false) {
+    //     subTotalCost ??= 0;
+    //     subTotalCost += singularCalc.typeUsageN!.cost!;
+    //   }
+    //   if (singularCalc.typeUsageG?.hasCost() ?? false) {
+    //     subTotalCost ??= 0;
+    //     subTotalCost += singularCalc.typeUsageG!.cost!;
+    //   }
+    // }
 
-    _subTotalCost = subTotalCost;
-    if (_subTotalCost != null) {
-      _subTotalCost = getRound(_subTotalCost!, 2);
-      if (subTotalCost != null && _billedGst != null) {
-        _gstAmount = subTotalCost * _billedGst / 100;
-      }
-      _gstAmount = getRoundUp(_gstAmount!, 2);
-      _totalCost = _subTotalCost! + _gstAmount!;
+    // _subTotalCost = subTotalCost;
+    // if (_subTotalCost != null) {
+    //   _subTotalCost = getRound(_subTotalCost!, 2);
 
-      if (_interestInfo != null) {
-        final totalInterestAmount = _interestInfo['total_interest_amount'];
-        double? interestAmountDouble = 0;
-        if (totalInterestAmount is String) {
-          interestAmountDouble = double.tryParse(totalInterestAmount);
-        } else if (totalInterestAmount is double) {
-          interestAmountDouble = totalInterestAmount;
-        }
+    //   _billedGstAmount = getRoundUp(_billedGstAmount!, 2);
+    //   _totalCost = _subTotalCost! + _billedGstAmount!;
 
-        _totalCost = _totalCost! + (interestAmountDouble ?? 0);
-      }
-    }
+    //   if (_interestInfo != null) {
+    //     final totalInterestAmount = _interestInfo['total_interest_amount'];
+    //     double? interestAmountDouble = 0;
+    //     if (totalInterestAmount is String) {
+    //       interestAmountDouble = double.tryParse(totalInterestAmount);
+    //     } else if (totalInterestAmount is double) {
+    //       interestAmountDouble = totalInterestAmount;
+    //     }
+
+    //     _totalCost = _totalCost! + (interestAmountDouble ?? 0);
+    //   }
+    // }
   }
 
   void _getUsageTrendingReleased(Map<String, dynamic> usageFactor) {

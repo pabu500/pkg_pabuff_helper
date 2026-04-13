@@ -389,6 +389,14 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
 
     String tenantLcs = _bill['tenant_lcs'] ?? '';
 
+    final billedGstAmount = _bill['billed_gst_amount'] ?? '';
+    double billedGstAmountDouble = 0.0;
+    if (billedGstAmount is String) {
+      billedGstAmountDouble = double.tryParse(billedGstAmount) ?? 0.0;
+    } else if (billedGstAmount is num) {
+      billedGstAmountDouble = billedGstAmount.toDouble();
+    }
+
     String strBilledUsageCostAmount = _bill['billed_usage_cost_amount'] ?? '';
     String strBilledInterestAmount = _bill['billed_interest_amount'] ?? '';
     String strBilledPayableAmount = _bill['billed_payable_amount'] ?? '';
@@ -401,6 +409,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     String amgrAddressLine1 = _bill['amgr_address_line_1'] ?? '';
     String amgrAddressLine2 = _bill['amgr_address_line_2'] ?? '';
     String amgrAddressLine3 = _bill['amgr_address_line_3'] ?? '';
+    String billedTpNote = _bill['billed_tp_note'] ?? '';
     String billedTptNote = _bill['billed_tpt_note'] ?? '';
 
     List<Map<String, dynamic>> lineItemList = [];
@@ -507,6 +516,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
           cycleStr,
           billDate,
           billBarFromMonth,
+          billedGstAmountDouble,
           lineItemList,
           miniSoaInfo,
           strCollectionStartDateTimestamp,
@@ -518,6 +528,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
           amgrAddressLine1,
           amgrAddressLine2,
           amgrAddressLine3,
+          billedTpNote,
           billedTptNote);
     } else {
       return getGeneratedRender(
@@ -812,6 +823,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     String cycleStr,
     String billDate,
     String billBarFromMonth,
+    double? billedGstAmount,
     List<Map<String, dynamic>> lineItemList,
     Map<String, dynamic> miniSoaInfo,
     String previousCollectionDateTimestampStr,
@@ -823,6 +835,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     String? amgrAddressLine1,
     String? amgrAddressLine2,
     String? amgrAddressLine3,
+    String? billedTpNote,
     String? billedTptNote,
   ) {
     bool isMonthly = true; //_bill['is_monthly'] == 'true' ? true : false;
@@ -845,7 +858,6 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
 
     List<String> usageTypeTags = ['E', 'W', 'B', 'N', 'G'];
 
-    double? billedGst;
     for (Map<String, dynamic> singularUsage in singularUsageList) {
       Map<String, dynamic> billedAutoUsageInfo = {};
       for (String typeTag in usageTypeTags) {
@@ -883,8 +895,13 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       Map<String, dynamic> billedManualUsages = {};
       List<Map<String, dynamic>> billedTrendingSnapShot = [];
 
+      double? billedGst;
       if (singularUsage['billed_gst'] != null) {
         billedGst = double.tryParse(singularUsage['billed_gst']);
+      }
+      double? billedGstAmount;
+      if (singularUsage['billed_gst_amount'] != null) {
+        billedGstAmount = double.tryParse(singularUsage['billed_gst_amount']);
       }
 
       PagEmsTypeUsageCalcRl emsTypeUsageCalcRl = PagEmsTypeUsageCalcRl(
@@ -920,6 +937,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
         billedRateN: billedRateInfo['billed_rate_n'],
         billedRateG: billedRateInfo['billed_rate_g'],
         billedGst: billedGst,
+        billedGstAmount: billedGstAmount,
         lineItemList: [], //lineItemList,
         billedTrendingSnapShot: billedTrendingSnapShot,
         billBarFromMonth: billBarFromMonth,
@@ -963,6 +981,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       billedUsageFactorN: _bill['billed_usage_factor_n'],
       billedUsageFactorG: _bill['billed_usage_factor_g'],
       billedTrendingSnapShot: _bill['billed_trending_snapshot'] ?? [],
+      billedGstAmount: billedGstAmount,
       lineItemList: lineItemList,
       billBarFromMonth: billBarFromMonth,
       singularUsageCalcList: singularUsageCalcList,
@@ -983,7 +1002,8 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
               'tenantBillingAddressLine1': tenantBillingAddressLine1,
               'tenantBillingAddressLine2': tenantBillingAddressLine2,
               'tenantBillingAddressLine3': tenantBillingAddressLine3,
-              'gst': billedGst,
+              'gst': compositeUsageCalcRl.billedGst,
+              'billedGstAmount': compositeUsageCalcRl.billedGstAmount,
               'billingRecName': _bill['billing_rec_name'],
               'billLabel': _bill['bill_label'],
               'billFrom': fromDatetime.toIso8601String(),
@@ -997,7 +1017,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
               'tenantUsageSummary': const [],
               'totalUsageCost': compositeUsageCalcRl.totalUsageCost,
               'subTotalAmount': compositeUsageCalcRl.subTotalCost,
-              'gstAmount': compositeUsageCalcRl.gstAmount,
+              'gstAmount': compositeUsageCalcRl.billedGstAmount,
               'totalAmount': compositeUsageCalcRl.totalCost,
               'payableAmount': compositeUsageCalcRl.payableAmount,
               'miniSoaInfo': compositeUsageCalcRl.miniSoaInfo,
@@ -1073,7 +1093,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
                 currentCollectionDateTimestampStr,
             excludeAutoUsage:
                 _bill['exclude_auto_usage'] == 'true' ? true : false,
-            gst: billedGst,
+            gst: compositeUsageCalcRl.billedGst,
             interestInfo: interestInfo,
             onUpdate: () {
               widget.onUpdate?.call();
