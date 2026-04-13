@@ -649,7 +649,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     } else if (widget.itemType is PagItemKind) {
       itemTypeStr = (widget.itemType as PagItemKind).name.toLowerCase();
     } else if (widget.itemType is PagFinanceType) {
-      itemTypeStr = (widget.itemType as PagFinanceType).name.toLowerCase();
+      itemTypeStr = (widget.itemType as PagFinanceType).value;
     } else if (widget.itemType is PagOrgType) {
       itemTypeStr = (widget.itemType as PagOrgType).name.toLowerCase();
     } else {

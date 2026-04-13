@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -45,9 +47,7 @@ Future<dynamic> fetchItemList(
   //   throw Exception(err);
   // }
 
-  if (kDebugMode) {
-    print('fetching item list');
-  }
+  dev.log('fetching item list');
 
   final response = await http.post(
     Uri.parse(PagUrlController(loggedInUser, pagAppConfig)

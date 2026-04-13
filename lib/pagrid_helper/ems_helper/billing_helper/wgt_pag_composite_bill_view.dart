@@ -1054,6 +1054,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
               'amgrAddressLine1': amgrAddressLine1,
               'amgrAddressLine2': amgrAddressLine2,
               'amgrAddressLine3': amgrAddressLine3,
+              'billedTpNote': billedTpNote,
               'billedTptNote': billedTptNote,
             },
           )

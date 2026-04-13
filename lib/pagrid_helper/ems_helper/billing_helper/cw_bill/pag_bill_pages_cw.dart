@@ -596,6 +596,7 @@ class PagBill {
     for (Map<String, dynamic> singularUsageInfo
         in tenantSingularUsageInfoList) {
       List<pw.Widget> typeStatList = [];
+      String billedTpNote = singularUsageInfo['billed_tp_note'] ?? '';
       String billedTptNote = singularUsageInfo['billed_tpt_note'] ?? '';
       String slotFromTimestampStr = singularUsageInfo['from_timestamp'] ?? '';
       String slotToTimestampStr = singularUsageInfo['to_timestamp'] ?? '';
@@ -643,7 +644,7 @@ class PagBill {
                         fontWeight: pw.FontWeight.bold,
                         color: _darkColor,
                         fontSize: 9)),
-                pw.Text(billedTptNote,
+                pw.Text(billedTpNote,
                     style: const pw.TextStyle(color: _darkColor, fontSize: 9)),
               ],
             ),
