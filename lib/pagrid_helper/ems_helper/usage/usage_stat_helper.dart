@@ -847,8 +847,14 @@ Widget getInterestInfo(
     // final billId = bill['bill_id'];
     final billLabel = bill['label'];
     final billDate = bill['bill_date_timestamp'];
-    final billedTotalAmount = bill['billed_total_amount'];
-    final outstandingAmount = bill['outstanding_amount'];
+    // final billedTotalAmount = bill['billed_total_amount'];
+
+    final billedUsageCostAmt = bill['billed_usage_cost_amount'];
+    final lineItemAmount1 = bill['line_item_amount_1'];
+    final billedGstAmount = bill['billed_gst_amount'];
+    final lineItemAmount2 = bill['line_item_amount_2'];
+    final interestBearingOsAmt = bill['interest_bearing_outstanding_amount'];
+
     final ttiRefAmount = bill['tti_ref_amount'];
     final ttiStartRefDateTimestamp = bill['tti_start_ref_date_timestamp'];
     final ttiDays = bill['tti_days'];
@@ -881,17 +887,41 @@ Widget getInterestInfo(
       }
     }
 
-    double billedTotalAmountDouble = 0.0;
-    if (billedTotalAmount is String) {
-      billedTotalAmountDouble = double.tryParse(billedTotalAmount) ?? 0.0;
-    } else if (billedTotalAmount is double) {
-      billedTotalAmountDouble = billedTotalAmount;
+    // double billedTotalAmountDouble = 0.0;
+    // if (billedTotalAmount is String) {
+    //   billedTotalAmountDouble = double.tryParse(billedTotalAmount) ?? 0.0;
+    // } else if (billedTotalAmount is double) {
+    //   billedTotalAmountDouble = billedTotalAmount;
+    // }
+    double billedUsageCostAmtDouble = 0.0;
+    if (billedUsageCostAmt is String) {
+      billedUsageCostAmtDouble = double.tryParse(billedUsageCostAmt) ?? 0.0;
+    } else if (billedUsageCostAmt is double) {
+      billedUsageCostAmtDouble = billedUsageCostAmt;
+    }
+    double lineItemAmount1Double = 0.0;
+    if (lineItemAmount1 is String) {
+      lineItemAmount1Double = double.tryParse(lineItemAmount1) ?? 0.0;
+    } else if (lineItemAmount1 is double) {
+      lineItemAmount1Double = lineItemAmount1;
+    }
+    double billedGstAmountDouble = 0.0;
+    if (billedGstAmount is String) {
+      billedGstAmountDouble = double.tryParse(billedGstAmount) ?? 0.0;
+    } else if (billedGstAmount is double) {
+      billedGstAmountDouble = billedGstAmount;
+    }
+    double lineItemAmount2Double = 0.0;
+    if (lineItemAmount2 is String) {
+      lineItemAmount2Double = double.tryParse(lineItemAmount2) ?? 0.0;
+    } else if (lineItemAmount2 is double) {
+      lineItemAmount2Double = lineItemAmount2;
     }
     double outstandingAmountDouble = 0.0;
-    if (outstandingAmount is String) {
-      outstandingAmountDouble = double.tryParse(outstandingAmount) ?? 0.0;
-    } else if (outstandingAmount is double) {
-      outstandingAmountDouble = outstandingAmount;
+    if (interestBearingOsAmt is String) {
+      outstandingAmountDouble = double.tryParse(interestBearingOsAmt) ?? 0.0;
+    } else if (interestBearingOsAmt is double) {
+      outstandingAmountDouble = interestBearingOsAmt;
     }
     double ttiRefAmountDouble = 0.0;
     if (ttiRefAmount is String) {
@@ -997,8 +1027,18 @@ Widget getInterestInfo(
             ],
           ),
           Text('Bill Date: ${billDate.substring(0, 10)}'),
+          // Text( 'Billed Total Amount: SGD${getCommaNumberStr(billedTotalAmountDouble, decimal: 2)}'),
           Text(
-              'Billed Total Amount: SGD${getCommaNumberStr(billedTotalAmountDouble, decimal: 2)}'),
+              'Interest Bearing TTI Amount: SGD${getCommaNumberStr(outstandingAmountDouble, decimal: 2)}'),
+          Text(
+              ' - Billed Usage Cost Amount: SGD${getCommaNumberStr(billedUsageCostAmtDouble, decimal: 2)}'),
+          Text(
+              ' - Line Item Amount 1: SGD${getCommaNumberStr(lineItemAmount1Double, decimal: 2)}'),
+          Text(
+              ' - Billed GST Amount: SGD${getCommaNumberStr(billedGstAmountDouble, decimal: 2)}'),
+          Text(
+              ' - Line Item Amount 2: SGD${getCommaNumberStr(lineItemAmount2Double, decimal: 2)}'),
+
           Text(
               'Cycle Start Date: ${cycleStartDateTimestamp.toString().substring(0, 10)}'),
           Text(
@@ -1073,7 +1113,7 @@ Widget getInterestInfo(
       ),
     // verticalSpaceSmall,
     if (showInterestDetail) ...billWidgets,
-    verticalSpaceTiny,
+    // verticalSpaceTiny,
     if (showInterestDetail)
       Row(
         children: [
