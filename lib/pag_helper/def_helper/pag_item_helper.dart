@@ -83,6 +83,20 @@ enum PagSimPackageEnum {
       enumByLabel(label, values, (e) => e.label);
 }
 
+enum PagGwGenEnum {
+  gen1("Gen1"),
+  gen2("Gen2"),
+  gen3("Gen3"),
+  ;
+
+  const PagGwGenEnum(this.label);
+
+  final String label;
+
+  static PagGwGenEnum? byLabel(String? label) =>
+      enumByLabel(label, values, (e) => e.label);
+}
+
 // T? enumByLabel<T extends Enum>(
 //   String? label,
 //   List<T> values,
