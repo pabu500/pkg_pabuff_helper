@@ -4,7 +4,6 @@ import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_popup_button.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -16,6 +15,7 @@ class WgtDateRangePicker2 extends StatefulWidget {
     required this.timezone,
     required this.onSet,
     required this.populateDefaultRange,
+    this.enabled = true,
     this.startDateTime,
     this.endDateTime,
     this.lastDate,
@@ -39,6 +39,7 @@ class WgtDateRangePicker2 extends StatefulWidget {
   final bool history;
   final bool useEdgeTime;
   final bool showHHmm;
+  final bool enabled;
   final void Function(
     DateTime? startDate,
     DateTime? endDate,
@@ -270,12 +271,10 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
       ),
     );
 
-    if (kDebugMode) {
-      print(
-          '_rangeDatePickerValueWithDefaultValue[0]:${_rangeDatePickerValueWithDefaultValue[0]}');
-      print(
-          '_rangeDatePickerValueWithDefaultValue[1]:${_rangeDatePickerValueWithDefaultValue[1]}');
-    }
+    dev.log(
+        '_rangeDatePickerValueWithDefaultValue[0]:${_rangeDatePickerValueWithDefaultValue[0]}');
+    dev.log(
+        '_rangeDatePickerValueWithDefaultValue[1]:${_rangeDatePickerValueWithDefaultValue[1]}');
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -295,7 +294,7 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
               }
               if (dates.length == 2) {
                 // _maxDurationExceeded = false;
-                Duration? duration = dates[1]!.difference(dates[0]!);
+                Duration? duration = dates[1].difference(dates[0]);
                 if (duration > widget.maxSelectionDuration) {
                   // setState(() {
                   //   _maxDurationExceeded = true;
@@ -354,12 +353,14 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
       message: 'Select Date Range',
       child: MediaQuery.of(context).size.width < 500
           ? InkWell(
-              onTap: () {
-                xtShowModelBottomSheet(
-                  context,
-                  _buildDefaultRangeDatePickerWithValue(),
-                );
-              },
+              onTap: !widget.enabled
+                  ? null
+                  : () {
+                      xtShowModelBottomSheet(
+                        context,
+                        _buildDefaultRangeDatePickerWithValue(),
+                      );
+                    },
               child: Icon(
                 Icons.date_range,
                 size: 35,

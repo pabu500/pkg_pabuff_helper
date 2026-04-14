@@ -13,6 +13,7 @@ class WgtPagDateRangePickerMonthly extends StatefulWidget {
     required this.onRangeSet,
     // required this.scopeProfile,
     required this.populateDefaultRange,
+    this.enabled = true,
     this.onMonthPicked,
     this.timeZone = 8,
     this.iniStartDateTime,
@@ -34,6 +35,7 @@ class WgtPagDateRangePickerMonthly extends StatefulWidget {
   final bool populateDefaultRange;
   final Function onRangeSet;
   final int timeZone;
+  final bool enabled;
   final DateTime? iniStartDateTime;
   final DateTime? iniEndDateTime;
   final DateTime? lastDate;
@@ -113,9 +115,11 @@ class _WgtPagDateRangePickerMonthlyState
       children: [
         if (widget.showMonthly)
           TextButton(
-            onPressed: () {
-              _onMonthlyPressed();
-            },
+            onPressed: !widget.enabled
+                ? null
+                : () {
+                    _onMonthlyPressed();
+                  },
             style: TextButton.styleFrom(
               backgroundColor: _monthPicked == null
                   ? Theme.of(context).colorScheme.primary.withAlpha(210)
@@ -153,6 +157,7 @@ class _WgtPagDateRangePickerMonthlyState
           child: !widget.allowCustomRange
               ? Container()
               : WgtDateRangePicker2(
+                  enabled: widget.enabled,
                   timezone: widget.timeZone,
                   populateDefaultRange: widget.populateDefaultRange,
                   width: 290,

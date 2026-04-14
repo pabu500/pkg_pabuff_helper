@@ -81,6 +81,8 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
 
   String? _selectedLcStatusStr;
 
+  bool _isOption1 = false;
+
   Future<dynamic> _triggerJob() async {
     if (_isPosting) return;
 
@@ -91,8 +93,10 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
     });
 
     // align to the midnight of the next day
-    _selectedToDate = DateTime(_selectedToDate!.year, _selectedToDate!.month,
-        _selectedToDate!.day + 1, 0, 0, 0);
+    if (_selectedToDate != null) {
+      _selectedToDate = DateTime(_selectedToDate!.year, _selectedToDate!.month,
+          _selectedToDate!.day + 1, 0, 0, 0);
+    }
 
     try {
       Map<String, dynamic> jobScope = widget.jobTypeScope?.toScopeMap() ??
@@ -125,6 +129,8 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
       if (_selectedLcStatusStr != null) {
         jobRequest['target_lc_status'] = _selectedLcStatusStr!;
       }
+
+      jobRequest['is_option_1'] = _isOption1.toString();
 
       Map<String, dynamic> queryMap = {
         'scope': jobScope,
@@ -201,9 +207,13 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
         return _selectedFromDate != null && _selectedToDate != null;
 
       case 'bill-release':
-        return _selectedFromDate != null &&
-            _selectedToDate != null &&
-            _selectedLcStatusStr != null;
+        if (_isOption1) {
+          return _selectedLcStatusStr != null;
+        } else {
+          return _selectedFromDate != null &&
+              _selectedToDate != null &&
+              _selectedLcStatusStr != null;
+        }
       case 'payment-release':
       case 'billing-report':
         return _selectedFromDate != null && _selectedToDate != null;
@@ -583,7 +593,34 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
               ),
             ),
             horizontalSpaceSmall,
-            getTimeRangePicker(forceMonthly: true),
+            getTimeRangePicker(forceMonthly: true, enabled: !_isOption1),
+            VerticalDivider(
+              color: Theme.of(context).hintColor,
+              width: 20,
+            ),
+            Row(
+              children: [
+                Checkbox(
+                  value: _isOption1,
+                  onChanged: (value) {
+                    setState(() {
+                      _isOption1 = value ?? false;
+                      if (_isOption1) {
+                      } else {
+                        _resetDate(resetDateRange: true);
+                      }
+                    });
+                  },
+                ),
+                Text(
+                  'Initial Bill',
+                  style: TextStyle(
+                    color: Theme.of(context).hintColor,
+                    fontSize: 16,
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
         verticalSpaceSmall,
@@ -645,9 +682,10 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
     );
   }
 
-  Widget getTimeRangePicker({bool forceMonthly = false}) {
+  Widget getTimeRangePicker({bool forceMonthly = false, bool enabled = true}) {
     return WgtPagDateRangePickerMonthly(
       // key: _timePickerKey,
+      enabled: enabled,
       iniEndDateTime: _selectedToDate,
       iniStartDateTime: _selectedFromDate,
       customRangeSelected: _customDateRangeSelected,
