@@ -217,6 +217,8 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
       case 'payment-release':
       case 'billing-report':
         return _selectedFromDate != null && _selectedToDate != null;
+      case 'gen-payment-matching-form':
+        return true;
       default:
         return false;
     }
@@ -310,6 +312,8 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
         return getBillReleaseOptions();
       case 'payment-release':
         return getPaymentReleaseOptions();
+      case 'gen-payment-matching-form':
+        return genPaymentMatchingFormOptions();
       default:
         return const SizedBox();
     }
@@ -875,5 +879,9 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
         ],
       ),
     );
+  }
+
+  Widget genPaymentMatchingFormOptions() {
+    return Container();
   }
 }
