@@ -206,7 +206,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
       case 'giro-file':
         return _selectedFromDate != null && _selectedToDate != null;
 
-      case 'bill-release':
+      case 'bill-lc-status-update':
         if (_isOption1) {
           return _selectedLcStatusStr != null;
         } else {
@@ -214,9 +214,10 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
               _selectedToDate != null &&
               _selectedLcStatusStr != null;
         }
-      case 'payment-release':
-      case 'billing-report':
-        return _selectedFromDate != null && _selectedToDate != null;
+      case 'payment-lc-status-update':
+        return _selectedFromDate != null &&
+            _selectedToDate != null &&
+            _selectedLcStatusStr != null;
       case 'gen-payment-matching-form':
         return true;
       default:
@@ -308,10 +309,10 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
         return getGiroFileOptions();
       case 'billing-report':
         return getBillingReportOptions();
-      case 'bill-release':
-        return getBillReleaseOptions();
-      case 'payment-release':
-        return getPaymentReleaseOptions();
+      case 'bill-lc-status-update':
+        return getBillLcStatusUpdateOptions();
+      case 'payment-lc-status-update':
+        return getPaymentLcStatusUpdateOptions();
       case 'gen-payment-matching-form':
         return genPaymentMatchingFormOptions();
       default:
@@ -583,7 +584,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
     );
   }
 
-  Widget getBillReleaseOptions() {
+  Widget getBillLcStatusUpdateOptions() {
     return Column(
       children: [
         Row(
@@ -634,7 +635,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
   }
 
   Widget getTargetBillLcStatusSelector() {
-    List<String> targetBilllcStatusOptions = ['pv', 'released'];
+    List<String> targetBilllcStatusOptions = ['pv', 'released', 'mfd'];
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -665,7 +666,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
     );
   }
 
-  Widget getPaymentReleaseOptions() {
+  Widget getPaymentLcStatusUpdateOptions() {
     return Column(
       children: [
         Row(
@@ -681,6 +682,40 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
             horizontalSpaceSmall,
             getTimeRangePicker(),
           ],
+        ),
+        verticalSpaceSmall,
+        getTargetPaymentLcStatusSelector(),
+      ],
+    );
+  }
+
+  Widget getTargetPaymentLcStatusSelector() {
+    List<String> targetPaymentLcStatusOptions = ['released', 'mfd'];
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          'Target Payment LC Status',
+          style: TextStyle(
+            color: Theme.of(context).hintColor,
+            fontSize: 16,
+          ),
+        ),
+        horizontalSpaceSmall,
+        DropdownButton<String>(
+          value: _selectedLcStatusStr,
+          items: targetPaymentLcStatusOptions
+              .map((status) => DropdownMenuItem<String>(
+                    value: status,
+                    child: Text(status),
+                  ))
+              .toList(),
+          onChanged: (String? newValue) {
+            setState(() {
+              _selectedLcStatusStr = newValue;
+            });
+          },
         ),
       ],
     );
