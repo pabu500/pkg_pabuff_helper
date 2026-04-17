@@ -1593,6 +1593,8 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         sidePadding: const EdgeInsets.only(left: 0, right: 60),
         showTimeRangePicker: widget.showTimeRangePicker,
         timeRangePickerWidget: widget.timeRangePickerWidget,
+        maxDurationDays:
+            widget.listContextType == PagListContextType.usage ? 1100 : null,
         initialFilterMap: widget.initialFilterMap,
         initialFilterGroupType: widget.initialFilterGroupType,
         allowFlexiLabel: widget.allowFlexiLabel,

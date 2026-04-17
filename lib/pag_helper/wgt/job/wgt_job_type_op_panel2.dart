@@ -205,7 +205,8 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
         return ok;
       case 'giro-file':
         return _selectedFromDate != null && _selectedToDate != null;
-
+      case 'billing-report':
+        return _selectedFromDate != null && _selectedToDate != null;
       case 'bill-lc-status-update':
         if (_isOption1) {
           return _selectedLcStatusStr != null;

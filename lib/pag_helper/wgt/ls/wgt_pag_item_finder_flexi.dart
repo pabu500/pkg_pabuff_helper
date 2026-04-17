@@ -77,6 +77,7 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
     this.hint,
     this.widthOffset = 0.0,
     this.additionalQuery = const {},
+    this.maxDurationDays,
   });
 
   final MdlPagUser loggedInUser;
@@ -116,6 +117,7 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
   final String? hint;
   final double widthOffset;
   final Map<String, dynamic> additionalQuery;
+  final int? maxDurationDays;
 
   @override
   State<WgtPagItemFinderFlexi> createState() => _WgtPagItemFinderFlexiState();
@@ -1014,6 +1016,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
           StatefulBuilder(builder: (context, setState) {
             return WgtPagDateRangePickerMonthly(
               // key: _timePickerKey,
+              maxDurationDays: widget.maxDurationDays,
               iniEndDateTime: _selectedToDate,
               iniStartDateTime: _selectedFromDate,
               customRangeSelected: _customDateRangeSelected,

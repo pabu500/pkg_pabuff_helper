@@ -44,8 +44,8 @@ class WgtPagDateRangePickerMonthly extends StatefulWidget {
   // final DateTime? selectedEndDate;
   final bool customRangeSelected;
   final bool showMonthly;
-  final int maxDurationDays;
-  final int maxSelectionDurationDays;
+  final int? maxDurationDays;
+  final int? maxSelectionDurationDays;
   final bool allowCustomRange;
 
   @override
@@ -175,9 +175,9 @@ class _WgtPagDateRangePickerMonthlyState
                     });
                     widget.onRangeSet.call(start, end);
                   },
-                  maxDuration: Duration(days: widget.maxDurationDays),
+                  maxDuration: Duration(days: widget.maxDurationDays!),
                   maxSelectionDuration:
-                      Duration(days: widget.maxSelectionDurationDays),
+                      Duration(days: widget.maxSelectionDurationDays!),
                   onMaxDurationExceeded: () {},
                 ),
         ),
