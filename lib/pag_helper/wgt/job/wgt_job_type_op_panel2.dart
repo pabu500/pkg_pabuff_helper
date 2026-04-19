@@ -75,7 +75,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
   UniqueKey? _date1PickerKey;
   UniqueKey? _date2PickerKey;
 
-  DateTime? _collectionStartDate;
+  DateTime? _selectedDate3;
   bool _useCustomCollectionStartDate = false;
   UniqueKey? _timePickerKeyCollectionStartDate;
 
@@ -113,10 +113,10 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
       if (_selectedDate2 != null) {
         jobRequest['selected_timestamp_2'] = _selectedDate2!.toIso8601String();
       }
-      if (_collectionStartDate != null) {
-        jobRequest['collection_start_date_timestamp'] =
-            _collectionStartDate!.toIso8601String();
+      if (_selectedDate3 != null) {
+        jobRequest['selected_timestamp_3'] = _selectedDate3!.toIso8601String();
       }
+
       if ((_selectedFromDate) != null && (_selectedToDate) != null) {
         jobRequest['from_timestamp'] = _selectedFromDate!.toIso8601String();
         jobRequest['to_timestamp'] = _selectedToDate!.toIso8601String();
@@ -198,7 +198,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
             _selectedDate1 != null &&
             _selectedDate2 != null;
         if (_useCustomCollectionStartDate) {
-          if (_collectionStartDate == null) {
+          if (_selectedDate3 == null) {
             ok = false;
           }
         }
@@ -421,7 +421,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
                     onDateChanged: (DateTime selectedDate) {
                       setState(() {
                         _selectedDate2 = selectedDate;
-                        _collectionStartDate = DateTime(_selectedDate2!.year,
+                        _selectedDate3 = DateTime(_selectedDate2!.year,
                             _selectedDate2!.month - 1, _selectedDate2!.day + 1);
                         _useCustomCollectionStartDate = false;
                         _timePickerKeyCollectionStartDate = UniqueKey();
@@ -506,12 +506,12 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
               defaultFirstDate: leftMostDate,
               defaultLastDate:
                   _selectedDate2!.subtract(const Duration(days: 1)),
-              initialDate: _collectionStartDate,
+              initialDate: _selectedDate3,
               timeZone: widget.loggedInUser.selectedScope.getProjectTimezone(),
               label: 'Set Collection Start Date',
               onDateChanged: (DateTime selectedDate) {
                 setState(() {
-                  _collectionStartDate = selectedDate;
+                  _selectedDate3 = selectedDate;
                 });
               },
             ),
