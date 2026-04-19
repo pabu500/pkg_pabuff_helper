@@ -24,8 +24,8 @@ class WgtPagDateRangePickerMonthly extends StatefulWidget {
     this.customRangeSelected = false,
     this.showMonthly = true,
     this.monthPicked,
-    this.maxDurationDays = 180,
-    this.maxSelectionDurationDays = 180,
+    this.maxDurationDays,
+    this.maxSelectionDurationDays,
     this.allowCustomRange = true,
   });
 
@@ -175,9 +175,9 @@ class _WgtPagDateRangePickerMonthlyState
                     });
                     widget.onRangeSet.call(start, end);
                   },
-                  maxDuration: Duration(days: widget.maxDurationDays!),
+                  maxDuration: Duration(days: widget.maxDurationDays ?? 180),
                   maxSelectionDuration:
-                      Duration(days: widget.maxSelectionDurationDays!),
+                      Duration(days: widget.maxSelectionDurationDays ?? 180),
                   onMaxDurationExceeded: () {},
                 ),
         ),

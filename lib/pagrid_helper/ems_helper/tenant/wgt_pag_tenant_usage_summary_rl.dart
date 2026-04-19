@@ -6,6 +6,7 @@ import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../../pag_helper/def_helper/dh_pag_bill.dart';
 import '../usage/pag_usage_stat_helper.dart';
 import '../usage/usage_stat_helper.dart';
 import '../usage/wgt_pag_meter_stat_core.dart';
@@ -182,11 +183,12 @@ class _WgtPagTenantUsageSummaryRlState
                 widget.appConfig,
                 '',
                 'released',
+                PagBillingLcStatus.released,
                 widget.usageCalc.totalUsageCost,
                 widget.gst!,
                 widget.usageCalc.subTotalCost,
                 widget.usageCalc.billedGstAmount,
-                widget.usageCalc.totalCost,
+                // widget.usageCalc.totalCost,
                 widget.usageCalc.principalAmount,
                 widget.usageCalc.cycleTotalAmount,
                 widget.usageCalc.payableAmount,

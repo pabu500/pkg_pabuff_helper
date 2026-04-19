@@ -8,6 +8,7 @@ import 'dart:developer' as dev;
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../../pag_helper/def_helper/dh_pag_bill.dart';
 import '../../../pag_helper/model/mdl_pag_app_config.dart';
 import '../usage/usage_stat_helper.dart';
 import '../../../pag_helper/wgt/app/ems/wgt_pag_group_stat_core.dart';
@@ -122,6 +123,10 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
     final String billDate = widget.billInfo['bill_date_timestamp'] ?? '';
     final String dueDate = widget.billInfo['billed_due_date_timestamp'] ?? '';
 
+    String lcStatus = widget.billInfo['lc_status'] ?? '';
+    PagBillingLcStatus currentBillLcStatus =
+        PagBillingLcStatus.byValue(lcStatus);
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 13),
       child: Container(
@@ -193,11 +198,12 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
                   widget.appConfig,
                   widget.billInfo['billing_rec_id'] ?? '',
                   'generated',
+                  currentBillLcStatus,
                   widget.usageCalc!.totalUsageCost,
                   widget.usageCalc!.gst!,
                   widget.usageCalc!.subTotalCost,
                   widget.usageCalc!.gstAmount,
-                  widget.usageCalc!.totalCost,
+                  // widget.usageCalc!.totalCost,
                   widget.usageCalc!.principalAmount,
                   widget.usageCalc!.cycleTotalAmount,
                   widget.usageCalc!.payableAmount,

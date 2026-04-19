@@ -214,7 +214,8 @@ class _WgtPagTenantCompositeUsageSummaryState
     //       context: context, errorText: 'Usage calc not available');
     // }
     String lcStatus = _billInfo['lc_status'] ?? '';
-    PagBillingLcStatus currentStatus = PagBillingLcStatus.byValue(lcStatus);
+    PagBillingLcStatus currentBillLcStatus =
+        PagBillingLcStatus.byValue(lcStatus);
 
     return Opacity(
       opacity: widget.isDisabled ? 0.5 : 1.0,
@@ -291,11 +292,12 @@ class _WgtPagTenantCompositeUsageSummaryState
                   widget.appConfig,
                   strBillingRecId,
                   'generated',
+                  currentBillLcStatus,
                   widget.compositeUsageCalc!.totalUsageCost,
                   widget.compositeUsageCalc!.gst!,
                   widget.compositeUsageCalc!.subTotalCost,
                   widget.compositeUsageCalc!.gstAmount,
-                  widget.compositeUsageCalc!.totalCost,
+                  // widget.compositeUsageCalc!.totalCost,
                   widget.compositeUsageCalc!.principalAmount,
                   widget.compositeUsageCalc!.cycleTotalAmount,
                   widget.compositeUsageCalc!.payableAmount,

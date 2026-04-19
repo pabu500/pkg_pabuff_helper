@@ -4,6 +4,7 @@ import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pag_helper/wgt/ls/wgt_item_delete_op.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 
 import '../../../pag_helper/def_helper/pag_item_helper.dart';
 import '../../../pag_helper/model/mdl_pag_project_profile.dart';
@@ -389,6 +390,9 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
 
     String tenantLcs = _bill['tenant_lcs'] ?? '';
 
+    final billedGstStr = _bill['billed_gst'] ?? '';
+    double? billedGst = double.tryParse(billedGstStr);
+
     final billedGstAmount = _bill['billed_gst_amount'] ?? '';
     double billedGstAmountDouble = 0.0;
     if (billedGstAmount is String) {
@@ -396,6 +400,26 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     } else if (billedGstAmount is num) {
       billedGstAmountDouble = billedGstAmount.toDouble();
     }
+
+    final billedUsageCostAmountStr = _bill['billed_usage_cost_amount'] ?? '';
+    double? billedUsageCostAmount =
+        double.tryParse(billedUsageCostAmountStr) ?? 0.0;
+
+    final billedInterestAmountStr = _bill['billed_interest_amount'] ?? '';
+    double? billedInterestAmount =
+        double.tryParse(billedInterestAmountStr) ?? 0.0;
+
+    final billedPrincipalAmountStr = _bill['billed_principal_amount'] ?? '';
+    double? billedPrincipalAmount =
+        double.tryParse(billedPrincipalAmountStr) ?? 0.0;
+
+    final billedCycleTotalAmountStr = _bill['billed_cycle_total_amount'] ?? '';
+    double? billedCycleTotalAmount =
+        double.tryParse(billedCycleTotalAmountStr) ?? 0.0;
+
+    final billedPayableAmountStr = _bill['billed_payable_amount'] ?? '';
+    double? billedPayableAmount =
+        double.tryParse(billedPayableAmountStr) ?? 0.0;
 
     String strBilledUsageCostAmount = _bill['billed_usage_cost_amount'] ?? '';
     String strBilledInterestAmount = _bill['billed_interest_amount'] ?? '';
@@ -500,36 +524,43 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
         // ||  _billLcStatusDisplay == PagBillingLcStatus.pv
         ) {
       return getReleaseRender(
-          tenantName,
-          tenantLabel,
-          tenantAccountNumber,
-          tenantType,
-          tenantBillingAddressLine1,
-          tenantBillingAddressLine2,
-          tenantBillingAddressLine3,
-          depositAmountStr,
-          paymentMethod,
-          tenantLcs,
-          fromDatetime!,
-          toDatetime!,
-          effectiveToDatetime,
-          cycleStr,
-          billDate,
-          billBarFromMonth,
-          billedGstAmountDouble,
-          lineItemList,
-          miniSoaInfo,
-          strCollectionStartDateTimestamp,
-          strCollectionEndDateTimestamp,
-          interestInfo,
-          billedAmgrCompanyTradingName,
-          billedAmgrCompanyRegNumber,
-          billedAmgrGstRegNumber,
-          amgrAddressLine1,
-          amgrAddressLine2,
-          amgrAddressLine3,
-          billedTpNote,
-          billedTptNote);
+        tenantName,
+        tenantLabel,
+        tenantAccountNumber,
+        tenantType,
+        tenantBillingAddressLine1,
+        tenantBillingAddressLine2,
+        tenantBillingAddressLine3,
+        depositAmountStr,
+        paymentMethod,
+        tenantLcs,
+        fromDatetime!,
+        toDatetime!,
+        effectiveToDatetime,
+        cycleStr,
+        billDate,
+        billBarFromMonth,
+        lineItemList,
+        miniSoaInfo,
+        strCollectionStartDateTimestamp,
+        strCollectionEndDateTimestamp,
+        interestInfo,
+        billedAmgrCompanyTradingName,
+        billedAmgrCompanyRegNumber,
+        billedAmgrGstRegNumber,
+        amgrAddressLine1,
+        amgrAddressLine2,
+        amgrAddressLine3,
+        billedTpNote,
+        billedTptNote,
+        billedGst,
+        billedGstAmountDouble,
+        billedUsageCostAmount,
+        billedPrincipalAmount,
+        billedInterestAmount,
+        billedCycleTotalAmount,
+        billedPayableAmount,
+      );
     } else {
       return getGeneratedRender(
           tenantName,
@@ -599,6 +630,9 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     }
 
     List<PagEmsTypeUsageCalc> singularUsageCalcList = [];
+
+    String billedGstStr = _bill['billed_gst'] ?? '';
+    double? billedGst = double.tryParse(billedGstStr);
 
     for (Map<String, dynamic> singularUsage in singularUsageList) {
       //sort auto usage
@@ -696,7 +730,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
 
     PagEmsTypeUsageCalc compositeUsageCalc = PagEmsTypeUsageCalc(
       costDecimals: widget.costDecimals,
-      gst: 9.0,
+      gst: billedGst,
       typeRates: {},
       usageFactor: usageFactor,
       autoUsageSummary: {},
@@ -823,7 +857,6 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     String cycleStr,
     String billDate,
     String billBarFromMonth,
-    double? billedGstAmount,
     List<Map<String, dynamic>> lineItemList,
     Map<String, dynamic> miniSoaInfo,
     String previousCollectionDateTimestampStr,
@@ -837,6 +870,13 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     String? amgrAddressLine3,
     String? billedTpNote,
     String? billedTptNote,
+    double? billedGst,
+    double? billedGstAmount,
+    double? billedUsageCostAmount,
+    double? billedPrincipalAmount,
+    double? billedInterestAmount,
+    double? billedCycleTotalAmount,
+    double? billedPayableAmount,
   ) {
     bool isMonthly = true; //_bill['is_monthly'] == 'true' ? true : false;
     String billTimeRangeStr = getTimeRangeStr(
@@ -938,6 +978,10 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
         billedRateG: billedRateInfo['billed_rate_g'],
         billedGst: billedGst,
         billedGstAmount: billedGstAmount,
+        billedUsageCostAmount: billedUsageCostAmount,
+        billedPrincipalAmount: billedPrincipalAmount,
+        billedInterestAmount: billedInterestAmount,
+        billedCycleTotalAmount: billedCycleTotalAmount,
         lineItemList: [], //lineItemList,
         billedTrendingSnapShot: billedTrendingSnapShot,
         billBarFromMonth: billBarFromMonth,
@@ -948,13 +992,8 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       singularUsage['usage_calc'] = emsTypeUsageCalcRl;
     }
 
-    // double balBf = double.tryParse(balBfStr) ?? 0.0;
-    // double balBfUsage = double.tryParse(balBfUsageStr) ?? 0.0;
-    // double balBfInterest = double.tryParse(balBfInterestStr) ?? 0.0;
-
     PagEmsTypeUsageCalcRl compositeUsageCalcRl = PagEmsTypeUsageCalcRl(
       costDecimals: widget.costDecimals,
-      billedGst: 9.0,
       billedRateE: _bill['billed_rate_e'],
       billedRateW: _bill['billed_rate_w'],
       billedRateB: _bill['billed_rate_b'],
@@ -981,12 +1020,18 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       billedUsageFactorN: _bill['billed_usage_factor_n'],
       billedUsageFactorG: _bill['billed_usage_factor_g'],
       billedTrendingSnapShot: _bill['billed_trending_snapshot'] ?? [],
-      billedGstAmount: billedGstAmount,
       lineItemList: lineItemList,
       billBarFromMonth: billBarFromMonth,
       singularUsageCalcList: singularUsageCalcList,
       miniSoaInfo: miniSoaInfo,
       interestInfo: interestInfo,
+      billedGst: billedGst,
+      billedGstAmount: billedGstAmount,
+      billedUsageCostAmount: billedUsageCostAmount,
+      billedPrincipalAmount: billedPrincipalAmount,
+      billedInterestAmount: billedInterestAmount,
+      billedCycleTotalAmount: billedCycleTotalAmount,
+      billedPayableAmount: billedPayableAmount,
     );
     compositeUsageCalcRl.doCompositeCalc();
 
@@ -1106,6 +1151,10 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
   }
 
   Widget getSwitchRenderMode() {
+    String genType = _bill['gen_type'] ?? '';
+    if (genType == 'initial_balance') {
+      return Container();
+    }
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
@@ -1133,6 +1182,10 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
   }
 
   Widget getSwitchGenType() {
+    String genType = _bill['gen_type'] ?? '';
+    if (genType == 'initial_balance') {
+      return Container();
+    }
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [

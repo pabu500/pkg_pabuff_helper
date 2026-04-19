@@ -378,23 +378,47 @@ class PagEmsTypeUsageCalc {
 
     double? subTotalCost = totalUsageCost;
 
-    double lineItemCostNotSubjectToTax = 0.0;
+    // line item 1
+    double lineItemCostSubjectToTaxSubjectToInterest = 0.0;
+    // line item 2
+    double lineItemCostNotSubjectToTaxSubjectToInterest = 0.0;
+    // not in use
+    // double lineItemCostSubjectToTaxNotSubjectToInterest = 0.0;
+    // line item 3 (interest adjustment)
+    double lineItemCostNotSubjectToTaxNotSubjectToInterest = 0.0;
+
     for (var item in _lineItemList) {
       String? strLineAmount = item['amount'];
       double? lineAmount = double.tryParse(strLineAmount ?? '');
       bool subjectToTax = item['subjectToTax'] as bool;
+      bool subjectToInerest = item['subjectToInterest'] as bool;
 
-      if (subjectToTax) {
-        if (lineAmount != null) {
-          subTotalCost ??= 0;
-          subTotalCost += lineAmount;
-        }
-      } else {
-        if (lineAmount != null) {
-          lineItemCostNotSubjectToTax += lineAmount;
+      // if (subjectToTax) {
+      //   if (lineAmount != null) {
+      //     subTotalCost ??= 0;
+      //     subTotalCost += lineAmount;
+      //   }
+      // } else {
+      //   if (lineAmount != null) {
+      //     lineItemCostNotSubjectToTax += lineAmount;
+      //   }
+      // }
+      if (lineAmount != null) {
+        if (subjectToTax && subjectToInerest) {
+          lineItemCostSubjectToTaxSubjectToInterest += lineAmount;
+        } else if (!subjectToTax && subjectToInerest) {
+          lineItemCostNotSubjectToTaxSubjectToInterest += lineAmount;
+        } else if (subjectToTax && !subjectToInerest) {
+          // lineItemCostSubjectToTaxNotSubjectToInterest += lineAmount;
+        } else if (!subjectToTax && !subjectToInerest) {
+          lineItemCostNotSubjectToTaxNotSubjectToInterest += lineAmount;
         }
       }
     }
+
+    subTotalCost ??= 0;
+    subTotalCost += lineItemCostSubjectToTaxSubjectToInterest;
+    // subTotalCost += lineItemCostSubjectToTaxNotSubjectToInterest;
 
     _subTotalCost = subTotalCost;
 
@@ -409,9 +433,12 @@ class PagEmsTypeUsageCalc {
       // _payableAmount = _totalCost;
       _principalAmount = _totalCost;
 
-      if (lineItemCostNotSubjectToTax > 0.0000001) {
-        _principalAmount = _principalAmount! + lineItemCostNotSubjectToTax;
-      }
+      // if (lineItemCostNotSubjectToTax > 0.0000001) {
+      //   _principalAmount = _principalAmount! + lineItemCostNotSubjectToTax;
+      // }
+
+      _principalAmount =
+          _principalAmount! + lineItemCostNotSubjectToTaxSubjectToInterest;
 
       _cycleTotalAmount = _principalAmount;
 

@@ -126,14 +126,19 @@ class PagEmsTypeUsageCalcRl {
     double? billedRateB,
     double? billedRateN,
     double? billedRateG,
-    double? billedGst,
-    double? billedGstAmount,
     required List<Map<String, dynamic>> lineItemList,
     List<Map<String, dynamic>>? billedTrendingSnapShot,
     String? billBarFromMonth,
     List<PagEmsTypeUsageCalcRl> singularUsageCalcList = const [],
     Map<String, dynamic>? miniSoaInfo,
     Map<String, dynamic>? interestInfo,
+    double? billedUsageCostAmount,
+    double? billedGst,
+    double? billedGstAmount,
+    double? billedPrincipalAmount,
+    double? billedInterestAmount,
+    double? billedCycleTotalAmount,
+    double? billedPayableAmount,
   }) {
     _costDecimals = costDecimals;
 
@@ -162,26 +167,25 @@ class PagEmsTypeUsageCalcRl {
     _billedRateB = billedRateB;
     _billedRateN = billedRateN;
     _billedRateG = billedRateG;
-    _billedGst = billedGst;
-    _billedGstAmount = billedGstAmount;
-    _billedTrendingSnapShot = billedTrendingSnapShot;
 
     _lineItemList = lineItemList;
-
     _billBarFromMonth = billBarFromMonth;
-
-    // _balBf = balBf;
-    // _balBfUsage = balBfUsage;
-    // _balBfInterest = balBfInterest;
     _miniSoaInfo = miniSoaInfo;
-
     _interestInfo = interestInfo;
-
     if (singularUsageCalcList.isNotEmpty) {
       for (var item in singularUsageCalcList) {
         _singularCalcList.add(item);
       }
     }
+
+    _billedGst = billedGst;
+    _billedGstAmount = billedGstAmount;
+    _totalUsageCost = billedUsageCostAmount;
+    _principalAmount = billedPrincipalAmount;
+    _cycleTotalAmount = billedCycleTotalAmount;
+    _payableAmount = billedPayableAmount;
+
+    _billedTrendingSnapShot = billedTrendingSnapShot;
   }
 
   void doCalc() {
@@ -191,7 +195,8 @@ class PagEmsTypeUsageCalcRl {
     _calcTypeUsage('N');
     _calcTypeUsage('G');
 
-    _calcTotalCost();
+    // _calcTotalCost();
+    _getBilledTotalCost();
 
     _getUsageTrendingReleased({
       'E': _billedUsageFactorE,
@@ -218,7 +223,7 @@ class PagEmsTypeUsageCalcRl {
 
   void doCompositeCalc() {
     _calcCompositeTypeUsage();
-    _calcTotalCost();
+    _getBilledTotalCost();
   }
 
   EmsTypeUsageR2 getTypeUsage(String usageType) {
@@ -417,43 +422,8 @@ class PagEmsTypeUsageCalcRl {
     }
   }
 
-  void _calcTotalCost() {
-    double? totalUsageCost;
-
-    if (_typeUsageE != null) {
-      if (_typeUsageE!.cost != null) {
-        totalUsageCost ??= 0;
-        totalUsageCost = totalUsageCost + _typeUsageE!.cost!;
-      }
-    }
-    if (_typeUsageW != null) {
-      if (_typeUsageW!.cost != null) {
-        totalUsageCost ??= 0;
-        totalUsageCost = totalUsageCost + _typeUsageW!.cost!;
-      }
-    }
-    if (_typeUsageB != null) {
-      if (_typeUsageB!.cost != null) {
-        totalUsageCost ??= 0;
-        totalUsageCost = totalUsageCost + _typeUsageB!.cost!;
-      }
-    }
-    if (_typeUsageN != null) {
-      if (_typeUsageN!.cost != null) {
-        totalUsageCost ??= 0;
-        totalUsageCost = totalUsageCost + _typeUsageN!.cost!;
-      }
-    }
-    if (_typeUsageG != null) {
-      if (_typeUsageG!.cost != null) {
-        totalUsageCost ??= 0;
-        totalUsageCost = totalUsageCost + _typeUsageG!.cost!;
-      }
-    }
-
-    _totalUsageCost = totalUsageCost;
-
-    double? subTotalCost = totalUsageCost;
+  void _getBilledTotalCost() {
+    double? subTotalCost = _totalUsageCost;
 
     //line items
     double lineItemCostNotSubjectToTax = 0.0;
@@ -478,44 +448,6 @@ class PagEmsTypeUsageCalcRl {
 
     if (_subTotalCost != null) {
       _subTotalCost = getRound(_subTotalCost!, 2);
-
-      _billedGstAmount = getRoundUp(_billedGstAmount!, 2);
-      _totalCost = _subTotalCost! + _billedGstAmount!;
-
-      // _payableAmount = _totalCost;
-      _principalAmount = _totalCost;
-
-      if (lineItemCostNotSubjectToTax > 0.0000001) {
-        _principalAmount = _principalAmount! + lineItemCostNotSubjectToTax;
-      }
-
-      _cycleTotalAmount = _principalAmount;
-
-      if (_interestInfo != null) {
-        final totalInterestAmount = _interestInfo['total_interest_amount'];
-        double? interestAmountDouble = 0;
-        if (totalInterestAmount is String) {
-          interestAmountDouble = double.tryParse(totalInterestAmount);
-        } else if (totalInterestAmount is double) {
-          interestAmountDouble = totalInterestAmount;
-        }
-
-        _cycleTotalAmount = _principalAmount! + (interestAmountDouble ?? 0);
-      }
-
-      _payableAmount = _cycleTotalAmount;
-
-      if (_miniSoaInfo != null) {
-        final strClosingBalance = _miniSoaInfo['closing_balance'];
-        double? closingBalance = double.tryParse(strClosingBalance ?? '');
-        if (closingBalance != null) {
-          _payableAmount = -1 * closingBalance + (_payableAmount ?? 0);
-        }
-      }
-
-      if (_payableAmount != null) {
-        _payableAmount = getRound(_payableAmount!, 2);
-      }
     }
   }
 

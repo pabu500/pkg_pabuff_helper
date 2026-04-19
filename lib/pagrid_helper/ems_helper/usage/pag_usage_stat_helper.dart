@@ -3,6 +3,7 @@ import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../../pag_helper/def_helper/dh_pag_bill.dart';
 import '../../../pag_helper/def_helper/dh_pag_finance.dart';
 import '../../../pag_helper/model/mdl_history.dart';
 import '../../../pag_helper/model/mdl_pag_app_config.dart';
@@ -772,11 +773,12 @@ Widget getPagTotal(
     MdlPagAppConfig? appConfig,
     String? strBillingRecId,
     String genType,
+    PagBillingLcStatus billLcStatus,
     double? totalUsageCost,
     double gst,
     double? subTotalAmt,
     double? gstAmt,
-    double? totalAmt,
+    // double? totalAmt,
     double? principalAmt,
     double? cycleTotalAmt,
     double? payableAmt,
@@ -871,6 +873,7 @@ Widget getPagTotal(
           appConfig,
           strBillingRecId,
           genType,
+          billLcStatus,
           {
             'label': lineItemSubjectToTaxSubjectToInterestLabel.trim(),
             'amount': strLineItemSubjectToTaxSubjectToInterestAmount.trim(),
@@ -922,28 +925,28 @@ Widget getPagTotal(
               ],
             ),
           ),
-        Padding(
-          padding: const EdgeInsets.only(top: 5),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(
-                width: contentWidth,
-                child: Text('Current Total', style: defStatStyle),
-              ),
-              horizontalSpaceSmall,
-              getStatWithUnit(
-                  applyGst
-                      ? getCommaNumberStr(totalAmt,
-                          decimal: 2, isRoundUp: false)
-                      : getCommaNumberStr(subTotalAmt,
-                          decimal: 2, isRoundUp: false),
-                  'SGD',
-                  statStrStyle: defStatStyle),
-            ],
-          ),
-        ),
+        // Padding(
+        //   padding: const EdgeInsets.only(top: 5),
+        //   child: Row(
+        //     mainAxisAlignment: MainAxisAlignment.start,
+        //     crossAxisAlignment: CrossAxisAlignment.center,
+        //     children: [
+        //       SizedBox(
+        //         width: contentWidth,
+        //         child: Text('Current Total', style: defStatStyle),
+        //       ),
+        //       horizontalSpaceSmall,
+        //       getStatWithUnit(
+        //           applyGst
+        //               ? getCommaNumberStr(totalAmt,
+        //                   decimal: 2, isRoundUp: false)
+        //               : getCommaNumberStr(subTotalAmt,
+        //                   decimal: 2, isRoundUp: false),
+        //           'SGD',
+        //           statStrStyle: defStatStyle),
+        //     ],
+        //   ),
+        // ),
         const Divider(height: 13),
         getLineItem(
           false,
@@ -952,6 +955,7 @@ Widget getPagTotal(
           appConfig,
           strBillingRecId,
           genType,
+          billLcStatus,
           {
             'label': lineItemNotSubjectToTaxSubjectToInterestLabel.trim(),
             'amount': strLineItemNotSubjectToTaxSubjectToInterestAmount.trim(),
@@ -1076,6 +1080,7 @@ Widget getLineItem(
     MdlPagAppConfig? appConfig,
     String? strBillingRecId,
     String genType,
+    PagBillingLcStatus billLcStatus,
     Map<String, dynamic> lineItem,
     BuildContext context,
     double width) {
@@ -1104,30 +1109,34 @@ Widget getLineItem(
   String label = lineItem['label'] ?? '';
   String valueStr = lineItem['amount'] ?? '';
   double? valueVal = double.tryParse(valueStr) ?? 0;
-  return Row(
-    mainAxisAlignment: MainAxisAlignment.start,
-    crossAxisAlignment: CrossAxisAlignment.center,
-    children: [
-      SizedBox(
-        width: width,
-        child: genType != 'generated'
-            ? Text(label, style: defStatStyle)
-            : WgtBillLineItemLabel(
-                loggedInUser: loggedInUser!,
-                appConfig: appConfig!,
-                strBillingRecId: strBillingRecId ?? '',
-                itemKeyName: itemKeyName,
-                lineItem: lineItem,
-                width: 250,
-                isEditableByAcl: false,
-              ),
-      ),
-      horizontalSpaceSmall,
-      getStatWithUnit(
-          getCommaNumberStr(valueVal, decimal: 2, isRoundUp: false), 'SGD',
-          statStrStyle: defStatStyle),
-    ],
-  );
+  return valueVal.abs() < 0.00001
+      ? Container()
+      : Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: width,
+              child: genType != 'generated' ||
+                      billLcStatus != PagBillingLcStatus.generated
+                  ? Text(label, style: defStatStyle)
+                  : WgtBillLineItemLabel(
+                      loggedInUser: loggedInUser!,
+                      appConfig: appConfig!,
+                      strBillingRecId: strBillingRecId ?? '',
+                      itemKeyName: itemKeyName,
+                      lineItem: lineItem,
+                      width: 250,
+                      isEditableByAcl: false,
+                    ),
+            ),
+            horizontalSpaceSmall,
+            getStatWithUnit(
+                getCommaNumberStr(valueVal, decimal: 2, isRoundUp: false),
+                'SGD',
+                statStrStyle: defStatStyle),
+          ],
+        );
 }
 
 // Widget getLineItemNotSubjectToTax(

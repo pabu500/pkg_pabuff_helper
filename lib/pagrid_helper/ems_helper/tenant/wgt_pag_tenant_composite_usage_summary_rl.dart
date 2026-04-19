@@ -118,7 +118,8 @@ class _WgtPagTenantCompositeUsageSummaryRlState
   @override
   Widget build(BuildContext context) {
     String lcStatus = _billInfo['lc_status'] ?? '';
-    PagBillingLcStatus currentStatus = PagBillingLcStatus.byValue(lcStatus);
+    PagBillingLcStatus currentBillLcStatus =
+        PagBillingLcStatus.byValue(lcStatus);
 
     return Opacity(
       opacity: widget.isDisabled ? 0.5 : 1.0,
@@ -193,11 +194,12 @@ class _WgtPagTenantCompositeUsageSummaryRlState
                   widget.appConfig,
                   widget.billInfo['billing_rec_id'] ?? '',
                   'released',
+                  currentBillLcStatus,
                   widget.compositeUsageCalc!.totalUsageCost,
                   widget.gst!,
                   widget.compositeUsageCalc!.subTotalCost,
                   widget.compositeUsageCalc!.billedGstAmount,
-                  widget.compositeUsageCalc!.totalCost,
+                  // widget.compositeUsageCalc!.totalCost,
                   widget.compositeUsageCalc!.principalAmount,
                   widget.compositeUsageCalc!.cycleTotalAmount,
                   widget.compositeUsageCalc!.payableAmount,
