@@ -193,6 +193,22 @@ enum PagPaymentMethod {
   }
 }
 
+String? validateTenantName(String value) {
+  if (value.trim().isEmpty) {
+    return 'required';
+  }
+  // must be in aaa-bb-123456-123 format,
+  // where a is alphanumeric is between 3-21 char
+  // b is alphanumeric is with 1-8 char
+
+  String pattern = r'^[a-zA-Z0-9&]{3,21}-[a-zA-Z0-9]{1,8}-\d{6}-\d{3,5}$';
+  RegExp regExp = RegExp(pattern);
+  if (!regExp.hasMatch(value)) {
+    return 'invalid format, must be in aaa-bb-123456-123 format';
+  }
+  return null;
+}
+
 String? validateTenantLabel(String value) {
   if (value.trim().isEmpty) {
     return 'required';
@@ -312,6 +328,19 @@ String? validateBankAccountNumber(String value) {
 String? validatePaymentAmount(String value) {
   if (value.isEmpty) {
     return 'Payment amount is required';
+  }
+  // Add more validation logic if needed
+  // numeric, - 1 million, 0 to 1 billion, up to 2 decimal places
+  final RegExp numeric = RegExp(r'^-?\d{1,9}(\.\d{0,2})?$');
+  if (!numeric.hasMatch(value)) {
+    return 'Invalid payment amount format';
+  }
+  return null;
+}
+
+String? validatePaymentAmountNotRequired(String value) {
+  if (value.isEmpty) {
+    return null;
   }
   // Add more validation logic if needed
   // numeric, - 1 million, 0 to 1 billion, up to 2 decimal places
@@ -970,7 +999,8 @@ final List<Map<String, dynamic>> listConfigMgAssign1on1 = [
   },
 ];
 
-List<Map<String, dynamic>> getListConfigBaseByOpType(PagTenantOpType opType) {
+List<Map<String, dynamic>> getListConfigBaseByTenantOpType(
+    PagTenantOpType opType) {
   final List<Map<String, dynamic>> list = [];
   switch (opType) {
     case PagTenantOpType.onboarding:

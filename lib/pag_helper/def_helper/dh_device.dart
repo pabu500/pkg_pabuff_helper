@@ -699,3 +699,66 @@ enum PagMeterCommType {
     );
   }
 }
+
+enum PagDeviceLsStatus {
+  cip('Commission in Progress', 'cip', Colors.lime),
+  normal('Noraml', 'norm.', Colors.lightGreen),
+  maintenance('Maintenance', 'maint.', Colors.orangeAccent),
+  dc('Decommissioned', 'dc', Colors.brown),
+  mfd('Marked for Delete', 'mfd', Colors.redAccent),
+  ;
+
+  const PagDeviceLsStatus(
+    this.label,
+    this.tag,
+    this.color,
+  );
+
+  final String label;
+  final String tag;
+  final Color color;
+
+  static PagDeviceLsStatus byLabel(String? label) =>
+      enumByLabel(
+        label,
+        values,
+        (e) => (e).label,
+      ) ??
+      normal;
+
+  static PagDeviceLsStatus byTag(String? tag) =>
+      enumByTag(
+        tag,
+        values,
+        (e) => (e).tag,
+      ) ??
+      normal;
+}
+
+enum PagSimPackageEnum {
+  nano("Nano"),
+  micro("Micro"),
+  standard("Standard"),
+  ;
+
+  const PagSimPackageEnum(this.label);
+
+  final String label;
+
+  static PagSimPackageEnum? byLabel(String? label) =>
+      enumByLabel(label, values, (e) => e.label);
+}
+
+enum PagGwGenEnum {
+  gen1("Gen1"),
+  gen2("Gen2"),
+  gen3("Gen3"),
+  ;
+
+  const PagGwGenEnum(this.label);
+
+  final String label;
+
+  static PagGwGenEnum? byLabel(String? label) =>
+      enumByLabel(label, values, (e) => e.label);
+}

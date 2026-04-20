@@ -35,94 +35,6 @@ enum PagItemKind {
       enumByLabel(label, values, (e) => (e).label);
 }
 
-enum PagDeviceLsStatus {
-  cip('Commission in Progress', 'cip', Colors.lime),
-  normal('Noraml', 'norm.', Colors.lightGreen),
-  maintenance('Maintenance', 'maint.', Colors.orangeAccent),
-  dc('Decommissioned', 'dc', Colors.brown),
-  mfd('Marked for Delete', 'mfd', Colors.redAccent),
-  ;
-
-  const PagDeviceLsStatus(
-    this.label,
-    this.tag,
-    this.color,
-  );
-
-  final String label;
-  final String tag;
-  final Color color;
-
-  static PagDeviceLsStatus byLabel(String? label) =>
-      enumByLabel(
-        label,
-        values,
-        (e) => (e).label,
-      ) ??
-      normal;
-
-  static PagDeviceLsStatus byTag(String? tag) =>
-      enumByTag(
-        tag,
-        values,
-      ) ??
-      normal;
-}
-
-enum PagSimPackageEnum {
-  nano("Nano"),
-  micro("Micro"),
-  standard("Standard"),
-  ;
-
-  const PagSimPackageEnum(this.label);
-
-  final String label;
-
-  static PagSimPackageEnum? byLabel(String? label) =>
-      enumByLabel(label, values, (e) => e.label);
-}
-
-enum PagGwGenEnum {
-  gen1("Gen1"),
-  gen2("Gen2"),
-  gen3("Gen3"),
-  ;
-
-  const PagGwGenEnum(this.label);
-
-  final String label;
-
-  static PagGwGenEnum? byLabel(String? label) =>
-      enumByLabel(label, values, (e) => e.label);
-}
-
-// T? enumByLabel<T extends Enum>(
-//   String? label,
-//   List<T> values,
-// ) {
-//   if (label == null) return null;
-//   for (var value in values) {
-//     if (value is PagDeviceLsStatus && value.label == label) {
-//       return value as T;
-//     }
-//   }
-//   return null;
-// }
-
-T? enumByTag<T extends Enum>(
-  String? tag,
-  List<T> values,
-) {
-  if (tag == null) return null;
-  for (var value in values) {
-    if (value is PagDeviceLsStatus && value.tag.replaceAll('.', '') == tag) {
-      return value as T;
-    }
-  }
-  return null;
-}
-
 String? getItemTypeStr(dynamic itemType) {
   if (itemType == null) {
     return null;
@@ -139,4 +51,30 @@ String? getItemTypeStr(dynamic itemType) {
   } else {
     throw Exception('Unsupported item type: ${itemType.runtimeType}');
   }
+}
+
+String? validateItemId(String? value) {
+  if (value == null || value.isEmpty) {
+    return 'required';
+  }
+
+  // must be a integer greater than 0
+  int? intValue = int.tryParse(value);
+  if (intValue == null || intValue <= 0) {
+    return 'must be a integer greater than 0';
+  }
+  return null;
+}
+
+String? validateItemIdNotRequired(String? value) {
+  if (value == null || value.isEmpty) {
+    return null;
+  }
+
+  // must be a integer greater than 0
+  int? intValue = int.tryParse(value);
+  if (intValue == null || intValue <= 0) {
+    return 'must be a integer greater than 0';
+  }
+  return null;
 }

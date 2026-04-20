@@ -221,6 +221,8 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
             _selectedLcStatusStr != null;
       case 'gen-payment-matching-form':
         return true;
+      case 'payment-matching':
+        return true;
       default:
         return false;
     }
@@ -316,6 +318,8 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
         return getPaymentLcStatusUpdateOptions();
       case 'gen-payment-matching-form':
         return genPaymentMatchingFormOptions();
+      case 'payment-matching':
+        return paymentMatchingOptions();
       default:
         return const SizedBox();
     }
@@ -918,6 +922,10 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
   }
 
   Widget genPaymentMatchingFormOptions() {
+    return Container();
+  }
+
+  Widget paymentMatchingOptions() {
     return Container();
   }
 }
