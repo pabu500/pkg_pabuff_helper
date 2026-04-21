@@ -216,3 +216,25 @@ Widget getBillLcStatusTagWidget(
     ),
   );
 }
+
+String? validateBillGenType(dynamic value) {
+  if (value == null || value.toString().isEmpty) {
+    return 'Gen Type is required';
+  }
+  final validTypes = ['manual', 'auto', 'initial_balance'];
+  if (!validTypes.contains(value.toString().toLowerCase())) {
+    return 'Invalid Gen Type';
+  }
+  return null;
+}
+
+String? validateBillGenTypeNotRequired(dynamic value) {
+  if (value == null || value.toString().isEmpty) {
+    return null;
+  }
+  final validTypes = ['manual', 'auto', 'initial_balance'];
+  if (!validTypes.contains(value.toString().toLowerCase())) {
+    return 'Invalid Gen Type';
+  }
+  return null;
+}

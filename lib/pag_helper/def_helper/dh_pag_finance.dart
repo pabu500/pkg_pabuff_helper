@@ -1,3 +1,4 @@
+import 'package:buff_helper/pag_helper/def_helper/dh_pag_bill.dart';
 import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -363,6 +364,14 @@ List<Map<String, dynamic>> listConfigPostPayment = [
 
 List<Map<String, dynamic>> listConfigMatchPayment = [
   {
+    'col_key': 'tenant_id',
+    'title': 'Tenant ID',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': true,
+    'validator': validateItemId,
+  },
+  {
     'col_key': 'tenant_name',
     'title': 'Tenant Name',
     'col_type': 'string',
@@ -425,6 +434,14 @@ List<Map<String, dynamic>> listConfigMatchPayment = [
     'width': 120,
     'is_mapping_required': true,
     'validator': validateItemIdNotRequired,
+  },
+  {
+    'col_key': 'gen_type_1',
+    'title': 'Gen Type 1',
+    'col_type': 'string',
+    'width': 120,
+    'is_mapping_required': true,
+    'validator': validateBillGenTypeNotRequired,
   },
   {
     'col_key': 'cycle_total_1',
