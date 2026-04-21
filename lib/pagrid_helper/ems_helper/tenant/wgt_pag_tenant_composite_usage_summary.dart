@@ -616,7 +616,11 @@ class _WgtPagTenantCompositeUsageSummaryState
 
     assert(meterTypeRateInfo[meterTypeTag] != null,
         'meterTypeRateInfo for $meterTypeTag cannot be null');
-    String typeRateStr = meterTypeRateInfo[meterTypeTag]['result']['rate'];
+    final typeRateInfo = meterTypeRateInfo[meterTypeTag]['result'];
+    String typeRateStr = typeRateInfo['rate'];
+    String tpId = typeRateInfo['tariff_package_id'];
+    String rateRemark = typeRateInfo['remark'] ?? '';
+
     double? typeRate = double.tryParse(typeRateStr);
 
     // return Container();
@@ -630,6 +634,8 @@ class _WgtPagTenantCompositeUsageSummaryState
         appConfig: widget.appConfig,
         isBillMode: widget.isBillMode,
         rate: typeRate,
+        tpId: tpId,
+        rateRemark: rateRemark,
         statColor: Theme.of(context).colorScheme.onSurface.withAlpha(210),
         showTrending: false,
         statVirticalStack: false,

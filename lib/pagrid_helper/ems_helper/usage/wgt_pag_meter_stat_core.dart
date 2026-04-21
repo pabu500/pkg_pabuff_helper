@@ -29,6 +29,8 @@ class WgtPagUsageStatCore extends StatefulWidget {
     this.height,
     this.isBillMode = false,
     this.rate,
+    this.tpId,
+    this.rateRemark = '',
     this.isStaticUsageStat = false,
     this.isSubstractUsage = false,
     this.showRate = true,
@@ -59,6 +61,8 @@ class WgtPagUsageStatCore extends StatefulWidget {
   final double? height;
   final bool isBillMode;
   final double? rate;
+  final String? tpId;
+  final String rateRemark;
   final bool isStaticUsageStat;
   final bool isSubstractUsage;
   final bool showRate;
@@ -292,6 +296,16 @@ class _WgtPagUsageStatCoreState extends State<WgtPagUsageStatCore> {
                         ),
                         showUnit: true,
                       ),
+                      if (widget.tpId != null)
+                        Text(
+                          'Tariff: ${widget.tpId}',
+                          style: defStatStyleSmall,
+                        ),
+                      if (widget.rateRemark.isNotEmpty)
+                        Text(
+                          'Remark: ${widget.rateRemark}',
+                          style: defStatStyleSmall,
+                        ),
                     ],
                   ),
                 ),
@@ -527,6 +541,16 @@ class _WgtPagUsageStatCoreState extends State<WgtPagUsageStatCore> {
                         ),
                         showUnit: true,
                       ),
+                      if (widget.tpId != null)
+                        Text(
+                          'TP ID: ${widget.tpId}',
+                          style: defStatStyleSmall,
+                        ),
+                      if (widget.rateRemark.isNotEmpty)
+                        Text(
+                          widget.rateRemark,
+                          style: defStatStyleSmall,
+                        ),
                     ],
                   ),
                 ),
