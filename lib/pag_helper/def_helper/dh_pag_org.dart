@@ -4,6 +4,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'enum_helper.dart';
 
 enum PagOrgType {
+  bank('Bank', 'bank', 'bank', Symbols.account_balance),
   amgr('Asset Manager', 'amgr', 'amgr', Symbols.apartment),
   landlord('Landlord', 'landlord', 'landlord', Symbols.home_work),
   none('None', 'none', 'none', Symbols.block);

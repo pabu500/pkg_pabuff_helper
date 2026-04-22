@@ -155,7 +155,9 @@ class MdlPagListController /*extends ChangeNotifier*/ {
         case 'landlord':
           itemType = PagOrgType.landlord;
           break;
-
+        case 'bank':
+          itemType = PagOrgType.bank;
+          break;
         default:
           itemType = null;
 

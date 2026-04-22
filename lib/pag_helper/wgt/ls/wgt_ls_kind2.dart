@@ -261,6 +261,7 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
       } else if (widget.itemKind == PagItemKind.org) {
         _itemTypeInfoList.add({'item_type': PagOrgType.amgr});
         _itemTypeInfoList.add({'item_type': PagOrgType.landlord});
+        _itemTypeInfoList.add({'item_type': PagOrgType.bank});
 
         for (Map<String, dynamic> orgTypeInfo in _itemTypeInfoList) {
           PagOrgType orgType = orgTypeInfo['item_type'];
