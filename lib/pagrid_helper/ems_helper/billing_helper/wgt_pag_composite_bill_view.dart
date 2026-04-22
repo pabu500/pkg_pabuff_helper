@@ -4,7 +4,6 @@ import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pag_helper/wgt/ls/wgt_item_delete_op.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
 
 import '../../../pag_helper/def_helper/pag_item_helper.dart';
 import '../../../pag_helper/model/mdl_pag_project_profile.dart';
@@ -1064,6 +1063,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
               'subTotalAmount': compositeUsageCalcRl.subTotalCost,
               'gstAmount': compositeUsageCalcRl.billedGstAmount,
               'totalAmount': compositeUsageCalcRl.totalCost,
+              'cycleTotalAmount': compositeUsageCalcRl.cycleTotalAmount,
               'payableAmount': compositeUsageCalcRl.payableAmount,
               'miniSoaInfo': compositeUsageCalcRl.miniSoaInfo,
               'typeRateE': compositeUsageCalcRl.typeUsageE?.rate,

@@ -48,6 +48,7 @@ Future<Uint8List> generatePagInvoice(
     gstAmount: billInfo['gstAmount'],
     totalAmount: billInfo['totalAmount'],
     interestInfo: billInfo['interestInfo'],
+    cycleTotalAmount: billInfo['cycleTotalAmount'],
     payableAmount: billInfo['payableAmount'],
     miniSoaInfo: billInfo['miniSoaInfo'],
     dueDate: billInfo['dueDate'],
@@ -113,6 +114,7 @@ class PagBill {
     required this.subTotalAmount,
     required this.gstAmount,
     required this.totalAmount,
+    required this.cycleTotalAmount,
     required this.totalUsageCost,
     required this.typeRateE,
     required this.typeRateW,
@@ -176,6 +178,7 @@ class PagBill {
   final String billTimeRangeStr;
   final double? totalUsageCost;
   final double? subTotalAmount;
+  final double? cycleTotalAmount;
   final double? gstAmount;
   final double? totalAmount;
   final Map<String, dynamic>? interestInfo;
@@ -321,28 +324,138 @@ class PagBill {
   pw.Widget _buildFooter(pw.Context context) {
     return pw.Row(
       mainAxisAlignment: pw.MainAxisAlignment.start,
-      crossAxisAlignment: pw.CrossAxisAlignment.end,
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        pw.Container(),
-        // pw.Container(
-        //   height: 20,
-        //   width: 100,
-        //   child: pw.BarcodeWidget(
-        //     barcode: pw.Barcode.pdf417(),
-        //     data: 'Invoice# $billingRecName',
-        //     drawText: false,
-        //   ),
-        // ),
-        // pw.Text(
-        //   'Page ${context.pageNumber}/${context.pagesCount}',
-        //   style: const pw.TextStyle(
-        //     fontSize: 12,
-        //     color: PdfColors.white,
-        //   ),
-        // ),
-        pw.Text(
-          'Bill Number: $billingRecName',
-          style: const pw.TextStyle(color: _darkColor, fontSize: 9),
+        pw.Container(
+          width: 300,
+          // height: 200,
+          padding: const pw.EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+          decoration: pw.BoxDecoration(
+            border: pw.Border.all(color: PdfColors.grey600, width: 1),
+          ),
+          child: pw.Column(
+            children: [
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.start,
+                children: [
+                  pw.Text('Payment by Telegraphic Transfer (T/T) or PayNow',
+                      style:
+                          const pw.TextStyle(fontSize: 9, color: _darkColor)),
+                ],
+              ),
+              pw.Row(
+                children: [
+                  pw.Text(
+                      'Please quote Account Number & Invoice Number(s) & remit to:',
+                      style:
+                          const pw.TextStyle(fontSize: 9, color: _darkColor)),
+                ],
+              ),
+              pw.Table(
+                columnWidths: {
+                  0: const pw.FixedColumnWidth(100),
+                  1: const pw.FixedColumnWidth(180),
+                },
+                children: [
+                  pw.TableRow(children: [
+                    pw.Text('Account Name:',
+                        style:
+                            const pw.TextStyle(fontSize: 9, color: _darkColor)),
+                    pw.Text('-',
+                        style:
+                            const pw.TextStyle(fontSize: 9, color: _darkColor)),
+                  ]),
+                  pw.TableRow(children: [
+                    pw.Text('Account Number:',
+                        style:
+                            const pw.TextStyle(fontSize: 9, color: _darkColor)),
+                    pw.Text('-',
+                        style:
+                            const pw.TextStyle(fontSize: 9, color: _darkColor)),
+                  ]),
+                  pw.TableRow(children: [
+                    pw.Text('Bank Name:',
+                        style:
+                            const pw.TextStyle(fontSize: 9, color: _darkColor)),
+                    pw.Text('-',
+                        style:
+                            const pw.TextStyle(fontSize: 9, color: _darkColor)),
+                  ]),
+                  pw.TableRow(children: [
+                    pw.Text('Branch Code:',
+                        style:
+                            const pw.TextStyle(fontSize: 9, color: _darkColor)),
+                    pw.Text('-',
+                        style:
+                            const pw.TextStyle(fontSize: 9, color: _darkColor)),
+                  ]),
+                  pw.TableRow(children: [
+                    pw.Text('Swift Code:',
+                        style:
+                            const pw.TextStyle(fontSize: 9, color: _darkColor)),
+                    pw.Text('-',
+                        style:
+                            const pw.TextStyle(fontSize: 9, color: _darkColor)),
+                  ]),
+                  pw.TableRow(children: [
+                    pw.Text('PayNow:',
+                        style:
+                            const pw.TextStyle(fontSize: 9, color: _darkColor)),
+                    pw.Text('-',
+                        style:
+                            const pw.TextStyle(fontSize: 9, color: _darkColor)),
+                  ]),
+                ],
+              ),
+              pw.Row(
+                children: [
+                  pw.Text('(No receipt will be issued)',
+                      style:
+                          const pw.TextStyle(fontSize: 9, color: _darkColor)),
+                ],
+              ),
+            ],
+          ),
+        ),
+        pw.SizedBox(width: 5),
+        pw.Table(
+          columnWidths: {
+            0: const pw.FixedColumnWidth(70),
+            1: const pw.FixedColumnWidth(100),
+          },
+          border: pw.TableBorder.all(color: PdfColors.grey600, width: 0.5),
+          children: [
+            pw.TableRow(children: [
+              pw.Text(' Account No',
+                  style: const pw.TextStyle(fontSize: 10, color: _darkColor)),
+              pw.Text(' $tenantAccountNumber',
+                  style: pw.TextStyle(
+                      fontSize: 10,
+                      color: _darkColor,
+                      fontWeight: pw.FontWeight.bold)),
+            ]),
+            pw.TableRow(children: [
+              pw.Text(' Invoice No',
+                  style: const pw.TextStyle(fontSize: 10, color: _darkColor)),
+              pw.Text(' $billLabel',
+                  style: pw.TextStyle(
+                      fontSize: 10,
+                      color: _darkColor,
+                      fontWeight: pw.FontWeight.bold)),
+            ]),
+            pw.TableRow(children: [
+              pw.Text(' Total Amount',
+                  style: const pw.TextStyle(fontSize: 10, color: _darkColor)),
+              pw.Text(
+                  payableAmount != null
+                      ? ' \$${payableAmount.toString()}'
+                      : '-',
+                  style: pw.TextStyle(
+                      fontSize: 10,
+                      color: _darkColor,
+                      fontWeight: pw.FontWeight.bold)),
+            ]),
+          ],
         ),
       ],
     );
@@ -409,7 +522,8 @@ class PagBill {
       // mainAxisAlignment: pw.MainAxisAlignment.spaceAround,
       children: [
         pw.SizedBox(
-          height: 160,
+          height: 180,
+          width: 210,
           child: pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
@@ -424,8 +538,8 @@ class PagBill {
                     border: pw.TableBorder.all(
                         color: PdfColors.grey600, width: 0.5),
                     columnWidths: {
-                      0: const pw.FixedColumnWidth(35),
-                      1: const pw.FixedColumnWidth(35),
+                      0: const pw.FixedColumnWidth(30),
+                      1: const pw.FixedColumnWidth(30),
                     },
                     defaultVerticalAlignment:
                         pw.TableCellVerticalAlignment.middle,
@@ -464,11 +578,15 @@ class PagBill {
                         pw.TableCellVerticalAlignment.middle,
                     children: [
                       pw.TableRow(children: [
-                        pw.Text(' Total Amount Payable:', style: textStyle),
+                        pw.Text(' Total Amount Payable',
+                            style: textStyle.copyWith(
+                                fontWeight: pw.FontWeight.bold)),
                         pw.Text(' $payableAmount', style: textStyleLarge),
                       ]),
                       pw.TableRow(children: [
-                        pw.Text(' Due Date:', style: textStyle),
+                        pw.Text(' Due Date',
+                            style: textStyle.copyWith(
+                                fontWeight: pw.FontWeight.bold)),
                         pw.Text(' ${dueDate.substring(0, 10)}',
                             style: textStyleLarge),
                       ]),
@@ -719,11 +837,11 @@ class PagBill {
                 pw.Icon(
                   pw.IconData(codePoint),
                   color: PdfColors.grey,
-                  size: 16,
+                  size: 13,
                 ),
                 pw.Text(
                   typeStr,
-                  style: const pw.TextStyle(color: _darkColor),
+                  style: const pw.TextStyle(color: _darkColor, fontSize: 10),
                 ),
               ],
             ),
@@ -772,8 +890,22 @@ class PagBill {
       }
     }
 
+    final openingBal =
+        miniSoaInfo != null ? miniSoaInfo!['opening_balance'] : null;
     final closingBal =
         miniSoaInfo != null ? miniSoaInfo!['closing_balance'] : null;
+    final paymentList =
+        miniSoaInfo != null ? miniSoaInfo!['payment_list'] : null;
+    double openingBalAmount = 0;
+    if (openingBal != null) {
+      if (openingBal is double) {
+        openingBalAmount = openingBal;
+      } else if (openingBal is String) {
+        openingBalAmount = (double.tryParse(openingBal) ?? 0);
+      }
+      openingBalAmount = -1 * openingBalAmount;
+    }
+
     double closingBalAmount = 0;
     if (closingBal != null) {
       if (closingBal is double) {
@@ -785,191 +917,241 @@ class PagBill {
     closingBalAmount = -1 * closingBalAmount;
 
     return pw.Container(
-        width: 500,
-        padding: const pw.EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-        decoration: pw.BoxDecoration(
-          border: pw.Border.all(color: PdfColors.grey600, width: 1),
-          borderRadius: pw.BorderRadius.circular(5.0),
-        ),
-        child: pw.Column(
-          children: [
-            //cf
-            if (closingBal != null)
-              pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: pw.CrossAxisAlignment.center,
-                children: [
-                  pw.Text(
-                    'Closing Balance from Previous Bill',
-                    style: pw.TextStyle(
-                      color: _darkColor,
-                      fontWeight: pw.FontWeight.bold,
-                    ),
-                  ),
-                  pw.Text(
-                    _formatCurrency(closingBalAmount),
-                    style: pw.TextStyle(
-                      color: _darkColor,
-                      fontWeight: pw.FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            if (lineItemLabel1 != null && lineItemValue1 != null)
-              pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: pw.CrossAxisAlignment.center,
-                children: [
-                  pw.Text(
-                    lineItemLabel1!,
-                    style: pw.TextStyle(
-                      color: _darkColor,
-                      fontWeight: pw.FontWeight.bold,
-                    ),
-                  ),
-                  pw.Text(
-                    _formatCurrency(lineItemValue1!),
-                    style: pw.TextStyle(
-                      color: _darkColor,
-                      fontWeight: pw.FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            pw.Row(
-              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: pw.CrossAxisAlignment.center,
-              children: [
-                pw.Text(
-                  'Usage Total',
-                  style: pw.TextStyle(
-                    color: _darkColor,
-                    fontWeight: pw.FontWeight.bold,
-                  ),
-                ),
-                pw.Text(
-                  _formatCurrency(totalUsageCost ?? 0),
-                  style: pw.TextStyle(
-                    color: _darkColor,
-                    fontWeight: pw.FontWeight.bold,
-                  ),
-                ),
-              ],
+      width: 500,
+      child: pw.Column(
+        children: [
+          pw.Container(
+            decoration: pw.BoxDecoration(
+              border: pw.Border.all(color: PdfColors.grey600, width: 1),
+              borderRadius: pw.BorderRadius.circular(3.0),
             ),
-            pw.Row(
-              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: pw.CrossAxisAlignment.center,
+            padding: const pw.EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+            child: pw.Column(
               children: [
-                pw.Text(
-                  'Sub Total',
-                  style: pw.TextStyle(
-                    color: _darkColor,
-                    fontWeight: pw.FontWeight.bold,
+                if (lineItemLabel1 != null && lineItemValue1 != null)
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: pw.CrossAxisAlignment.center,
+                    children: [
+                      pw.Text(
+                        lineItemLabel1!,
+                        style:
+                            const pw.TextStyle(color: _darkColor, fontSize: 10),
+                      ),
+                      pw.Text(
+                        _formatCurrency(lineItemValue1!),
+                        style:
+                            const pw.TextStyle(color: _darkColor, fontSize: 10),
+                      ),
+                    ],
                   ),
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: pw.CrossAxisAlignment.center,
+                  children: [
+                    pw.Text(
+                      'Usage Total',
+                      style:
+                          const pw.TextStyle(color: _darkColor, fontSize: 10),
+                    ),
+                    pw.Text(
+                      _formatCurrency(totalUsageCost ?? 0),
+                      style:
+                          const pw.TextStyle(color: _darkColor, fontSize: 10),
+                    ),
+                  ],
                 ),
-                pw.Text(
-                  _formatCurrency(subTotalAmount),
-                  style: pw.TextStyle(
-                    color: _darkColor,
-                    fontWeight: pw.FontWeight.bold,
-                  ),
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: pw.CrossAxisAlignment.center,
+                  children: [
+                    pw.Text(
+                      'Sub Total',
+                      style:
+                          const pw.TextStyle(color: _darkColor, fontSize: 10),
+                    ),
+                    pw.Text(
+                      _formatCurrency(subTotalAmount),
+                      style:
+                          const pw.TextStyle(color: _darkColor, fontSize: 10),
+                    ),
+                  ],
                 ),
-              ],
-            ),
 
-            pw.Row(
-              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: pw.CrossAxisAlignment.center,
-              children: [
-                pw.Text(
-                  'GST (${gst ?? 0}%)',
-                  style: pw.TextStyle(
-                    color: _darkColor,
-                    fontWeight: pw.FontWeight.bold,
-                  ),
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: pw.CrossAxisAlignment.center,
+                  children: [
+                    pw.Text(
+                      'GST (${gst ?? 0}%)',
+                      style:
+                          const pw.TextStyle(color: _darkColor, fontSize: 10),
+                    ),
+                    pw.Text(
+                      _formatCurrency(gstAmount),
+                      style:
+                          const pw.TextStyle(color: _darkColor, fontSize: 10),
+                    ),
+                  ],
                 ),
-                pw.Text(
-                  _formatCurrency(gstAmount),
-                  style: pw.TextStyle(
-                    color: _darkColor,
-                    fontWeight: pw.FontWeight.bold,
+                // pw.Divider(color: PdfColors.grey600, thickness: 0.5),
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: pw.CrossAxisAlignment.center,
+                  children: [
+                    pw.Text(
+                      'Interest Amount',
+                      style:
+                          const pw.TextStyle(color: _darkColor, fontSize: 10),
+                    ),
+                    pw.Text(
+                      _formatCurrency(interestAmount),
+                      style:
+                          const pw.TextStyle(color: _darkColor, fontSize: 10),
+                    ),
+                  ],
+                ),
+                // pw.Divider(color: PdfColors.grey600, thickness: 0.5),
+                // line item 2
+                if (lineItemLabel2 != null && lineItemValue2 != null)
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: pw.CrossAxisAlignment.center,
+                    children: [
+                      pw.Text(
+                        lineItemLabel2!,
+                        style:
+                            const pw.TextStyle(color: _darkColor, fontSize: 10),
+                      ),
+                      pw.Text(
+                        _formatCurrency(lineItemValue2!),
+                        style:
+                            const pw.TextStyle(color: _darkColor, fontSize: 10),
+                      ),
+                    ],
                   ),
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: pw.CrossAxisAlignment.center,
+                  children: [
+                    pw.Text(
+                      'Total Amount',
+                      style:
+                          const pw.TextStyle(color: _darkColor, fontSize: 10),
+                    ),
+                    pw.Text(
+                      _formatCurrency(cycleTotalAmount),
+                      style:
+                          const pw.TextStyle(color: _darkColor, fontSize: 10),
+                    ),
+                  ],
                 ),
               ],
             ),
-            pw.Row(
-              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: pw.CrossAxisAlignment.center,
-              children: [
-                pw.Text(
-                  'Total Amount',
-                  style: pw.TextStyle(
-                    color: _darkColor,
-                    fontWeight: pw.FontWeight.bold,
-                  ),
-                ),
-                pw.Text(
-                  _formatCurrency(totalAmount),
-                  style: pw.TextStyle(
-                    color: _darkColor,
-                    fontWeight: pw.FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            pw.Divider(color: PdfColors.grey600, thickness: 0.5),
-            pw.Row(
-              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: pw.CrossAxisAlignment.center,
-              children: [
-                pw.Text(
-                  'Interest Amount',
-                  style: pw.TextStyle(
-                    color: _darkColor,
-                    fontWeight: pw.FontWeight.bold,
-                  ),
-                ),
-                pw.Text(
-                  _formatCurrency(interestAmount),
-                  style: pw.TextStyle(
-                    color: _darkColor,
-                    fontWeight: pw.FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            pw.Divider(color: PdfColors.grey600, thickness: 0.5),
-            // line item 2
-            if (lineItemLabel2 != null && lineItemValue2 != null)
-              pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: pw.CrossAxisAlignment.center,
+          ),
+          pw.SizedBox(height: 5),
+          if (openingBal != null)
+            pw.Container(
+              decoration: pw.BoxDecoration(
+                border: pw.Border.all(color: PdfColors.grey600, width: 0.5),
+                borderRadius: pw.BorderRadius.circular(3),
+              ),
+              padding: const pw.EdgeInsets.all(5),
+              child: pw.Column(
                 children: [
-                  pw.Text(
-                    lineItemLabel2!,
-                    style: pw.TextStyle(
-                      color: _darkColor,
-                      fontWeight: pw.FontWeight.bold,
-                    ),
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: pw.CrossAxisAlignment.center,
+                    children: [
+                      pw.Text(
+                        'Balance B/F from previous invoice',
+                        style:
+                            const pw.TextStyle(fontSize: 10, color: _darkColor),
+                      ),
+                      pw.Text(
+                        _formatCurrency(openingBalAmount),
+                        style: const pw.TextStyle(color: _darkColor),
+                      ),
+                    ],
                   ),
-                  pw.Text(
-                    _formatCurrency(lineItemValue2!),
-                    style: pw.TextStyle(
-                      color: _darkColor,
-                      fontWeight: pw.FontWeight.bold,
-                    ),
+                  if (paymentList != null)
+                    ...paymentList.map<pw.Widget>((payment) {
+                      final paymentAmountObj = payment['credit_amount'];
+                      final paymentDateStr = payment['entry_timestamp'] ?? '';
+                      double paymentAmount = 0;
+                      if (paymentAmountObj != null) {
+                        if (paymentAmountObj is double) {
+                          paymentAmount = -1 * paymentAmountObj;
+                        } else if (paymentAmountObj is String) {
+                          paymentAmount =
+                              double.tryParse(paymentAmountObj) ?? 0;
+                        }
+                      }
+                      paymentAmount = -1 * paymentAmount;
+                      return pw.Row(
+                        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: pw.CrossAxisAlignment.center,
+                        children: [
+                          pw.Text(
+                            'Payment received as at* ${paymentDateStr.substring(0, 10)}',
+                            style: pw.TextStyle(
+                                fontSize: 10,
+                                color: _darkColor,
+                                fontWeight: pw.FontWeight.bold),
+                          ),
+                          pw.Text(
+                            _formatCurrency(paymentAmount),
+                            style: pw.TextStyle(
+                                color: _darkColor,
+                                fontWeight: pw.FontWeight.bold),
+                          ),
+                        ],
+                      );
+                    }).toList(),
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: pw.CrossAxisAlignment.center,
+                    children: [
+                      pw.Text(
+                        'Balance C/F',
+                        style:
+                            const pw.TextStyle(fontSize: 10, color: _darkColor),
+                      ),
+                      pw.Text(
+                        _formatCurrency(closingBalAmount),
+                        style: const pw.TextStyle(color: _darkColor),
+                      ),
+                    ],
                   ),
                 ],
               ),
-
-            pw.Row(
+            ),
+          pw.SizedBox(height: 5),
+          pw.Row(children: [
+            pw.Text(
+              '* payments made close to this collection date may not be reflected',
+              style: pw.TextStyle(
+                  fontSize: 9,
+                  color: _darkColor,
+                  fontStyle: pw.FontStyle.italic),
+            ),
+          ]),
+          pw.SizedBox(height: 5),
+          pw.Container(
+            decoration: pw.BoxDecoration(
+              border: pw.Border.all(color: PdfColors.grey600, width: 2),
+              borderRadius: pw.BorderRadius.circular(3),
+            ),
+            padding: const pw.EdgeInsets.all(5),
+            child: pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
               crossAxisAlignment: pw.CrossAxisAlignment.center,
               children: [
                 pw.Text(
-                  'Payable Amount',
+                  'Balance Due (Due Date: ${dueDate.substring(0, 10)})',
                   style: pw.TextStyle(
                     color: _darkColor,
+                    fontSize: 12,
                     fontWeight: pw.FontWeight.bold,
                   ),
                 ),
@@ -977,13 +1159,16 @@ class PagBill {
                   _formatCurrency(payableAmount),
                   style: pw.TextStyle(
                     color: _darkColor,
+                    fontSize: 12,
                     fontWeight: pw.FontWeight.bold,
                   ),
                 ),
               ],
             ),
-          ],
-        ));
+          ),
+        ],
+      ),
+    );
   }
 
   pw.Widget _getLineItemRow(String label, double value) {
