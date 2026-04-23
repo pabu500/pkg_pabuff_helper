@@ -299,9 +299,7 @@ class MdlPagProjectProfile {
       portalProjectScope =
           PagPortalProjectScope.values.byName(projectName.toUpperCase());
     } catch (e) {
-      if (kDebugMode) {
-        print({'exception in MdlPagProjectProfile.fromJson2:$e'});
-      }
+      dev.log('exception in MdlPagProjectProfile.fromJson2:$e');
     }
 
     String projectTimezoneStr = json['project_timezone'];
