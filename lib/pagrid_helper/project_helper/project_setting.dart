@@ -463,7 +463,8 @@ String? nusSnValidator(String displayname) {
     bool isNusC = isNUSC(displayname) == null;
     bool isUtrNorth = isUTRNorth(displayname) == null;
     bool isUtrSouth = isUTRSouth(displayname) == null;
-    if(isVh || isRvrc || isNusC || isUtrNorth || isUtrSouth) {
+    bool isTembusuCinnamon = isTembusuAndCinnamon(displayname) == null;
+    if(isVh || isRvrc || isNusC || isUtrNorth || isUtrSouth || isTembusuCinnamon) {
       return null;
     }
     return 'Invalid displayname';
@@ -532,6 +533,7 @@ String? isNUSC(String displayname) {
   return null;
 }
 
+//north range 10100700 - 10101296 except 10000713, 10000744,10000780,10000781,10000782,10000783,10000784
  String? isUTRNorth(String displayname) {
   int displaynameInt = int.parse(displayname);
   if ((displaynameInt < 10100700 && !{10000713, 10000744,10000780,10000781,10000782,10000783,10000784}.contains(displaynameInt)) || (displaynameInt > 10101296)) {
@@ -540,10 +542,28 @@ String? isNUSC(String displayname) {
   return null;
 }
 
+// south range 10000000 - 10003984 +  10101297, 10101298,10101299,10101300,10101301,10101302
  String? isUTRSouth(String displayname) {
   int displaynameInt = int.parse(displayname);
   if ((displaynameInt < 10000000  || (displaynameInt > 10003984 && !{10101297, 10101298,10101299,10101300,10101301,10101302}.contains(displaynameInt)))) {
     return 'Invalid displayname';
   }
   return null;
+}
+
+// tembusu range 10000090 - 10000989 (mcu)
+// tembusu range 10100034 - 10100497 (loop)
+// cinnamon range 10000319 - 10003983 (mcu)
+// cinnamon range 10100068 - 10100411 (loop)
+// cinnamon range in excel but not in db (10010161-10010184)
+String? isTembusuAndCinnamon(String displayname) {
+  int displaynameInt = int.parse(displayname);
+  if ((displaynameInt >= 10000090 && displaynameInt <= 10000989) ||
+    (displaynameInt >= 10100034 && displaynameInt <= 10100497) ||
+    (displaynameInt >= 10000319 && displaynameInt <= 10003983) || 
+    (displaynameInt >= 10100068 && displaynameInt <= 10100411)
+    ) {
+    return null;
+  }
+  return 'Invalid displayname';
 }
