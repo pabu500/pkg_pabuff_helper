@@ -572,7 +572,8 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
 
                         // join key is not directly editable
                         // therefore exlude from the field list
-                        if (colController.colKey != 'amgr_name') {
+                        if (colController.colKey != 'amgr_name' &&
+                            colController.colKey != 'bank_name') {
                           continue;
                         }
                       }
