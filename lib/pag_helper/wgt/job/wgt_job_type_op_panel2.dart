@@ -83,6 +83,8 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
 
   bool _isOption1 = false;
 
+  String? _selectedItemTypeStr;
+
   Future<dynamic> _triggerJob() async {
     if (_isPosting) return;
 
@@ -131,6 +133,8 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
       }
 
       jobRequest['is_option_1'] = _isOption1.toString();
+
+      jobRequest['selected_item_type'] = _selectedItemTypeStr ?? '';
 
       Map<String, dynamic> queryMap = {
         'scope': jobScope,
@@ -223,6 +227,8 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
         return true;
       case 'payment-matching':
         return true;
+      case 'get-item-list':
+        return _selectedItemTypeStr != null;
       default:
         return false;
     }
@@ -320,6 +326,8 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
         return genPaymentMatchingFormOptions();
       case 'payment-matching':
         return paymentMatchingOptions();
+      case 'get-item-list':
+        return getItemListOptions();
       default:
         return const SizedBox();
     }
@@ -927,5 +935,36 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
 
   Widget paymentMatchingOptions() {
     return Container();
+  }
+
+  Widget getItemListOptions() {
+    List<String> itemTypeOptions = ['tenant' /*, 'meter', 'user'*/];
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          'Item Type',
+          style: TextStyle(
+            color: Theme.of(context).hintColor,
+            fontSize: 16,
+          ),
+        ),
+        horizontalSpaceSmall,
+        DropdownButton<String>(
+          value: _selectedItemTypeStr,
+          items: itemTypeOptions
+              .map((type) => DropdownMenuItem<String>(
+                    value: type,
+                    child: Text(type),
+                  ))
+              .toList(),
+          onChanged: (String? newValue) {
+            setState(() {
+              _selectedItemTypeStr = newValue;
+            });
+          },
+        ),
+      ],
+    );
   }
 }
