@@ -432,6 +432,14 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     String amgrAddressLine1 = _bill['amgr_address_line_1'] ?? '';
     String amgrAddressLine2 = _bill['amgr_address_line_2'] ?? '';
     String amgrAddressLine3 = _bill['amgr_address_line_3'] ?? '';
+
+    String amgrBankAccountName = _bill['amgr_bank_account_name'] ?? '';
+    String amgrBankAccountNumber = _bill['amgr_bank_account_number'] ?? '';
+    String amgrBankName = _bill['amgr_bank_name'] ?? '';
+    String amgrBankBranchCode = _bill['amgr_bank_branch_code'] ?? '';
+    String amgrBankSwiftCode = _bill['amgr_bank_swift_code'] ?? '';
+    String amgrBankPayNow = _bill['amgr_bank_pay_now'] ?? '';
+
     String billedTpNote = _bill['billed_tp_note'] ?? '';
     String billedTptNote = _bill['billed_tpt_note'] ?? '';
 
@@ -550,6 +558,12 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
         amgrAddressLine1,
         amgrAddressLine2,
         amgrAddressLine3,
+        amgrBankAccountName,
+        amgrBankAccountNumber,
+        amgrBankName,
+        amgrBankBranchCode,
+        amgrBankSwiftCode,
+        amgrBankPayNow,
         billedTpNote,
         billedTptNote,
         billedGst,
@@ -867,6 +881,12 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     String? amgrAddressLine1,
     String? amgrAddressLine2,
     String? amgrAddressLine3,
+    String? amgrBankAccountName,
+    String? amgrBankAccountNumber,
+    String? amgrBankName,
+    String? amgrBankBranchCode,
+    String? amgrBankSwiftCode,
+    String? amgrBankPayNow,
     String? billedTpNote,
     String? billedTptNote,
     double? billedGst,
@@ -1099,6 +1119,12 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
               'amgrAddressLine1': amgrAddressLine1,
               'amgrAddressLine2': amgrAddressLine2,
               'amgrAddressLine3': amgrAddressLine3,
+              'amgrBankAccountName': amgrBankAccountName,
+              'amgrBankAccountNumber': amgrBankAccountNumber,
+              'amgrBankName': amgrBankName,
+              'amgrBankBranchCode': amgrBankBranchCode,
+              'amgrBankSwiftCode': amgrBankSwiftCode,
+              'amgrBankPayNow': amgrBankPayNow,
               'billedTpNote': billedTpNote,
               'billedTptNote': billedTptNote,
             },
