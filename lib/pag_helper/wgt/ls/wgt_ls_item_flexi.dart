@@ -421,6 +421,16 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     if (hasInfoViewEditColumn) {
       addInfoViewEditColumn = false;
     }
+
+    if (widget.itemKind == PagItemKind.jobType) {
+      // role dependency: only show info view/edit panel when at project level
+      bool isAtProjectLevel =
+          loggedInUser!.selectedScope.isAtScopeType(PagScopeType.project);
+      if (!isAtProjectLevel) {
+        addInfoViewEditColumn = false;
+      }
+    }
+
     bool addOpColumn = false;
     if (widget.itemKind == PagItemKind.jobType ||
         widget.itemKind == PagItemKind.tariffPackage ||

@@ -438,7 +438,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     String amgrBankName = _bill['amgr_bank_name'] ?? '';
     String amgrBankBranchCode = _bill['amgr_bank_branch_code'] ?? '';
     String amgrBankSwiftCode = _bill['amgr_bank_swift_code'] ?? '';
-    String amgrBankPayNow = _bill['amgr_bank_pay_now'] ?? '';
+    String amgrBankPayNow = _bill['amgr_bank_paynow'] ?? '';
 
     String billedTpNote = _bill['billed_tp_note'] ?? '';
     String billedTptNote = _bill['billed_tpt_note'] ?? '';

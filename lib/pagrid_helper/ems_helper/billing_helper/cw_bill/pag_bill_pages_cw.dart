@@ -85,6 +85,12 @@ Future<Uint8List> generatePagInvoice(
     amgrAddressLine2: billInfo['amgrAddressLine2'],
     amgrAddressLine3: billInfo['amgrAddressLine3'],
     // billedTptNote: billInfo['billedTptNote'],
+    amgrBankAccountName: billInfo['amgrBankAccountName'],
+    amgrBankAccountNumber: billInfo['amgrBankAccountNumber'],
+    amgrBankName: billInfo['amgrBankName'],
+    amgrBankBranchCode: billInfo['amgrBankBranchCode'],
+    amgrBankSwiftCode: billInfo['amgrBankSwiftCode'],
+    amgrBankPayNow: billInfo['amgrBankPayNow'],
     tax: .15,
     baseColor: PdfColors.teal,
     accentColor: PdfColors.blueGrey900,
@@ -157,6 +163,12 @@ class PagBill {
     required this.amgrAddressLine2,
     required this.amgrAddressLine3,
     // required this.billedTptNote,
+    required this.amgrBankAccountName,
+    required this.amgrBankAccountNumber,
+    required this.amgrBankName,
+    required this.amgrBankBranchCode,
+    required this.amgrBankSwiftCode,
+    required this.amgrBankPayNow,
   });
 
   final String customerLabel;
@@ -220,6 +232,12 @@ class PagBill {
   final String? amgrAddressLine1;
   final String? amgrAddressLine2;
   final String? amgrAddressLine3;
+  final String? amgrBankAccountName;
+  final String? amgrBankAccountNumber;
+  final String? amgrBankName;
+  final String? amgrBankBranchCode;
+  final String? amgrBankSwiftCode;
+  final String? amgrBankPayNow;
   // final String? billedTptNote;
   static const _darkColor = PdfColors.blueGrey800;
   static const _lightColor = PdfColors.white;
@@ -353,7 +371,7 @@ class PagBill {
               ),
               pw.Table(
                 columnWidths: {
-                  0: const pw.FixedColumnWidth(100),
+                  0: const pw.FixedColumnWidth(80),
                   1: const pw.FixedColumnWidth(180),
                 },
                 children: [
@@ -361,7 +379,7 @@ class PagBill {
                     pw.Text('Account Name:',
                         style:
                             const pw.TextStyle(fontSize: 9, color: _darkColor)),
-                    pw.Text('-',
+                    pw.Text(amgrBankName ?? '-',
                         style:
                             const pw.TextStyle(fontSize: 9, color: _darkColor)),
                   ]),
@@ -369,7 +387,7 @@ class PagBill {
                     pw.Text('Account Number:',
                         style:
                             const pw.TextStyle(fontSize: 9, color: _darkColor)),
-                    pw.Text('-',
+                    pw.Text(amgrBankAccountNumber ?? '-',
                         style:
                             const pw.TextStyle(fontSize: 9, color: _darkColor)),
                   ]),
@@ -377,7 +395,7 @@ class PagBill {
                     pw.Text('Bank Name:',
                         style:
                             const pw.TextStyle(fontSize: 9, color: _darkColor)),
-                    pw.Text('-',
+                    pw.Text(amgrBankName ?? '-',
                         style:
                             const pw.TextStyle(fontSize: 9, color: _darkColor)),
                   ]),
@@ -385,7 +403,7 @@ class PagBill {
                     pw.Text('Branch Code:',
                         style:
                             const pw.TextStyle(fontSize: 9, color: _darkColor)),
-                    pw.Text('-',
+                    pw.Text(amgrBankBranchCode ?? '-',
                         style:
                             const pw.TextStyle(fontSize: 9, color: _darkColor)),
                   ]),
@@ -393,7 +411,7 @@ class PagBill {
                     pw.Text('Swift Code:',
                         style:
                             const pw.TextStyle(fontSize: 9, color: _darkColor)),
-                    pw.Text('-',
+                    pw.Text(amgrBankSwiftCode ?? '-',
                         style:
                             const pw.TextStyle(fontSize: 9, color: _darkColor)),
                   ]),
@@ -401,7 +419,7 @@ class PagBill {
                     pw.Text('PayNow:',
                         style:
                             const pw.TextStyle(fontSize: 9, color: _darkColor)),
-                    pw.Text('-',
+                    pw.Text(amgrBankPayNow ?? '-',
                         style:
                             const pw.TextStyle(fontSize: 9, color: _darkColor)),
                   ]),
