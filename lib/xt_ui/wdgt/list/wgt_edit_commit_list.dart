@@ -115,6 +115,7 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
   late double _listHeight;
   UniqueKey? _listKey;
   late TextStyle _listItemStyle;
+  final int _decimal = 3;
 
   UniqueKey? _headerRefreshKey;
 
@@ -601,7 +602,7 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
       }
       if (configItem['useThousandSeparator'] == true) {
         originalFullText =
-            getCommaNumberStr(double.tryParse(originalFullText), decimal: 2);
+            getCommaNumberStr(double.tryParse(originalFullText), decimal: _decimal);
       }
 
       bool showTag = false;
