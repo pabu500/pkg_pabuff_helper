@@ -63,7 +63,7 @@ class _WgtHistoryRepListState extends State<WgtHistoryRepList> {
 
   List<Map<String, dynamic>> _listConfig = [];
   final List<Map<String, dynamic>> _list = [];
-  int _decimals = 2;
+  int _decimals = 3;
   String _unit = '';
   bool _jobPosted = false;
 
@@ -438,10 +438,10 @@ class _WgtHistoryRepListState extends State<WgtHistoryRepList> {
       String originalFullText = '';
       if (row[configItem['fieldKey']] != null) {
         String str = row[configItem['fieldKey']].toString();
-        // double? value = double.tryParse(str);
-        // originalFullText =
-        //     value == null ? str : value.toStringAsFixed(_decimals);
-          originalFullText = str;
+        double? value = double.tryParse(str);
+        _decimals = 3;
+        originalFullText =
+            value == null ? str : value.toStringAsFixed(_decimals);
         bool dtIsMissing = row['dt_missing'] ?? false;
         if (dtIsMissing && originalFullText is! double) {
           listItemStyle = listItemStyle.copyWith(
