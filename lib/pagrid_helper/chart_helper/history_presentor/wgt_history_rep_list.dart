@@ -63,7 +63,7 @@ class _WgtHistoryRepListState extends State<WgtHistoryRepList> {
 
   List<Map<String, dynamic>> _listConfig = [];
   final List<Map<String, dynamic>> _list = [];
-  int _decimals = 2;
+  int _decimals = 3;
   String _unit = '';
   bool _jobPosted = false;
 
@@ -166,7 +166,8 @@ class _WgtHistoryRepListState extends State<WgtHistoryRepList> {
       bool hasInsertZero = false;
       for (String key in readings.keys) {
         //get total
-        newRow[key] = readings[key]['rt'];
+        String strRt = getCommaNumberStr(readings[key]['rt'], decimal: 3);
+        newRow[key] = strRt;
         if (widget.fullCols) {
           int isTotalEst = readings[key]['rt_is_est'] ?? 0;
           bool readingPartTotalIsEst = (isTotalEst == 0) ? false : true;
@@ -178,7 +179,8 @@ class _WgtHistoryRepListState extends State<WgtHistoryRepList> {
           newRow['${key}_is_neg'] = readingPartTotalIsNeg;
         }
         //get diff
-        newRow['${key}_diff'] = readings[key]['rd'];
+        String strRd = getCommaNumberStr(readings[key]['rd'], decimal: 3);
+        newRow['${key}_diff'] = strRd;
         if (widget.fullCols) {
           int isDiffEst = readings[key]['rd_is_est'] ?? 0;
           bool readingPartDiffIsEst = (isDiffEst == 0) ? false : true;
@@ -437,10 +439,11 @@ class _WgtHistoryRepListState extends State<WgtHistoryRepList> {
       if (row[configItem['fieldKey']] != null) {
         String str = row[configItem['fieldKey']].toString();
         double? value = double.tryParse(str);
+        _decimals = 3;
         originalFullText =
             value == null ? str : value.toStringAsFixed(_decimals);
         bool dtIsMissing = row['dt_missing'] ?? false;
-        if (dtIsMissing && value is! double) {
+        if (dtIsMissing && originalFullText is! double) {
           listItemStyle = listItemStyle.copyWith(
             color: Colors.yellow.shade900,
           );
