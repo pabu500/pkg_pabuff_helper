@@ -1209,7 +1209,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                       //use billed trending snapshot
                       // billedTrendingSnapShot: billedTrendingSnapShot,
                     );
-                    emsTypeUsageCalc.doCalc();
+                    emsTypeUsageCalc.doCalc(isForBilling: false);
 
                     xtShowModelBottomSheet(
                       context,

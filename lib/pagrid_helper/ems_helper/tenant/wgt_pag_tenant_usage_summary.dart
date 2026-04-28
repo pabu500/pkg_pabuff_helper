@@ -124,8 +124,12 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
     final String dueDate = widget.billInfo['billed_due_date_timestamp'] ?? '';
 
     String lcStatus = widget.billInfo['lc_status'] ?? '';
-    PagBillingLcStatus currentBillLcStatus =
-        PagBillingLcStatus.byValue(lcStatus);
+    PagBillingLcStatus? currentBillLcStatus;
+    try {
+      currentBillLcStatus = PagBillingLcStatus.byValue(lcStatus);
+    } catch (e) {
+      currentBillLcStatus = null;
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 13),
@@ -198,7 +202,7 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
                   widget.appConfig,
                   widget.billInfo['billing_rec_id'] ?? '',
                   'generated',
-                  currentBillLcStatus,
+                  currentBillLcStatus!,
                   widget.usageCalc!.totalUsageCost,
                   widget.usageCalc!.gst!,
                   widget.usageCalc!.subTotalCost,
@@ -347,7 +351,7 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
               color: Theme.of(context).hintColor.withAlpha(130),
               fontWeight: FontWeight.bold,
             )),
-        if (groupInfo['showChart'] ?? false)
+        if (/*groupInfo['showChart'] ??*/ false)
           Padding(
             padding: const EdgeInsets.only(top: 10),
             child: WgtPagMeterGroupStatCore(

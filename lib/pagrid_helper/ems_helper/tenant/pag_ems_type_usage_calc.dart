@@ -130,14 +130,16 @@ class PagEmsTypeUsageCalc {
     }
   }
 
-  void doCalc() {
+  void doCalc({bool isForBilling = true}) {
     _calcTypeUsage('E');
     _calcTypeUsage('W');
     _calcTypeUsage('B');
     _calcTypeUsage('N');
     _calcTypeUsage('G');
 
-    _calcTotalCost();
+    if (isForBilling) {
+      _calcTotalCost();
+    }
     _sortSubTenantUsage();
     _getUsageTrending();
   }
