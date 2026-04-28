@@ -229,6 +229,8 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
         return true;
       case 'get-item-list':
         return _selectedItemTypeStr != null;
+      case 'collection-report':
+        return _selectedFromDate != null && _selectedToDate != null;
       default:
         return false;
     }
@@ -328,6 +330,8 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
         return paymentMatchingOptions();
       case 'get-item-list':
         return getItemListOptions();
+      case 'collection-report':
+        return collectionReportOptions();
       default:
         return const SizedBox();
     }
@@ -963,6 +967,27 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
               _selectedItemTypeStr = newValue;
             });
           },
+        ),
+      ],
+    );
+  }
+
+  Widget collectionReportOptions() {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Collection Cycle Month',
+              style: TextStyle(
+                color: Theme.of(context).hintColor,
+                fontSize: 16,
+              ),
+            ),
+            horizontalSpaceSmall,
+            getTimeRangePicker(forceMonthly: true),
+          ],
         ),
       ],
     );
