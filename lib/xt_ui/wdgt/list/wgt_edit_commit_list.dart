@@ -600,8 +600,9 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
             configItem['getDisplayString'](row[configItem['fieldKey']]) ?? '';
       }
       if (configItem['useThousandSeparator'] == true) {
+        int decimal = 3;
         originalFullText =
-            getCommaNumberStr(double.tryParse(originalFullText), decimal: 2);
+            getCommaNumberStr(double.tryParse(originalFullText), decimal: decimal);
       }
 
       bool showTag = false;
