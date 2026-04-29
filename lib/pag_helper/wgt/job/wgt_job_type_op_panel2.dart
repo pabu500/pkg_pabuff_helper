@@ -231,6 +231,8 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
         return _selectedItemTypeStr != null;
       case 'collection-report':
         return _selectedFromDate != null && _selectedToDate != null;
+      case 'ar-aging-report':
+        return _selectedDate1 != null;
       default:
         return false;
     }
@@ -332,6 +334,8 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
         return getItemListOptions();
       case 'collection-report':
         return collectionReportOptions();
+      case 'ar-aging-report':
+        return arAgingReportOptions();
       default:
         return const SizedBox();
     }
@@ -987,6 +991,41 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
             ),
             horizontalSpaceSmall,
             getTimeRangePicker(forceMonthly: true),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget arAgingReportOptions() {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'As Of Date',
+              style: TextStyle(
+                color: Theme.of(context).hintColor,
+                fontSize: 16,
+              ),
+            ),
+            horizontalSpaceSmall,
+            WgtDatePicker(
+              key: _date1PickerKey,
+              labelFontSize: 15,
+              defaultFirstDate:
+                  DateTime.now().subtract(const Duration(days: 365)),
+              defaultLastDate: DateTime.now(),
+              initialDate: _selectedDate1,
+              timeZone: widget.loggedInUser.selectedScope.getProjectTimezone(),
+              label: 'Set As Of Date',
+              onDateChanged: (DateTime selectedDate) {
+                setState(() {
+                  _selectedDate1 = selectedDate;
+                });
+              },
+            ),
           ],
         ),
       ],
