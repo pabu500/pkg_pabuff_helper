@@ -777,43 +777,61 @@ class PagBill {
             ...typeStatList,
             pw.SizedBox(height: 5),
             pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
                 if (billedTpNote.isNotEmpty)
-                  pw.Row(children: [
-                    pw.Text('Tp Note: ',
-                        style: pw.TextStyle(
-                            fontWeight: pw.FontWeight.bold,
-                            color: _darkColor,
-                            fontSize: 9)),
-                    pw.Text(billedTpNote,
-                        style:
-                            const pw.TextStyle(color: _darkColor, fontSize: 9)),
-                  ]),
-                if (billedTptRateNote.isNotEmpty)
                   pw.Row(
-                    children: [
-                      pw.Text('Tpt Note (Rate): ',
-                          style: pw.TextStyle(
-                              fontWeight: pw.FontWeight.bold,
-                              color: _darkColor,
-                              fontSize: 9)),
-                      pw.Text(billedTptRateNote,
-                          style: const pw.TextStyle(
-                              color: _darkColor, fontSize: 9)),
-                    ],
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Text('Tp Note: ',
+                            style: pw.TextStyle(
+                                fontWeight: pw.FontWeight.bold,
+                                color: _darkColor,
+                                fontSize: 9)),
+                        pw.SizedBox(
+                            width: 390,
+                            child: pw.Text(billedTpNote,
+                                maxLines: 2,
+                                style: const pw.TextStyle(
+                                    color: _darkColor, fontSize: 9))),
+                      ]),
+                if (billedTptRateNote.isNotEmpty)
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.only(top: 3),
+                    child: pw.Row(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                        children: [
+                          pw.Text('Tpt Note (Rate): ',
+                              style: pw.TextStyle(
+                                  fontWeight: pw.FontWeight.bold,
+                                  color: _darkColor,
+                                  fontSize: 9)),
+                          pw.SizedBox(
+                              width: 390,
+                              child: pw.Text(billedTptRateNote,
+                                  maxLines: 2,
+                                  style: const pw.TextStyle(
+                                      color: _darkColor, fontSize: 9))),
+                        ]),
                   ),
                 if (billedTptCycleNote.isNotEmpty)
-                  pw.Row(
-                    children: [
-                      pw.Text('Tpt Note (Cycle): ',
-                          style: pw.TextStyle(
-                              fontWeight: pw.FontWeight.bold,
-                              color: _darkColor,
-                              fontSize: 9)),
-                      pw.Text(billedTptCycleNote,
-                          style: const pw.TextStyle(
-                              color: _darkColor, fontSize: 9)),
-                    ],
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.only(top: 3),
+                    child: pw.Row(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                        children: [
+                          pw.Text('Tpt Note (Cycle): ',
+                              style: pw.TextStyle(
+                                  fontWeight: pw.FontWeight.bold,
+                                  color: _darkColor,
+                                  fontSize: 9)),
+                          pw.SizedBox(
+                              width: 390,
+                              child: pw.Text(billedTptCycleNote,
+                                  maxLines: 2,
+                                  style: const pw.TextStyle(
+                                      color: _darkColor, fontSize: 9))),
+                        ]),
                   ),
               ],
             ),
