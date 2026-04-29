@@ -441,7 +441,8 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     String amgrBankPayNow = _bill['amgr_bank_paynow'] ?? '';
 
     String billedTpNote = _bill['billed_tp_note'] ?? '';
-    String billedTptNote = _bill['billed_tpt_note'] ?? '';
+    String billedTptRateNote = _bill['billed_tpt_rate_note'] ?? '';
+    String billedTptCycleNote = _bill['billed_tpt_cycle_note'] ?? '';
 
     List<Map<String, dynamic>> lineItemList = [];
     final lineItemInfo = _bill['line_item_info'] ?? {};
@@ -565,7 +566,8 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
         amgrBankSwiftCode,
         amgrBankPayNow,
         billedTpNote,
-        billedTptNote,
+        billedTptRateNote,
+        billedTptCycleNote,
         billedGst,
         billedGstAmountDouble,
         billedUsageCostAmount,
@@ -888,7 +890,8 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     String? amgrBankSwiftCode,
     String? amgrBankPayNow,
     String? billedTpNote,
-    String? billedTptNote,
+    String? billedTptRateNote,
+    String? billedTptCycleNote,
     double? billedGst,
     double? billedGstAmount,
     double? billedUsageCostAmount,
@@ -1126,7 +1129,8 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
               'amgrBankSwiftCode': amgrBankSwiftCode,
               'amgrBankPayNow': amgrBankPayNow,
               'billedTpNote': billedTpNote,
-              'billedTptNote': billedTptNote,
+              'billedTptRateNote': billedTptRateNote,
+              'billedTptCycleNote': billedTptCycleNote,
             },
           )
         : WgtPagTenantCompositeUsageSummaryRl(

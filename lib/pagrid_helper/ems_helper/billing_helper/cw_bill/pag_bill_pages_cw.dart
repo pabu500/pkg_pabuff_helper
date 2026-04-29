@@ -733,7 +733,10 @@ class PagBill {
         in tenantSingularUsageInfoList) {
       List<pw.Widget> typeStatList = [];
       String billedTpNote = singularUsageInfo['billed_tp_note'] ?? '';
-      String billedTptNote = singularUsageInfo['billed_tpt_note'] ?? '';
+      String billedTptRateNote =
+          singularUsageInfo['billed_tpt_rate_note'] ?? '';
+      String billedTptCycleNote =
+          singularUsageInfo['billed_tpt_cycle_note'] ?? '';
       String slotFromTimestampStr = singularUsageInfo['from_timestamp'] ?? '';
       String slotToTimestampStr = singularUsageInfo['to_timestamp'] ?? '';
       String slotStr =
@@ -773,18 +776,47 @@ class PagBill {
             pw.SizedBox(height: 5),
             ...typeStatList,
             pw.SizedBox(height: 5),
-            pw.Row(
+            pw.Column(
               children: [
-                pw.Text(' Note: ',
-                    style: pw.TextStyle(
-                        fontWeight: pw.FontWeight.bold,
-                        color: _darkColor,
-                        fontSize: 9)),
-                pw.Text(billedTpNote,
-                    style: const pw.TextStyle(color: _darkColor, fontSize: 9)),
+                if (billedTpNote.isNotEmpty)
+                  pw.Row(children: [
+                    pw.Text('Tp Note: ',
+                        style: pw.TextStyle(
+                            fontWeight: pw.FontWeight.bold,
+                            color: _darkColor,
+                            fontSize: 9)),
+                    pw.Text(billedTpNote,
+                        style:
+                            const pw.TextStyle(color: _darkColor, fontSize: 9)),
+                  ]),
+                if (billedTptRateNote.isNotEmpty)
+                  pw.Row(
+                    children: [
+                      pw.Text('Tpt Note (Rate): ',
+                          style: pw.TextStyle(
+                              fontWeight: pw.FontWeight.bold,
+                              color: _darkColor,
+                              fontSize: 9)),
+                      pw.Text(billedTptRateNote,
+                          style: const pw.TextStyle(
+                              color: _darkColor, fontSize: 9)),
+                    ],
+                  ),
+                if (billedTptCycleNote.isNotEmpty)
+                  pw.Row(
+                    children: [
+                      pw.Text('Tpt Note (Cycle): ',
+                          style: pw.TextStyle(
+                              fontWeight: pw.FontWeight.bold,
+                              color: _darkColor,
+                              fontSize: 9)),
+                      pw.Text(billedTptCycleNote,
+                          style: const pw.TextStyle(
+                              color: _darkColor, fontSize: 9)),
+                    ],
+                  ),
               ],
             ),
-            pw.SizedBox(height: 3),
           ],
         ),
       ));
