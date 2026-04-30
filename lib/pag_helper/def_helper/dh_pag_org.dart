@@ -52,3 +52,30 @@ String getPagOrgTypeStr(dynamic itemType) {
       return '';
   }
 }
+
+String? validateBranchCode(String? value) {
+  if (value == null || value.isEmpty) {
+    return 'Branch code is required';
+  }
+  if (value.length > 20) {
+    return 'Branch code must be at most 20 characters';
+  }
+  return null;
+}
+
+String? validateSwiftCode(String? value) {
+  if (value == null || value.isEmpty) {
+    return 'SWIFT code is required';
+  }
+  if (value.length > 20) {
+    return 'SWIFT code must be at most 20 characters';
+  }
+  return null;
+}
+
+String? validateBankTag(String? value) {
+  if (value != null && value.length > 8) {
+    return 'Bank tag must be at most 8 characters';
+  }
+  return null;
+}
