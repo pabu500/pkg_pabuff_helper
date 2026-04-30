@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:buff_helper/pag_helper/def_helper/project_helper.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 import 'package:flutter/foundation.dart';
@@ -208,12 +210,11 @@ class MdlPagSiteProfile {
 
     dynamic timezone = itemInfo['timezone'];
     if (timezone == null) {
-      if (kDebugMode) {
-        print('timezone is null for site ${itemInfo['name']}');
+      dev.log('timezone is null for site ${itemInfo['name']}');
+    } else {
+      if (timezone is String) {
+        timezone = int.tryParse(timezone);
       }
-    }
-    if (timezone is String) {
-      timezone = int.tryParse(timezone);
     }
     assert(timezone is int);
 

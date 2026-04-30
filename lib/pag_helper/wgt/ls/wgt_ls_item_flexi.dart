@@ -411,7 +411,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         isEmsTenantUsage ||
         isEsInsights ||
         isBill ||
-        isSoa ||
+        // isSoa ||
         isPp ||
         isCmDeviceLs ||
         isFhDevice ||
