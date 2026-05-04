@@ -53,6 +53,16 @@ String getPagOrgTypeStr(dynamic itemType) {
   }
 }
 
+String? validateBankCode(String? value) {
+  if (value == null || value.isEmpty) {
+    return 'Bank code is required';
+  }
+  if (value.length > 20) {
+    return 'Bank code must be at most 20 characters';
+  }
+  return null;
+}
+
 String? validateBranchCode(String? value) {
   if (value == null || value.isEmpty) {
     return 'Branch code is required';
