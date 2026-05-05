@@ -1,5 +1,6 @@
 import 'dart:developer' as dev;
 
+import 'package:buff_helper/pag_helper/def_helper/list_helper.dart';
 import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
@@ -49,11 +50,13 @@ class MdlPagListController /*extends ChangeNotifier*/ {
   //   }
   // }
 
-  factory MdlPagListController.fromJson(Map<String, dynamic> json) {
+  factory MdlPagListController.fromJson(Map<String, dynamic> json,
+      {PagListContextType? listContextType}) {
     List<MdlListColController> listConfigItemList = [];
     if (json['list_config'] != null) {
       for (var listConfigItem in json['list_config']) {
-        listConfigItem = MdlListColController.fromJson(listConfigItem);
+        listConfigItem = MdlListColController.fromJson(listConfigItem,
+            listContextType: listContextType);
         listConfigItemList.add(listConfigItem);
       }
     }

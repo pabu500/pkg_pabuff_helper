@@ -204,9 +204,8 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
         }
       }
       if (allEmpty) {
-        if (kDebugMode) {
-          print('all empty, no sort');
-        }
+        dev.log('all empty, no sort');
+
         return;
       }
 
@@ -409,11 +408,11 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
         continue;
       }
 
-      final contextExludeList = item.contextExcludeList ?? [];
-      if (widget.listContextType != null &&
-          contextExludeList.contains(widget.listContextType!.name)) {
-        continue;
-      }
+      // final contextExludeList = item.contextExcludeList ?? [];
+      // if (widget.listContextType != null &&
+      //     contextExludeList.contains(widget.listContextType!.name)) {
+      //   continue;
+      // }
 
       List<Widget> suffix = [];
       if (item.showSort) {

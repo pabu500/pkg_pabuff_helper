@@ -223,8 +223,9 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         }
 
         for (var listInfoMap in listInfoList) {
-          MdlPagListController listController =
-              MdlPagListController.fromJson(listInfoMap);
+          MdlPagListController listController = MdlPagListController.fromJson(
+              listInfoMap,
+              listContextType: widget.listContextType);
           _listControllerList.add(listController);
         }
       }

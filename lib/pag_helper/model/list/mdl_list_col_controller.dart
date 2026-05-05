@@ -143,7 +143,8 @@ class MdlListColController {
     filterResetKey = UniqueKey();
   }
 
-  factory MdlListColController.fromJson(Map<String, dynamic> json) {
+  factory MdlListColController.fromJson(Map<String, dynamic> json,
+      {PagListContextType? listContextType}) {
     String? colKey = json['colKey'] ?? json['col_key'] ?? json['fieldKey'];
     if (colKey == null) {
       throw Exception('col_key is missing');
@@ -202,6 +203,7 @@ class MdlListColController {
         showColumn = showValue.toLowerCase() == 'true';
       }
     }
+
     showEditPanel = showColumn;
 
     if (json['show_edit_panel'] != null) {
@@ -322,6 +324,12 @@ class MdlListColController {
       }
     }
 
+    if (listContextType != null) {
+      if (contextExcludeList.contains(listContextType.name)) {
+        showColumn = false;
+      }
+    }
+
     Widget Function(
             Map<String, dynamic> row, List<Map<String, dynamic>> fullList)?
         getCustomWidget;
@@ -368,37 +376,38 @@ class MdlListColController {
     }
 
     return MdlListColController(
-        colKey: colKey,
-        joinKey: json['join_key'],
-        asIsKey: json['as_is_key'],
-        colTitle: colTitle,
-        includeColKeyAsFilter: isIncludeColKeyAsFilter,
-        includeColKeyAsGroupBy: isIncludeColKeyAsGroupBy,
-        stringAgg: stringAgg,
-        isMutable: isMutable,
-        isDisplayNameKey: isDisplayNameKey,
-        filterLabel: filterLabel,
-        colWidth: width,
-        showColumn: showColumn,
-        showEditPanel: showEditPanel,
-        showSort: showSort,
-        sortOrder: sortOrder,
-        hidden: permHidden,
-        filterWidgetType: filterWidgetType,
-        filterGroupType: filterGroupType,
-        getListEpt: getListEpt,
-        colWidgetType: colWidgetType,
-        // editorWidgetType: editorWidgetType,
-        isUnique: isUnique,
-        isDetailKey: isDetailKey,
-        isClickCopy: isClickCopy,
-        valueList: valueList,
-        getCustomWidget: getCustomWidget,
-        isPaneKey: isPaneKey,
-        scopeType: scopeType,
-        align: align,
-        decimal: decimal,
-        contextExcludeList: contextExcludeList,);
+      colKey: colKey,
+      joinKey: json['join_key'],
+      asIsKey: json['as_is_key'],
+      colTitle: colTitle,
+      includeColKeyAsFilter: isIncludeColKeyAsFilter,
+      includeColKeyAsGroupBy: isIncludeColKeyAsGroupBy,
+      stringAgg: stringAgg,
+      isMutable: isMutable,
+      isDisplayNameKey: isDisplayNameKey,
+      filterLabel: filterLabel,
+      colWidth: width,
+      showColumn: showColumn,
+      showEditPanel: showEditPanel,
+      showSort: showSort,
+      sortOrder: sortOrder,
+      hidden: permHidden,
+      filterWidgetType: filterWidgetType,
+      filterGroupType: filterGroupType,
+      getListEpt: getListEpt,
+      colWidgetType: colWidgetType,
+      // editorWidgetType: editorWidgetType,
+      isUnique: isUnique,
+      isDetailKey: isDetailKey,
+      isClickCopy: isClickCopy,
+      valueList: valueList,
+      getCustomWidget: getCustomWidget,
+      isPaneKey: isPaneKey,
+      scopeType: scopeType,
+      align: align,
+      decimal: decimal,
+      contextExcludeList: contextExcludeList,
+    );
   }
 
   Map<String, dynamic> toJson() {
