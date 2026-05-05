@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
+import '../../def_helper/list_helper.dart';
 import '../../model/mdl_pag_app_config.dart';
 import 'wgt_pag_edit_commit_list.dart';
 import 'dart:developer' as dev;
@@ -23,6 +24,7 @@ class WgtListPane extends StatefulWidget {
     required this.totalItemCount,
     required this.queryMap,
     required this.listController,
+    this.listContextType,
     this.getPaneWidget,
     this.getSwitcher,
     required this.sectionName,
@@ -38,6 +40,7 @@ class WgtListPane extends StatefulWidget {
   final List<Map<String, dynamic>> initialItemList;
   final Map<String, dynamic> queryMap;
   final MdlPagListController listController;
+  final PagListContextType? listContextType;
   final Widget Function(Map<String, dynamic>, List<Map<String, dynamic>>)?
       getPaneWidget;
   final Widget Function(
@@ -277,6 +280,7 @@ class _WgtListPaneState extends State<WgtListPane> {
         isFetching: _isFetchingItemList,
         loggedInUser: loggedInUser,
         listController: widget.listController,
+        listContextType: widget.listContextType,
         listItems: _entityItems,
         itemType: widget.itemType,
         selectShowColumn: true,

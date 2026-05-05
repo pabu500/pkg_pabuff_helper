@@ -20,6 +20,7 @@ import 'package:flutter/services.dart';
 
 import '../../def_helper/dh_device.dart';
 import '../../def_helper/dh_pag_tenant.dart';
+import '../../def_helper/list_helper.dart';
 import '../wgt_list_column_customize.dart';
 
 class WgtPagEditCommitList extends StatefulWidget {
@@ -33,6 +34,7 @@ class WgtPagEditCommitList extends StatefulWidget {
     required this.listController,
     required this.listItems,
     required this.listPrefix,
+    this.listContextType,
     this.selectShowColumn = false,
     this.showCommit = true,
     this.doCommit,
@@ -72,6 +74,7 @@ class WgtPagEditCommitList extends StatefulWidget {
   final String sectionName;
   // final List<Map<String, dynamic>> listConfig;
   final MdlPagListController listController;
+  final PagListContextType? listContextType;
   final List<Map<String, dynamic>> listItems;
   final bool selectShowColumn;
   final Function? doCommit;
@@ -363,9 +366,8 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
   }
 
   Widget _buildListHeader() {
-    if (kDebugMode) {
-      print('build list header');
-    }
+    dev.log('build list header');
+
     TextStyle listHeaderStyle = TextStyle(
       fontWeight: FontWeight.bold,
       fontSize: 15,
@@ -406,6 +408,13 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
       if (!item.showColumn) {
         continue;
       }
+
+      final contextExludeList = item.contextExcludeList ?? [];
+      if (widget.listContextType != null &&
+          contextExludeList.contains(widget.listContextType!.name)) {
+        continue;
+      }
+
       List<Widget> suffix = [];
       if (item.showSort) {
         suffix.add(

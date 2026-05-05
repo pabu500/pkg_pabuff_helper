@@ -1,4 +1,5 @@
 import 'dart:developer' as dev;
+import 'package:buff_helper/pag_helper/def_helper/list_helper.dart';
 import 'package:flutter/material.dart';
 
 import '../../def_helper/dh_scope.dart';
@@ -73,6 +74,7 @@ class MdlListColController {
   bool useComma;
   int? decimal;
   String? Function(String)? validator;
+  List<String>? contextExcludeList;
 
   MdlListColController({
     required this.colKey,
@@ -113,6 +115,7 @@ class MdlListColController {
     this.decimal,
     this.useComma = false,
     this.validator,
+    this.contextExcludeList,
   }) {
     pinned = pinned ?? false;
   }
@@ -310,6 +313,15 @@ class MdlListColController {
       }
     }
 
+    List<String> contextExcludeList = [];
+    if (json['context_exclude'] != null) {
+      dynamic contextExcludeListValue = json['context_exclude'];
+      if (contextExcludeListValue is List) {
+        contextExcludeList =
+            List<String>.from(contextExcludeListValue.map((e) => e.toString()));
+      }
+    }
+
     Widget Function(
             Map<String, dynamic> row, List<Map<String, dynamic>> fullList)?
         getCustomWidget;
@@ -356,37 +368,37 @@ class MdlListColController {
     }
 
     return MdlListColController(
-      colKey: colKey,
-      joinKey: json['join_key'],
-      asIsKey: json['as_is_key'],
-      colTitle: colTitle,
-      includeColKeyAsFilter: isIncludeColKeyAsFilter,
-      includeColKeyAsGroupBy: isIncludeColKeyAsGroupBy,
-      stringAgg: stringAgg,
-      isMutable: isMutable,
-      isDisplayNameKey: isDisplayNameKey,
-      filterLabel: filterLabel,
-      colWidth: width,
-      showColumn: showColumn,
-      showEditPanel: showEditPanel,
-      showSort: showSort,
-      sortOrder: sortOrder,
-      hidden: permHidden,
-      filterWidgetType: filterWidgetType,
-      filterGroupType: filterGroupType,
-      getListEpt: getListEpt,
-      colWidgetType: colWidgetType,
-      // editorWidgetType: editorWidgetType,
-      isUnique: isUnique,
-      isDetailKey: isDetailKey,
-      isClickCopy: isClickCopy,
-      valueList: valueList,
-      getCustomWidget: getCustomWidget,
-      isPaneKey: isPaneKey,
-      scopeType: scopeType,
-      align: align,
-      decimal: decimal,
-    );
+        colKey: colKey,
+        joinKey: json['join_key'],
+        asIsKey: json['as_is_key'],
+        colTitle: colTitle,
+        includeColKeyAsFilter: isIncludeColKeyAsFilter,
+        includeColKeyAsGroupBy: isIncludeColKeyAsGroupBy,
+        stringAgg: stringAgg,
+        isMutable: isMutable,
+        isDisplayNameKey: isDisplayNameKey,
+        filterLabel: filterLabel,
+        colWidth: width,
+        showColumn: showColumn,
+        showEditPanel: showEditPanel,
+        showSort: showSort,
+        sortOrder: sortOrder,
+        hidden: permHidden,
+        filterWidgetType: filterWidgetType,
+        filterGroupType: filterGroupType,
+        getListEpt: getListEpt,
+        colWidgetType: colWidgetType,
+        // editorWidgetType: editorWidgetType,
+        isUnique: isUnique,
+        isDetailKey: isDetailKey,
+        isClickCopy: isClickCopy,
+        valueList: valueList,
+        getCustomWidget: getCustomWidget,
+        isPaneKey: isPaneKey,
+        scopeType: scopeType,
+        align: align,
+        decimal: decimal,
+        contextExcludeList: contextExcludeList,);
   }
 
   Map<String, dynamic> toJson() {
@@ -414,6 +426,7 @@ class MdlListColController {
     data['filter_group_type'] = filterGroupType.name;
     data['align'] = align;
     data['decimal'] = decimal;
+    data['context_exclude'] = contextExcludeList;
     return data;
   }
 }

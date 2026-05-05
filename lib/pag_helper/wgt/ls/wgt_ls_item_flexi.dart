@@ -1736,6 +1736,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           appConfig: widget.appConfig,
           enablePaneModeSwitcher: widget.enablePaneModeSwitcher,
           initialItemList: _entityItems,
+          listContextType: widget.listContextType,
           queryMap: _queryMap,
           totalItemCount: _totalItemCount,
           listController: _selectedListController!,
