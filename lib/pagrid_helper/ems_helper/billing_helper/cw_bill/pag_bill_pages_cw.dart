@@ -785,9 +785,9 @@ class PagBill {
                   pw.Row(
                       crossAxisAlignment: pw.CrossAxisAlignment.start,
                       children: [
-                        pw.Text('Tp Note: ',
-                            style: pw.TextStyle(
-                                fontWeight: pw.FontWeight.bold,
+                        pw.Text('#: ',
+                            style: const pw.TextStyle(
+                                // fontWeight: pw.FontWeight.bold,
                                 color: _darkColor,
                                 fontSize: 9)),
                         pw.SizedBox(
@@ -803,9 +803,9 @@ class PagBill {
                     child: pw.Row(
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
-                          pw.Text('Tpt Note (Rate): ',
-                              style: pw.TextStyle(
-                                  fontWeight: pw.FontWeight.bold,
+                          pw.Text('##: ',
+                              style: const pw.TextStyle(
+                                  // fontWeight: pw.FontWeight.bold,
                                   color: _darkColor,
                                   fontSize: 9)),
                           pw.SizedBox(
@@ -822,9 +822,9 @@ class PagBill {
                     child: pw.Row(
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
-                          pw.Text('Tpt Note (Cycle): ',
-                              style: pw.TextStyle(
-                                  fontWeight: pw.FontWeight.bold,
+                          pw.Text('###: ',
+                              style: const pw.TextStyle(
+                                  // fontWeight: pw.FontWeight.bold,
                                   color: _darkColor,
                                   fontSize: 9)),
                           pw.SizedBox(
@@ -1004,7 +1004,7 @@ class PagBill {
                     crossAxisAlignment: pw.CrossAxisAlignment.center,
                     children: [
                       pw.Text(
-                        lineItemLabel1!,
+                        'Line Item: ${lineItemLabel1!}',
                         style:
                             const pw.TextStyle(color: _darkColor, fontSize: 10),
                       ),
