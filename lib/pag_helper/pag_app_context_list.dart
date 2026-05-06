@@ -45,7 +45,7 @@ MdlPagAppContext appCtxEms = MdlPagAppContext(
   routeList: [
     PagPageRoute.emsDashboard,
     PagPageRoute.meterManager,
-    PagPageRoute.meterGroupManager,
+    PagPageRoute.emsMeterGroupManager,
     PagPageRoute.tenantManager,
     PagPageRoute.tariffManager,
     PagPageRoute.billingManager,
@@ -71,9 +71,10 @@ MdlPagAppContext appCtxEvs = MdlPagAppContext(
   routeList: [
     PagPageRoute.evsDashboard,
     PagPageRoute.evsMeterManager,
+    PagPageRoute.evsMeterGroupManager,
     PagPageRoute.evsTenantManager,
     PagPageRoute.creditTransaction,
-    PagPageRoute.evsTaskReportManager,
+    // PagPageRoute.evsTaskReportManager,
   ],
 );
 MdlPagAppContext appCtxPtw = MdlPagAppContext(
@@ -275,7 +276,7 @@ void routeGuard(BuildContext context, MdlPagUser? loggedInUser,
   if (loggedInUser.selectedRole?.name.contains('project-billing-') ?? false) {
     if (pr != PagPageRoute.consoleHomeDashboard &&
         pr != PagPageRoute.consoleHomeTaskManager &&
-        pr != PagPageRoute.meterGroupManager &&
+        pr != PagPageRoute.emsMeterGroupManager &&
         pr != PagPageRoute.billingManager &&
         pr != PagPageRoute.paymentManager &&
         pr != PagPageRoute.tenantManager &&
@@ -291,7 +292,7 @@ void routeGuard(BuildContext context, MdlPagUser? loggedInUser,
   if (loggedInUser.selectedRole?.name.contains('project-ops-') ?? false) {
     if (pr != PagPageRoute.consoleHomeDashboard &&
         pr != PagPageRoute.consoleHomeTaskManager &&
-        // pr != PagPageRoute.meterGroupManager &&
+        // pr != PagPageRoute.emsMeterGroupManager &&
         pr != PagPageRoute.billingManager &&
         // pr != PagPageRoute.paymentManager &&
         pr != PagPageRoute.tenantManager &&

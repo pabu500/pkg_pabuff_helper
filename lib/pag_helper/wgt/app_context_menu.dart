@@ -180,7 +180,7 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
         if (appModel.appName == 'pag_ems_tp') {
           if (pr == PagPageRoute.consoleHomeTaskManager ||
                   pr == PagPageRoute.emsDashboard ||
-                  pr == PagPageRoute.meterGroupManager ||
+                  pr == PagPageRoute.emsMeterGroupManager ||
                   // pr == PagPageRoute.billingManager ||
                   pr == PagPageRoute.tenantManager ||
                   pr == PagPageRoute.tariffManager ||
@@ -215,7 +215,7 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
                 .contains('project-billing-') ??
             false) {
           if (pr != PagPageRoute.consoleHomeTaskManager &&
-              pr != PagPageRoute.meterGroupManager &&
+              pr != PagPageRoute.emsMeterGroupManager &&
               pr != PagPageRoute.billingManager &&
               pr != PagPageRoute.paymentManager &&
               pr != PagPageRoute.tenantManager &&
