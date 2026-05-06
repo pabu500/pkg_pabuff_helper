@@ -1,8 +1,8 @@
+import 'dart:developer' as dev;
+
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_context.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'vendor_helper.dart';
 import 'model/mdl_pag_user.dart';
 import 'def_helper/def_page_route.dart';
 
@@ -261,32 +261,61 @@ MdlPagAppContext getPageContext(PagPageRoute pageRoute) {
 }
 
 void routeGuard(BuildContext context, MdlPagUser? loggedInUser,
-    {MdlPagAppContext? appContext, bool? goHome}) {
+    {MdlPagAppContext? appContext, bool? goHome, PagPageRoute? pr}) {
   if (loggedInUser == null) {
     return;
   }
   PagPageRoute pageRouteHome =
       loggedInUser.selectedScope.projectProfile!.homePageRoute;
   String homeRouteStr = getRoute(pageRouteHome);
-  if (kDebugMode) {
-    print('homeRouteStr: $homeRouteStr');
+
+  dev.log('homeRouteStr: $homeRouteStr');
+
+  bool noAccess = false;
+  if (loggedInUser.selectedRole?.name.contains('project-billing-') ?? false) {
+    if (pr != PagPageRoute.consoleHomeDashboard &&
+        pr != PagPageRoute.consoleHomeTaskManager &&
+        pr != PagPageRoute.meterGroupManager &&
+        pr != PagPageRoute.billingManager &&
+        pr != PagPageRoute.paymentManager &&
+        pr != PagPageRoute.tenantManager &&
+        pr != PagPageRoute.tariffManager &&
+        // pr != PagPageRoute.amgrManager &&
+        // pr != PagPageRoute.landlordManager &&
+        // pr != PagPageRoute.amOrgManager &&
+        pr != PagPageRoute.meterManager) {
+      noAccess = true;
+    }
   }
+
+  if (loggedInUser.selectedRole?.name.contains('project-ops-') ?? false) {
+    if (pr != PagPageRoute.consoleHomeDashboard &&
+        pr != PagPageRoute.consoleHomeTaskManager &&
+        // pr != PagPageRoute.meterGroupManager &&
+        pr != PagPageRoute.billingManager &&
+        // pr != PagPageRoute.paymentManager &&
+        pr != PagPageRoute.tenantManager &&
+        pr != PagPageRoute.tariffManager &&
+        // pr != PagPageRoute.amOrgManager &&
+        pr != PagPageRoute.meterManager) {
+      noAccess = true;
+    }
+  }
+
   WidgetsBinding.instance.addPostFrameCallback((_) {
     if (appContext != null) {
       if (!loggedInUser.selectedScope.projectProfile!
           .hasAppInfo(appContext.name)) {
-        if (kDebugMode) {
-          print('routeGuard: appContext ${appContext.name} not found');
-        }
+        dev.log('routeGuard: appContext ${appContext.name} not found');
+
         context.go(pageRouteHome == PagPageRoute.none
             ? getRoute(PagPageRoute.techIssue)
             : homeRouteStr);
       }
     }
-    if (goHome == true) {
-      if (kDebugMode) {
-        print('goHome: $homeRouteStr');
-      }
+    if (goHome == true || noAccess) {
+      dev.log('goHome: $homeRouteStr');
+
       GoRouter.of(context).go(homeRouteStr);
     }
   });
