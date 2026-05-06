@@ -455,6 +455,14 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       addOpColumn = true;
     }
 
+    // acl
+    if (loggedInUser!.selectedRole?.name.contains('project-ops-') ?? false) {
+      if (widget.itemKind == PagItemKind.tenant ||
+          widget.itemKind == PagItemKind.tariffPackage) {
+        addOpColumn = false;
+      }
+    }
+
     bool addMeterUsageColumn = false;
     if (isEmsMeterUsage) {
       addMeterUsageColumn = true;

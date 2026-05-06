@@ -39,7 +39,7 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
   String _dragStatus = '';
   late final List<PagPageRoute> routeList;
 
-  Offset _position = Offset(0, 0);
+  Offset _position = const Offset(0, 0);
 
   RenderBox? _renderBox;
 
@@ -64,7 +64,7 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
     //   return const SizedBox();
     // }
 
-    PagAppProvider appModel = Provider.of<PagAppProvider>(context);
+    // PagAppProvider appModel = Provider.of<PagAppProvider>(context);
 
     // if (kDebugMode) {
     //   print(_position.dy);
@@ -222,7 +222,21 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
               pr != PagPageRoute.tariffManager &&
               // pr != PagPageRoute.amgrManager &&
               // pr != PagPageRoute.landlordManager &&
-              pr != PagPageRoute.amOrgManager &&
+              // pr != PagPageRoute.amOrgManager &&
+              pr != PagPageRoute.meterManager) {
+            isDisabled = true;
+          }
+        }
+
+        if (widget.loggedInUser.selectedRole?.name.contains('project-ops-') ??
+            false) {
+          if (pr != PagPageRoute.consoleHomeTaskManager &&
+              // pr != PagPageRoute.meterGroupManager &&
+              pr != PagPageRoute.billingManager &&
+              // pr != PagPageRoute.paymentManager &&
+              pr != PagPageRoute.tenantManager &&
+              pr != PagPageRoute.tariffManager &&
+              // pr != PagPageRoute.amOrgManager &&
               pr != PagPageRoute.meterManager) {
             isDisabled = true;
           }

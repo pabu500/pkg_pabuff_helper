@@ -185,6 +185,12 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       }
     }
 
+    bool enableEditLcStatus = widget.displayContextStr == 'bill_view';
+    if (widget.loggedInUser.selectedRole?.name.contains('project-ops-') ??
+        false) {
+      enableEditLcStatus = false;
+    }
+
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -246,7 +252,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
                           key: _lcStatusOpsKey,
                           appConfig: widget.appConfig,
                           loggedInUser: widget.loggedInUser,
-                          enableEdit: widget.displayContextStr == 'bill_view',
+                          enableEdit: enableEditLcStatus,
                           billInfo: _bill,
                           initialStatus: _billLcStatusActual,
                           onCommitted: (newStatus) {
