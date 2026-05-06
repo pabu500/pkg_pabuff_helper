@@ -1083,8 +1083,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
               'billTo': toDatetime.toIso8601String(),
               'effectiveTo': effectiveToDatetime?.toIso8601String(),
               'tenantLcs': tenantLcs,
-              'billDate': _bill['released_bill_timestamp'] ??
-                  _bill['created_timestamp'],
+              'billDate': _bill['bill_date_timestamp'] ?? '',
               'dueDate': _bill['billed_due_date_timestamp'] ?? '',
               'billTimeRangeStr': billTimeRangeStr,
               'tenantUsageSummary': const [],

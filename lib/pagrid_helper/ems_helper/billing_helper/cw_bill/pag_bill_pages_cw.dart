@@ -617,7 +617,9 @@ class PagBill {
 
   String _getBillingPeriodStr() {
     DateTime billFrom = DateTime.parse(billFromStr);
-    DateTime billTo = DateTime.parse(billToStr);
+    // subtract 1 second from billTo to avoid showing next day if billTo is at 00:00:00
+    DateTime billTo =
+        DateTime.parse(billToStr).subtract(const Duration(seconds: 1));
     String formattedFrom = DateFormat('dd MMM yyyy').format(billFrom);
     String formattedTo = DateFormat('dd MMM yyyy').format(billTo);
     return '$formattedFrom - $formattedTo';
