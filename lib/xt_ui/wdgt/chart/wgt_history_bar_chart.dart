@@ -502,6 +502,15 @@ class _WgtHistoryBarChartState extends State<WgtHistoryBarChart> {
         _loadChartData();
       }
     }
+
+    String yUnitDisplay = widget.yUnit;
+    if (widget.useK) {
+      yUnitDisplay =
+          widget.yUnitK.isNotEmpty ? widget.yUnitK : '${widget.yUnit}K';
+    } else if (widget.adjK) {
+      yUnitDisplay = widget.yUnitK.isNotEmpty ? widget.yUnitK : widget.yUnit;
+    }
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -516,7 +525,7 @@ class _WgtHistoryBarChartState extends State<WgtHistoryBarChart> {
                         color: Theme.of(context)
                             .colorScheme
                             .onSurface
-                            .withOpacity(0.8),
+                            .withAlpha(210),
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
@@ -538,6 +547,14 @@ class _WgtHistoryBarChartState extends State<WgtHistoryBarChart> {
               // print(widget.key);
               return Stack(
                 children: [
+                  Text(yUnitDisplay,
+                      style: TextStyle(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withAlpha(210),
+                        fontSize: 12,
+                      )),
                   if (widget.historyData.isEmpty)
                     Center(
                       child: Padding(
@@ -550,9 +567,7 @@ class _WgtHistoryBarChartState extends State<WgtHistoryBarChart> {
                                   'no data for the duration',
                                   const TextStyle(fontWeight: FontWeight.bold)),
                               fontWeight: FontWeight.bold,
-                              color: Theme.of(context)
-                                  .hintColor
-                                  .withOpacity(0.13)),
+                              color: Theme.of(context).hintColor.withAlpha(33)),
                         ),
                       ),
                     ),
@@ -572,9 +587,7 @@ class _WgtHistoryBarChartState extends State<WgtHistoryBarChart> {
                                   'zero values for the duration',
                                   const TextStyle(fontWeight: FontWeight.bold)),
                               fontWeight: FontWeight.bold,
-                              color: Theme.of(context)
-                                  .hintColor
-                                  .withOpacity(0.13)),
+                              color: Theme.of(context).hintColor.withAlpha(33)),
                         ),
                       ),
                     ),
@@ -788,7 +801,7 @@ class _WgtHistoryBarChartState extends State<WgtHistoryBarChart> {
                               color: Theme.of(context)
                                   .colorScheme
                                   .onSurface
-                                  .withOpacity(0.33),
+                                  .withAlpha(85),
                             ),
                       ),
                       gridData: FlGridData(
@@ -806,8 +819,9 @@ class _WgtHistoryBarChartState extends State<WgtHistoryBarChart> {
                             );
                           } else {
                             return FlLine(
-                              color: Theme.of(context).hintColor.withOpacity(
-                                  0.2), //AppColors.mainGridLineColor,
+                              color: Theme.of(context)
+                                  .hintColor
+                                  .withAlpha(55), // 0.2 * 255 = 51
                               strokeWidth: 0.5,
                             );
                           }

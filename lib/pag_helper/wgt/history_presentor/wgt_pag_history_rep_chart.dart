@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -247,11 +249,10 @@ class _WgtPagHistoryRepChartState extends State<WgtPagHistoryRepChart> {
   }
 
   Widget getChartCore() {
-    if (kDebugMode) {
-      if (_selectedHistoryDataSets.isEmpty) {
-        print('getChartCore: selectedHistoryDataSets is empty');
-      }
+    if (_selectedHistoryDataSets.isEmpty) {
+      dev.log('getChartCore: selectedHistoryDataSets is empty');
     }
+
     return _chartType == ChartType.line
         ? WgtHistoryLineChart(
             showTitle: false,
@@ -273,7 +274,7 @@ class _WgtPagHistoryRepChartState extends State<WgtPagHistoryRepChart> {
             legend: _legend,
             rereservedSizeBottom: 65,
             bottomTextColor:
-                Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+                Theme.of(context).colorScheme.onSurface.withAlpha(210),
           )
         : WgtHistoryBarChart(
             chartKey: widget.chartKey,
@@ -322,11 +323,11 @@ class _WgtPagHistoryRepChartState extends State<WgtPagHistoryRepChart> {
             useAltBarColor: true,
             border: widget.chartBorder,
             bottomTextColor:
-                Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+                Theme.of(context).colorScheme.onSurface.withAlpha(210),
             tooltipTextColor:
-                Theme.of(context).colorScheme.onPrimary.withOpacity(0.92),
+                Theme.of(context).colorScheme.onPrimary.withAlpha(235),
             highlightColor:
-                Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                Theme.of(context).colorScheme.onSurface.withAlpha(128),
             timestampOnSecondLine: true,
           );
   }
