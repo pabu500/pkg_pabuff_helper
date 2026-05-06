@@ -85,6 +85,8 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
 
   String? _selectedItemTypeStr;
 
+  bool _sendToAll = false;
+
   Future<dynamic> _triggerJob() async {
     if (_isPosting) return;
 
@@ -108,7 +110,14 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
         'job_type': widget.jobTypeName,
         'job_task_type': widget.jobTaskType,
         'scope_prefix': widget.jobScopeLabel ?? '',
+        'send_to_all': _sendToAll ? 'true' : 'false',
       };
+
+      if (!_sendToAll) {
+        jobRequest['recipient_email'] = _loggedInUser!.email ?? '';
+        jobRequest['recipient_name'] = _loggedInUser!.username ?? '';
+      }
+
       if (_selectedDate1 != null) {
         jobRequest['selected_timestamp'] = _selectedDate1!.toIso8601String();
       }
@@ -902,38 +911,60 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
       enableSubmit = false;
     }
 
-    return Container(
-      decoration: BoxDecoration(
-        color: !enableSubmit
-            ? Theme.of(context).colorScheme.secondary.withAlpha(55)
-            : Theme.of(context).colorScheme.secondary,
-        borderRadius: BorderRadius.circular(5),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          InkWell(
-            onTap: !enableSubmit
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Text('Self', style: TextStyle(fontSize: 13)),
+        Transform.scale(
+          scale: 0.8,
+          child: Switch(
+            value: _sendToAll,
+            onChanged: !enableSubmit
                 ? null
-                : () async {
-                    await _triggerJob();
-                    // Timer.periodic(const Duration(milliseconds: 300), (timer) {
-                    //   Navigator.of(context).pop();
-                    // });
+                : (value) {
+                    setState(() {
+                      _sendToAll = value;
+                    });
                   },
-            child: Text('Submit Task',
-                style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSecondary)),
           ),
-          if (_isPosting)
-            const Padding(
-              padding: EdgeInsets.only(left: 5),
-              child: WgtPagWait(size: 21),
-            ),
-        ],
-      ),
+        ),
+        const Text('All', style: TextStyle(fontSize: 13)),
+        horizontalSpaceSmall,
+        Container(
+          decoration: BoxDecoration(
+            color: !enableSubmit
+                ? Theme.of(context).colorScheme.secondary.withAlpha(55)
+                : Theme.of(context).colorScheme.secondary,
+            borderRadius: BorderRadius.circular(5),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              InkWell(
+                onTap: !enableSubmit
+                    ? null
+                    : () async {
+                        await _triggerJob();
+                        // Timer.periodic(const Duration(milliseconds: 300), (timer) {
+                        //   Navigator.of(context).pop();
+                        // });
+                      },
+                child: Text('Submit Task',
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSecondary)),
+              ),
+              if (_isPosting)
+                const Padding(
+                  padding: EdgeInsets.only(left: 5),
+                  child: WgtPagWait(size: 21),
+                ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
