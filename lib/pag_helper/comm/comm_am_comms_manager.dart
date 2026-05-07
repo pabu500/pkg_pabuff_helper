@@ -111,3 +111,53 @@ Future<dynamic> checkDeviceLinkage(
     throw Exception(jsonDecode(response.body)['error']);
   }
 }
+
+Future<dynamic> getDeviceItemHistoryLatest(
+  MdlPagAppConfig appConfig,
+  Map<String, dynamic> queryMap,
+  MdlPagSvcClaim svcClaim,
+) async {
+  svcClaim.svcName = PagSvcType.oresvc2.name;
+  svcClaim.endpoint = PagUrlBase.eptGetItemHistory;
+
+  String svcToken = '';
+  // try {
+  //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
+  // } catch (err) {
+  //   throw Exception(err);
+  // }
+
+  final response = await http.post(
+    Uri.parse(PagUrlController(null, appConfig)
+        .getUrl(PagSvcType.oresvc2, svcClaim.endpoint!)),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer $svcToken',
+    },
+    body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
+  );
+
+  if (response.statusCode == 200) {
+    final respJson = jsonDecode(response.body);
+    if (respJson['error'] != null) {
+      throw Exception(respJson['error']);
+    }
+    final data = respJson['data'];
+    if (data == null) {
+      throw Exception('Failed to get response data');
+    }
+    final itemHistory = data['item_history'];
+    if (itemHistory == null) {
+      throw Exception("No item history found in the response");
+    }
+    final historyList = itemHistory['history_list'];
+    if (historyList == null || historyList.isEmpty) {
+      throw Exception("No history data found in the response");
+    }
+    return historyList.first;
+  } else if (response.statusCode == 403) {
+    throw Exception("You are not authorized to perform this operation");
+  } else {
+    throw Exception(jsonDecode(response.body)['error']);
+  }
+}
