@@ -112,7 +112,7 @@ Future<dynamic> checkDeviceLinkage(
   }
 }
 
-Future<dynamic> getDeviceItemHistoryLatest(
+Future<dynamic> getDeviceLastReading(
   MdlPagAppConfig appConfig,
   Map<String, dynamic> queryMap,
   MdlPagSvcClaim svcClaim,
