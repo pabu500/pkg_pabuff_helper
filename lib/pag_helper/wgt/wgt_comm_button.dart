@@ -17,6 +17,7 @@ class WgtCommButton extends StatefulWidget {
     this.labelWidget,
     this.onPressed,
     this.onResult,
+    this.cooldownMillis,
   });
 
   final String label;
@@ -27,6 +28,7 @@ class WgtCommButton extends StatefulWidget {
   final Color? faceColor;
   final TextStyle? labelStyle;
   final Widget? labelWidget;
+  final int? cooldownMillis;
   final Function()? onPressed;
   final Function(dynamic)? onResult;
 
@@ -36,6 +38,7 @@ class WgtCommButton extends StatefulWidget {
 
 class _WgtCommButtonState extends State<WgtCommButton> {
   bool _isWaiting = false;
+  bool _isCoolingDown = false;
 
   @override
   void initState() {
@@ -54,7 +57,7 @@ class _WgtCommButtonState extends State<WgtCommButton> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         InkWell(
-          onTap: !widget.enabled || (widget.onPressed == null)
+          onTap: !widget.enabled || (widget.onPressed == null) || _isCoolingDown
               ? null
               : () async {
                   // comm could be initiated by onEditComplete, instead of onPressed
@@ -64,6 +67,7 @@ class _WgtCommButtonState extends State<WgtCommButton> {
                     dev.log('WgtCommButton: onTap _isWaiting');
 
                     _isWaiting = true;
+                    _isCoolingDown = true;
                   });
                   try {
                     var result = await widget.onPressed?.call();
@@ -77,6 +81,14 @@ class _WgtCommButtonState extends State<WgtCommButton> {
                       _isWaiting = false;
                     });
                   }
+
+                  if (widget.cooldownMillis != null) {
+                    await Future.delayed(
+                        Duration(milliseconds: widget.cooldownMillis!));
+                    setState(() {
+                      _isCoolingDown = false;
+                    });
+                  }
                 },
           child: Container(
             width: widget.width,
@@ -84,7 +96,9 @@ class _WgtCommButtonState extends State<WgtCommButton> {
             padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 5),
             decoration: BoxDecoration(
               color: widget.faceColor ??
-                  (widget.enabled
+                  (widget.enabled &&
+                          !(widget.inComm ?? false) &&
+                          !_isCoolingDown
                       ? pagCallToActionFace.withAlpha(230)
                       : pagCallToActionFace.withAlpha(80)),
               borderRadius: BorderRadius.circular(5),
