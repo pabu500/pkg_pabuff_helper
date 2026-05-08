@@ -185,6 +185,19 @@ String? validateSerialNumber(String val) {
   return null;
 }
 
+String? validateServiceType2(String val) {
+  final normalizedString = val.trim().toLowerCase();
+
+  if (normalizedString.isEmpty) {
+    return 'required';
+  }
+
+  if (normalizedString != 'comm' && normalizedString != 'evs') {
+    return 'service type must be either "comm" or "evs"';
+  }
+  return null;
+}
+
 String? validateModel(String val) {
   val = val.trim();
 
@@ -283,6 +296,20 @@ String? validateAdapterType(String? val) {
 
   if (!value.contains('jbs2') && !value.contains('evs2sim')) {
     return 'Value must contain "jbs2" or "evs2sim"';
+  }
+
+  return null;
+}
+
+String? validatePollingLaw(String? val) {
+  if (val == null || val.trim().isEmpty) {
+    return 'required';
+  }
+
+  String value = val.toLowerCase();
+
+  if (value != '0' && value != '1' && value != '2') {
+    return 'Value must be "0", "1", or "2"';
   }
 
   return null;
