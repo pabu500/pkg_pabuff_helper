@@ -121,14 +121,14 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
     deviceInfo['meter_tag'] = _selectedMeterInfo['meter_tag'];
     deviceInfo['device_cat'] = widget.deviceCat.name;
 
-    if(widget.deviceCat == PagDeviceCat.gateway){
+    if (widget.deviceCat == PagDeviceCat.gateway) {
       deviceInfo['gateway_id'] = widget.deviceInfo['id'];
       deviceInfo['gateway_tag'] = widget.deviceInfo['tag'];
-    } else if(widget.deviceCat == PagDeviceCat.mcu){
+    } else if (widget.deviceCat == PagDeviceCat.mcu) {
       deviceInfo['mcu_id'] = widget.deviceInfo['id'];
       deviceInfo['iccid'] = widget.deviceInfo['iccid'];
     } else {
-      return ;
+      return;
     }
 
     Map<String, dynamic> queryMap = {
@@ -279,8 +279,7 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
     final signal = content['s'];
     final errorList = content['el'] ?? [];
 
-    final meterGroupLabel =
-        _deviceHealthData['meter_group_label'] ?? 'Unknown';
+    final meterGroupLabel = _deviceHealthData['meter_group_label'] ?? 'Unknown';
 
     final meterInfoList = _deviceHealthData['meter_info_list'] ?? [];
 
@@ -325,9 +324,7 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
     String submittedTimestamp = _deviceHealthData['submitted_timestamp'] ?? '';
     final content = _deviceHealthData['content'];
     final version = content['v'] ?? '-';
-    final temperature = content['t'] == null ?
-        '-' :
-        '${content['t']}°C';
+    final temperature = content['t'] == null ? '-' : '${content['t']}°C';
     final signal = content['s'] ?? '-';
     final signalPercentage = content['s'] == null
         ? '-'
@@ -434,16 +431,20 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
   }
 
   Widget getMeterGroupStatus() {
-    final meterGroupLabel =
-        _deviceHealthData['meter_group_label'];
+    final meterGroupLabel = _deviceHealthData['meter_group_label'];
 
     final content = _deviceHealthData['content'];
     final errorList = content['el'];
     final meterInfoList = _deviceHealthData['meter_info_list'] ?? [];
-    final String lastOnlineTimestamp = _deviceHealthData['${widget.deviceCat.name}_last_online_timestamp'] ?? '';
+    final String lastOnlineTimestamp =
+        _deviceHealthData['${widget.deviceCat.name}_last_online_timestamp'] ??
+            '';
 
-    bool isMeterGroupExist = meterGroupLabel != null && meterGroupLabel.isNotEmpty;
-    String labelToShow = isMeterGroupExist ? meterGroupLabel + ' ($lastOnlineTimestamp)' : lastOnlineTimestamp;
+    bool isMeterGroupExist =
+        meterGroupLabel != null && meterGroupLabel.isNotEmpty;
+    String labelToShow = isMeterGroupExist
+        ? meterGroupLabel + ' ($lastOnlineTimestamp)'
+        : lastOnlineTimestamp;
 
     // sort by tag strings
     meterInfoList.sort((a, b) {
@@ -491,11 +492,11 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 isMeterGroupExist
-                        ? SizedBox(
-                            width: keyWidth,
-                            child:  Icon(PagDeviceCat.meterGroup.iconData,
-                                    color: Theme.of(context).hintColor))
-                        : const SizedBox.shrink(),
+                    ? SizedBox(
+                        width: keyWidth,
+                        child: Icon(PagDeviceCat.meterGroup.iconData,
+                            color: Theme.of(context).hintColor))
+                    : const SizedBox.shrink(),
                 horizontalSpaceTiny,
                 SizedBox(
                     width: valueWidth,
@@ -621,6 +622,11 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
       }
     }
 
+    bool isCheckButtonEnabled = _isCheckingMeter != true &&
+        _isFetching != true &&
+        _meterHealthData.isEmpty &&
+        (_checkMeterErrorText.isEmpty);
+
     return Container(
       decoration: BoxDecoration(
         border: Border.all(color: Theme.of(context).hintColor.withAlpha(130)),
@@ -670,10 +676,7 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
                       color: Theme.of(context).colorScheme.onSecondary)),
               horizontalSpaceSmall,
               WgtCommButton(
-                  enabled: _isCheckingMeter != true &&
-                      _isFetching != true &&
-                      _meterHealthData.isEmpty &&
-                      (_checkMeterErrorText.isEmpty),
+                  enabled: isCheckButtonEnabled,
                   label: 'Check Status',
                   labelWidget: Icon(Symbols.wifi_find,
                       color: Theme.of(context).colorScheme.onSecondary),

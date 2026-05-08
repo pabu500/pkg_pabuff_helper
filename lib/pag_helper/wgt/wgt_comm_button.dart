@@ -89,6 +89,9 @@ class _WgtCommButtonState extends State<WgtCommButton> {
                       _isCoolingDown = false;
                     });
                   }
+                  setState(() {
+                    _isCoolingDown = false;
+                  });
                 },
           child: Container(
             width: widget.width,
