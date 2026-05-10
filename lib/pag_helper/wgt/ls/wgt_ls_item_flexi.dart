@@ -79,6 +79,8 @@ class WgtListSearchItemFlexi extends StatefulWidget {
     this.hint,
     this.widthOffset = 0.0,
     this.additionalQuery = const {},
+    this.sortBy,
+    this.sortOrder,
   });
 
   final MdlPagAppConfig appConfig;
@@ -116,6 +118,8 @@ class WgtListSearchItemFlexi extends StatefulWidget {
   final String? hint;
   final double widthOffset;
   final Map<String, dynamic> additionalQuery;
+  final String? sortBy;
+  final String? sortOrder;
 
   @override
   State<WgtListSearchItemFlexi> createState() => _WgtListSearchItemFlexiState();
@@ -1497,6 +1501,9 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     if (widget.listController != null) {
       _selectedListController = widget.listController;
     }
+
+    _sortBy = widget.sortBy;
+    _sortOrder = widget.sortOrder;
   }
 
   @override
@@ -1620,6 +1627,8 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         allowFlexiLabel: widget.allowFlexiLabel,
         hint: widget.hint,
         additionalQuery: widget.additionalQuery,
+        sortBy: _sortBy,
+        sortOrder: _sortOrder,
         onSearching: () {
           setState(() {
             _isFetchingItemList = true;

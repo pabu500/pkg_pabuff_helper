@@ -236,6 +236,8 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
         'tenant_name': tenantName,
         'tenant_label': tenantLabel,
       },
+      sortBy: 'entry_timestamp',
+      sortOrder: 'desc',
     );
   }
 

@@ -78,6 +78,8 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
     this.widthOffset = 0.0,
     this.additionalQuery = const {},
     this.maxDurationDays,
+    this.sortBy,
+    this.sortOrder,
   });
 
   final MdlPagUser loggedInUser;
@@ -118,6 +120,8 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
   final double widthOffset;
   final Map<String, dynamic> additionalQuery;
   final int? maxDurationDays;
+  final String? sortBy;
+  final String? sortOrder;
 
   @override
   State<WgtPagItemFinderFlexi> createState() => _WgtPagItemFinderFlexiState();
@@ -224,8 +228,8 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
       'item_type': itemTypeStr,
       'max_rows_per_page': '$_selectedRowsPerPage',
       'current_page': '$_currentPage',
-      'sort_by': '',
-      'sort_order': 'desc',
+      'sort_by': widget.sortBy,
+      'sort_order': widget.sortOrder,
       'get_count_only': widget.getCountOnly ? 'true' : 'false',
       'list_context_type': widget.listContextType.name,
       'allow_flexi_label': widget.allowFlexiLabel ? 'true' : 'false',

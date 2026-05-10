@@ -75,6 +75,7 @@ class MdlListColController {
   int? decimal;
   String? Function(String)? validator;
   List<String>? contextExcludeList;
+  bool requiredOnOnb;
 
   MdlListColController({
     required this.colKey,
@@ -116,6 +117,7 @@ class MdlListColController {
     this.useComma = false,
     this.validator,
     this.contextExcludeList,
+    this.requiredOnOnb = false,
   }) {
     pinned = pinned ?? false;
   }
@@ -330,6 +332,16 @@ class MdlListColController {
       }
     }
 
+    bool requiredOnOnb = false;
+    if (json['required_on_onb'] != null) {
+      dynamic requiredOnOnbValue = json['required_on_onb'];
+      if (requiredOnOnbValue is bool) {
+        requiredOnOnb = requiredOnOnbValue;
+      } else if (requiredOnOnbValue is String) {
+        requiredOnOnb = requiredOnOnbValue.toLowerCase() == 'true';
+      }
+    }
+
     Widget Function(
             Map<String, dynamic> row, List<Map<String, dynamic>> fullList)?
         getCustomWidget;
@@ -407,6 +419,7 @@ class MdlListColController {
       align: align,
       decimal: decimal,
       contextExcludeList: contextExcludeList,
+      requiredOnOnb: requiredOnOnb,
     );
   }
 
@@ -436,6 +449,7 @@ class MdlListColController {
     data['align'] = align;
     data['decimal'] = decimal;
     data['context_exclude'] = contextExcludeList;
+    data['required_on_onb'] = requiredOnOnb.toString();
     return data;
   }
 }
