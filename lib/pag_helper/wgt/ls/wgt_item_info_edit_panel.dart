@@ -917,7 +917,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
         ),
         child: WgtItemGroupTree(
           appConfig: widget.appConfig,
-          mode: 'edit',
+          mode: isEditableByAcl ? 'edit' : 'view',
           width: width,
           loggedInUser: _loggedInUser!,
           groupItemId: widget.itemIndexStr,

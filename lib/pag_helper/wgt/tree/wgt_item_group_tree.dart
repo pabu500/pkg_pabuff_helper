@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as dev;
 
 import 'package:buff_helper/pag_helper/comm/comm_pag_item.dart';
 import 'package:buff_helper/pag_helper/comm/comm_pag_job.dart';
@@ -227,9 +228,8 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
           break;
       }
     } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
+      dev.log(e.toString());
+
       result['message'] = e.toString();
       _committErrorText = 'Error committing changes';
     } finally {
@@ -1569,17 +1569,20 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
                                   });
                                 },
                 )
-              : IconButton(
-                  icon: Icon(Icons.edit, color: Theme.of(context).hintColor),
-                  onPressed: () {
-                    setState(() {
-                      _isEditing = true;
-                      _allowAddButton = true;
-                      _showCommitted = false;
-                      _rePop();
-                    });
-                  },
-                ),
+              : widget.mode == 'view'
+                  ? Container()
+                  : IconButton(
+                      icon:
+                          Icon(Icons.edit, color: Theme.of(context).hintColor),
+                      onPressed: () {
+                        setState(() {
+                          _isEditing = true;
+                          _allowAddButton = true;
+                          _showCommitted = false;
+                          _rePop();
+                        });
+                      },
+                    ),
           horizontalSpaceSmall,
         ],
       ),
