@@ -242,6 +242,8 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
         return _selectedFromDate != null && _selectedToDate != null;
       case 'ar-aging-report':
         return _selectedDate1 != null;
+      case 'email-blast':
+        return _selectedFromDate != null && _selectedToDate != null;
       default:
         return false;
     }
@@ -345,6 +347,8 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
         return collectionReportOptions();
       case 'ar-aging-report':
         return arAgingReportOptions();
+      case 'email-blast':
+        return blastEmailOptions();
       default:
         return const SizedBox();
     }
@@ -1059,6 +1063,62 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
             ),
           ],
         ),
+      ],
+    );
+  }
+
+  Widget blastEmailOptions() {
+    List<String> blastTypeOptions = [
+      'billing-notification',
+    ];
+
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Type',
+              style: TextStyle(
+                color: Theme.of(context).hintColor,
+                fontSize: 16,
+              ),
+            ),
+            horizontalSpaceSmall,
+            DropdownButton<String>(
+              value: _selectedItemTypeStr,
+              items: blastTypeOptions
+                  .map((type) => DropdownMenuItem<String>(
+                        value: type,
+                        child: Text(type),
+                      ))
+                  .toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedItemTypeStr = newValue;
+                });
+              },
+            ),
+          ],
+        ),
+        if (_selectedItemTypeStr == 'billing-notification')
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Cycle Month',
+                  style: TextStyle(
+                    color: Theme.of(context).hintColor,
+                    fontSize: 16,
+                  ),
+                ),
+                horizontalSpaceSmall,
+                getTimeRangePicker(forceMonthly: true),
+              ],
+            ),
+          ),
       ],
     );
   }
