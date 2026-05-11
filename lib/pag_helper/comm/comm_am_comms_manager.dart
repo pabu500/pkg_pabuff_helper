@@ -152,7 +152,7 @@ Future<dynamic> getDeviceLastReading(
     }
     final historyList = itemHistory['history_list'];
     if (historyList == null || historyList.isEmpty) {
-      throw Exception("No history data found in the response");
+      throw Exception("m:No last reading found");
     }
     return historyList.first;
   } else if (response.statusCode == 403) {
