@@ -243,7 +243,11 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
       case 'ar-aging-report':
         return _selectedDate1 != null;
       case 'email-blast':
-        return _selectedFromDate != null && _selectedToDate != null;
+        if (_selectedItemTypeStr == 'billing-notification') {
+          return _selectedFromDate != null && _selectedToDate != null;
+        } else {
+          return false;
+        }
       default:
         return false;
     }
