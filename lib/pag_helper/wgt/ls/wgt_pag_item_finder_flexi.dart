@@ -1090,7 +1090,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     List<Widget> list = [];
     for (MdlListColController colController
         in widget.listController.listColControllerList) {
-      if (colController.showColumn == false) continue;
+      if (colController.showFilter == false) continue;
       if (!_isFullPanel && !colController.pinned && !widget.isCompactMode) {
         continue;
       }
@@ -1184,7 +1184,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
         continue;
       }
 
-      if (colController.showColumn == false) continue;
+      if (colController.showFilter == false) continue;
       if (!_isFullPanel && !colController.pinned && !widget.isCompactMode) {
         continue;
       }
@@ -1285,7 +1285,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     List<Widget> list = [];
     for (MdlListColController colController
         in widget.listController.listColControllerList) {
-      if (colController.showColumn == false) continue;
+      if (colController.showFilter == false) continue;
       // need to pull the filter value list regardless of the panel status
       // because the value list is needed to populate for the info edit panel
       // if (!_isFullPanel && !colController.pinned) continue;
@@ -1386,7 +1386,13 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
 
     for (MdlListColController colController
         in widget.listController.listColControllerList) {
-      if (colController.showColumn == false) continue;
+      // show scope filters by default
+      if (colController.showFilter == false) {
+        if (!colController.colKey.contains('_label')) {
+          continue;
+        }
+      }
+
       if (!_isFullPanel && !colController.pinned) continue;
 
       if (colController.filterGroupType == PagFilterGroupType.location) {
@@ -1420,7 +1426,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     List<Widget> list = [];
     for (MdlListColController item
         in widget.listController.listColControllerList) {
-      if (item.showColumn == false) continue;
+      if (item.showFilter == false) continue;
       // need to pull the filter value list regardless of the panel status
       // because the value list is needed to populate for the info edit panel
       // if (!_isFullPanel && !item.pinned) continue;

@@ -76,6 +76,7 @@ class MdlListColController {
   String? Function(String)? validator;
   List<String>? contextExcludeList;
   bool requiredOnOnb;
+  bool showFilter;
 
   MdlListColController({
     required this.colKey,
@@ -118,6 +119,7 @@ class MdlListColController {
     this.validator,
     this.contextExcludeList,
     this.requiredOnOnb = false,
+    this.showFilter = false,
   }) {
     pinned = pinned ?? false;
   }
@@ -387,6 +389,16 @@ class MdlListColController {
       }
     }
 
+    bool showFilter = showColumn;
+    if (json['show_filter'] != null) {
+      dynamic showFilterValue = json['show_filter'];
+      if (showFilterValue is bool) {
+        showFilter = showFilterValue;
+      } else if (showFilterValue is String) {
+        showFilter = showFilterValue.toLowerCase() == 'true';
+      }
+    }
+
     return MdlListColController(
       colKey: colKey,
       joinKey: json['join_key'],
@@ -420,6 +432,7 @@ class MdlListColController {
       decimal: decimal,
       contextExcludeList: contextExcludeList,
       requiredOnOnb: requiredOnOnb,
+      showFilter: showFilter,
     );
   }
 
