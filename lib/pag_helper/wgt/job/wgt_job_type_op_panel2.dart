@@ -1086,7 +1086,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
         verticalSpaceSmall,
         getItemIdSelector(),
         verticalSpaceSmall,
-        if (_selectedItemTypeStr != null) getTimeRangePicker(),
+        getTimeRangePicker(),
       ],
     );
   }
