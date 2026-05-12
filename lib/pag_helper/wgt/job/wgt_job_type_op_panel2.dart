@@ -246,8 +246,9 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
       case 'item-history':
         return _selectedItemTypeStr != null &&
             _selectedItemIdTypeStr != null &&
-            _selectedItemIdStr != null;
-        _selectedFromDate != null && _selectedToDate != null;
+            _selectedItemIdStr != null &&
+            _selectedFromDate != null &&
+            _selectedToDate != null;
       case 'item-list':
         return _selectedItemTypeStr != null;
       case 'collection-report':
@@ -948,8 +949,13 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
           ),
         ),
         horizontalSpaceSmall,
-        SizedBox(
+        Container(
           width: 200,
+          decoration: BoxDecoration(
+              border:
+                  Border.all(color: Theme.of(context).hintColor.withAlpha(50)),
+              borderRadius: BorderRadius.circular(5)),
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
           child: WgtTextField(
             appConfig: widget.appConfig,
             hintText: 'Enter Item ID',
@@ -1087,6 +1093,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
         getItemIdSelector(),
         verticalSpaceSmall,
         getTimeRangePicker(),
+        verticalSpaceSmall,
       ],
     );
   }
