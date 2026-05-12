@@ -45,8 +45,8 @@ class WgtPagTenantCompositeUsageSummaryRl extends StatefulWidget {
     this.costDecimals = 3,
     this.tenantSingularUsageInfoList = const [],
     required this.compositeUsageCalc,
-    required this.previousCollectionDateTimestampStr,
-    required this.currentCollectionDateTimestampStr,
+    required this.collectionStartDateTimestampStr,
+    required this.collectionEndDateTimestampStr,
     this.onUpdate,
     this.interestInfo = const {},
   });
@@ -85,8 +85,8 @@ class WgtPagTenantCompositeUsageSummaryRl extends StatefulWidget {
   final int costDecimals;
   final List<Map<String, dynamic>> tenantSingularUsageInfoList;
   final PagEmsTypeUsageCalcRl? compositeUsageCalc;
-  final String previousCollectionDateTimestampStr;
-  final String currentCollectionDateTimestampStr;
+  final String collectionStartDateTimestampStr;
+  final String collectionEndDateTimestampStr;
   final Map<String, dynamic> interestInfo;
   final Function? onUpdate;
 
@@ -206,8 +206,8 @@ class _WgtPagTenantCompositeUsageSummaryRlState
                   widget.tenantType,
                   widget.lineItems,
                   widget.compositeUsageCalc!.miniSoaInfo,
-                  widget.previousCollectionDateTimestampStr,
-                  widget.currentCollectionDateTimestampStr,
+                  widget.collectionStartDateTimestampStr,
+                  widget.collectionEndDateTimestampStr,
                   widget.interestInfo,
                   showInterestDetail: _showInterestDetail,
                   onCheckInterestDetail: () {

@@ -91,6 +91,8 @@ Future<Uint8List> generatePagInvoice(
     amgrBankBranchCode: billInfo['amgrBankBranchCode'],
     amgrBankSwiftCode: billInfo['amgrBankSwiftCode'],
     amgrBankPayNow: billInfo['amgrBankPayNow'],
+    collectionStartDateStr: billInfo['collectionStartDate'],
+    collectionEndDateStr: billInfo['collectionEndDate'],
     tax: .15,
     baseColor: PdfColors.teal,
     accentColor: PdfColors.blueGrey900,
@@ -169,6 +171,8 @@ class PagBill {
     required this.amgrBankBranchCode,
     required this.amgrBankSwiftCode,
     required this.amgrBankPayNow,
+    required this.collectionStartDateStr,
+    required this.collectionEndDateStr,
   });
 
   final String customerLabel;
@@ -238,6 +242,8 @@ class PagBill {
   final String? amgrBankBranchCode;
   final String? amgrBankSwiftCode;
   final String? amgrBankPayNow;
+  final String collectionStartDateStr;
+  final String collectionEndDateStr;
   // final String? billedTptNote;
   static const _darkColor = PdfColors.blueGrey800;
   static const _lightColor = PdfColors.white;
@@ -1184,7 +1190,7 @@ class PagBill {
                     crossAxisAlignment: pw.CrossAxisAlignment.center,
                     children: [
                       pw.Text(
-                        'Balance C/F',
+                        'Balance C/F as at ${collectionEndDateStr.substring(0, 10)}',
                         style:
                             const pw.TextStyle(fontSize: 10, color: _darkColor),
                       ),
@@ -1200,7 +1206,7 @@ class PagBill {
           pw.SizedBox(height: 5),
           pw.Row(children: [
             pw.Text(
-              '* payments made close to this collection date may not be reflected',
+              '* payments made close to this collection end date may not be reflected',
               style: pw.TextStyle(
                   fontSize: 9,
                   color: _darkColor,

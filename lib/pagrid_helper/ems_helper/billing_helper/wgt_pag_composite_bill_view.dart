@@ -880,8 +880,8 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     String billBarFromMonth,
     List<Map<String, dynamic>> lineItemList,
     Map<String, dynamic> miniSoaInfo,
-    String previousCollectionDateTimestampStr,
-    String currentCollectionDateTimestampStr,
+    String collectionStartDateTimestampStr,
+    String collectionEndDateTimestampStr,
     Map<String, dynamic> interestInfo,
     String? billedAmgrCompanyTradingName,
     String? billedAmgrCompanyRegNumber,
@@ -1136,6 +1136,8 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
               'billedTpNote': billedTpNote,
               'billedTptRateNote': billedTptRateNote,
               'billedTptCycleNote': billedTptCycleNote,
+              'collectionStartDate': collectionStartDateTimestampStr,
+              'collectionEndDate': collectionEndDateTimestampStr,
             },
           )
         : WgtPagTenantCompositeUsageSummaryRl(
@@ -1168,10 +1170,8 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             // meterTypeRates: billedRates,
             tenantSingularUsageInfoList: singularUsageList,
             compositeUsageCalc: compositeUsageCalcRl,
-            previousCollectionDateTimestampStr:
-                previousCollectionDateTimestampStr,
-            currentCollectionDateTimestampStr:
-                currentCollectionDateTimestampStr,
+            collectionStartDateTimestampStr: collectionStartDateTimestampStr,
+            collectionEndDateTimestampStr: collectionEndDateTimestampStr,
             excludeAutoUsage:
                 _bill['exclude_auto_usage'] == 'true' ? true : false,
             gst: compositeUsageCalcRl.billedGst,
