@@ -615,11 +615,11 @@ class PagBill {
     );
   }
 
-  String _getBillingPeriodStr() {
-    DateTime billFrom = DateTime.parse(billFromStr);
+  String _getBillingPeriodStr(String fromStr, String toStr) {
+    DateTime billFrom = DateTime.parse(fromStr);
     // subtract 1 second from billTo to avoid showing next day if billTo is at 00:00:00
     DateTime billTo =
-        DateTime.parse(billToStr).subtract(const Duration(seconds: 1));
+        DateTime.parse(toStr).subtract(const Duration(seconds: 1));
     String formattedFrom = DateFormat('dd MMM yyyy').format(billFrom);
     String formattedTo = DateFormat('dd MMM yyyy').format(billTo);
     return '$formattedFrom - $formattedTo';
@@ -641,7 +641,7 @@ class PagBill {
             pw.Text('Billing Period: ',
                 style: pw.TextStyle(
                     color: _darkColor, fontWeight: pw.FontWeight.bold)),
-            pw.Text(_getBillingPeriodStr(),
+            pw.Text(_getBillingPeriodStr(billFromStr, billToStr),
                 style: const pw.TextStyle(color: _darkColor, fontSize: 11)),
           ]),
           pw.SizedBox(width: 50),
@@ -742,7 +742,8 @@ class PagBill {
       String slotFromTimestampStr = singularUsageInfo['from_timestamp'] ?? '';
       String slotToTimestampStr = singularUsageInfo['to_timestamp'] ?? '';
       String slotStr =
-          '  ${slotFromTimestampStr.substring(0, 10)} - ${slotToTimestampStr.substring(0, 10)}';
+          // '  ${slotFromTimestampStr.substring(0, 10)} - ${slotToTimestampStr.substring(0, 10)}';
+          '  ${_getBillingPeriodStr(slotFromTimestampStr, slotToTimestampStr)}';
       typeStatList.add(
           _getTypeRow2(boltIcon, 'Electricity', 'kWh', singularUsageInfo, 'E'));
       typeStatList
