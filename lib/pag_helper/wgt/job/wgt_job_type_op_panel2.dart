@@ -87,6 +87,9 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
 
   bool _sendToAll = false;
 
+  String? _selectedItemIdTypeStr;
+  String? _selectedItemIdStr;
+
   Future<dynamic> _triggerJob() async {
     if (_isPosting) return;
 
@@ -106,7 +109,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
       Map<String, dynamic> jobScope = widget.jobTypeScope?.toScopeMap() ??
           widget.loggedInUser.selectedScope.toScopeMap();
 
-      Map<String, String> jobRequest = {
+      Map<String, dynamic> jobRequest = {
         'job_type': widget.jobTypeName,
         'job_task_type': widget.jobTaskType,
         'scope_prefix': widget.jobScopeLabel ?? '',
@@ -114,8 +117,8 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
       };
 
       if (!_sendToAll) {
-        jobRequest['recipient_email'] = _loggedInUser!.email ?? '';
-        jobRequest['recipient_name'] = _loggedInUser!.username ?? '';
+        jobRequest['recipient_email'] = _loggedInUser!.email;
+        jobRequest['recipient_name'] = _loggedInUser!.username;
       }
 
       if (_selectedDate1 != null) {
@@ -138,12 +141,16 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
               ? 'main'
               : 'sub';
       if (_selectedLcStatusStr != null) {
-        jobRequest['target_lc_status'] = _selectedLcStatusStr!;
+        jobRequest['target_lc_status'] = _selectedLcStatusStr;
       }
 
       jobRequest['is_option_1'] = _isOption1.toString();
 
-      jobRequest['selected_item_type'] = _selectedItemTypeStr ?? '';
+      jobRequest['selected_item_type'] = _selectedItemTypeStr;
+
+      jobRequest['selected_item_id_type'] = _selectedItemIdTypeStr;
+
+      jobRequest['selected_item_id'] = _selectedItemIdStr;
 
       Map<String, dynamic> queryMap = {
         'scope': jobScope,
@@ -236,7 +243,12 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
         return true;
       case 'payment-matching':
         return true;
-      case 'get-item-list':
+      case 'item-history':
+        return _selectedItemTypeStr != null &&
+            _selectedItemIdTypeStr != null &&
+            _selectedItemIdStr != null;
+        _selectedFromDate != null && _selectedToDate != null;
+      case 'item-list':
         return _selectedItemTypeStr != null;
       case 'collection-report':
         return _selectedFromDate != null && _selectedToDate != null;
@@ -345,7 +357,9 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
         return genPaymentMatchingFormOptions();
       case 'payment-matching':
         return paymentMatchingOptions();
-      case 'get-item-list':
+      case 'item-history':
+        return getItemHistoryOptions();
+      case 'item-list':
         return getItemListOptions();
       case 'collection-report':
         return collectionReportOptions();
@@ -897,6 +911,60 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
     );
   }
 
+  Widget getItemIdSelector() {
+    List<String> itemIdTypeOptions = ['id', 'name', 'label', 'sn'];
+
+    TextStyle dropDownListHintStyle =
+        TextStyle(fontSize: 15, color: Theme.of(context).hintColor);
+    Widget dropDownUnderline =
+        Container(height: 1, color: Theme.of(context).hintColor.withAlpha(75));
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // dropdown to select item id type
+        Container(
+          decoration: BoxDecoration(
+            border:
+                Border.all(color: Theme.of(context).hintColor.withAlpha(50)),
+            borderRadius: BorderRadius.circular(5),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+          child: DropdownButton<String>(
+            hint: Text('Select ID Type', style: dropDownListHintStyle),
+            value: _selectedItemIdTypeStr,
+            underline: dropDownUnderline,
+            items: itemIdTypeOptions
+                .map((type) => DropdownMenuItem<String>(
+                      value: type,
+                      child: Text(type.toUpperCase()),
+                    ))
+                .toList(),
+            onChanged: (String? newValue) {
+              setState(() {
+                _selectedItemIdTypeStr = newValue;
+              });
+            },
+          ),
+        ),
+        horizontalSpaceSmall,
+        SizedBox(
+          width: 200,
+          child: WgtTextField(
+            appConfig: widget.appConfig,
+            hintText: 'Enter Item ID',
+            labelText: 'Item ID',
+            onChanged: (value) {
+              setState(() {
+                _selectedItemIdStr = value;
+              });
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget getResultText() {
     if (_postDone) {
       if (_postResultErrorText.isNotEmpty) {
@@ -982,6 +1050,45 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
 
   Widget paymentMatchingOptions() {
     return Container();
+  }
+
+  Widget getItemHistoryOptions() {
+    List<String> itemTypeOptions = ['meter'];
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Item Type',
+              style: TextStyle(
+                color: Theme.of(context).hintColor,
+                fontSize: 16,
+              ),
+            ),
+            horizontalSpaceSmall,
+            DropdownButton<String>(
+              value: _selectedItemTypeStr,
+              items: itemTypeOptions
+                  .map((type) => DropdownMenuItem<String>(
+                        value: type,
+                        child: Text(type),
+                      ))
+                  .toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedItemTypeStr = newValue;
+                });
+              },
+            ),
+          ],
+        ),
+        verticalSpaceSmall,
+        getItemIdSelector(),
+        verticalSpaceSmall,
+        if (_selectedItemTypeStr != null) getTimeRangePicker(),
+      ],
+    );
   }
 
   Widget getItemListOptions() {
