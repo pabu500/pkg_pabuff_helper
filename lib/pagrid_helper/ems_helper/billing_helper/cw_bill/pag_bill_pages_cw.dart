@@ -1170,7 +1170,7 @@ class PagBill {
                         crossAxisAlignment: pw.CrossAxisAlignment.center,
                         children: [
                           pw.Text(
-                            'Payment received as at* ${paymentDateStr.substring(0, 10)}',
+                            'Payment received as at ${paymentDateStr.substring(0, 10)}',
                             style: pw.TextStyle(
                                 fontSize: 10,
                                 color: _darkColor,
@@ -1190,7 +1190,7 @@ class PagBill {
                     crossAxisAlignment: pw.CrossAxisAlignment.center,
                     children: [
                       pw.Text(
-                        'Balance C/F as at ${collectionEndDateStr.substring(0, 10)}',
+                        'Balance C/F as at* ${collectionEndDateStr.substring(0, 10)}',
                         style:
                             const pw.TextStyle(fontSize: 10, color: _darkColor),
                       ),
