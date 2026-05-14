@@ -229,6 +229,10 @@ class MdlListColController {
       }
     }
 
+    if (permHidden) {
+      showEditPanel = false;
+    }
+
     bool showSort = false;
     if (json['show_sort'] != null) {
       dynamic showSortValue = json['show_sort'];
