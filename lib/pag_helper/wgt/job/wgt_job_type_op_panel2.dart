@@ -4,14 +4,12 @@ import 'dart:developer' as dev;
 import 'package:buff_helper/pag_helper/comm/comm_pag_job.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_controller.dart';
-import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_scope.dart';
 import 'package:buff_helper/pag_helper/wgt/datetime/wgt_date_range_picker_monthly.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/xt_ui/wdgt/datetime/wgt_date_picker.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../../model/mdl_pag_app_config.dart';
 
@@ -49,7 +47,7 @@ class WgtJobTypeOpPanel2 extends StatefulWidget {
 }
 
 class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
-  late MdlPagUser? _loggedInUser;
+  // late MdlPagUser? _loggedInUser;
 
   final double width = 550;
 
@@ -117,8 +115,8 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
       };
 
       if (!_sendToAll) {
-        jobRequest['recipient_email'] = _loggedInUser!.email;
-        jobRequest['recipient_name'] = _loggedInUser!.username;
+        jobRequest['recipient_email'] = widget.loggedInUser.email;
+        jobRequest['recipient_name'] = widget.loggedInUser.username;
       }
 
       if (_selectedDate1 != null) {
@@ -160,11 +158,11 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
 
       var result = await doPagPostJob(
         widget.appConfig,
-        _loggedInUser,
+        widget.loggedInUser,
         queryMap,
         MdlPagSvcClaim(
-          username: _loggedInUser!.username,
-          userId: _loggedInUser!.id,
+          username: widget.loggedInUser.username,
+          userId: widget.loggedInUser.id,
           scope: '',
           target: '',
           operation: '',
@@ -270,8 +268,8 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
   void initState() {
     super.initState();
 
-    _loggedInUser =
-        Provider.of<PagUserProvider>(context, listen: false).currentUser;
+    // _loggedInUser =
+    //     Provider.of<PagUserProvider>(context, listen: false).currentUser;
     _itemDisplayName = widget.itemDisplayName;
   }
 
@@ -505,6 +503,24 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
         ),
         verticalSpaceSmall,
         getMainMeterSwitcher(),
+        verticalSpaceSmall,
+        //check box to check full report
+        if (_monthPicked != null && !_isMTD)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Checkbox(
+                value: _isOption1,
+                onChanged: (bool? value) {
+                  setState(() {
+                    _isOption1 = value ?? false;
+                  });
+                },
+              ),
+              const Text('Full Report'),
+            ],
+          ),
       ],
     );
   }
