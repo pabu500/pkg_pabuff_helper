@@ -619,7 +619,7 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
     // for scope, or for item kinds with flexi scope
     if (widget.forItemKind == PagItemKind.scope ||
         widget.forItemKind == PagItemKind.meterGroup ||
-        widget.forItemKind == PagItemKind.tariffPackage) {
+        widget.forItemKind == PagItemKind.tariff) {
       if (_selectedLocationGroupProfile == null) {
         pullChildrenList = false;
       }
@@ -1198,7 +1198,7 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
     switch (widget.forItemKind) {
       case PagItemKind.scope:
         break;
-      case PagItemKind.tariffPackage:
+      case PagItemKind.tariff:
         break;
       case PagItemKind.tenant:
         if (_selectedLocation == null) {
@@ -1360,8 +1360,7 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
                                 }
 
                                 bool updateUiOnly = false;
-                                if (widget.forItemKind ==
-                                        PagItemKind.tariffPackage ||
+                                if (widget.forItemKind == PagItemKind.tariff ||
                                     widget.forItemKind == PagItemKind.tenant ||
                                     widget.forItemKind == PagItemKind.device) {
                                   updateUiOnly = true;

@@ -368,7 +368,7 @@ class MdlListColController {
     PagScopeType? scopeType;
     if (filterGroupType == PagFilterGroupType.location) {
       String scopeKey = colKey.replaceFirst('_label', '');
-      scopeType = PagScopeType.byKey(scopeKey);
+      scopeType = PagScopeType.byValue(scopeKey);
     }
 
     String? align;

@@ -16,6 +16,7 @@ import 'package:provider/provider.dart';
 import '../../def_helper/dh_device.dart';
 import '../../def_helper/dh_pag_finance.dart';
 import '../../def_helper/dh_pag_org.dart';
+import '../../def_helper/dh_pag_tariff.dart';
 import '../../model/mdl_pag_app_config.dart';
 import '../../wgt/history_presentor/wgt_pag_item_history_presenter.dart';
 import 'wgt_ls_item_flexi.dart';
@@ -156,6 +157,10 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
           itemTypeStr = itemType.value;
           listControllerItemTypeStr =
               (listController.itemType as PagOrgType).value;
+        } else if (itemType is PagTariff) {
+          itemTypeStr = itemType.value;
+          listControllerItemTypeStr =
+              (listController.itemType as PagTariff).value;
         } else {
           throw Exception('Unsupported item type: ${itemType.runtimeType}');
         }
@@ -214,8 +219,11 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
     } else if (itemType is PagScopeType) {
       return getPagScopeTypeStr(itemType);
     } else if (itemType is PagFinanceType) {
-      return getPagFinanceTypeStr(itemType);
+      // return getPagFinanceTypeStr(itemType);
+      return itemType.value;
     } else if (itemType is PagOrgType) {
+      return itemType.value;
+    } else if (itemType is PagTariff) {
       return itemType.value;
     } else {
       throw Exception('Unsupported item type: ${itemType.runtimeType}');
@@ -267,6 +275,10 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
           PagOrgType orgType = orgTypeInfo['item_type'];
           itemTypeList.add(orgType.value);
         }
+      } else if (widget.itemKind == PagItemKind.tariff) {
+        _itemTypeInfoList.add({'item_type': PagTariff.tariffPackage});
+        _itemTypeInfoList.add({'item_type': PagTariff.tariffRate});
+        _itemTypeInfoList.add({'item_type': PagTariff.tariffPackageType});
       } else {
         throw Exception('Unsupported item kind: ${widget.itemKind.name}');
       }

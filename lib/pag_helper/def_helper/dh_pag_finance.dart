@@ -55,18 +55,18 @@ enum PagFinanceType {
 //   return null;
 // }
 
-String getPagFinanceTypeStr(dynamic itemType) {
-  switch (itemType) {
-    case PagFinanceType.tenantSoa:
-      return PagFinanceType.tenantSoa.value;
-    case PagFinanceType.payment:
-      return PagFinanceType.payment.value;
-    case PagFinanceType.paymentApply:
-      return PagFinanceType.paymentApply.value;
-    default:
-      return '';
-  }
-}
+// String getPagFinanceTypeStr(dynamic itemType) {
+//   switch (itemType) {
+//     case PagFinanceType.tenantSoa:
+//       return PagFinanceType.tenantSoa.value;
+//     case PagFinanceType.payment:
+//       return PagFinanceType.payment.value;
+//     case PagFinanceType.paymentApply:
+//       return PagFinanceType.paymentApply.value;
+//     default:
+//       return '';
+//   }
+// }
 
 enum PagPaymentLcStatus {
   posted('posted', 'Posted', 'pt', Colors.lightBlue),

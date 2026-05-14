@@ -458,7 +458,7 @@ class _WgtTariffPackageAssignmentState
               fontWeight: FontWeight.bold, color: Theme.of(context).hintColor),
         ),
         horizontalSpaceSmall,
-        Icon(PagItemKind.tariffPackage.iconData, size: 21),
+        Icon(PagItemKind.tariff.iconData, size: 21),
         horizontalSpaceTiny,
         Text(
           widget.itemName,

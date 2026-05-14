@@ -5,6 +5,7 @@ import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import 'dh_pag_tariff.dart';
 import 'enum_helper.dart';
 
 enum PagItemKind {
@@ -16,12 +17,12 @@ enum PagItemKind {
   org('Organization', Symbols.corporate_fare),
   jobType('Job Type', Symbols.energy_program_time_used),
   jobTypeSub('Job Type Sub', Symbols.group),
-  tariffPackage('Tariff Package', Symbols.price_change),
-  tariffPackageType('Tariff Package Type', Symbols.price_check),
+  // tariffPackage('Tariff Package', Symbols.price_change),
+  // tariffPackageType('Tariff Package Type', Symbols.price_check),
   bill('Bill', Symbols.request_quote),
   meterGroup('Meter Group', Symbols.atr),
   finance('Finance', Symbols.account_balance),
-  ;
+  tariff('Tariff', Symbols.price_change);
 
   const PagItemKind(
     this.label,
@@ -45,8 +46,11 @@ String? getItemTypeStr(dynamic itemType) {
   } else if (itemType is PagScopeType) {
     return getPagScopeTypeStr(itemType);
   } else if (itemType is PagFinanceType) {
-    return getPagFinanceTypeStr(itemType);
+    // return getPagFinanceTypeStr(itemType);
+    return itemType.value;
   } else if (itemType is PagOrgType) {
+    return itemType.value;
+  } else if (itemType is PagTariff) {
     return itemType.value;
   } else {
     throw Exception('Unsupported item type: ${itemType.runtimeType}');

@@ -28,7 +28,7 @@ class MdlPagProjectConfig {
 
   String getSupportEmail(PagScopeType scope) {
     for (Map<String, dynamic> supportChannel in supportChannelList) {
-      if (PagScopeType.byKey(supportChannel['scope']) == scope) {
+      if (PagScopeType.byValue(supportChannel['scope']) == scope) {
         return supportChannel['email'];
       }
     }
@@ -73,7 +73,7 @@ class MdlPagProjectConfig {
           // scopeList = PagScopeType.values;
         } else {
           List<String> scopeKeyList = scopeListStr.split(',');
-          scopeList = scopeKeyList.map((e) => PagScopeType.byKey(e)).toList();
+          scopeList = scopeKeyList.map((e) => PagScopeType.byValue(e)).toList();
         }
         continue;
       }
@@ -89,7 +89,7 @@ class MdlPagProjectConfig {
                 List<String> scopeKeyList =
                     ctxMenuConfig['visible_at_scope'].split(',');
                 List<PagScopeType> scopeList =
-                    scopeKeyList.map((e) => PagScopeType.byKey(e)).toList();
+                    scopeKeyList.map((e) => PagScopeType.byValue(e)).toList();
                 ctxMenuConfig['visible_at_scope'] = scopeList;
               }
             }

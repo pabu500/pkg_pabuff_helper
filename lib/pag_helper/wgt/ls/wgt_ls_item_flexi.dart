@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:buff_helper/pag_helper/comm/comm_pag_item.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_device.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_pag_tariff.dart';
 import 'package:buff_helper/pag_helper/def_helper/list_helper.dart';
 import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pag_helper/def_helper/pag_tariff_package_helper.dart';
@@ -438,7 +439,10 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
 
     bool addOpColumn = false;
     if (widget.itemKind == PagItemKind.jobType ||
-        widget.itemKind == PagItemKind.tariffPackage ||
+        // widget.itemKind == PagItemKind.tariffPackage ||
+        // widget.itemKind == PagItemKind.tariff ||
+        (widget.itemKind == PagItemKind.tariff &&
+            _selectedListController!.itemType == PagTariff.tariffPackage) ||
         widget.itemKind == PagItemKind.meterGroup ||
         widget.itemKind == PagItemKind.tenant ||
         widget.listContextType == PagListContextType.paymentMatching) {
@@ -462,7 +466,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     // acl
     if (loggedInUser!.selectedRole?.name.contains('project-ops-') ?? false) {
       if (widget.itemKind == PagItemKind.tenant ||
-          widget.itemKind == PagItemKind.tariffPackage) {
+          widget.itemKind == PagItemKind.tariff) {
         addOpColumn = false;
       }
     }
@@ -662,7 +666,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                     // }
 
                     Map<String, dynamic> customProperties = {};
-                    if (widget.itemKind == PagItemKind.tariffPackage) {
+                    if (widget.itemKind == PagItemKind.tariff) {
                       String tpTypeCatStr = item['tpt_cat'] ?? '';
                       PagTariffPackageTypeCat? tpTypeCat =
                           PagTariffPackageTypeCat.byTag(tpTypeCatStr);
@@ -676,7 +680,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                       WgtPagItemInfoEditPanel(
                         appConfig: widget.appConfig,
                         itemKind: widget.itemKind,
-                        itemIndexStr: item['id'],
+                        strItemIndex: item['id'],
                         fields: fieldList,
                         itemDisplayName:
                             itemDisplayName, //item[displayNameKey] ?? '',
@@ -719,7 +723,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
 
   void _addOpColumn(MdlPagListController listController) {
     if (widget.itemKind != PagItemKind.jobType &&
-        widget.itemKind != PagItemKind.tariffPackage &&
+        widget.itemKind != PagItemKind.tariff &&
         widget.itemKind != PagItemKind.meterGroup &&
         widget.itemKind != PagItemKind.tenant &&
         widget.itemKind != PagItemKind.device) {
@@ -743,7 +747,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           case PagItemKind.jobType:
             opIcon = Symbols.settings_b_roll;
             break;
-          case PagItemKind.tariffPackage:
+          case PagItemKind.tariff:
             opIcon = Symbols.assignment;
             if (item['tpt_cat'] == 'system_rate') {
               // system rate is not for assignment
@@ -891,7 +895,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                           },
                         );
                         break;
-                      case PagItemKind.tariffPackage:
+                      case PagItemKind.tariff:
                         opWidget = WgtTariffPackageAssignment(
                           appConfig: widget.appConfig,
                           loggedInUser: loggedInUser!,

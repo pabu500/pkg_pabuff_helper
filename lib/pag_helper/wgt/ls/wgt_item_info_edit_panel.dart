@@ -27,6 +27,7 @@ import 'dart:developer' as dev;
 import '../../comm/comm_fin_ops.dart';
 import '../../def_helper/dh_device.dart';
 import '../../def_helper/dh_pag_finance.dart';
+import '../../def_helper/dh_pag_tariff.dart';
 import '../../def_helper/dh_pag_tenant.dart';
 import '../../def_helper/tariff_package_helper.dart';
 import '../../model/mdl_pag_app_config.dart';
@@ -40,7 +41,7 @@ class WgtPagItemInfoEditPanel extends StatefulWidget {
   const WgtPagItemInfoEditPanel({
     super.key,
     required this.appConfig,
-    required this.itemIndexStr,
+    required this.strItemIndex,
     required this.itemKind,
     required this.itemDisplayName,
     required this.fields,
@@ -56,7 +57,7 @@ class WgtPagItemInfoEditPanel extends StatefulWidget {
   });
 
   final MdlPagAppConfig appConfig;
-  final String itemIndexStr;
+  final String strItemIndex;
   final PagItemKind itemKind;
   final String itemDisplayName;
   final MdlPagListController? listController;
@@ -126,7 +127,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
       {String? oldVal, String? scopeProfileIdColName}) async {
     try {
       Map<String, dynamic> opItem = {
-        'id': widget.itemIndexStr,
+        'id': widget.strItemIndex,
         key: value,
         'checked': true,
       };
@@ -136,14 +137,14 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
 
       Map<String, dynamic> queryMap = {
         'scope': _loggedInUser!.selectedScope.toScopeMap(),
-        'id': widget.itemIndexStr,
+        'id': widget.strItemIndex,
         'item_kind': widget.itemKind.name,
         'item_type': widget.itemType is Enum
             ? (widget.itemType as Enum).name
             : widget.itemType ?? '',
         'item_id_type': ItemIdType.id.name,
         'item_id_key': 'id',
-        'item_id': widget.itemIndexStr,
+        'item_id': widget.strItemIndex,
         // 'key1, key2, key3, ...'
         'update_key_str': key,
         'op_name': 'multi_key_val_update',
@@ -197,12 +198,12 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
       }
       Map<String, dynamic> queryMap = {
         'scope': _loggedInUser!.selectedScope.toScopeMap(),
-        'id': widget.itemIndexStr,
+        'id': widget.strItemIndex,
         'item_kind': widget.itemKind.name,
         'item_type': itemTypeStr,
         'item_id_type': ItemIdType.id.name,
         'item_id_key': 'id',
-        'item_id_value': widget.itemIndexStr,
+        'item_id_value': widget.strItemIndex,
         'item_name': itemName,
       };
       if (widget.listController != null) {
@@ -257,7 +258,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
     try {
       Map<String, dynamic> queryMap = {
         'scope': _loggedInUser!.selectedScope.toScopeMap(),
-        'payment_id': widget.itemIndexStr,
+        'payment_id': widget.strItemIndex,
         'item_kind': widget.itemKind.name,
         'item_id_type': ItemIdType.id.name,
       };
@@ -686,7 +687,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
       child: WgtOpResetPassword(
         appConfig: widget.appConfig,
         loggedInUser: _loggedInUser!,
-        targetUserIndexStr: widget.itemIndexStr,
+        targetUserIndexStr: widget.strItemIndex,
         targetUsername: widget.itemInfoMap?['username'] ?? '',
         targetUserAuthProvider: widget.itemInfoMap?['auth_provider'] ?? '',
         // height: 200,
@@ -710,7 +711,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
       child: WgtUesrRoleSetter(
         appConfig: widget.appConfig,
         loggedInUser: _loggedInUser!,
-        userIndexStr: widget.itemIndexStr,
+        userIndexStr: widget.strItemIndex,
         height: 350,
         onUserRoleListLoaded: (List<Map<String, dynamic>> userRoleList) {
           if (userRoleList.isEmpty) {
@@ -745,7 +746,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
         widget.itemKind == PagItemKind.user ||
         widget.itemKind == PagItemKind.role ||
         widget.itemKind == PagItemKind.finance ||
-        widget.itemKind == PagItemKind.tariffPackageType) {
+        widget.itemKind == PagItemKind.tariff) {
       return Container();
     }
 
@@ -754,7 +755,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
     bool isEditableByMapping = true;
     // String leafScopeLabel = '';
     MdlPagScope? initialScope;
-    if (widget.itemKind == PagItemKind.tariffPackage ||
+    if (widget.itemKind == PagItemKind.tariff ||
         /*widget.itemKind == PagItemKind.meterGroup ||*/
         widget.itemKind == PagItemKind.org) {
       isSingleLabel = true;
@@ -776,7 +777,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
     bool isFlexiScope = false;
     if (/* widget.itemKind == PagItemKind.scope ||*/
         widget.itemKind == PagItemKind.meterGroup ||
-            widget.itemKind == PagItemKind.tariffPackage) {
+            widget.itemKind == PagItemKind.tariff) {
       isFlexiScope = true;
     }
 
@@ -864,7 +865,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
 
         itemGroupType = PagItemGroupType.userTenant;
 
-        String userId = widget.itemIndexStr;
+        String userId = widget.strItemIndex;
         String userName = widget.fields
             .firstWhere((element) => element['col_key'] == 'username')['value'];
 
@@ -876,7 +877,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
       case PagItemKind.tenant:
         itemGroupType = PagItemGroupType.tenantUser;
 
-        String tenantId = widget.itemIndexStr;
+        String tenantId = widget.strItemIndex;
         String tenantName = widget.fields
             .firstWhere((element) => element['col_key'] == 'name')['value'];
 
@@ -887,17 +888,20 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
         break;
       case PagItemKind.jobType:
         itemGroupType = PagItemGroupType.jobTypeSub;
-        queryMap = {'job_type_id': widget.itemIndexStr};
+        queryMap = {'job_type_id': widget.strItemIndex};
         rootName = widget.itemDisplayName;
         rootLabel = widget.itemDisplayName;
         addButtonLabelSuffix = 'sub';
         break;
-      case PagItemKind.tariffPackage:
-        itemGroupType = PagItemGroupType.tariffPackageTariffRate;
-        queryMap = {'tariff_package_id': widget.itemIndexStr};
-        rootName = widget.itemDisplayName;
-        rootLabel = widget.itemDisplayName;
-        addButtonLabelSuffix = 'tariff rate';
+      case PagItemKind.tariff:
+        if (widget.itemType is PagTariff &&
+            widget.itemType == PagTariff.tariffPackage) {
+          itemGroupType = PagItemGroupType.tariffPackageTariffRate;
+          queryMap = {'tariff_package_id': widget.strItemIndex};
+          rootName = widget.itemDisplayName;
+          rootLabel = widget.itemDisplayName;
+          addButtonLabelSuffix = 'tariff rate';
+        }
         break;
       default:
         break;
@@ -920,7 +924,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
           mode: isEditableByAcl ? 'edit' : 'view',
           width: width,
           loggedInUser: _loggedInUser!,
-          groupItemId: widget.itemIndexStr,
+          groupItemId: widget.strItemIndex,
           itemGroupType: itemGroupType,
           queryMap: queryMap,
           rootName: rootName,
@@ -929,7 +933,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
           addButtonLabelSuffix: addButtonLabelSuffix,
           // newItemWidget: getNewSubWidget(),
           validateTreeChildren: (List<Map<String, dynamic>> childreanList) {
-            if (widget.itemKind != PagItemKind.tariffPackage) {
+            if (widget.itemKind != PagItemKind.tariff) {
               return 'valid';
             }
             int tpComingMonthCount = 6;
@@ -993,8 +997,8 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
                   appConfig: widget.appConfig,
                   itemKind: PagItemKind.finance,
                   itemType: PagFinanceType.payment,
-                  itemIndexStr: widget.itemIndexStr,
-                  itemDeleteRef: widget.itemIndexStr,
+                  itemIndexStr: widget.strItemIndex,
+                  itemDeleteRef: widget.strItemIndex,
                   onDeleting: () {
                     setState(() {
                       _isDeleting = true;
@@ -1054,8 +1058,8 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
                   appConfig: widget.appConfig,
                   itemKind: PagItemKind.tenant,
                   itemType: '',
-                  itemIndexStr: widget.itemIndexStr,
-                  itemDeleteRef: widget.itemIndexStr,
+                  itemIndexStr: widget.strItemIndex,
+                  itemDeleteRef: widget.strItemIndex,
                   onDeleting: () {
                     setState(() {
                       _isDeleting = true;

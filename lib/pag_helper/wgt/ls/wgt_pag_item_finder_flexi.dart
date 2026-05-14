@@ -32,6 +32,7 @@ import '../../../xt_ui/wdgt/info/get_error_text_prompt.dart';
 import '../../../xt_ui/xt_helpers.dart';
 import '../../comm/comm_list.dart';
 import '../../def_helper/dh_device.dart';
+import '../../def_helper/dh_pag_tariff.dart';
 import '../../model/mdl_pag_user.dart';
 import '../wgt_custom_pin.dart';
 import 'wgt_finder_field_input.dart';
@@ -634,6 +635,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
         widget.itemType is PagItemKind ||
         widget.itemType is PagFinanceType ||
         widget.itemType is PagOrgType ||
+        widget.itemType is PagTariff ||
         widget.itemType == null);
     // switch (widget.itemType.runtimeType) {
     //   case const (DeviceType):
@@ -651,13 +653,15 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     if (widget.itemType is PagDeviceCat) {
       itemTypeStr = (widget.itemType as PagDeviceCat).value.toLowerCase();
     } else if (widget.itemType is PagScopeType) {
-      itemTypeStr = (widget.itemType as PagScopeType).key.toLowerCase();
+      itemTypeStr = (widget.itemType as PagScopeType).value.toLowerCase();
     } else if (widget.itemType is PagItemKind) {
       itemTypeStr = (widget.itemType as PagItemKind).name.toLowerCase();
     } else if (widget.itemType is PagFinanceType) {
       itemTypeStr = (widget.itemType as PagFinanceType).value;
     } else if (widget.itemType is PagOrgType) {
       itemTypeStr = (widget.itemType as PagOrgType).name.toLowerCase();
+    } else if (widget.itemType is PagTariff) {
+      itemTypeStr = (widget.itemType as PagTariff).value.toLowerCase();
     } else {
       itemTypeStr = 'unknown_item_type';
     }
@@ -1439,15 +1443,13 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
                 builder: (context, AsyncSnapshot<void> snapshot) {
                   switch (snapshot.connectionState) {
                     case ConnectionState.waiting:
-                      if (kDebugMode) {
-                        print('item status group list waiting...');
-                      }
+                      dev.log('item status group list waiting...');
+
                       return const WgtPagWait(size: 34);
                     default:
                       if (snapshot.hasError) {
-                        if (kDebugMode) {
-                          print(snapshot.error);
-                        }
+                        dev.log(snapshot.error.toString());
+
                         return getErrorTextPrompt(
                             context: context, errorText: 'list error');
                       } else {

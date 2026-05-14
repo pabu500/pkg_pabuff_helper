@@ -16,18 +16,19 @@ enum PagScopeType {
 
   const PagScopeType(
     this.label,
-    this.key,
+    this.value,
     this.iconData,
   );
 
   final String label;
-  final String key;
+  final String value;
   final IconData iconData;
 
   static PagScopeType byLabel(String? label) =>
       enumByLabel(label, values, (e) => e.label) ?? none;
 
-  static PagScopeType byKey(String? key) => enumByKey(key, values) ?? none;
+  static PagScopeType byValue(String? value) =>
+      enumByValue(value, values, (e) => e.value) ?? none;
 }
 
 // T? enumByLabel<T extends Enum>(
@@ -43,15 +44,15 @@ enum PagScopeType {
 //   return null;
 // }
 
-T? enumByKey<T extends Enum>(String? key, List<T> values) {
-  if (key == null) return null;
-  for (var value in values) {
-    if (value is PagScopeType && value.key == key) {
-      return value as T;
-    }
-  }
-  return null;
-}
+// T? enumByValue<T extends Enum>(String? value, List<T> values, String Function(T) getValue) {
+//   if (value == null) return null;
+//   for (var enumValue in values) {
+//     if (getValue(enumValue) == value) {
+//       return enumValue;
+//     }
+//   }
+//   return null;
+// }
 
 PagScopeType getChildScopeType(PagScopeType parentScopeType) {
   switch (parentScopeType) {

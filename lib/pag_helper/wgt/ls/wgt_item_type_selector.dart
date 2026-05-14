@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:buff_helper/pag_helper/comm/comm_list.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_device.dart';
@@ -23,6 +22,7 @@ import 'package:provider/provider.dart';
 import 'dart:developer' as dev;
 
 import '../../def_helper/dh_pag_org.dart';
+import '../../def_helper/dh_pag_tariff.dart';
 
 class WgtItemTypeSelector extends StatefulWidget {
   const WgtItemTypeSelector({
@@ -299,6 +299,8 @@ class _WgtItemTypeSelectorState extends State<WgtItemTypeSelector> {
           }
         } else if (widget.itemKind == PagItemKind.org) {
           itemType = PagOrgType.byValue(itemTypeStr);
+        } else if (widget.itemKind == PagItemKind.tariff) {
+          itemType = PagTariff.byValue(itemTypeStr);
         } else {
           throw Exception('Unsupported item kind: ${widget.itemKind.name}');
         }
@@ -346,21 +348,28 @@ class _WgtItemTypeSelectorState extends State<WgtItemTypeSelector> {
                                         .colorScheme
                                         .onSecondary,
                                   )
-                                : widget.itemKind is String
-                                    ? Text(
-                                        itemType,
-                                        style: TextStyle(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSecondary,
-                                        ),
-                                      )
-                                    : Icon(
-                                        Symbols.help,
+                                : itemType is PagTariff
+                                    ? Icon(
+                                        itemType.iconData,
                                         color: Theme.of(context)
                                             .colorScheme
                                             .onSecondary,
-                                      ),
+                                      )
+                                    : widget.itemKind is String
+                                        ? Text(
+                                            itemType,
+                                            style: TextStyle(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSecondary,
+                                            ),
+                                          )
+                                        : Icon(
+                                            Symbols.help,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSecondary,
+                                          ),
               ),
             ),
           ),

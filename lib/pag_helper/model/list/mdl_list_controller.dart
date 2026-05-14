@@ -8,6 +8,7 @@ import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 import '../../def_helper/dh_device.dart';
 import '../../def_helper/dh_pag_finance.dart';
 import '../../def_helper/dh_pag_org.dart';
+import '../../def_helper/dh_pag_tariff.dart';
 
 class MdlPagListController /*extends ChangeNotifier*/ {
   // PagItemKind pagItemKind;
@@ -159,6 +160,15 @@ class MdlPagListController /*extends ChangeNotifier*/ {
           break;
         case 'bank':
           itemType = PagOrgType.bank;
+          break;
+        case 'tariff_package':
+          itemType = PagTariff.tariffPackage;
+          break;
+        case 'tariff_package_type':
+          itemType = PagTariff.tariffPackageType;
+          break;
+        case 'tariff_rate':
+          itemType = PagTariff.tariffRate;
           break;
         default:
           itemType = null;
