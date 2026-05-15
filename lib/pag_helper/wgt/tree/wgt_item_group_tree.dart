@@ -26,6 +26,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import '../../comm/comm_ems.dart';
 import '../../comm/comm_tenant.dart';
 import '../../model/mdl_pag_app_config.dart';
+import '../app/ems/wgt_new_edit_tenant_user.dart';
 import '../job/wgt_new_edit_sub.dart';
 import '../app/ems/wgt_new_edit_tariff_rate.dart';
 
@@ -1223,6 +1224,38 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
             setState(() {
               tariffRateInfo?.addAll(editedTariffRateInfo);
               tariffRateInfo?['edit_type'] = 'update';
+              _isModified = true;
+              _modifyTypeStr = 'update';
+              _showCommitted = false;
+              _editingNodeChildInfoId = null;
+
+              _rePop();
+            });
+          },
+          onClose: () {
+            setState(() {
+              _editingNodeChildInfoId = null;
+            });
+          },
+        );
+      case PagItemGroupType.tenantUser:
+        Map<String, dynamic>? userInfo;
+        for (var item in _groupItemList) {
+          if (item['id'] == node.child['id']) {
+            userInfo = item;
+            break;
+          }
+        }
+        return WgtNewEditTenantUser(
+          appConfig: widget.appConfig,
+          readOnly: !_isEditing,
+          width: widget.width - 65,
+          // strTenantUserId: node.child['id'],
+          initialValueMap: userInfo,
+          onUpdate: (editedUserInfo) {
+            setState(() {
+              userInfo?.addAll(editedUserInfo);
+              userInfo?['edit_type'] = 'update';
               _isModified = true;
               _modifyTypeStr = 'update';
               _showCommitted = false;
