@@ -609,7 +609,7 @@ class PagBill {
 
   pw.Widget _getBillTime() {
     return pw.SizedBox(
-      height: 15,
+      height: 10,
       child: pw.Row(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
@@ -956,6 +956,8 @@ class PagBill {
     }
     closingBalAmount = -1 * closingBalAmount;
 
+    double subTotalNonTaxable = interestAmount + (lineItemValue2 ?? 0.0);
+
     return pw.Container(
       width: 500,
       child: pw.Column(
@@ -1036,7 +1038,6 @@ class PagBill {
                     ),
                   ],
                 ),
-                // pw.Divider(color: PdfColors.grey600, thickness: 0.5),
                 // line item 2
                 if (lineItemLabel2 != null && lineItemValue2 != null)
                   pw.Row(
@@ -1053,6 +1054,23 @@ class PagBill {
                       ),
                     ],
                   ),
+                // sub total (non-taxable)
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: pw.CrossAxisAlignment.center,
+                  children: [
+                    pw.Text(
+                      'Sub-Total (Non-Taxable)',
+                      style:
+                          styleNormal.copyWith(fontWeight: pw.FontWeight.bold),
+                    ),
+                    pw.Text(
+                      _formatCurrency(subTotalNonTaxable),
+                      style:
+                          styleNormal.copyWith(fontWeight: pw.FontWeight.bold),
+                    ),
+                  ],
+                ),
                 pw.Divider(color: PdfColors.grey600, thickness: 0.5, height: 5),
                 pw.Container(
                     color: PdfColors.grey300,
@@ -1180,7 +1198,8 @@ class PagBill {
                   crossAxisAlignment: pw.CrossAxisAlignment.center,
                   children: [
                     pw.Text(
-                      'Balance Due (Due Date: ${_getDateStr(dueDate)})',
+                      // 'Balance Due (Due Date: ${_getDateStr(dueDate)})',
+                      'Balance Due',
                       style:
                           styleLarge.copyWith(fontWeight: pw.FontWeight.bold),
                     ),
