@@ -208,10 +208,16 @@ String? validateModel(String val) {
 
   // Pattern: int.int.int[.alphanumeric] or int.int.int[.int]
   // final pattern = r'^\d{1,3}\.\d{1,3}\.\d{1,3}(\.[A-Za-z0-9]+)?$';
-  final pattern =
+  const pattern1 =
       r'^(\d{1,3}\.\d{1,3}\.\d{1,3}(\.[A-Za-z0-9]+)?|[A-Za-z0-9]{3})$';
 
-  final regExp = RegExp(pattern);
+  const pattern2 = r'gen[A-Za-z0-9]+';
+
+  // final regExp = RegExp(pattern);
+  final regExp = RegExp(
+    r'^(' + pattern1 + r'|' + pattern2 + r')$',
+    caseSensitive: false,
+  );
 
   if (!regExp.hasMatch(val)) {
     return 'invalid model format';
@@ -472,7 +478,7 @@ final List<Map<String, dynamic>> listConfigBaseGateway = [
     'title': 'ip',
     'col_type': 'string',
     'width': 150,
-    'is_mapping_required': true,
+    'is_mapping_required': false,
     'validator': validateIp,
   },
   {
@@ -480,7 +486,7 @@ final List<Map<String, dynamic>> listConfigBaseGateway = [
     'title': 'iccid',
     'col_type': 'string',
     'width': 150,
-    'is_mapping_required': true,
+    'is_mapping_required': false,
     'validator': validateDeviceIccid,
   },
 ];
