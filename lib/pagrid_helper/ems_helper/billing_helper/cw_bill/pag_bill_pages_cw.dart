@@ -350,8 +350,8 @@ class PagBill {
           children: [
             pw.SizedBox(width: 230, child: _getPayerInfo()),
             pw.Expanded(child: pw.Container()),
-            // if (paymentMethod == 'giro')
-            pw.SizedBox(width: 210, child: _getGrioNote()),
+            if (paymentMethod == 'giro')
+              pw.SizedBox(width: 210, child: _getGrioNote()),
           ],
         ),
         // if (context.pageNumber > 1) pw.SizedBox(height: 20)
