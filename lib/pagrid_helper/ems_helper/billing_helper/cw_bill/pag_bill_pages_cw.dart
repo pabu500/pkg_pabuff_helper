@@ -342,13 +342,16 @@ class PagBill {
               ),
             ),
             pw.Expanded(child: pw.Container()),
-            pw.SizedBox(width: 250, child: _getPaymentInfo()),
+            pw.SizedBox(child: _getPaymentInfo()),
           ],
         ),
         pw.Row(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            pw.SizedBox(width: 250, child: _getPayerInfo()),
+            pw.SizedBox(width: 230, child: _getPayerInfo()),
+            pw.Expanded(child: pw.Container()),
+            // if (paymentMethod == 'giro')
+            pw.SizedBox(width: 210, child: _getGrioNote()),
           ],
         ),
         // if (context.pageNumber > 1) pw.SizedBox(height: 20)
@@ -360,7 +363,7 @@ class PagBill {
     return pw.Container(
       alignment: pw.Alignment.topLeft,
       // padding: const pw.EdgeInsets.only(bottom: 8, left: 30),
-      height: 50,
+      height: 39,
       child: _logo != null ? pw.Image(_logo!) : pw.PdfLogo(),
     );
   }
@@ -514,7 +517,7 @@ class PagBill {
       // mainAxisAlignment: pw.MainAxisAlignment.spaceAround,
       children: [
         pw.SizedBox(
-          height: 150,
+          height: 135,
           width: 210,
           child: pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -555,7 +558,7 @@ class PagBill {
                         pw.Text(' $paymentMethod', style: styleNormal),
                       ]),
                     ]),
-                pw.SizedBox(height: 15),
+                pw.SizedBox(height: 10),
                 pw.Table(
                     border: pw.TableBorder.all(
                         color: PdfColors.grey600, width: 0.5),
@@ -580,6 +583,20 @@ class PagBill {
                       ]),
                     ]),
               ]),
+        ),
+      ],
+    );
+  }
+
+  pw.Widget _getGrioNote() {
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        pw.Text('Note for GIRO tenants:',
+            style: styleNormal.copyWith(fontWeight: pw.FontWeight.bold)),
+        pw.Text(
+          'If invoice due date falls on a non-business day, GIRO deduction (if applicable) will be processed on the next business day. If deduction is unsuccessful, late payment interest will accrue daily from the due date until the invoice is fully settled.',
+          style: styleSmall,
         ),
       ],
     );
