@@ -156,9 +156,7 @@ class MdlPagSiteProfile {
   }
 
   factory MdlPagSiteProfile.fromJson(Map<String, dynamic> json) {
-    if (kDebugMode) {
-      print('MdlPagSiteProfile.fromJson');
-    }
+    dev.log('MdlPagSiteProfile.fromJson');
 
     Map<String, dynamic> itemInfo = json['item_info'] ?? {};
     assert(itemInfo.isNotEmpty);
@@ -183,9 +181,7 @@ class MdlPagSiteProfile {
 
     dynamic lat = itemInfo['lat'];
     if (lat == null) {
-      if (kDebugMode) {
-        print('lat is null for site ${json['lat']}');
-      }
+      dev.log('lat is null for site ${itemInfo['name']}');
     }
     if (lat is String) {
       lat = double.tryParse(lat);
@@ -194,9 +190,7 @@ class MdlPagSiteProfile {
 
     dynamic lng = itemInfo['lng'];
     if (lng == null) {
-      if (kDebugMode) {
-        print('lng is null for site ${itemInfo['name']}');
-      }
+      dev.log('lng is null for site ${itemInfo['name']}');
     }
     if (lng is String) {
       lng = double.tryParse(lng);

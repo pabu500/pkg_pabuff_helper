@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 import 'package:flutter/foundation.dart';
 import '../../def_helper/project_helper.dart';
@@ -163,9 +165,7 @@ class MdlPagSiteGroupProfile {
               MdlPagSiteProfile.fromJson(scopeInfo!);
           siteProfileListX.add(siteProfile);
         } catch (e) {
-          if (kDebugMode) {
-            print('fromJson site_list $e');
-          }
+          dev.log('fromJson site_list $e');
           rethrow;
         }
         siteProfileListX.sort((a, b) => a.name.compareTo(b.name));
@@ -174,9 +174,7 @@ class MdlPagSiteGroupProfile {
 
     dynamic lat = itemInfo['lat'];
     if (lat == null) {
-      if (kDebugMode) {
-        // print('lat is null for site ${json['name']}');
-      }
+      dev.log('lat is null for site ${itemInfo['name']}');
     }
     if (lat is String) {
       lat = double.tryParse(lat);
@@ -185,9 +183,7 @@ class MdlPagSiteGroupProfile {
 
     dynamic lng = itemInfo['lng'];
     if (lng == null) {
-      if (kDebugMode) {
-        // print('lng is null for site ${itemInfo['name']}');
-      }
+      dev.log('lng is null for site ${itemInfo['name']}');
     }
     if (lng is String) {
       lng = double.tryParse(lng);
