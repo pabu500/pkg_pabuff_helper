@@ -120,7 +120,7 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
   final String newItemHintText = 'Enter new item name';
   final String newItemLabelText = 'New Item';
   Map<String, dynamic>? _newItemInfo;
-  int _newItems = 0;
+  int _newItemCount = 0;
 
   String _modifyTypeStr = '';
 
@@ -139,7 +139,7 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
       Map<String, dynamic> querrMap = {
         'scope': widget.loggedInUser.selectedScope.toScopeMap(),
         'group_item_id': widget.groupItemId,
-        'new_items': _newItems,
+        'new_items': _newItemCount,
         'modify_type': _modifyTypeStr,
         'group_item_list': _groupItemList,
       };
@@ -319,9 +319,8 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
       _updateOriginal();
       _populateTree(rootNode!, leafTreePartType!, 1);
     } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
+      dev.log(e.toString());
+
       rethrow;
     } finally {
       setState(() {
@@ -392,7 +391,7 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
         _groupItemList.insert(0, _newItemInfo!);
         _isModified = true;
         _modifyTypeStr = 'add';
-        _newItems++;
+        _newItemCount++;
         _showCommitted = false;
       }
       _isAdding = false;
@@ -404,9 +403,8 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
       _populateTree(rootNode!, leafTreePartType!, 1);
       _treeRefreshKey = UniqueKey();
     } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
+      dev.log(e.toString());
+
       String eMsg = e.toString();
       if (eMsg.contains('Empty') || eMsg.contains('No item record found')) {
         _addNewItemErrorText = 'No item record found';
@@ -644,7 +642,15 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
     }
     if (_isAdding || _editingNodeChildInfoId != null) {
       // add item height
-      height += widget.itemGroupType == PagItemGroupType.jobTypeSub ? 280 : 80;
+      // height += widget.itemGroupType == PagItemGroupType.jobTypeSub ? 280 : 80;
+      double addHeight = 80;
+      if (widget.itemGroupType == PagItemGroupType.jobTypeSub) {
+        addHeight = 295;
+      } else if (widget.itemGroupType == PagItemGroupType.tenantUser &&
+          _isEditing) {
+        addHeight = 200;
+      }
+      height += addHeight;
     }
 
     if (_committErrorText.isNotEmpty) {
@@ -694,7 +700,7 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
       _newItemName = '';
       _isSearchingNewItemInfo = false;
       _newItemInfo = null;
-      _newItems = 0;
+      _newItemCount = 0;
       _groupItemList.clear();
       _groupItemList.addAll(_groupItemListOriginal);
       _rePop();
@@ -945,9 +951,12 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
             // in the function there is a increment of from date time
             newItemWidget = getTariffPackageTariffRate();
             break;
-          // case PagItemGroupType.tariffPackageTenant:
-          //   newItemWidget = getTariffPackageTenant();
+          case PagItemGroupType.tenantUser:
+            newItemWidget = getTenantUser();
+            break;
           default:
+            dev.log(
+                'No new item widget for this item group type: ${widget.itemGroupType}');
             break;
         }
       }
@@ -1243,14 +1252,17 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
         for (var item in _groupItemList) {
           if (item['id'] == node.child['id']) {
             userInfo = item;
+            userInfo['user_id'] = item['id'];
             break;
           }
         }
         return WgtNewEditTenantUser(
           appConfig: widget.appConfig,
+          loggedInUser: widget.loggedInUser,
+          strItemGroupId: widget.groupItemId,
           readOnly: !_isEditing,
           width: widget.width - 65,
-          // strTenantUserId: node.child['id'],
+          groupItemList: _groupItemList,
           initialValueMap: userInfo,
           onUpdate: (editedUserInfo) {
             setState(() {
@@ -1330,7 +1342,7 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
           _groupItemList.insert(0, newJobTypeSubInfo);
           _isModified = true;
           _modifyTypeStr = 'add';
-          _newItems++;
+          _newItemCount++;
           _showCommitted = false;
 
           _isAdding = false;
@@ -1426,7 +1438,40 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
           _groupItemList.add(newTariffRateInfo);
           _isModified = true;
           _modifyTypeStr = 'update';
-          _newItems++;
+          _newItemCount++;
+          _showCommitted = false;
+
+          _isAdding = false;
+          _rePop();
+        });
+      },
+      onClose: () {
+        setState(() {
+          _isAdding = false;
+          _allowAddButton = true;
+        });
+      },
+    );
+  }
+
+  Widget getTenantUser() {
+    if (widget.itemGroupType != PagItemGroupType.tenantUser) {
+      return Container();
+    }
+
+    return WgtNewEditTenantUser(
+      appConfig: widget.appConfig,
+      loggedInUser: widget.loggedInUser,
+      strItemGroupId: widget.groupItemId,
+      groupItemList: _groupItemList,
+      width: widget.width - 65,
+      onInsert: (newUserInfo) {
+        setState(() {
+          newUserInfo['edit_type'] = 'add';
+          _groupItemList.insert(0, newUserInfo);
+          _isModified = true;
+          _modifyTypeStr = 'add';
+          _newItemCount++;
           _showCommitted = false;
 
           _isAdding = false;
@@ -1462,15 +1507,14 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
           ),
         ),
       ),
-      _addNewItemErrorText.isNotEmpty
-          ? Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                _addNewItemErrorText,
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
-              ),
-            )
-          : const SizedBox(),
+      if (_addNewItemErrorText.isNotEmpty)
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            _addNewItemErrorText,
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
+          ),
+        )
     ]);
   }
 

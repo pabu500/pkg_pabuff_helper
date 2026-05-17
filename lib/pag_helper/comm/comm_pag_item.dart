@@ -208,7 +208,9 @@ Future<dynamic> getPagItemInfo(
     // If the server did return a 200 OK response, parse the JSON.
     final responseBody = jsonDecode(response.body);
     if (responseBody['error'] != null) {
-      throw Exception(responseBody['error']);
+      final message = responseBody['error']['message'];
+      dev.log('Error message: $message');
+      throw Exception(message);
     }
     final data = responseBody['data'];
     final info = data['info'];
