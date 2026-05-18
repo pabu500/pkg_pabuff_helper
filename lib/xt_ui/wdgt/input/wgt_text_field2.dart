@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -39,6 +41,7 @@ class WgtTextField extends StatefulWidget {
     this.suffix,
     this.unfocusOnEditingComplete = false,
     this.textStyle,
+    this.requireUnique = true,
   });
 
   final dynamic appConfig;
@@ -72,6 +75,7 @@ class WgtTextField extends StatefulWidget {
   final Widget? suffix;
   final bool unfocusOnEditingComplete;
   final TextStyle? textStyle;
+  final bool requireUnique;
 
   @override
   State<WgtTextField> createState() => _WgtTextFieldState();
@@ -116,9 +120,8 @@ class _WgtTextFieldState extends State<WgtTextField> {
         widget.onUniqueCheck?.call(exists);
       }
     } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
+      dev.log(e.toString());
+
       setState(() {
         _checkUniqueResultText = 'error';
       });
@@ -162,7 +165,7 @@ class _WgtTextFieldState extends State<WgtTextField> {
         if (!value) {
           widget.onEditingComplete?.call();
           if (_controller.text.trim().isNotEmpty) {
-            if (widget.checkUnique != null) {
+            if (widget.requireUnique) {
               if (!_uniqueChecked && _isValidated) {
                 assert(widget.itemTableName != null);
                 assert(widget.uniqueKey != null);
@@ -233,7 +236,7 @@ class _WgtTextFieldState extends State<WgtTextField> {
               }
               widget.onEditingComplete?.call();
 
-              if (widget.checkUnique != null) {
+              if (widget.requireUnique) {
                 checkUnique(widget.appConfig, widget.uniqueKey!,
                     _controller.text, widget.itemTableName!);
               }

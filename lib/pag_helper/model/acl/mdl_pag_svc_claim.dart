@@ -6,10 +6,12 @@ class MdlPagSvcClaim {
   String? scope = '';
   String? target = '';
   String? operation = '';
+  int? selectedRoleId = 0;
 
   MdlPagSvcClaim(
       {this.username,
       this.userId,
+      this.selectedRoleId,
       this.svcName,
       this.endpoint,
       this.scope,
@@ -20,6 +22,7 @@ class MdlPagSvcClaim {
     return MdlPagSvcClaim(
       username: json['username'],
       userId: json['user_id'],
+      selectedRoleId: json['selected_role_id'],
       svcName: json['svc_name'],
       endpoint: json['endpoint'],
       scope: json['scope'],
@@ -32,6 +35,7 @@ class MdlPagSvcClaim {
     return {
       'username': username,
       'user_id': userId,
+      'selected_role_id': selectedRoleId,
       'svcName': svcName,
       'endpoint': endpoint,
       'scope': scope,
