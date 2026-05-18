@@ -19,9 +19,8 @@ const int waterDropIcon = 0xe798;
 const int usageDecimals = 3;
 const int rateDecimals = 4;
 
-const tableHeaders = ['Category', 'Budget', 'Expense', 'Result'];
-
 Future<Uint8List> generatePagInvoice(
+  MdlPagUser loggedInUser,
   PdfPageFormat pageFormat,
   Map<String, dynamic> billInfo,
 ) async {
@@ -84,7 +83,6 @@ Future<Uint8List> generatePagInvoice(
     amgrAddressLine1: billInfo['amgrAddressLine1'],
     amgrAddressLine2: billInfo['amgrAddressLine2'],
     amgrAddressLine3: billInfo['amgrAddressLine3'],
-    // billedTptNote: billInfo['billedTptNote'],
     amgrBankAccountName: billInfo['amgrBankAccountName'],
     amgrBankAccountNumber: billInfo['amgrBankAccountNumber'],
     amgrBankName: billInfo['amgrBankName'],

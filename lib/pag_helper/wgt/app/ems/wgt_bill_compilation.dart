@@ -4,12 +4,14 @@ import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:buff_helper/pag_helper/def_helper/list_helper.dart';
 import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pag_helper/wgt/wgt_comm_button.dart';
-import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/wgt_pag_bill_list_compilation_view.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../../../pagrid_helper/ems_helper/billing_helper/cw_bill/pag_gen_pdf_bill_compilation_cw.dart';
+import '../../../../pagrid_helper/ems_helper/billing_helper/wgt_pag_render_pdf.dart';
 import '../../../../up_helper/exceptions.dart';
 import '../../../../xt_ui/xt_helpers.dart';
+import '../../../comm/comm_pag_billing.dart';
 import '../../../comm/comm_pag_item.dart';
 import '../../../model/acl/mdl_pag_svc_claim.dart';
 import '../../../model/mdl_pag_app_context.dart';
@@ -45,6 +47,7 @@ class _WgtBillCompilationState extends State<WgtBillCompilation> {
   int _pullFails = 0;
   bool _showCompilation = false;
   bool _compilationGenerated = false;
+  final String defaultErrorText = 'Error getting bill compilation';
 
   final int maxPerPage = 1000;
   late final BoxDecoration boxDecoration = BoxDecoration(
@@ -120,7 +123,39 @@ class _WgtBillCompilationState extends State<WgtBillCompilation> {
       );
       final itemList = billResult['item_list'];
       for (var item in itemList) {
-        _billList.add(item);
+        String itemId = item['id'];
+        // _billList.add(item);
+        Map<String, dynamic> queryMap = {
+          'scope': widget.loggedInUser.selectedScope.toScopeMap(),
+          'billing_rec_index': itemId,
+          'is_released_mode': 'true',
+        };
+        try {
+          final billResult = await getPagCompositeBill(
+            widget.appConfig,
+            queryMap,
+            MdlPagSvcClaim(
+              userId: widget.loggedInUser.id,
+              username: widget.loggedInUser.username,
+              target: '',
+              scope: '',
+              operation: '',
+            ),
+          );
+          _billList.add(billResult);
+        } catch (err) {
+          _pullFails++;
+          dev.log('Error generating bill: $err');
+
+          _errorText = getErrorText(err, defaultErrorText: defaultErrorText);
+        } finally {
+          setState(() {
+            _gettingBillList = false;
+            if (_errorText.isNotEmpty) {
+              showInfoDialog(context, 'Error', _errorText);
+            }
+          });
+        }
       }
     } catch (err) {
       _pullFails++;
@@ -168,7 +203,11 @@ class _WgtBillCompilationState extends State<WgtBillCompilation> {
           getOpRow(),
           verticalSpaceSmall,
           if (_showCompilation && _billList.isNotEmpty)
-            WgtPagBillListCompilationView(billingInfoList: _billList),
+            WgtPagRenderPdf(
+              loggedInUser: widget.loggedInUser,
+              itemInfo: {'bill_info_list': _billList},
+              builder: generatePagInvoiceCompilation,
+            ),
           verticalSpaceSmall,
         ],
       ),

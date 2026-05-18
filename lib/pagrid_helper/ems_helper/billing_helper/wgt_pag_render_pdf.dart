@@ -15,13 +15,16 @@ import 'package:web/web.dart' as web;
 class WgtPagRenderPdf extends StatefulWidget {
   const WgtPagRenderPdf({
     super.key,
+    required this.loggedInUser,
     required this.itemInfo,
     required this.builder,
   });
 
+  final MdlPagUser loggedInUser;
   // final Map<String, dynamic> billingInfo;
   final Map<String, dynamic> itemInfo;
   final Future<Uint8List> Function(
+    MdlPagUser loggedInUser,
     PdfPageFormat pageFormat,
     Map<String, dynamic> itemInfo,
   ) builder;
@@ -87,7 +90,8 @@ class _WgtPagRenderPdfState extends State<WgtPagRenderPdf> {
         canChangePageFormat: false,
         canDebug: kDebugMode,
         // build: (format) => generatePagInvoice(format, widget.billingInfo),
-        build: (format) => widget.builder(format, widget.itemInfo),
+        build: (format) =>
+            widget.builder(widget.loggedInUser, format, widget.itemInfo),
         actions: actions,
         loadingWidget: xtWait(
           size: 34,

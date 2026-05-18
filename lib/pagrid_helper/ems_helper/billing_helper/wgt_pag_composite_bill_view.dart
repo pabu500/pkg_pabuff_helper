@@ -106,18 +106,6 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       _bill.addAll(billResult);
     } catch (err) {
       _pullFails++;
-
-      // dev.log(err.toString());
-
-      // String errMsg = err.toString();
-      // if (errMsg.contains('valid tariff rate entry') ||
-      //     errMsg.toLowerCase().contains('inconsistent usage info') ||
-      //     errMsg.toLowerCase().contains('no tariff found')) {
-      //   _errorText = err.toString().replaceFirst('Exception: ', '');
-      //   _errorText = 'Vill Bill Error: $_errorText';
-      // } else {
-      //   _errorText = 'Error getting bill';
-      // }
       dev.log('Error generating bill: $err');
 
       _errorText = getErrorText(err, defaultErrorText: defaultErrorText);
@@ -651,11 +639,10 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       }
     }
 
-    List<PagEmsTypeUsageCalc> singularUsageCalcList = [];
-
     String billedGstStr = _bill['billed_gst'] ?? '';
     double? billedGst = double.tryParse(billedGstStr);
 
+    List<PagEmsTypeUsageCalc> singularUsageCalcList = [];
     for (Map<String, dynamic> singularUsage in singularUsageList) {
       //sort auto usage
       List<Map<String, dynamic>> meterGroupUsageList = [];
@@ -745,6 +732,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
         billedTrendingSnapShot: [],
       );
       emsTypeUsageCalc.doSingularCalc();
+
       singularUsageCalcList.add(emsTypeUsageCalc);
 
       singularUsage['usage_calc'] = emsTypeUsageCalc;
@@ -915,6 +903,17 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       useMiddle: isMonthly ? true : false,
     );
 
+    Map<String, dynamic> billedUsageFactorInfo = {};
+    if (_bill['usage_factor_list'] != null) {
+      for (var item in _bill['usage_factor_list']) {
+        String meterType = item['meter_type'];
+        meterType = meterType.toLowerCase();
+        String valueStr = item['usage_factor'];
+        double? value = double.tryParse(valueStr);
+        billedUsageFactorInfo['billed_usage_factor_$meterType'] = value;
+      }
+    }
+
     List<Map<String, dynamic>> singularUsageList = [];
 
     if (_bill['singular_billing_rec_list'] != null) {
@@ -939,17 +938,6 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
         }
       }
 
-      Map<String, dynamic> billedUsageFactorInfo = {};
-      if (_bill['usage_factor_list'] != null) {
-        for (var item in _bill['usage_factor_list']) {
-          String meterType = item['meter_type'];
-          meterType = meterType.toLowerCase();
-          String valueStr = item['usage_factor'];
-          double? value = double.tryParse(valueStr);
-          billedUsageFactorInfo['billed_usage_factor_$meterType'] = value;
-        }
-      }
-
       Map<String, dynamic> billedRateInfo = {};
       for (String typeTag in usageTypeTags) {
         typeTag = typeTag.toLowerCase();
@@ -968,10 +956,10 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       if (singularUsage['billed_gst'] != null) {
         billedGst = double.tryParse(singularUsage['billed_gst']);
       }
-      double? billedGstAmount;
-      if (singularUsage['billed_gst_amount'] != null) {
-        billedGstAmount = double.tryParse(singularUsage['billed_gst_amount']);
-      }
+      // double? billedGstAmount;
+      // if (singularUsage['billed_gst_amount'] != null) {
+      //   billedGstAmount = double.tryParse(singularUsage['billed_gst_amount']);
+      // }
 
       PagEmsTypeUsageCalcRl emsTypeUsageCalcRl = PagEmsTypeUsageCalcRl(
         costDecimals: widget.costDecimals,
@@ -1066,6 +1054,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
 
     return _renderMode == 'pdf'
         ? WgtPagRenderPdf(
+            loggedInUser: widget.loggedInUser,
             itemInfo: {
               'customerName': tenantName,
               'customerAccountId': accountId,
