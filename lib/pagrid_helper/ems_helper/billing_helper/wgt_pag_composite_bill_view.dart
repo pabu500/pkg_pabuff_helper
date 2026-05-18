@@ -2,6 +2,7 @@ import 'dart:developer' as dev;
 
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pag_helper/wgt/ls/wgt_item_delete_op.dart';
+import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/cw_bill/pag_gen_pdf_bill_cw.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
 
@@ -15,7 +16,7 @@ import '../../../pag_helper/comm/comm_pag_billing.dart';
 import '../tenant/wgt_pag_tenant_composite_usage_summary_rl.dart';
 import '../../../pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import '../../../pag_helper/def_helper/dh_pag_bill.dart';
-import 'wgt_pag_bill_render_pdf.dart';
+import 'wgt_pag_render_pdf.dart';
 
 class WgtPagCompositeBillView extends StatefulWidget {
   const WgtPagCompositeBillView({
@@ -1064,8 +1065,8 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     compositeUsageCalcRl.doCompositeCalc();
 
     return _renderMode == 'pdf'
-        ? WgtPagBillRenderPdf(
-            billingInfo: {
+        ? WgtPagRenderPdf(
+            itemInfo: {
               'customerName': tenantName,
               'customerAccountId': accountId,
               'customerLabel': tenantLabel,
@@ -1139,6 +1140,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
               'collectionStartDate': collectionStartDateTimestampStr,
               'collectionEndDate': collectionEndDateTimestampStr,
             },
+            builder: generatePagInvoice,
           )
         : WgtPagTenantCompositeUsageSummaryRl(
             isDisabled: _isDisabledPvRl,

@@ -4,6 +4,7 @@ import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:buff_helper/pag_helper/def_helper/list_helper.dart';
 import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pag_helper/wgt/wgt_comm_button.dart';
+import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/wgt_pag_bill_list_compilation_view.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -42,6 +43,8 @@ class _WgtBillCompilationState extends State<WgtBillCompilation> {
   bool _fetchedBillList = false;
   final List<Map<String, dynamic>> _billList = [];
   int _pullFails = 0;
+  bool _showCompilation = false;
+  bool _compilationGenerated = false;
 
   final int maxPerPage = 1000;
   late final BoxDecoration boxDecoration = BoxDecoration(
@@ -137,6 +140,8 @@ class _WgtBillCompilationState extends State<WgtBillCompilation> {
     }
   }
 
+  void _genBillListCompilation() {}
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -162,6 +167,8 @@ class _WgtBillCompilationState extends State<WgtBillCompilation> {
           verticalSpaceTiny,
           getOpRow(),
           verticalSpaceSmall,
+          if (_showCompilation && _billList.isNotEmpty)
+            WgtPagBillListCompilationView(billingInfoList: _billList),
           verticalSpaceSmall,
         ],
       ),
@@ -222,8 +229,12 @@ class _WgtBillCompilationState extends State<WgtBillCompilation> {
             padding: const EdgeInsets.only(left: 8.0),
             child: WgtCommButton(
                 label: 'Gen Compilation',
+                enabled: !_compilationGenerated,
                 onPressed: () {
-                  // Add your render compilation logic here
+                  setState(() {
+                    _showCompilation = true;
+                    _compilationGenerated = true;
+                  });
                 }),
           ),
       ],

@@ -12,21 +12,25 @@ import 'dart:io';
 
 import 'package:web/web.dart' as web;
 
-import 'cw_bill/pag_bill_pages_cw.dart';
-
-class WgtPagBillRenderPdf extends StatefulWidget {
-  const WgtPagBillRenderPdf({
+class WgtPagRenderPdf extends StatefulWidget {
+  const WgtPagRenderPdf({
     super.key,
-    required this.billingInfo,
+    required this.itemInfo,
+    required this.builder,
   });
 
-  final Map<String, dynamic> billingInfo;
+  // final Map<String, dynamic> billingInfo;
+  final Map<String, dynamic> itemInfo;
+  final Future<Uint8List> Function(
+    PdfPageFormat pageFormat,
+    Map<String, dynamic> itemInfo,
+  ) builder;
 
   @override
-  State<WgtPagBillRenderPdf> createState() => _WgtPagBillRenderPdfState();
+  State<WgtPagRenderPdf> createState() => _WgtPagRenderPdfState();
 }
 
-class _WgtPagBillRenderPdfState extends State<WgtPagBillRenderPdf> {
+class _WgtPagRenderPdfState extends State<WgtPagRenderPdf> {
   String _fileName = 'bill';
 
   late final actions = <PdfPreviewAction>[
@@ -67,7 +71,6 @@ class _WgtPagBillRenderPdfState extends State<WgtPagBillRenderPdf> {
   @override
   void initState() {
     super.initState();
-    // _fileName = 'bill_${widget.billingInfo['billing_rec_index']}';
   }
 
   @override
@@ -83,7 +86,8 @@ class _WgtPagBillRenderPdfState extends State<WgtPagBillRenderPdf> {
         initialPageFormat: PdfPageFormat.a4,
         canChangePageFormat: false,
         canDebug: kDebugMode,
-        build: (format) => generatePagInvoice(format, widget.billingInfo),
+        // build: (format) => generatePagInvoice(format, widget.billingInfo),
+        build: (format) => widget.builder(format, widget.itemInfo),
         actions: actions,
         loadingWidget: xtWait(
           size: 34,
