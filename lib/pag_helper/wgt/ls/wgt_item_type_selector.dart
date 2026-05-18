@@ -37,6 +37,7 @@ class WgtItemTypeSelector extends StatefulWidget {
     this.allowChangeItemType = true,
     this.onGetListInfoListResult,
     this.onItemTypeSelected,
+    this.enabledItemTypeList = const [],
   });
 
   final MdlPagAppContext pagAppContext;
@@ -49,6 +50,7 @@ class WgtItemTypeSelector extends StatefulWidget {
   final bool allowChangeItemType;
   final Function? onGetListInfoListResult;
   final Function? onItemTypeSelected;
+  final List<dynamic> enabledItemTypeList;
 
   @override
   State<WgtItemTypeSelector> createState() => _WgtItemTypeSelectorState();
@@ -279,6 +281,11 @@ class _WgtItemTypeSelectorState extends State<WgtItemTypeSelector> {
           if (itemTypeStr != selectedItemTypeStr) {
             enabled = false;
           }
+        }
+
+        if (widget.enabledItemTypeList.isNotEmpty &&
+            !widget.enabledItemTypeList.contains(itemTypeStr)) {
+          enabled = false;
         }
 
         if (!enabled) {

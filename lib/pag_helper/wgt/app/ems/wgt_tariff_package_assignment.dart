@@ -194,9 +194,8 @@ class _WgtTariffPackageAssignmentState
         throw Exception(data['error']);
       }
     } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
+      dev.log(e.toString());
+
       setState(() {
         _commitErrorText = 'Commit Error';
       });

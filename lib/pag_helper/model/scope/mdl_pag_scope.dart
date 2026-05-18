@@ -178,4 +178,62 @@ class MdlPagScope {
       'location_label': locationLabel,
     };
   }
+
+  factory MdlPagScope.fromScopeTypeInfo(Map<String, dynamic> scopeInfo,
+      PagScopeType scopeType, String projectId, String projectName) {
+    String? scopeId = scopeInfo['id'];
+    String? scopeName = scopeInfo['name'];
+    String? scopeLabel = scopeInfo['label'];
+
+    switch (scopeType) {
+      case PagScopeType.project:
+        return MdlPagScope(
+          projectId: projectId,
+          projectName: projectName,
+          projectLabel: scopeLabel,
+        );
+      case PagScopeType.siteGroup:
+        return MdlPagScope(
+          projectId: projectId,
+          projectName: projectName,
+          siteGroupId: scopeId,
+          siteGroupName: scopeName,
+          siteGroupLabel: scopeLabel,
+        );
+      case PagScopeType.site:
+        return MdlPagScope(
+          projectId: projectId,
+          projectName: projectName,
+          siteId: scopeId,
+          siteName: scopeName,
+          siteLabel: scopeLabel,
+        );
+      case PagScopeType.building:
+        return MdlPagScope(
+          projectId: projectId,
+          projectName: projectName,
+          buildingId: scopeId,
+          buildingName: scopeName,
+          buildingLabel: scopeLabel,
+        );
+      case PagScopeType.locationGroup:
+        return MdlPagScope(
+          projectId: projectId,
+          projectName: projectName,
+          locationGroupId: scopeId,
+          locationGroupName: scopeName,
+          locationGroupLabel: scopeLabel,
+        );
+      case PagScopeType.location:
+        return MdlPagScope(
+          projectId: projectId,
+          projectName: projectName,
+          locationId: scopeId,
+          locationName: scopeName,
+          locationLabel: scopeLabel,
+        );
+      default:
+        throw Exception('Unsupported scope type: $scopeType');
+    }
+  }
 }

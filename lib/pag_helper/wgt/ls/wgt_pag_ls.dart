@@ -21,6 +21,7 @@ class WgtPagLs extends StatefulWidget {
     this.selectedItemInfoList,
     this.isSingleItemMode = false,
     this.hint,
+    this.enabledItemTypeList = const [],
   });
 
   final MdlPagAppConfig appConfig;
@@ -36,6 +37,7 @@ class WgtPagLs extends StatefulWidget {
   final List<Map<String, dynamic>>? selectedItemInfoList;
   final bool isSingleItemMode;
   final String? hint;
+  final List<dynamic> enabledItemTypeList;
 
   @override
   State<WgtPagLs> createState() => _WgtPagLsState();
@@ -69,6 +71,7 @@ class _WgtPagLsState extends State<WgtPagLs> {
             additionalColumnConfig: widget.additionalColumnConfig,
             getPaneWidget: widget.getPaneWidget,
             validateTreeChildren: widget.validateTreeChildren,
+            selectedItemInfoList: widget.selectedItemInfoList,
             hint: widget.hint,
           );
         }
@@ -81,6 +84,7 @@ class _WgtPagLsState extends State<WgtPagLs> {
           additionalColumnConfig: widget.additionalColumnConfig,
           listContextType: widget.listContextType,
           onScopeTreeUpdate: widget.onScopeTreeUpdate,
+          enabledItemTypeList: widget.enabledItemTypeList,
         );
       case PagItemKind.user ||
             PagItemKind.tenant ||

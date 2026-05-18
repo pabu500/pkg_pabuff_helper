@@ -43,6 +43,7 @@ class WgtListSearchKind2 extends StatefulWidget {
     this.allowChangeItemType = true,
     this.allowFlexiLabel = false,
     this.additionalQuery = const {},
+    this.enabledItemTypeList = const [],
   });
 
   final MdlPagAppConfig appConfig;
@@ -63,6 +64,7 @@ class WgtListSearchKind2 extends StatefulWidget {
   final bool allowChangeItemType;
   final bool allowFlexiLabel;
   final Map<String, dynamic> additionalQuery;
+  final List<dynamic> enabledItemTypeList;
 
   @override
   State<WgtListSearchKind2> createState() => _WgtListSearchKind2State();
@@ -313,6 +315,7 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
             prefKey: 'item_type',
             iniItemType: widget.iniItemType,
             allowChangeItemType: widget.allowChangeItemType,
+            enabledItemTypeList: widget.enabledItemTypeList,
             onGetListInfoListResult: (lisInfoList) {
               _listControllerList.clear();
               _listControllerList.addAll(lisInfoList);

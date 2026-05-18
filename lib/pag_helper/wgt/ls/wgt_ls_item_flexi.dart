@@ -35,6 +35,7 @@ import 'package:provider/provider.dart';
 
 import '../../comm/comm_list.dart';
 import '../../model/mdl_pag_app_config.dart';
+import '../app/ems/wgt_bill_compilation.dart';
 import '../app/ems/wgt_match_payment_op_item.dart';
 import '../app/fh/wgt_fh_device_health.dart';
 import '../job/wgt_job_type_op_panel2.dart';
@@ -165,6 +166,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
   bool _viewSoAColumnExists = false;
   bool _matchPaymentColumnExists = false;
   bool _deviceHealthColumnExists = false;
+  bool _billCompilationColumnExists = false;
 
   Future<dynamic> _getListInfo() async {
     if (loggedInUser == null) {
@@ -393,23 +395,26 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     // }
 
     bool addInfoViewEditColumn = true;
-    bool isEmsDeviceLs = widget.pagAppContext! == appCtxEms &&
+    bool isEmsDeviceLs = widget.pagAppContext == appCtxEms &&
         widget.itemKind == PagItemKind.device;
-    bool isEmsMeterUsage = widget.pagAppContext! == appCtxEms &&
+    bool isEmsMeterUsage = widget.pagAppContext == appCtxEms &&
         widget.itemKind == PagItemKind.device &&
         widget.listContextType == PagListContextType.usage;
     bool isEmsTenantUsage = widget.pagAppContext == appCtxEms &&
         widget.itemKind == PagItemKind.tenant &&
         widget.listContextType == PagListContextType.usage;
     bool isBill = widget.itemKind == PagItemKind.bill;
-    bool isEsInsights = widget.pagAppContext! == appCtxEs &&
+    bool isEsInsights = widget.pagAppContext == appCtxEs &&
         widget.itemKind == PagItemKind.scope;
     bool isSoa = widget.listContextType == PagListContextType.soa;
     bool isPp = widget.listContextType == PagListContextType.paymentMatching;
-    bool isCmDeviceLs = widget.pagAppContext! == appCtxCm &&
+    bool isCmDeviceLs = widget.pagAppContext == appCtxCm &&
         widget.itemKind == PagItemKind.device;
-    bool isFhDevice = widget.pagAppContext! == appCtxFh &&
+    bool isFhDevice = widget.pagAppContext == appCtxFh &&
         widget.itemKind == PagItemKind.device;
+    bool isBillCompilation = widget.pagAppContext == appCtxEms &&
+        widget.itemKind == PagItemKind.scope &&
+        widget.listContextType == PagListContextType.billCompilation;
     bool isPaymentApply =
         widget.listContextType == PagListContextType.paymentApply;
     if (isEmsDeviceLs ||
@@ -417,7 +422,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         isEmsTenantUsage ||
         isEsInsights ||
         isBill ||
-        // isSoa ||
+        isBillCompilation ||
         isPp ||
         isCmDeviceLs ||
         isFhDevice ||
@@ -500,6 +505,11 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       addDeviceHealthColumn = true;
     }
 
+    bool addBillCompilationColumn = false;
+    if (isBillCompilation) {
+      addBillCompilationColumn = true;
+    }
+
     if (hasOpColumn) {
       addOpColumn = false;
     }
@@ -536,6 +546,12 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     if (addDeviceHealthColumn && !hasDetailColumn) {
       _addDeviceHealthColumn(listController);
       _deviceHealthColumnExists = true;
+    }
+    if (addBillCompilationColumn) {
+      if (!_billCompilationColumnExists) {
+        _addBillCompilationColumn(listController);
+      }
+      _billCompilationColumnExists = true;
     }
   }
 
@@ -1442,6 +1458,47 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                   padding: const EdgeInsets.symmetric(
                       horizontal: 13.0, vertical: 3));
             },
+          ),
+        );
+      },
+    );
+    listController.listColControllerList.insert(0, appCtxCol);
+  }
+
+  void _addBillCompilationColumn(MdlPagListController listController) {
+    MdlListColController appCtxCol = MdlListColController(
+      colKey: 'detail',
+      colTitle: 'Comp',
+      includeColKeyAsFilter: false,
+      showColumn: true,
+      colWidth: 50,
+      colWidgetType: PagColWidgetType.CUSTOM,
+      getCustomWidget: (item, fullList) {
+        bool showDetail = true;
+        return Padding(
+          padding: const EdgeInsets.only(right: 0),
+          child: InkWell(
+            onTap: !showDetail
+                ? null
+                : () {
+                    xtShowModelBottomSheet(
+                      context,
+                      WgtBillCompilation(
+                        appConfig: widget.appConfig,
+                        loggedInUser: loggedInUser!,
+                        pagAppContext: widget.pagAppContext!,
+                        scopeType: _selectedListController!.itemType,
+                        scopeInfo: item,
+                      ),
+                      onClosed: () {},
+                    );
+                  },
+            child: Icon(
+              Symbols.contract,
+              color: showDetail
+                  ? Theme.of(context).colorScheme.primary.withAlpha(200)
+                  : Theme.of(context).hintColor.withAlpha(130),
+            ),
           ),
         );
       },
