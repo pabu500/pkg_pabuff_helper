@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as dev;
 
 import 'package:buff_helper/pag_helper/comm/pag_be_api_base.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
@@ -42,7 +43,9 @@ Future<dynamic> doPagCreateScope(
         throw Exception(responseBody['info']);
       }
       if (responseBody['error'] != null) {
-        throw Exception(responseBody['error']);
+        final message = responseBody['error']['message'];
+        dev.log('Error message: $message');
+        throw Exception(message);
       }
       final data = responseBody['data'];
       if (data == null) {
@@ -59,7 +62,8 @@ Future<dynamic> doPagCreateScope(
       return result[resultKey];
     } else {
       Map<String, dynamic> responseBody = jsonDecode(response.body);
-      throw Exception(responseBody['error']);
+      throw Exception(
+          responseBody['error']['message'] ?? 'Failed to create scope');
     }
   } catch (err) {
     throw Exception(err);
