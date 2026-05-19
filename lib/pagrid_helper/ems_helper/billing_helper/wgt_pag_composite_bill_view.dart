@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import '../../../pag_helper/def_helper/pag_item_helper.dart';
 import '../../../pag_helper/model/mdl_pag_project_profile.dart';
 import '../tenant/pag_ems_type_usage_calc.dart';
-import '../tenant/pag_ems_type_usage_calc_rl.dart';
 import '../../../pag_helper/wgt/app/ems/wgt_bill_lc_status_op.dart';
 import '../tenant/wgt_pag_tenant_composite_usage_summary.dart';
 import '../../../pag_helper/comm/comm_pag_billing.dart';
@@ -523,54 +522,53 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     final Map<String, dynamic> scopeMap =
         widget.loggedInUser.selectedScope.toScopeMap();
 
-    if (_billLcStatusDisplay == PagBillingLcStatus.released
-        // ||  _billLcStatusDisplay == PagBillingLcStatus.pv
-        ) {
-      return getReleaseRender(
-        tenantName,
-        tenantLabel,
-        tenantAccountNumber,
-        tenantType,
-        tenantBillingAddressLine1,
-        tenantBillingAddressLine2,
-        tenantBillingAddressLine3,
-        depositAmountStr,
-        paymentMethod,
-        tenantLcs,
-        fromDatetime!,
-        toDatetime!,
-        effectiveToDatetime,
-        cycleStr,
-        billDate,
-        billBarFromMonth,
-        lineItemList,
-        miniSoaInfo,
-        strCollectionStartDateTimestamp,
-        strCollectionEndDateTimestamp,
-        interestInfo,
-        billedAmgrCompanyTradingName,
-        billedAmgrCompanyRegNumber,
-        billedAmgrGstRegNumber,
-        amgrAddressLine1,
-        amgrAddressLine2,
-        amgrAddressLine3,
-        amgrBankAccountName,
-        amgrBankAccountNumber,
-        amgrBankName,
-        amgrBankBranchCode,
-        amgrBankSwiftCode,
-        amgrBankPayNow,
-        billedTpNote,
-        billedTptRateNote,
-        billedTptCycleNote,
-        billedGst,
-        billedGstAmountDouble,
-        billedUsageCostAmount,
-        billedPrincipalAmount,
-        billedInterestAmount,
-        billedCycleTotalAmount,
-        billedPayableAmount,
-      );
+    if (_billLcStatusDisplay == PagBillingLcStatus.released) {
+      return getReleaseRender2(_bill);
+      // return getReleaseRender(
+      //   tenantName,
+      //   tenantLabel,
+      //   tenantAccountNumber,
+      //   tenantType,
+      //   tenantBillingAddressLine1,
+      //   tenantBillingAddressLine2,
+      //   tenantBillingAddressLine3,
+      //   depositAmountStr,
+      //   paymentMethod,
+      //   tenantLcs,
+      //   fromDatetime!,
+      //   toDatetime!,
+      //   effectiveToDatetime,
+      //   cycleStr,
+      //   billDate,
+      //   billBarFromMonth,
+      //   lineItemList,
+      //   miniSoaInfo,
+      //   strCollectionStartDateTimestamp,
+      //   strCollectionEndDateTimestamp,
+      //   interestInfo,
+      //   billedAmgrCompanyTradingName,
+      //   billedAmgrCompanyRegNumber,
+      //   billedAmgrGstRegNumber,
+      //   amgrAddressLine1,
+      //   amgrAddressLine2,
+      //   amgrAddressLine3,
+      //   amgrBankAccountName,
+      //   amgrBankAccountNumber,
+      //   amgrBankName,
+      //   amgrBankBranchCode,
+      //   amgrBankSwiftCode,
+      //   amgrBankPayNow,
+      //   billedTpNote,
+      //   billedTptRateNote,
+      //   billedTptCycleNote,
+      //   billedGst,
+      //   billedGstAmountDouble,
+      //   billedUsageCostAmount,
+      //   billedPrincipalAmount,
+      //   billedInterestAmount,
+      //   billedCycleTotalAmount,
+      //   billedPayableAmount,
+      // );
     } else {
       return getGeneratedRender(
           tenantName,
@@ -850,286 +848,342 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
           );
   }
 
-  Widget getReleaseRender(
-    String tenantName,
-    String tenantLabel,
-    String accountId,
-    String tenantType,
-    String tenantBillingAddressLine1,
-    String tenantBillingAddressLine2,
-    String tenantBillingAddressLine3,
-    String depositAmountStr,
-    String paymentMethod,
-    String? tenantLcs,
-    DateTime fromDatetime,
-    DateTime toDatetime,
-    DateTime? effectiveToDatetime,
-    String cycleStr,
-    String billDate,
-    String billBarFromMonth,
-    List<Map<String, dynamic>> lineItemList,
-    Map<String, dynamic> miniSoaInfo,
-    String collectionStartDateTimestampStr,
-    String collectionEndDateTimestampStr,
-    Map<String, dynamic> interestInfo,
-    String? billedAmgrCompanyTradingName,
-    String? billedAmgrCompanyRegNumber,
-    String? billedAmgrGstRegNumber,
-    String? amgrAddressLine1,
-    String? amgrAddressLine2,
-    String? amgrAddressLine3,
-    String? amgrBankAccountName,
-    String? amgrBankAccountNumber,
-    String? amgrBankName,
-    String? amgrBankBranchCode,
-    String? amgrBankSwiftCode,
-    String? amgrBankPayNow,
-    String? billedTpNote,
-    String? billedTptRateNote,
-    String? billedTptCycleNote,
-    double? billedGst,
-    double? billedGstAmount,
-    double? billedUsageCostAmount,
-    double? billedPrincipalAmount,
-    double? billedInterestAmount,
-    double? billedCycleTotalAmount,
-    double? billedPayableAmount,
-  ) {
-    bool isMonthly = true; //_bill['is_monthly'] == 'true' ? true : false;
-    String billTimeRangeStr = getTimeRangeStr(
-      fromDatetime,
-      toDatetime,
-      targetInterval: 'monthly',
-      useMiddle: isMonthly ? true : false,
-    );
+  // Widget getReleaseRender(
+  //   String tenantName,
+  //   String tenantLabel,
+  //   String accountId,
+  //   String tenantType,
+  //   String tenantBillingAddressLine1,
+  //   String tenantBillingAddressLine2,
+  //   String tenantBillingAddressLine3,
+  //   String depositAmountStr,
+  //   String paymentMethod,
+  //   String? tenantLcs,
+  //   DateTime fromDatetime,
+  //   DateTime toDatetime,
+  //   DateTime? effectiveToDatetime,
+  //   String cycleStr,
+  //   String billDate,
+  //   String billBarFromMonth,
+  //   List<Map<String, dynamic>> lineItemList,
+  //   Map<String, dynamic> miniSoaInfo,
+  //   String collectionStartDateTimestampStr,
+  //   String collectionEndDateTimestampStr,
+  //   Map<String, dynamic> interestInfo,
+  //   String? billedAmgrCompanyTradingName,
+  //   String? billedAmgrCompanyRegNumber,
+  //   String? billedAmgrGstRegNumber,
+  //   String? amgrAddressLine1,
+  //   String? amgrAddressLine2,
+  //   String? amgrAddressLine3,
+  //   String? amgrBankAccountName,
+  //   String? amgrBankAccountNumber,
+  //   String? amgrBankName,
+  //   String? amgrBankBranchCode,
+  //   String? amgrBankSwiftCode,
+  //   String? amgrBankPayNow,
+  //   String? billedTpNote,
+  //   String? billedTptRateNote,
+  //   String? billedTptCycleNote,
+  //   double? billedGst,
+  //   double? billedGstAmount,
+  //   double? billedUsageCostAmount,
+  //   double? billedPrincipalAmount,
+  //   double? billedInterestAmount,
+  //   double? billedCycleTotalAmount,
+  //   double? billedPayableAmount,
+  // ) {
+  //   bool isMonthly = true; //_bill['is_monthly'] == 'true' ? true : false;
+  //   String billTimeRangeStr = getTimeRangeStr(
+  //     fromDatetime,
+  //     toDatetime,
+  //     targetInterval: 'monthly',
+  //     useMiddle: isMonthly ? true : false,
+  //   );
 
-    Map<String, dynamic> billedUsageFactorInfo = {};
-    if (_bill['usage_factor_list'] != null) {
-      for (var item in _bill['usage_factor_list']) {
-        String meterType = item['meter_type'];
-        meterType = meterType.toLowerCase();
-        String valueStr = item['usage_factor'];
-        double? value = double.tryParse(valueStr);
-        billedUsageFactorInfo['billed_usage_factor_$meterType'] = value;
-      }
-    }
+  //   Map<String, dynamic> billedUsageFactorInfo = {};
+  //   if (_bill['usage_factor_list'] != null) {
+  //     for (var item in _bill['usage_factor_list']) {
+  //       String meterType = item['meter_type'];
+  //       meterType = meterType.toLowerCase();
+  //       String valueStr = item['usage_factor'];
+  //       double? value = double.tryParse(valueStr);
+  //       billedUsageFactorInfo['billed_usage_factor_$meterType'] = value;
+  //     }
+  //   }
 
-    List<Map<String, dynamic>> singularUsageList = [];
+  //   List<Map<String, dynamic>> singularUsageList = [];
 
-    if (_bill['singular_billing_rec_list'] != null) {
-      for (var singularUsage in _bill['singular_billing_rec_list']) {
-        singularUsageList.add(singularUsage);
-      }
-    }
+  //   if (_bill['singular_billing_rec_list'] != null) {
+  //     for (var singularUsage in _bill['singular_billing_rec_list']) {
+  //       singularUsageList.add(singularUsage);
+  //     }
+  //   }
 
-    List<PagEmsTypeUsageCalcRl> singularUsageCalcList = [];
+  //   List<PagEmsTypeUsageCalcRl> singularUsageCalcList = [];
 
-    List<String> usageTypeTags = ['E', 'W', 'B', 'N', 'G'];
+  //   List<String> usageTypeTags = ['E', 'W', 'B', 'N', 'G'];
 
-    for (Map<String, dynamic> singularUsage in singularUsageList) {
-      Map<String, dynamic> billedAutoUsageInfo = {};
-      for (String typeTag in usageTypeTags) {
-        typeTag = typeTag.toLowerCase();
-        String typebilledAutoUsageStr =
-            singularUsage['billed_auto_usage_$typeTag'] ?? '';
-        double? usage = double.tryParse(typebilledAutoUsageStr);
-        if (usage != null) {
-          billedAutoUsageInfo['billed_auto_usage_$typeTag'] = usage;
-        }
-      }
+  //   for (Map<String, dynamic> singularUsage in singularUsageList) {
+  //     Map<String, dynamic> billedAutoUsageInfo = {};
+  //     for (String typeTag in usageTypeTags) {
+  //       typeTag = typeTag.toLowerCase();
+  //       String typebilledAutoUsageStr =
+  //           singularUsage['billed_auto_usage_$typeTag'] ?? '';
+  //       double? usage = double.tryParse(typebilledAutoUsageStr);
+  //       if (usage != null) {
+  //         billedAutoUsageInfo['billed_auto_usage_$typeTag'] = usage;
+  //       }
+  //     }
 
-      Map<String, dynamic> billedRateInfo = {};
-      for (String typeTag in usageTypeTags) {
-        typeTag = typeTag.toLowerCase();
-        String typebilledRateStr = singularUsage['billed_rate_$typeTag'] ?? '';
-        double? rate = double.tryParse(typebilledRateStr);
-        if (rate != null) {
-          billedRateInfo['billed_rate_$typeTag'] = rate;
-        }
-      }
+  //     Map<String, dynamic> billedRateInfo = {};
+  //     for (String typeTag in usageTypeTags) {
+  //       typeTag = typeTag.toLowerCase();
+  //       String typebilledRateStr = singularUsage['billed_rate_$typeTag'] ?? '';
+  //       double? rate = double.tryParse(typebilledRateStr);
+  //       if (rate != null) {
+  //         billedRateInfo['billed_rate_$typeTag'] = rate;
+  //       }
+  //     }
 
-      Map<String, dynamic> billedSubTenantUsages = {};
-      Map<String, dynamic> billedManualUsages = {};
-      List<Map<String, dynamic>> billedTrendingSnapShot = [];
+  //     Map<String, dynamic> billedSubTenantUsages = {};
+  //     Map<String, dynamic> billedManualUsages = {};
+  //     List<Map<String, dynamic>> billedTrendingSnapShot = [];
 
-      double? billedGst;
-      if (singularUsage['billed_gst'] != null) {
-        billedGst = double.tryParse(singularUsage['billed_gst']);
-      }
-      // double? billedGstAmount;
-      // if (singularUsage['billed_gst_amount'] != null) {
-      //   billedGstAmount = double.tryParse(singularUsage['billed_gst_amount']);
-      // }
+  //     double? billedGst;
+  //     if (singularUsage['billed_gst'] != null) {
+  //       billedGst = double.tryParse(singularUsage['billed_gst']);
+  //     }
+  //     // double? billedGstAmount;
+  //     // if (singularUsage['billed_gst_amount'] != null) {
+  //     //   billedGstAmount = double.tryParse(singularUsage['billed_gst_amount']);
+  //     // }
 
-      PagEmsTypeUsageCalcRl emsTypeUsageCalcRl = PagEmsTypeUsageCalcRl(
-        costDecimals: widget.costDecimals,
-        billedAutoUsageE: billedAutoUsageInfo['billed_auto_usage_e'],
-        billedAutoUsageW: billedAutoUsageInfo['billed_auto_usage_w'],
-        billedAutoUsageB: billedAutoUsageInfo['billed_auto_usage_b'],
-        billedAutoUsageN: billedAutoUsageInfo['billed_auto_usage_n'],
-        billedAutoUsageG: billedAutoUsageInfo['billed_auto_usage_g'],
-        billedSubTenantUsageE:
-            billedSubTenantUsages['billed_sub_tenant_usage_e'],
-        billedSubTenantUsageW:
-            billedSubTenantUsages['billed_sub_tenant_usage_w'],
-        billedSubTenantUsageB:
-            billedSubTenantUsages['billed_sub_tenant_usage_b'],
-        billedSubTenantUsageN:
-            billedSubTenantUsages['billed_sub_tenant_usage_n'],
-        billedSubTenantUsageG:
-            billedSubTenantUsages['billed_sub_tenant_usage_g'],
-        billedManualUsageE: billedManualUsages['manual_usage_e'],
-        billedManualUsageW: billedManualUsages['manual_usage_w'],
-        billedManualUsageB: billedManualUsages['manual_usage_b'],
-        billedManualUsageN: billedManualUsages['manual_usage_n'],
-        billedManualUsageG: billedManualUsages['manual_usage_g'],
-        billedUsageFactorE: billedUsageFactorInfo['billed_usage_factor_e'],
-        billedUsageFactorW: billedUsageFactorInfo['billed_usage_factor_w'],
-        billedUsageFactorB: billedUsageFactorInfo['billed_usage_factor_b'],
-        billedUsageFactorN: billedUsageFactorInfo['billed_usage_factor_n'],
-        billedUsageFactorG: billedUsageFactorInfo['billed_usage_factor_g'],
-        billedRateE: billedRateInfo['billed_rate_e'],
-        billedRateW: billedRateInfo['billed_rate_w'],
-        billedRateB: billedRateInfo['billed_rate_b'],
-        billedRateN: billedRateInfo['billed_rate_n'],
-        billedRateG: billedRateInfo['billed_rate_g'],
-        billedGst: billedGst,
-        billedGstAmount: billedGstAmount,
-        billedUsageCostAmount: billedUsageCostAmount,
-        billedPrincipalAmount: billedPrincipalAmount,
-        billedInterestAmount: billedInterestAmount,
-        billedCycleTotalAmount: billedCycleTotalAmount,
-        lineItemList: [], //lineItemList,
-        billedTrendingSnapShot: billedTrendingSnapShot,
-        billBarFromMonth: billBarFromMonth,
-      );
-      emsTypeUsageCalcRl.doSingularCalc();
-      singularUsageCalcList.add(emsTypeUsageCalcRl);
+  //     PagEmsTypeUsageCalcRl emsTypeUsageCalcRl = PagEmsTypeUsageCalcRl(
+  //       costDecimals: widget.costDecimals,
+  //       billedAutoUsageE: billedAutoUsageInfo['billed_auto_usage_e'],
+  //       billedAutoUsageW: billedAutoUsageInfo['billed_auto_usage_w'],
+  //       billedAutoUsageB: billedAutoUsageInfo['billed_auto_usage_b'],
+  //       billedAutoUsageN: billedAutoUsageInfo['billed_auto_usage_n'],
+  //       billedAutoUsageG: billedAutoUsageInfo['billed_auto_usage_g'],
+  //       billedSubTenantUsageE:
+  //           billedSubTenantUsages['billed_sub_tenant_usage_e'],
+  //       billedSubTenantUsageW:
+  //           billedSubTenantUsages['billed_sub_tenant_usage_w'],
+  //       billedSubTenantUsageB:
+  //           billedSubTenantUsages['billed_sub_tenant_usage_b'],
+  //       billedSubTenantUsageN:
+  //           billedSubTenantUsages['billed_sub_tenant_usage_n'],
+  //       billedSubTenantUsageG:
+  //           billedSubTenantUsages['billed_sub_tenant_usage_g'],
+  //       billedManualUsageE: billedManualUsages['manual_usage_e'],
+  //       billedManualUsageW: billedManualUsages['manual_usage_w'],
+  //       billedManualUsageB: billedManualUsages['manual_usage_b'],
+  //       billedManualUsageN: billedManualUsages['manual_usage_n'],
+  //       billedManualUsageG: billedManualUsages['manual_usage_g'],
+  //       billedUsageFactorE: billedUsageFactorInfo['billed_usage_factor_e'],
+  //       billedUsageFactorW: billedUsageFactorInfo['billed_usage_factor_w'],
+  //       billedUsageFactorB: billedUsageFactorInfo['billed_usage_factor_b'],
+  //       billedUsageFactorN: billedUsageFactorInfo['billed_usage_factor_n'],
+  //       billedUsageFactorG: billedUsageFactorInfo['billed_usage_factor_g'],
+  //       billedRateE: billedRateInfo['billed_rate_e'],
+  //       billedRateW: billedRateInfo['billed_rate_w'],
+  //       billedRateB: billedRateInfo['billed_rate_b'],
+  //       billedRateN: billedRateInfo['billed_rate_n'],
+  //       billedRateG: billedRateInfo['billed_rate_g'],
+  //       billedGst: billedGst,
+  //       billedGstAmount: billedGstAmount,
+  //       billedUsageCostAmount: billedUsageCostAmount,
+  //       billedPrincipalAmount: billedPrincipalAmount,
+  //       billedInterestAmount: billedInterestAmount,
+  //       billedCycleTotalAmount: billedCycleTotalAmount,
+  //       lineItemList: [], //lineItemList,
+  //       billedTrendingSnapShot: billedTrendingSnapShot,
+  //       billBarFromMonth: billBarFromMonth,
+  //     );
+  //     emsTypeUsageCalcRl.doSingularCalc();
+  //     singularUsageCalcList.add(emsTypeUsageCalcRl);
 
-      singularUsage['usage_calc'] = emsTypeUsageCalcRl;
-    }
+  //     singularUsage['usage_calc'] = emsTypeUsageCalcRl;
+  //   }
 
-    PagEmsTypeUsageCalcRl compositeUsageCalcRl = PagEmsTypeUsageCalcRl(
-      costDecimals: widget.costDecimals,
-      billedRateE: _bill['billed_rate_e'],
-      billedRateW: _bill['billed_rate_w'],
-      billedRateB: _bill['billed_rate_b'],
-      billedRateN: _bill['billed_rate_n'],
-      billedRateG: _bill['billed_rate_g'],
-      billedAutoUsageE: _bill['billed_auto_usage_e'],
-      billedAutoUsageW: _bill['billed_auto_usage_w'],
-      billedAutoUsageB: _bill['billed_auto_usage_b'],
-      billedAutoUsageN: _bill['billed_auto_usage_n'],
-      billedAutoUsageG: _bill['billed_auto_usage_g'],
-      billedSubTenantUsageE: _bill['billed_sub_tenant_usage_e'],
-      billedSubTenantUsageW: _bill['billed_sub_tenant_usage_w'],
-      billedSubTenantUsageB: _bill['billed_sub_tenant_usage_b'],
-      billedSubTenantUsageN: _bill['billed_sub_tenant_usage_n'],
-      billedSubTenantUsageG: _bill['billed_sub_tenant_usage_g'],
-      billedManualUsageE: _bill['manual_usage_e'],
-      billedManualUsageW: _bill['manual_usage_w'],
-      billedManualUsageB: _bill['manual_usage_b'],
-      billedManualUsageN: _bill['manual_usage_n'],
-      billedManualUsageG: _bill['manual_usage_g'],
-      billedUsageFactorE: _bill['billed_usage_factor_e'],
-      billedUsageFactorW: _bill['billed_usage_factor_w'],
-      billedUsageFactorB: _bill['billed_usage_factor_b'],
-      billedUsageFactorN: _bill['billed_usage_factor_n'],
-      billedUsageFactorG: _bill['billed_usage_factor_g'],
-      billedTrendingSnapShot: _bill['billed_trending_snapshot'] ?? [],
-      lineItemList: lineItemList,
-      billBarFromMonth: billBarFromMonth,
-      singularUsageCalcList: singularUsageCalcList,
-      miniSoaInfo: miniSoaInfo,
-      interestInfo: interestInfo,
-      billedGst: billedGst,
-      billedGstAmount: billedGstAmount,
-      billedUsageCostAmount: billedUsageCostAmount,
-      billedPrincipalAmount: billedPrincipalAmount,
-      billedInterestAmount: billedInterestAmount,
-      billedCycleTotalAmount: billedCycleTotalAmount,
-      billedPayableAmount: billedPayableAmount,
-    );
-    compositeUsageCalcRl.doCompositeCalc();
+  //   PagEmsTypeUsageCalcRl compositeUsageCalcRl = PagEmsTypeUsageCalcRl(
+  //     costDecimals: widget.costDecimals,
+  //     billedRateE: _bill['billed_rate_e'],
+  //     billedRateW: _bill['billed_rate_w'],
+  //     billedRateB: _bill['billed_rate_b'],
+  //     billedRateN: _bill['billed_rate_n'],
+  //     billedRateG: _bill['billed_rate_g'],
+  //     billedAutoUsageE: _bill['billed_auto_usage_e'],
+  //     billedAutoUsageW: _bill['billed_auto_usage_w'],
+  //     billedAutoUsageB: _bill['billed_auto_usage_b'],
+  //     billedAutoUsageN: _bill['billed_auto_usage_n'],
+  //     billedAutoUsageG: _bill['billed_auto_usage_g'],
+  //     billedSubTenantUsageE: _bill['billed_sub_tenant_usage_e'],
+  //     billedSubTenantUsageW: _bill['billed_sub_tenant_usage_w'],
+  //     billedSubTenantUsageB: _bill['billed_sub_tenant_usage_b'],
+  //     billedSubTenantUsageN: _bill['billed_sub_tenant_usage_n'],
+  //     billedSubTenantUsageG: _bill['billed_sub_tenant_usage_g'],
+  //     billedManualUsageE: _bill['manual_usage_e'],
+  //     billedManualUsageW: _bill['manual_usage_w'],
+  //     billedManualUsageB: _bill['manual_usage_b'],
+  //     billedManualUsageN: _bill['manual_usage_n'],
+  //     billedManualUsageG: _bill['manual_usage_g'],
+  //     billedUsageFactorE: _bill['billed_usage_factor_e'],
+  //     billedUsageFactorW: _bill['billed_usage_factor_w'],
+  //     billedUsageFactorB: _bill['billed_usage_factor_b'],
+  //     billedUsageFactorN: _bill['billed_usage_factor_n'],
+  //     billedUsageFactorG: _bill['billed_usage_factor_g'],
+  //     billedTrendingSnapShot: _bill['billed_trending_snapshot'] ?? [],
+  //     lineItemList: lineItemList,
+  //     billBarFromMonth: billBarFromMonth,
+  //     singularUsageCalcList: singularUsageCalcList,
+  //     miniSoaInfo: miniSoaInfo,
+  //     interestInfo: interestInfo,
+  //     billedGst: billedGst,
+  //     billedGstAmount: billedGstAmount,
+  //     billedUsageCostAmount: billedUsageCostAmount,
+  //     billedPrincipalAmount: billedPrincipalAmount,
+  //     billedInterestAmount: billedInterestAmount,
+  //     billedCycleTotalAmount: billedCycleTotalAmount,
+  //     billedPayableAmount: billedPayableAmount,
+  //   );
+  //   compositeUsageCalcRl.doCompositeCalc();
+
+  //   return _renderMode == 'pdf'
+  //       ? WgtPagRenderPdf(
+  //           loggedInUser: widget.loggedInUser,
+  //           builder: generatePagInvoice,
+  //           itemInfo: {
+  //             'customerName': tenantName,
+  //             'customerAccountId': accountId,
+  //             'customerLabel': tenantLabel,
+  //             'customerType': tenantType,
+  //             'strDepositAmount': depositAmountStr,
+  //             'paymentMethod': paymentMethod,
+  //             'tenantBillingAddressLine1': tenantBillingAddressLine1,
+  //             'tenantBillingAddressLine2': tenantBillingAddressLine2,
+  //             'tenantBillingAddressLine3': tenantBillingAddressLine3,
+  //             'gst': compositeUsageCalcRl.billedGst,
+  //             'billedGstAmount': compositeUsageCalcRl.billedGstAmount,
+  //             'billingRecName': _bill['billing_rec_name'],
+  //             'billLabel': _bill['bill_label'],
+  //             'strBillFrom': fromDatetime.toIso8601String(),
+  //             'strBillTo': toDatetime.toIso8601String(),
+  //             'effectiveTo': effectiveToDatetime?.toIso8601String(),
+  //             'tenantLcs': tenantLcs,
+  //             'strBillDate': _bill['bill_date_timestamp'] ?? '',
+  //             'strDueDate': _bill['billed_due_date_timestamp'] ?? '',
+  //             'strBillTimeRange': billTimeRangeStr,
+  //             'tenantUsageSummary': const [],
+  //             'totalUsageCost': compositeUsageCalcRl.totalUsageCost,
+  //             'subTotalAmount': compositeUsageCalcRl.subTotalCost,
+  //             'gstAmount': compositeUsageCalcRl.billedGstAmount,
+  //             'totalAmount': compositeUsageCalcRl.totalCost,
+  //             'cycleTotalAmount': compositeUsageCalcRl.cycleTotalAmount,
+  //             'payableAmount': compositeUsageCalcRl.payableAmount,
+  //             'miniSoaInfo': compositeUsageCalcRl.miniSoaInfo,
+  //             'typeRateE': compositeUsageCalcRl.typeUsageE?.rate,
+  //             'typeRateW': compositeUsageCalcRl.typeUsageW?.rate,
+  //             'typeRateB': compositeUsageCalcRl.typeUsageB?.rate,
+  //             'typeRateN': compositeUsageCalcRl.typeUsageN?.rate,
+  //             'typeRateG': compositeUsageCalcRl.typeUsageG?.rate,
+  //             'typeUsageE': compositeUsageCalcRl.typeUsageE?.usageFactored,
+  //             'typeUsageW': compositeUsageCalcRl.typeUsageW?.usageFactored,
+  //             'typeUsageB': compositeUsageCalcRl.typeUsageB?.usageFactored,
+  //             'typeUsageN': compositeUsageCalcRl.typeUsageN?.usageFactored,
+  //             'typeUsageG': compositeUsageCalcRl.typeUsageG?.usageFactored,
+  //             'typeCostE': compositeUsageCalcRl.typeUsageE?.cost,
+  //             'typeCostW': compositeUsageCalcRl.typeUsageW?.cost,
+  //             'typeCostB': compositeUsageCalcRl.typeUsageB?.cost,
+  //             'typeCostN': compositeUsageCalcRl.typeUsageN?.cost,
+  //             'typeCostG': compositeUsageCalcRl.typeUsageG?.cost,
+  //             'trendingE': compositeUsageCalcRl.trendingE,
+  //             'trendingW': compositeUsageCalcRl.trendingW,
+  //             'trendingB': compositeUsageCalcRl.trendingB,
+  //             'trendingN': compositeUsageCalcRl.trendingN,
+  //             'trendingG': compositeUsageCalcRl.trendingG,
+  //             'interestInfo': interestInfo,
+  //             'lineItemLabel1': compositeUsageCalcRl.getLineItem(0)?['label'],
+  //             'lineItemValue1': compositeUsageCalcRl.getLineItem(0)?['amount'],
+  //             'lineItemLabel2': compositeUsageCalcRl.getLineItem(1)?['label'],
+  //             'lineItemValue2': compositeUsageCalcRl.getLineItem(1)?['amount'],
+  //             'lineItemLabel3': compositeUsageCalcRl.getLineItem(2)?['label'],
+  //             'lineItemValue3': compositeUsageCalcRl.getLineItem(2)?['amount'],
+  //             'assetFolder': assetFolder,
+  //             'tenantSingularUsageInfoList': singularUsageList,
+  //             'billedAmgrCompanyTradingName': billedAmgrCompanyTradingName,
+  //             'billedAmgrCompanyRegNumber': billedAmgrCompanyRegNumber,
+  //             'billedAmgrGstRegNumber': billedAmgrGstRegNumber,
+  //             'amgrAddressLine1': amgrAddressLine1,
+  //             'amgrAddressLine2': amgrAddressLine2,
+  //             'amgrAddressLine3': amgrAddressLine3,
+  //             'amgrBankAccountName': amgrBankAccountName,
+  //             'amgrBankAccountNumber': amgrBankAccountNumber,
+  //             'amgrBankName': amgrBankName,
+  //             'amgrBankBranchCode': amgrBankBranchCode,
+  //             'amgrBankSwiftCode': amgrBankSwiftCode,
+  //             'amgrBankPayNow': amgrBankPayNow,
+  //             'billedTpNote': billedTpNote,
+  //             'billedTptRateNote': billedTptRateNote,
+  //             'billedTptCycleNote': billedTptCycleNote,
+  //             'collectionStartDate': collectionStartDateTimestampStr,
+  //             'collectionEndDate': collectionEndDateTimestampStr,
+  //           },
+  //         )
+  //       : WgtPagTenantCompositeUsageSummaryRl(
+  //           isDisabled: _isDisabledPvRl,
+  //           costDecimals: widget.costDecimals,
+  //           appConfig: widget.appConfig,
+  //           loggedInUser: widget.loggedInUser,
+  //           displayContextStr: widget.displayContextStr,
+  //           isBillMode: widget.isBillMode,
+  //           billInfo: _bill,
+  //           // usageCalc: compositeUsageCalc,
+  //           showRenderModeSwitch: true,
+  //           itemType: ItemType.meter_iwow,
+  //           isMonthly: isMonthly,
+  //           // cycleStr: cycleStr,
+  //           // billDate: billDate,
+  //           tenantLcs: tenantLcs,
+  //           fromDatetime: fromDatetime,
+  //           toDatetime: toDatetime,
+  //           effectiveToDatetime: effectiveToDatetime,
+  //           tenantName: tenantName,
+  //           tenantLabel: tenantLabel,
+  //           tenantAccountId: accountId,
+  //           tenantType: tenantType,
+  //           // billedAutoUsages: billedAutoUsages,
+  //           // billedSubTenantUsages: billedSubTenantUsages,
+  //           // billedUsageFactor: billedUsageFactors,
+  //           // manualUsages: billedManualUsages,
+  //           lineItems: lineItemList,
+  //           // meterTypeRates: billedRates,
+  //           tenantSingularUsageInfoList: singularUsageList,
+  //           compositeUsageCalc: compositeUsageCalcRl,
+  //           collectionStartDateTimestampStr: collectionStartDateTimestampStr,
+  //           collectionEndDateTimestampStr: collectionEndDateTimestampStr,
+  //           excludeAutoUsage:
+  //               _bill['exclude_auto_usage'] == 'true' ? true : false,
+  //           gst: compositeUsageCalcRl.billedGst,
+  //           interestInfo: interestInfo,
+  //           onUpdate: () {
+  //             widget.onUpdate?.call();
+  //             setState(() {
+  //               // _lcStatusDisplay = _bill['lc_status'];
+  //             });
+  //           },
+  //         );
+  // }
+
+  Widget getReleaseRender2(Map<String, dynamic> billInfo) {
+    final calcedBillInfoRl = prepCalcedBillInfoRl(billInfo);
 
     return _renderMode == 'pdf'
         ? WgtPagRenderPdf(
             loggedInUser: widget.loggedInUser,
-            itemInfo: {
-              'customerName': tenantName,
-              'customerAccountId': accountId,
-              'customerLabel': tenantLabel,
-              'customerType': tenantType,
-              'depositAmountStr': depositAmountStr,
-              'paymentMethod': paymentMethod,
-              'tenantBillingAddressLine1': tenantBillingAddressLine1,
-              'tenantBillingAddressLine2': tenantBillingAddressLine2,
-              'tenantBillingAddressLine3': tenantBillingAddressLine3,
-              'gst': compositeUsageCalcRl.billedGst,
-              'billedGstAmount': compositeUsageCalcRl.billedGstAmount,
-              'billingRecName': _bill['billing_rec_name'],
-              'billLabel': _bill['bill_label'],
-              'billFrom': fromDatetime.toIso8601String(),
-              'billTo': toDatetime.toIso8601String(),
-              'effectiveTo': effectiveToDatetime?.toIso8601String(),
-              'tenantLcs': tenantLcs,
-              'billDate': _bill['bill_date_timestamp'] ?? '',
-              'dueDate': _bill['billed_due_date_timestamp'] ?? '',
-              'billTimeRangeStr': billTimeRangeStr,
-              'tenantUsageSummary': const [],
-              'totalUsageCost': compositeUsageCalcRl.totalUsageCost,
-              'subTotalAmount': compositeUsageCalcRl.subTotalCost,
-              'gstAmount': compositeUsageCalcRl.billedGstAmount,
-              'totalAmount': compositeUsageCalcRl.totalCost,
-              'cycleTotalAmount': compositeUsageCalcRl.cycleTotalAmount,
-              'payableAmount': compositeUsageCalcRl.payableAmount,
-              'miniSoaInfo': compositeUsageCalcRl.miniSoaInfo,
-              'typeRateE': compositeUsageCalcRl.typeUsageE?.rate,
-              'typeRateW': compositeUsageCalcRl.typeUsageW?.rate,
-              'typeRateB': compositeUsageCalcRl.typeUsageB?.rate,
-              'typeRateN': compositeUsageCalcRl.typeUsageN?.rate,
-              'typeRateG': compositeUsageCalcRl.typeUsageG?.rate,
-              'typeUsageE': compositeUsageCalcRl.typeUsageE?.usageFactored,
-              'typeUsageW': compositeUsageCalcRl.typeUsageW?.usageFactored,
-              'typeUsageB': compositeUsageCalcRl.typeUsageB?.usageFactored,
-              'typeUsageN': compositeUsageCalcRl.typeUsageN?.usageFactored,
-              'typeUsageG': compositeUsageCalcRl.typeUsageG?.usageFactored,
-              'typeCostE': compositeUsageCalcRl.typeUsageE?.cost,
-              'typeCostW': compositeUsageCalcRl.typeUsageW?.cost,
-              'typeCostB': compositeUsageCalcRl.typeUsageB?.cost,
-              'typeCostN': compositeUsageCalcRl.typeUsageN?.cost,
-              'typeCostG': compositeUsageCalcRl.typeUsageG?.cost,
-              'trendingE': compositeUsageCalcRl.trendingE,
-              'trendingW': compositeUsageCalcRl.trendingW,
-              'trendingB': compositeUsageCalcRl.trendingB,
-              'trendingN': compositeUsageCalcRl.trendingN,
-              'trendingG': compositeUsageCalcRl.trendingG,
-              'interestInfo': interestInfo,
-              'lineItemLabel1': compositeUsageCalcRl.getLineItem(0)?['label'],
-              'lineItemValue1': compositeUsageCalcRl.getLineItem(0)?['amount'],
-              'lineItemLabel2': compositeUsageCalcRl.getLineItem(1)?['label'],
-              'lineItemValue2': compositeUsageCalcRl.getLineItem(1)?['amount'],
-              'assetFolder': assetFolder,
-              'tenantSingularUsageInfoList': singularUsageList,
-              'billedAmgrCompanyTradingName': billedAmgrCompanyTradingName,
-              'billedAmgrCompanyRegNumber': billedAmgrCompanyRegNumber,
-              'billedAmgrGstRegNumber': billedAmgrGstRegNumber,
-              'amgrAddressLine1': amgrAddressLine1,
-              'amgrAddressLine2': amgrAddressLine2,
-              'amgrAddressLine3': amgrAddressLine3,
-              'amgrBankAccountName': amgrBankAccountName,
-              'amgrBankAccountNumber': amgrBankAccountNumber,
-              'amgrBankName': amgrBankName,
-              'amgrBankBranchCode': amgrBankBranchCode,
-              'amgrBankSwiftCode': amgrBankSwiftCode,
-              'amgrBankPayNow': amgrBankPayNow,
-              'billedTpNote': billedTpNote,
-              'billedTptRateNote': billedTptRateNote,
-              'billedTptCycleNote': billedTptCycleNote,
-              'collectionStartDate': collectionStartDateTimestampStr,
-              'collectionEndDate': collectionEndDateTimestampStr,
-            },
             builder: generatePagInvoice,
+            itemInfo: calcedBillInfoRl,
           )
         : WgtPagTenantCompositeUsageSummaryRl(
             isDisabled: _isDisabledPvRl,
@@ -1139,34 +1193,30 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             displayContextStr: widget.displayContextStr,
             isBillMode: widget.isBillMode,
             billInfo: _bill,
-            // usageCalc: compositeUsageCalc,
             showRenderModeSwitch: true,
             itemType: ItemType.meter_iwow,
-            isMonthly: isMonthly,
-            // cycleStr: cycleStr,
-            // billDate: billDate,
-            tenantLcs: tenantLcs,
-            fromDatetime: fromDatetime,
-            toDatetime: toDatetime,
-            effectiveToDatetime: effectiveToDatetime,
-            tenantName: tenantName,
-            tenantLabel: tenantLabel,
-            tenantAccountId: accountId,
-            tenantType: tenantType,
-            // billedAutoUsages: billedAutoUsages,
-            // billedSubTenantUsages: billedSubTenantUsages,
-            // billedUsageFactor: billedUsageFactors,
-            // manualUsages: billedManualUsages,
-            lineItems: lineItemList,
-            // meterTypeRates: billedRates,
-            tenantSingularUsageInfoList: singularUsageList,
-            compositeUsageCalc: compositeUsageCalcRl,
-            collectionStartDateTimestampStr: collectionStartDateTimestampStr,
-            collectionEndDateTimestampStr: collectionEndDateTimestampStr,
+            isMonthly: true,
+            tenantLcs: calcedBillInfoRl['tenantLcs'] ?? '',
+            fromDatetime: DateTime.parse(calcedBillInfoRl['strFrom']),
+            toDatetime: DateTime.parse(calcedBillInfoRl['strTo']),
+            effectiveToDatetime:
+                DateTime.tryParse(calcedBillInfoRl['strEffectiveTo']),
+            tenantName: calcedBillInfoRl['customerName'] ?? '',
+            tenantLabel: calcedBillInfoRl['tenantLabel'] ?? '',
+            tenantAccountId: calcedBillInfoRl['tenantAccountId'] ?? '',
+            tenantType: calcedBillInfoRl['tenantType'] ?? '',
+            lineItems: calcedBillInfoRl['lineItemList'] ?? [],
+            tenantSingularUsageInfoList:
+                calcedBillInfoRl['singularUsageList'] ?? [],
+            compositeUsageCalc: calcedBillInfoRl['compositeUsageCalc'],
+            collectionStartDateTimestampStr:
+                calcedBillInfoRl['strCollectionStartDate'],
+            collectionEndDateTimestampStr:
+                calcedBillInfoRl['strCollectionEndDate'],
             excludeAutoUsage:
                 _bill['exclude_auto_usage'] == 'true' ? true : false,
-            gst: compositeUsageCalcRl.billedGst,
-            interestInfo: interestInfo,
+            gst: calcedBillInfoRl['gst'],
+            interestInfo: calcedBillInfoRl['interestInfo'] ?? {},
             onUpdate: () {
               widget.onUpdate?.call();
               setState(() {
