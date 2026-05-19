@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
+import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
@@ -100,6 +101,11 @@ Future<Uint8List> generatePagInvoiceCompilation(
 
     final interestInfo = billInfo['interest_info'] ?? {};
     final miniSoaInfo = billInfo['mini_soa_info'] ?? {};
+    final strCollectionStartDateTimestamp =
+        miniSoaInfo['collection_start_date_timestamp'] ?? '';
+    final strCollectionEndDateTimestamp =
+        miniSoaInfo['collection_end_date_timestamp'] ?? '';
+
     String billBarFromMonth = billInfo['bill_bar_from_timestamp'] ?? '';
     List<PagEmsTypeUsageCalcRl> singularUsageCalcList = [];
 
@@ -209,7 +215,7 @@ Future<Uint8List> generatePagInvoiceCompilation(
         billedRateN: billedRateInfo['billed_rate_n'],
         billedRateG: billedRateInfo['billed_rate_g'],
         billedGst: billedGst,
-        billedGstAmount: billedGstAmount,
+        billedGstAmount: billedGstAmountDouble,
         billedUsageCostAmount: billedUsageCostAmount,
         billedPrincipalAmount: billedPrincipalAmount,
         billedInterestAmount: billedInterestAmount,
@@ -258,7 +264,7 @@ Future<Uint8List> generatePagInvoiceCompilation(
       miniSoaInfo: miniSoaInfo,
       interestInfo: interestInfo,
       billedGst: billedGst,
-      billedGstAmount: billedGstAmount,
+      billedGstAmount: billedGstAmountDouble,
       billedUsageCostAmount: billedUsageCostAmount,
       billedPrincipalAmount: billedPrincipalAmount,
       billedInterestAmount: billedInterestAmount,
@@ -319,7 +325,7 @@ Future<Uint8List> generatePagInvoiceCompilation(
       lineItemValue2: compositeUsageCalcRl.getLineItem(1)?['amount'],
       miniSoaInfo: miniSoaInfo,
       assetFolder: assetFolder,
-      tenantSingularUsageInfoList: billInfo['tenant_singular_usage_info_list'],
+      tenantSingularUsageInfoList: singularUsageList,
       billedAmgrCompanyTradingName:
           billInfo['billed_amgr_company_trading_name'],
       billedAmgrCompanyRegNumber: billInfo['billed_amgr_company_reg_number'],
@@ -333,8 +339,8 @@ Future<Uint8List> generatePagInvoiceCompilation(
       amgrBankBranchCode: billInfo['amgr_bank_branch_code'],
       amgrBankSwiftCode: billInfo['amgr_bank_swift_code'],
       amgrBankPayNow: billInfo['amgr_bank_pay_now'],
-      collectionStartDateStr: billInfo['collection_start_date_timestamp'],
-      collectionEndDateStr: billInfo['collection_end_date_timestamp'],
+      collectionStartDateStr: strCollectionStartDateTimestamp,
+      collectionEndDateStr: strCollectionEndDateTimestamp,
       tax: .15,
       baseColor: PdfColors.teal,
       accentColor: PdfColors.blueGrey900,
@@ -342,14 +348,20 @@ Future<Uint8List> generatePagInvoiceCompilation(
     invoiceList.add(invoice);
   }
 
-  return await buildPdf(pageFormat, invoiceList);
+  return await buildPdf(pageFormat, assetFolder, invoiceList);
 }
 
-Future<Uint8List> buildPdf(
-    PdfPageFormat pageFormat, List<PagBill> invoiceList) async {
+Future<Uint8List> buildPdf(PdfPageFormat pageFormat, String assetFolder,
+    List<PagBill> invoiceList) async {
   final pdf = pw.Document();
+  final logo = pw.MemoryImage(
+    (await rootBundle.load('$assetFolder/transparent_32x32.png'))
+        .buffer
+        .asUint8List(),
+  );
+
   for (var invoice in invoiceList) {
-    pdf.addPage(await invoice.getPage1());
+    pdf.addPage(await invoice.getPage1(logo: logo));
   }
   return await pdf.save();
 }

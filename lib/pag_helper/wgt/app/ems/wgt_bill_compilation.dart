@@ -10,6 +10,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import '../../../../pagrid_helper/ems_helper/billing_helper/cw_bill/pag_gen_pdf_bill_compilation_cw.dart';
 import '../../../../pagrid_helper/ems_helper/billing_helper/wgt_pag_render_pdf.dart';
 import '../../../../up_helper/exceptions.dart';
+import '../../../../util/date_time_util.dart';
 import '../../../../xt_ui/xt_helpers.dart';
 import '../../../comm/comm_pag_billing.dart';
 import '../../../comm/comm_pag_item.dart';
@@ -18,6 +19,7 @@ import '../../../model/mdl_pag_app_context.dart';
 import '../../../model/mdl_pag_user.dart';
 import '../../../model/mdl_pag_app_config.dart';
 import '../../../model/scope/mdl_pag_scope.dart';
+import '../../datetime/wgt_date_range_picker_monthly.dart';
 
 class WgtBillCompilation extends StatefulWidget {
   const WgtBillCompilation({
@@ -54,6 +56,16 @@ class _WgtBillCompilationState extends State<WgtBillCompilation> {
     border: Border.all(color: Theme.of(context).hintColor, width: 1.5),
     borderRadius: BorderRadius.circular(5),
   );
+
+  DateTime? _selectedFromDate;
+  DateTime? _selectedToDate;
+  bool _customDateRangeSelected = false;
+  bool _isMTD = false;
+  DateTime? _monthPicked;
+  DateTime? _selectedDate1;
+  DateTime? _selectedDate2;
+  UniqueKey? _date1PickerKey;
+  UniqueKey? _date2PickerKey;
 
   Future<dynamic> _getScopeBillList() async {
     if (_gettingBillList) {
@@ -94,15 +106,30 @@ class _WgtBillCompilationState extends State<WgtBillCompilation> {
       });
       return;
     }
+
+    String cycleStr = '';
+    if (_selectedFromDate != null && _selectedToDate != null) {
+      // get mid date and make 'YYYY-MM' format
+      DateTime midDate = _selectedFromDate!
+          .add(_selectedToDate!.difference(_selectedFromDate!) ~/ 2);
+      cycleStr = '${midDate.year}-${midDate.month.toString().padLeft(2, '0')}';
+    }
+    if (cycleStr.isEmpty) {
+      throw Exception('Cycle month is not selected');
+    }
+
     Map<String, dynamic> queryMap = {
       'scope': widget.loggedInUser.selectedScope.toScopeMap(),
       'item_scope': itemScopeMap,
       'item_kind': PagItemKind.bill.name,
       // 'item_type': itemTypeStr,
       'max_rows_per_page': '$maxPerPage',
+      'lc_status': 'released',
+      'additional_constraint':
+          'gen_type != \'initial_balance\' AND cycle_str = \'$cycleStr\'',
       // 'current_page': '$_currentPage',
-      // 'sort_by': widget.sortBy,
-      // 'sort_order': `widget.sortOrder,
+      'sort_by': 'account_number',
+      'sort_order': 'asc',
       // 'get_count_only': widget.getCountOnly ? 'true' : 'false',
       'list_context_type': PagListContextType.billCompilation.name,
       // 'allow_flexi_label': widget.allowFlexiLabel ? 'true' : 'false',
@@ -175,7 +202,22 @@ class _WgtBillCompilationState extends State<WgtBillCompilation> {
     }
   }
 
-  void _genBillListCompilation() {}
+  void _resetDate({bool resetDateRange = false}) {
+    setState(() {
+      if (resetDateRange) {
+        _selectedToDate = null;
+        _selectedFromDate = null;
+        // _timePickerKey = UniqueKey();
+        _customDateRangeSelected = false;
+        _monthPicked = null;
+        _isMTD = false;
+        _selectedDate1 = null;
+        _selectedDate2 = null;
+        _date1PickerKey = null;
+        _date2PickerKey = null;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -252,11 +294,22 @@ class _WgtBillCompilationState extends State<WgtBillCompilation> {
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        WgtCommButton(
-          enabled: !_gettingBillList && !_fetchedBillList,
-          label: 'Get Bill List',
-          onPressed: _gettingBillList ? null : _getScopeBillList,
+        Text(
+          'Cycle Month',
+          style: TextStyle(
+            color: Theme.of(context).hintColor,
+            fontSize: 16,
+          ),
         ),
+        horizontalSpaceSmall,
+        getTimeRangePicker(forceMonthly: true),
+        horizontalSpaceSmall,
+        if (_selectedFromDate != null && _selectedToDate != null)
+          WgtCommButton(
+            enabled: !_gettingBillList && !_fetchedBillList,
+            label: 'Get Bill List',
+            onPressed: _gettingBillList ? null : _getScopeBillList,
+          ),
         if (_fetchedBillList)
           Padding(
             padding: const EdgeInsets.only(left: 8.0),
@@ -277,6 +330,75 @@ class _WgtBillCompilationState extends State<WgtBillCompilation> {
                 }),
           ),
       ],
+    );
+  }
+
+  Widget getTimeRangePicker({bool forceMonthly = false, bool enabled = true}) {
+    return WgtPagDateRangePickerMonthly(
+      // key: _timePickerKey,
+      enabled: enabled,
+      iniEndDateTime: _selectedToDate,
+      iniStartDateTime: _selectedFromDate,
+      customRangeSelected: _customDateRangeSelected,
+      monthPicked: _monthPicked,
+      populateDefaultRange: false,
+      allowCustomRange: !forceMonthly,
+      onRangeSet: (startDate, endDate) async {
+        if (startDate == null || endDate == null) return;
+        _resetDate(resetDateRange: true);
+        setState(() {
+          _selectedFromDate = startDate;
+          _selectedToDate = endDate;
+
+          _customDateRangeSelected = true;
+          _isMTD = false;
+          _monthPicked = null;
+
+          // _timePickerKey = UniqueKey();
+          _selectedDate1 = null;
+          _selectedDate2 = null;
+          _date1PickerKey = UniqueKey();
+          _date2PickerKey = UniqueKey();
+
+          _billList.clear();
+          _showCompilation = false;
+          _compilationGenerated = false;
+          _errorText = '';
+          _fetchedBillList = false;
+          _gettingBillList = false;
+          _pullFails = 0;
+        });
+      },
+      onMonthPicked: (selected) {
+        _resetDate(resetDateRange: true);
+        setState(() {
+          // _timePickerKey = UniqueKey();
+          _monthPicked = selected;
+          _selectedFromDate = DateTime(selected.year, selected.month, 1);
+          _selectedToDate = DateTime(selected.year, selected.month + 1, 0);
+          // _customRange = false;
+          DateTime localNow = getTargetLocalDatetimeNow(
+              widget.loggedInUser.selectedScope.getProjectTimezone());
+          _isMTD = false;
+          if (localNow.year == selected.year &&
+              localNow.month == selected.month) {
+            _isMTD = true;
+          }
+
+          _selectedDate1 = null;
+          _selectedDate2 = null;
+          _date1PickerKey = UniqueKey();
+          _date2PickerKey = UniqueKey();
+
+          _billList.clear();
+          _showCompilation = false;
+          _compilationGenerated = false;
+          _errorText = '';
+          _fetchedBillList = false;
+          _gettingBillList = false;
+          _pullFails = 0;
+        });
+      },
     );
   }
 }

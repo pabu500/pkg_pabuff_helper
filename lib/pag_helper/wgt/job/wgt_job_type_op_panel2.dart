@@ -54,7 +54,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
   String? _itemDisplayName;
   final List<Widget> fields = [];
 
-  UniqueKey? _timePickerKey;
+  // UniqueKey? _timePickerKey;
   DateTime? _selectedFromDate;
   DateTime? _selectedToDate;
   bool _customDateRangeSelected = false;
@@ -196,11 +196,14 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
       if (resetDateRange) {
         _selectedToDate = null;
         _selectedFromDate = null;
-        _timePickerKey = UniqueKey();
+        // _timePickerKey = UniqueKey();
         _customDateRangeSelected = false;
         _monthPicked = null;
         _isMTD = false;
         _selectedDate1 = null;
+        _selectedDate2 = null;
+        _date1PickerKey = null;
+        _date2PickerKey = null;
       }
     });
   }

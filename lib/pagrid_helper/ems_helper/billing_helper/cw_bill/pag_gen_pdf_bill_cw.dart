@@ -250,7 +250,7 @@ class PagBill {
 
   PdfColor get _accentTextColor => baseColor.isLight ? _lightColor : _darkColor;
 
-  late final _logo;
+  dynamic _logo;
 
   final double size1 = 8;
   final double size2 = 9.5;
@@ -295,7 +295,7 @@ class PagBill {
     return doc.save();
   }
 
-  Future<pw.MultiPage> getPage1() async {
+  Future<pw.MultiPage> getPage1({dynamic logo}) async {
     double pageWidth = PdfPageFormat.a4.width;
     dev.log('Page width: $pageWidth');
 
@@ -323,7 +323,7 @@ class PagBill {
     );
   }
 
-  pw.Widget _buildHeader(pw.Context context) {
+  pw.Widget _buildHeader(pw.Context context, {dynamic logo}) {
     // int codePoint = mt.Icons.abc.codePoint;
     //hex
     return pw.Column(
@@ -336,7 +336,7 @@ class PagBill {
               child: pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 mainAxisSize: pw.MainAxisSize.min,
-                children: [_getLogo(), _getBillerInfo()],
+                children: [_getLogo(logo: logo), _getBillerInfo()],
               ),
             ),
             pw.Expanded(child: pw.Container()),
@@ -357,12 +357,13 @@ class PagBill {
     );
   }
 
-  pw.Widget _getLogo() {
+  pw.Widget _getLogo({dynamic logo}) {
+    dynamic displayLogo = logo ?? _logo;
     return pw.Container(
       alignment: pw.Alignment.topLeft,
       // padding: const pw.EdgeInsets.only(bottom: 8, left: 30),
       height: 39,
-      child: _logo != null ? pw.Image(_logo!) : pw.PdfLogo(),
+      child: displayLogo != null ? pw.Image(displayLogo) : pw.PdfLogo(),
     );
   }
 
