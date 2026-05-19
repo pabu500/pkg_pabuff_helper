@@ -902,7 +902,10 @@ class PagPdfBill {
     }
     closingBalAmount = -1 * closingBalAmount;
 
-    double subTotalNonTaxable = interestAmount + (lineItemValue2 ?? 0.0);
+    // line 3 is interest adj and inclucded in the interest amount,
+    // so not adding separately here to avoid double counting
+    double subTotalNonTaxable =
+        interestAmount + (lineItemValue2 ?? 0.0) /* + (lineItemValue3 ?? 0.0)*/;
 
     return pw.Container(
       width: 500,
@@ -921,8 +924,7 @@ class PagPdfBill {
                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: pw.CrossAxisAlignment.center,
                     children: [
-                      pw.Text('Line Item: ${lineItemLabel1!}',
-                          style: styleNormal),
+                      pw.Text(lineItemLabel1!, style: styleNormal),
                       pw.Text(_formatCurrency(lineItemValue1!),
                           style: styleNormal),
                     ],
@@ -970,6 +972,22 @@ class PagPdfBill {
                   ],
                 ),
                 pw.Divider(color: PdfColors.grey600, thickness: 0.5, height: 5),
+                // line item 3
+                if (lineItemLabel3 != null && lineItemValue3 != null)
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: pw.CrossAxisAlignment.center,
+                    children: [
+                      pw.Text(
+                        '(${lineItemLabel3!})',
+                        style: styleNormal,
+                      ),
+                      pw.Text(
+                        _formatCurrency(lineItemValue3!),
+                        style: styleNormal,
+                      ),
+                    ],
+                  ),
                 pw.Row(
                   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: pw.CrossAxisAlignment.center,
@@ -1000,6 +1018,22 @@ class PagPdfBill {
                       ),
                     ],
                   ),
+                // line item 3
+                // if (lineItemLabel3 != null && lineItemValue3 != null)
+                //   pw.Row(
+                //     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                //     crossAxisAlignment: pw.CrossAxisAlignment.center,
+                //     children: [
+                //       pw.Text(
+                //         lineItemLabel3!,
+                //         style: styleNormal,
+                //       ),
+                //       pw.Text(
+                //         _formatCurrency(lineItemValue3!),
+                //         style: styleNormal,
+                //       ),
+                //     ],
+                //   ),
                 // sub total (non-taxable)
                 pw.Row(
                   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
