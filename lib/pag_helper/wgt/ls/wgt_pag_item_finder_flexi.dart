@@ -637,19 +637,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
         widget.itemType is PagOrgType ||
         widget.itemType is PagTariff ||
         widget.itemType == null);
-    // switch (widget.itemType.runtimeType) {
-    //   case const (DeviceType):
-    //     itemTypeStr = (widget.itemType as DeviceType).name;
-    //     break;
-    //   case const (MeterType):
-    //     itemTypeStr = (widget.itemType as MeterType).name;
-    //     break;
-    //   case const (SensorType):
-    //     itemTypeStr = (widget.itemType as SensorType).name;
-    //     break;
-    //   default:
-    //     itemTypeStr = 'NOT_SET';
-    // }
+
     if (widget.itemType is PagDeviceCat) {
       itemTypeStr = (widget.itemType as PagDeviceCat).value.toLowerCase();
     } else if (widget.itemType is PagScopeType) {
@@ -884,14 +872,19 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
         ),
       ]);
     }
+
     return Column(
       children: [
         Wrap(
           children: [
-            getItemIdFilterGroup(),
-            getItemSpecFilterGroup(),
-            getItemLocationFilterGroup(),
-            getItemStatusFilterGroup(),
+            if (widget.listContextType != PagListContextType.infoTp)
+              getItemIdFilterGroup(),
+            if (widget.listContextType != PagListContextType.infoTp)
+              getItemSpecFilterGroup(),
+            if (widget.listContextType != PagListContextType.infoTp)
+              getItemLocationFilterGroup(),
+            if (widget.listContextType != PagListContextType.infoTp)
+              getItemStatusFilterGroup(),
             getItemJoinFilterGroup(),
           ],
         ),
@@ -1079,6 +1072,12 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     if (list.isEmpty) {
       return Container();
     }
+
+    // bool isReadOnly = false;
+    // if (widget.listContextType == PagListContextType.infoTp) {
+    //   isReadOnly = true;
+    // }
+
     return Container(
       decoration: blockDecoration,
       margin: const EdgeInsets.symmetric(horizontal: 3),

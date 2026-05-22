@@ -39,7 +39,7 @@ class _WgtSubmitTableState extends State<WgtSubmitTable> {
     FilePickerResult? result;
     File file;
     try {
-      result = await FilePicker.platform.pickFiles(
+      result = await FilePicker /*.platform*/ .pickFiles(
           type: FileType.custom,
           allowMultiple: false,
           allowedExtensions: widget.fileExtensions ?? ['csv']);

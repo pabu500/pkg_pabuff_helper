@@ -22,6 +22,7 @@ class WgtPagLs extends StatefulWidget {
     this.isSingleItemMode = false,
     this.hint,
     this.enabledItemTypeList = const [],
+    this.initialFilterMap = const {},
   });
 
   final MdlPagAppConfig appConfig;
@@ -38,6 +39,7 @@ class WgtPagLs extends StatefulWidget {
   final bool isSingleItemMode;
   final String? hint;
   final List<dynamic> enabledItemTypeList;
+  final Map<String, dynamic> initialFilterMap;
 
   @override
   State<WgtPagLs> createState() => _WgtPagLsState();
@@ -119,6 +121,7 @@ class _WgtPagLsState extends State<WgtPagLs> {
           validateTreeChildren: widget.validateTreeChildren,
           isSingleItemMode: widget.isSingleItemMode,
           hint: widget.hint,
+          initialFilterMap: widget.initialFilterMap,
         );
       default:
         return Container();
