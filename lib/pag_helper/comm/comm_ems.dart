@@ -132,7 +132,7 @@ Future<dynamic> commitTenantUserList(
   if (response.statusCode == 200) {
     final respJson = jsonDecode(response.body);
     if (respJson['error'] != null) {
-      throw Exception(respJson['error']);
+      throw Exception(respJson['error']['message']);
     }
     return respJson['data'];
   } else if (response.statusCode == 403) {
