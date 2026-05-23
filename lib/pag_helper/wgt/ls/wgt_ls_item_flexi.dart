@@ -1306,6 +1306,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                         costDecimals: 2,
                         appConfig: widget.appConfig,
                         loggedInUser: loggedInUser!,
+                        listContextType: widget.listContextType,
                         billingRecIndexStr: item['id'],
                         defaultBillLcStatusStr: item['lc_status'],
                         modes: item['lc_status'] == 'released' ||

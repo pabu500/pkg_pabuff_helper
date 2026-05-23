@@ -4,6 +4,8 @@ import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/wgt_pag_comp
 import 'package:buff_helper/xt_ui/xt_helpers.dart';
 import 'package:flutter/material.dart';
 
+import '../../../def_helper/list_helper.dart';
+
 class WgtMatchOnePayment extends StatefulWidget {
   const WgtMatchOnePayment({
     super.key,
@@ -72,6 +74,7 @@ class _WgtMatchOnePaymentState extends State<WgtMatchOnePayment> {
             costDecimals: 2,
             appConfig: widget.appConfig,
             loggedInUser: widget.loggedInUser,
+            listContextType: PagListContextType.info,
             billingRecIndexStr: billingRecId,
             defaultBillLcStatusStr: billingLcStatusStr,
             modes: const ['wgt', 'pdf'],

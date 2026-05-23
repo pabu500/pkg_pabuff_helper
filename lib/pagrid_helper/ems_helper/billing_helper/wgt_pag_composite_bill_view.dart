@@ -6,6 +6,7 @@ import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/cw_bill/pag_
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
 
+import '../../../pag_helper/def_helper/list_helper.dart';
 import '../../../pag_helper/def_helper/pag_item_helper.dart';
 import '../../../pag_helper/model/mdl_pag_project_profile.dart';
 import '../tenant/pag_ems_type_usage_calc.dart';
@@ -24,6 +25,7 @@ class WgtPagCompositeBillView extends StatefulWidget {
     required this.loggedInUser,
     required this.billingRecIndexStr,
     required this.defaultBillLcStatusStr,
+    required this.listContextType,
     this.displayContextStr = 'bill_view',
     this.isBillMode = true,
     this.costDecimals = 3,
@@ -34,6 +36,7 @@ class WgtPagCompositeBillView extends StatefulWidget {
 
   final MdlPagUser loggedInUser;
   final MdlPagAppConfig appConfig;
+  final PagListContextType listContextType;
   final bool isBillMode;
   final String displayContextStr;
   final String billingRecIndexStr;
@@ -135,12 +138,19 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     _showGenTypeSwitch = widget.genTypes.length > 1;
     _showRenderModeSwitch = widget.modes.length > 1 &&
         _billLcStatusDisplay == PagBillingLcStatus.released;
+
     _renderMode = widget.modes[0];
 
     if (_billLcStatusDisplay == PagBillingLcStatus.released) {
       // _renderMode = 'pdf';
       // temp to put wgt till pdf template is ready
       _renderMode = 'wgt';
+    }
+
+    if (widget.listContextType == PagListContextType.infoTp) {
+      _showGenTypeSwitch = false;
+      _showRenderModeSwitch = false;
+      _renderMode = 'pdf';
     }
 
     MdlPagProjectProfile selectedProjectProfile =
@@ -205,7 +215,8 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         horizontalSpaceRegular,
-                        if (_billLcStatusDisplay == PagBillingLcStatus.mfd)
+                        if (_billLcStatusDisplay == PagBillingLcStatus.mfd &&
+                            widget.listContextType != PagListContextType.infoTp)
                           Padding(
                             padding: const EdgeInsets.only(right: 8.0),
                             child: WgtItemDeleteOp(
@@ -236,35 +247,36 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
                               },
                             ),
                           ),
-                        WgtPagBillLcStatusOp(
-                          key: _lcStatusOpsKey,
-                          appConfig: widget.appConfig,
-                          loggedInUser: widget.loggedInUser,
-                          enableEdit: enableEditLcStatus,
-                          billInfo: _bill,
-                          initialStatus: _billLcStatusActual,
-                          onCommitted: (newStatus) {
-                            setState(() {
-                              _lcStatusOpsKey = UniqueKey();
-                              _bill['lc_status'] = newStatus.value;
-                              _isDisabledGn =
-                                      false /*
+                        if (widget.listContextType != PagListContextType.infoTp)
+                          WgtPagBillLcStatusOp(
+                            key: _lcStatusOpsKey,
+                            appConfig: widget.appConfig,
+                            loggedInUser: widget.loggedInUser,
+                            enableEdit: enableEditLcStatus,
+                            billInfo: _bill,
+                            initialStatus: _billLcStatusActual,
+                            onCommitted: (newStatus) {
+                              setState(() {
+                                _lcStatusOpsKey = UniqueKey();
+                                _bill['lc_status'] = newStatus.value;
+                                _isDisabledGn =
+                                        false /*
                                   newStatus == PagBillingLcStatus.pv ||
                                       newStatus == PagBillingLcStatus.released*/
-                                  ;
-                              _isDisabledPvRl =
-                                  newStatus == PagBillingLcStatus.generated;
-                              _billLcStatusActual = newStatus;
-                              _showGenTypeSwitch =
-                                  newStatus == PagBillingLcStatus.pv ||
-                                      newStatus == PagBillingLcStatus.released;
-                              _showRenderModeSwitch =
-                                  newStatus == PagBillingLcStatus.pv ||
-                                      newStatus == PagBillingLcStatus.released;
-                            });
-                            widget.onUpdate?.call();
-                          },
-                        ),
+                                    ;
+                                _isDisabledPvRl =
+                                    newStatus == PagBillingLcStatus.generated;
+                                _billLcStatusActual = newStatus;
+                                _showGenTypeSwitch = newStatus ==
+                                        PagBillingLcStatus.pv ||
+                                    newStatus == PagBillingLcStatus.released;
+                                _showRenderModeSwitch = newStatus ==
+                                        PagBillingLcStatus.pv ||
+                                    newStatus == PagBillingLcStatus.released;
+                              });
+                              widget.onUpdate?.call();
+                            },
+                          ),
                       ],
                     ),
                     Row(
