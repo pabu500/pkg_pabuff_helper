@@ -43,6 +43,7 @@ class _WgtSubmitFilesState extends State<WgtSubmitFiles> {
     try {
       await FilePicker /*.platform*/
               .pickFiles(
+                  withData: true,
                   type: FileType.custom,
                   allowMultiple: true,
                   allowedExtensions: widget.fileExtensions!)
