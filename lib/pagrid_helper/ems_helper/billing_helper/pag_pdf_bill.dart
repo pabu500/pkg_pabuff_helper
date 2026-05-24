@@ -176,7 +176,7 @@ class PagPdfBill {
 
   dynamic _logo;
 
-  final double size1 = 8;
+  final double size1 = 8.5;
   final double size2 = 9.5;
   final double size3 = 10;
   final double size4 = 11;
@@ -645,6 +645,8 @@ class PagPdfBill {
 
   pw.Widget _getSingularList() {
     List<pw.Widget> singularStatList = [];
+    double footnoteWidth = 470;
+
     for (Map<String, dynamic> singularUsageInfo
         in tenantSingularUsageInfoList) {
       List<pw.Widget> typeStatList = [];
@@ -700,17 +702,17 @@ class PagPdfBill {
                   pw.Row(
                       crossAxisAlignment: pw.CrossAxisAlignment.start,
                       children: [
-                        pw.Text('#: ',
+                        pw.Text('    *: ',
                             style: const pw.TextStyle(
                                 // fontWeight: pw.FontWeight.bold,
                                 color: _darkColor,
                                 fontSize: 9)),
                         pw.SizedBox(
-                            width: 390,
+                            width: footnoteWidth,
                             child: pw.Text(billedTpNote,
                                 maxLines: 2,
-                                style: const pw.TextStyle(
-                                    color: _darkColor, fontSize: 9))),
+                                style: styleSmall.copyWith(
+                                    fontStyle: pw.FontStyle.italic))),
                       ]),
                 if (billedTptRateNote.isNotEmpty)
                   pw.Padding(
@@ -718,17 +720,17 @@ class PagPdfBill {
                     child: pw.Row(
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
-                          pw.Text('##: ',
+                          pw.Text('  **: ',
                               style: const pw.TextStyle(
                                   // fontWeight: pw.FontWeight.bold,
                                   color: _darkColor,
                                   fontSize: 9)),
                           pw.SizedBox(
-                              width: 390,
+                              width: footnoteWidth,
                               child: pw.Text(billedTptRateNote,
                                   maxLines: 2,
-                                  style: const pw.TextStyle(
-                                      color: _darkColor, fontSize: 9))),
+                                  style: styleSmall.copyWith(
+                                      fontStyle: pw.FontStyle.italic))),
                         ]),
                   ),
                 if (billedTptCycleNote.isNotEmpty)
@@ -737,17 +739,17 @@ class PagPdfBill {
                     child: pw.Row(
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
-                          pw.Text('###: ',
+                          pw.Text('***: ',
                               style: const pw.TextStyle(
                                   // fontWeight: pw.FontWeight.bold,
                                   color: _darkColor,
                                   fontSize: 9)),
                           pw.SizedBox(
-                              width: 390,
+                              width: footnoteWidth,
                               child: pw.Text(billedTptCycleNote,
                                   maxLines: 2,
-                                  style: const pw.TextStyle(
-                                      color: _darkColor, fontSize: 9))),
+                                  style: styleSmall.copyWith(
+                                      fontStyle: pw.FontStyle.italic))),
                         ]),
                   ),
               ],
@@ -867,12 +869,12 @@ class PagPdfBill {
   pw.Widget _getTotal() {
     final interestAmountObj =
         interestInfo != null ? interestInfo!['total_interest_amount'] : null;
-    double interestAmount = 0;
+    double billedInterestAmount = 0;
     if (interestAmountObj != null) {
       if (interestAmountObj is double) {
-        interestAmount = interestAmountObj;
+        billedInterestAmount = interestAmountObj;
       } else if (interestAmountObj is String) {
-        interestAmount = double.tryParse(interestAmountObj) ?? 0;
+        billedInterestAmount = double.tryParse(interestAmountObj) ?? 0;
       }
     }
 
@@ -902,10 +904,29 @@ class PagPdfBill {
     }
     closingBalAmount = -1 * closingBalAmount;
 
-    // line 3 is interest adj and inclucded in the interest amount,
-    // so not adding separately here to avoid double counting
-    double subTotalNonTaxable =
-        interestAmount + (lineItemValue2 ?? 0.0) /* + (lineItemValue3 ?? 0.0)*/;
+// “Non-Taxable Panel” Consists of:
+// Late Payment Interest
+// [Line Item 2] - Line adjustable that is not GST liable AND interest generating
+// [Line Item 3] - Line adjustment that is not GST liable AND NOT interest generating
+
+// Sub-Total (Non-Taxable)
+// Late Payment Interest:
+// - is the interest generated based on the previous outstanding amounts that were not paid any day during the collection period of this current invoice.
+// - system generated
+// Line Item 2
+// - Definition as per background above
+// - keyed-in by C&W
+// Line Item 3
+// - Definition as per background aboved
+// - keyed-in by C&W
+// Sub-Total (Non-Taxable) = (1) + (2) + (3)
+
+    double latePaymentInterestAmount =
+        billedInterestAmount - (lineItemValue3 ?? 0.0);
+
+    double subTotalNonTaxable = latePaymentInterestAmount +
+        (lineItemValue2 ?? 0.0) +
+        (lineItemValue3 ?? 0.0);
 
     return pw.Container(
       width: 500,
@@ -920,15 +941,16 @@ class PagPdfBill {
             child: pw.Column(
               children: [
                 if (lineItemLabel1 != null && lineItemValue1 != null)
-                  pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: pw.CrossAxisAlignment.center,
-                    children: [
-                      pw.Text(lineItemLabel1!, style: styleNormal),
-                      pw.Text(_formatCurrency(lineItemValue1!),
-                          style: styleNormal),
-                    ],
-                  ),
+                  if (lineItemValue1! > 0.0001)
+                    pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: pw.CrossAxisAlignment.center,
+                      children: [
+                        pw.Text(lineItemLabel1!, style: styleNormal),
+                        pw.Text(_formatCurrency(lineItemValue1!),
+                            style: styleNormal),
+                      ],
+                    ),
                 pw.Row(
                   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: pw.CrossAxisAlignment.center,
@@ -972,85 +994,73 @@ class PagPdfBill {
                   ],
                 ),
                 pw.Divider(color: PdfColors.grey600, thickness: 0.5, height: 5),
-                // line item 3
-                if (lineItemLabel3 != null && lineItemValue3 != null)
+                if (latePaymentInterestAmount > 0.0001)
                   pw.Row(
                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: pw.CrossAxisAlignment.center,
                     children: [
                       pw.Text(
-                        '(${lineItemLabel3!})',
+                        'Late Payment Interest',
                         style: styleNormal,
                       ),
                       pw.Text(
-                        _formatCurrency(lineItemValue3!),
+                        _formatCurrency(latePaymentInterestAmount),
                         style: styleNormal,
                       ),
                     ],
                   ),
-                pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: pw.CrossAxisAlignment.center,
-                  children: [
-                    pw.Text(
-                      'Late Payment Interest',
-                      style: styleNormal,
-                    ),
-                    pw.Text(
-                      _formatCurrency(interestAmount),
-                      style: styleNormal,
-                    ),
-                  ],
-                ),
                 // line item 2
                 if (lineItemLabel2 != null && lineItemValue2 != null)
+                  if (lineItemValue2! > 0.0001)
+                    pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: pw.CrossAxisAlignment.center,
+                      children: [
+                        pw.Text(
+                          lineItemLabel2!,
+                          style: styleNormal,
+                        ),
+                        pw.Text(
+                          _formatCurrency(lineItemValue2!),
+                          style: styleNormal,
+                        ),
+                      ],
+                    ),
+                // line item 3
+                if (lineItemLabel3 != null && lineItemValue3 != null)
+                  if (lineItemValue3! > 0.0001)
+                    pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: pw.CrossAxisAlignment.center,
+                      children: [
+                        pw.Text(
+                          lineItemLabel3!,
+                          style: styleNormal,
+                        ),
+                        pw.Text(
+                          _formatCurrency(lineItemValue3!),
+                          style: styleNormal,
+                        ),
+                      ],
+                    ),
+                // sub total (non-taxable)
+                if (subTotalNonTaxable > 0.0001)
                   pw.Row(
                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: pw.CrossAxisAlignment.center,
                     children: [
                       pw.Text(
-                        lineItemLabel2!,
-                        style: styleNormal,
+                        'Sub-Total (Non-Taxable)',
+                        style: styleNormal.copyWith(
+                            fontWeight: pw.FontWeight.bold),
                       ),
                       pw.Text(
-                        _formatCurrency(lineItemValue2!),
-                        style: styleNormal,
+                        _formatCurrency(subTotalNonTaxable),
+                        style: styleNormal.copyWith(
+                            fontWeight: pw.FontWeight.bold),
                       ),
                     ],
                   ),
-                // line item 3
-                // if (lineItemLabel3 != null && lineItemValue3 != null)
-                //   pw.Row(
-                //     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                //     crossAxisAlignment: pw.CrossAxisAlignment.center,
-                //     children: [
-                //       pw.Text(
-                //         lineItemLabel3!,
-                //         style: styleNormal,
-                //       ),
-                //       pw.Text(
-                //         _formatCurrency(lineItemValue3!),
-                //         style: styleNormal,
-                //       ),
-                //     ],
-                //   ),
-                // sub total (non-taxable)
-                pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: pw.CrossAxisAlignment.center,
-                  children: [
-                    pw.Text(
-                      'Sub-Total (Non-Taxable)',
-                      style:
-                          styleNormal.copyWith(fontWeight: pw.FontWeight.bold),
-                    ),
-                    pw.Text(
-                      _formatCurrency(subTotalNonTaxable),
-                      style:
-                          styleNormal.copyWith(fontWeight: pw.FontWeight.bold),
-                    ),
-                  ],
-                ),
                 pw.Divider(color: PdfColors.grey600, thickness: 0.5, height: 5),
                 pw.Container(
                     color: PdfColors.grey300,
