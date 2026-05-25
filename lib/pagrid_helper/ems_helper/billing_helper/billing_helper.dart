@@ -211,6 +211,13 @@ Map<String, dynamic> prepCalcedBillInfoRl(Map<String, dynamic> billInfo) {
   );
   compositeUsageCalcRl.doCompositeCalc();
 
+  final lineItemLabel1 = compositeUsageCalcRl.getLineItemLabel(true, true);
+  final lineItemAmount1 = compositeUsageCalcRl.getLineItemAmount(true, true);
+  final lineItemLabel2 = compositeUsageCalcRl.getLineItemLabel(false, true);
+  final lineItemAmount2 = compositeUsageCalcRl.getLineItemAmount(false, true);
+  final lineItemLabel3 = compositeUsageCalcRl.getLineItemLabel(false, false);
+  final lineItemAmount3 = compositeUsageCalcRl.getLineItemAmount(false, false);
+
   final Map<String, dynamic> calcedBillInfo = {
     'billingRecName': billInfo['name'] ?? '',
     'billLabel': billInfo['bill_label'] ?? '',
@@ -258,12 +265,12 @@ Map<String, dynamic> prepCalcedBillInfoRl(Map<String, dynamic> billInfo) {
     'trendingB': compositeUsageCalcRl.trendingB,
     'trendingN': compositeUsageCalcRl.trendingN,
     'trendingG': compositeUsageCalcRl.trendingG,
-    'lineItemLabel1': compositeUsageCalcRl.getLineItem(0)?['label'],
-    'lineItemValue1': compositeUsageCalcRl.getLineItem(0)?['amount'],
-    'lineItemLabel2': compositeUsageCalcRl.getLineItem(1)?['label'],
-    'lineItemValue2': compositeUsageCalcRl.getLineItem(1)?['amount'],
-    'lineItemLabel3': compositeUsageCalcRl.getLineItem(2)?['label'],
-    'lineItemValue3': compositeUsageCalcRl.getLineItem(2)?['amount'],
+    'lineItemLabel1': lineItemLabel1,
+    'lineItemValue1': lineItemAmount1,
+    'lineItemLabel2': lineItemLabel2,
+    'lineItemValue2': lineItemAmount2,
+    'lineItemLabel3': lineItemLabel3,
+    'lineItemValue3': lineItemAmount3,
     'miniSoaInfo': miniSoaInfo,
     'tenantSingularUsageInfoList': singularUsageList,
     'billedAmgrCompanyTradingName': billedAmgrCompanyTradingName,
