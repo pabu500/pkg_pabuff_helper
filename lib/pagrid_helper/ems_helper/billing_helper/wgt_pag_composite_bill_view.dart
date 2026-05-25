@@ -1214,7 +1214,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             effectiveToDatetime:
                 DateTime.tryParse(calcedBillInfoRl['strEffectiveTo']),
             tenantName: calcedBillInfoRl['customerName'] ?? '',
-            tenantLabel: calcedBillInfoRl['tenantLabel'] ?? '',
+            tenantLabel: calcedBillInfoRl['customerLabel'] ?? '',
             tenantAccountId: calcedBillInfoRl['tenantAccountId'] ?? '',
             tenantType: calcedBillInfoRl['tenantType'] ?? '',
             lineItems: calcedBillInfoRl['lineItemList'] ?? [],
