@@ -367,7 +367,7 @@ class PagPdfBill {
         pw.Table(
           columnWidths: {
             0: const pw.FixedColumnWidth(70),
-            1: const pw.FixedColumnWidth(100),
+            1: const pw.FixedColumnWidth(105),
           },
           border: pw.TableBorder.all(color: PdfColors.grey600, width: 0.5),
           children: [
