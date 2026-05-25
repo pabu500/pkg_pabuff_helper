@@ -226,9 +226,12 @@ Map<String, dynamic> prepCalcedBillInfoRl(Map<String, dynamic> billInfo) {
     'tenantAccountNumber': billInfo['tenant_account_number'] ?? '',
     'strDepositAmount': billInfo['deposit_amount'] ?? '',
     'paymentMethod': billInfo['payment_method'] ?? '',
-    'tenantBillingAddressLine1': billInfo['tenant_billing_address_line1'] ?? '',
-    'tenantBillingAddressLine2': billInfo['tenant_billing_address_line2'] ?? '',
-    'tenantBillingAddressLine3': billInfo['tenant_billing_address_line3'] ?? '',
+    'tenantBillingAddressLine1':
+        billInfo['tenant_billing_address_line_1'] ?? '',
+    'tenantBillingAddressLine2':
+        billInfo['tenant_billing_address_line_2'] ?? '',
+    'tenantBillingAddressLine3':
+        billInfo['tenant_billing_address_line_3'] ?? '',
     'customerType': billInfo['customer_type'] ?? '',
     'gst': compositeUsageCalcRl.billedGst, //billInfo['gst'],
     'paymentInfo': billInfo['payment_info'] ?? '',
