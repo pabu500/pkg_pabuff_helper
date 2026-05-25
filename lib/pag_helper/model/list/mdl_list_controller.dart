@@ -170,6 +170,9 @@ class MdlPagListController /*extends ChangeNotifier*/ {
         case 'tariff_rate':
           itemType = PagTariff.tariffRate;
           break;
+        case 'billing_cost_item':
+          itemType = PagTariff.billingCostItem;
+          break;
         default:
           itemType = null;
 

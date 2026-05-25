@@ -8,7 +8,7 @@ enum PagTariff {
   tariffPackageType(
       'Tariff Package Type', 'tariff_package_type', Symbols.rate_review),
   tariffRate('Tariff Rate', 'tariff_rate', Symbols.price_check),
-  ;
+  billingCostItem('Billing Cost Item', 'billing_cost_item', Symbols.more);
 
   const PagTariff(
     this.label,

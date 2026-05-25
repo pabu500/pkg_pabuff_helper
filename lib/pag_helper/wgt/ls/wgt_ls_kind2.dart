@@ -281,6 +281,7 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
         _itemTypeInfoList.add({'item_type': PagTariff.tariffPackage});
         _itemTypeInfoList.add({'item_type': PagTariff.tariffRate});
         _itemTypeInfoList.add({'item_type': PagTariff.tariffPackageType});
+        _itemTypeInfoList.add({'item_type': PagTariff.billingCostItem});
       } else {
         throw Exception('Unsupported item kind: ${widget.itemKind.name}');
       }
