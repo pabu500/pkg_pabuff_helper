@@ -21,7 +21,7 @@ class WgtTenantpAssignment extends StatefulWidget {
   const WgtTenantpAssignment({
     super.key,
     required this.appConfig,
-    required this.itemGroupIndexStr,
+    required this.strItemGroupIndex,
     required this.itemName,
     required this.itemLabel,
     required this.itemScope,
@@ -30,7 +30,7 @@ class WgtTenantpAssignment extends StatefulWidget {
   });
 
   final MdlPagAppConfig appConfig;
-  final String itemGroupIndexStr;
+  final String strItemGroupIndex;
   final String itemName;
   final String itemLabel;
   final MdlPagScope itemScope;
@@ -73,7 +73,7 @@ class _WgtTenantpAssignmentState extends State<WgtTenantpAssignment> {
 
     Map<String, dynamic> queryMap = {
       'scope': loggedInUser!.selectedScope.toScopeMap(),
-      'item_group_id': widget.itemGroupIndexStr,
+      'item_group_id': widget.strItemGroupIndex,
       'item_scope': widget.itemScope.toScopeMap(),
     };
 
@@ -120,7 +120,7 @@ class _WgtTenantpAssignmentState extends State<WgtTenantpAssignment> {
           itemInfo['assigned'] = true;
         }
         itemInfo['assgigned_to_this_tenant'] = false;
-        if (itemInfo['meter_group_tenant_id'] == widget.itemGroupIndexStr) {
+        if (itemInfo['meter_group_tenant_id'] == widget.strItemGroupIndex) {
           itemInfo['assigned_to_this_tenant'] = true;
         }
         itemInfo['used_for_billing'] = false;
@@ -138,6 +138,19 @@ class _WgtTenantpAssignmentState extends State<WgtTenantpAssignment> {
       // and move it to the top
       for (Map<String, dynamic> itemInfo in _itemGroupScopeMatchingItemList!) {
         if (itemInfo['assigned_to_this_tenant'] != true) {
+          continue;
+        }
+        String itemIndexStr = itemInfo['id'];
+        // move this item to the top
+        _itemGroupScopeMatchingItemList!.removeWhere(
+          (item) => item['id'] == itemIndexStr,
+        );
+        _itemGroupScopeMatchingItemList!.insert(0, itemInfo);
+      }
+      // find the item that is non_scope_matching,
+      // and move it to the top
+      for (Map<String, dynamic> itemInfo in _itemGroupScopeMatchingItemList!) {
+        if (itemInfo['non_scope_matching'] != 'true') {
           continue;
         }
         String itemIndexStr = itemInfo['id'];
@@ -172,7 +185,7 @@ class _WgtTenantpAssignmentState extends State<WgtTenantpAssignment> {
             .toList();
     Map<String, dynamic> queryMap = {
       'scope': loggedInUser!.selectedScope.toScopeMap(),
-      'item_group_id': widget.itemGroupIndexStr,
+      'item_group_id': widget.strItemGroupIndex,
       'item_assignment_list': assignmentList,
     };
     try {
@@ -442,46 +455,52 @@ class _WgtTenantpAssignmentState extends State<WgtTenantpAssignment> {
       border: Border.all(color: Theme.of(context).hintColor.withAlpha(50)),
       borderRadius: BorderRadius.circular(5),
     );
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
+    return Column(
       children: [
-        Text(
-          'Assignment',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).hintColor,
-          ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Assignment',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).hintColor,
+              ),
+            ),
+            horizontalSpaceSmall,
+            Text(
+              widget.itemName,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            horizontalSpaceSmall,
+            Text(
+              widget.itemLabel.isNotEmpty ? widget.itemLabel : '-',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            // horizontalSpaceSmall,
+            // Container(
+            //   decoration: boxDecoration,
+            //   padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+            //   child: Row(
+            //     mainAxisSize: MainAxisSize.min,
+            //     children: [
+            //       scopeIcon,
+            //       horizontalSpaceTiny,
+            //       // Text(itemGroupScopeLabel),
+            //     ],
+            //   ),
+            // ),
+            // horizontalSpaceSmall,
+            // Container(
+            //   decoration: boxDecoration,
+            //   padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+            //   child: Text(widget.tariffPackageTypeLabel),
+            // ),
+          ],
         ),
-        horizontalSpaceSmall,
-        Text(
-          widget.itemName,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        horizontalSpaceSmall,
-        Text(
-          widget.itemLabel.isNotEmpty ? widget.itemLabel : '-',
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        horizontalSpaceSmall,
-        Container(
-          decoration: boxDecoration,
-          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              scopeIcon,
-              horizontalSpaceTiny,
-              Text(itemGroupScopeLabel),
-            ],
-          ),
-        ),
-        horizontalSpaceSmall,
-        // Container(
-        //   decoration: boxDecoration,
-        //   padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-        //   child: Text(widget.tariffPackageTypeLabel),
-        // ),
+        verticalSpaceTiny,
+        getScopeLabel(context, widget.itemScope),
       ],
     );
   }
@@ -590,6 +609,13 @@ class _WgtTenantpAssignmentState extends State<WgtTenantpAssignment> {
         (itemInfo['assigned_to_this_tenant'] == true ||
             itemInfo['assigned'] == true);
 
+    bool isNonScopeMatching = itemInfo['non_scope_matching'] == 'true';
+
+    MdlPagScope? itemScope;
+    // if (isNonScopeMatching) {
+    itemScope = MdlPagScope.fromJson(itemInfo);
+    // }
+
     return Column(
       children: [
         Row(
@@ -646,8 +672,33 @@ class _WgtTenantpAssignmentState extends State<WgtTenantpAssignment> {
                       },
               ),
             ),
+            SizedBox(
+              width: 25,
+              child: isNonScopeMatching
+                  ? Tooltip(
+                      message:
+                          'This meter group is assigned to this tenant but does not match the item group scope',
+                      child: Icon(
+                        Symbols.warning,
+                        color: Theme.of(context).colorScheme.error,
+                        size: 21,
+                      ),
+                    )
+                  : null,
+            ),
           ],
         ),
+        if (isNonScopeMatching || (checked && !disabled))
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                getScopeLabel(context, itemScope),
+              ],
+            ),
+          ),
         if (_selectedMeterGroupIndexStr == itemInfo['id']) getAssignmentMap(),
       ],
     );
