@@ -331,7 +331,7 @@ class PagPdfBill {
                 children: [
                   pw.TableRow(children: [
                     pw.Text('Account Name:', style: styleSmall),
-                    pw.Text(amgrBankName ?? '-', style: styleSmall),
+                    pw.Text(amgrBankAccountName ?? '-', style: styleSmall),
                   ]),
                   pw.TableRow(children: [
                     pw.Text('Account Number:', style: styleSmall),
