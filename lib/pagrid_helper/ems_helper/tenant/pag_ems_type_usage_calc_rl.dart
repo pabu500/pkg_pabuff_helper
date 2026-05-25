@@ -99,6 +99,8 @@ class PagEmsTypeUsageCalcRl {
 
   List<PagEmsTypeUsageCalcRl> get singularCalcList => _singularCalcList;
 
+  List<Map<String, dynamic>>? get lineItemList => _lineItemList;
+
   PagEmsTypeUsageCalcRl({
     required int costDecimals,
     double? billedAutoUsageE,
@@ -186,6 +188,41 @@ class PagEmsTypeUsageCalcRl {
     _payableAmount = billedPayableAmount;
 
     _billedTrendingSnapShot = billedTrendingSnapShot;
+  }
+
+  Map<String, dynamic>? getLineItemInfo(
+      bool subjectToTax, bool subjectToInterest) {
+    if (_lineItemList.isEmpty) {
+      return null;
+    }
+
+    for (var item in _lineItemList) {
+      bool itemSubjectToTax = item['subjectToTax'] as bool? ?? false;
+      bool itemSubjectToInterest = item['subjectToInterest'] as bool? ?? false;
+
+      if (itemSubjectToTax == subjectToTax &&
+          itemSubjectToInterest == subjectToInterest) {
+        return item;
+      }
+    }
+
+    return null;
+  }
+
+  String? getLineItemLabel(bool subjectToTax, bool subjectToInterest) {
+    Map<String, dynamic>? lineItemInfo =
+        getLineItemInfo(subjectToTax, subjectToInterest);
+    return lineItemInfo?['label'];
+  }
+
+  double? getLineItemAmount(bool subjectToTax, bool subjectToInterest) {
+    Map<String, dynamic>? lineItemInfo =
+        getLineItemInfo(subjectToTax, subjectToInterest);
+    String? strAmount = lineItemInfo?['amount'];
+    if (strAmount != null) {
+      return double.tryParse(strAmount);
+    }
+    return null;
   }
 
   void doCalc() {
