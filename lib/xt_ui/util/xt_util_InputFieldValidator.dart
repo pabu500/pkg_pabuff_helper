@@ -51,10 +51,10 @@ String? validateFullName(String? value,
   return result;
 }
 
-String? validateUsername(String? value,
+Future<String?> validateUsername(String? value,
     {Map<Enum, String?>? formErrors,
     Enum? filedKey,
-    Function? additonalValidator}) {
+    Function? additonalValidator}) async {
   RegExp regex = RegExp(glb_reg_loginName);
 
   String? result;
@@ -74,7 +74,7 @@ String? validateUsername(String? value,
   }
   if (result == null) {
     if (additonalValidator != null) {
-      result = additonalValidator(value);
+      result = await additonalValidator(value);
     }
   }
 
