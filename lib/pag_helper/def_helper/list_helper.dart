@@ -2,6 +2,7 @@ import 'package:buff_helper/pkg_buff_helper.dart';
 
 enum PagListContextType {
   info,
+  infoTp,
   usage,
   scada,
   soa,

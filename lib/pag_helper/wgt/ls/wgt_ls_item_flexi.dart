@@ -486,7 +486,8 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     }
     bool addViewBillColumn = false;
     if (widget.itemKind == PagItemKind.bill &&
-        widget.listContextType == PagListContextType.info) {
+            widget.listContextType == PagListContextType.info ||
+        widget.listContextType == PagListContextType.infoTp) {
       addViewBillColumn = true;
     }
 
@@ -1305,6 +1306,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                         costDecimals: 2,
                         appConfig: widget.appConfig,
                         loggedInUser: loggedInUser!,
+                        listContextType: widget.listContextType,
                         billingRecIndexStr: item['id'],
                         defaultBillLcStatusStr: item['lc_status'],
                         modes: item['lc_status'] == 'released' ||
@@ -1660,6 +1662,11 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       return Container();
     }
 
+    bool isInitialValueMutable = true;
+    if (widget.listContextType == PagListContextType.infoTp) {
+      isInitialValueMutable = false;
+    }
+
     return Column(children: [
       verticalSpaceTiny,
       // if (_selectedListController != null)
@@ -1685,6 +1692,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
             widget.listContextType == PagListContextType.usage ? 1100 : null,
         initialFilterMap: widget.initialFilterMap,
         initialFilterGroupType: widget.initialFilterGroupType,
+        isInitialValueMutable: isInitialValueMutable,
         allowFlexiLabel: widget.allowFlexiLabel,
         hint: widget.hint,
         additionalQuery: widget.additionalQuery,

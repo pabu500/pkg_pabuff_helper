@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer' as dev;
 
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
@@ -35,17 +36,17 @@ class _WgtSubmitFilesState extends State<WgtSubmitFiles> {
 
   Future<dynamic> _getFile() async {
     if (widget.fileExtensions == null) {
-      if (kDebugMode) {
-        print('fileExtensions is null');
-      }
+      dev.log('fileExtensions is null');
+
       return;
     }
     try {
-      await FilePicker.platform
-          .pickFiles(
-              type: FileType.custom,
-              allowMultiple: true,
-              allowedExtensions: widget.fileExtensions!)
+      await FilePicker /*.platform*/
+              .pickFiles(
+                  withData: true,
+                  type: FileType.custom,
+                  allowMultiple: true,
+                  allowedExtensions: widget.fileExtensions!)
           .then((result) {
         if (result == null || result.files.isEmpty) {
           if (mounted) {
@@ -75,9 +76,7 @@ class _WgtSubmitFilesState extends State<WgtSubmitFiles> {
         }
       });
     } catch (e) {
-      if (kDebugMode) {
-        print('piceker error: $e');
-      }
+      dev.log('piceker error: $e');
     }
   }
 
@@ -99,16 +98,12 @@ class _WgtSubmitFilesState extends State<WgtSubmitFiles> {
         }
         widget.onSubmitFiles(_fileContentList);
       } catch (e) {
-        if (kDebugMode) {
-          print(e);
-        }
+        dev.log(e.toString());
       }
 
       return;
     } catch (e) {
-      if (kDebugMode) {
-        print('piceker error: $e');
-      }
+      dev.log('piceker error: $e');
     }
   }
 
@@ -116,9 +111,7 @@ class _WgtSubmitFilesState extends State<WgtSubmitFiles> {
     try {
       widget.onSubmitFiles(files);
     } catch (e) {
-      if (kDebugMode) {
-        print('piceker error: $e');
-      }
+      dev.log('piceker error: $e');
     }
   }
 

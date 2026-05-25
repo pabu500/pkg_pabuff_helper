@@ -23,6 +23,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_fancy_tree_view2/flutter_fancy_tree_view2.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../../up_helper/exceptions.dart';
 import '../../comm/comm_ems.dart';
 import '../../comm/comm_tenant.dart';
 import '../../model/mdl_pag_app_config.dart';
@@ -232,7 +233,9 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
       dev.log(e.toString());
 
       result['message'] = e.toString();
-      _committErrorText = 'Error committing changes';
+      // _committErrorText = 'Error committing changes';
+      _committErrorText =
+          getErrorText(e, defaultErrorText: 'Error committing changes');
     } finally {
       _isCommitting = false;
       _showCommitted = true;

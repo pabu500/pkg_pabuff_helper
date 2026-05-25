@@ -9,7 +9,6 @@ import 'package:printing/printing.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
 import 'dart:io';
-
 import 'package:web/web.dart' as web;
 
 class WgtPagRenderPdf extends StatefulWidget {
@@ -17,16 +16,19 @@ class WgtPagRenderPdf extends StatefulWidget {
     super.key,
     required this.loggedInUser,
     required this.itemInfo,
+    // required this.invoice,
     required this.builder,
   });
 
   final MdlPagUser loggedInUser;
   // final Map<String, dynamic> billingInfo;
   final Map<String, dynamic> itemInfo;
+  // final PagBill invoice;
   final Future<Uint8List> Function(
     MdlPagUser loggedInUser,
     PdfPageFormat pageFormat,
     Map<String, dynamic> itemInfo,
+    // PagBill invoice,
   ) builder;
 
   @override
