@@ -460,11 +460,8 @@ String? nusSnValidator(String displayname) {
   if (exp.hasMatch(displayname)) {
     bool isRvrc = isRVRC(displayname) == null;
     bool isVh = isVH(displayname) == null;
-    bool isNusC = isNUSC(displayname) == null;
-    bool isUtrNorth = isUTRNorth(displayname) == null;
-    bool isUtrSouth = isUTRSouth(displayname) == null;
-    bool isTembusuCinnamon = isTembusuAndCinnamon(displayname) == null;
-    if(isVh || isRvrc || isNusC || isUtrNorth || isUtrSouth || isTembusuCinnamon) {
+    bool isUTown = isUtown(displayname) == null;
+    if(isVh || isRvrc || isUTown) {
       return null;
     }
     return 'Invalid displayname';
@@ -525,45 +522,61 @@ String? isVH(String displayname) {
   return null;
 }
 
-String? isNUSC(String displayname) {
+String? isUtown(String displayname) {
   int displaynameInt = int.parse(displayname);
-  if (displaynameInt < 10002801  || (displaynameInt > 10003925 && displaynameInt != 10003963 && displaynameInt != 10003982 && displaynameInt != 10003985 && displaynameInt != 10009999)) {
+
+  bool isValidUtownRange =
+      (displaynameInt >= 10000000 && displaynameInt <= 10003985) ||
+      (displaynameInt == 10009999) ||
+      (displaynameInt >= 10010161 && displaynameInt <= 10010184) ||
+      (displaynameInt >= 10100034 && displaynameInt <= 10101302);
+
+  if (!isValidUtownRange) {
     return 'Invalid displayname';
   }
+
   return null;
 }
 
-//north range 10100700 - 10101296 except 10000713, 10000744,10000780,10000781,10000782,10000783,10000784
- String? isUTRNorth(String displayname) {
-  int displaynameInt = int.parse(displayname);
-  if ((displaynameInt < 10100700 && !{10000713, 10000744,10000780,10000781,10000782,10000783,10000784}.contains(displaynameInt)) || (displaynameInt > 10101296)) {
-    return 'Invalid displayname';
-  }
-  return null;
-}
+// String? isNUSC(String displayname) {
+//   int displaynameInt = int.parse(displayname);
+//   if (displaynameInt < 10002801  || (displaynameInt > 10003925 && displaynameInt != 10003963 && displaynameInt != 10003982 && displaynameInt != 10003985 && displaynameInt != 10009999)) {
+//     return 'Invalid displayname';
+//   }
+//   return null;
+// }
 
-// south range 10000000 - 10003984 +  10101297, 10101298,10101299,10101300,10101301,10101302
- String? isUTRSouth(String displayname) {
-  int displaynameInt = int.parse(displayname);
-  if ((displaynameInt < 10000000  || (displaynameInt > 10003984 && !{10101297, 10101298,10101299,10101300,10101301,10101302}.contains(displaynameInt)))) {
-    return 'Invalid displayname';
-  }
-  return null;
-}
+// //north range 10100700 - 10101296 except 10000713, 10000744,10000780,10000781,10000782,10000783,10000784
+//  String? isUTRNorth(String displayname) {
+//   int displaynameInt = int.parse(displayname);
+//   if ((displaynameInt < 10100700 && !{10000713, 10000744,10000780,10000781,10000782,10000783,10000784}.contains(displaynameInt)) || (displaynameInt > 10101296)) {
+//     return 'Invalid displayname';
+//   }
+//   return null;
+// }
 
-// tembusu range 10000090 - 10000989 (mcu)
-// tembusu range 10100034 - 10100497 (loop)
-// cinnamon range 10000319 - 10003983 (mcu)
-// cinnamon range 10100068 - 10100411 (loop)
-// cinnamon range in excel but not in db (10010161-10010184)
-String? isTembusuAndCinnamon(String displayname) {
-  int displaynameInt = int.parse(displayname);
-  if ((displaynameInt >= 10000090 && displaynameInt <= 10000989) ||
-    (displaynameInt >= 10100034 && displaynameInt <= 10100497) ||
-    (displaynameInt >= 10000319 && displaynameInt <= 10003983) || 
-    (displaynameInt >= 10100068 && displaynameInt <= 10100411)
-    ) {
-    return null;
-  }
-  return 'Invalid displayname';
-}
+// // south range 10000000 - 10003984 +  10101297, 10101298,10101299,10101300,10101301,10101302
+//  String? isUTRSouth(String displayname) {
+//   int displaynameInt = int.parse(displayname);
+//   if ((displaynameInt < 10000000  || (displaynameInt > 10003984 && !{10101297, 10101298,10101299,10101300,10101301,10101302}.contains(displaynameInt)))) {
+//     return 'Invalid displayname';
+//   }
+//   return null;
+// }
+
+// // tembusu range 10000090 - 10000989 (mcu)
+// // tembusu range 10100034 - 10100497 (loop)
+// // cinnamon range 10000319 - 10003983 (mcu)
+// // cinnamon range 10100068 - 10100411 (loop)
+// // cinnamon range in excel but not in db (10010161-10010184)
+// String? isTembusuAndCinnamon(String displayname) {
+//   int displaynameInt = int.parse(displayname);
+//   if ((displaynameInt >= 10000090 && displaynameInt <= 10000989) ||
+//     (displaynameInt >= 10100034 && displaynameInt <= 10100497) ||
+//     (displaynameInt >= 10000319 && displaynameInt <= 10003983) || 
+//     (displaynameInt >= 10100068 && displaynameInt <= 10100411)
+//     ) {
+//     return null;
+//   }
+//   return 'Invalid displayname';
+// }
