@@ -424,7 +424,7 @@ class PagPdfBill {
       children: [
         pw.Text(customerLabel,
             style: styleLarge.copyWith(fontWeight: pw.FontWeight.bold)),
-        pw.SizedBox(height: 3),
+        // pw.SizedBox(height: 2),
         pw.Row(children: [
           pw.Text(tenantBillingAddressLine1, style: styleNormal),
         ]),
