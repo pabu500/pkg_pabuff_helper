@@ -41,7 +41,7 @@ class WgtTextField extends StatefulWidget {
     this.suffix,
     this.unfocusOnEditingComplete = false,
     this.textStyle,
-    this.requireUnique = true,
+    this.requireUnique = false,
   });
 
   final dynamic appConfig;
@@ -237,8 +237,12 @@ class _WgtTextFieldState extends State<WgtTextField> {
               widget.onEditingComplete?.call();
 
               if (widget.requireUnique) {
-                checkUnique(widget.appConfig, widget.uniqueKey!,
-                    _controller.text, widget.itemTableName!);
+                if (!_uniqueChecked) {
+                  assert(widget.itemTableName != null);
+                  assert(widget.uniqueKey != null);
+                  checkUnique(widget.appConfig, widget.uniqueKey!,
+                      _controller.text, widget.itemTableName!);
+                }
               }
 
               // unfocus
