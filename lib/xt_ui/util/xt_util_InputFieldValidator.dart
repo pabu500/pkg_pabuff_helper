@@ -72,11 +72,7 @@ Future<String?> validateUsername(String? value,
       }
     }
   }
-  if (result == null) {
-    if (additonalValidator != null) {
-      result = await additonalValidator(value);
-    }
-  }
+  result ??= await additonalValidator?.call(value);
 
   if (formErrors != null && filedKey != null) {
     formErrors[filedKey] = result;
