@@ -389,7 +389,7 @@ class PagPdfBill {
               pw.Text(
                   payableAmount != null
                       // ? ' \$${payableAmount.toString()}'
-                      ? ' \$${getCommaNumberStr(payableAmount!)}'
+                      ? ' \$${getCommaNumberStr(payableAmount!, decimal: 2)}'
                       : '-',
                   style: styleNormal.copyWith(fontWeight: pw.FontWeight.bold)),
             ]),
