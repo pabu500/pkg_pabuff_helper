@@ -260,7 +260,7 @@ class PagPdfBill {
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
             pw.SizedBox(
-              width: 210,
+              width: 250,
               child: pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 mainAxisSize: pw.MainAxisSize.min,
@@ -268,7 +268,7 @@ class PagPdfBill {
               ),
             ),
             pw.Expanded(child: pw.Container()),
-            pw.SizedBox(child: _getPaymentInfo()),
+            pw.SizedBox(width: 230, child: _getPaymentInfo()),
           ],
         ),
         pw.Row(
