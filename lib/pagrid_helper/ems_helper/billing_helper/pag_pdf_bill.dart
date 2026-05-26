@@ -388,7 +388,8 @@ class PagPdfBill {
                   style: styleNormal.copyWith(fontWeight: pw.FontWeight.bold)),
               pw.Text(
                   payableAmount != null
-                      ? ' \$${payableAmount.toString()}'
+                      // ? ' \$${payableAmount.toString()}'
+                      ? ' \$${getCommaNumberStr(payableAmount!)}'
                       : '-',
                   style: styleNormal.copyWith(fontWeight: pw.FontWeight.bold)),
             ]),
@@ -439,6 +440,9 @@ class PagPdfBill {
   }
 
   pw.Widget _getPaymentInfo() {
+    double depositAmount =
+        double.tryParse(strDepositAmount.replaceAll(',', '')) ?? 0;
+
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       // mainAxisAlignment: pw.MainAxisAlignment.spaceAround,
@@ -478,7 +482,8 @@ class PagPdfBill {
                       ]),
                       pw.TableRow(children: [
                         pw.Text(' Deposit Amount:', style: styleNormal),
-                        pw.Text(' $strDepositAmount', style: styleNormal),
+                        pw.Text(' \$${getCommaNumberStr(depositAmount)}',
+                            style: styleNormal),
                       ]),
                       pw.TableRow(children: [
                         pw.Text(' Mode of Payment:', style: styleNormal),
@@ -498,7 +503,7 @@ class PagPdfBill {
                     children: [
                       pw.TableRow(children: [
                         pw.Text(' Total Amount Payable', style: styleNormal),
-                        pw.Text(' $payableAmount',
+                        pw.Text(' \$${getCommaNumberStr(payableAmount!)}',
                             style: styleNormal.copyWith(
                                 fontWeight: pw.FontWeight.bold)),
                       ]),
@@ -578,10 +583,11 @@ class PagPdfBill {
 
   pw.Widget _getBillerInfo() {
     return pw.SizedBox(
-        height: 90,
+        height: 110,
         child: pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
+            pw.Text('Issued on behalf of', style: styleSmall),
             pw.Text(billedAmgrCompanyTradingName ?? '',
                 style: styleNormal.copyWith(fontWeight: pw.FontWeight.bold)),
             pw.Text('Company Reg No: ${billedAmgrCompanyRegNumber ?? ''}',
@@ -841,7 +847,8 @@ class PagPdfBill {
               children: [
                 pw.SizedBox(width: 5),
                 pw.Text(
-                  '${usage.toStringAsFixed(usageDecimals)} ($typeUnit)',
+                  // '${usage.toStringAsFixed(usageDecimals)} ($typeUnit)',
+                  '${getCommaNumberStr(usage, decimal: usageDecimals)} ($typeUnit)',
                   style: styleNormal,
                 ),
               ],
@@ -850,7 +857,7 @@ class PagPdfBill {
               children: [
                 pw.SizedBox(width: 5),
                 pw.Text(
-                  '\$${rate.toStringAsFixed(rateDecimals)}',
+                  '\$${getCommaNumberStr(rate, decimal: rateDecimals)}',
                   style: styleNormal,
                 ),
               ],
