@@ -655,6 +655,10 @@ class PagPdfBill {
           singularUsageInfo['billed_tpt_rate_note'] ?? '';
       String billedTptCycleNote =
           singularUsageInfo['billed_tpt_cycle_note'] ?? '';
+
+      if (billedTptCycleNote == billedTptRateNote) {
+        billedTptCycleNote = '';
+      }
       String slotFromTimestampStr = singularUsageInfo['from_timestamp'] ?? '';
       String slotToTimestampStr = singularUsageInfo['to_timestamp'] ?? '';
       String slotStr =
