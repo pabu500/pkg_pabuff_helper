@@ -503,7 +503,8 @@ class PagPdfBill {
                     children: [
                       pw.TableRow(children: [
                         pw.Text(' Total Amount Payable', style: styleNormal),
-                        pw.Text(' \$${getCommaNumberStr(payableAmount!)}',
+                        pw.Text(
+                            ' \$${getCommaNumberStr(payableAmount!, decimal: 2)}',
                             style: styleNormal.copyWith(
                                 fontWeight: pw.FontWeight.bold)),
                       ]),
