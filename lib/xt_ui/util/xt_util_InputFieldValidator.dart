@@ -51,7 +51,33 @@ String? validateFullName(String? value,
   return result;
 }
 
-Future<String?> validateUsername(String? value,
+String? validateUsername(String? value,
+    {Map<Enum, String?>? formErrors, Enum? filedKey}) {
+  RegExp regex = RegExp(glb_reg_loginName);
+
+  String? result;
+
+  if (value == null) {
+    result = 'Please enter your username';
+  } else {
+    if (value.isEmpty) {
+      result = 'Please enter your username';
+    } else {
+      if (!regex.hasMatch(value)) {
+        result = glb_loginName_callout;
+      } else {
+        result = null;
+      }
+    }
+  }
+
+  if (formErrors != null && filedKey != null) {
+    formErrors[filedKey] = result;
+  }
+  return result;
+}
+
+Future<String?> validateUsername2(String? value,
     {Map<Enum, String?>? formErrors,
     Enum? filedKey,
     Function? additonalValidator}) async {

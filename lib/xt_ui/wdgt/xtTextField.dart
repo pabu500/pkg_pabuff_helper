@@ -38,7 +38,7 @@ class xtTextField extends StatefulWidget {
   void Function()? onTap;
   String? Function(String)? onChanged;
   void Function()? onEditingComplete;
-  String? Function(String)? doValidate;
+  dynamic Function(String)? doValidate;
   void Function(String?)? onValidate;
   Enum? tfKey;
   // FormProvider? formProvider;
@@ -166,7 +166,7 @@ class _xtTextFieldState extends State<xtTextField> {
           onTap: widget.onTap,
           onChanged: widget.onChanged,
           onEditingComplete: widget.onEditingComplete,
-          doValidate: widget.doValidate,
+          doValidate: widget.doValidate as String? Function(String)?,
           obscureText: widget.obscureText,
           disabled: _disabled,
           maxLength: widget.maxLength,
