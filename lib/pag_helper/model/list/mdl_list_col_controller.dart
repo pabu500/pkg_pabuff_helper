@@ -31,6 +31,14 @@ enum PagFilterGroupType {
   join,
 }
 
+enum PagFilterDataType {
+  string,
+  number,
+  boolean,
+  date,
+  datetime,
+}
+
 class MdlListColController {
   late final String colKey;
   String? joinKey;
@@ -50,6 +58,7 @@ class MdlListColController {
   bool hidden;
   PagFilterWidgetType filterWidgetType;
   PagFilterGroupType filterGroupType;
+  PagFilterDataType filterDataType;
   UniqueKey? filterResetKey;
   Map<String, dynamic>? filterValue;
   String? getListEpt;
@@ -97,6 +106,7 @@ class MdlListColController {
     this.hidden = false,
     this.filterWidgetType = PagFilterWidgetType.INPUT,
     this.filterGroupType = PagFilterGroupType.other,
+    this.filterDataType = PagFilterDataType.string,
     this.getListEpt,
     this.filterResetKey,
     this.colWidgetType = PagColWidgetType.TEXT,
@@ -285,6 +295,13 @@ class MdlListColController {
     //       PagEditorWidgetType.values.byName(editorWidgetTypeStr.toUpperCase());
     // }
 
+    PagFilterDataType filterDataType = PagFilterDataType.string;
+    if (json['filter_data_type'] != null) {
+      String filterDataTypeStr = json['filter_data_type'];
+      filterDataType =
+          PagFilterDataType.values.byName(filterDataTypeStr.toLowerCase());
+    }
+
     bool isUnique = false;
     if (json['is_unique'] != null) {
       dynamic isUniqueValue = json['is_unique'];
@@ -422,6 +439,7 @@ class MdlListColController {
       hidden: permHidden,
       filterWidgetType: filterWidgetType,
       filterGroupType: filterGroupType,
+      filterDataType: filterDataType,
       getListEpt: getListEpt,
       colWidgetType: colWidgetType,
       // editorWidgetType: editorWidgetType,
@@ -466,6 +484,7 @@ class MdlListColController {
     data['align'] = align;
     data['decimal'] = decimal;
     data['context_exclude'] = contextExcludeList;
+    data['filter_data_type'] = filterDataType.name;
     data['required_on_onb'] = requiredOnOnb.toString();
     return data;
   }

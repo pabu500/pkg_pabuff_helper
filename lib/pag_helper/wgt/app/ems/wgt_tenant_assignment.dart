@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
@@ -12,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../up_helper/exceptions.dart';
 import '../../../comm/comm_tenant.dart';
 import '../../../comm/comm_tenant_ops.dart';
 import '../../../def_helper/dh_pag_tenant.dart';
@@ -49,6 +52,7 @@ class _WgtTenantpAssignmentState extends State<WgtTenantpAssignment> {
   bool _isFetching = false;
   bool _isFetched = false;
   bool _modified = false;
+  String _fetchErrorText = '';
 
   bool _isCommitting = false;
   bool _isCommitted = false;
@@ -161,9 +165,10 @@ class _WgtTenantpAssignmentState extends State<WgtTenantpAssignment> {
         _itemGroupScopeMatchingItemList!.insert(0, itemInfo);
       }
     } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
+      dev.log('Error fetching item group scope matching item list: $e');
+      _fetchErrorText =
+          getErrorText(e, defaultErrorText: 'Error fetching item group data');
+
       rethrow;
     } finally {
       setState(() {
@@ -214,12 +219,11 @@ class _WgtTenantpAssignmentState extends State<WgtTenantpAssignment> {
       //   itemInfo.remove('is_fetching');
       // }
     } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
-      setState(() {
-        _commitErrorText = 'Commit Error';
-      });
+      dev.log('Error committing tenant meter group assignment: $e');
+      _commitErrorText =
+          getErrorText(e, defaultErrorText: 'Error committing assignment');
+
+      setState(() {});
     } finally {
       setState(() {
         _isCommitting = false;
@@ -300,6 +304,12 @@ class _WgtTenantpAssignmentState extends State<WgtTenantpAssignment> {
     bool fetchData = false;
     if (!_isFetched) {
       fetchData = true;
+    }
+    if (_fetchErrorText.isNotEmpty) {
+      return getErrorTextPrompt(
+        context: context,
+        errorText: _fetchErrorText,
+      );
     }
     return fetchData
         ? FutureBuilder(
@@ -632,7 +642,29 @@ class _WgtTenantpAssignmentState extends State<WgtTenantpAssignment> {
                 ),
               ),
             ),
+
             horizontalSpaceSmall,
+            Tooltip(
+              message: 'Show/Hide Scope',
+              waitDuration: const Duration(milliseconds: 500),
+              child: InkWell(
+                onTap: () {
+                  setState(() {
+                    if (itemInfo['show_scope'] == true) {
+                      itemInfo['show_scope'] = false;
+                    } else {
+                      itemInfo['show_scope'] = true;
+                    }
+                  });
+                },
+                child: Icon(
+                  _selectedMeterGroupIndexStr == itemInfo['id']
+                      ? Symbols.expand_less
+                      : Symbols.expand_more,
+                  color: Theme.of(context).hintColor,
+                ),
+              ),
+            ),
             Container(
               width: 150,
               decoration: boxDecoration,
@@ -672,31 +704,31 @@ class _WgtTenantpAssignmentState extends State<WgtTenantpAssignment> {
                       },
               ),
             ),
-            SizedBox(
-              width: 25,
-              child: isNonScopeMatching
-                  ? Tooltip(
-                      message:
-                          'This meter group is assigned to this tenant but does not match the item group scope',
-                      child: Icon(
-                        Symbols.warning,
-                        color: Theme.of(context).colorScheme.error,
-                        size: 21,
-                      ),
-                    )
-                  : null,
-            ),
+            // SizedBox(
+            //   width: 25,
+            //   child: isNonScopeMatching
+            //       ? Tooltip(
+            //           message:
+            //               'This meter group is assigned to this tenant but does not match the item group scope',
+            //           child: Icon(
+            //             Symbols.warning,
+            //             color: Theme.of(context).colorScheme.error,
+            //             size: 21,
+            //           ),
+            //         )
+            //       : null,
+            // ),
+            // button to show/hide scope label
           ],
         ),
-        if (isNonScopeMatching || (checked && !disabled))
+        // if (isNonScopeMatching || (checked && !disabled))
+        if (itemInfo['show_scope'] == true)
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                getScopeLabel(context, itemScope),
-              ],
+              children: [getScopeLabel(context, itemScope)],
             ),
           ),
         if (_selectedMeterGroupIndexStr == itemInfo['id']) getAssignmentMap(),

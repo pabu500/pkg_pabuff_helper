@@ -65,41 +65,65 @@ class MdlPagScope {
 
   List<Map<String, dynamic>> getScopeChain() {
     List<Map<String, dynamic>> scopeChain = [];
-    if (projectLabel != null) {
+    if (projectLabel != null || projectName.isNotEmpty) {
       scopeChain.add({
         'type': PagScopeType.project,
         'label': projectLabel ?? projectName,
       });
     }
-    if (siteGroupLabel != null) {
+    if (siteGroupLabel != null || siteGroupName != null) {
       scopeChain.add({
         'type': PagScopeType.siteGroup,
         'label': siteGroupLabel ?? siteGroupName,
       });
     }
-    if (siteLabel != null) {
+    if (siteLabel != null || siteName != null) {
       scopeChain.add({
         'type': PagScopeType.site,
         'label': siteLabel ?? siteName,
       });
+      // remove project level if site level is missing
+      if (scopeChain.length == 2 &&
+          scopeChain[0]['type'] == PagScopeType.project &&
+          scopeChain[1]['type'] == PagScopeType.site) {
+        scopeChain.removeAt(0);
+      }
     }
-    if (buildingLabel != null) {
+    if (buildingLabel != null || buildingName != null) {
       scopeChain.add({
         'type': PagScopeType.building,
         'label': buildingLabel ?? buildingName,
       });
+      // remove project level if building level is missing
+      if (scopeChain.length == 2 &&
+          scopeChain[0]['type'] == PagScopeType.project &&
+          scopeChain[1]['type'] == PagScopeType.building) {
+        scopeChain.removeAt(0);
+      }
     }
-    if (locationGroupLabel != null) {
+    if (locationGroupLabel != null || locationGroupName != null) {
       scopeChain.add({
         'type': PagScopeType.locationGroup,
         'label': locationGroupLabel ?? locationGroupName,
       });
+      // remove project level if location group level is missing
+      if (scopeChain.length == 2 &&
+          scopeChain[0]['type'] == PagScopeType.project &&
+          scopeChain[1]['type'] == PagScopeType.locationGroup) {
+        scopeChain.removeAt(0);
+      }
     }
-    if (locationLabel != null) {
+    if (locationLabel != null || locationName != null) {
       scopeChain.add({
         'type': PagScopeType.location,
         'label': locationLabel ?? locationName,
       });
+      // remove project level if location group level is missing
+      if (scopeChain.length == 2 &&
+          scopeChain[0]['type'] == PagScopeType.project &&
+          scopeChain[1]['type'] == PagScopeType.location) {
+        scopeChain.removeAt(0);
+      }
     }
     return scopeChain;
   }
