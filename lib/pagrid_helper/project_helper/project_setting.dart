@@ -461,7 +461,8 @@ String? nusSnValidator(String displayname) {
     bool isRvrc = isRVRC(displayname) == null;
     bool isVh = isVH(displayname) == null;
     bool isUTown = isUtown(displayname) == null;
-    if(isVh || isRvrc || isUTown) {
+    bool isPgpr = isPGPR(displayname) == null;
+    if (isVh || isRvrc || isUTown || isPgpr) {
       return null;
     }
     return 'Invalid displayname';
@@ -515,8 +516,7 @@ String? isRVRC(String displayname) {
 
 String? isVH(String displayname) {
   int displaynameInt = int.parse(displayname);
-  if ((displaynameInt < 10013400  ||
-      displaynameInt > 10014000)) {
+  if ((displaynameInt < 10013400 || displaynameInt > 10014000)) {
     return 'Invalid displayname';
   }
   return null;
@@ -527,14 +527,22 @@ String? isUtown(String displayname) {
 
   bool isValidUtownRange =
       (displaynameInt >= 10000000 && displaynameInt <= 10003985) ||
-      (displaynameInt == 10009999) ||
-      (displaynameInt >= 10010161 && displaynameInt <= 10010184) ||
-      (displaynameInt >= 10100034 && displaynameInt <= 10101302);
+          (displaynameInt == 10009999) ||
+          (displaynameInt >= 10010161 && displaynameInt <= 10010184) ||
+          (displaynameInt >= 10100034 && displaynameInt <= 10101302);
 
   if (!isValidUtownRange) {
     return 'Invalid displayname';
   }
 
+  return null;
+}
+
+String? isPGPR(String displayname) {
+  int displaynameInt = int.parse(displayname);
+  if ((displaynameInt < 10010701 && displaynameInt > 10012432)) {
+    return 'Invalid displayname';
+  }
   return null;
 }
 
@@ -573,7 +581,7 @@ String? isUtown(String displayname) {
 //   int displaynameInt = int.parse(displayname);
 //   if ((displaynameInt >= 10000090 && displaynameInt <= 10000989) ||
 //     (displaynameInt >= 10100034 && displaynameInt <= 10100497) ||
-//     (displaynameInt >= 10000319 && displaynameInt <= 10003983) || 
+//     (displaynameInt >= 10000319 && displaynameInt <= 10003983) ||
 //     (displaynameInt >= 10100068 && displaynameInt <= 10100411)
 //     ) {
 //     return null;
