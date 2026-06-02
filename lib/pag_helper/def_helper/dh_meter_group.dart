@@ -63,22 +63,6 @@ final List<Map<String, dynamic>> listConfigOnb1o1 = [
     'is_mapping_required': true,
     'validator': validateSerialNumber,
   },
-  // {
-  //   'col_key': 'service_type',
-  //   'title': 'Service Type',
-  //   'col_type': 'string',
-  //   'width': 200,
-  //   'is_mapping_required': false,
-  //   'validator': validateServiceType2,
-  // },
-  // {
-  //   'col_key': 'polling_law',
-  //   'title': 'Polling Law',
-  //   'col_type': 'string',
-  //   'width': 200,
-  //   'is_mapping_required': false,
-  //   'validator': validatePollingLaw,
-  // },
   {
     'col_key': 'onb_type',
     'title': 'Onb Type',
@@ -86,6 +70,20 @@ final List<Map<String, dynamic>> listConfigOnb1o1 = [
     'width': 200,
     'is_mapping_required': true,
     'validator': validateMeterGroupOnbType,
+  },
+  {
+    'col_key': 'polling_id_mapping_law',
+    'title': 'Polling Law',
+    'col_type': 'string',
+    'width': 200,
+    'is_mapping_required': false
+  },
+  {
+    'col_key': 'service_type',
+    'title': 'Service Type',
+    'col_type': 'string',
+    'width': 200,
+    'is_mapping_required': false
   },
 ];
 
