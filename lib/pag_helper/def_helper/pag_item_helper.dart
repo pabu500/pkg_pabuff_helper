@@ -5,6 +5,7 @@ import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../xt_ui/xt_globals.dart';
 import 'dh_pag_tariff.dart';
 import 'enum_helper.dart';
 
@@ -80,5 +81,29 @@ String? validateItemIdNotRequired(String? value) {
   if (intValue == null || intValue <= 0) {
     return 'must be a integer greater than 0';
   }
+  return null;
+}
+
+String? validateItemLabel(String? value) {
+  if (value == null || value.trim().isEmpty) {
+    return 'required';
+  }
+
+  if (value.length > maxFullNameLength) {
+    return 'must be at most $maxFullNameLength characters';
+  }
+
+  // Allowed:
+  // alphanumeric, space, hyphen, underscore,
+  // parentheses, period, comma, slash, ampersand, plus,
+  // hash, colon, semicolon, double quote, single quote
+  final validCharacters = RegExp(
+    r"""^[a-zA-Z0-9\s\-_().,/&+#:;"']+$""",
+  );
+
+  if (!validCharacters.hasMatch(value)) {
+    return 'contains invalid characters';
+  }
+
   return null;
 }
