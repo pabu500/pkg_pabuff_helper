@@ -1155,7 +1155,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Collection Cycle Month',
+              'Billing Cycle Month',
               style: TextStyle(
                 color: Theme.of(context).hintColor,
                 fontSize: 16,
