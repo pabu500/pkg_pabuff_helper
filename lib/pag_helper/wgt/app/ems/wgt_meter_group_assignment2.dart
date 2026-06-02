@@ -773,7 +773,7 @@ class _WgtMeterGroupAssignmentItemState
     bool hasAssignmentInfo = assignmentInfo != null;
     bool needToCheck = !hasAssignmentInfo;
 
-    double barWidth = 190;
+    double barWidth = 195;
     double maxAssignedWidth = barWidth - 2;
     double totalTenantPercentage = 0.0;
     String tooltipMessage = '';
@@ -1164,7 +1164,7 @@ class _WgtMeterGroupAssignmentItemState
             Tooltip(
               message: tenantLabel,
               child: SizedBox(
-                width: 170,
+                width: 175,
                 child: tenantName.isEmpty
                     ? Text(
                         '-',

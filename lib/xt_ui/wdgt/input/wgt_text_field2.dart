@@ -1,7 +1,6 @@
 import 'dart:developer' as dev;
 
 import 'package:buff_helper/pkg_buff_helper.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -41,7 +40,7 @@ class WgtTextField extends StatefulWidget {
     this.suffix,
     this.unfocusOnEditingComplete = false,
     this.textStyle,
-    this.requireUnique = true,
+    this.requireUnique = false,
   });
 
   final dynamic appConfig;
@@ -188,7 +187,7 @@ class _WgtTextFieldState extends State<WgtTextField> {
             minLines: 1,
             maxLength: widget.maxLength,
             inputFormatters: widget.inputFormatters,
-            onChanged: (value) {
+            onChanged: (value) async {
               setState(() {
                 _uniqueChecked = false;
               });
@@ -206,28 +205,25 @@ class _WgtTextFieldState extends State<WgtTextField> {
                   return;
                 }
               }
-              String? result;
+              // String? result;
               if (widget.validator != null) {
                 _isValidated = false;
-                result = widget.validator!(
-                  value,
-                  // widget.minLength,
-                  // widget.required,
-                );
+                final result = await widget.validator?.call(value);
                 widget.onValidate?.call(result);
+                if (result != null) {
+                  setState(() {
+                    _isValidated = false;
+                    _errorText = result!;
+                  });
+                  return;
+                } else {
+                  setState(() {
+                    _isValidated = true;
+                    _errorText = '';
+                  });
+                }
               }
-              if (result != null) {
-                setState(() {
-                  _isValidated = false;
-                  _errorText = result!;
-                });
-                return;
-              } else {
-                setState(() {
-                  _isValidated = true;
-                  _errorText = '';
-                });
-              }
+
               widget.onChanged(value);
             },
             onEditingComplete: () {
@@ -237,8 +233,12 @@ class _WgtTextFieldState extends State<WgtTextField> {
               widget.onEditingComplete?.call();
 
               if (widget.requireUnique) {
-                checkUnique(widget.appConfig, widget.uniqueKey!,
-                    _controller.text, widget.itemTableName!);
+                if (!_uniqueChecked) {
+                  assert(widget.itemTableName != null);
+                  assert(widget.uniqueKey != null);
+                  checkUnique(widget.appConfig, widget.uniqueKey!,
+                      _controller.text, widget.itemTableName!);
+                }
               }
 
               // unfocus

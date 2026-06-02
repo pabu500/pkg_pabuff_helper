@@ -93,7 +93,7 @@ Map<String, dynamic> prepCalcedBillInfoRl(Map<String, dynamic> billInfo) {
 
   String amgrBankAccountName = billInfo['amgr_bank_account_name'] ?? '';
   String amgrBankAccountNumber = billInfo['amgr_bank_account_number'] ?? '';
-  String amgrBankName = billInfo['amgr_bank_name'] ?? '';
+  String amgrBankName = billInfo['amgr_bank_label'] ?? '';
   String amgrBankBranchCode = billInfo['amgr_bank_branch_code'] ?? '';
   String amgrBankSwiftCode = billInfo['amgr_bank_swift_code'] ?? '';
   String amgrBankPayNow = billInfo['amgr_bank_paynow'] ?? '';
@@ -226,9 +226,12 @@ Map<String, dynamic> prepCalcedBillInfoRl(Map<String, dynamic> billInfo) {
     'tenantAccountNumber': billInfo['tenant_account_number'] ?? '',
     'strDepositAmount': billInfo['deposit_amount'] ?? '',
     'paymentMethod': billInfo['payment_method'] ?? '',
-    'tenantBillingAddressLine1': billInfo['tenant_billing_address_line1'] ?? '',
-    'tenantBillingAddressLine2': billInfo['tenant_billing_address_line2'] ?? '',
-    'tenantBillingAddressLine3': billInfo['tenant_billing_address_line3'] ?? '',
+    'tenantBillingAddressLine1':
+        billInfo['tenant_billing_address_line_1'] ?? '',
+    'tenantBillingAddressLine2':
+        billInfo['tenant_billing_address_line_2'] ?? '',
+    'tenantBillingAddressLine3':
+        billInfo['tenant_billing_address_line_3'] ?? '',
     'customerType': billInfo['customer_type'] ?? '',
     'gst': compositeUsageCalcRl.billedGst, //billInfo['gst'],
     'paymentInfo': billInfo['payment_info'] ?? '',

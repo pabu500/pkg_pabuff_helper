@@ -188,9 +188,7 @@ Widget getScopeLabel(BuildContext context, MdlPagScope scope) {
     }
   }
 
-  return Row(
-    children: scopeWidgets,
-  );
+  return Row(children: scopeWidgets);
 }
 
 enum PagScopeOpType {
