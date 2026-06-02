@@ -223,6 +223,20 @@ String? validateTenantLabel(String value) {
   return null;
 }
 
+String? validateDisplayName(String value) {
+  if (value.trim().isEmpty) {
+    return 'required';
+  }
+  //length 6-10, alphanumeric, space, /, ', +, -, #, @, (), ., only
+  String pattern = r"^[-a-zA-Z0-9 ./'()+&#@]{6,10}$";
+  RegExp regExp = RegExp(pattern);
+  if (!regExp.hasMatch(value)) {
+    return 'alphanumeric, space, /, +, -, #, &, @, (), '
+        ', ., only and length 6-10';
+  }
+  return null;
+}
+
 String? validateCompanyTradingName(String value) {
   if (value.trim().isEmpty) {
     return 'required';
@@ -738,15 +752,7 @@ final List<Map<String, dynamic>> listConfigBaseTenant = [
   },
 ];
 final List<Map<String, dynamic>> listConfigBaseTenantExt = [
-  {
-    'col_key': 'company_trading_name',
-    'title': 'Company Trading Name',
-    'col_type': 'string',
-    'width': 200,
-    'is_mapping_required': true,
-    'validator': validateCompanyTradingName,
-  },
-  {
+   {
     'col_key': 'label',
     'title': 'Label',
     'col_type': 'string',
@@ -754,6 +760,23 @@ final List<Map<String, dynamic>> listConfigBaseTenantExt = [
     'is_mapping_required': false,
     'validator': validateTenantLabel,
   },
+    {
+    'col_key': 'displayname',
+    'title': 'Display Name',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': false,
+    'validator': validateDisplayName,
+  },
+  {
+    'col_key': 'company_trading_name',
+    'title': 'Company Trading Name',
+    'col_type': 'string',
+    'width': 200,
+    'is_mapping_required': false,
+    'validator': validateCompanyTradingName,
+  },
+
   // {
   //   'col_key': 'billing_address',
   //   'title': 'Billing Address',
@@ -768,7 +791,7 @@ final List<Map<String, dynamic>> listConfigBaseTenantExt = [
     'title': 'Billing Address Line 1',
     'col_type': 'string',
     'width': 200,
-    'is_mapping_required': true,
+    'is_mapping_required': false,
     'validator': validateBillingAddressLine1
   },
   {
@@ -808,7 +831,7 @@ final List<Map<String, dynamic>> listConfigBaseTenantExt = [
     'title': 'Billing Contact Name',
     'col_type': 'string',
     'width': 150,
-    'is_mapping_required': true,
+    'is_mapping_required': false,
     'validator': validateFullName,
   },
   {
@@ -816,7 +839,7 @@ final List<Map<String, dynamic>> listConfigBaseTenantExt = [
     'title': 'Billing Email 1',
     'col_type': 'email',
     'width': 150,
-    'is_mapping_required': true,
+    'is_mapping_required': false,
     'validator': validateEmail,
   },
   {
@@ -832,7 +855,7 @@ final List<Map<String, dynamic>> listConfigBaseTenantExt = [
     'title': 'Payment Method',
     'col_type': 'enum',
     'width': 150,
-    'is_mapping_required': true,
+    'is_mapping_required': false,
     // 'enum_values': PagTenantPaymentMethod.values
     //     .map((e) => {'label': e.label, 'value': e.value})
     //     .toList(),
@@ -843,7 +866,7 @@ final List<Map<String, dynamic>> listConfigBaseTenantExt = [
     'title': 'Credit Term',
     'col_type': 'int',
     'width': 100,
-    'is_mapping_required': true,
+    'is_mapping_required': false,
     'validator': validateCreditTerm,
   },
   {
@@ -859,7 +882,7 @@ final List<Map<String, dynamic>> listConfigBaseTenantExt = [
     'title': 'Deposit Amount',
     'col_type': 'double',
     'width': 120,
-    'is_mapping_required': true,
+    'is_mapping_required': false,
     'validator': validateDepositAmount,
   },
   {
@@ -939,7 +962,7 @@ final List<Map<String, dynamic>> listConfigBaseTenantExt = [
     'title': 'Building Label',
     'col_type': 'string',
     'width': 150,
-    'is_mapping_required': true,
+    'is_mapping_required': false,
     'validator': validateLabelScope,
   },
   {
@@ -947,7 +970,7 @@ final List<Map<String, dynamic>> listConfigBaseTenantExt = [
     'title': 'Location Label',
     'col_type': 'string',
     'width': 150,
-    'is_mapping_required': true,
+    'is_mapping_required': false,
     'validator': validateLabelScope,
   },
   // {
@@ -989,12 +1012,28 @@ final List<Map<String, dynamic>> listConfigMgAssign1on1 = [
   //   'is_mapping_required': true,
   //   'validator': validateLabelScope,
   // },
+   {
+    'col_key': 'displayname',
+    'title': 'Display Name',
+    'col_type': 'string',
+    'width': 200,
+    'is_mapping_required': false,
+    'validator': validateDisplayName,
+  },
+   {
+    'col_key': 'label',
+    'title': 'Label',
+    'col_type': 'string',
+    'width': 200,
+    'is_mapping_required': false,
+    'validator': validateTenantLabel,
+  },
   {
     'col_key': 'mg_assign_type',
     'title': 'MG Type',
     'col_type': 'string',
     'width': 200,
-    'is_mapping_required': true,
+    'is_mapping_required': false,
     'validator': validateMgAssign1on1Type,
   },
 ];

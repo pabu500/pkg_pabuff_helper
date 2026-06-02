@@ -144,10 +144,12 @@ String? validateDeviceLabel(String val) {
 
   // validate number, letter, underscore, and dash, space,
   // and minimum 5 characters
-  String pattern = r'^[a-zA-Z0-9_ -]{5,}$';
+  // String pattern = r'^[a-zA-Z0-9_ -]{5,}$';
+  String pattern = r'^[a-zA-Z0-9_ \-#().&/]{5,}$';
   RegExp regExp = RegExp(pattern);
   if (!regExp.hasMatch(val)) {
-    return 'min length is 5 and letter, number, space, _, - only';
+    // return 'min length is 5 and letter, number, space, _, - only';
+    return 'min length is 5 and letter, number, space, _, -, #, (, ), ., &, / only';
   }
   return null;
 }
