@@ -450,9 +450,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
             _selectedListController!.itemType == PagTariff.tariffPackage) ||
         widget.itemKind == PagItemKind.meterGroup ||
         widget.itemKind == PagItemKind.tenant ||
-        widget.listContextType == PagListContextType.paymentMatching ||
-        widget.itemKind == PagItemKind.tariff &&
-            _selectedListController!.itemType == PagTariff.billingCostItem) {
+        widget.listContextType == PagListContextType.paymentMatching) {
       addOpColumn = true;
     }
     if (widget.itemKind == PagItemKind.tenant &&
