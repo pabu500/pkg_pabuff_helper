@@ -1,6 +1,5 @@
 import 'dart:developer' as dev;
 
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:buff_helper/pag_helper/comm/pag_be_api_base.dart';
@@ -21,7 +20,16 @@ Future<dynamic> doPagCheckUnique(
         await http.get(Uri.parse('$url?t=$table&field=$field&val=$val'));
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      final result = jsonDecode(response.body);
+      if (result['exists'] == 'true') {
+        return {'exists': true};
+      } else if (result['exists'] == 'false') {
+        return {'exists': false};
+      } else if (result['error'] != null) {
+        throw Exception(result['error']);
+      } else {
+        throw Exception('Invalid response format');
+      }
     } else {
       throw Exception('Failed to check unique.');
     }

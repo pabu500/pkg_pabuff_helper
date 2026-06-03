@@ -7,7 +7,7 @@ import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
 import 'package:buff_helper/pag_helper/model/mdl_svc_query.dart';
 
-Future<dynamic> doPagBillingCostItem(
+Future<dynamic> doCreatePagBillingCostItem(
   MdlPagUser loggedInUser,
   MdlPagAppConfig appConfig,
   Map<String, dynamic> queryMap,
@@ -56,7 +56,7 @@ Future<dynamic> doGetTariffPackageTenantList(
   MdlPagSvcClaim svcClaim,
 ) async {
   svcClaim.svcName = PagSvcType.oresvc2.name;
-  svcClaim.endpoint = PagUrlBase.eptPagGetTariffPackageTenantList;
+  svcClaim.endpoint = PagUrlBase.eptPagGetBillingCostItemTenantList;
 
   String svcToken = '';
   // try {
@@ -106,7 +106,7 @@ Future<dynamic> doGetScopeTenantList(
   MdlPagSvcClaim svcClaim,
 ) async {
   svcClaim.svcName = PagSvcType.oresvc2.name;
-  svcClaim.endpoint = PagUrlBase.eptPagGetTariffPackageScopeTenantList;
+  svcClaim.endpoint = PagUrlBase.eptPagGetBillingCostItemScopeTenantList;
 
   String svcToken = '';
   // try {
@@ -188,66 +188,13 @@ Future<dynamic> commitTariffPackageTenantList(
   }
 }
 
-Future<dynamic> getTpRateBillList(
+Future<dynamic> commitBillingCostItemTenantList2(
   MdlPagAppConfig appConfig,
   Map<String, dynamic> queryMap,
   MdlPagSvcClaim svcClaim,
 ) async {
   svcClaim.svcName = PagSvcType.oresvc2.name;
-  svcClaim.endpoint = PagUrlBase.eptGetTpRateBillList;
-
-  String svcToken = '';
-  // try {
-  //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
-  // } catch (err) {
-  //   throw Exception(err);
-  // }
-
-  final response = await http.post(
-    Uri.parse(PagUrlController(null, appConfig)
-        .getUrl(PagSvcType.oresvc2, svcClaim.endpoint!)),
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-      'Authorization': 'Bearer $svcToken',
-    },
-    body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
-  );
-
-  if (response.statusCode == 200) {
-    final respJson = jsonDecode(response.body);
-    if (respJson['error'] != null) {
-      throw Exception(respJson['error']['message']);
-    }
-    final data = respJson['data'];
-    if (data == null) {
-      throw Exception('Failed to get response data');
-    }
-    final result = data['result'];
-    if (result == null) {
-      throw Exception("No result found in the response");
-    }
-    String? resultKey = data['result_key'];
-    if (resultKey == null && resultKey!.isEmpty) {
-      throw Exception("Error: $resultKey");
-    }
-    if (result[resultKey] == null) {
-      throw Exception("No data found in the response");
-    }
-    return result[resultKey];
-  } else if (response.statusCode == 403) {
-    throw Exception("You are not authorized to perform this operation");
-  } else {
-    throw Exception(jsonDecode(response.body)['error']);
-  }
-}
-
-Future<dynamic> commitTariffPackageTenantList2(
-  MdlPagAppConfig appConfig,
-  Map<String, dynamic> queryMap,
-  MdlPagSvcClaim svcClaim,
-) async {
-  svcClaim.svcName = PagSvcType.oresvc2.name;
-  svcClaim.endpoint = PagUrlBase.eptUpdateTariffPackageTenantList;
+  svcClaim.endpoint = PagUrlBase.eptUpdateBillingCostItemTenantList;
 
   String svcToken = '';
   // try {
@@ -279,13 +226,13 @@ Future<dynamic> commitTariffPackageTenantList2(
   }
 }
 
-Future<dynamic> getTariffPackageTenantAssignment(
+Future<dynamic> getBillingCostItemTenantAssignment(
   MdlPagAppConfig appConfig,
   Map<String, dynamic> queryMap,
   MdlPagSvcClaim svcClaim,
 ) async {
   svcClaim.svcName = PagSvcType.oresvc2.name;
-  svcClaim.endpoint = PagUrlBase.eptPagGetTariffPackageTenantAssignment;
+  svcClaim.endpoint = PagUrlBase.eptGetBillingCostItemTenantAssignment;
 
   String svcToken = '';
   // try {
@@ -316,13 +263,13 @@ Future<dynamic> getTariffPackageTenantAssignment(
         throw Exception(respJson['error']);
       }
       if (respJson['data'] == null) {
-        throw Exception('Failed to get meter tenant list');
+        throw Exception('Failed to get billing cost item tenant assignment');
       }
 
       var data = respJson['data'];
       return data;
     } else {
-      throw Exception('Failed to get meter tenant list');
+      throw Exception('Failed to get billing cost item tenant assignment');
     }
   } catch (err) {
     rethrow;

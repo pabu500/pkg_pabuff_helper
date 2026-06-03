@@ -9,7 +9,6 @@ import 'package:buff_helper/xt_ui/style/evs2_colors.dart';
 import 'package:buff_helper/xt_ui/wdgt/info/get_error_text_prompt.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 import 'package:buff_helper/xt_ui/xt_helpers.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
@@ -20,8 +19,8 @@ import '../../../comm/comm_tenant_ops.dart';
 import '../../../def_helper/dh_pag_tenant.dart';
 import '../../../model/mdl_pag_app_config.dart';
 
-class WgtTenantpAssignment extends StatefulWidget {
-  const WgtTenantpAssignment({
+class WgtTenantMeterGroupAssignment extends StatefulWidget {
+  const WgtTenantMeterGroupAssignment({
     super.key,
     required this.appConfig,
     required this.strItemGroupIndex,
@@ -41,10 +40,12 @@ class WgtTenantpAssignment extends StatefulWidget {
   final Function? onUpdate;
 
   @override
-  State<WgtTenantpAssignment> createState() => _WgtTenantpAssignmentState();
+  State<WgtTenantMeterGroupAssignment> createState() =>
+      _WgtTenantMeterGroupAssignmentState();
 }
 
-class _WgtTenantpAssignmentState extends State<WgtTenantpAssignment> {
+class _WgtTenantMeterGroupAssignmentState
+    extends State<WgtTenantMeterGroupAssignment> {
   late final MdlPagUser? loggedInUser;
 
   final double width = 395.0;
@@ -123,7 +124,7 @@ class _WgtTenantpAssignmentState extends State<WgtTenantpAssignment> {
         if (itemInfo['meter_group_tenant_id'] != null) {
           itemInfo['assigned'] = true;
         }
-        itemInfo['assgigned_to_this_tenant'] = false;
+        itemInfo['assigned_to_this_tenant'] = false;
         if (itemInfo['meter_group_tenant_id'] == widget.strItemGroupIndex) {
           itemInfo['assigned_to_this_tenant'] = true;
         }
@@ -138,7 +139,7 @@ class _WgtTenantpAssignmentState extends State<WgtTenantpAssignment> {
         String assignedB = b['assigned'] ? '1' : '0';
         return assignedA.compareTo(assignedB);
       });
-      // find the item that is assgigned to this tenant,
+      // find the item that is assigned to this tenant,
       // and move it to the top
       for (Map<String, dynamic> itemInfo in _itemGroupScopeMatchingItemList!) {
         if (itemInfo['assigned_to_this_tenant'] != true) {

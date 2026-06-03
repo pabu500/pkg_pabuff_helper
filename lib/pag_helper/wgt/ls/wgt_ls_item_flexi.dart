@@ -37,13 +37,13 @@ import '../../comm/comm_list.dart';
 import '../../model/mdl_pag_app_config.dart';
 import '../app/ems/wgt_bill_compilation.dart';
 import '../app/ems/wgt_match_payment_op_item.dart';
+import '../app/ems/wgt_tenant_item_assignment.dart';
 import '../app/fh/wgt_fh_device_health.dart';
 import '../job/wgt_job_type_op_panel2.dart';
 import 'wgt_pag_item_info_edit_panel.dart';
 import 'wgt_list_pane.dart';
 import 'wgt_pag_item_finder_flexi.dart';
 import '../app/ems/wgt_tariff_package_assignment.dart';
-import '../app/ems/wgt_tenant_assignment.dart';
 import 'dart:developer' as dev;
 
 class WgtListSearchItemFlexi extends StatefulWidget {
@@ -450,7 +450,9 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
             _selectedListController!.itemType == PagTariff.tariffPackage) ||
         widget.itemKind == PagItemKind.meterGroup ||
         widget.itemKind == PagItemKind.tenant ||
-        widget.listContextType == PagListContextType.paymentMatching) {
+        widget.listContextType == PagListContextType.paymentMatching ||
+        widget.itemKind == PagItemKind.tariff &&
+            _selectedListController!.itemType == PagTariff.billingCostItem) {
       addOpColumn = true;
     }
     if (widget.itemKind == PagItemKind.tenant &&
@@ -944,7 +946,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                           },
                         );
                       case PagItemKind.tenant:
-                        opWidget = WgtTenantpAssignment(
+                        opWidget = WgtTenantItemAssignment(
                           appConfig: widget.appConfig,
                           strItemGroupIndex: item['id'],
                           itemName: item['name'],

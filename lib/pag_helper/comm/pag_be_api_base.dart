@@ -366,6 +366,14 @@ class PagUrlBase {
 
   static const String eptPagCreateBillingCostItem =
       '/ems/billing_cost_item/create_billing_cost_item';
+  static const String eptPagGetBillingCostItemTenantList =
+      '/ems/billing_cost_item/get_billing_cost_item_tenant_list';
+  static const String eptPagGetBillingCostItemScopeTenantList =
+      '/ems/billing_cost_item/get_billing_cost_item_scope_tenant_list';
+  static const String eptUpdateBillingCostItemTenantList =
+      '/ems/billing_cost_item/update_billing_cost_item_tenant_list';
+  static const String eptGetBillingCostItemTenantAssignment =
+      '/ems/billing_cost_item/get_billing_cost_item_tenant_assignment';
 
   // Tenant Manager
   static const String eptPagCreateTenant = '/ems/tenant/create_tenant';
@@ -378,8 +386,12 @@ class PagUrlBase {
       '/ems/tenant/get_tenant_meter_group_list';
   static const String eptPagGetTenantScopeMeterGroupList =
       '/ems/tenant/get_tenant_scope_meter_group_list';
+  static const String eptPagGetTenantScopeBciList =
+      '/ems/tenant/get_tenant_scope_bci_list';
   static const String eptPagUpdateTenantMeterGroupList =
       '/ems/tenant/update_tenant_meter_group_list';
+  static const String eptPagUpdateTenantBciList =
+      '/ems/tenant/update_tenant_bci_list';
   static const String eptPagGetMeterTenantAssignment =
       '/ems/tenant/get_meter_tenant_assignment';
   static const String eptPagGetTenantMeterAssignment =
