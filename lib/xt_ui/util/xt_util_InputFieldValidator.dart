@@ -133,6 +133,20 @@ String? validateEmail(String? value, {String? emptyCallout}) {
   return result;
 }
 
+String? validateOptionalEmail(String? value) {
+  if (value == null || value.trim().isEmpty) {
+    return null; 
+  }
+
+  final regex = RegExp(glb_reg_email);
+
+  if (!regex.hasMatch(value)) {
+    return glb_email_callout;
+  }
+
+  return null;
+}
+
 String? validatePhone(String? value,
     {String? emptyCallout, Map<Enum, String?>? formErrors, Enum? filedKey}) {
   final phoneRegExp = RegExp(glb_reg_phone);
