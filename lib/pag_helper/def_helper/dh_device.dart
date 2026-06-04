@@ -228,6 +228,25 @@ String? validateModel(String val) {
   return null;
 }
 
+String? validateCwP2Model(String val) {
+  val = val.trim();
+
+  if (val.isEmpty) {
+    return null;
+  }
+
+  // Alphanumeric, space, dot, underscore, hyphen
+  const pattern = r'^[A-Za-z0-9._ -]+$';
+
+  final regExp = RegExp(pattern);
+
+  if (val.length > 55 || !regExp.hasMatch(val)) {
+    return 'invalid model format, length must be less than 55 and only alphanumeric, space, dot, underscore, hyphen allowed';
+  }
+
+  return null;
+}
+
 String? validatePhaseType(String val) {
   val = val.trim();
 
@@ -768,6 +787,31 @@ enum PagDeviceLsStatus {
         (e) => (e).tag,
       ) ??
       normal;
+}
+
+enum PagMeterPhaseType {
+  single('Single Phase', 'single_phase'),
+  threePhaseDirect('Three Phase Direct', 'three_phase_direct'),
+  threePhaseCt('Three Phase CT', 'three_phase_ct');
+
+  const PagMeterPhaseType(this.key, this.value);
+
+  final String key;    // UI display
+  final String value;  // API / storage
+
+  static PagMeterPhaseType? byKey(String? key) {
+    for (final e in values) {
+      if (e.key == key) return e;
+    }
+    return null;
+  }
+
+  static PagMeterPhaseType? byValue(String? value) {
+    for (final e in values) {
+      if (e.value == value) return e;
+    }
+    return null;
+  }
 }
 
 enum PagSimPackageEnum {
