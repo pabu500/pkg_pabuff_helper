@@ -14,6 +14,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../up_helper/exceptions.dart';
+import '../../../../xt_ui/wdgt/datetime/wgt_date_picker.dart';
 import '../../../comm/comm_tenant.dart';
 import '../../../comm/comm_tenant_ops.dart';
 import '../../../def_helper/dh_pag_tenant.dart';
@@ -45,6 +46,11 @@ class WgtTenantBciAssignment extends StatefulWidget {
 
 class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
   late final MdlPagUser? loggedInUser;
+
+  final DateTime leftMostDate =
+      DateTime.now().subtract(const Duration(days: 365 * 5));
+  final DateTime rightMostDate =
+      DateTime.now().add(const Duration(days: 365 * 5));
 
   final double width = 395.0;
 
@@ -218,7 +224,7 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
       //   itemInfo.remove('is_fetching');
       // }
     } catch (e) {
-      dev.log('Error committing tenant meter group assignment: $e');
+      dev.log('Error committing tenant bci assignment: $e');
       _commitErrorText =
           getErrorText(e, defaultErrorText: 'Error committing assignment');
 
@@ -233,19 +239,39 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
   }
 
   bool _checkModified() {
-    bool modified = false;
+    bool assignmentModified = false;
     for (Map<String, dynamic> item in _itemGroupScopeMatchingItemList ?? []) {
       if (item['assigned_new'] != null) {
         if (item['assigned'] != item['assigned_new']) {
-          modified = true;
+          assignmentModified = true;
           break;
         }
       }
     }
+    bool effectiveDateModified = false;
+    for (Map<String, dynamic> item in _itemGroupScopeMatchingItemList ?? []) {
+      // only assigned items can modify effective date
+      if (item['assigned'] == true && item['assigned_new'] != false) {
+        if (item['effective_from_timestamp_new'] != null) {
+          if (item['effective_from_timestamp'] !=
+              item['effective_from_timestamp_new']) {
+            effectiveDateModified = true;
+            break;
+          }
+        }
+        if (item['effective_to_timestamp_new'] != null) {
+          if (item['effective_to_timestamp'] !=
+              item['effective_to_timestamp_new']) {
+            effectiveDateModified = true;
+            break;
+          }
+        }
+      }
+    }
     setState(() {
-      _modified = modified;
+      _modified = assignmentModified || effectiveDateModified;
     });
-    return modified;
+    return assignmentModified || effectiveDateModified;
   }
 
   @override
@@ -379,32 +405,6 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
           ),
         ),
         horizontalSpaceSmall,
-        // Container(
-        //   padding: const EdgeInsets.symmetric(horizontal: 5),
-        //   child: SizedBox(
-        //     width: 180,
-        //     height: 39,
-        //     child: TextField(
-        //       controller: _itemLabelFilterController,
-        //       readOnly: _isCommitting ||
-        //           _isCommitted ||
-        //           {_itemGroupScopeMatchingItemList ?? []}.isEmpty,
-        //       decoration: InputDecoration(
-        //           hintText: 'Meter Group Label',
-        //           hintStyle: TextStyle(
-        //               color: Theme.of(context)
-        //                   .hintColor) // prefixIcon: Icon(Icons.search),
-        //           ),
-        //       onChanged: (value) {
-        //         setState(() {
-        //           _itemLabelFilterStr = value.trim().toLowerCase();
-        //         });
-        //       },
-        //     ),
-        //   ),
-        // ),
-        // horizontalSpaceSmall,
-        // virtical separator
         Container(
           width: 1,
           height: 39,
@@ -442,16 +442,6 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
                               : Theme.of(context).hintColor,
                         ),
         ),
-        // if (_hasTptMismatchAssignmentError)
-        //   Container(
-        //     margin: const EdgeInsets.only(left: 10),
-        //     padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-        //     decoration: boxDecoration.copyWith(color: Colors.transparent),
-        //     child: Text(
-        //       '✘ TPT Mismatch Error',
-        //       style: TextStyle(color: Theme.of(context).colorScheme.error),
-        //     ),
-        //   ),
       ],
     );
   }
@@ -487,25 +477,6 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
               widget.itemLabel.isNotEmpty ? widget.itemLabel : '-',
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            // horizontalSpaceSmall,
-            // Container(
-            //   decoration: boxDecoration,
-            //   padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-            //   child: Row(
-            //     mainAxisSize: MainAxisSize.min,
-            //     children: [
-            //       scopeIcon,
-            //       horizontalSpaceTiny,
-            //       // Text(itemGroupScopeLabel),
-            //     ],
-            //   ),
-            // ),
-            // horizontalSpaceSmall,
-            // Container(
-            //   decoration: boxDecoration,
-            //   padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-            //   child: Text(widget.tariffPackageTypeLabel),
-            // ),
           ],
         ),
         verticalSpaceTiny,
@@ -513,19 +484,6 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
       ],
     );
   }
-
-  // bool _showItem(Map<String, dynamic> item) {
-  //   if (_itemNameFilterStr.isNotEmpty || _itemLabelFilterStr.isNotEmpty) {
-  //     String? name = item['name'];
-  //     String? label = item['label'];
-  //     bool nameMatches =
-  //         name != null && name.toLowerCase().contains(_itemNameFilterStr);
-  //     bool labelMatches =
-  //         label != null && label.toLowerCase().contains(_itemLabelFilterStr);
-  //     return nameMatches || labelMatches;
-  //   }
-  //   return true; // Include item if no filter is applied
-  // }
 
   bool _showItem(Map<String, dynamic> item) {
     if (_itemNameFilterStr.isNotEmpty) {
@@ -577,8 +535,8 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
   }
 
   Widget getItemRow(Map<String, dynamic> itemInfo, int index) {
-    String meterGroupName = itemInfo['name'] ?? '-';
-    String meterGroupLabel = itemInfo['label'] ?? '-';
+    String itemName = itemInfo['name'] ?? '-';
+    String itemLabel = itemInfo['label'] ?? '-';
     String tenantName = itemInfo['tenant_name'] ?? '-';
     String tenantLabel = itemInfo['tenant_label'] ?? '-';
     String? tenantLcStatus = itemInfo['tenant_lc_status'];
@@ -641,7 +599,6 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
                 ),
               ),
             ),
-
             horizontalSpaceSmall,
             Tooltip(
               message: 'Show/Hide Scope',
@@ -657,7 +614,8 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
                   });
                 },
                 child: Icon(
-                  _selectedBciIndexStr == itemInfo['id']
+                  // _selectedBciIndexStr == itemInfo['id']
+                  itemInfo['show_scope'] == true
                       ? Symbols.expand_less
                       : Symbols.expand_more,
                   color: Theme.of(context).hintColor,
@@ -669,7 +627,7 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
               decoration: boxDecoration,
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
               child: SelectableText(
-                meterGroupName,
+                itemName,
                 style: disabled ? disabledTextStyle : null,
               ),
             ),
@@ -679,10 +637,12 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
               decoration: boxDecoration,
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
               child: SelectableText(
-                meterGroupLabel,
+                itemLabel,
                 style: disabled ? disabledTextStyle : null,
               ),
             ),
+            horizontalSpaceTiny,
+            getEffectiveDateRange(itemInfo),
             horizontalSpaceTiny,
             Tooltip(
               message: disabled ? disabledText : '',
@@ -694,30 +654,15 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
                         setState(() {
                           if (value == null) return;
                           itemInfo['assigned_new'] = value;
-                          if (itemInfo['assigned'] !=
-                              itemInfo['assigned_new']) {
-                            _modified = true;
-                          }
+                          // if (itemInfo['assigned'] !=
+                          //     itemInfo['assigned_new']) {
+                          //   _modified = true;
+                          // }
                         });
                         _checkModified();
                       },
               ),
             ),
-            // SizedBox(
-            //   width: 25,
-            //   child: isNonScopeMatching
-            //       ? Tooltip(
-            //           message:
-            //               'This meter group is assigned to this tenant but does not match the item group scope',
-            //           child: Icon(
-            //             Symbols.warning,
-            //             color: Theme.of(context).colorScheme.error,
-            //             size: 21,
-            //           ),
-            //         )
-            //       : null,
-            // ),
-            // button to show/hide scope label
           ],
         ),
         // if (isNonScopeMatching || (checked && !disabled))
@@ -731,6 +676,85 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
             ),
           ),
         if (_selectedBciIndexStr == itemInfo['id']) getAssignmentMap(),
+      ],
+    );
+  }
+
+  Widget getEffectiveDateRange(Map<String, dynamic> itemInfo) {
+    String effectiveFromTimestamp = itemInfo['effective_from_timestamp'] ?? '';
+    String effectiveToTimestamp = itemInfo['effective_to_timestamp'] ?? '';
+    DateTime? effectiveFromDateTime;
+    DateTime? effectiveToDateTime;
+    if (effectiveFromTimestamp.isNotEmpty) {
+      effectiveFromDateTime = DateTime.tryParse(effectiveFromTimestamp);
+    }
+    if (effectiveToTimestamp.isNotEmpty) {
+      effectiveToDateTime = DateTime.tryParse(effectiveToTimestamp);
+    }
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        WgtDatePicker(
+          // key: _timePickerFromKey,
+          iconSize: 18,
+          enabled: itemInfo['assigned_new'] == true ||
+              (itemInfo['assigned'] == true &&
+                  itemInfo['assigned_new'] != false),
+          defaultFirstDate: leftMostDate,
+          defaultLastDate: effectiveToDateTime ?? rightMostDate,
+          initialDate: effectiveFromDateTime,
+          labelFontSize: 15,
+          timeZone: loggedInUser!.selectedScope.getProjectTimezone(),
+          label: 'Eff. From Date',
+          onDateChanged: (DateTime selectedDate) {
+            setState(() {
+              effectiveFromDateTime = DateTime(selectedDate.year,
+                  selectedDate.month, selectedDate.day, 0, 0, 0, 0);
+              itemInfo['effective_from_timestamp_new'] =
+                  effectiveFromDateTime?.toIso8601String();
+              _checkModified();
+            });
+          },
+          onDateCleared: () {
+            setState(() {
+              effectiveFromDateTime = null;
+              itemInfo['effective_from_timestamp_new'] = null;
+              _checkModified();
+            });
+          },
+        ),
+        horizontalSpaceTiny,
+        WgtDatePicker(
+          // key: _timePickerToKey,
+          iconSize: 18,
+          enabled: itemInfo['assigned_new'] == true ||
+              (itemInfo['assigned'] == true &&
+                  itemInfo['assigned_new'] != false),
+          defaultFirstDate: effectiveFromDateTime ?? leftMostDate,
+          defaultLastDate: effectiveToDateTime ?? rightMostDate,
+          initialDate: effectiveToDateTime,
+          labelFontSize: 15,
+          timeZone: loggedInUser!.selectedScope.getProjectTimezone(),
+          label: 'Eff. To Date',
+          onDateChanged: (DateTime selectedDate) {
+            setState(() {
+              effectiveToDateTime = DateTime(selectedDate.year,
+                      selectedDate.month, selectedDate.day, 0, 0, 0, 0)
+                  .add(const Duration(days: 1));
+              itemInfo['effective_to_timestamp_new'] =
+                  effectiveToDateTime?.toIso8601String();
+              _checkModified();
+            });
+          },
+          onDateCleared: () {
+            setState(() {
+              effectiveToDateTime = null;
+              itemInfo['effective_to_timestamp_new'] = null;
+              _checkModified();
+            });
+          },
+        ),
       ],
     );
   }
