@@ -843,6 +843,20 @@ final List<Map<String, dynamic>> listConfigBaseTenantExt = [
     'validator': validateEmail,
   },
   {
+    'col_key': 'billing_email_2',
+    'title': 'Billing Email 2',
+    'col_type': 'email',
+    'width': 150,
+    'is_mapping_required': false
+  },
+  {
+    'col_key': 'billing_email_3',
+    'title': 'Billing Email 3',
+    'col_type': 'email',
+    'width': 150,
+    'is_mapping_required': false
+  },
+  {
     'col_key': 'billing_did',
     'title': 'Billing DID',
     'col_type': 'string',
