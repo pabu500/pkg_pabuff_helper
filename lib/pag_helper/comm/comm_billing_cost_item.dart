@@ -43,7 +43,8 @@ Future<dynamic> doCreatePagBillingCostItem(
       return respJson;
     } else {
       Map<String, dynamic> responseBody = jsonDecode(response.body);
-      throw Exception(responseBody['error']);
+      throw Exception(responseBody['error']['message'] ??
+          'Failed to create billing cost item');
     }
   } catch (err) {
     throw Exception(err);

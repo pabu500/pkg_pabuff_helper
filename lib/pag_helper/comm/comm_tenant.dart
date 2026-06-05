@@ -43,7 +43,8 @@ Future<dynamic> doPagCreateTenant(
       return respJson;
     } else {
       Map<String, dynamic> responseBody = jsonDecode(response.body);
-      throw Exception(responseBody['error']);
+      throw Exception(
+          responseBody['error']['message'] ?? 'Failed to create tenant');
     }
   } catch (err) {
     throw Exception(err);
