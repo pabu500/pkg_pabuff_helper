@@ -6,6 +6,8 @@ import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pag_helper/model/mdl_svc_query.dart';
 import 'package:http/http.dart' as http;
 
+import 'comm_helper.dart';
+
 Future<dynamic> commitTenantMeterGroupList(
   MdlPagAppConfig appConfig,
   Map<String, dynamic> queryMap,
@@ -34,13 +36,14 @@ Future<dynamic> commitTenantMeterGroupList(
   if (response.statusCode == 200) {
     final respJson = jsonDecode(response.body);
     if (respJson['error'] != null) {
-      throw Exception(respJson['error']);
+      throw Exception(respJson['error']['message'] ?? 'Unknown error');
     }
     return respJson['data'];
   } else if (response.statusCode == 403) {
     throw Exception("You are not authorized to perform this operation");
   } else {
-    throw Exception(jsonDecode(response.body)['error']);
+    final respJson = jsonDecode(response.body);
+    throw Exception(respJson['error']['message'] ?? 'Unknown error');
   }
 }
 
@@ -70,14 +73,31 @@ Future<dynamic> commitTenantBciList(
   );
 
   if (response.statusCode == 200) {
+    // return getResult(response.body);
     final respJson = jsonDecode(response.body);
     if (respJson['error'] != null) {
-      throw Exception(respJson['error']);
+      throw Exception(respJson['error']['message']);
     }
-    return respJson['data'];
+    final data = respJson['data'];
+    if (data == null) {
+      throw Exception('Failed to get response data');
+    }
+    final result = data['result'];
+    if (result == null) {
+      throw Exception("No result found in the response");
+    }
+    String? resultKey = data['result_key'];
+    if (resultKey == null || resultKey.isEmpty) {
+      throw Exception("Error: $resultKey");
+    }
+    if (result[resultKey] == null) {
+      throw Exception("No data found in the response");
+    }
+    return result[resultKey];
   } else if (response.statusCode == 403) {
     throw Exception("You are not authorized to perform this operation");
   } else {
-    throw Exception(jsonDecode(response.body)['error']);
+    final respJson = jsonDecode(response.body);
+    throw Exception(respJson['error']['message'] ?? 'Unknown error');
   }
 }

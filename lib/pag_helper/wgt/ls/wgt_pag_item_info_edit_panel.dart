@@ -18,7 +18,6 @@ import 'package:buff_helper/pag_helper/wgt/app/ems/wgt_payment_lc_status_op.dart
 import 'package:buff_helper/pag_helper/wgt/ls/wgt_item_delete_op.dart';
 import 'package:buff_helper/pagrid_helper/batch_op_helper/wgt_confirm_box.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
-import 'package:buff_helper/xt_ui/wdgt/datetime/wgt_date_picker.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 import 'package:flutter/material.dart';
 import 'package:buff_helper/pag_helper/def_helper/def_item_group.dart';
@@ -596,7 +595,10 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
                           widget.onUpdate?.call();
                         });
                       } else {
-                        Map<String, dynamic> errorMap = resultMap['error'];
+                        Map<String, dynamic> errorMap =
+                            resultMap['error'] is String
+                                ? {'message': resultMap['error']}
+                                : resultMap['error'];
                         String? status = errorMap['status'];
                         dev.log('Status: $status');
                         setState(() {

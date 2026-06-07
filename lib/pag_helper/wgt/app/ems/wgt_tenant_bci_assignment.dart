@@ -191,7 +191,12 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
     // filter out items that are not modified
     final List<Map<String, dynamic>> assignmentList =
         _itemGroupScopeMatchingItemList!
-            .where((item) => item['assigned_new'] != null)
+            .where((item) =>
+                item['assigned_new'] != item['assigned'] ||
+                item['bci_tenant_effective_from_timestamp_new'] !=
+                    item['bci_tenant_effective_from_timestamp'] ||
+                item['bci_tenant_effective_to_timestamp_new'] !=
+                    item['bci_tenant_effective_to_timestamp'])
             .toList();
     Map<String, dynamic> queryMap = {
       'scope': loggedInUser!.selectedScope.toScopeMap(),
@@ -201,7 +206,7 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
     try {
       _isCommitting = true;
 
-      final data = await commitTenantBciList(
+      final result = await commitTenantBciList(
         widget.appConfig,
         queryMap,
         MdlPagSvcClaim(
@@ -212,28 +217,16 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
           operation: 'update',
         ),
       );
-
-      if (data['error'] != null) {
-        throw Exception(data['error']);
-      }
-
-      // clear assginment info from the item list
-      // for (Map<String, dynamic> itemInfo in _itemGroupScopeMatchingItemList!) {
-      //   itemInfo.remove('assignment_info');
-      //   itemInfo.remove('assigned_new');
-      //   itemInfo.remove('is_fetching');
-      // }
     } catch (e) {
       dev.log('Error committing tenant bci assignment: $e');
-      _commitErrorText =
-          getErrorText(e, defaultErrorText: 'Error committing assignment');
-
-      setState(() {});
+      _commitErrorText = getErrorText(e,
+          defaultErrorText: 'Error committing tenant bci assignment');
     } finally {
       setState(() {
         _isCommitting = false;
         _isCommitted = true;
         _modified = false;
+        _isFetched = false;
       });
     }
   }
@@ -252,19 +245,19 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
     for (Map<String, dynamic> item in _itemGroupScopeMatchingItemList ?? []) {
       // only assigned items can modify effective date
       if (item['assigned'] == true && item['assigned_new'] != false) {
-        if (item['effective_from_timestamp_new'] != null) {
-          if (item['effective_from_timestamp'] !=
-              item['effective_from_timestamp_new']) {
-            effectiveDateModified = true;
-            break;
-          }
+        // if (item['bci_tenant_effective_from_timestamp_new'] != null) {
+        if (item['bci_tenant_effective_from_timestamp'] !=
+            item['bci_tenant_effective_from_timestamp_new']) {
+          effectiveDateModified = true;
+          break;
         }
-        if (item['effective_to_timestamp_new'] != null) {
-          if (item['effective_to_timestamp'] !=
-              item['effective_to_timestamp_new']) {
-            effectiveDateModified = true;
-            break;
-          }
+        // }
+        // if (item['bci_tenant_effective_to_timestamp_new'] != null) {
+        if (item['bci_tenant_effective_to_timestamp'] !=
+            item['bci_tenant_effective_to_timestamp_new']) {
+          effectiveDateModified = true;
+          break;
+          // }
         }
       }
     }
@@ -681,8 +674,14 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
   }
 
   Widget getEffectiveDateRange(Map<String, dynamic> itemInfo) {
-    String effectiveFromTimestamp = itemInfo['effective_from_timestamp'] ?? '';
-    String effectiveToTimestamp = itemInfo['effective_to_timestamp'] ?? '';
+    String effectiveFromTimestamp =
+        itemInfo['bci_tenant_effective_from_timestamp_new'] ??
+            itemInfo['bci_tenant_effective_from_timestamp'] ??
+            '';
+    String effectiveToTimestamp =
+        itemInfo['bci_tenant_effective_to_timestamp_new'] ??
+            itemInfo['bci_tenant_effective_to_timestamp'] ??
+            '';
     DateTime? effectiveFromDateTime;
     DateTime? effectiveToDateTime;
     if (effectiveFromTimestamp.isNotEmpty) {
@@ -695,65 +694,71 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        WgtDatePicker(
-          // key: _timePickerFromKey,
-          iconSize: 18,
-          enabled: itemInfo['assigned_new'] == true ||
-              (itemInfo['assigned'] == true &&
-                  itemInfo['assigned_new'] != false),
-          defaultFirstDate: leftMostDate,
-          defaultLastDate: effectiveToDateTime ?? rightMostDate,
-          initialDate: effectiveFromDateTime,
-          labelFontSize: 15,
-          timeZone: loggedInUser!.selectedScope.getProjectTimezone(),
-          label: 'Eff. From Date',
-          onDateChanged: (DateTime selectedDate) {
-            setState(() {
-              effectiveFromDateTime = DateTime(selectedDate.year,
-                  selectedDate.month, selectedDate.day, 0, 0, 0, 0);
-              itemInfo['effective_from_timestamp_new'] =
-                  effectiveFromDateTime?.toIso8601String();
-              _checkModified();
-            });
-          },
-          onDateCleared: () {
-            setState(() {
-              effectiveFromDateTime = null;
-              itemInfo['effective_from_timestamp_new'] = null;
-              _checkModified();
-            });
-          },
+        SizedBox(
+          width: 150,
+          child: WgtDatePicker(
+            // key: _timePickerFromKey,
+            iconSize: 18,
+            enabled: itemInfo['assigned_new'] == true ||
+                (itemInfo['assigned'] == true &&
+                    itemInfo['assigned_new'] != false),
+            defaultFirstDate: leftMostDate,
+            defaultLastDate: effectiveToDateTime ?? rightMostDate,
+            initialDate: effectiveFromDateTime,
+            labelFontSize: 15,
+            timeZone: loggedInUser!.selectedScope.getProjectTimezone(),
+            label: 'Eff. From Date',
+            onDateChanged: (DateTime selectedDate) {
+              setState(() {
+                effectiveFromDateTime = DateTime(selectedDate.year,
+                    selectedDate.month, selectedDate.day, 0, 0, 0, 0);
+                itemInfo['bci_tenant_effective_from_timestamp_new'] =
+                    effectiveFromDateTime?.toIso8601String();
+                _checkModified();
+              });
+            },
+            onDateCleared: () {
+              setState(() {
+                effectiveFromDateTime = null;
+                itemInfo['bci_tenant_effective_from_timestamp_new'] = '';
+                _checkModified();
+              });
+            },
+          ),
         ),
         horizontalSpaceTiny,
-        WgtDatePicker(
-          // key: _timePickerToKey,
-          iconSize: 18,
-          enabled: itemInfo['assigned_new'] == true ||
-              (itemInfo['assigned'] == true &&
-                  itemInfo['assigned_new'] != false),
-          defaultFirstDate: effectiveFromDateTime ?? leftMostDate,
-          defaultLastDate: effectiveToDateTime ?? rightMostDate,
-          initialDate: effectiveToDateTime,
-          labelFontSize: 15,
-          timeZone: loggedInUser!.selectedScope.getProjectTimezone(),
-          label: 'Eff. To Date',
-          onDateChanged: (DateTime selectedDate) {
-            setState(() {
-              effectiveToDateTime = DateTime(selectedDate.year,
-                      selectedDate.month, selectedDate.day, 0, 0, 0, 0)
-                  .add(const Duration(days: 1));
-              itemInfo['effective_to_timestamp_new'] =
-                  effectiveToDateTime?.toIso8601String();
-              _checkModified();
-            });
-          },
-          onDateCleared: () {
-            setState(() {
-              effectiveToDateTime = null;
-              itemInfo['effective_to_timestamp_new'] = null;
-              _checkModified();
-            });
-          },
+        SizedBox(
+          width: 150,
+          child: WgtDatePicker(
+            // key: _timePickerToKey,
+            iconSize: 18,
+            enabled: itemInfo['assigned_new'] == true ||
+                (itemInfo['assigned'] == true &&
+                    itemInfo['assigned_new'] != false),
+            defaultFirstDate: effectiveFromDateTime ?? leftMostDate,
+            defaultLastDate: effectiveToDateTime ?? rightMostDate,
+            initialDate: effectiveToDateTime,
+            labelFontSize: 15,
+            timeZone: loggedInUser!.selectedScope.getProjectTimezone(),
+            label: 'Eff. To Date',
+            onDateChanged: (DateTime selectedDate) {
+              setState(() {
+                effectiveToDateTime = DateTime(selectedDate.year,
+                        selectedDate.month, selectedDate.day, 0, 0, 0, 0)
+                    .add(const Duration(days: 1));
+                itemInfo['bci_tenant_effective_to_timestamp_new'] =
+                    effectiveToDateTime?.toIso8601String();
+                _checkModified();
+              });
+            },
+            onDateCleared: () {
+              setState(() {
+                effectiveToDateTime = null;
+                itemInfo['bci_tenant_effective_to_timestamp_new'] = '';
+                _checkModified();
+              });
+            },
+          ),
         ),
       ],
     );
