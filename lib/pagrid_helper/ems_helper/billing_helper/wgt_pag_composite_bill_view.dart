@@ -480,6 +480,13 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       });
     }
 
+    final billedBciInfo = _bill['billed_bci_info'] ?? {};
+    List<Map<String, dynamic>> effBciInfoList = [];
+    if (billedBciInfo['effective_bci_info_list'] != null) {
+      effBciInfoList = List<Map<String, dynamic>>.from(
+          billedBciInfo['effective_bci_info_list']);
+    }
+
     if ('initial_balance' == genType) {
       return Container(
         padding: const EdgeInsets.symmetric(vertical: 20),
@@ -553,7 +560,8 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
           miniSoaInfo,
           strCollectionStartDateTimestamp,
           strCollectionEndDateTimestamp,
-          interestInfo);
+          interestInfo,
+          effBciInfoList);
     }
   }
 
@@ -574,6 +582,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     String strCollectionStartDateTimestamp,
     String strCollectionEndDateTimestamp,
     Map<String, dynamic>? interestInfo,
+    List<Map<String, dynamic>>? effBciInfoList,
   ) {
     // sort time
     bool isMonthly = true;
@@ -718,6 +727,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
       singularUsageCalcList: singularUsageCalcList,
       miniSoaInfo: miniSoaInfo,
       interestInfo: interestInfo,
+      effBciInfoList: effBciInfoList,
     );
     compositeUsageCalc.doCompositeCalc();
 
@@ -804,7 +814,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             subTenantListUsageSummary: subTenantListUsageSummary,
             // manualUsages: manualUsage,
             lineItems: lineItemList,
-            // excludeAutoUsage: _bill['exclude_auto_usage'] == 'true' ? true : false,
+            bciInfoList: effBciInfoList ?? [],
             interestInfo: interestInfo!,
             onUpdate: () {
               widget.onUpdate?.call();

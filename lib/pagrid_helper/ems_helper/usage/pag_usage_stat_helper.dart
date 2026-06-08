@@ -784,6 +784,7 @@ Widget getPagTotal(
     double? payableAmt,
     String tenantType,
     List<Map<String, dynamic>>? lineItems,
+    List<Map<String, dynamic>>? bciInfoList,
     Map<String, dynamic>? miniSoaInfo,
     String strCollectionStartDateTimestamp,
     String strCollectionEndDateTimestamp,
@@ -864,6 +865,11 @@ Widget getPagTotal(
                 getCommaNumberStr(totalUsageCost, decimal: 2), 'SGD',
                 statStrStyle: defStatStyle),
           ],
+        ),
+        getBciInfo(
+          bciInfoList: bciInfoList,
+          context: context,
+          contentWidth: contentWidth,
         ),
         const Divider(height: 13),
         getLineItem(
@@ -1139,59 +1145,71 @@ Widget getLineItem(
         );
 }
 
-// Widget getLineItemNotSubjectToTax(
-//     MdlPagUser? loggedInUser,
-//     MdlPagAppConfig? appConfig,
-//     String? strBillingRecId,
-//     String genType,
-//     Map<String, dynamic> lineItem,
-//     BuildContext context,
-//     double width) {
-//   if (lineItem.isEmpty) {
-//     return Container();
-//   }
-//   bool subjectToTax = lineItem['subjectToTax'] as bool;
-//   if (subjectToTax) {
-//     return Container();
-//   }
+Widget getBciInfo({
+  required List<Map<String, dynamic>>? bciInfoList,
+  required BuildContext context,
+  required double contentWidth,
+}) {
+  if (bciInfoList == null || bciInfoList.isEmpty) {
+    return Container();
+  }
+  List<Widget> bciWidgets = [];
+  for (var bciInfo in bciInfoList) {
+    String bciEffFromTimestamp = bciInfo['effective_from_timestamp'] ?? '-';
+    String bciEffToTimestamp = bciInfo['effective_to_timestamp'] ?? '-';
+    String tenantBciEffFromDateStr =
+        bciInfo['tenant_bci_effective_from_timestamp'] ?? '-';
+    String tenantBciEffToDateStr =
+        bciInfo['tenant_bci_effective_to_timestamp'] ?? '-';
+    String bciEffFromDate = bciEffFromTimestamp == '-'
+        ? bciEffFromTimestamp
+        : bciEffFromTimestamp.substring(0, 10);
+    String bciEffToDate = bciEffToTimestamp == '-'
+        ? bciEffToTimestamp
+        : bciEffToTimestamp.substring(0, 10);
+    String tenantBciEffFromDate = tenantBciEffFromDateStr == '-'
+        ? tenantBciEffFromDateStr
+        : tenantBciEffFromDateStr.substring(0, 10);
+    String tenantBciEffToDate = tenantBciEffToDateStr == '-'
+        ? tenantBciEffToDateStr
+        : tenantBciEffToDateStr.substring(0, 10);
+    String bciEffRangeStr = 'BCI Eff. Date: $bciEffFromDate to $bciEffToDate\n'
+        'Tenant BCI Eff. Date: $tenantBciEffFromDate to $tenantBciEffToDate';
 
-//   String label = lineItem['label'] ?? '';
-//   String valueStr = lineItem['amount'] ?? '';
-//   double? valueVal = double.tryParse(valueStr) ?? 0;
-//   return Row(
-//     mainAxisAlignment: MainAxisAlignment.start,
-//     crossAxisAlignment: CrossAxisAlignment.center,
-//     children: [
-//       SizedBox(
-//         width: width,
-//         child: genType != 'generated'
-//             ? Text(
-//                 label,
-//                 style: defStatStyle.copyWith(
-//                   color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
-//                 ),
-//               )
-//             : WgtBillLineItemLabel(
-//                 loggedInUser: loggedInUser!,
-//                 appConfig: appConfig!,
-//                 strBillingRecId: strBillingRecId ?? '',
-//                 itemKeyName: 'line_item_label_2',
-//                 lineItem: lineItem,
-//                 width: 250,
-//                 isEditableByAcl: false,
-//               ),
-//       ),
-//       horizontalSpaceSmall,
-//       getStatWithUnit(
-//         getCommaNumberStr(valueVal, decimal: 2, isRoundUp: false),
-//         'SGD',
-//         statStrStyle: defStatStyle.copyWith(
-//           color: Theme.of(context).colorScheme.onSurface.withAlpha(210),
-//         ),
-//       ),
-//     ],
-//   );
-// }
+    String bciLabel = bciInfo['billing_cost_item_label'] ?? '';
+    String bciAmtStr = bciInfo['billing_cost_item_amount'] ?? '';
+    double? bciAmt = double.tryParse(bciAmtStr);
+    if (bciAmt != null && bciAmt.abs() > 0.00001) {
+      bciWidgets.add(
+        Padding(
+          padding: const EdgeInsets.only(bottom: 5),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: contentWidth,
+                child: Tooltip(
+                    message: bciEffRangeStr,
+                    waitDuration: const Duration(milliseconds: 500),
+                    child: Text(bciLabel, style: defStatStyle)),
+              ),
+              horizontalSpaceSmall,
+              getStatWithUnit(
+                  getCommaNumberStr(bciAmt, decimal: 2, isRoundUp: false),
+                  'SGD',
+                  statStrStyle: defStatStyle),
+            ],
+          ),
+        ),
+      );
+    }
+  }
+
+  return Column(
+    children: [const Divider(height: 13), ...bciWidgets],
+  );
+}
 
 Widget getMiniSoA(
     Map<String, dynamic> miniSoaInfo,

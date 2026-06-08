@@ -205,6 +205,7 @@ class _WgtPagTenantCompositeUsageSummaryRlState
                   widget.compositeUsageCalc!.payableAmount,
                   widget.tenantType,
                   widget.lineItems,
+                  null,
                   widget.compositeUsageCalc!.miniSoaInfo,
                   widget.collectionStartDateTimestampStr,
                   widget.collectionEndDateTimestampStr,
