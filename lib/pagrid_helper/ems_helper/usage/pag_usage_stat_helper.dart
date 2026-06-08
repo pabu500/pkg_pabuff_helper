@@ -1177,8 +1177,16 @@ Widget getBciInfo({
         'Tenant BCI Eff. Date: $tenantBciEffFromDate to $tenantBciEffToDate';
 
     String bciLabel = bciInfo['billing_cost_item_label'] ?? '';
-    String bciAmtStr = bciInfo['billing_cost_item_amount'] ?? '';
-    double? bciAmt = double.tryParse(bciAmtStr);
+    // String bciAmtStr = bciInfo['billing_cost_item_amount'] ?? '';
+    dynamic bciAmtObj = bciInfo['billing_cost_item_amount'];
+    double? bciAmt;
+    if (bciAmtObj is String) {
+      bciAmt = double.tryParse(bciAmtObj);
+    } else if (bciAmtObj is double) {
+      bciAmt = bciAmtObj;
+    } else {
+      bciAmt = 0.0;
+    }
     if (bciAmt != null && bciAmt.abs() > 0.00001) {
       bciWidgets.add(
         Padding(

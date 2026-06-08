@@ -83,6 +83,7 @@ Future<Uint8List> generatePagInvoiceCompilation(
       lineItemValue2: calcedBillInfoRl['lineItemValue2'],
       lineItemLabel3: calcedBillInfoRl['lineItemLabel3'],
       lineItemValue3: calcedBillInfoRl['lineItemValue3'],
+      billedBciInfoList: calcedBillInfoRl['billedBciInfoList'] ?? [],
       miniSoaInfo: calcedBillInfoRl['miniSoaInfo'] ?? {},
       assetFolder: assetFolder,
       tenantSingularUsageInfoList:
@@ -117,7 +118,7 @@ Future<Uint8List> generatePagInvoiceCompilation(
 Future<Uint8List> buildPdf(PdfPageFormat pageFormat, String assetFolder,
     List<PagPdfBill> invoiceList) async {
   final pdf = pw.Document();
-  
+
   final logo = pw.MemoryImage(
     (await rootBundle.load('$assetFolder/transparent_32x32.png'))
         .buffer

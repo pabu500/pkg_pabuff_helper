@@ -72,6 +72,11 @@ Map<String, dynamic> prepCalcedBillInfoRl(Map<String, dynamic> billInfo) {
     });
   }
 
+  final billedBciInfo = billInfo['billed_bci_info'] ?? {};
+  String strBilledTotalBciAmount = billInfo['billed_total_bci_amount'] ?? '';
+  double? billedTotalBciAmount =
+      double.tryParse(strBilledTotalBciAmount) ?? 0.0;
+
   final interestInfo = billInfo['interest_info'] ?? {};
   final miniSoaInfo = billInfo['mini_soa_info'] ?? {};
   final strCollectionStartDateTimestamp =
@@ -208,6 +213,8 @@ Map<String, dynamic> prepCalcedBillInfoRl(Map<String, dynamic> billInfo) {
     billedInterestAmount: billedInterestAmount,
     billedCycleTotalAmount: billedCycleTotalAmount,
     billedPayableAmount: billedPayableAmount,
+    billedBciInfo: billedBciInfo,
+    billedTotalBciAmount: billedTotalBciAmount,
   );
   compositeUsageCalcRl.doCompositeCalc();
 
@@ -274,6 +281,8 @@ Map<String, dynamic> prepCalcedBillInfoRl(Map<String, dynamic> billInfo) {
     'lineItemValue2': lineItemAmount2,
     'lineItemLabel3': lineItemLabel3,
     'lineItemValue3': lineItemAmount3,
+    'billedBciInfoList': compositeUsageCalcRl.billedEffBciInfoList,
+    'billedTotalBciAmount': compositeUsageCalcRl.billedTotalBciAmount,
     'miniSoaInfo': miniSoaInfo,
     'tenantSingularUsageInfoList': singularUsageList,
     'billedAmgrCompanyTradingName': billedAmgrCompanyTradingName,

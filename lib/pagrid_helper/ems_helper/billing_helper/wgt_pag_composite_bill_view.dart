@@ -855,6 +855,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             tenantAccountId: calcedBillInfoRl['tenantAccountId'] ?? '',
             tenantType: calcedBillInfoRl['tenantType'] ?? '',
             lineItems: calcedBillInfoRl['lineItemList'] ?? [],
+            billedBciInfoList: calcedBillInfoRl['billedBciInfoList'] ?? [],
             tenantSingularUsageInfoList:
                 calcedBillInfoRl['singularUsageList'] ?? [],
             compositeUsageCalc: calcedBillInfoRl['compositeUsageCalc'],
