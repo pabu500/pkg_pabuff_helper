@@ -35,6 +35,7 @@ import 'package:provider/provider.dart';
 
 import '../../comm/comm_list.dart';
 import '../../model/mdl_pag_app_config.dart';
+import '../app/ems/wgt_bci_tenant_assignment.dart';
 import '../app/ems/wgt_bill_compilation.dart';
 import '../app/ems/wgt_match_payment_op_item.dart';
 import '../app/ems/wgt_tariff_item_assignment.dart';
@@ -448,7 +449,9 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         // widget.itemKind == PagItemKind.tariffPackage ||
         // widget.itemKind == PagItemKind.tariff ||
         (widget.itemKind == PagItemKind.tariff &&
-            _selectedListController!.itemType == PagTariff.tariffPackage) ||
+            (_selectedListController!.itemType == PagTariff.tariffPackage ||
+                _selectedListController!.itemType ==
+                    PagTariff.billingCostItem)) ||
         widget.itemKind == PagItemKind.meterGroup ||
         widget.itemKind == PagItemKind.tenant ||
         widget.listContextType == PagListContextType.paymentMatching) {
@@ -924,35 +927,40 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                         );
                         break;
                       case PagItemKind.tariff:
-                        opWidget = WgtTariffItemAssignment(
-                          appConfig: widget.appConfig,
-                          loggedInUser: loggedInUser!,
-                          strItemGroupIndex: item['id'],
-                          itemInfo: item,
-                          itemName: item['name'],
-                          itemLabel: item['label'] ?? '',
-                          itemScope: itemScope,
-                          onUpdate: () {
-                            setState(() {
-                              _itemUpdated = true;
-                            });
-                          },
-                        );
-                      case PagItemKind.meterGroup:
-                        opWidget = WgtMeterGroupAssignment2(
-                          appConfig: widget.appConfig,
-                          itemGroupIndexStr: item['id'],
-                          itemName: item['name'],
-                          itemLabel: item['label'] ?? '',
-                          meterType: item['meter_type'] ?? '',
-                          itemInfo: item,
-                          itemScope: itemScope,
-                          onUpdate: () {
-                            setState(() {
-                              _itemUpdated = true;
-                            });
-                          },
-                        );
+                        _selectedListController!.itemType ==
+                                PagTariff.tariffPackage
+                            ? opWidget = WgtTariffPackageAssignment(
+                                appConfig: widget.appConfig,
+                                loggedInUser: loggedInUser!,
+                                meterType: item['meter_type'] ?? '',
+                                itemGroupIndexStr: item['id'],
+                                itemInfo: item,
+                                itemName: item['name'],
+                                itemLabel: item['label'] ?? '',
+                                itemScope: itemScope,
+                                onUpdate: () {
+                                  setState(() {
+                                    _itemUpdated = true;
+                                  });
+                                },
+                              )
+                            : _selectedListController!.itemType ==
+                                    PagTariff.billingCostItem
+                                ? opWidget = WgtBciTenantAssignment(
+                                    appConfig: widget.appConfig,
+                                    loggedInUser: loggedInUser!,
+                                    itemGroupIndexStr: item['id'],
+                                    itemName: item['name'],
+                                    itemLabel: item['label'] ?? '',
+                                    itemInfo: item,
+                                    itemScope: itemScope,
+                                    onUpdate: () {
+                                      setState(() {
+                                        _itemUpdated = true;
+                                      });
+                                    },
+                                  )
+                                : Container();
                       case PagItemKind.tenant:
                         opWidget = WgtTenantItemAssignment(
                           appConfig: widget.appConfig,

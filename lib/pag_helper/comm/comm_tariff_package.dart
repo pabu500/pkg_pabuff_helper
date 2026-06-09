@@ -101,7 +101,7 @@ Future<dynamic> doGetTariffPackageTenantList(
   }
 }
 
-Future<dynamic> doGetScopeTenantList(
+Future<dynamic> doGetTariffPackageScopeTenantList(
   MdlPagAppConfig appConfig,
   Map<String, dynamic> queryMap,
   MdlPagSvcClaim svcClaim,

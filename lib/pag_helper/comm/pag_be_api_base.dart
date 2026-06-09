@@ -364,13 +364,14 @@ class PagUrlBase {
   static const String eptPagGetTariffPackageTenantAssignment =
       '/ems/tariff_package/get_tariff_package_tenant_assignment';
 
+  // BCI
   static const String eptPagCreateBillingCostItem =
       '/ems/billing_cost_item/create_billing_cost_item';
   static const String eptPagGetBillingCostItemTenantList =
       '/ems/billing_cost_item/get_billing_cost_item_tenant_list';
-  static const String eptPagGetBillingCostItemScopeTenantList =
+  static const String eptPagGetBciScopeTenantList =
       '/ems/billing_cost_item/get_billing_cost_item_scope_tenant_list';
-  static const String eptUpdateBillingCostItemTenantList =
+  static const String eptUpdateBciTenantList =
       '/ems/billing_cost_item/update_billing_cost_item_tenant_list';
   static const String eptGetBillingCostItemTenantAssignment =
       '/ems/billing_cost_item/get_billing_cost_item_tenant_assignment';
