@@ -895,8 +895,8 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
         addButtonLabelSuffix = 'sub';
         break;
       case PagItemKind.tariff:
-        if (widget.itemType is PagTariff &&
-            widget.itemType == PagTariff.tariffPackage) {
+        if (widget.itemType == PagTariff.tariffPackage ||
+            widget.itemType == PagTariff.tariffPackage.value) {
           itemGroupType = PagItemGroupType.tariffPackageTariffRate;
           queryMap = {'tariff_package_id': widget.strItemIndex};
           rootName = widget.itemDisplayName;
