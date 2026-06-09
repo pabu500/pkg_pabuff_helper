@@ -694,10 +694,17 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                     // }
 
                     Map<String, dynamic> customProperties = {};
-                    if (widget.itemKind == PagItemKind.tariff) {
-                      String tpTypeCatStr = item['tpt_cat'] ?? '';
+                    if (widget.itemKind == PagItemKind.tariff &&
+                        _selectedListController!.itemType ==
+                            PagTariff.tariffPackage) {
+                      String tpTypeCatStr =
+                          item['tariff_package_type_cat'] ?? '';
                       PagTariffPackageTypeCat? tpTypeCat =
                           PagTariffPackageTypeCat.byTag(tpTypeCatStr);
+                      if (tpTypeCat == null) {
+                        dev.log(
+                            'Unknown tariff package type cat: $tpTypeCatStr');
+                      }
                       customProperties = {
                         'tpTypeCat': tpTypeCat,
                       };
@@ -716,6 +723,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                         itemScopeMap: itemScopeMap,
                         itemInfoMap: item,
                         itemType: widget.itemType ??
+                            widget.listController?.itemType ??
                             widget.listController?.itemType?.value,
                         onScopeTreeUpdate: widget.onScopeTreeUpdate,
                         validateTreeChildren: widget.validateTreeChildren,
