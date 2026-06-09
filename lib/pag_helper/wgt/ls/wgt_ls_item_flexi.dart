@@ -617,9 +617,16 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
 
                         // join key is not directly editable
                         // therefore exlude from the field list
-                        if (colController.colKey != 'amgr_name' &&
-                            colController.colKey != 'bank_name') {
+
+                        // continue;
+                        // show join key as read only
+                        if (colController.hidden == true) {
                           continue;
+                        } else {
+                          if (colController.colKey != 'amgr_name' &&
+                              colController.colKey != 'bank_name') {
+                            colController.isMutable = false;
+                          }
                         }
                       }
 
@@ -816,9 +823,12 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                           itemScopeMap[colController.colKey] =
                               item[colController.colKey];
                         }
-                        // joint key is not directly editable
+                        // join key is not directly editable
                         // therefore exlude from the field list
                         continue;
+
+                        // // show join key as read only
+                        // colController.isMutable = false;
                       }
 
                       String widgetType =
