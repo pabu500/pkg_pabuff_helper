@@ -20,6 +20,7 @@ class WgtPagLs extends StatefulWidget {
     this.validateTreeChildren,
     this.selectedItemInfoList,
     this.isSingleItemMode = false,
+    this.isCompactFinder = false,
     this.hint,
     this.enabledItemTypeList = const [],
     this.initialFilterMap = const {},
@@ -37,6 +38,7 @@ class WgtPagLs extends StatefulWidget {
   final Function? validateTreeChildren;
   final List<Map<String, dynamic>>? selectedItemInfoList;
   final bool isSingleItemMode;
+  final bool isCompactFinder;
   final String? hint;
   final List<dynamic> enabledItemTypeList;
   final Map<String, dynamic> initialFilterMap;
@@ -81,6 +83,7 @@ class _WgtPagLsState extends State<WgtPagLs> {
           appConfig: widget.appConfig,
           itemKind: widget.itemKind,
           pagAppContext: widget.pagAppContext,
+          isCompactFinder: widget.isCompactFinder,
           prefKey: prefKey,
           selectedItemInfoList: widget.selectedItemInfoList,
           additionalColumnConfig: widget.additionalColumnConfig,

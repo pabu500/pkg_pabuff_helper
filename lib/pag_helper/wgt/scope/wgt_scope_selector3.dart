@@ -23,6 +23,7 @@ class WgtPagScopeSelector3 extends StatefulWidget {
     required this.iniScope,
     this.isNarrow = false,
     this.width,
+    this.readOnly = false,
   });
 
   final Function(
@@ -30,11 +31,12 @@ class WgtPagScopeSelector3 extends StatefulWidget {
       MdlPagSiteGroupProfile? pagSiteGroupScope,
       MdlPagSiteProfile? pagSiteScope,
       MdlPagBuildingProfile? pagBuildingScope,
-      MdlPagLocationGroupProfile? pagLocationGroupScope) onChange;
+      MdlPagLocationGroupProfile? pagLocationGroupScope)? onChange;
   final MdlPagScopeProfile iniScope;
   final List<MdlPagProjectProfile> projectList;
   final bool isNarrow;
   final double? width;
+  final bool readOnly;
 
   @override
   State<WgtPagScopeSelector3> createState() => _WgtPagScopeSelector3State();
@@ -201,17 +203,19 @@ class _WgtPagScopeSelector3State extends State<WgtPagScopeSelector3> {
           children: [
             _scopeSet
                 ? InkWell(
-                    onTap: (widget.projectList.length == 1 &&
-                            _siteGroupProfileList.length == 1 &&
-                            _siteProfileList.length == 1 &&
-                            _buildingProfileList.length == 1 &&
-                            _locationGroupProfileList.length == 1)
+                    onTap: widget.readOnly
                         ? null
-                        : () {
-                            setState(() {
-                              _scopeSet = false;
-                            });
-                          },
+                        : (widget.projectList.length == 1 &&
+                                _siteGroupProfileList.length == 1 &&
+                                _siteProfileList.length == 1 &&
+                                _buildingProfileList.length == 1 &&
+                                _locationGroupProfileList.length == 1)
+                            ? null
+                            : () {
+                                setState(() {
+                                  _scopeSet = false;
+                                });
+                              },
                     child: Padding(
                       padding: EdgeInsets.zero,
                       child: Row(
@@ -266,7 +270,7 @@ class _WgtPagScopeSelector3State extends State<WgtPagScopeSelector3> {
                               return;
                             }
 
-                            widget.onChange(
+                            widget.onChange?.call(
                               _selectedProjectProfile,
                               _selectedSiteGroupProfile,
                               _selectedSiteProfile,
