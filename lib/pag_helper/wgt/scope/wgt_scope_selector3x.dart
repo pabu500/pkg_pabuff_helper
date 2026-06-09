@@ -1,4 +1,3 @@
-import 'package:buff_helper/pag_helper/def_helper/def_tree.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_project_profile.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
 import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
@@ -7,13 +6,13 @@ import 'package:buff_helper/pag_helper/model/scope/mdl_pag_location_group_profil
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_scope_profile.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_site_group_profile.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_site_profile.dart';
+import 'package:buff_helper/pag_helper/wgt_project_logo.dart';
 import 'package:buff_helper/pagrid_helper/comm_helper/local_storage.dart';
 import 'package:buff_helper/xt_ui/xt_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
-import '../../wgt_project_logo.dart';
 
 class WgtPagScopeSelector3 extends StatefulWidget {
   const WgtPagScopeSelector3({
@@ -21,8 +20,7 @@ class WgtPagScopeSelector3 extends StatefulWidget {
     required this.projectList,
     required this.onChange,
     required this.iniScope,
-    this.isNarrow = false,
-    this.width,
+    this.readOnly = false,
   });
 
   final Function(
@@ -30,11 +28,10 @@ class WgtPagScopeSelector3 extends StatefulWidget {
       MdlPagSiteGroupProfile? pagSiteGroupScope,
       MdlPagSiteProfile? pagSiteScope,
       MdlPagBuildingProfile? pagBuildingScope,
-      MdlPagLocationGroupProfile? pagLocationGroupScope) onChange;
+      MdlPagLocationGroupProfile? pagLocationGroupScope)? onChange;
   final MdlPagScopeProfile iniScope;
   final List<MdlPagProjectProfile> projectList;
-  final bool isNarrow;
-  final double? width;
+  final bool readOnly;
 
   @override
   State<WgtPagScopeSelector3> createState() => _WgtPagScopeSelector3State();
@@ -66,7 +63,7 @@ class _WgtPagScopeSelector3State extends State<WgtPagScopeSelector3> {
 
   UniqueKey? _projectLogoKey;
 
-  Widget getEffectScopeWidget() {
+  Widget _getEffectScopeWidget() {
     String effectiveScopeStr = '';
     String projectScopeLabel = _selectedProjectProfile.label.toUpperCase();
 
@@ -78,18 +75,18 @@ class _WgtPagScopeSelector3State extends State<WgtPagScopeSelector3> {
     // return effectiveScopeStr;
     List<Widget> scopeWidgetList = [];
     TextStyle scopeTextStyle =
-        TextStyle(fontSize: 15, color: pag3.withAlpha(230), height: 0.95);
-    scopeWidgetList.add(Icon(PagTreePartType.project.iconData,
-        size: 18, color: Theme.of(context).hintColor.withAlpha(128)));
+        TextStyle(fontSize: 17, color: pag3.withAlpha(200), height: 0.95);
+    scopeWidgetList.add(Icon(Symbols.flag_filled_rounded,
+        size: 19, color: Theme.of(context).hintColor.withAlpha(128)));
     scopeWidgetList.add(Padding(
       padding: const EdgeInsets.only(left: 1),
       child: Text(projectScopeLabel, style: scopeTextStyle),
     ));
     if (siteGroupScopeLabel.isNotEmpty) {
       scopeWidgetList.add(Icon(Symbols.arrow_right,
-          size: 18, color: Theme.of(context).hintColor.withAlpha(128)));
-      scopeWidgetList.add(Icon(PagTreePartType.siteGroup.iconData,
-          size: 18, color: Theme.of(context).hintColor.withAlpha(128)));
+          size: 19, color: Theme.of(context).hintColor.withAlpha(128)));
+      scopeWidgetList.add(Icon(Symbols.workspaces,
+          size: 19, color: Theme.of(context).hintColor.withAlpha(128)));
       scopeWidgetList.add(Padding(
         padding: const EdgeInsets.only(left: 1),
         child: Text(siteGroupScopeLabel, style: scopeTextStyle),
@@ -97,9 +94,9 @@ class _WgtPagScopeSelector3State extends State<WgtPagScopeSelector3> {
     }
     if (siteScopeLabel.isNotEmpty) {
       scopeWidgetList.add(Icon(Symbols.arrow_right,
-          size: 18, color: Theme.of(context).hintColor.withAlpha(128)));
-      scopeWidgetList.add(Icon(PagTreePartType.site.iconData,
-          size: 18, color: Theme.of(context).hintColor.withAlpha(128)));
+          size: 19, color: Theme.of(context).hintColor.withAlpha(128)));
+      scopeWidgetList.add(Icon(Symbols.home_pin,
+          size: 19, color: Theme.of(context).hintColor.withAlpha(128)));
       scopeWidgetList.add(Padding(
         padding: const EdgeInsets.only(left: 1),
         child: Text(siteScopeLabel, style: scopeTextStyle),
@@ -107,9 +104,9 @@ class _WgtPagScopeSelector3State extends State<WgtPagScopeSelector3> {
     }
     if (buildingScopeLabel.isNotEmpty) {
       scopeWidgetList.add(Icon(Symbols.arrow_right,
-          size: 18, color: Theme.of(context).hintColor.withAlpha(128)));
-      scopeWidgetList.add(Icon(PagTreePartType.building.iconData,
-          size: 18, color: Theme.of(context).hintColor.withAlpha(128)));
+          size: 19, color: Theme.of(context).hintColor.withAlpha(128)));
+      scopeWidgetList.add(Icon(Symbols.domain,
+          size: 19, color: Theme.of(context).hintColor.withAlpha(128)));
       scopeWidgetList.add(Padding(
         padding: const EdgeInsets.only(left: 1),
         child: Text(buildingScopeLabel, style: scopeTextStyle),
@@ -117,9 +114,9 @@ class _WgtPagScopeSelector3State extends State<WgtPagScopeSelector3> {
     }
     if (locationGroupScopeLabel.isNotEmpty) {
       scopeWidgetList.add(Icon(Symbols.arrow_right,
-          size: 18, color: Theme.of(context).hintColor.withAlpha(128)));
-      scopeWidgetList.add(Icon(PagTreePartType.locationGroup.iconData,
-          size: 18, color: Theme.of(context).hintColor.withAlpha(128)));
+          size: 19, color: Theme.of(context).hintColor.withAlpha(128)));
+      scopeWidgetList.add(Icon(Symbols.group_work,
+          size: 19, color: Theme.of(context).hintColor.withAlpha(128)));
       scopeWidgetList.add(Padding(
         padding: const EdgeInsets.only(left: 1),
         child: Text(locationGroupScopeLabel, style: scopeTextStyle),
@@ -193,113 +190,104 @@ class _WgtPagScopeSelector3State extends State<WgtPagScopeSelector3> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: widget.width,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: [
-            _scopeSet
-                ? InkWell(
-                    onTap: (widget.projectList.length == 1 &&
-                            _siteGroupProfileList.length == 1 &&
-                            _siteProfileList.length == 1 &&
-                            _buildingProfileList.length == 1 &&
-                            _locationGroupProfileList.length == 1)
-                        ? null
-                        : () {
-                            setState(() {
-                              _scopeSet = false;
-                            });
-                          },
-                    child: Padding(
-                      padding: EdgeInsets.zero,
-                      child: Row(
-                        children: [
-                          WgtProjectLogo(
-                            key: _projectLogoKey,
-                            onTap: null,
-                          ),
-                          horizontalSpaceSmall,
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              getProjectSiteStat(),
-                              verticalSpaceTiny,
-                              getEffectScopeWidget(),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                : Wrap(
+    return _scopeSet
+        ? InkWell(
+            onTap: widget.readOnly
+                ? null
+                : // if only one project, site group, site, building and location group is available, then do not allow scope change
+                (widget.projectList.length == 1 &&
+                        _siteGroupProfileList.length == 1 &&
+                        _siteProfileList.length == 1 &&
+                        _buildingProfileList.length == 1 &&
+                        _locationGroupProfileList.length == 1)
+                    ? null
+                    : () {
+                        setState(() {
+                          _scopeSet = false;
+                        });
+                      },
+            child: Padding(
+              padding: EdgeInsets.zero,
+              child: Row(
+                children: [
+                  WgtProjectLogo(
+                    key: _projectLogoKey,
+                    onTap: null,
+                  ),
+                  horizontalSpaceSmall,
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      getProjectScopeSelector(),
-                      horizontalSpaceSmall,
-                      getSiteGroupScopeSelector(),
-                      horizontalSpaceSmall,
-                      getSiteScopeSelector(),
-                      horizontalSpaceSmall,
-                      getBuildingScopeSelector(),
-                      horizontalSpaceSmall,
-                      getLocationGroupScopeSelector(),
-                      horizontalSpaceSmall,
-                      if (!_scopeSet)
-                        ElevatedButton(
-                          onPressed: () {
-                            // no change
-                            if (_selectedProjectProfile ==
-                                    widget.iniScope.projectProfile &&
-                                (_selectedSiteGroupProfile ==
-                                    widget.iniScope.siteGroupProfile) &&
-                                (_selectedSiteProfile ==
-                                    widget.iniScope.siteProfile) &&
-                                (_selectedBuildingProfile ==
-                                    widget.iniScope.buildingProfile) &&
-                                (_selectedLocationGroupProfile ==
-                                    widget.iniScope.locationGroupProfile)) {
-                              setState(() {
-                                _scopeSet = true;
-                              });
-                              return;
-                            }
-
-                            widget.onChange(
-                              _selectedProjectProfile,
-                              _selectedSiteGroupProfile,
-                              _selectedSiteProfile,
-                              _selectedBuildingProfile,
-                              _selectedLocationGroupProfile,
-                            );
-
-                            _saveScopePref();
-
-                            setState(() {
-                              _scopeSet = true;
-                            });
-                          },
-                          style: ButtonStyle(
-                            shape: WidgetStateProperty.all(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(3),
-                              ),
-                            ),
-                            backgroundColor: WidgetStateProperty.all(
-                                commitColor.withAlpha(200)),
-                          ),
-                          child: Text('Apply',
-                              style: TextStyle(
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface)),
-                        ),
+                      getProjectSiteStat(),
+                      verticalSpaceTiny,
+                      _getEffectScopeWidget(),
                     ],
                   ),
-          ],
-        ),
-      ),
-    );
+                ],
+              ),
+            ),
+          )
+        : Row(
+            children: [
+              getProjectScopeSelector(),
+              horizontalSpaceSmall,
+              getSiteGroupScopeSelector(),
+              horizontalSpaceSmall,
+              getSiteScopeSelector(),
+              horizontalSpaceSmall,
+              getBuildingScopeSelector(),
+              horizontalSpaceSmall,
+              getLocationGroupScopeSelector(),
+              horizontalSpaceSmall,
+              if (!_scopeSet)
+                ElevatedButton(
+                  onPressed: () {
+                    // no change
+                    if (_selectedProjectProfile ==
+                            widget.iniScope.projectProfile &&
+                        (_selectedSiteGroupProfile ==
+                            widget.iniScope.siteGroupProfile) &&
+                        (_selectedSiteProfile == widget.iniScope.siteProfile) &&
+                        (_selectedBuildingProfile ==
+                            widget.iniScope.buildingProfile) &&
+                        (_selectedLocationGroupProfile ==
+                            widget.iniScope.locationGroupProfile)) {
+                      setState(() {
+                        _scopeSet = true;
+                      });
+                      return;
+                    }
+
+                    widget.onChange?.call(
+                      _selectedProjectProfile,
+                      _selectedSiteGroupProfile,
+                      _selectedSiteProfile,
+                      _selectedBuildingProfile,
+                      _selectedLocationGroupProfile,
+                    );
+
+                    _saveScopePref();
+
+                    setState(() {
+                      _scopeSet = true;
+                    });
+                  },
+                  style: ButtonStyle(
+                    shape: WidgetStateProperty.all(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                    ),
+                    backgroundColor:
+                        WidgetStateProperty.all(commitColor.withAlpha(200)),
+                  ),
+                  child: Text('Apply',
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface)),
+                ),
+            ],
+          );
   }
 
   Widget getProjectSiteStat() {
@@ -324,7 +312,7 @@ class _WgtPagScopeSelector3State extends State<WgtPagScopeSelector3> {
               Icon(
                 Symbols.flag_filled_rounded,
                 color: Theme.of(context).hintColor,
-                size: 15,
+                size: 16,
               ),
               // horizontalSpaceTiny,
               const SizedBox(width: 3),
@@ -459,104 +447,90 @@ class _WgtPagScopeSelector3State extends State<WgtPagScopeSelector3> {
   }
 
   Widget getProjectScopeSelector() {
-    List<DropdownMenuItem<MdlPagProjectProfile>> items = widget.projectList
-        .map<DropdownMenuItem<MdlPagProjectProfile>>(
-            (MdlPagProjectProfile projectProfile) {
-      return DropdownMenuItem<MdlPagProjectProfile>(
-        value: projectProfile,
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 3.0),
-          child: Text(
-            projectProfile.label.toUpperCase(),
-            style: dropDownListTextStyle,
-          ),
-        ),
-      );
-    }).toList();
-
     return DropdownButton<MdlPagProjectProfile>(
-      alignment: AlignmentDirectional.centerEnd,
-      hint: Padding(
-          padding: const EdgeInsets.only(bottom: 3.0),
-          child: Text('Project', style: dropDownListHintStyle)),
-      value: _selectedProjectProfile,
-      // isDense: true,
-      // itemHeight: 55,
-      focusColor: Theme.of(context).hoverColor,
-      underline: dropDownUnderline,
-      icon: const Icon(Icons.arrow_drop_down),
-      iconSize: 21,
-      style: TextStyle(color: Theme.of(context).colorScheme.primary),
-      onChanged: (MdlPagProjectProfile? value) async {
-        setState(() {
-          loggedInUser!.updateSelectedScopeByName(value!.name, '', '', '', '');
-          _selectedProjectProfile = value;
-          _selectedSiteGroupProfile = null;
-          _selectedSiteProfile = null;
-          _selectedBuildingProfile = null;
-          _selectedLocationGroupProfile = null;
-          _scopeSet = false;
+        alignment: AlignmentDirectional.centerEnd,
+        hint: Padding(
+            padding: const EdgeInsets.only(bottom: 3.0),
+            child: Text('Project', style: dropDownListHintStyle)),
+        value: _selectedProjectProfile,
+        // isDense: true,
+        // itemHeight: 55,
+        focusColor: Theme.of(context).hoverColor,
+        underline: dropDownUnderline,
+        icon: const Icon(Icons.arrow_drop_down),
+        iconSize: 21,
+        style: TextStyle(color: Theme.of(context).colorScheme.primary),
+        onChanged: (MdlPagProjectProfile? value) async {
+          setState(() {
+            loggedInUser!
+                .updateSelectedScopeByName(value!.name, '', '', '', '');
+            _selectedProjectProfile = value;
+            _selectedSiteGroupProfile = null;
+            _selectedSiteProfile = null;
+            _selectedBuildingProfile = null;
+            _selectedLocationGroupProfile = null;
+            _scopeSet = false;
 
-          _siteGroupProfileList.clear();
-          _siteGroupProfileList
-              .addAll(_selectedProjectProfile.siteGroupProfileList);
-          if (_siteGroupProfileList.length == 1) {
-            _selectedSiteGroupProfile = _siteGroupProfileList[0];
+            _siteGroupProfileList.clear();
+            _siteGroupProfileList
+                .addAll(_selectedProjectProfile.siteGroupProfileList);
+            if (_siteGroupProfileList.length == 1) {
+              _selectedSiteGroupProfile = _siteGroupProfileList[0];
+              _siteProfileList.clear();
+              _siteProfileList
+                  .addAll(_selectedSiteGroupProfile!.siteProfileList);
+              if (_siteProfileList.length == 1) {
+                _selectedSiteProfile = _siteProfileList[0];
+              }
+            }
+
             _siteProfileList.clear();
-            _siteProfileList.addAll(_selectedSiteGroupProfile!.siteProfileList);
+            if (_selectedSiteGroupProfile == null) {
+              // _siteProfileList.addAll(_selectedProjectProfile.getAllSiteProfileList());
+            } else {
+              _siteProfileList
+                  .addAll(_selectedSiteGroupProfile!.siteProfileList);
+            }
             if (_siteProfileList.length == 1) {
               _selectedSiteProfile = _siteProfileList[0];
             }
-          }
 
-          _siteProfileList.clear();
-          if (_selectedSiteGroupProfile == null) {
-            // _siteProfileList.addAll(_selectedProjectProfile.getAllSiteProfileList());
-          } else {
-            _siteProfileList.addAll(_selectedSiteGroupProfile!.siteProfileList);
-          }
-          if (_siteProfileList.length == 1) {
-            _selectedSiteProfile = _siteProfileList[0];
-          }
+            _buildingProfileList.clear();
+            if (_selectedSiteProfile == null) {
+              // _buildingProfileList.addAll(_selectedSiteGroupProfile!.getAllBuildingProfileList());
+            } else {
+              _buildingProfileList
+                  .addAll(_selectedSiteProfile!.buildingProfileList);
+            }
+            if (_buildingProfileList.length == 1) {
+              _selectedBuildingProfile = _buildingProfileList[0];
+            }
 
-          _buildingProfileList.clear();
-          if (_selectedSiteProfile == null) {
-            // _buildingProfileList.addAll(_selectedSiteGroupProfile!.getAllBuildingProfileList());
-          } else {
-            _buildingProfileList
-                .addAll(_selectedSiteProfile!.buildingProfileList);
-          }
-          if (_buildingProfileList.length == 1) {
-            _selectedBuildingProfile = _buildingProfileList[0];
-          }
-
-          _locationGroupProfileList.clear();
-          if (_selectedBuildingProfile == null) {
-            // _locationGroupProfileList.addAll(_selectedSiteProfile!.getAllLocationGroupProfileList());
-          } else {
-            _locationGroupProfileList
-                .addAll(_selectedBuildingProfile!.locationGroupProfileList);
-          }
-          if (_locationGroupProfileList.length == 1) {
-            _selectedLocationGroupProfile = _locationGroupProfileList[0];
-          }
-        });
-      },
-      items: items,
-      // widget.projectList.map<DropdownMenuItem<MdlPagProjectProfile>>(
-      //     (MdlPagProjectProfile projectProfile) {
-      //   return DropdownMenuItem<MdlPagProjectProfile>(
-      //     value: projectProfile,
-      //     child: Padding(
-      //       padding: const EdgeInsets.only(bottom: 3.0),
-      //       child: Text(
-      //         projectProfile.label.toUpperCase(),
-      //         style: dropDownListTextStyle,
-      //       ),
-      //     ),
-      //   );
-      // }).toList()
-    );
+            _locationGroupProfileList.clear();
+            if (_selectedBuildingProfile == null) {
+              // _locationGroupProfileList.addAll(_selectedSiteProfile!.getAllLocationGroupProfileList());
+            } else {
+              _locationGroupProfileList
+                  .addAll(_selectedBuildingProfile!.locationGroupProfileList);
+            }
+            if (_locationGroupProfileList.length == 1) {
+              _selectedLocationGroupProfile = _locationGroupProfileList[0];
+            }
+          });
+        },
+        items: widget.projectList.map<DropdownMenuItem<MdlPagProjectProfile>>(
+            (MdlPagProjectProfile projectProfile) {
+          return DropdownMenuItem<MdlPagProjectProfile>(
+            value: projectProfile,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 3.0),
+              child: Text(
+                projectProfile.label.toUpperCase(),
+                style: dropDownListTextStyle,
+              ),
+            ),
+          );
+        }).toList());
   }
 
   Widget getSiteGroupScopeSelector() {
