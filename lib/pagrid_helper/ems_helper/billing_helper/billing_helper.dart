@@ -72,7 +72,7 @@ Map<String, dynamic> prepCalcedBillInfoRl(Map<String, dynamic> billInfo) {
     });
   }
 
-  final billedBciInfo = billInfo['billed_bci_info'] ?? {};
+  final billedBciInfo = billInfo['billed_bci_info'];
   String strBilledTotalBciAmount = billInfo['billed_total_bci_amount'] ?? '';
   double? billedTotalBciAmount =
       double.tryParse(strBilledTotalBciAmount) ?? 0.0;

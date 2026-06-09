@@ -3,7 +3,6 @@ import 'dart:developer' as dev;
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
-import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_scope.dart';
 import 'package:buff_helper/xt_ui/style/evs2_colors.dart';
 import 'package:buff_helper/xt_ui/wdgt/info/get_error_text_prompt.dart';
@@ -11,7 +10,6 @@ import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 import 'package:buff_helper/xt_ui/xt_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:provider/provider.dart';
 
 import '../../../../up_helper/exceptions.dart';
 import '../../../../xt_ui/wdgt/datetime/wgt_date_picker.dart';
@@ -24,6 +22,7 @@ class WgtTenantBciAssignment extends StatefulWidget {
   const WgtTenantBciAssignment({
     super.key,
     required this.appConfig,
+    required this.loggedInUser,
     required this.strItemGroupIndex,
     required this.itemName,
     required this.itemLabel,
@@ -33,6 +32,7 @@ class WgtTenantBciAssignment extends StatefulWidget {
   });
 
   final MdlPagAppConfig appConfig;
+  final MdlPagUser loggedInUser;
   final String strItemGroupIndex;
   final String itemName;
   final String itemLabel;
@@ -45,8 +45,6 @@ class WgtTenantBciAssignment extends StatefulWidget {
 }
 
 class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
-  late final MdlPagUser? loggedInUser;
-
   final DateTime leftMostDate =
       DateTime.now().subtract(const Duration(days: 365 * 5));
   final DateTime rightMostDate =
@@ -81,7 +79,7 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
     }
 
     Map<String, dynamic> queryMap = {
-      'scope': loggedInUser!.selectedScope.toScopeMap(),
+      'scope': widget.loggedInUser.selectedScope.toScopeMap(),
       'item_group_id': widget.strItemGroupIndex,
       'item_scope': widget.itemScope.toScopeMap(),
     };
@@ -92,8 +90,8 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
         widget.appConfig,
         queryMap,
         MdlPagSvcClaim(
-          username: loggedInUser!.username,
-          userId: loggedInUser!.id,
+          username: widget.loggedInUser.username,
+          userId: widget.loggedInUser.id,
           scope: '',
           target: '',
           operation: 'read',
@@ -199,7 +197,7 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
                     item['bci_tenant_effective_to_timestamp'])
             .toList();
     Map<String, dynamic> queryMap = {
-      'scope': loggedInUser!.selectedScope.toScopeMap(),
+      'scope': widget.loggedInUser.selectedScope.toScopeMap(),
       'item_group_id': widget.strItemGroupIndex,
       'item_assignment_list': assignmentList,
     };
@@ -210,8 +208,8 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
         widget.appConfig,
         queryMap,
         MdlPagSvcClaim(
-          username: loggedInUser!.username,
-          userId: loggedInUser!.id,
+          username: widget.loggedInUser.username,
+          userId: widget.loggedInUser.id,
           scope: '',
           target: '',
           operation: 'update',
@@ -270,11 +268,6 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
   @override
   void initState() {
     super.initState();
-
-    loggedInUser = Provider.of<PagUserProvider>(
-      context,
-      listen: false,
-    ).currentUser;
   }
 
   @override
@@ -706,7 +699,7 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
             defaultLastDate: effectiveToDateTime ?? rightMostDate,
             initialDate: effectiveFromDateTime,
             labelFontSize: 15,
-            timeZone: loggedInUser!.selectedScope.getProjectTimezone(),
+            timeZone: widget.loggedInUser.selectedScope.getProjectTimezone(),
             label: 'Eff. From Date',
             onDateChanged: (DateTime selectedDate) {
               setState(() {
@@ -739,7 +732,7 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
             defaultLastDate: effectiveToDateTime ?? rightMostDate,
             initialDate: effectiveToDateTime,
             labelFontSize: 15,
-            timeZone: loggedInUser!.selectedScope.getProjectTimezone(),
+            timeZone: widget.loggedInUser.selectedScope.getProjectTimezone(),
             label: 'Eff. To Date',
             onDateChanged: (DateTime selectedDate) {
               setState(() {

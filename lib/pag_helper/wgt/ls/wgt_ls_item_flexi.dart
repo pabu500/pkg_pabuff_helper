@@ -37,6 +37,7 @@ import '../../comm/comm_list.dart';
 import '../../model/mdl_pag_app_config.dart';
 import '../app/ems/wgt_bill_compilation.dart';
 import '../app/ems/wgt_match_payment_op_item.dart';
+import '../app/ems/wgt_tariff_item_assignment.dart';
 import '../app/ems/wgt_tenant_item_assignment.dart';
 import '../app/fh/wgt_fh_device_health.dart';
 import '../job/wgt_job_type_op_panel2.dart';
@@ -913,14 +914,13 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                         );
                         break;
                       case PagItemKind.tariff:
-                        opWidget = WgtTariffPackageAssignment(
+                        opWidget = WgtTariffItemAssignment(
                           appConfig: widget.appConfig,
                           loggedInUser: loggedInUser!,
-                          itemGroupIndexStr: item['id'],
-                          itemName: item['name'],
-                          itemLabel: item['label'],
-                          meterType: item['meter_type'] ?? '',
+                          strItemGroupIndex: item['id'],
                           itemInfo: item,
+                          itemName: item['name'],
+                          itemLabel: item['label'] ?? '',
                           itemScope: itemScope,
                           onUpdate: () {
                             setState(() {
@@ -946,6 +946,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                       case PagItemKind.tenant:
                         opWidget = WgtTenantItemAssignment(
                           appConfig: widget.appConfig,
+                          loggedInUser: loggedInUser!,
                           strItemGroupIndex: item['id'],
                           itemName: item['name'],
                           itemLabel: item['label'] ?? '',
