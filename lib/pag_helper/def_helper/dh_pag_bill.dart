@@ -81,6 +81,90 @@ enum PagBillingLcStatus {
   }
 }
 
+enum PagBillPaymentStaus {
+  paid('Paid', 'paid', 'p', Colors.teal),
+  unPaid('Unpaid', 'unpaid', 'up', Colors.orange),
+  pp('Partial Payment', 'pp', 'pp', Colors.orangeAccent),
+  unKnown('Unknown', 'unknown', 'un', Colors.grey),
+  ;
+  // overDue('Overdue', 'overdue', 'od', Colors.red);
+
+  const PagBillPaymentStaus([this.label, this.value, this.tag, this.color]);
+
+  final String? label;
+  final String? tag;
+  final String? value;
+  final Color? color;
+
+  static PagBillPaymentStaus byLabel(String label) {
+    for (var type in values) {
+      if (type.label == label) {
+        return type;
+      }
+    }
+    throw Exception('Invalid label: $label');
+  }
+
+  static PagBillPaymentStaus byValue(String value) {
+    for (var type in values) {
+      if (type.value == value) {
+        return type;
+      }
+    }
+    throw Exception('Invalid value: $value');
+  }
+
+  static PagBillPaymentStaus byTag(String tag) {
+    for (var type in values) {
+      if (type.tag == tag) {
+        return type;
+      }
+    }
+    throw Exception('Invalid tag: $tag');
+  }
+}
+
+enum PagBillOverdueStatus {
+  normal('Normal', 'normal', 'n', Colors.green),
+  overDue('Overdue', 'overdue', 'od', Colors.red),
+  unKnown('Unknown', 'unknown', 'un', Colors.grey),
+  ;
+
+  const PagBillOverdueStatus([this.label, this.value, this.tag, this.color]);
+
+  final String? label;
+  final String? tag;
+  final String? value;
+  final Color? color;
+
+  static PagBillOverdueStatus byLabel(String label) {
+    for (var type in values) {
+      if (type.label == label) {
+        return type;
+      }
+    }
+    throw Exception('Invalid label: $label');
+  }
+
+  static PagBillOverdueStatus byValue(String value) {
+    for (var type in values) {
+      if (type.value == value) {
+        return type;
+      }
+    }
+    throw Exception('Invalid value: $value');
+  }
+
+  static PagBillOverdueStatus byTag(String tag) {
+    for (var type in values) {
+      if (type.tag == tag) {
+        return type;
+      }
+    }
+    throw Exception('Invalid tag: $tag');
+  }
+}
+
 String? getGenTypeTagStr(String? statusStr) {
   if ((statusStr ?? '').isEmpty) {
     return null;
