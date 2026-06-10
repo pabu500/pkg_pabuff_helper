@@ -722,7 +722,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                         itemScopeMap: itemScopeMap,
                         itemInfoMap: item,
                         itemType: widget.itemType ??
-                            widget.listController?.itemType ??
+                            // widget.listController?.itemType.value ??
                             widget.listController?.itemType?.value,
                         onScopeTreeUpdate: widget.onScopeTreeUpdate,
                         validateTreeChildren: widget.validateTreeChildren,
