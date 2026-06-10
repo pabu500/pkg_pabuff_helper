@@ -81,22 +81,22 @@ enum PagBillingLcStatus {
   }
 }
 
-enum PagBillPaymentStaus {
-  paid('Paid', 'paid', 'p', Colors.teal),
-  unPaid('Unpaid', 'unpaid', 'up', Colors.orange),
+enum PagBillPaymentStatus {
+  paid('Paid', 'paid', 'paid', Colors.teal),
+  unPaid('Unpaid', 'unpaid', 'unpaid', Colors.orange),
   pp('Partial Payment', 'pp', 'pp', Colors.orangeAccent),
-  unKnown('Unknown', 'unknown', 'un', Colors.grey),
+  unKnown('Unknown', 'unknown', 'unknown', Colors.grey),
   ;
   // overDue('Overdue', 'overdue', 'od', Colors.red);
 
-  const PagBillPaymentStaus([this.label, this.value, this.tag, this.color]);
+  const PagBillPaymentStatus([this.label, this.value, this.tag, this.color]);
 
   final String? label;
   final String? tag;
   final String? value;
   final Color? color;
 
-  static PagBillPaymentStaus byLabel(String label) {
+  static PagBillPaymentStatus byLabel(String label) {
     for (var type in values) {
       if (type.label == label) {
         return type;
@@ -105,7 +105,7 @@ enum PagBillPaymentStaus {
     throw Exception('Invalid label: $label');
   }
 
-  static PagBillPaymentStaus byValue(String value) {
+  static PagBillPaymentStatus byValue(String value) {
     for (var type in values) {
       if (type.value == value) {
         return type;
@@ -114,7 +114,7 @@ enum PagBillPaymentStaus {
     throw Exception('Invalid value: $value');
   }
 
-  static PagBillPaymentStaus byTag(String tag) {
+  static PagBillPaymentStatus byTag(String tag) {
     for (var type in values) {
       if (type.tag == tag) {
         return type;
@@ -124,20 +124,20 @@ enum PagBillPaymentStaus {
   }
 }
 
-enum PagBillOverdueStatus {
-  normal('Normal', 'normal', 'n', Colors.green),
-  overDue('Overdue', 'overdue', 'od', Colors.red),
-  unKnown('Unknown', 'unknown', 'un', Colors.grey),
+enum PagBillDueStatus {
+  normal('Normal', 'normal', 'normal', Colors.green),
+  overDue('Overdue', 'overdue', 'overdue', Colors.red),
+  unKnown('Unknown', 'unknown', 'unknown', Colors.grey),
   ;
 
-  const PagBillOverdueStatus([this.label, this.value, this.tag, this.color]);
+  const PagBillDueStatus([this.label, this.value, this.tag, this.color]);
 
   final String? label;
   final String? tag;
   final String? value;
   final Color? color;
 
-  static PagBillOverdueStatus byLabel(String label) {
+  static PagBillDueStatus byLabel(String label) {
     for (var type in values) {
       if (type.label == label) {
         return type;
@@ -146,7 +146,7 @@ enum PagBillOverdueStatus {
     throw Exception('Invalid label: $label');
   }
 
-  static PagBillOverdueStatus byValue(String value) {
+  static PagBillDueStatus byValue(String value) {
     for (var type in values) {
       if (type.value == value) {
         return type;
@@ -155,7 +155,7 @@ enum PagBillOverdueStatus {
     throw Exception('Invalid value: $value');
   }
 
-  static PagBillOverdueStatus byTag(String tag) {
+  static PagBillDueStatus byTag(String tag) {
     for (var type in values) {
       if (type.tag == tag) {
         return type;

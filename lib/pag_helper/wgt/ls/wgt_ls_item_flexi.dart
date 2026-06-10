@@ -1851,6 +1851,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           initialItemList: _entityItems,
           listContextType: widget.listContextType,
           queryMap: _queryMap,
+          displayMode: widget.isCompactFinder ? 'card' : 'table',
           totalItemCount: _totalItemCount,
           listController: _selectedListController!,
           getPaneWidget: widget.getPaneWidget,

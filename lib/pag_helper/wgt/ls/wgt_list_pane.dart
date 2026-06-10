@@ -3,6 +3,7 @@ import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_controller.dart';
 import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
+import 'package:buff_helper/pag_helper/wgt/ls/wgt_card_list.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 
 import 'package:flutter/material.dart';
@@ -33,6 +34,7 @@ class WgtListPane extends StatefulWidget {
     this.initialListPaneMode = ListPaneMode.list,
     this.paneHeight,
     this.itemType,
+    this.displayMode = 'table',
     this.onResult,
   });
 
@@ -55,6 +57,7 @@ class WgtListPane extends StatefulWidget {
   final String listPrefix;
   final double? paneHeight;
   final dynamic itemType;
+  final String displayMode;
   final Function(Map<String, dynamic>)? onResult;
 
   @override
@@ -274,61 +277,63 @@ class _WgtListPaneState extends State<WgtListPane> {
   Widget getList(ListPaneMode listPaneMode) {
     return SizedBox(
       height: (_listPaneMode == ListPaneMode.pane) ? widget.paneHeight : null,
-      child: WgtPagEditCommitList(
-        key: _refreshKey,
-        appConfig: widget.appConfig,
-        isFetching: _isFetchingItemList,
-        loggedInUser: loggedInUser,
-        listController: widget.listController,
-        listContextType: widget.listContextType,
-        listItems: _entityItems,
-        itemType: widget.itemType,
-        selectShowColumn: true,
-        sectionName: widget.sectionName,
-        listPrefix: widget.listPrefix,
-        showIndex: true,
-        queryMap: _queryMap,
-        currentPage: _currentPage,
-        maxRowsPerPage: _maxRowsPerPage,
-        totalCount: _totalItemCount,
-        narrowPaginationBar: listPaneMode == ListPaneMode.pane,
-        colKeyShowList: _colKeyShowList,
-        onColCustomizeSet: listPaneMode == ListPaneMode.pane
-            ? () {
-                _setPaneMode();
-              }
-            : null,
-        onPreviousPage: () async {
-          setState(() {
-            _currentPage--;
-          });
-          await _getItemList();
-        },
-        onNextPage: () async {
-          setState(() {
-            _currentPage++;
-          });
-          await _getItemList();
-        },
-        onClickPage: (page) async {
-          setState(() {
-            _currentPage = page;
-          });
-          await _getItemList();
-        },
-        onSort: (sortBy, sortOrder) async {
-          setState(() {
-            _sortBy = sortBy;
-            _sortOrder = sortOrder;
-          });
-          await _getItemList();
-        },
-        onRequestRefresh: () {
-          setState(() {
-            _refreshKey = UniqueKey();
-          });
-        },
-      ),
+      child: widget.displayMode == 'card'
+          ? getCardList(listPaneMode)
+          : WgtPagEditCommitList(
+              key: _refreshKey,
+              appConfig: widget.appConfig,
+              isFetching: _isFetchingItemList,
+              loggedInUser: loggedInUser,
+              listController: widget.listController,
+              listContextType: widget.listContextType,
+              listItems: _entityItems,
+              itemType: widget.itemType,
+              selectShowColumn: true,
+              sectionName: widget.sectionName,
+              listPrefix: widget.listPrefix,
+              showIndex: true,
+              queryMap: _queryMap,
+              currentPage: _currentPage,
+              maxRowsPerPage: _maxRowsPerPage,
+              totalCount: _totalItemCount,
+              narrowPaginationBar: listPaneMode == ListPaneMode.pane,
+              colKeyShowList: _colKeyShowList,
+              onColCustomizeSet: listPaneMode == ListPaneMode.pane
+                  ? () {
+                      _setPaneMode();
+                    }
+                  : null,
+              onPreviousPage: () async {
+                setState(() {
+                  _currentPage--;
+                });
+                await _getItemList();
+              },
+              onNextPage: () async {
+                setState(() {
+                  _currentPage++;
+                });
+                await _getItemList();
+              },
+              onClickPage: (page) async {
+                setState(() {
+                  _currentPage = page;
+                });
+                await _getItemList();
+              },
+              onSort: (sortBy, sortOrder) async {
+                setState(() {
+                  _sortBy = sortBy;
+                  _sortOrder = sortOrder;
+                });
+                await _getItemList();
+              },
+              onRequestRefresh: () {
+                setState(() {
+                  _refreshKey = UniqueKey();
+                });
+              },
+            ),
     );
   }
 
@@ -376,6 +381,37 @@ class _WgtListPaneState extends State<WgtListPane> {
         horizontalSpaceSmall,
         widget.getPaneWidget?.call(selectedItem, _entityItems) ?? Container(),
       ],
+    );
+  }
+
+  Widget getCardList(ListPaneMode listPaneMode) {
+    return WgtCardList(
+      appConfig: widget.appConfig,
+      loggedInUser: loggedInUser!,
+      itemType: widget.itemType,
+      itemList: _entityItems,
+      currentPage: _currentPage,
+      maxRowsPerPage: _maxRowsPerPage,
+      totalCount: _totalItemCount,
+      listController: widget.listController,
+      onPreviousPage: () async {
+        setState(() {
+          _currentPage--;
+        });
+        await _getItemList();
+      },
+      onNextPage: () async {
+        setState(() {
+          _currentPage++;
+        });
+        await _getItemList();
+      },
+      onClickPage: (page) async {
+        setState(() {
+          _currentPage = page;
+        });
+        await _getItemList();
+      },
     );
   }
 }

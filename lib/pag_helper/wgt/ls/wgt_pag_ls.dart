@@ -115,6 +115,7 @@ class _WgtPagLsState extends State<WgtPagLs> {
           pagAppContext: widget.pagAppContext,
           itemKind: widget.itemKind,
           itemType: itemType,
+          isCompactFinder: widget.isCompactFinder,
           listContextType: widget.listContextType,
           // use bottom sheet instead of pane mode switcher
           enablePaneModeSwitcher: false,
