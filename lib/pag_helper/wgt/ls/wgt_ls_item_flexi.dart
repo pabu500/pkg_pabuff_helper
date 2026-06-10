@@ -614,6 +614,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                             PagFilterGroupType.location) {
                           itemScopeMap[colController.colKey] =
                               item[colController.colKey];
+                          continue;
                         }
 
                         // join key is not directly editable
