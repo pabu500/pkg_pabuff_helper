@@ -94,13 +94,13 @@ Future<dynamic> doGetBciScopeTenantList(
   }
 }
 
-Future<dynamic> commitBciTenantList(
+Future<dynamic> commitBciTenantAssignment(
   MdlPagAppConfig appConfig,
   Map<String, dynamic> queryMap,
   MdlPagSvcClaim svcClaim,
 ) async {
   svcClaim.svcName = PagSvcType.oresvc2.name;
-  svcClaim.endpoint = PagUrlBase.eptUpdateBciTenantList;
+  svcClaim.endpoint = PagUrlBase.eptUpdateBciTenantAssignment;
 
   String svcToken = '';
   // try {
@@ -120,11 +120,9 @@ Future<dynamic> commitBciTenantList(
   );
 
   if (response.statusCode == 200) {
-    final respJson = jsonDecode(response.body);
-    if (respJson['error'] != null) {
-      throw Exception(respJson['error']);
-    }
-    return respJson['data'];
+    return getResult(response.body,
+        defualtErrorMsg:
+            'Failed to update billing cost item tenant assignment');
   } else if (response.statusCode == 403) {
     throw Exception("You are not authorized to perform this operation");
   } else {

@@ -9,6 +9,7 @@ import 'package:buff_helper/xt_ui/xt_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../../../up_helper/exceptions.dart';
 import '../../../../xt_ui/wdgt/datetime/wgt_date_picker.dart';
 import '../../../comm/comm_billing_cost_item.dart';
 import '../../../def_helper/dh_pag_tariff.dart';
@@ -53,6 +54,11 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
   final DateTime rightMostDate =
       DateTime.now().add(const Duration(days: 365 * 5));
 
+  late final BoxDecoration boxDecoration = BoxDecoration(
+    border: Border.all(color: Theme.of(context).hintColor.withAlpha(50)),
+    borderRadius: BorderRadius.circular(5),
+  );
+
   final double width = 395.0;
 
   bool _isFetching = false;
@@ -72,6 +78,9 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
   final TextEditingController _itemLabelFilterController =
       TextEditingController();
   String _itemLabelFilterStr = '';
+
+  UniqueKey? _timePickerFromKey;
+  UniqueKey? _timePickerToKey;
 
   Future<void> _doAutoPopulate() async {
     if (_isFetching) {
@@ -139,17 +148,23 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
     // filter out items that are not modified
     final List<Map<String, dynamic>> assignmentList =
         _itemGroupScopeMatchingItemList!
-            .where((tenant) => tenant['assigned_new'] != null)
+            .where((item) =>
+                item['assigned_new'] != item['assigned'] ||
+                item['bci_tenant_effective_from_timestamp_new'] !=
+                    item['bci_tenant_effective_from_timestamp'] ||
+                item['bci_tenant_effective_to_timestamp_new'] !=
+                    item['bci_tenant_effective_to_timestamp'])
             .toList();
     Map<String, dynamic> queryMap = {
       'scope': widget.loggedInUser!.selectedScope.toScopeMap(),
-      'tariff_package_id': widget.itemGroupIndexStr,
-      'tenant_assignment_list': assignmentList,
+      'assignment_type': 'bci-to-tenant-list',
+      'item_group_id': widget.itemGroupIndexStr,
+      'item_assignment_list': assignmentList,
     };
     try {
       _isCommitting = true;
 
-      final data = await commitBciTenantList(
+      final result = await commitBciTenantAssignment(
         widget.appConfig,
         queryMap,
         MdlPagSvcClaim(
@@ -160,21 +175,17 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
           operation: 'update',
         ),
       );
-
-      if (data['error'] != null) {
-        throw Exception(data['error']);
-      }
     } catch (e) {
       dev.log(e.toString());
 
-      setState(() {
-        _commitErrorText = 'Commit Error';
-      });
+      _commitErrorText = getErrorText(e,
+          defaultErrorText: 'Error committing bci tenant assignment');
     } finally {
       setState(() {
         _isCommitting = false;
         _isCommitted = true;
         _modified = false;
+        _isFetched = false; // to trigger data refresh on next open
       });
     }
   }
@@ -209,16 +220,16 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
     for (Map<String, dynamic> item in _itemGroupScopeMatchingItemList ?? []) {
       // only assigned items can modify effective date
       if (item['assigned'] == true && item['assigned_new'] != false) {
-        // if (item['tbci__effective_from_timestamp_new'] != null) {
+        // if (item['tbci_effective_from_timestamp_new'] != null) {
         if (item['tbci_effective_from_timestamp'] !=
-            item['tbci__effective_from_timestamp_new']) {
+            item['tbci_effective_from_timestamp_new']) {
           effectiveDateModified = true;
           break;
         }
         // }
-        // if (item['tbci__effective_to_timestamp_new'] != null) {
+        // if (item['tbci_effective_to_timestamp_new'] != null) {
         if (item['tbci_effective_to_timestamp'] !=
-            item['tbci__effective_to_timestamp_new']) {
+            item['tbci_effective_to_timestamp_new']) {
           effectiveDateModified = true;
           break;
           // }
@@ -466,10 +477,11 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
     for (Map<String, dynamic> itemInfo
         in _itemGroupScopeMatchingItemList ?? []) {
       bool showItem = _showItem(itemInfo);
+      index++;
       if (!showItem) {
         continue; // Skip this item if it doesn't match the filter
       }
-      Widget tile = getItemRow(itemInfo, ++index);
+      Widget tile = getItemRow(itemInfo, index);
       itemWidgetList.add(
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 5),
@@ -492,22 +504,11 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
     String tenantLabel = itemInfo['tenant_label'] ?? '';
     bool assigned = itemInfo['assigned'] ?? false;
 
-    BoxDecoration boxDecoration = BoxDecoration(
-      border: Border.all(color: Theme.of(context).hintColor.withAlpha(50)),
-      borderRadius: BorderRadius.circular(5),
-    );
-
     TextStyle disabledTextStyle =
         TextStyle(color: Theme.of(context).hintColor.withAlpha(150));
 
-    bool disabled = itemInfo['assigned_to_another_tp_name'] != null;
-
+    bool disabled = false;
     String disabledText = '';
-    if (itemInfo['assigned'] == true &&
-        itemInfo['assigned_to_this_tenant'] != true) {
-      disabled = true;
-      disabledText = 'Already assigned to: $tenantLabel';
-    }
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -567,13 +568,12 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
 
   Widget getEffectiveDateRange(Map<String, dynamic> itemInfo) {
     String effectiveFromTimestamp =
-        itemInfo['tbci__effective_from_timestamp_new'] ??
+        itemInfo['tbci_effective_from_timestamp_new'] ??
             itemInfo['tbci_effective_from_timestamp'] ??
             '';
-    String effectiveToTimestamp =
-        itemInfo['tbci__effective_to_timestamp_new'] ??
-            itemInfo['tbci_effective_to_timestamp'] ??
-            '';
+    String effectiveToTimestamp = itemInfo['tbci_effective_to_timestamp_new'] ??
+        itemInfo['tbci_effective_to_timestamp'] ??
+        '';
     DateTime? effectiveFromDateTime;
     DateTime? effectiveToDateTime;
     if (effectiveFromTimestamp.isNotEmpty) {
@@ -582,6 +582,9 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
     if (effectiveToTimestamp.isNotEmpty) {
       effectiveToDateTime = DateTime.tryParse(effectiveToTimestamp);
     }
+    _timePickerFromKey = UniqueKey();
+    _timePickerToKey = UniqueKey();
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -589,7 +592,7 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
         SizedBox(
           width: 150,
           child: WgtDatePicker(
-            // key: _timePickerFromKey,
+            key: _timePickerFromKey,
             iconSize: 18,
             enabled: itemInfo['assigned_new'] == true ||
                 (itemInfo['assigned'] == true &&
@@ -604,7 +607,7 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
               setState(() {
                 effectiveFromDateTime = DateTime(selectedDate.year,
                     selectedDate.month, selectedDate.day, 0, 0, 0, 0);
-                itemInfo['tbci__effective_from_timestamp_new'] =
+                itemInfo['tbci_effective_from_timestamp_new'] =
                     effectiveFromDateTime?.toIso8601String();
                 _checkModified();
               });
@@ -612,7 +615,7 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
             onDateCleared: () {
               setState(() {
                 effectiveFromDateTime = null;
-                itemInfo['tbci__effective_from_timestamp_new'] = '';
+                itemInfo['tbci_effective_from_timestamp_new'] = '';
                 _checkModified();
               });
             },
@@ -622,7 +625,7 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
         SizedBox(
           width: 150,
           child: WgtDatePicker(
-            // key: _timePickerToKey,
+            key: _timePickerToKey,
             iconSize: 18,
             enabled: itemInfo['assigned_new'] == true ||
                 (itemInfo['assigned'] == true &&
@@ -638,7 +641,7 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
                 effectiveToDateTime = DateTime(selectedDate.year,
                         selectedDate.month, selectedDate.day, 0, 0, 0, 0)
                     .add(const Duration(days: 1));
-                itemInfo['tbci__effective_to_timestamp_new'] =
+                itemInfo['tbci_effective_to_timestamp_new'] =
                     effectiveToDateTime?.toIso8601String();
                 _checkModified();
               });
@@ -646,7 +649,7 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
             onDateCleared: () {
               setState(() {
                 effectiveToDateTime = null;
-                itemInfo['tbci__effective_to_timestamp_new'] = '';
+                itemInfo['tbci_effective_to_timestamp_new'] = '';
                 _checkModified();
               });
             },

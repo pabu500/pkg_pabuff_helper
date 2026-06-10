@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:buff_helper/pag_helper/comm/comm_helper.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:buff_helper/pag_helper/comm/pag_be_api_base.dart';
@@ -296,18 +297,10 @@ Future<dynamic> doGetScopeBciList(
     );
 
     if (response.statusCode == 200) {
-      final respJson = jsonDecode(response.body);
-      if (respJson['error'] != null) {
-        throw Exception(respJson['error']);
-      }
-      if (respJson['data'] == null) {
-        throw Exception('Failed to get scope tenant list');
-      }
-
-      var data = respJson['data'];
-      return data;
+      return getResult(response.body,
+          defualtErrorMsg: 'Failed to get scope bci list');
     } else {
-      throw Exception('Failed to get scope tenant list');
+      throw Exception('Failed to get scope bci list');
     }
   } catch (err) {
     rethrow;
