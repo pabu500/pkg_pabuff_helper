@@ -54,7 +54,7 @@ class WgtListSearchItemFlexi extends StatefulWidget {
     required this.itemKind,
     required this.prefKey,
     required this.listContextType,
-    this.itemType,
+    this.itemTypeEnum,
     this.listController,
     this.selectedItemInfoList,
     this.onGetListInfoListResult,
@@ -88,7 +88,7 @@ class WgtListSearchItemFlexi extends StatefulWidget {
   final MdlPagAppConfig appConfig;
   final MdlPagAppContext? pagAppContext;
   final PagItemKind itemKind;
-  final dynamic itemType;
+  final dynamic itemTypeEnum;
   final PagListContextType listContextType;
   final String prefKey;
   final MdlPagListController? listController;
@@ -447,8 +447,8 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         // widget.itemKind == PagItemKind.tariffPackage ||
         // widget.itemKind == PagItemKind.tariff ||
         (widget.itemKind == PagItemKind.tariff &&
-            (_selectedListController!.itemType == PagTariff.tariffPackage ||
-                _selectedListController!.itemType ==
+            (_selectedListController!.itemTypeEnum == PagTariff.tariffPackage ||
+                _selectedListController!.itemTypeEnum ==
                     PagTariff.billingCostItem)) ||
         widget.itemKind == PagItemKind.meterGroup ||
         widget.itemKind == PagItemKind.tenant ||
@@ -465,7 +465,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     }
     bool isAmDeviceMeterManager = widget.pagAppContext! == appCtxAm &&
         widget.itemKind == PagItemKind.device &&
-        _selectedListController!.itemType == PagDeviceCat.meterGroup;
+        _selectedListController!.itemTypeEnum == PagDeviceCat.meterGroup;
     if (isAmDeviceMeterManager) {
       addOpColumn = true;
     }
@@ -694,7 +694,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
 
                     Map<String, dynamic> customProperties = {};
                     if (widget.itemKind == PagItemKind.tariff &&
-                        _selectedListController!.itemType ==
+                        _selectedListController!.itemTypeEnum ==
                             PagTariff.tariffPackage) {
                       String tpTypeCatStr =
                           item['tariff_package_type_cat'] ?? '';
@@ -714,6 +714,9 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                       WgtPagItemInfoEditPanel(
                         appConfig: widget.appConfig,
                         itemKind: widget.itemKind,
+                        itemTypeEnum: widget.itemTypeEnum ??
+                            widget.listController?.itemTypeEnum,
+                        // widget.listController?.itemType?.value,
                         strItemIndex: item['id'],
                         fields: fieldList,
                         itemDisplayName:
@@ -721,9 +724,6 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                         listController: _selectedListController,
                         itemScopeMap: itemScopeMap,
                         itemInfoMap: item,
-                        itemType: widget.itemType ??
-                            // widget.listController?.itemType.value ??
-                            widget.listController?.itemType?.value,
                         onScopeTreeUpdate: widget.onScopeTreeUpdate,
                         validateTreeChildren: widget.validateTreeChildren,
                         customProperties: customProperties,
@@ -934,7 +934,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                         );
                         break;
                       case PagItemKind.tariff:
-                        _selectedListController!.itemType ==
+                        _selectedListController!.itemTypeEnum ==
                                 PagTariff.tariffPackage
                             ? opWidget = WgtTariffPackageAssignment(
                                 appConfig: widget.appConfig,
@@ -951,7 +951,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                                   });
                                 },
                               )
-                            : _selectedListController!.itemType ==
+                            : _selectedListController!.itemTypeEnum ==
                                     PagTariff.billingCostItem
                                 ? opWidget = WgtBciTenantAssignment(
                                     appConfig: widget.appConfig,
@@ -983,7 +983,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                           },
                         );
                       case PagItemKind.device:
-                        _selectedListController?.itemType ==
+                        _selectedListController?.itemTypeEnum ==
                                 PagDeviceCat.meterGroup
                             ? opWidget = WgtAmMeterGroupAssignment(
                                 appConfig: widget.appConfig,
@@ -999,6 +999,21 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                                 },
                               )
                             : Container();
+                        break;
+                      case PagItemKind.meterGroup:
+                        opWidget = WgtAmMeterGroupAssignment(
+                          appConfig: widget.appConfig,
+                          meterType: item['meter_type'] ?? '',
+                          itemGroupIndexStr: item['id'],
+                          itemName: item['name'],
+                          itemLabel: item['label'] ?? '',
+                          itemScope: itemScope,
+                          onUpdate: () {
+                            setState(() {
+                              _itemUpdated = true;
+                            });
+                          },
+                        );
                         break;
                       default:
                         opWidget = Container();
@@ -1456,7 +1471,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
   }
 
   void _addDeviceHealthColumn(MdlPagListController listController) {
-    PagDeviceCat? deviceCat = listController.itemType;
+    PagDeviceCat? deviceCat = listController.itemTypeEnum;
     assert(deviceCat != null);
 
     MdlListColController appCtxCol = MdlListColController(
@@ -1515,7 +1530,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                         appConfig: widget.appConfig,
                         loggedInUser: loggedInUser!,
                         pagAppContext: widget.pagAppContext!,
-                        scopeType: _selectedListController!.itemType,
+                        scopeType: _selectedListController!.itemTypeEnum,
                         scopeInfo: item,
                       ),
                       onClosed: () {},
@@ -1552,12 +1567,12 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
   String _getListPrefix() {
     String prefix = widget.itemKind.name.toLowerCase();
 
-    if (widget.itemType != null) {
-      prefix += '_${widget.itemType}'.toLowerCase();
+    if (widget.itemTypeEnum != null) {
+      prefix += '_${widget.itemTypeEnum}'.toLowerCase();
     } else if (_selectedListController != null &&
-        _selectedListController!.itemType != null) {
+        _selectedListController!.itemTypeEnum != null) {
       prefix +=
-          '_${_selectedListController!.itemType}'.toString().toLowerCase();
+          '_${_selectedListController!.itemTypeEnum}'.toString().toLowerCase();
     }
 
     prefix += '_${widget.listContextType.name}';
@@ -1703,7 +1718,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         loggedInUser: loggedInUser!,
         appConfig: widget.appConfig,
         itemKind: widget.itemKind,
-        itemType: _selectedListController!.itemType,
+        itemType: _selectedListController!.itemTypeEnum,
         listContextType: widget.listContextType,
         listController: _selectedListController!,
         selectedItemInfoList: widget.selectedItemInfoList,
@@ -1858,7 +1873,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           getSwitcher: widget.getSwitcher ?? getPaneModeSwitcher,
           sectionName: widget.prefKey,
           paneHeight: widget.paneHeight,
-          itemType: widget.itemType ?? widget.listController?.itemType,
+          itemType: widget.itemTypeEnum ?? widget.listController?.itemTypeEnum,
           listPrefix: _getListPrefix(),
           onResult: (Map<String, dynamic> result) {
             widget.onResult?.call(result);

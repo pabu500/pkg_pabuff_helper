@@ -12,7 +12,7 @@ import '../../def_helper/dh_pag_tariff.dart';
 
 class MdlPagListController /*extends ChangeNotifier*/ {
   // PagItemKind pagItemKind;
-  dynamic itemType;
+  dynamic itemTypeEnum;
   List<MdlListColController> listColControllerList = [];
   String? rootTableName;
   List<String> filterKeyEqualList;
@@ -22,7 +22,7 @@ class MdlPagListController /*extends ChangeNotifier*/ {
 
   MdlPagListController({
     // required this.pagItemKind,
-    required this.itemType,
+    required this.itemTypeEnum,
     required this.listColControllerList,
     this.rootTableName,
     this.filterKeyEqualList = const [],
@@ -92,96 +92,96 @@ class MdlPagListController /*extends ChangeNotifier*/ {
     bool enableGroupBy = json['enable_group_by'] == 'true';
 
     String? itemTypeStr = json['item_type'];
-    dynamic itemType;
+    dynamic itemTypeEnum;
     if (itemTypeStr != null) {
       switch (itemTypeStr) {
         case 'meter':
-          itemType = PagDeviceCat.meter;
+          itemTypeEnum = PagDeviceCat.meter;
           break;
         case 'meterGroup':
-          itemType = PagDeviceCat.meterGroup;
+          itemTypeEnum = PagDeviceCat.meterGroup;
           break;
         case 'sensor':
-          itemType = PagDeviceCat.sensor;
+          itemTypeEnum = PagDeviceCat.sensor;
           break;
         case 'lock':
-          itemType = PagDeviceCat.lock;
+          itemTypeEnum = PagDeviceCat.lock;
           break;
         case 'camera':
-          itemType = PagDeviceCat.camera;
+          itemTypeEnum = PagDeviceCat.camera;
           break;
         case 'gateway':
-          itemType = PagDeviceCat.gateway;
+          itemTypeEnum = PagDeviceCat.gateway;
           break;
         case 'mcu':
-          itemType = PagDeviceCat.mcu;
+          itemTypeEnum = PagDeviceCat.mcu;
           break;
         case 'motherboard':
-          itemType = PagDeviceCat.motherboard;
+          itemTypeEnum = PagDeviceCat.motherboard;
           break;
         case 'sim':
-          itemType = PagDeviceCat.sim;
+          itemTypeEnum = PagDeviceCat.sim;
           break;
         case 'project':
-          itemType = PagScopeType.project;
+          itemTypeEnum = PagScopeType.project;
           break;
         case 'site_group' || 'siteGroup':
-          itemType = PagScopeType.siteGroup;
+          itemTypeEnum = PagScopeType.siteGroup;
           break;
         case 'site':
-          itemType = PagScopeType.site;
+          itemTypeEnum = PagScopeType.site;
           break;
         case 'building':
-          itemType = PagScopeType.building;
+          itemTypeEnum = PagScopeType.building;
           break;
         case 'location_group' || 'locationGroup':
-          itemType = PagScopeType.locationGroup;
+          itemTypeEnum = PagScopeType.locationGroup;
           break;
         case 'location':
-          itemType = PagScopeType.location;
+          itemTypeEnum = PagScopeType.location;
           break;
         case 'bill':
-          itemType = PagItemKind.bill;
+          itemTypeEnum = PagItemKind.bill;
           break;
         case 'tenant_soa':
-          itemType = PagFinanceType.tenantSoa;
+          itemTypeEnum = PagFinanceType.tenantSoa;
           break;
         case 'payment':
-          itemType = PagFinanceType.payment;
+          itemTypeEnum = PagFinanceType.payment;
           break;
         case 'payment_apply':
-          itemType = PagFinanceType.paymentApply;
+          itemTypeEnum = PagFinanceType.paymentApply;
           break;
         case 'amgr':
-          itemType = PagOrgType.amgr;
+          itemTypeEnum = PagOrgType.amgr;
           break;
         case 'landlord':
-          itemType = PagOrgType.landlord;
+          itemTypeEnum = PagOrgType.landlord;
           break;
         case 'bank':
-          itemType = PagOrgType.bank;
+          itemTypeEnum = PagOrgType.bank;
           break;
         case 'tariff_package':
-          itemType = PagTariff.tariffPackage;
+          itemTypeEnum = PagTariff.tariffPackage;
           break;
         case 'tariff_package_type':
-          itemType = PagTariff.tariffPackageType;
+          itemTypeEnum = PagTariff.tariffPackageType;
           break;
         case 'tariff_rate':
-          itemType = PagTariff.tariffRate;
+          itemTypeEnum = PagTariff.tariffRate;
           break;
         case 'billing_cost_item':
-          itemType = PagTariff.billingCostItem;
+          itemTypeEnum = PagTariff.billingCostItem;
           break;
         default:
-          itemType = null;
+          itemTypeEnum = null;
 
           dev.log('Unknown item type: $itemTypeStr');
       }
     }
 
     return MdlPagListController(
-      itemType: itemType,
+      itemTypeEnum: itemTypeEnum,
       listColControllerList: listConfigItemList,
       rootTableName: json['root_table_name'],
       filterKeyEqualList: filterKeyEqualList,
@@ -200,9 +200,9 @@ class MdlPagListController /*extends ChangeNotifier*/ {
     }
 
     String itemTypeStr = 'unknown_item_type';
-    if (itemType is PagDeviceCat) {
+    if (itemTypeEnum is PagDeviceCat) {
       // itemTypeStr = getPagDeviceTypeStr(itemType);
-      itemTypeStr = (itemType as PagDeviceCat).name; // use the enum's name
+      itemTypeStr = (itemTypeEnum as PagDeviceCat).name; // use the enum's name
       // switch (itemType) {
       //   case PagDeviceCat.meter:
       //     itemTypeStr = 'meter';

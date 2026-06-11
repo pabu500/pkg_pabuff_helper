@@ -68,7 +68,7 @@ class _WgtPagLsState extends State<WgtPagLs> {
             appConfig: widget.appConfig,
             pagAppContext: widget.pagAppContext,
             itemKind: widget.itemKind,
-            itemType: PagFinanceType.payment,
+            itemTypeEnum: PagFinanceType.payment,
             listContextType: widget.listContextType,
             prefKey: prefKey,
             itemTypeListStr: PagFinanceType.payment.name,
@@ -114,7 +114,7 @@ class _WgtPagLsState extends State<WgtPagLs> {
           appConfig: widget.appConfig,
           pagAppContext: widget.pagAppContext,
           itemKind: widget.itemKind,
-          itemType: itemType,
+          itemTypeEnum: itemType,
           isCompactFinder: widget.isCompactFinder,
           listContextType: widget.listContextType,
           // use bottom sheet instead of pane mode switcher
