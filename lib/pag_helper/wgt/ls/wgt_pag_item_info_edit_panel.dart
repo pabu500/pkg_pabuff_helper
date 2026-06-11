@@ -141,7 +141,8 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
         'item_kind': widget.itemKind.name,
         'item_type': widget.itemTypeEnum is Enum
             ? (widget.itemTypeEnum as Enum).name
-            : widget.itemTypeEnum ?? '',
+            : '',
+        // : widget.itemTypeEnum ?? '',
         'item_id_type': ItemIdType.id.name,
         'item_id_key': 'id',
         'item_id': widget.strItemIndex,
