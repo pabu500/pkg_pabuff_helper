@@ -517,10 +517,10 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
         continue;
       }
 
-      // _listItemStyle = TextStyle(
-      //   fontSize: 13.5,
-      //   color: Theme.of(context).hintColor,
-      // );
+      TextStyle listItemStyle = TextStyle(
+        fontSize: 13.5,
+        color: Theme.of(context).hintColor,
+      );
 
       bool unique = ctrlItem.isUnique;
       List<String> listValues = [];
@@ -575,7 +575,7 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
       if (row[ctrlItem.colKey] != null) {
         //col colors
         if (ctrlItem.colColor != null) {
-          _listItemStyle = _listItemStyle.copyWith(
+          listItemStyle = _listItemStyle.copyWith(
             color: ctrlItem.colColor,
             fontWeight: FontWeight.w500,
           );
@@ -600,18 +600,18 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
         if (ctrlItem.errorColor != null &&
             (row[ctrlItem.colKey] as String).contains(
                 'error') /*&& row['error'].keys.first == item['fieldKey']*/) {
-          _listItemStyle = _listItemStyle.copyWith(
+          listItemStyle = _listItemStyle.copyWith(
               color: ctrlItem.errorColor, fontWeight: FontWeight.w500);
         } else if (row['${ctrlItem.colKey}_color'] != null) {
-          _listItemStyle = _listItemStyle.copyWith(
+          listItemStyle = _listItemStyle.copyWith(
               color: row['${ctrlItem.colKey}_color'],
               fontWeight: FontWeight.w500);
         } else if (row['${ctrlItem.colKey}_modified'] != null) {
-          _listItemStyle = _listItemStyle.copyWith(
+          listItemStyle = _listItemStyle.copyWith(
               color: _modifiedColor, fontWeight: FontWeight.w500);
         } else if (ctrlItem.successColor != null &&
             (row[ctrlItem.colKey] as String).contains('success')) {
-          _listItemStyle = _listItemStyle.copyWith(
+          listItemStyle = _listItemStyle.copyWith(
               color: ctrlItem.successColor, fontWeight: FontWeight.w500);
         }
         // else if (colEditable) {
@@ -665,7 +665,7 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
                   child: getCellText(
                     originalFullText: originalFullText,
                     width: width,
-                    style: _listItemStyle,
+                    style: listItemStyle,
                     clickCopy: true,
                     alignment: ctrlItem.align == 'right'
                         ? Alignment.centerRight
