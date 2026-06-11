@@ -86,6 +86,7 @@ class _WgtPagRenderPdfState extends State<WgtPagRenderPdf> {
       ),
       child: PdfPreview(
         maxPageWidth: 700,
+        previewPageMargin: const EdgeInsets.all(3),
         allowSharing: false,
         canChangeOrientation: false,
         initialPageFormat: PdfPageFormat.a4,

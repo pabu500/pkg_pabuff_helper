@@ -294,7 +294,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
                   ],
                 ),
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 13),
+            padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 5),
             child: Container(
               decoration: BoxDecoration(
                 border: Border.all(
@@ -351,7 +351,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             ),
           )
         : Padding(
-            padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 13),
+            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
             child: getBillRender(),
           );
   }

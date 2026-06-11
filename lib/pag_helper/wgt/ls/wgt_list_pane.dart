@@ -388,6 +388,7 @@ class _WgtListPaneState extends State<WgtListPane> {
     return WgtCardList(
       appConfig: widget.appConfig,
       loggedInUser: loggedInUser!,
+      listPrefix: widget.listPrefix,
       itemType: widget.itemType,
       itemList: _entityItems,
       currentPage: _currentPage,

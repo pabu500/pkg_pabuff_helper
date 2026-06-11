@@ -1332,11 +1332,16 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       includeColKeyAsFilter: false,
       showColumn: true,
       colWidth: 45,
+      showOnCard: true,
+      rowOnCard: 2,
+      rowOrder: 3,
+      // align: 'right',
       colWidgetType: PagColWidgetType.CUSTOM,
       getCustomWidget: (item, fullList) {
         bool showDetail = true;
         return Padding(
-          padding: const EdgeInsets.only(right: 0),
+          padding: EdgeInsets.only(
+              right: 0, left: widget.isCompactFinder ? 30.0 : 0.0),
           child: InkWell(
             onTap: !showDetail
                 ? null
