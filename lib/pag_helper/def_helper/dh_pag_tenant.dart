@@ -508,9 +508,6 @@ String? validateFloorArea(String value) {
   return null;
 }
 
-String? validateBillingContactName(String value) {
-  return validateFullName(value);
-}
 
 String? validateBillingContactEmail(String value) {
   return validateEmail(value);
@@ -848,7 +845,7 @@ final List<Map<String, dynamic>> listConfigBaseTenantExt = [
     'col_type': 'string',
     'width': 150,
     'is_mapping_required': false,
-    'validator': validateFullName,
+    'validator': validateBillingContactName,
   },
   {
     'col_key': 'billing_email_1',
