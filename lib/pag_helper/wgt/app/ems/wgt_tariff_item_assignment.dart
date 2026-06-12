@@ -1,5 +1,4 @@
 import 'package:buff_helper/pag_helper/wgt/app/ems/wgt_tenant_bci_assignment.dart';
-import 'package:buff_helper/pag_helper/wgt/app/ems/wgt_tenant_meter_group_assignment.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../xt_ui/style/evs2_colors.dart';
@@ -7,12 +6,14 @@ import '../../../../xt_ui/xt_helpers.dart';
 import '../../../model/mdl_pag_app_config.dart';
 import '../../../model/mdl_pag_user.dart';
 import '../../../model/scope/mdl_pag_scope.dart';
+import 'wgt_tariff_package_assignment.dart';
 
-class WgtTenantItemAssignment extends StatefulWidget {
-  const WgtTenantItemAssignment({
+class WgtTariffItemAssignment extends StatefulWidget {
+  const WgtTariffItemAssignment({
     super.key,
     required this.appConfig,
     required this.loggedInUser,
+    required this.itemInfo,
     required this.strItemGroupIndex,
     required this.itemName,
     required this.itemLabel,
@@ -23,6 +24,7 @@ class WgtTenantItemAssignment extends StatefulWidget {
 
   final MdlPagAppConfig appConfig;
   final MdlPagUser loggedInUser;
+  final Map<String, dynamic> itemInfo;
   final String strItemGroupIndex;
   final String itemName;
   final String itemLabel;
@@ -31,14 +33,14 @@ class WgtTenantItemAssignment extends StatefulWidget {
   final Function? onUpdate;
 
   @override
-  State<WgtTenantItemAssignment> createState() =>
-      _WgtTenantItemAssignmentState();
+  State<WgtTariffItemAssignment> createState() =>
+      _WgtTariffItemAssignmentState();
 }
 
-class _WgtTenantItemAssignmentState extends State<WgtTenantItemAssignment> {
-  final List<String> tenantItemList = ['Meter Group', 'Billing Cost Item'];
+class _WgtTariffItemAssignmentState extends State<WgtTariffItemAssignment> {
+  final List<String> tariffItemList = ['Meter Group', 'Billing Cost Item'];
 
-  String? _selectedTenantItem;
+  String? _selectedTariffItem;
 
   @override
   Widget build(BuildContext context) {
@@ -47,25 +49,25 @@ class _WgtTenantItemAssignmentState extends State<WgtTenantItemAssignment> {
         child: Column(
           children: [
             // select item
-            getTenantItemButtons(),
+            getTariffItemButtons(),
             verticalSpaceSmall,
             getAssignmentItemView(),
           ],
         ));
   }
 
-  Widget getTenantItemButtons() {
+  Widget getTariffItemButtons() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
-      children: tenantItemList.map((tenantItem) {
-        bool isSelected = tenantItem == _selectedTenantItem;
+      children: tariffItemList.map((tariffItem) {
+        bool isSelected = tariffItem == _selectedTariffItem;
         return Padding(
           padding: const EdgeInsets.only(right: 8.0),
           child: InkWell(
             onTap: () {
               setState(() {
-                _selectedTenantItem = tenantItem;
+                _selectedTariffItem = tariffItem;
               });
             },
             child: Container(
@@ -78,7 +80,7 @@ class _WgtTenantItemAssignmentState extends State<WgtTenantItemAssignment> {
                 borderRadius: BorderRadius.circular(5.0),
               ),
               child: Text(
-                tenantItem,
+                tariffItem,
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onPrimary,
                 ),
@@ -91,14 +93,17 @@ class _WgtTenantItemAssignmentState extends State<WgtTenantItemAssignment> {
   }
 
   Widget getAssignmentItemView() {
-    if (_selectedTenantItem == null) {
+    if (_selectedTariffItem == null) {
       return Container();
     }
-    switch (_selectedTenantItem) {
-      case 'Meter Group':
-        return WgtTenantMeterGroupAssignment(
+    switch (_selectedTariffItem) {
+      case 'Tariff Package':
+        return WgtTariffPackageAssignment(
           appConfig: widget.appConfig,
-          strItemGroupIndex: widget.strItemGroupIndex,
+          loggedInUser: widget.loggedInUser,
+          itemGroupIndexStr: widget.strItemGroupIndex,
+          meterType: '',
+          itemInfo: widget.itemInfo,
           itemName: widget.itemName,
           itemLabel: widget.itemLabel,
           itemScope: widget.itemScope,

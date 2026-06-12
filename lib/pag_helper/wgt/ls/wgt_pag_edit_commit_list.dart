@@ -12,7 +12,6 @@ import 'package:buff_helper/xt_ui/wdgt/list/wgt_list_pane_switch_icon.dart';
 import 'package:buff_helper/xt_ui/wdgt/list/wgt_list_sort_icon.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_popup_button.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
@@ -112,7 +111,7 @@ class WgtPagEditCommitList extends StatefulWidget {
 }
 
 class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
-  final double _indexWidth = 34;
+  final double indexWidth = 34;
 
   bool _modified = false;
   // late double _lastColWidth;
@@ -123,7 +122,11 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
   late double _width;
   late double _listHeight;
   UniqueKey? _listKey;
-  late TextStyle _listItemStyle;
+
+  late TextStyle _listItemStyle = TextStyle(
+    fontSize: 13.5,
+    color: Theme.of(context).hintColor,
+  );
 
   UniqueKey? _headerRefreshKey;
 
@@ -261,10 +264,7 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
   @override
   Widget build(BuildContext context) {
     double itemExt = widget.itemExt;
-    _listItemStyle = TextStyle(
-      fontSize: 13.5,
-      color: Theme.of(context).hintColor,
-    );
+
     _width = widget.width ?? getListWidth();
     _listHeight = widget.height ?? widget.listItems.length * itemExt + itemExt;
 
@@ -379,7 +379,7 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
     // if (widget.showCommit || _modified) {
     listHeader.add(
       SizedBox(
-        width: _indexWidth,
+        width: indexWidth,
         child:
             // widget.showCommit && _modified
             //     ? CommitModifiedTable(
@@ -499,7 +499,7 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
             Evs2ListText(
               // originalFullText: index.toString(),
               originalFullText: indexLabel,
-              width: _indexWidth,
+              width: indexWidth,
               style: TextStyle(
                 fontSize: 13.5,
                 color: Theme.of(context).hintColor,
@@ -517,7 +517,7 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
         continue;
       }
 
-      _listItemStyle = TextStyle(
+      TextStyle listItemStyle = TextStyle(
         fontSize: 13.5,
         color: Theme.of(context).hintColor,
       );
@@ -575,7 +575,7 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
       if (row[ctrlItem.colKey] != null) {
         //col colors
         if (ctrlItem.colColor != null) {
-          _listItemStyle = _listItemStyle.copyWith(
+          listItemStyle = _listItemStyle.copyWith(
             color: ctrlItem.colColor,
             fontWeight: FontWeight.w500,
           );
@@ -600,18 +600,18 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
         if (ctrlItem.errorColor != null &&
             (row[ctrlItem.colKey] as String).contains(
                 'error') /*&& row['error'].keys.first == item['fieldKey']*/) {
-          _listItemStyle = _listItemStyle.copyWith(
+          listItemStyle = _listItemStyle.copyWith(
               color: ctrlItem.errorColor, fontWeight: FontWeight.w500);
         } else if (row['${ctrlItem.colKey}_color'] != null) {
-          _listItemStyle = _listItemStyle.copyWith(
+          listItemStyle = _listItemStyle.copyWith(
               color: row['${ctrlItem.colKey}_color'],
               fontWeight: FontWeight.w500);
         } else if (row['${ctrlItem.colKey}_modified'] != null) {
-          _listItemStyle = _listItemStyle.copyWith(
+          listItemStyle = _listItemStyle.copyWith(
               color: _modifiedColor, fontWeight: FontWeight.w500);
         } else if (ctrlItem.successColor != null &&
             (row[ctrlItem.colKey] as String).contains('success')) {
-          _listItemStyle = _listItemStyle.copyWith(
+          listItemStyle = _listItemStyle.copyWith(
               color: ctrlItem.successColor, fontWeight: FontWeight.w500);
         }
         // else if (colEditable) {
@@ -665,7 +665,7 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
                   child: getCellText(
                     originalFullText: originalFullText,
                     width: width,
-                    style: _listItemStyle,
+                    style: listItemStyle,
                     clickCopy: true,
                     alignment: ctrlItem.align == 'right'
                         ? Alignment.centerRight
@@ -1106,17 +1106,30 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
           tagColor = tenantLcStatus.color.withAlpha(130);
         }
       }
+    } else if (widget.itemType == PagItemKind.bill) {
+      if (configItem['col_key'] == 'payment_status') {
+        PagBillPaymentStatus billPaymentStatus =
+            PagBillPaymentStatus.byValue(tagText);
+        tagLabel = billPaymentStatus.tag ?? '';
+        tagColor = billPaymentStatus.color?.withAlpha(130) ??
+            Colors.grey.withAlpha(130);
+      } else if (configItem['col_key'] == 'due_status') {
+        PagBillDueStatus billDueStatus = PagBillDueStatus.byValue(tagText);
+        tagLabel = billDueStatus.tag ?? '';
+        tagColor =
+            billDueStatus.color?.withAlpha(130) ?? Colors.grey.withAlpha(130);
+      } else if (configItem['col_key'] == 'gen_type') {
+        if (widget.itemType == PagItemKind.bill) {
+          PagBillGenType billingGenType = PagBillGenType.byValue(tagText);
+          tagLabel = billingGenType.tag ?? '';
+          tagColor = billingGenType.color?.withAlpha(130) ??
+              Colors.grey.withAlpha(130);
+        }
+      }
     } else if (configItem['col_key'] == 'entry_type') {
       PagSoaEntryType entryType = PagSoaEntryType.byValue(tagText);
       tagLabel = entryType.tag;
       tagColor = entryType.color;
-    } else if (configItem['col_key'] == 'gen_type') {
-      if (widget.itemType == PagItemKind.bill) {
-        PagBillGenType billingGenType = PagBillGenType.byValue(tagText);
-        tagLabel = billingGenType.tag ?? '';
-        tagColor =
-            billingGenType.color?.withAlpha(130) ?? Colors.grey.withAlpha(130);
-      }
     } else if (configItem['col_key'] == 'comm_type') {
       PagMeterCommType commType = PagMeterCommType.byValue(tagText);
       tagLabel = commType.tag;

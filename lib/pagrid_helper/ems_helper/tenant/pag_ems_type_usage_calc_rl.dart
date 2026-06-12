@@ -49,6 +49,10 @@ class PagEmsTypeUsageCalcRl {
 
   late final Map<String, dynamic>? _interestInfo;
 
+  late final Map<String, dynamic>? _billedBciInfo;
+  late final List<Map<String, dynamic>> _billedEffBciInfoList = [];
+  late final double? _billedTotalBciAmount;
+
   //output
   EmsTypeUsageR2? _typeUsageE;
   EmsTypeUsageR2? _typeUsageW;
@@ -101,6 +105,10 @@ class PagEmsTypeUsageCalcRl {
 
   List<Map<String, dynamic>>? get lineItemList => _lineItemList;
 
+  Map<String, dynamic>? get billedBciInfo => _billedBciInfo;
+  List<Map<String, dynamic>>? get billedEffBciInfoList => _billedEffBciInfoList;
+  double? get billedTotalBciAmount => _billedTotalBciAmount;
+
   PagEmsTypeUsageCalcRl({
     required int costDecimals,
     double? billedAutoUsageE,
@@ -141,6 +149,8 @@ class PagEmsTypeUsageCalcRl {
     double? billedInterestAmount,
     double? billedCycleTotalAmount,
     double? billedPayableAmount,
+    Map<String, dynamic>? billedBciInfo,
+    double? billedTotalBciAmount,
   }) {
     _costDecimals = costDecimals;
 
@@ -186,6 +196,9 @@ class PagEmsTypeUsageCalcRl {
     _principalAmount = billedPrincipalAmount;
     _cycleTotalAmount = billedCycleTotalAmount;
     _payableAmount = billedPayableAmount;
+
+    _billedBciInfo = billedBciInfo;
+    _billedTotalBciAmount = billedTotalBciAmount;
 
     _billedTrendingSnapShot = billedTrendingSnapShot;
   }
@@ -461,6 +474,27 @@ class PagEmsTypeUsageCalcRl {
 
   void _getBilledTotalCost() {
     double? subTotalCost = _totalUsageCost;
+
+    // bci
+    if (subTotalCost != null) {
+      subTotalCost += _billedTotalBciAmount ?? 0;
+    }
+
+    if (_billedBciInfo != null) {
+      final effBciInfoList =
+          _billedBciInfo['effective_bci_info_list'] as List<dynamic>?;
+      if (effBciInfoList != null) {
+        for (var item in effBciInfoList) {
+          String? strBciAmount = item['billing_cost_item_amount'];
+          double? bciAmount = double.tryParse(strBciAmount ?? '');
+          _billedEffBciInfoList.add({
+            'billing_cost_item_name': item['billing_cost_item_name'],
+            'billing_cost_item_label': item['billing_cost_item_label'],
+            'billing_cost_item_amount': bciAmount,
+          });
+        }
+      }
+    }
 
     //line items
     double lineItemCostNotSubjectToTax = 0.0;

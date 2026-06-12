@@ -29,14 +29,14 @@ class WgtPagTenantCompositeUsageSummaryRl extends StatefulWidget {
     this.showRenderModeSwitch = false,
     this.tenantLabel,
     this.tenantAccountId = '',
-    // this.cycleStr = '',
-    // this.billDate = '',
     this.isBillMode = true,
     this.billInfo = const {},
     this.gst,
     // this.meterTypeRates = const {},
     // this.manualUsages = const {},
     this.lineItems = const [],
+    this.billedBciInfoList = const [],
+    this.billedTotalBciAmount,
     // this.billedAutoUsages = const {},
     // this.billedSubTenantUsages = const {},
     // required this.billedUsageFactor,
@@ -67,17 +67,16 @@ class WgtPagTenantCompositeUsageSummaryRl extends StatefulWidget {
   final String tenantAccountId;
   final String? tenantLabel;
   final String tenantType;
-  // final String cycleStr;
-  // final String billDate;
   final bool excludeAutoUsage;
   final bool isBillMode;
   final Map<String, dynamic> billInfo;
   final double? gst;
   final String renderMode;
   final bool showRenderModeSwitch;
-  // final Map<String, dynamic> meterTypeRates;
   // final Map<String, dynamic> manualUsages;
   final List<Map<String, dynamic>> lineItems;
+  final List<Map<String, dynamic>> billedBciInfoList;
+  final double? billedTotalBciAmount;
   // final Map<String, dynamic> billedAutoUsages;
   // final Map<String, dynamic> billedSubTenantUsages;
   final int usageDecimals;
@@ -205,6 +204,7 @@ class _WgtPagTenantCompositeUsageSummaryRlState
                   widget.compositeUsageCalc!.payableAmount,
                   widget.tenantType,
                   widget.lineItems,
+                  widget.billedBciInfoList,
                   widget.compositeUsageCalc!.miniSoaInfo,
                   widget.collectionStartDateTimestampStr,
                   widget.collectionEndDateTimestampStr,

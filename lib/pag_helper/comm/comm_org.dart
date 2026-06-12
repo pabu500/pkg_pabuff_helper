@@ -59,6 +59,8 @@ Future<dynamic> doPagCreateOrg(
   } else if (response.statusCode == 403) {
     throw Exception("You are not authorized to perform this operation");
   } else {
-    throw Exception(jsonDecode(response.body)['error']);
+    Map<String, dynamic> responseBody = jsonDecode(response.body);
+    throw Exception(
+        responseBody['error']['message'] ?? 'Failed to create organization');
   }
 }

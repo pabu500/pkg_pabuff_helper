@@ -53,6 +53,10 @@ class MdlListColController {
   double colWidth;
   bool showColumn;
   bool showEditPanel;
+  bool showOnCard;
+  bool showTimestampAsDate;
+  int rowOnCard;
+  int rowOrder = 1;
   bool showSort;
   String sortOrder;
   bool hidden;
@@ -101,10 +105,14 @@ class MdlListColController {
     this.colWidth = 0.0,
     this.showColumn = true,
     this.showEditPanel = true,
+    this.showOnCard = false,
+    this.rowOnCard = 1,
+    this.rowOrder = 1,
     this.showSort = false,
     this.sortOrder = 'desc',
     this.hidden = false,
     this.filterWidgetType = PagFilterWidgetType.INPUT,
+    this.showTimestampAsDate = false,
     this.filterGroupType = PagFilterGroupType.other,
     this.filterDataType = PagFilterDataType.string,
     this.getListEpt,
@@ -420,6 +428,46 @@ class MdlListColController {
       }
     }
 
+    bool showOnCard = false;
+    if (json['show_on_card'] != null) {
+      dynamic showOnCardValue = json['show_on_card'];
+      if (showOnCardValue is bool) {
+        showOnCard = showOnCardValue;
+      } else if (showOnCardValue is String) {
+        showOnCard = showOnCardValue.toLowerCase() == 'true';
+      }
+    }
+
+    int rowOnCard = 1;
+    if (json['row_on_card'] != null) {
+      dynamic rowOnCardValue = json['row_on_card'];
+      if (rowOnCardValue is int) {
+        rowOnCard = rowOnCardValue;
+      } else if (rowOnCardValue is String) {
+        rowOnCard = int.tryParse(rowOnCardValue) ?? 1;
+      }
+    }
+
+    bool showTimestampAsDate = false;
+    if (json['show_timestamp_as_date'] != null) {
+      dynamic showTimestampAsDateValue = json['show_timestamp_as_date'];
+      if (showTimestampAsDateValue is bool) {
+        showTimestampAsDate = showTimestampAsDateValue;
+      } else if (showTimestampAsDateValue is String) {
+        showTimestampAsDate = showTimestampAsDateValue.toLowerCase() == 'true';
+      }
+    }
+
+    int rowOrder = 0;
+    if (json['row_order'] != null) {
+      dynamic rowOrderValue = json['row_order'];
+      if (rowOrderValue is int) {
+        rowOrder = rowOrderValue;
+      } else if (rowOrderValue is String) {
+        rowOrder = int.tryParse(rowOrderValue) ?? 0;
+      }
+    }
+
     return MdlListColController(
       colKey: colKey,
       joinKey: json['join_key'],
@@ -434,6 +482,8 @@ class MdlListColController {
       colWidth: width,
       showColumn: showColumn,
       showEditPanel: showEditPanel,
+      showOnCard: showOnCard,
+      rowOnCard: rowOnCard,
       showSort: showSort,
       sortOrder: sortOrder,
       hidden: permHidden,
@@ -455,6 +505,8 @@ class MdlListColController {
       contextExcludeList: contextExcludeList,
       requiredOnOnb: requiredOnOnb,
       showFilter: showFilter,
+      showTimestampAsDate: showTimestampAsDate,
+      rowOrder: rowOrder,
     );
   }
 
@@ -474,6 +526,8 @@ class MdlListColController {
     data['col_width'] = colWidth;
     data['show_column'] = showColumn.toString();
     data['show_edit_panel'] = showEditPanel.toString();
+    data['show_on_card'] = showOnCard.toString();
+    data['row_on_card'] = rowOnCard;
     data['show_sort'] = showSort.toString();
     // data['custHidden'] = hidden.toString();
     data['hidden'] = hidden.toString();
@@ -486,6 +540,9 @@ class MdlListColController {
     data['context_exclude'] = contextExcludeList;
     data['filter_data_type'] = filterDataType.name;
     data['required_on_onb'] = requiredOnOnb.toString();
+    data['show_filter'] = showFilter.toString();
+    data['show_timestamp_as_date'] = showTimestampAsDate.toString();
+    data['row_order'] = rowOrder;
     return data;
   }
 }

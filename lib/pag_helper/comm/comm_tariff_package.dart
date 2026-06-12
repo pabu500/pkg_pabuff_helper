@@ -43,7 +43,8 @@ Future<dynamic> doPagTariffPackage(
       return respJson;
     } else {
       Map<String, dynamic> responseBody = jsonDecode(response.body);
-      throw Exception(responseBody['error']);
+      throw Exception(responseBody['error']['message'] ??
+          'Failed to create tariff package');
     }
   } catch (err) {
     throw Exception(err);
@@ -100,7 +101,7 @@ Future<dynamic> doGetTariffPackageTenantList(
   }
 }
 
-Future<dynamic> doGetScopeTenantList(
+Future<dynamic> doGetTariffPackageScopeTenantList(
   MdlPagAppConfig appConfig,
   Map<String, dynamic> queryMap,
   MdlPagSvcClaim svcClaim,

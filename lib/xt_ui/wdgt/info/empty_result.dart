@@ -20,16 +20,16 @@ class EmptyResult extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             // mainAxisSize: MainAxisSize.min,
             children: [
-              verticalSpaceSmall,
-              Container(
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage("assets/images/data_not_found.png"),
-                    opacity: 0.62,
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
+              // verticalSpaceSmall,
+              // Container(
+              //   decoration: const BoxDecoration(
+              //     image: DecorationImage(
+              //       image: AssetImage("assets/images/data_not_found.png"),
+              //       opacity: 0.62,
+              //       fit: BoxFit.contain,
+              //     ),
+              //   ),
+              // ),
               verticalSpaceSmall,
               Text(
                 message,

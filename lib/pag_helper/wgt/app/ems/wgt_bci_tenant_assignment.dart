@@ -9,13 +9,15 @@ import 'package:buff_helper/xt_ui/xt_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-import '../../../comm/comm_tariff_package.dart';
-import '../../../def_helper/pag_item_helper.dart';
+import '../../../../up_helper/exceptions.dart';
+import '../../../../xt_ui/wdgt/datetime/wgt_date_picker.dart';
+import '../../../comm/comm_billing_cost_item.dart';
+import '../../../def_helper/dh_pag_tariff.dart';
 import '../../../model/mdl_pag_app_config.dart';
 import 'dart:developer' as dev;
 
-class WgtTariffPackageAssignment extends StatefulWidget {
-  const WgtTariffPackageAssignment({
+class WgtBciTenantAssignment extends StatefulWidget {
+  const WgtBciTenantAssignment({
     super.key,
     required this.appConfig,
     required this.loggedInUser,
@@ -23,7 +25,6 @@ class WgtTariffPackageAssignment extends StatefulWidget {
     required this.itemName,
     required this.itemLabel,
     required this.itemScope,
-    required this.meterType,
     // required this.tariffPackageTypeName,
     // required this.tariffPackageTypeLabel,
     required this.itemInfo,
@@ -36,7 +37,6 @@ class WgtTariffPackageAssignment extends StatefulWidget {
   final String itemGroupIndexStr;
   final String itemName;
   final String itemLabel;
-  final String meterType;
   final Map<String, dynamic> itemInfo;
   // final String tariffPackageTypeName;
   // final String tariffPackageTypeLabel;
@@ -45,17 +45,24 @@ class WgtTariffPackageAssignment extends StatefulWidget {
   final Function? onUpdate;
 
   @override
-  State<WgtTariffPackageAssignment> createState() =>
-      _WgtTariffPackageAssignmentState();
+  State<WgtBciTenantAssignment> createState() => _WgtBciTenantAssignmentState();
 }
 
-class _WgtTariffPackageAssignmentState
-    extends State<WgtTariffPackageAssignment> {
+class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
+  final DateTime leftMostDate =
+      DateTime.now().subtract(const Duration(days: 365 * 5));
+  final DateTime rightMostDate =
+      DateTime.now().add(const Duration(days: 365 * 5));
+
+  late final BoxDecoration boxDecoration = BoxDecoration(
+    border: Border.all(color: Theme.of(context).hintColor.withAlpha(50)),
+    borderRadius: BorderRadius.circular(5),
+  );
+
   final double width = 395.0;
 
   bool _isFetching = false;
   bool _isFetched = false;
-  bool _hasTptMismatchAssignmentError = false;
   bool _modified = false;
 
   bool _isCommitting = false;
@@ -72,6 +79,9 @@ class _WgtTariffPackageAssignmentState
       TextEditingController();
   String _itemLabelFilterStr = '';
 
+  UniqueKey? _timePickerFromKey;
+  UniqueKey? _timePickerToKey;
+
   Future<void> _doAutoPopulate() async {
     if (_isFetching) {
       return;
@@ -79,12 +89,12 @@ class _WgtTariffPackageAssignmentState
 
     Map<String, dynamic> queryMap = {
       'scope': widget.loggedInUser!.selectedScope.toScopeMap(),
-      'tariff_package_id': widget.itemGroupIndexStr,
+      'billing_cost_item_id': widget.itemGroupIndexStr,
     };
 
     _isFetching = true;
     try {
-      final data = await doGetTariffPackageScopeTenantList(
+      final result = await doGetBciScopeTenantList(
         widget.appConfig,
         queryMap,
         MdlPagSvcClaim(
@@ -95,56 +105,28 @@ class _WgtTariffPackageAssignmentState
           operation: 'read',
         ),
       );
-      final tpAssignment = data['tariff_package_assignment'];
-      if (tpAssignment == null || tpAssignment.isEmpty) {
-        throw Exception('No tenant found for this tariff package');
-      }
-      final tpScopeMatchingTenantList =
-          tpAssignment['tariff_package_scope_matching_tenant_list'];
+      final bciScopeMatchingTenantList =
+          result['bci_scope_matching_tenant_list'];
 
-      if (tpScopeMatchingTenantList == null) {
+      if (bciScopeMatchingTenantList == null) {
         throw Exception(
-            'No scope matching tenant found for this tariff package');
+            'No scope matching tenant found for this billing cost item');
       }
       _itemGroupScopeMatchingItemList =
-          List<Map<String, dynamic>>.from(tpScopeMatchingTenantList);
+          List<Map<String, dynamic>>.from(bciScopeMatchingTenantList);
       // sort by label
       _itemGroupScopeMatchingItemList!.sort((a, b) {
-        String labelA = a['label'] ?? '';
-        String labelB = b['label'] ?? '';
+        String labelA = a['tenant_label'] ?? '';
+        String labelB = b['tenant_label'] ?? '';
         return labelA.compareTo(labelB);
       });
 
       for (Map<String, dynamic> tenant in _itemGroupScopeMatchingItemList!) {
-        String tenantMeterTypeTpKey =
-            'tp_name_${widget.meterType.toLowerCase()}';
-        String tenantMeterTypeTpTypeName =
-            tenant['tpt_name_${widget.meterType.toLowerCase()}'] ?? '';
-
-        String? tpName = tenant[tenantMeterTypeTpKey];
-        bool isUnassigned = tpName == null;
-
-        bool isAsignedToOtherTps = tpName != null && tpName != widget.itemName;
-        final tptName = tenant['tpt_name_${widget.meterType.toLowerCase()}'] ??
-            'Unknown TPT';
-
-        bool hasTptMismatch = tenantMeterTypeTpTypeName != tptName;
+        bool isassignedThisBci = tenant['is_assigned_to_this_bci'] == 'true';
 
         tenant['assigned'] = false;
-        if (!isUnassigned && !isAsignedToOtherTps) {
+        if (isassignedThisBci) {
           tenant['assigned'] = true;
-        }
-        if (isAsignedToOtherTps) {
-          tenant['assigned_to_another_tp_name'] = tpName;
-          tenant['assigned'] = true;
-        }
-        tenant['tpt_mismatch'] = hasTptMismatch;
-        bool tptMismatchAssignmentError =
-            !isUnassigned && hasTptMismatch && !isAsignedToOtherTps;
-        tenant['tpt_mismatch_assignment_error'] = tptMismatchAssignmentError;
-
-        if (tptMismatchAssignmentError) {
-          _hasTptMismatchAssignmentError = true;
         }
       }
     } catch (e) {
@@ -166,17 +148,23 @@ class _WgtTariffPackageAssignmentState
     // filter out items that are not modified
     final List<Map<String, dynamic>> assignmentList =
         _itemGroupScopeMatchingItemList!
-            .where((tenant) => tenant['assigned_new'] != null)
+            .where((item) =>
+                item['assigned_new'] != item['assigned'] ||
+                item['bci_tenant_effective_from_timestamp_new'] !=
+                    item['bci_tenant_effective_from_timestamp'] ||
+                item['bci_tenant_effective_to_timestamp_new'] !=
+                    item['bci_tenant_effective_to_timestamp'])
             .toList();
     Map<String, dynamic> queryMap = {
       'scope': widget.loggedInUser!.selectedScope.toScopeMap(),
-      'tariff_package_id': widget.itemGroupIndexStr,
-      'tenant_assignment_list': assignmentList,
+      'assignment_type': 'bci-to-tenant-list',
+      'item_group_id': widget.itemGroupIndexStr,
+      'item_assignment_list': assignmentList,
     };
     try {
       _isCommitting = true;
 
-      final data = await commitTariffPackageTenantList(
+      final result = await commitBciTenantAssignment(
         widget.appConfig,
         queryMap,
         MdlPagSvcClaim(
@@ -187,39 +175,71 @@ class _WgtTariffPackageAssignmentState
           operation: 'update',
         ),
       );
-
-      if (data['error'] != null) {
-        throw Exception(data['error']);
-      }
     } catch (e) {
       dev.log(e.toString());
 
-      setState(() {
-        _commitErrorText = 'Commit Error';
-      });
+      _commitErrorText = getErrorText(e,
+          defaultErrorText: 'Error committing bci tenant assignment');
     } finally {
       setState(() {
         _isCommitting = false;
         _isCommitted = true;
         _modified = false;
+        _isFetched = false; // to trigger data refresh on next open
       });
     }
   }
 
   bool _showItem(Map<String, dynamic> item) {
     if (_itemNameFilterStr.isNotEmpty) {
-      String? name = item['name'];
+      String? name = item['tenant_name'];
       bool nameMatches = (name ?? '').isNotEmpty &&
           (name ?? '').toLowerCase().contains(_itemNameFilterStr);
       return nameMatches;
     }
     if (_itemLabelFilterStr.isNotEmpty) {
-      String? label = item['label'];
+      String? label = item['tenant_label'];
       bool labelMatches = (label ?? '').isNotEmpty &&
           (label ?? '').toLowerCase().contains(_itemLabelFilterStr);
       return labelMatches;
     }
     return true; // Include item if no filter is applied
+  }
+
+  bool _checkModified() {
+    bool assignmentModified = false;
+    for (Map<String, dynamic> item in _itemGroupScopeMatchingItemList ?? []) {
+      if (item['assigned_new'] != null) {
+        if (item['assigned'] != item['assigned_new']) {
+          assignmentModified = true;
+          break;
+        }
+      }
+    }
+    bool effectiveDateModified = false;
+    for (Map<String, dynamic> item in _itemGroupScopeMatchingItemList ?? []) {
+      // only assigned items can modify effective date
+      if (item['assigned'] == true && item['assigned_new'] != false) {
+        // if (item['tbci_effective_from_timestamp_new'] != null) {
+        if (item['tbci_effective_from_timestamp'] !=
+            item['tbci_effective_from_timestamp_new']) {
+          effectiveDateModified = true;
+          break;
+        }
+        // }
+        // if (item['tbci_effective_to_timestamp_new'] != null) {
+        if (item['tbci_effective_to_timestamp'] !=
+            item['tbci_effective_to_timestamp_new']) {
+          effectiveDateModified = true;
+          break;
+          // }
+        }
+      }
+    }
+    setState(() {
+      _modified = assignmentModified || effectiveDateModified;
+    });
+    return assignmentModified || effectiveDateModified;
   }
 
   @override
@@ -241,7 +261,7 @@ class _WgtTariffPackageAssignmentState
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Icon(Symbols.assignment_ind, color: Colors.transparent),
-              getTpInfo(),
+              getBciInfo(),
               IconButton(
                 icon: const Icon(Symbols.close),
                 onPressed: () {
@@ -362,16 +382,12 @@ class _WgtTariffPackageAssignmentState
         ),
         horizontalSpaceSmall,
         InkWell(
-          onTap: (_itemGroupScopeMatchingItemList ?? []).isEmpty ||
-                  _hasTptMismatchAssignmentError
+          onTap: (_itemGroupScopeMatchingItemList ?? []).isEmpty
               ? null
               : () {
                   setState(() {
                     for (Map<String, dynamic> tenant
                         in _itemGroupScopeMatchingItemList!) {
-                      if (tenant['tpt_mismatch']) {
-                        continue;
-                      }
                       tenant['assigned_new'] = true;
                       if (tenant['assigned'] != tenant['assigned_new']) {
                         _modified = true;
@@ -381,17 +397,11 @@ class _WgtTariffPackageAssignmentState
                 },
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-            decoration: _hasTptMismatchAssignmentError
-                ? boxDecoration.copyWith(
-                    color:
-                        Theme.of(context).colorScheme.secondary.withAlpha(130))
-                : boxDecoration,
+            decoration: boxDecoration,
             child: Text(
               'Select All',
               style: TextStyle(
-                color: _hasTptMismatchAssignmentError
-                    ? Theme.of(context).hintColor
-                    : null,
+                color: Theme.of(context).hintColor,
               ),
             ),
           ),
@@ -401,8 +411,7 @@ class _WgtTariffPackageAssignmentState
           onTap: !_modified ||
                   _isCommitting ||
                   _isCommitted ||
-                  (_itemGroupScopeMatchingItemList ?? []).isEmpty ||
-                  _hasTptMismatchAssignmentError
+                  (_itemGroupScopeMatchingItemList ?? []).isEmpty
               ? null
               : () async {
                   await _doCommit();
@@ -418,33 +427,15 @@ class _WgtTariffPackageAssignmentState
                   : _isCommitting
                       ? const WgtPagWait(size: 21)
                       : Icon(Icons.cloud_upload,
-                          color: _modified && !_hasTptMismatchAssignmentError
+                          color: _modified
                               ? commitColor
                               : Theme.of(context).hintColor),
         ),
-        if (_hasTptMismatchAssignmentError)
-          Container(
-            margin: const EdgeInsets.only(left: 10),
-            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-            decoration: boxDecoration.copyWith(color: Colors.transparent),
-            child: Text(
-              '✘ TPT Mismatch Error',
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-            ),
-          ),
       ],
     );
   }
 
-  Widget getTpInfo() {
-    String tariffPackageScopeLabel = widget.itemScope.getLeafScopeLabel();
-    PagScopeType itemScopeType = widget.itemScope.getScopeType();
-    Widget scopeIcon = getScopeIcon(context, itemScopeType, size: 21);
-    BoxDecoration boxDecoration = BoxDecoration(
-      border: Border.all(color: Theme.of(context).hintColor, width: 1.5),
-      borderRadius: BorderRadius.circular(5),
-    );
-    final tptLabel = widget.itemInfo['tpt_label'] ?? 'Unknown TPT';
+  Widget getBciInfo() {
     return Row(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -455,7 +446,7 @@ class _WgtTariffPackageAssignmentState
               fontWeight: FontWeight.bold, color: Theme.of(context).hintColor),
         ),
         horizontalSpaceSmall,
-        Icon(PagItemKind.tariff.iconData, size: 21),
+        Icon(PagTariff.billingCostItem.iconData, size: 21),
         horizontalSpaceTiny,
         Text(
           widget.itemName,
@@ -467,35 +458,7 @@ class _WgtTariffPackageAssignmentState
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         horizontalSpaceSmall,
-        // Container(
-        //   decoration: boxDecoration,
-        //   padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-        //   child: Row(
-        //     mainAxisSize: MainAxisSize.min,
-        //     children: [
-        //       scopeIcon,
-        //       horizontalSpaceTiny,
-        //       Text(tariffPackageScopeLabel),
-        //     ],
-        //   ),
-        // ),
         getScopeLabel(context, widget.itemScope),
-        horizontalSpaceSmall,
-        Container(
-          // width: 20,
-          decoration: boxDecoration,
-          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-          child: Text(widget.meterType,
-              style: const TextStyle(fontWeight: FontWeight.bold)),
-        ),
-        horizontalSpaceSmall,
-        Container(
-          // width: 60,
-          decoration: boxDecoration,
-          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-          child: Text(tptLabel,
-              style: const TextStyle(fontWeight: FontWeight.bold)),
-        ),
       ],
     );
   }
@@ -514,10 +477,11 @@ class _WgtTariffPackageAssignmentState
     for (Map<String, dynamic> itemInfo
         in _itemGroupScopeMatchingItemList ?? []) {
       bool showItem = _showItem(itemInfo);
+      index++;
       if (!showItem) {
         continue; // Skip this item if it doesn't match the filter
       }
-      Widget tile = getItemRow(itemInfo, ++index);
+      Widget tile = getItemRow(itemInfo, index);
       itemWidgetList.add(
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 5),
@@ -536,35 +500,15 @@ class _WgtTariffPackageAssignmentState
   }
 
   Widget getItemRow(Map<String, dynamic> itemInfo, int index) {
-    String tenantName = itemInfo['name'] ?? 'Unknown Tenant';
-    String tenantLabel = itemInfo['label'] ?? '';
+    String tenantName = itemInfo['tenant_name'] ?? 'Unknown Tenant';
+    String tenantLabel = itemInfo['tenant_label'] ?? '';
     bool assigned = itemInfo['assigned'] ?? false;
-
-    String? meterTypeTptLabel =
-        itemInfo['tpt_label_${widget.meterType.toLowerCase()}'];
-    if (meterTypeTptLabel == null) {
-      // if (kDebugMode) {
-      // meter type tpt is not assigned for this tenant
-      dev.log(
-          'warning: meterTypeTptLabel is null for ${widget.meterType} in itemInfo: $itemInfo');
-      // }
-      // return const SizedBox.shrink();
-    }
-    // assert(meterTypeTptLabel.isNotEmpty);
-
-    BoxDecoration boxDecoration = BoxDecoration(
-      border: Border.all(color: Theme.of(context).hintColor.withAlpha(50)),
-      borderRadius: BorderRadius.circular(5),
-    );
 
     TextStyle disabledTextStyle =
         TextStyle(color: Theme.of(context).hintColor.withAlpha(150));
 
-    bool disabled = meterTypeTptLabel == null ||
-        _hasTptMismatchAssignmentError ||
-        itemInfo['assigned_to_another_tp_name'] != null ||
-        itemInfo['tpt_mismatch'] ||
-        itemInfo['tpt_mismatch_assignment_error'];
+    bool disabled = false;
+    String disabledText = '';
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -598,59 +542,119 @@ class _WgtTariffPackageAssignmentState
           child: SelectableText(tenantLabel.isNotEmpty ? tenantLabel : '-',
               style: disabled ? disabledTextStyle : null),
         ),
-        horizontalSpaceSmall,
+        horizontalSpaceTiny,
+        getEffectiveDateRange(itemInfo),
         Tooltip(
-          message: meterTypeTptLabel == null
-              ? 'Tpt is not set for the tenant'
-              : itemInfo['tpt_mismatch_assignment_error']
-                  ? 'TP Type Mismatch Error'
-                  : itemInfo['tpt_mismatch'] &&
-                          (itemInfo['assigned_to_another_tp_name'] == null)
-                      ? 'TP Type Mismatch'
-                      : '',
-          child: Container(
-            width: 90,
-            decoration: itemInfo['tpt_mismatch_assignment_error']
-                ? boxDecoration.copyWith(
-                    border:
-                        Border.all(color: Theme.of(context).colorScheme.error))
-                : itemInfo['tpt_mismatch'] &&
-                        (itemInfo['assigned_to_another_tp_name'] == null)
-                    ? boxDecoration.copyWith(
-                        border: Border.all(color: Colors.yellow.withAlpha(130)))
-                    : boxDecoration,
-            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-            child: Text(meterTypeTptLabel ?? '-',
-                style: disabled ? disabledTextStyle : null),
+          message: disabled ? disabledText : '',
+          child: Checkbox(
+            value: itemInfo['assigned_new'] ?? itemInfo['assigned'],
+            onChanged: disabled
+                ? null
+                : (bool? value) {
+                    setState(() {
+                      if (value == null) return;
+                      itemInfo['assigned_new'] = value;
+                      if (itemInfo['assigned'] != itemInfo['assigned_new']) {
+                        _modified = true;
+                      }
+                    });
+                    widget.onScopeTreeUpdate?.call();
+                  },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget getEffectiveDateRange(Map<String, dynamic> itemInfo) {
+    String effectiveFromTimestamp =
+        itemInfo['tbci_effective_from_timestamp_new'] ??
+            itemInfo['tbci_effective_from_timestamp'] ??
+            '';
+    String effectiveToTimestamp = itemInfo['tbci_effective_to_timestamp_new'] ??
+        itemInfo['tbci_effective_to_timestamp'] ??
+        '';
+    DateTime? effectiveFromDateTime;
+    DateTime? effectiveToDateTime;
+    if (effectiveFromTimestamp.isNotEmpty) {
+      effectiveFromDateTime = DateTime.tryParse(effectiveFromTimestamp);
+    }
+    if (effectiveToTimestamp.isNotEmpty) {
+      effectiveToDateTime = DateTime.tryParse(effectiveToTimestamp);
+    }
+    _timePickerFromKey = UniqueKey();
+    _timePickerToKey = UniqueKey();
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SizedBox(
+          width: 150,
+          child: WgtDatePicker(
+            key: _timePickerFromKey,
+            iconSize: 18,
+            enabled: itemInfo['assigned_new'] == true ||
+                (itemInfo['assigned'] == true &&
+                    itemInfo['assigned_new'] != false),
+            defaultFirstDate: leftMostDate,
+            defaultLastDate: effectiveToDateTime ?? rightMostDate,
+            initialDate: effectiveFromDateTime,
+            labelFontSize: 15,
+            timeZone: widget.loggedInUser!.selectedScope.getProjectTimezone(),
+            label: 'Eff. From Date',
+            onDateChanged: (DateTime selectedDate) {
+              setState(() {
+                effectiveFromDateTime = DateTime(selectedDate.year,
+                    selectedDate.month, selectedDate.day, 0, 0, 0, 0);
+                itemInfo['tbci_effective_from_timestamp_new'] =
+                    effectiveFromDateTime?.toIso8601String();
+                _checkModified();
+              });
+            },
+            onDateCleared: () {
+              setState(() {
+                effectiveFromDateTime = null;
+                itemInfo['tbci_effective_from_timestamp_new'] = '';
+                _checkModified();
+              });
+            },
           ),
         ),
         horizontalSpaceTiny,
-        Checkbox(
-          value: itemInfo['assigned_new'] ?? itemInfo['assigned'],
-          onChanged: disabled
-              ? null
-              : (bool? value) {
-                  setState(() {
-                    if (value == null) return;
-                    itemInfo['assigned_new'] = value;
-                    if (itemInfo['assigned'] != itemInfo['assigned_new']) {
-                      _modified = true;
-                    }
-                  });
-                  widget.onScopeTreeUpdate?.call();
-                },
+        SizedBox(
+          width: 150,
+          child: WgtDatePicker(
+            key: _timePickerToKey,
+            iconSize: 18,
+            enabled: itemInfo['assigned_new'] == true ||
+                (itemInfo['assigned'] == true &&
+                    itemInfo['assigned_new'] != false),
+            defaultFirstDate: effectiveFromDateTime ?? leftMostDate,
+            defaultLastDate: effectiveToDateTime ?? rightMostDate,
+            initialDate: effectiveToDateTime,
+            labelFontSize: 15,
+            timeZone: widget.loggedInUser!.selectedScope.getProjectTimezone(),
+            label: 'Eff. To Date',
+            onDateChanged: (DateTime selectedDate) {
+              setState(() {
+                effectiveToDateTime = DateTime(selectedDate.year,
+                        selectedDate.month, selectedDate.day, 0, 0, 0, 0)
+                    .add(const Duration(days: 1));
+                itemInfo['tbci_effective_to_timestamp_new'] =
+                    effectiveToDateTime?.toIso8601String();
+                _checkModified();
+              });
+            },
+            onDateCleared: () {
+              setState(() {
+                effectiveToDateTime = null;
+                itemInfo['tbci_effective_to_timestamp_new'] = '';
+                _checkModified();
+              });
+            },
+          ),
         ),
-        itemInfo['assigned_to_another_tp_name'] != null
-            ? Tooltip(
-                message:
-                    'Assigned to another tariff package: ${itemInfo['assigned_to_another_tp_name']}',
-                child: const Icon(
-                  Symbols.info,
-                  color: Colors.blue,
-                  size: 18,
-                ),
-              )
-            : const SizedBox(width: 18),
       ],
     );
   }

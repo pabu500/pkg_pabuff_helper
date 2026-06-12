@@ -15,7 +15,6 @@ import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
 import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_scope.dart';
 import 'package:buff_helper/pag_helper/wgt/app/am/wgt_am_meter_group_assignment.dart';
-import 'package:buff_helper/pag_helper/wgt/app/ems/wgt_meter_group_assignment2.dart';
 import 'package:buff_helper/pag_helper/wgt/app/ems/wgt_tenant_soa2.dart';
 import 'package:buff_helper/pagrid_helper/comm_helper/local_storage.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/wgt_pag_composite_bill_view.dart';
@@ -35,6 +34,7 @@ import 'package:provider/provider.dart';
 
 import '../../comm/comm_list.dart';
 import '../../model/mdl_pag_app_config.dart';
+import '../app/ems/wgt_bci_tenant_assignment.dart';
 import '../app/ems/wgt_bill_compilation.dart';
 import '../app/ems/wgt_match_payment_op_item.dart';
 import '../app/ems/wgt_tenant_item_assignment.dart';
@@ -54,7 +54,7 @@ class WgtListSearchItemFlexi extends StatefulWidget {
     required this.itemKind,
     required this.prefKey,
     required this.listContextType,
-    this.itemType,
+    this.itemTypeEnum,
     this.listController,
     this.selectedItemInfoList,
     this.onGetListInfoListResult,
@@ -88,7 +88,7 @@ class WgtListSearchItemFlexi extends StatefulWidget {
   final MdlPagAppConfig appConfig;
   final MdlPagAppContext? pagAppContext;
   final PagItemKind itemKind;
-  final dynamic itemType;
+  final dynamic itemTypeEnum;
   final PagListContextType listContextType;
   final String prefKey;
   final MdlPagListController? listController;
@@ -447,7 +447,9 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         // widget.itemKind == PagItemKind.tariffPackage ||
         // widget.itemKind == PagItemKind.tariff ||
         (widget.itemKind == PagItemKind.tariff &&
-            _selectedListController!.itemType == PagTariff.tariffPackage) ||
+            (_selectedListController!.itemTypeEnum == PagTariff.tariffPackage ||
+                _selectedListController!.itemTypeEnum ==
+                    PagTariff.billingCostItem)) ||
         widget.itemKind == PagItemKind.meterGroup ||
         widget.itemKind == PagItemKind.tenant ||
         widget.listContextType == PagListContextType.paymentMatching) {
@@ -463,7 +465,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     }
     bool isAmDeviceMeterManager = widget.pagAppContext! == appCtxAm &&
         widget.itemKind == PagItemKind.device &&
-        _selectedListController!.itemType == PagDeviceCat.meterGroup;
+        _selectedListController!.itemTypeEnum == PagDeviceCat.meterGroup;
     if (isAmDeviceMeterManager) {
       addOpColumn = true;
     }
@@ -612,13 +614,21 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                             PagFilterGroupType.location) {
                           itemScopeMap[colController.colKey] =
                               item[colController.colKey];
+                          continue;
                         }
 
                         // join key is not directly editable
                         // therefore exlude from the field list
-                        if (colController.colKey != 'amgr_name' &&
-                            colController.colKey != 'bank_name') {
+
+                        // continue;
+                        // show join key as read only
+                        if (colController.hidden == true) {
                           continue;
+                        } else {
+                          if (colController.colKey != 'amgr_name' &&
+                              colController.colKey != 'bank_name') {
+                            colController.isMutable = false;
+                          }
                         }
                       }
 
@@ -683,10 +693,17 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                     // }
 
                     Map<String, dynamic> customProperties = {};
-                    if (widget.itemKind == PagItemKind.tariff) {
-                      String tpTypeCatStr = item['tpt_cat'] ?? '';
+                    if (widget.itemKind == PagItemKind.tariff &&
+                        _selectedListController!.itemTypeEnum ==
+                            PagTariff.tariffPackage) {
+                      String tpTypeCatStr =
+                          item['tariff_package_type_cat'] ?? '';
                       PagTariffPackageTypeCat? tpTypeCat =
                           PagTariffPackageTypeCat.byTag(tpTypeCatStr);
+                      if (tpTypeCat == null) {
+                        dev.log(
+                            'Unknown tariff package type cat: $tpTypeCatStr');
+                      }
                       customProperties = {
                         'tpTypeCat': tpTypeCat,
                       };
@@ -697,6 +714,9 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                       WgtPagItemInfoEditPanel(
                         appConfig: widget.appConfig,
                         itemKind: widget.itemKind,
+                        itemTypeEnum: widget.itemTypeEnum ??
+                            widget.listController?.itemTypeEnum,
+                        // widget.listController?.itemType?.value,
                         strItemIndex: item['id'],
                         fields: fieldList,
                         itemDisplayName:
@@ -704,8 +724,6 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                         listController: _selectedListController,
                         itemScopeMap: itemScopeMap,
                         itemInfoMap: item,
-                        itemType:
-                            widget.itemType ?? widget.listController?.itemType,
                         onScopeTreeUpdate: widget.onScopeTreeUpdate,
                         validateTreeChildren: widget.validateTreeChildren,
                         customProperties: customProperties,
@@ -815,9 +833,12 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                           itemScopeMap[colController.colKey] =
                               item[colController.colKey];
                         }
-                        // joint key is not directly editable
+                        // join key is not directly editable
                         // therefore exlude from the field list
                         continue;
+
+                        // // show join key as read only
+                        // colController.isMutable = false;
                       }
 
                       String widgetType =
@@ -913,39 +934,44 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                         );
                         break;
                       case PagItemKind.tariff:
-                        opWidget = WgtTariffPackageAssignment(
-                          appConfig: widget.appConfig,
-                          loggedInUser: loggedInUser!,
-                          itemGroupIndexStr: item['id'],
-                          itemName: item['name'],
-                          itemLabel: item['label'],
-                          meterType: item['meter_type'] ?? '',
-                          itemInfo: item,
-                          itemScope: itemScope,
-                          onUpdate: () {
-                            setState(() {
-                              _itemUpdated = true;
-                            });
-                          },
-                        );
-                      case PagItemKind.meterGroup:
-                        opWidget = WgtMeterGroupAssignment2(
-                          appConfig: widget.appConfig,
-                          itemGroupIndexStr: item['id'],
-                          itemName: item['name'],
-                          itemLabel: item['label'] ?? '',
-                          meterType: item['meter_type'] ?? '',
-                          itemInfo: item,
-                          itemScope: itemScope,
-                          onUpdate: () {
-                            setState(() {
-                              _itemUpdated = true;
-                            });
-                          },
-                        );
+                        _selectedListController!.itemTypeEnum ==
+                                PagTariff.tariffPackage
+                            ? opWidget = WgtTariffPackageAssignment(
+                                appConfig: widget.appConfig,
+                                loggedInUser: loggedInUser!,
+                                meterType: item['meter_type'] ?? '',
+                                itemGroupIndexStr: item['id'],
+                                itemInfo: item,
+                                itemName: item['name'],
+                                itemLabel: item['label'] ?? '',
+                                itemScope: itemScope,
+                                onUpdate: () {
+                                  setState(() {
+                                    _itemUpdated = true;
+                                  });
+                                },
+                              )
+                            : _selectedListController!.itemTypeEnum ==
+                                    PagTariff.billingCostItem
+                                ? opWidget = WgtBciTenantAssignment(
+                                    appConfig: widget.appConfig,
+                                    loggedInUser: loggedInUser!,
+                                    itemGroupIndexStr: item['id'],
+                                    itemName: item['name'],
+                                    itemLabel: item['label'] ?? '',
+                                    itemInfo: item,
+                                    itemScope: itemScope,
+                                    onUpdate: () {
+                                      setState(() {
+                                        _itemUpdated = true;
+                                      });
+                                    },
+                                  )
+                                : Container();
                       case PagItemKind.tenant:
                         opWidget = WgtTenantItemAssignment(
                           appConfig: widget.appConfig,
+                          loggedInUser: loggedInUser!,
                           strItemGroupIndex: item['id'],
                           itemName: item['name'],
                           itemLabel: item['label'] ?? '',
@@ -957,7 +983,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                           },
                         );
                       case PagItemKind.device:
-                        _selectedListController?.itemType ==
+                        _selectedListController?.itemTypeEnum ==
                                 PagDeviceCat.meterGroup
                             ? opWidget = WgtAmMeterGroupAssignment(
                                 appConfig: widget.appConfig,
@@ -973,6 +999,21 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                                 },
                               )
                             : Container();
+                        break;
+                      case PagItemKind.meterGroup:
+                        opWidget = WgtAmMeterGroupAssignment(
+                          appConfig: widget.appConfig,
+                          meterType: item['meter_type'] ?? '',
+                          itemGroupIndexStr: item['id'],
+                          itemName: item['name'],
+                          itemLabel: item['label'] ?? '',
+                          itemScope: itemScope,
+                          onUpdate: () {
+                            setState(() {
+                              _itemUpdated = true;
+                            });
+                          },
+                        );
                         break;
                       default:
                         opWidget = Container();
@@ -1291,11 +1332,16 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       includeColKeyAsFilter: false,
       showColumn: true,
       colWidth: 45,
+      showOnCard: true,
+      rowOnCard: 2,
+      rowOrder: 3,
+      // align: 'right',
       colWidgetType: PagColWidgetType.CUSTOM,
       getCustomWidget: (item, fullList) {
         bool showDetail = true;
         return Padding(
-          padding: const EdgeInsets.only(right: 0),
+          padding: EdgeInsets.only(
+              right: 0, left: widget.isCompactFinder ? 30.0 : 0.0),
           child: InkWell(
             onTap: !showDetail
                 ? null
@@ -1430,7 +1476,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
   }
 
   void _addDeviceHealthColumn(MdlPagListController listController) {
-    PagDeviceCat? deviceCat = listController.itemType;
+    PagDeviceCat? deviceCat = listController.itemTypeEnum;
     assert(deviceCat != null);
 
     MdlListColController appCtxCol = MdlListColController(
@@ -1489,7 +1535,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                         appConfig: widget.appConfig,
                         loggedInUser: loggedInUser!,
                         pagAppContext: widget.pagAppContext!,
-                        scopeType: _selectedListController!.itemType,
+                        scopeType: _selectedListController!.itemTypeEnum,
                         scopeInfo: item,
                       ),
                       onClosed: () {},
@@ -1526,12 +1572,12 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
   String _getListPrefix() {
     String prefix = widget.itemKind.name.toLowerCase();
 
-    if (widget.itemType != null) {
-      prefix += '_${widget.itemType}'.toLowerCase();
+    if (widget.itemTypeEnum != null) {
+      prefix += '_${widget.itemTypeEnum}'.toLowerCase();
     } else if (_selectedListController != null &&
-        _selectedListController!.itemType != null) {
+        _selectedListController!.itemTypeEnum != null) {
       prefix +=
-          '_${_selectedListController!.itemType}'.toString().toLowerCase();
+          '_${_selectedListController!.itemTypeEnum}'.toString().toLowerCase();
     }
 
     prefix += '_${widget.listContextType.name}';
@@ -1677,7 +1723,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         loggedInUser: loggedInUser!,
         appConfig: widget.appConfig,
         itemKind: widget.itemKind,
-        itemType: _selectedListController!.itemType,
+        itemType: _selectedListController!.itemTypeEnum,
         listContextType: widget.listContextType,
         listController: _selectedListController!,
         selectedItemInfoList: widget.selectedItemInfoList,
@@ -1825,13 +1871,14 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           initialItemList: _entityItems,
           listContextType: widget.listContextType,
           queryMap: _queryMap,
+          displayMode: widget.isCompactFinder ? 'card' : 'table',
           totalItemCount: _totalItemCount,
           listController: _selectedListController!,
           getPaneWidget: widget.getPaneWidget,
           getSwitcher: widget.getSwitcher ?? getPaneModeSwitcher,
           sectionName: widget.prefKey,
           paneHeight: widget.paneHeight,
-          itemType: widget.itemType ?? widget.listController?.itemType,
+          itemType: widget.itemTypeEnum ?? widget.listController?.itemTypeEnum,
           listPrefix: _getListPrefix(),
           onResult: (Map<String, dynamic> result) {
             widget.onResult?.call(result);

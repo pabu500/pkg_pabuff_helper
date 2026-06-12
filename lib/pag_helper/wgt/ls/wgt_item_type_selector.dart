@@ -149,7 +149,7 @@ class _WgtItemTypeSelectorState extends State<WgtItemTypeSelector> {
 
     _selectedItemType = itemType;
     for (var listController in _listControllerList) {
-      if (listController.itemType == itemType) {
+      if (listController.itemTypeEnum == itemType) {
         _selectedListController = listController;
         break;
       }
@@ -169,7 +169,7 @@ class _WgtItemTypeSelectorState extends State<WgtItemTypeSelector> {
   }
 
   void _saveItemTypePref() {
-    String? itemTypeStr = getItemTypeStr(_selectedListController?.itemType);
+    String? itemTypeStr = getItemTypeStr(_selectedListController?.itemTypeEnum);
     String itemTypePrefKey = '${widget.prefKey}_${widget.itemKind.name}';
     saveToSharedPref(itemTypePrefKey, itemTypeStr);
   }

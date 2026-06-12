@@ -45,7 +45,7 @@ class WgtPagItemInfoEditPanel extends StatefulWidget {
     required this.itemKind,
     required this.itemDisplayName,
     required this.fields,
-    this.itemType,
+    this.itemTypeEnum,
     this.listController,
     this.itemScopeMap,
     this.itemInfoMap,
@@ -64,7 +64,7 @@ class WgtPagItemInfoEditPanel extends StatefulWidget {
   final Map<String, dynamic>? itemScopeMap;
   final Map<String, dynamic>? itemInfoMap;
   final List<Map<String, dynamic>> fields;
-  final dynamic itemType;
+  final dynamic itemTypeEnum;
   final Function? onClose;
   final Function? onUpdate;
   final Function? onScopeTreeUpdate;
@@ -139,9 +139,10 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
         'scope': _loggedInUser!.selectedScope.toScopeMap(),
         'id': widget.strItemIndex,
         'item_kind': widget.itemKind.name,
-        'item_type': widget.itemType is Enum
-            ? (widget.itemType as Enum).name
-            : widget.itemType ?? '',
+        'item_type': widget.itemTypeEnum is Enum
+            ? (widget.itemTypeEnum as Enum).name
+            : '',
+        // : widget.itemTypeEnum ?? '',
         'item_id_type': ItemIdType.id.name,
         'item_id_key': 'id',
         'item_id': widget.strItemIndex,
@@ -191,10 +192,10 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
     await Future.delayed(const Duration(milliseconds: 1000));
     try {
       String itemTypeStr = '';
-      if (widget.itemType is PagScopeType) {
-        itemTypeStr = (widget.itemType as PagScopeType).name;
-      } else if (widget.itemType is PagDeviceCat) {
-        itemTypeStr = (widget.itemType as PagDeviceCat).name;
+      if (widget.itemTypeEnum is PagScopeType) {
+        itemTypeStr = (widget.itemTypeEnum as PagScopeType).name;
+      } else if (widget.itemTypeEnum is PagDeviceCat) {
+        itemTypeStr = (widget.itemTypeEnum as PagDeviceCat).name;
       }
       Map<String, dynamic> queryMap = {
         'scope': _loggedInUser!.selectedScope.toScopeMap(),
@@ -315,8 +316,8 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
     isDeleteableItem = false;
     switch (widget.itemKind) {
       case PagItemKind.device:
-        if (widget.itemType is PagDeviceCat) {
-          if (widget.itemType == PagDeviceCat.meter) {
+        if (widget.itemTypeEnum is PagDeviceCat) {
+          if (widget.itemTypeEnum == PagDeviceCat.meter) {
             isDeleteableItem = true;
           }
         }
@@ -584,10 +585,8 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
                     },
                     hasFocus: _currentField == field['col_key'],
                     onSetValue: (newValue) async {
-                      List<Map<String, dynamic>> result = await _updateProfile(
-                        field['col_key'],
-                        newValue,
-                      );
+                      List<Map<String, dynamic>> result =
+                          await _updateProfile(field['col_key'], newValue);
                       Map<String, dynamic> resultMap = result[0];
                       if (resultMap['error'] == null) {
                         setState(() {
@@ -597,7 +596,10 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
                           widget.onUpdate?.call();
                         });
                       } else {
-                        Map<String, dynamic> errorMap = resultMap['error'];
+                        Map<String, dynamic> errorMap =
+                            resultMap['error'] is String
+                                ? {'message': resultMap['error']}
+                                : resultMap['error'];
                         String? status = errorMap['status'];
                         dev.log('Status: $status');
                         setState(() {
@@ -794,7 +796,8 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
         itemScopeMap: widget.itemScopeMap!,
         forItemKind: widget.itemKind,
         isFlexiScope: isFlexiScope,
-        forScopeType: widget.itemType is PagScopeType ? widget.itemType : null,
+        forScopeType:
+            widget.itemTypeEnum is PagScopeType ? widget.itemTypeEnum : null,
         onScopeSet: (dynamic profile) async {
           if (profile == null) {
             dev.log('Profile is null');
@@ -894,8 +897,9 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
         addButtonLabelSuffix = 'sub';
         break;
       case PagItemKind.tariff:
-        if (widget.itemType is PagTariff &&
-            widget.itemType == PagTariff.tariffPackage) {
+        if (widget.itemTypeEnum == PagTariff.tariffPackage
+            // || widget.itemType == PagTariff.tariffPackage.value
+            ) {
           itemGroupType = PagItemGroupType.tariffPackageTariffRate;
           queryMap = {'tariff_package_id': widget.strItemIndex};
           rootName = widget.itemDisplayName;
@@ -977,8 +981,8 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
 
     switch (widget.itemKind) {
       case PagItemKind.finance:
-        if (widget.itemType is PagFinanceType) {
-          if (widget.itemType != PagFinanceType.payment) {
+        if (widget.itemTypeEnum is PagFinanceType) {
+          if (widget.itemTypeEnum != PagFinanceType.payment) {
             return Container();
           } else {
             _lcStatusDisplay ??= PagPaymentLcStatus.byValue(lcStatusStr);
@@ -1109,7 +1113,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
 
   Widget getPaymentApplyList() {
     if (widget.itemKind != PagItemKind.finance ||
-        widget.itemType != PagFinanceType.payment) {
+        widget.itemTypeEnum != PagFinanceType.payment) {
       return Container();
     }
     return Padding(

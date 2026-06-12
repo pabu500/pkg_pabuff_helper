@@ -213,6 +213,7 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
                   widget.usageCalc!.payableAmount,
                   widget.tenantType,
                   widget.lineItems,
+                  null,
                   {},
                   '',
                   '',
@@ -304,9 +305,7 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
       String usageStr = meterUsageSummary['usage'] ?? '';
       double? usageVal = double.tryParse(usageStr);
       if (usageVal == null) {
-        if (kDebugMode) {
-          print('usageVal is null');
-        }
+        dev.log('usageVal is null');
       }
       if (usageVal != null && usageFactor != null) {
         usageVal = usageVal * usageFactor;

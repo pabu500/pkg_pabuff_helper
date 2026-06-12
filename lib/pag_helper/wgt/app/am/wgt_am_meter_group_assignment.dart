@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_tenant.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
@@ -123,9 +125,8 @@ class _WgtAmMeterGroupAssignmentState extends State<WgtAmMeterGroupAssignment> {
         itemInfo['meter_type_mismatch'] = hasMeterTypeMismatch;
       }
     } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
+      dev.log(e.toString());
+
       rethrow;
     } finally {
       setState(() {
@@ -177,9 +178,7 @@ class _WgtAmMeterGroupAssignmentState extends State<WgtAmMeterGroupAssignment> {
       // }
       await _doAutoPopulate(); // refresh the item list
     } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
+      dev.log(e.toString());
       setState(() {
         _commitErrorText = 'Commit Error';
       });
@@ -370,16 +369,6 @@ class _WgtAmMeterGroupAssignmentState extends State<WgtAmMeterGroupAssignment> {
                               : Theme.of(context).hintColor,
                         ),
         ),
-        // if (_hasTptMismatchAssignmentError)
-        //   Container(
-        //     margin: const EdgeInsets.only(left: 10),
-        //     padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-        //     decoration: boxDecoration.copyWith(color: Colors.transparent),
-        //     child: Text(
-        //       '✘ TPT Mismatch Error',
-        //       style: TextStyle(color: Theme.of(context).colorScheme.error),
-        //     ),
-        //   ),
       ],
     );
   }
@@ -452,10 +441,11 @@ class _WgtAmMeterGroupAssignmentState extends State<WgtAmMeterGroupAssignment> {
     int index = 0;
     for (Map<String, dynamic> itemInfo in _itemGroupScopeMatchingItemList!) {
       bool showItem = _showItem(itemInfo);
+      index++;
       if (!showItem) {
         continue; // Skip this item if it doesn't match the filter
       }
-      Widget tile = getItemRow(itemInfo, ++index);
+      Widget tile = getItemRow(itemInfo, index);
       itemWidgetList.add(
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 3),

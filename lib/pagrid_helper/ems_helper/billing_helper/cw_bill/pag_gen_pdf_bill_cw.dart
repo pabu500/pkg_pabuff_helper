@@ -70,6 +70,7 @@ Future<Uint8List> generatePagInvoice(
     lineItemValue2: calcedBillInfoRl['lineItemValue2'],
     lineItemLabel3: calcedBillInfoRl['lineItemLabel3'],
     lineItemValue3: calcedBillInfoRl['lineItemValue3'],
+    billedBciInfoList: calcedBillInfoRl['billedBciInfoList'] ?? [],
     miniSoaInfo: calcedBillInfoRl['miniSoaInfo'] ?? {},
     assetFolder: assetFolder,
     tenantSingularUsageInfoList:

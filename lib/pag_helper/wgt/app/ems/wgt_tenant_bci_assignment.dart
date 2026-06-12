@@ -3,7 +3,6 @@ import 'dart:developer' as dev;
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
-import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_scope.dart';
 import 'package:buff_helper/xt_ui/style/evs2_colors.dart';
 import 'package:buff_helper/xt_ui/wdgt/info/get_error_text_prompt.dart';
@@ -11,9 +10,10 @@ import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 import 'package:buff_helper/xt_ui/xt_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:provider/provider.dart';
 
 import '../../../../up_helper/exceptions.dart';
+import '../../../../xt_ui/wdgt/datetime/wgt_date_picker.dart';
+import '../../../comm/comm_billing_cost_item.dart';
 import '../../../comm/comm_tenant.dart';
 import '../../../comm/comm_tenant_ops.dart';
 import '../../../def_helper/dh_pag_tenant.dart';
@@ -23,6 +23,7 @@ class WgtTenantBciAssignment extends StatefulWidget {
   const WgtTenantBciAssignment({
     super.key,
     required this.appConfig,
+    required this.loggedInUser,
     required this.strItemGroupIndex,
     required this.itemName,
     required this.itemLabel,
@@ -32,6 +33,7 @@ class WgtTenantBciAssignment extends StatefulWidget {
   });
 
   final MdlPagAppConfig appConfig;
+  final MdlPagUser loggedInUser;
   final String strItemGroupIndex;
   final String itemName;
   final String itemLabel;
@@ -44,7 +46,10 @@ class WgtTenantBciAssignment extends StatefulWidget {
 }
 
 class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
-  late final MdlPagUser? loggedInUser;
+  final DateTime leftMostDate =
+      DateTime.now().subtract(const Duration(days: 365 * 5));
+  final DateTime rightMostDate =
+      DateTime.now().add(const Duration(days: 365 * 5));
 
   final double width = 395.0;
 
@@ -75,56 +80,56 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
     }
 
     Map<String, dynamic> queryMap = {
-      'scope': loggedInUser!.selectedScope.toScopeMap(),
+      'scope': widget.loggedInUser.selectedScope.toScopeMap(),
       'item_group_id': widget.strItemGroupIndex,
       'item_scope': widget.itemScope.toScopeMap(),
     };
 
     _isFetching = true;
     try {
-      final data = await doGetScopeBciList(
+      final result = await doGetScopeBciList(
         widget.appConfig,
         queryMap,
         MdlPagSvcClaim(
-          username: loggedInUser!.username,
-          userId: loggedInUser!.id,
+          username: widget.loggedInUser.username,
+          userId: widget.loggedInUser.id,
           scope: '',
           target: '',
           operation: 'read',
         ),
       );
-      final itemGroupScopeItemAssignment =
-          data['item_group_scope_item_assignment'];
-      if (itemGroupScopeItemAssignment == null ||
-          itemGroupScopeItemAssignment.isEmpty) {
+      final itemGroupScopeMatchingItemList =
+          result['item_group_scope_matching_item_list'];
+      if (itemGroupScopeMatchingItemList == null ||
+          itemGroupScopeMatchingItemList.isEmpty) {
         throw Exception('No item found for this item group');
       }
-      // list of items that are matching the item group scope
-      final itemGroupScopeMatchingItemList =
-          itemGroupScopeItemAssignment['item_group_scope_matching_item_list'];
-      if (itemGroupScopeMatchingItemList == null) {
-        throw Exception('item_group_scope_matching_item_list is null');
-      }
+      // // list of items that are matching the item group scope
+      // final itemGroupScopeMatchingItemList =
+      //     result['item_group_scope_item_assignment'];
+      // if (itemGroupScopeMatchingItemList == null) {
+      //   throw Exception('item_group_scope_matching_item_list is null');
+      // }
 
       _itemGroupScopeMatchingItemList = List<Map<String, dynamic>>.from(
         itemGroupScopeMatchingItemList,
       );
       // sort by label
       _itemGroupScopeMatchingItemList!.sort((a, b) {
-        String labelA = a['label'] ?? '';
-        String labelB = b['label'] ?? '';
+        String labelA = a['bci_label'] ?? '';
+        String labelB = b['bci_label'] ?? '';
         return labelA.compareTo(labelB);
       });
 
       for (Map<String, dynamic> itemInfo in _itemGroupScopeMatchingItemList!) {
         // add assignment info
         itemInfo['assigned'] = false;
-        if (itemInfo['bci_tenant_id'] != null) {
+        if (itemInfo['tbci_tenant_id'] != null) {
           itemInfo['assigned'] = true;
         }
-        itemInfo['assigned_to_this_tenant'] = false;
-        if (itemInfo['bci_tenant_id'] == widget.strItemGroupIndex) {
-          itemInfo['assigned_to_this_tenant'] = true;
+        itemInfo['is_assigned_to_this_tenant'] = false;
+        if (itemInfo['tbci_tenant_id'] == widget.strItemGroupIndex) {
+          itemInfo['is_assigned_to_this_tenant'] = true;
         }
         itemInfo['used_for_billing'] = false;
         if (itemInfo['brmg_bci_id'] != null) {
@@ -140,13 +145,13 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
       // find the item that is assigned to this tenant,
       // and move it to the top
       for (Map<String, dynamic> itemInfo in _itemGroupScopeMatchingItemList!) {
-        if (itemInfo['assigned_to_this_tenant'] != true) {
+        if (itemInfo['is_assigned_to_this_tenant'] != true) {
           continue;
         }
-        String itemIndexStr = itemInfo['id'];
+        String itemIndexStr = itemInfo['bci_id'];
         // move this item to the top
         _itemGroupScopeMatchingItemList!.removeWhere(
-          (item) => item['id'] == itemIndexStr,
+          (item) => item['bci_id'] == itemIndexStr,
         );
         _itemGroupScopeMatchingItemList!.insert(0, itemInfo);
       }
@@ -156,10 +161,10 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
         if (itemInfo['non_scope_matching'] != 'true') {
           continue;
         }
-        String itemIndexStr = itemInfo['id'];
+        String itemIndexStr = itemInfo['bci_id'];
         // move this item to the top
         _itemGroupScopeMatchingItemList!.removeWhere(
-          (item) => item['id'] == itemIndexStr,
+          (item) => item['bci_id'] == itemIndexStr,
         );
         _itemGroupScopeMatchingItemList!.insert(0, itemInfo);
       }
@@ -185,77 +190,86 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
     // filter out items that are not modified
     final List<Map<String, dynamic>> assignmentList =
         _itemGroupScopeMatchingItemList!
-            .where((item) => item['assigned_new'] != null)
+            .where((item) =>
+                item['assigned_new'] != item['assigned'] ||
+                item['tbci_effective_from_timestamp_new'] !=
+                    item['tbci_effective_from_timestamp'] ||
+                item['tbci_effective_to_timestamp_new'] !=
+                    item['tbci_effective_to_timestamp'])
             .toList();
     Map<String, dynamic> queryMap = {
-      'scope': loggedInUser!.selectedScope.toScopeMap(),
+      'scope': widget.loggedInUser.selectedScope.toScopeMap(),
+      'assignment_type': 'tenant-to-bci-list',
       'item_group_id': widget.strItemGroupIndex,
       'item_assignment_list': assignmentList,
     };
     try {
       _isCommitting = true;
 
-      final data = await commitTenantBciList(
+      final result = await commitBciTenantAssignment(
         widget.appConfig,
         queryMap,
         MdlPagSvcClaim(
-          username: loggedInUser!.username,
-          userId: loggedInUser!.id,
+          username: widget.loggedInUser.username,
+          userId: widget.loggedInUser.id,
           scope: '',
           target: '',
           operation: 'update',
         ),
       );
-
-      if (data['error'] != null) {
-        throw Exception(data['error']);
-      }
-
-      // clear assginment info from the item list
-      // for (Map<String, dynamic> itemInfo in _itemGroupScopeMatchingItemList!) {
-      //   itemInfo.remove('assignment_info');
-      //   itemInfo.remove('assigned_new');
-      //   itemInfo.remove('is_fetching');
-      // }
     } catch (e) {
-      dev.log('Error committing tenant meter group assignment: $e');
-      _commitErrorText =
-          getErrorText(e, defaultErrorText: 'Error committing assignment');
-
-      setState(() {});
+      dev.log('Error committing bci tenant assignment: $e');
+      _commitErrorText = getErrorText(e,
+          defaultErrorText: 'Error committing bci tenant assignment');
     } finally {
       setState(() {
         _isCommitting = false;
         _isCommitted = true;
         _modified = false;
+        _isFetched = false;
       });
     }
   }
 
   bool _checkModified() {
-    bool modified = false;
+    bool assignmentModified = false;
     for (Map<String, dynamic> item in _itemGroupScopeMatchingItemList ?? []) {
       if (item['assigned_new'] != null) {
         if (item['assigned'] != item['assigned_new']) {
-          modified = true;
+          assignmentModified = true;
           break;
         }
       }
     }
+    bool effectiveDateModified = false;
+    for (Map<String, dynamic> item in _itemGroupScopeMatchingItemList ?? []) {
+      // only assigned items can modify effective date
+      if (item['assigned'] == true && item['assigned_new'] != false) {
+        // if (item['tbci_effective_from_timestamp_new'] != null) {
+        if (item['tbci_effective_from_timestamp'] !=
+            item['tbci_effective_from_timestamp_new']) {
+          effectiveDateModified = true;
+          break;
+        }
+        // }
+        // if (item['tbci_effective_to_timestamp_new'] != null) {
+        if (item['tbci_effective_to_timestamp'] !=
+            item['tbci_effective_to_timestamp_new']) {
+          effectiveDateModified = true;
+          break;
+          // }
+        }
+      }
+    }
     setState(() {
-      _modified = modified;
+      _modified = assignmentModified || effectiveDateModified;
     });
-    return modified;
+    return assignmentModified || effectiveDateModified;
   }
 
   @override
   void initState() {
     super.initState();
-
-    loggedInUser = Provider.of<PagUserProvider>(
-      context,
-      listen: false,
-    ).currentUser;
   }
 
   @override
@@ -379,32 +393,6 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
           ),
         ),
         horizontalSpaceSmall,
-        // Container(
-        //   padding: const EdgeInsets.symmetric(horizontal: 5),
-        //   child: SizedBox(
-        //     width: 180,
-        //     height: 39,
-        //     child: TextField(
-        //       controller: _itemLabelFilterController,
-        //       readOnly: _isCommitting ||
-        //           _isCommitted ||
-        //           {_itemGroupScopeMatchingItemList ?? []}.isEmpty,
-        //       decoration: InputDecoration(
-        //           hintText: 'Meter Group Label',
-        //           hintStyle: TextStyle(
-        //               color: Theme.of(context)
-        //                   .hintColor) // prefixIcon: Icon(Icons.search),
-        //           ),
-        //       onChanged: (value) {
-        //         setState(() {
-        //           _itemLabelFilterStr = value.trim().toLowerCase();
-        //         });
-        //       },
-        //     ),
-        //   ),
-        // ),
-        // horizontalSpaceSmall,
-        // virtical separator
         Container(
           width: 1,
           height: 39,
@@ -442,16 +430,6 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
                               : Theme.of(context).hintColor,
                         ),
         ),
-        // if (_hasTptMismatchAssignmentError)
-        //   Container(
-        //     margin: const EdgeInsets.only(left: 10),
-        //     padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-        //     decoration: boxDecoration.copyWith(color: Colors.transparent),
-        //     child: Text(
-        //       '✘ TPT Mismatch Error',
-        //       style: TextStyle(color: Theme.of(context).colorScheme.error),
-        //     ),
-        //   ),
       ],
     );
   }
@@ -487,25 +465,6 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
               widget.itemLabel.isNotEmpty ? widget.itemLabel : '-',
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            // horizontalSpaceSmall,
-            // Container(
-            //   decoration: boxDecoration,
-            //   padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-            //   child: Row(
-            //     mainAxisSize: MainAxisSize.min,
-            //     children: [
-            //       scopeIcon,
-            //       horizontalSpaceTiny,
-            //       // Text(itemGroupScopeLabel),
-            //     ],
-            //   ),
-            // ),
-            // horizontalSpaceSmall,
-            // Container(
-            //   decoration: boxDecoration,
-            //   padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-            //   child: Text(widget.tariffPackageTypeLabel),
-            // ),
           ],
         ),
         verticalSpaceTiny,
@@ -514,28 +473,15 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
     );
   }
 
-  // bool _showItem(Map<String, dynamic> item) {
-  //   if (_itemNameFilterStr.isNotEmpty || _itemLabelFilterStr.isNotEmpty) {
-  //     String? name = item['name'];
-  //     String? label = item['label'];
-  //     bool nameMatches =
-  //         name != null && name.toLowerCase().contains(_itemNameFilterStr);
-  //     bool labelMatches =
-  //         label != null && label.toLowerCase().contains(_itemLabelFilterStr);
-  //     return nameMatches || labelMatches;
-  //   }
-  //   return true; // Include item if no filter is applied
-  // }
-
   bool _showItem(Map<String, dynamic> item) {
     if (_itemNameFilterStr.isNotEmpty) {
-      String? name = item['name'];
+      String? name = item['bci_name'];
       bool nameMatches = (name ?? '').isNotEmpty &&
           (name ?? '').toLowerCase().contains(_itemNameFilterStr);
       return nameMatches;
     }
     if (_itemLabelFilterStr.isNotEmpty) {
-      String? label = item['label'];
+      String? label = item['bci_label'];
       bool labelMatches = (label ?? '').isNotEmpty &&
           (label ?? '').toLowerCase().contains(_itemLabelFilterStr);
       return labelMatches;
@@ -554,10 +500,11 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
     for (Map<String, dynamic> itemInfo
         in _itemGroupScopeMatchingItemList ?? []) {
       bool showItem = _showItem(itemInfo);
+      index++;
       if (!showItem) {
         continue; // Skip this item if it doesn't match the filter
       }
-      Widget tile = getItemRow(itemInfo, ++index);
+      Widget tile = getItemRow(itemInfo, index);
       itemWidgetList.add(
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 13),
@@ -577,8 +524,8 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
   }
 
   Widget getItemRow(Map<String, dynamic> itemInfo, int index) {
-    String meterGroupName = itemInfo['name'] ?? '-';
-    String meterGroupLabel = itemInfo['label'] ?? '-';
+    String itemName = itemInfo['bci_name'] ?? '-';
+    String itemLabel = itemInfo['bci_label'] ?? '-';
     String tenantName = itemInfo['tenant_name'] ?? '-';
     String tenantLabel = itemInfo['tenant_label'] ?? '-';
     String? tenantLcStatus = itemInfo['tenant_lc_status'];
@@ -609,13 +556,13 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
     }
 
     if (itemInfo['assigned'] == true &&
-        itemInfo['assigned_to_this_tenant'] != true) {
+        itemInfo['is_assigned_to_this_tenant'] != true) {
       disabled = true;
       disabledText = 'Already assigned to: $tenantLabel';
     }
 
     bool checked = itemInfo['assigned_new'] ??
-        (itemInfo['assigned_to_this_tenant'] == true ||
+        (itemInfo['is_assigned_to_this_tenant'] == true ||
             itemInfo['assigned'] == true);
 
     bool isNonScopeMatching = itemInfo['non_scope_matching'] == 'true';
@@ -641,7 +588,6 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
                 ),
               ),
             ),
-
             horizontalSpaceSmall,
             Tooltip(
               message: 'Show/Hide Scope',
@@ -657,7 +603,8 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
                   });
                 },
                 child: Icon(
-                  _selectedBciIndexStr == itemInfo['id']
+                  // _selectedBciIndexStr == itemInfo['id']
+                  itemInfo['show_scope'] == true
                       ? Symbols.expand_less
                       : Symbols.expand_more,
                   color: Theme.of(context).hintColor,
@@ -669,7 +616,7 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
               decoration: boxDecoration,
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
               child: SelectableText(
-                meterGroupName,
+                itemName,
                 style: disabled ? disabledTextStyle : null,
               ),
             ),
@@ -679,10 +626,12 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
               decoration: boxDecoration,
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
               child: SelectableText(
-                meterGroupLabel,
+                itemLabel,
                 style: disabled ? disabledTextStyle : null,
               ),
             ),
+            horizontalSpaceTiny,
+            getEffectiveDateRange(itemInfo),
             horizontalSpaceTiny,
             Tooltip(
               message: disabled ? disabledText : '',
@@ -694,30 +643,15 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
                         setState(() {
                           if (value == null) return;
                           itemInfo['assigned_new'] = value;
-                          if (itemInfo['assigned'] !=
-                              itemInfo['assigned_new']) {
-                            _modified = true;
-                          }
+                          // if (itemInfo['assigned'] !=
+                          //     itemInfo['assigned_new']) {
+                          //   _modified = true;
+                          // }
                         });
                         _checkModified();
                       },
               ),
             ),
-            // SizedBox(
-            //   width: 25,
-            //   child: isNonScopeMatching
-            //       ? Tooltip(
-            //           message:
-            //               'This meter group is assigned to this tenant but does not match the item group scope',
-            //           child: Icon(
-            //             Symbols.warning,
-            //             color: Theme.of(context).colorScheme.error,
-            //             size: 21,
-            //           ),
-            //         )
-            //       : null,
-            // ),
-            // button to show/hide scope label
           ],
         ),
         // if (isNonScopeMatching || (checked && !disabled))
@@ -730,140 +664,97 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
               children: [getScopeLabel(context, itemScope)],
             ),
           ),
-        if (_selectedBciIndexStr == itemInfo['id']) getAssignmentMap(),
       ],
     );
   }
 
-  Widget getAssignmentMap() {
-    if (_itemGroupScopeMatchingItemList == null ||
-        _itemGroupScopeMatchingItemList!.isEmpty) {
-      return Container();
+  Widget getEffectiveDateRange(Map<String, dynamic> itemInfo) {
+    String effectiveFromTimestamp =
+        itemInfo['tbci_effective_from_timestamp_new'] ??
+            itemInfo['tbci_effective_from_timestamp'] ??
+            '';
+    String effectiveToTimestamp = itemInfo['tbci_effective_to_timestamp_new'] ??
+        itemInfo['tbci_effective_to_timestamp'] ??
+        '';
+    DateTime? effectiveFromDateTime;
+    DateTime? effectiveToDateTime;
+    if (effectiveFromTimestamp.isNotEmpty) {
+      effectiveFromDateTime = DateTime.tryParse(effectiveFromTimestamp);
     }
-    // if (_itemGroupItemList == null || _itemGroupItemList!.isEmpty) {
-    //   return Container();
-    // }
-    if (_selectedBciIndexStr == null) {
-      return Container();
+    if (effectiveToTimestamp.isNotEmpty) {
+      effectiveToDateTime = DateTime.tryParse(effectiveToTimestamp);
     }
-
-    Map<String, dynamic>? itemInfo;
-    for (Map<String, dynamic> item in _itemGroupScopeMatchingItemList!) {
-      if (item['id'] == _selectedBciIndexStr) {
-        itemInfo = item;
-        break;
-      }
-    }
-    if (itemInfo == null) {
-      return getErrorTextPrompt(
-          context: context, errorText: 'Error: Item not found');
-    }
-    Map<String, dynamic>? assignmentInfo = itemInfo['assignment_info'];
-    if (assignmentInfo == null) {
-      return getErrorTextPrompt(
-          context: context, errorText: 'Error: Assignment info not found');
-    }
-    final meterTeantAssignmentList = assignmentInfo['meter_tenant_assignment'];
-    List<Widget> assignmentWidgetList = [];
-    int assignedToActiveTenantCount = 0;
-    for (Map<String, dynamic> assignment in meterTeantAssignmentList ?? []) {
-      String meterName = assignment['meter_name'] ?? '';
-      String meterLabel = assignment['meter_label'] ?? '';
-      String meterSn = assignment['meter_sn'] ?? '';
-      String bciName = assignment['bci_name'] ?? '';
-      String bciLabel = assignment['bci_label'] ?? '';
-      double percentage =
-          double.tryParse(assignment['percentage'] ?? '0.0') ?? 0.0;
-
-      final tenantInfo = assignment['tenant_info'];
-      String tenantName = tenantInfo?['name'] ?? '';
-      String tenantLabel = tenantInfo?['label'] ?? '';
-      String tenantLcStatus = tenantInfo?['lc_status'] ?? '';
-      PagTenantLcStatus? tenantLcStatusEnum =
-          PagTenantLcStatus.byTag(tenantLcStatus);
-      tenantLcStatusEnum ??= PagTenantLcStatus.normal;
-      if (tenantInfo != null) {
-        if (tenantLcStatusEnum == PagTenantLcStatus.normal ||
-            tenantLcStatusEnum == PagTenantLcStatus.onboarding ||
-            tenantLcStatusEnum == PagTenantLcStatus.offboarding) {
-          assignedToActiveTenantCount++;
-        }
-      }
-
-      bool meterGroupIsAssignedToActiveTenant = false;
-      if (assignedToActiveTenantCount != 0) {
-        meterGroupIsAssignedToActiveTenant = true;
-      }
-
-      if (assignedToActiveTenantCount > 1) {
-        return getErrorTextPrompt(
-          context: context,
-          errorText:
-              'Error: Multiple active tenants assigned to this meter group',
-        );
-      }
-
-      Widget assignmentWidget = Padding(
-        padding: const EdgeInsets.symmetric(vertical: 2.0),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(
-              width: 135,
-              child: Text(
-                bciName,
-                style: TextStyle(
-                    color: meterGroupIsAssignedToActiveTenant
-                        ? Colors.greenAccent
-                        : Theme.of(context).hintColor),
-              ),
-            ),
-            horizontalSpaceTiny,
-            SizedBox(
-              width: 60,
-              child: Text(
-                '${percentage.toStringAsFixed(2)}%',
-                style: TextStyle(color: Theme.of(context).hintColor),
-              ),
-            ),
-            horizontalSpaceTiny,
-            Tooltip(
-              message: tenantLabel,
-              child: SizedBox(
-                width: 170,
-                child: tenantName.isEmpty
-                    ? Text(
-                        '-',
-                        style: TextStyle(color: Theme.of(context).hintColor),
-                      )
-                    : SelectableText(
-                        tenantName,
-                        style: TextStyle(
-                          color: tenantLcStatusEnum.color,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-              ),
-            ),
-          ],
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SizedBox(
+          width: 150,
+          child: WgtDatePicker(
+            // key: _timePickerFromKey,
+            iconSize: 18,
+            enabled: itemInfo['assigned_new'] == true ||
+                (itemInfo['assigned'] == true &&
+                    itemInfo['assigned_new'] != false),
+            defaultFirstDate: leftMostDate,
+            defaultLastDate: effectiveToDateTime ?? rightMostDate,
+            initialDate: effectiveFromDateTime,
+            labelFontSize: 15,
+            timeZone: widget.loggedInUser.selectedScope.getProjectTimezone(),
+            label: 'Eff. From Date',
+            onDateChanged: (DateTime selectedDate) {
+              setState(() {
+                effectiveFromDateTime = DateTime(selectedDate.year,
+                    selectedDate.month, selectedDate.day, 0, 0, 0, 0);
+                itemInfo['tbci_effective_from_timestamp_new'] =
+                    effectiveFromDateTime?.toIso8601String();
+                _checkModified();
+              });
+            },
+            onDateCleared: () {
+              setState(() {
+                effectiveFromDateTime = null;
+                itemInfo['tbci_effective_from_timestamp_new'] = '';
+                _checkModified();
+              });
+            },
+          ),
         ),
-      );
-      assignmentWidgetList.add(assignmentWidget);
-    }
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: Theme.of(context).hintColor.withAlpha(50)),
-        borderRadius: BorderRadius.circular(5),
-      ),
-      margin: const EdgeInsets.symmetric(horizontal: 5),
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ...assignmentWidgetList,
-        ],
-      ),
+        horizontalSpaceTiny,
+        SizedBox(
+          width: 150,
+          child: WgtDatePicker(
+            // key: _timePickerToKey,
+            iconSize: 18,
+            enabled: itemInfo['assigned_new'] == true ||
+                (itemInfo['assigned'] == true &&
+                    itemInfo['assigned_new'] != false),
+            defaultFirstDate: effectiveFromDateTime ?? leftMostDate,
+            defaultLastDate: effectiveToDateTime ?? rightMostDate,
+            initialDate: effectiveToDateTime,
+            labelFontSize: 15,
+            timeZone: widget.loggedInUser.selectedScope.getProjectTimezone(),
+            label: 'Eff. To Date',
+            onDateChanged: (DateTime selectedDate) {
+              setState(() {
+                effectiveToDateTime = DateTime(selectedDate.year,
+                        selectedDate.month, selectedDate.day, 0, 0, 0, 0)
+                    .add(const Duration(days: 1));
+                itemInfo['tbci_effective_to_timestamp_new'] =
+                    effectiveToDateTime?.toIso8601String();
+                _checkModified();
+              });
+            },
+            onDateCleared: () {
+              setState(() {
+                effectiveToDateTime = null;
+                itemInfo['tbci_effective_to_timestamp_new'] = '';
+                _checkModified();
+              });
+            },
+          ),
+        ),
+      ],
     );
   }
 }

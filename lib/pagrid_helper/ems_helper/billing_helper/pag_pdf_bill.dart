@@ -76,6 +76,7 @@ class PagPdfBill {
     required this.lineItemValue2,
     required this.lineItemLabel3,
     required this.lineItemValue3,
+    required this.billedBciInfoList,
     required this.payableAmount,
     required this.strDueDate,
     required this.baseColor,
@@ -145,6 +146,7 @@ class PagPdfBill {
   final double? lineItemValue2;
   final String? lineItemLabel3;
   final double? lineItemValue3;
+  final List<Map<String, dynamic>>? billedBciInfoList;
   final List<Map<String, dynamic>>? trendingE;
   final List<Map<String, dynamic>>? trendingW;
   final List<Map<String, dynamic>>? trendingB;
@@ -972,6 +974,8 @@ class PagPdfBill {
                         style: styleNormal),
                   ],
                 ),
+                // bci
+                getBci(),
                 pw.Row(
                   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: pw.CrossAxisAlignment.center,
@@ -1217,6 +1221,37 @@ class PagPdfBill {
           ),
         ],
       ),
+    );
+  }
+
+  pw.Widget getBci() {
+    if ((billedBciInfoList ?? []).isEmpty) {
+      return pw.SizedBox();
+    }
+    return pw.Column(
+      children: billedBciInfoList!.map<pw.Widget>((bciInfo) {
+        String bciLabel = bciInfo['billing_cost_item_label'] ?? '';
+        double bciAmt = 0;
+        final bciAmtObj = bciInfo['billing_cost_item_amount'];
+        if (bciAmtObj != null) {
+          if (bciAmtObj is double) {
+            bciAmt = bciAmtObj;
+          } else if (bciAmtObj is String) {
+            bciAmt = double.tryParse(bciAmtObj) ?? 0;
+          }
+        }
+        if (bciAmt < 0.0001) {
+          return pw.SizedBox();
+        }
+        return pw.Row(
+          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: pw.CrossAxisAlignment.center,
+          children: [
+            pw.Text(bciLabel, style: styleNormal),
+            pw.Text(_formatCurrency(bciAmt), style: styleNormal),
+          ],
+        );
+      }).toList(),
     );
   }
 

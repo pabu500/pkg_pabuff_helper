@@ -18,7 +18,6 @@ import 'package:buff_helper/xt_ui/wdgt/show_model_bottom_sheet.dart';
 import 'dart:developer' as dev;
 
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
@@ -130,6 +129,8 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
 
 class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   bool _isPhone = false;
+
+  int _filterCount = 0;
 
   late final String listName;
   late final String itemTypeStr;
@@ -756,9 +757,15 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          getOptions(),
+          if (_filterCount > 0) getOptions(),
           // horizontalSpaceTiny,
-          getFilterCore(isCompactMode: true),
+          getFilterCore(
+              isCompactMode: true,
+              onGetList: (itemCount) {
+                setState(() {
+                  _filterCount = itemCount;
+                });
+              }),
           // horizontalSpaceTiny,
           getSearchButton(),
         ],
@@ -857,7 +864,8 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     );
   }
 
-  Widget getFilterCore({bool isCompactMode = false}) {
+  Widget getFilterCore(
+      {bool isCompactMode = false, Function(int itemCount)? onGetList}) {
     if (isCompactMode) {
       // _isFullPanel = true;
       String? singleIdFilterKey = getSingleIdFilterKey();
@@ -865,7 +873,8 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
         getItemIdFilterGroup(
             isCompactMode: isCompactMode,
             singleIdFilterKey: singleIdFilterKey,
-            inputWidth: 200),
+            inputWidth: 200,
+            onGetList: onGetList),
         Padding(
           padding: const EdgeInsets.only(top: 5),
           child: getItemLocationFilterGroup(dropdownWidth: 222),
@@ -878,7 +887,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
         Wrap(
           children: [
             if (widget.listContextType != PagListContextType.infoTp)
-              getItemIdFilterGroup(),
+              getItemIdFilterGroup(onGetList: onGetList),
             if (widget.listContextType != PagListContextType.infoTp)
               getItemSpecFilterGroup(),
             if (widget.listContextType != PagListContextType.infoTp)
@@ -916,13 +925,19 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   Widget getItemIdFilterGroup(
       {bool isCompactMode = false,
       String? singleIdFilterKey,
-      double inputWidth = 160}) {
+      double inputWidth = 160,
+      Function(int itemCount)? onGetList}) {
     List<Widget> list = getItemIdGroupList(
         singleIdFilter: singleIdFilterKey,
         showScanner: isCompactMode,
         inputWidth: inputWidth);
     if (list.isEmpty) {
-      return Container();
+      // return Container();
+      onGetList?.call(0);
+
+      return SizedBox(width: widget.width ?? 308);
+    } else {
+      onGetList?.call(list.length);
     }
     return Container(
       decoration: blockDecoration,
@@ -1116,7 +1131,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
           Padding(
             padding: const EdgeInsets.only(left: 8, right: 8, bottom: 3),
             child: SizedBox(
-              height: 55,
+              height: 56,
               child: Row(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -1213,7 +1228,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
           Padding(
             padding: const EdgeInsets.only(left: 8, right: 8, bottom: 3),
             child: SizedBox(
-              height: 55,
+              height: 56,
               child: Row(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -1299,7 +1314,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
           wdiget = Padding(
             padding: const EdgeInsets.only(left: 8, right: 8, bottom: 3),
             child: SizedBox(
-              height: 55,
+              height: 56,
               child: Row(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.start,

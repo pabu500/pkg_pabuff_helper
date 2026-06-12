@@ -62,6 +62,7 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
     this.costDecimals = 3,
     this.onUpdate,
     this.interestInfo = const {},
+    this.bciInfoList = const [],
   });
 
   final MdlPagAppConfig appConfig;
@@ -91,6 +92,7 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
   final bool isBillMode;
   final Map<String, dynamic> billInfo;
   final List<Map<String, dynamic>> lineItems;
+  final List<Map<String, dynamic>> bciInfoList;
   final String renderMode;
   final bool showRenderModeSwitch;
   // final Map<String, dynamic> billedAutoUsages;
@@ -118,6 +120,7 @@ class _WgtPagTenantCompositeUsageSummaryState
 
   final List<Map<String, dynamic>> _manualUsageList = [];
   final List<Map<String, dynamic>> _lineItemList = [];
+  final List<Map<String, dynamic>> _bciInfoList = [];
 
   // late final EmsTypeUsageCalc _emsTypeUsageCalc;
 
@@ -303,6 +306,7 @@ class _WgtPagTenantCompositeUsageSummaryState
                   widget.compositeUsageCalc!.payableAmount,
                   widget.tenantType,
                   widget.lineItems,
+                  widget.bciInfoList,
                   widget.compositeUsageCalc!.miniSoaInfo,
                   widget.strCollectionStartDateTimestamp,
                   widget.strCollectionEndDateTimestamp,
@@ -449,16 +453,6 @@ class _WgtPagTenantCompositeUsageSummaryState
       ],
     );
   }
-
-  // List<Widget> getStat() {
-  //   List<Widget> typeStat = [];
-  //   typeStat.add(getTypeStat('E'));
-  //   typeStat.add(getTypeStat('B'));
-  //   typeStat.add(getTypeStat('W'));
-  //   typeStat.add(getTypeStat('N'));
-  //   typeStat.add(getTypeStat('G'));
-  //   return typeStat;
-  // }
 
   Widget getTypeStat(Map<String, dynamic> singularUsageInfo, String typeStr) {
     List<Widget> slotList = [];

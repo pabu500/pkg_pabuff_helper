@@ -106,7 +106,7 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
     try {
       for (var listController in _listControllerList) {
         if (_getItemTypeStr(itemType) ==
-            _getItemTypeStr(listController.itemType)) {
+            _getItemTypeStr(listController.itemTypeEnum)) {
           _selectedListController = listController;
           break;
         }
@@ -125,7 +125,7 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
       // update col pref
       _loadColPref();
 
-      widget.onItemTypeSelected?.call(_selectedListController?.itemType);
+      widget.onItemTypeSelected?.call(_selectedListController?.itemTypeEnum);
 
       setState(() {});
     } catch (e) {
@@ -146,23 +146,23 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
         if (itemType is PagDeviceCat) {
           itemTypeStr = itemType.name;
           listControllerItemTypeStr =
-              (listController.itemType as PagDeviceCat).name;
+              (listController.itemTypeEnum as PagDeviceCat).name;
         } else if (itemType is PagScopeType) {
           itemTypeStr = itemType.name;
           listControllerItemTypeStr =
-              (listController.itemType as PagScopeType).name;
+              (listController.itemTypeEnum as PagScopeType).name;
         } else if (itemType is PagFinanceType) {
           itemTypeStr = itemType.name;
           listControllerItemTypeStr =
-              (listController.itemType as PagFinanceType).name;
+              (listController.itemTypeEnum as PagFinanceType).name;
         } else if (itemType is PagOrgType) {
           itemTypeStr = itemType.value;
           listControllerItemTypeStr =
-              (listController.itemType as PagOrgType).value;
+              (listController.itemTypeEnum as PagOrgType).value;
         } else if (itemType is PagTariff) {
           itemTypeStr = itemType.value;
           listControllerItemTypeStr =
-              (listController.itemType as PagTariff).value;
+              (listController.itemTypeEnum as PagTariff).value;
         } else {
           throw Exception('Unsupported item type: ${itemType.runtimeType}');
         }
@@ -209,7 +209,8 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
   }
 
   void _saveItemTypePref() {
-    String? itemTypeStr = _getItemTypeStr(_selectedListController?.itemType);
+    String? itemTypeStr =
+        _getItemTypeStr(_selectedListController?.itemTypeEnum);
     String itemTypePrefKey = '${widget.prefKey}_${widget.itemKind.name}';
     saveToSharedPref(itemTypePrefKey, itemTypeStr);
   }
@@ -433,7 +434,7 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
           width: paneWidth - 21,
           height: paneHeight - 60,
           itemKind: PagItemKind.device,
-          itemType: _selectedListController!.itemType,
+          itemType: _selectedListController!.itemTypeEnum,
           itemSubType: itemSubType,
           loggedInUser: loggedInUser!,
           historyType: PagItemHistoryType.DEVICE_READING,

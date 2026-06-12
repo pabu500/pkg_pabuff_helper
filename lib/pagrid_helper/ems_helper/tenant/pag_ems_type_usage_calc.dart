@@ -46,6 +46,8 @@ class PagEmsTypeUsageCalc {
 
   late final Map<String, dynamic>? _interestInfo;
 
+  late final List<Map<String, dynamic>>? _effBciInfoList;
+
   EmsTypeUsageR2? get typeUsageE => _typeUsageE;
   EmsTypeUsageR2? get typeUsageW => _typeUsageW;
   EmsTypeUsageR2? get typeUsageB => _typeUsageB;
@@ -86,6 +88,8 @@ class PagEmsTypeUsageCalc {
 
   List<Map<String, dynamic>>? get manualUsageList => _manualUsageList;
 
+  List<Map<String, dynamic>>? get effBciInfoList => _effBciInfoList;
+
   PagEmsTypeUsageCalc({
     required int costDecimals,
     double? gst,
@@ -100,6 +104,7 @@ class PagEmsTypeUsageCalc {
     List<PagEmsTypeUsageCalc> singularUsageCalcList = const [],
     Map<String, dynamic>? miniSoaInfo,
     Map<String, dynamic>? interestInfo,
+    List<Map<String, dynamic>>? effBciInfoList,
   }) {
     if (usageFactor.isEmpty) {
       throw Exception('usageFactor is empty');
@@ -128,6 +133,7 @@ class PagEmsTypeUsageCalc {
         _singularCalcList.add(item);
       }
     }
+    _effBciInfoList = effBciInfoList;
   }
 
   void doCalc({bool isForBilling = true}) {
@@ -422,12 +428,23 @@ class PagEmsTypeUsageCalc {
     subTotalCost += lineItemCostSubjectToTaxSubjectToInterest;
     // subTotalCost += lineItemCostSubjectToTaxNotSubjectToInterest;
 
+    if (effBciInfoList != null) {
+      for (var bciInfo in effBciInfoList!) {
+        String? strBciAmount = bciInfo['billing_cost_item_amount'];
+        double? bciAmount = double.tryParse(strBciAmount ?? '');
+        if (bciAmount != null) {
+          subTotalCost ??= 0;
+          subTotalCost += bciAmount;
+        }
+      }
+    }
+
     _subTotalCost = subTotalCost;
 
     if (_subTotalCost != null) {
       _subTotalCost = getRound(_subTotalCost!, 2);
-      if (subTotalCost != null && _gst != null) {
-        _gstAmount = subTotalCost * _gst / 100;
+      if (_gst != null) {
+        _gstAmount = _subTotalCost! * _gst / 100;
       }
       _gstAmount = getRoundUp(_gstAmount!, 2);
       _totalCost = _subTotalCost! + _gstAmount!;
