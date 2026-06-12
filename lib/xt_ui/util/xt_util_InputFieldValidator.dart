@@ -58,13 +58,13 @@ String? validateBillingContactName(String? value,
   String? result;
 
   if (value == null) {
-    result = 'Please enter your full name';
+    result = 'Please enter your billing contact name';
     if (emptyCallout != null) {
       result = emptyCallout;
     }
   } else {
     if (value.isEmpty) {
-      result = 'Please enter your full name';
+      result = 'Please enter your billing contact name';
       if (emptyCallout != null) {
         result = emptyCallout;
       }
