@@ -16,6 +16,8 @@ const String glb_reg_allkeyboard =
 const String glb_reg_fullName = r"^[a-zA-Z]{2,}[a-zA-Z-\s]*[a-zA-Z]{2,}$";
 const String glb_fullName_callout = 'Please provide a valid full name';
 const String glb_regNG_fullName = r"[^a-zA-Z '\.]|([.']| )(\.|')|(\s)(\s)";
+const String glb_reg_billing_contact_name =
+    r"^[a-zA-Z]{2,}[a-zA-Z\s\-()/]*[a-zA-Z)]{2,}$";
 // r"^
 // [a-zA-Z0-9-]  //mmatches any character from the alphabet (lowercase or uppercase), digits, or the hyphen symbol
 // {6,} //matches the preceding expression (a character from the alphabet or a hyphen symbol) at least 6 times
