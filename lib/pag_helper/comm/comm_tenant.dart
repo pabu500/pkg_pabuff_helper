@@ -297,7 +297,7 @@ Future<dynamic> doGetScopeBciList(
     );
 
     if (response.statusCode == 200) {
-      return getResult(response.body,
+      return getResultFromResp(response.body,
           defualtErrorMsg: 'Failed to get scope bci list');
     } else {
       throw Exception('Failed to get scope bci list');

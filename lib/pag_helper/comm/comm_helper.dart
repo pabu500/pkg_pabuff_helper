@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-dynamic getResult(String responseBody,
+dynamic getResultFromResp(String responseBody,
     {String defualtErrorMsg = 'Failed to get response data'}) {
   final respJson = jsonDecode(responseBody);
   if (respJson['error'] != null) {

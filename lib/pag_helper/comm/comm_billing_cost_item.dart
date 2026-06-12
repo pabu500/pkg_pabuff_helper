@@ -84,7 +84,7 @@ Future<dynamic> doGetBciScopeTenantList(
     );
 
     if (response.statusCode == 200) {
-      return getResult(response.body,
+      return getResultFromResp(response.body,
           defualtErrorMsg: 'Failed to get billing cost item tenant list');
     } else {
       throw Exception('Failed to get billing cost item tenant list');
@@ -120,7 +120,7 @@ Future<dynamic> commitBciTenantAssignment(
   );
 
   if (response.statusCode == 200) {
-    return getResult(response.body,
+    return getResultFromResp(response.body,
         defualtErrorMsg:
             'Failed to update billing cost item tenant assignment');
   } else if (response.statusCode == 403) {

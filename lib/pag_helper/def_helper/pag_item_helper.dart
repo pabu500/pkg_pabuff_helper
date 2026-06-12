@@ -1,7 +1,10 @@
+import 'dart:developer' as dev;
+
 import 'package:buff_helper/pag_helper/def_helper/dh_device.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_finance.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_org.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_user.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -106,4 +109,14 @@ String? validateItemLabel(String? value) {
   }
 
   return null;
+}
+
+String? Function(String?)? getValidator(PagItemKind itemKind, String key) {
+  switch (itemKind) {
+    case PagItemKind.user:
+      return getUserValidator(key);
+    default:
+      dev.log('No validator found for item kind: $itemKind, key: $key');
+      return null;
+  }
 }

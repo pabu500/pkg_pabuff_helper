@@ -72,6 +72,7 @@ class MdlListColController {
   bool isUnique;
   bool isClickCopy;
   bool isPaneKey;
+  String colType;
   Color? colColor;
   Color? successColor;
   Color? errorColor;
@@ -90,6 +91,7 @@ class MdlListColController {
   List<String>? contextExcludeList;
   bool requiredOnOnb;
   bool showFilter;
+  List<Map<String, dynamic>>? opInfoList;
 
   MdlListColController({
     required this.colKey,
@@ -123,6 +125,7 @@ class MdlListColController {
     this.isDetailKey = false,
     this.isClickCopy = false,
     this.isPaneKey = false,
+    this.colType = 'string',
     this.colColor,
     this.successColor,
     this.errorColor,
@@ -138,6 +141,7 @@ class MdlListColController {
     this.contextExcludeList,
     this.requiredOnOnb = false,
     this.showFilter = false,
+    this.opInfoList,
   }) {
     pinned = pinned ?? false;
   }
@@ -213,6 +217,11 @@ class MdlListColController {
       } else if (widthValueStr is String) {
         width = double.parse(widthValueStr);
       }
+    }
+
+    String? colType;
+    if (json['colType'] != null || json['col_type'] != null) {
+      colType = json['col_type'] ?? json['colType'];
     }
 
     bool showColumn = true;
@@ -468,11 +477,20 @@ class MdlListColController {
       }
     }
 
+    List<Map<String, dynamic>>? opInfoList;
+    if (json['op_info_list'] != null) {
+      dynamic opsInfoListValue = json['op_info_list'];
+      if (opsInfoListValue is List) {
+        opInfoList = List<Map<String, dynamic>>.from(opsInfoListValue);
+      }
+    }
+
     return MdlListColController(
       colKey: colKey,
       joinKey: json['join_key'],
       asIsKey: json['as_is_key'],
       colTitle: colTitle,
+      colType: colType ?? 'string',
       includeColKeyAsFilter: isIncludeColKeyAsFilter,
       includeColKeyAsGroupBy: isIncludeColKeyAsGroupBy,
       stringAgg: stringAgg,
@@ -507,6 +525,7 @@ class MdlListColController {
       showFilter: showFilter,
       showTimestampAsDate: showTimestampAsDate,
       rowOrder: rowOrder,
+      opInfoList: opInfoList,
     );
   }
 
@@ -522,6 +541,7 @@ class MdlListColController {
     data['is_mutable'] = isMutable.toString();
     data['is_display_name_key'] = isDisplayNameKey.toString();
     data['col_title'] = colTitle;
+    data['col_type'] = colType;
     data['filter_label'] = filterLabel;
     data['col_width'] = colWidth;
     data['show_column'] = showColumn.toString();
@@ -543,6 +563,8 @@ class MdlListColController {
     data['show_filter'] = showFilter.toString();
     data['show_timestamp_as_date'] = showTimestampAsDate.toString();
     data['row_order'] = rowOrder;
+    data['op_info_list'] = opInfoList;
+
     return data;
   }
 }
