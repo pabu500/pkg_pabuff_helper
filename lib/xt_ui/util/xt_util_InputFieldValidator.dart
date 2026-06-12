@@ -51,6 +51,39 @@ String? validateFullName(String? value,
   return result;
 }
 
+String? validateBillingContactName(String? value,
+    {String? emptyCallout, Map<Enum, String?>? formErrors, Enum? filedKey}) {
+  RegExp regex = RegExp(glb_reg_billing_contact_name);
+
+  String? result;
+
+  if (value == null) {
+    result = 'Please enter your billing contact name';
+    if (emptyCallout != null) {
+      result = emptyCallout;
+    }
+  } else {
+    if (value.isEmpty) {
+      result = 'Please enter your billing contact name';
+      if (emptyCallout != null) {
+        result = emptyCallout;
+      }
+    } else {
+      if (!regex.hasMatch(value)) {
+        result = glb_fullName_callout;
+      } else {
+        result = null;
+      }
+    }
+  }
+
+  if (formErrors != null && filedKey != null) {
+    formErrors[filedKey] = result;
+  }
+
+  return result;
+}
+
 String? validateUsername(String? value,
     {Map<Enum, String?>? formErrors, Enum? filedKey}) {
   RegExp regex = RegExp(glb_reg_loginName);
@@ -135,7 +168,7 @@ String? validateEmail(String? value, {String? emptyCallout}) {
 
 String? validateOptionalEmail(String? value) {
   if (value == null || value.trim().isEmpty) {
-    return null; 
+    return null;
   }
 
   final regex = RegExp(glb_reg_email);

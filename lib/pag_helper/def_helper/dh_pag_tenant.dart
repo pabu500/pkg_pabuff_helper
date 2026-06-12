@@ -223,6 +223,22 @@ String? validateTenantLabel(String value) {
   return null;
 }
 
+String? validateRemark(String value) {
+  if (value.trim().isEmpty) {
+    return null; // allow empty
+  }
+
+  // length 1-255, alphanumeric, space, /, ', +, -, #, @, (), .
+  String pattern = r"^[-a-zA-Z0-9 ./'()+&#@]{1,255}$";
+  RegExp regExp = RegExp(pattern);
+
+  if (!regExp.hasMatch(value)) {
+    return 'alphanumeric, space, /, +, -, #, &, @, (), ., only and length 1-255';
+  }
+
+  return null;
+}
+
 String? validateDisplayName(String value) {
   if (value.trim().isEmpty) {
     return 'required';
@@ -492,9 +508,6 @@ String? validateFloorArea(String value) {
   return null;
 }
 
-String? validateBillingContactName(String value) {
-  return validateFullName(value);
-}
 
 String? validateBillingContactEmail(String value) {
   return validateEmail(value);
@@ -832,7 +845,7 @@ final List<Map<String, dynamic>> listConfigBaseTenantExt = [
     'col_type': 'string',
     'width': 150,
     'is_mapping_required': false,
-    'validator': validateFullName,
+    'validator': validateBillingContactName,
   },
   {
     'col_key': 'billing_email_1',
@@ -988,6 +1001,14 @@ final List<Map<String, dynamic>> listConfigBaseTenantExt = [
     'width': 150,
     'is_mapping_required': false,
     'validator': validateLabelScope,
+  },
+  {
+    'col_key': 'remark',
+    'title': 'Remark',
+    'col_type': 'string',
+    'width': 150,
+    'is_mapping_required': false,
+    'validator': validateTenantLabel,
   },
   // {
   //   'col_key': 'initial_balance',
