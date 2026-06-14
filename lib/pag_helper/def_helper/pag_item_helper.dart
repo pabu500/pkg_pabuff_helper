@@ -13,31 +13,36 @@ import 'dh_pag_tariff.dart';
 import 'enum_helper.dart';
 
 enum PagItemKind {
-  scope('Scope', Symbols.file_map_stack),
-  device('Device', Symbols.home_iot_device),
-  user('User', Symbols.person),
-  role('Role', Symbols.badge),
-  tenant('Tenant', Symbols.location_away),
-  org('Organization', Symbols.corporate_fare),
-  jobType('Job Type', Symbols.energy_program_time_used),
-  jobTypeSub('Job Type Sub', Symbols.group),
-  // tariffPackage('Tariff Package', Symbols.price_change),
-  // tariffPackageType('Tariff Package Type', Symbols.price_check),
-  bill('Bill', Symbols.request_quote),
-  meterGroup('Meter Group', Symbols.atr),
-  finance('Finance', Symbols.account_balance),
-  tariff('Tariff', Symbols.price_change);
+  scope('Scope', 'scope', Symbols.file_map_stack),
+  device('Device', 'device', Symbols.home_iot_device),
+  user('User', 'user', Symbols.person),
+  role('Role', 'role', Symbols.badge),
+  tenant('Tenant', 'tenant', Symbols.location_away),
+  org('Organization', 'org', Symbols.corporate_fare),
+  jobType('Job Type', 'job_type', Symbols.energy_program_time_used),
+  jobTypeSub('Job Type Sub', 'job_type_sub', Symbols.group),
+  // tariffPackage('Tariff Package', 'tariff_package', Symbols.price_change),
+  // tariffPackageType('Tariff Package Type', 'tariff_package_type', Symbols.price_check),
+  bill('Bill', 'bill', Symbols.request_quote),
+  meterGroup('Meter Group', 'meter_group', Symbols.atr),
+  finance('Finance', 'finance', Symbols.account_balance),
+  tariff('Tariff', 'tariff', Symbols.price_change);
 
   const PagItemKind(
     this.label,
+    this.value,
     this.iconData,
   );
 
   final String label;
+  final String value;
   final IconData iconData;
 
   static PagItemKind? byLabel(String? label) =>
       enumByLabel(label, values, (e) => (e).label);
+
+  static PagItemKind? byValue(String? value) =>
+      enumByLabel(value, values, (e) => (e).value);
 }
 
 String? getItemTypeStr(dynamic itemType) {
@@ -55,6 +60,8 @@ String? getItemTypeStr(dynamic itemType) {
   } else if (itemType is PagOrgType) {
     return itemType.value;
   } else if (itemType is PagTariff) {
+    return itemType.value;
+  } else if (itemType is PagItemKind) {
     return itemType.value;
   } else {
     throw Exception('Unsupported item type: ${itemType.runtimeType}');

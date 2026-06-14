@@ -60,9 +60,29 @@ String? Function(String?)? getUserValidator(String key) {
       return validateAuthProvider;
     case 'portal_type_str':
       return validatePortalTypeStr;
+    case 'role_label':
+      return validateRoleLabel;
     default:
       return null;
   }
+}
+
+String? validateRoleLabel(String? value) {
+  if (value == null || value.isEmpty) {
+    return 'required';
+  }
+
+  if (value.length < 3 || value.length > 20) {
+    return 'must be between 3 and 20 characters';
+  }
+
+  //alphanumeric, comma, space, dash and underscore only
+  final regex = RegExp(r'^[a-zA-Z0-9 ,_-]+$');
+  if (!regex.hasMatch(value)) {
+    return 'only alphanumeric, comma, space, dash and underscore allowed';
+  }
+
+  return null;
 }
 
 String? validatePortalTypeStr(String? value) {
