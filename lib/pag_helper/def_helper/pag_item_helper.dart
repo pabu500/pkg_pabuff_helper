@@ -118,12 +118,15 @@ String? validateItemLabel(String? value) {
   return null;
 }
 
-String? Function(String?)? getValidator(PagItemKind itemKind, String key) {
+String? Function(String) getValidator(PagItemKind itemKind, String key,
+    {bool isValueRequired = true}) {
   switch (itemKind) {
     case PagItemKind.user:
-      return getUserValidator(key);
+      return getUserValidator(key, isValueRequired: isValueRequired);
     default:
       dev.log('No validator found for item kind: $itemKind, key: $key');
-      return null;
+      return (String value) {
+        return null;
+      };
   }
 }

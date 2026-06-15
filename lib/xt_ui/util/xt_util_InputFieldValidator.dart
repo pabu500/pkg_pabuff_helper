@@ -212,6 +212,28 @@ String? validatePhone(String? value,
   return result;
 }
 
+String? validatePhoneNotRequired(String? value,
+    {String? emptyCallout, Map<Enum, String?>? formErrors, Enum? filedKey}) {
+  final phoneRegExp = RegExp(glb_reg_phone);
+
+  String? result;
+  if (value == null || value.trim().isEmpty) {
+    result = null;
+  } else {
+    if (!phoneRegExp.hasMatch(value)) {
+      result = glb_phone_callout;
+    } else {
+      result = null;
+    }
+  }
+
+  if (formErrors != null && filedKey != null) {
+    formErrors[filedKey] = result;
+  }
+
+  return result;
+}
+
 String? validatePassword(String? value,
     {Map<Enum, String?>? formErrors, Enum? filedKey}) {
   RegExp regex = RegExp(glb_reg_password);

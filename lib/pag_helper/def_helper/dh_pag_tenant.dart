@@ -223,6 +223,20 @@ String? validateTenantLabel(String value) {
   return null;
 }
 
+String? validateTenantLabelNotRequired(String value) {
+  if (value.trim().isEmpty) {
+    return null;
+  }
+  //length 5-255, alphanumeric, space, /, ', +, -, #, @, (), ., only
+  String pattern = r"^[-a-zA-Z0-9 ./'()+&#@]{5,255}$";
+  RegExp regExp = RegExp(pattern);
+  if (!regExp.hasMatch(value)) {
+    return 'alphanumeric, space, /, +, -, #, &, @, (), '
+        ', ., only and length 5-255';
+  }
+  return null;
+}
+
 String? validateRemark(String value) {
   if (value.trim().isEmpty) {
     return null; // allow empty
@@ -445,7 +459,7 @@ String? validateGfa(String value) {
 //   return null;
 // }
 
-String? validateAccountNumber(String value) {
+String? validateTenantAccountNumber(String value) {
   // if (value.trim().isEmpty) {
   //   return 'required';
   // }
@@ -462,13 +476,27 @@ String? validateAccountNumber(String value) {
   return null;
 }
 
-String? validateAccountNumber2(String value) {
+String? validateTenantAccountNumber2(String value) {
   if (value.trim().isEmpty) {
     return 'required';
   }
   // if (value.trim().isEmpty) {
   //   return null;
   // }
+  // validate number, letter, underscore, and dash,
+  // and minimum 5 characters
+  String pattern = r'^[a-zA-Z0-9_ -]{5,}$';
+  RegExp regExp = RegExp(pattern);
+  if (!regExp.hasMatch(value)) {
+    return 'min length is 5 and letter, number, _, - only';
+  }
+  return null;
+}
+
+String? validateTenantAccountNumberNotRequired(String value) {
+  if (value.trim().isEmpty) {
+    return null;
+  }
   // validate number, letter, underscore, and dash,
   // and minimum 5 characters
   String pattern = r'^[a-zA-Z0-9_ -]{5,}$';
@@ -507,7 +535,6 @@ String? validateFloorArea(String value) {
   }
   return null;
 }
-
 
 String? validateBillingContactEmail(String value) {
   return validateEmail(value);
@@ -761,11 +788,11 @@ final List<Map<String, dynamic>> listConfigBaseTenant = [
     'col_type': 'string',
     'width': 200,
     'is_mapping_required': false,
-    'validator': validateAccountNumber,
+    'validator': validateTenantAccountNumber,
   },
 ];
 final List<Map<String, dynamic>> listConfigBaseTenantExt = [
-   {
+  {
     'col_key': 'label',
     'title': 'Label',
     'col_type': 'string',
@@ -773,7 +800,7 @@ final List<Map<String, dynamic>> listConfigBaseTenantExt = [
     'is_mapping_required': false,
     'validator': validateTenantLabel,
   },
-    {
+  {
     'col_key': 'displayname',
     'title': 'Display Name',
     'col_type': 'string',
@@ -1049,7 +1076,7 @@ final List<Map<String, dynamic>> listConfigMgAssign1on1 = [
   //   'is_mapping_required': true,
   //   'validator': validateLabelScope,
   // },
-   {
+  {
     'col_key': 'displayname',
     'title': 'Display Name',
     'col_type': 'string',
@@ -1057,7 +1084,7 @@ final List<Map<String, dynamic>> listConfigMgAssign1on1 = [
     'is_mapping_required': false,
     'validator': validateDisplayName,
   },
-   {
+  {
     'col_key': 'label',
     'title': 'Label',
     'col_type': 'string',
@@ -1088,7 +1115,7 @@ List<Map<String, dynamic>> getListConfigBaseByTenantOpType(
     case PagTenantOpType.mgAssign1on1:
       final accountNumberConfig = listConfigBaseTenant
           .firstWhere((element) => element['col_key'] == 'account_number');
-      accountNumberConfig['validator'] = validateAccountNumber2;
+      accountNumberConfig['validator'] = validateTenantAccountNumber2;
       list.addAll(listConfigBaseTenant + listConfigMgAssign1on1);
       break;
     default:
