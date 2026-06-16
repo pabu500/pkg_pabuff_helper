@@ -85,7 +85,7 @@ enum PagBillPaymentStatus {
   paid('Paid', 'paid', 'paid', Colors.teal),
   unPaid('Unpaid', 'unpaid', 'unpaid', Colors.orange),
   pp('Partial Payment', 'pp', 'pp', Colors.orangeAccent),
-  unKnown('Unknown', 'unknown', 'unknown', Colors.grey),
+  unKnown('Unknown', 'unknown', 'unkn', Colors.grey),
   ;
   // overDue('Overdue', 'overdue', 'od', Colors.red);
 
@@ -111,7 +111,8 @@ enum PagBillPaymentStatus {
         return type;
       }
     }
-    throw Exception('Invalid value: $value');
+    // throw Exception('Invalid value: $value');
+    return PagBillPaymentStatus.unKnown;
   }
 
   static PagBillPaymentStatus byTag(String tag) {
@@ -120,14 +121,15 @@ enum PagBillPaymentStatus {
         return type;
       }
     }
-    throw Exception('Invalid tag: $tag');
+    // throw Exception('Invalid tag: $tag');
+    return PagBillPaymentStatus.unKnown;
   }
 }
 
 enum PagBillDueStatus {
-  normal('Normal', 'normal', 'normal', Colors.green),
-  overDue('Overdue', 'overdue', 'overdue', Colors.red),
-  unKnown('Unknown', 'unknown', 'unknown', Colors.grey),
+  normal('Normal', 'normal', 'norm', Colors.green),
+  overDue('Overdue', 'overdue', 'od', Colors.red),
+  unKnown('Unknown', 'unknown', 'unkn', Colors.grey),
   ;
 
   const PagBillDueStatus([this.label, this.value, this.tag, this.color]);
@@ -152,7 +154,8 @@ enum PagBillDueStatus {
         return type;
       }
     }
-    throw Exception('Invalid value: $value');
+    // throw Exception('Invalid value: $value');
+    return PagBillDueStatus.unKnown;
   }
 
   static PagBillDueStatus byTag(String tag) {
@@ -161,7 +164,8 @@ enum PagBillDueStatus {
         return type;
       }
     }
-    throw Exception('Invalid tag: $tag');
+    // throw Exception('Invalid tag: $tag');
+    return PagBillDueStatus.unKnown;
   }
 }
 
