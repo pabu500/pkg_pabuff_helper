@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:buff_helper/pag_helper/comm/comm_helper.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:buff_helper/pag_helper/comm/pag_be_api_base.dart';
@@ -133,18 +134,52 @@ Future<dynamic> doGetScopeMeterList(
     );
 
     if (response.statusCode == 200) {
-      final respJson = jsonDecode(response.body);
-      if (respJson['error'] != null) {
-        throw Exception(respJson['error']);
-      }
-      if (respJson['data'] == null) {
-        throw Exception('Failed to get scope tenant list');
-      }
-
-      var data = respJson['data'];
-      return data;
+      return getResultFromResp(response.body,
+          defualtErrorMsg: 'Failed to get scope meter list');
     } else {
-      throw Exception('Failed to get scope tenant list');
+      throw Exception('Failed to get scope meter list');
+    }
+  } catch (err) {
+    rethrow;
+  }
+}
+
+Future<dynamic> getMeterMeterGroupAssignment(
+  MdlPagAppConfig appConfig,
+  Map<String, dynamic> queryMap,
+  MdlPagSvcClaim svcClaim,
+) async {
+  svcClaim.svcName = PagSvcType.oresvc2.name;
+  svcClaim.endpoint = PagUrlBase.eptGetMeterMeterGroupAssignment;
+
+  String svcToken = '';
+  // try {
+  //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
+  // } catch (err) {
+  //   throw Exception(err);
+  // }
+
+  // List<Map<String, dynamic>> meterList = [];
+  // for (var item in reqMap['meter_group_info']) {
+  //   meterList.add(item);
+  // }
+
+  try {
+    final response = await http.post(
+      Uri.parse(PagUrlController(null, appConfig)
+          .getUrl(PagSvcType.oresvc2, svcClaim.endpoint!)),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $svcToken',
+      },
+      body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      return getResultFromResp(response.body,
+          defualtErrorMsg: 'Failed to get meter meter group assignment');
+    } else {
+      throw Exception('Failed to get meter meter group assignment');
     }
   } catch (err) {
     rethrow;

@@ -420,6 +420,8 @@ class PagUrlBase {
       '/ems/meter_group/get_meter_group_scope_meter_list';
   static const String eptUpdateMetrGroupMeterList =
       '/ems/meter_group/update_meter_group_meter_list';
+  static const String eptGetMeterMeterGroupAssignment =
+      '/ems/meter_group/get_meter_meter_group_assignment';
 
   // AM - Device Manager
   static const String eptPagCreateDevice = '/am/device/create_device';
