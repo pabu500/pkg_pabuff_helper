@@ -218,7 +218,7 @@ class _WgtCardListState extends State<WgtCardList> {
           }
         }
 
-        bool showTag = false;
+        bool showTag = true;
         String tagText = '';
         String? tagTooltip;
         Color? tagColor;
@@ -274,13 +274,23 @@ class _WgtCardListState extends State<WgtCardList> {
                   ),
                 )
               : ctrlItem.colWidgetType == PagColWidgetType.TAG && showTag
-                  ? getTag(
-                      row: row,
-                      configItem: ctrlItem.toJson(),
+                  ? SizedBox(
                       width: width,
-                      tagColor: tagColor,
-                      tagText: tagText,
-                      tagTooltip: tagTooltip,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          getTag2(
+                            row: row,
+                            configItem: ctrlItem.toJson(),
+                            width: width,
+                            tagColor: tagColor,
+                            tagText: tagText.isNotEmpty
+                                ? tagText
+                                : row[ctrlItem.colKey] ?? '',
+                            tagTooltip: tagTooltip,
+                          ),
+                        ],
+                      ),
                     )
                   : ctrlItem.colWidgetType == PagColWidgetType.TAG_LIST
                       ? getTagList(
