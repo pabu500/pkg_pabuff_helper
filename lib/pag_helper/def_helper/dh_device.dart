@@ -480,7 +480,7 @@ final List<Map<String, dynamic>> listConfigBaseMeter = [
     'title': 'Building Label',
     'col_type': 'string',
     'width': 150,
-    'is_mapping_required': true,
+    'is_mapping_required': false,
     'validator': validateLabelScope,
   },
   {
@@ -488,7 +488,7 @@ final List<Map<String, dynamic>> listConfigBaseMeter = [
     'title': 'Location Label',
     'col_type': 'string',
     'width': 150,
-    'is_mapping_required': true,
+    'is_mapping_required': false,
     'validator': validateLabelScope,
   },
 ];
