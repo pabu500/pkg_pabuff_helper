@@ -871,6 +871,7 @@ Widget getInterestInfo(
     final strInterestStartDateType = bill['interest_start_date_type'];
     final totalOverdueDays = bill['total_overdue_days'];
     final paymentApplyList = bill['payment_apply_list'];
+    final effBciInfoList = bill['effective_bci_info_list'];
 
     final cycleStartDateTimestamp = bill['cycle_start_date_timestamp'];
     final cycleEndDateTimestamp = bill['cycle_end_date_timestamp'];
@@ -883,6 +884,15 @@ Widget getInterestInfo(
       for (var payment in paymentApplyList) {
         if (payment is Map<String, dynamic>) {
           paymentApplyListCasted.add(payment);
+        }
+      }
+    }
+
+    List<Map<String, dynamic>> effBciInfoListCasted = [];
+    if (effBciInfoList != null) {
+      for (var bci in effBciInfoList) {
+        if (bci is Map<String, dynamic>) {
+          effBciInfoListCasted.add(bci);
         }
       }
     }
@@ -1032,6 +1042,7 @@ Widget getInterestInfo(
               'Interest Bearing TTI Amount: SGD${getCommaNumberStr(outstandingAmountDouble, decimal: 2)}'),
           Text(
               ' - Billed Usage Cost Amount: SGD${getCommaNumberStr(billedUsageCostAmtDouble, decimal: 2)}'),
+          getEffBciInfoList(effBciInfoListCasted, context),
           Text(
               ' - Line Item Amount 1: SGD${getCommaNumberStr(lineItemAmount1Double, decimal: 2)}'),
           Text(
@@ -1126,6 +1137,27 @@ Widget getInterestInfo(
         ],
       ),
   ]);
+}
+
+Widget getEffBciInfoList(
+    List<Map<String, dynamic>> effBciInfoList, BuildContext context) {
+  List<Widget> bciWidgets = [];
+  for (var bci in effBciInfoList) {
+    final bciLabel = bci['billing_cost_item_label'] ?? '';
+    final bciAmount = bci['billing_cost_item_amount'] ?? '';
+    double bciAmountDouble = 0.0;
+    if (bciAmount is String) {
+      bciAmountDouble = double.tryParse(bciAmount) ?? 0.0;
+    } else if (bciAmount is double) {
+      bciAmountDouble = bciAmount;
+    }
+    Widget bciWidget = Text(
+        '   - $bciLabel: SGD${getCommaNumberStr(bciAmountDouble, decimal: 2)}');
+    bciWidgets.add(bciWidget);
+  }
+  return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [const Text(' - Billing Cost Item:'), ...bciWidgets]);
 }
 
 Widget getPaymentApplyList(
