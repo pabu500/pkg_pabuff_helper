@@ -36,6 +36,7 @@ import '../../comm/comm_list.dart';
 import '../../model/mdl_pag_app_config.dart';
 import '../app/ems/wgt_bci_tenant_assignment.dart';
 import '../app/ems/wgt_bill_compilation.dart';
+import '../app/ems/wgt_ems_meter_group_assignment.dart';
 import '../app/ems/wgt_match_payment_op_item.dart';
 import '../app/ems/wgt_tenant_item_assignment.dart';
 import '../app/fh/wgt_fh_device_health.dart';
@@ -1001,7 +1002,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                             : Container();
                         break;
                       case PagItemKind.meterGroup:
-                        opWidget = WgtAmMeterGroupAssignment(
+                        opWidget = WgtEmsMeterGroupAssignment(
                           appConfig: widget.appConfig,
                           meterType: item['meter_type'] ?? '',
                           itemGroupIndexStr: item['id'],

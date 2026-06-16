@@ -21,8 +21,8 @@ import '../../../comm/comm_tenant.dart';
 import '../../../model/mdl_pag_app_config.dart';
 import '../../wgt_comm_button.dart';
 
-class WgtMeterGroupAssignment2 extends StatefulWidget {
-  const WgtMeterGroupAssignment2({
+class WgtEmsMeterGroupAssignment extends StatefulWidget {
+  const WgtEmsMeterGroupAssignment({
     super.key,
     required this.appConfig,
     required this.itemGroupIndexStr,
@@ -46,11 +46,12 @@ class WgtMeterGroupAssignment2 extends StatefulWidget {
   final Function? onUpdate;
 
   @override
-  State<WgtMeterGroupAssignment2> createState() =>
-      _WgtMeterGroupAssignment2State();
+  State<WgtEmsMeterGroupAssignment> createState() =>
+      _WgtEmsMeterGroupAssignmentState();
 }
 
-class _WgtMeterGroupAssignment2State extends State<WgtMeterGroupAssignment2> {
+class _WgtEmsMeterGroupAssignmentState
+    extends State<WgtEmsMeterGroupAssignment> {
   late final MdlPagUser? loggedInUser;
 
   final double width = 395.0;
