@@ -339,23 +339,6 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   // get value list to populate input dropdown
   Future<dynamic> _getFilterValueList(
       MdlListColController listColController) async {
-    // assert(widget.itemType is DeviceType ||
-    //     widget.itemType is MeterType ||
-    //     widget.itemType is SensorType ||
-    // widget.itemType == null);
-    // String itemTypeStr = '';
-    // switch (widget.itemType.runtimeType) {
-    //   case const (DeviceType):
-    //     itemTypeStr = (widget.itemType as DeviceType).name;
-    //     break;
-    //   case const (MeterType):
-    //     itemTypeStr = (widget.itemType as MeterType).name;
-    //     break;
-    //   case const (SensorType):
-    //     itemTypeStr = (widget.itemType as SensorType).name;
-    //     break;
-    // }
-
     Map<String, dynamic> queryMap = {
       'scope': widget.loggedInUser.selectedScope.toScopeMap(),
       'item_kind': widget.itemKind.name,
