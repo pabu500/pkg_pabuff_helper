@@ -10,9 +10,7 @@ import 'package:buff_helper/xt_ui/style/evs2_colors.dart';
 import 'package:buff_helper/xt_ui/wdgt/info/get_error_text_prompt.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 import 'package:buff_helper/xt_ui/xt_helpers.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_utils/get_utils.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'dart:developer' as dev;
@@ -132,6 +130,7 @@ class _WgtEmsMeterGroupAssignmentState
     }
   }
 
+  // for ems, meter to meter group assignment should involve tenant assignment as well
   Future<void> _getMeterAssignment(Map<String, dynamic> itemInfo) async {
     if (itemInfo['is_fetching'] ?? false) {
       return;
@@ -144,7 +143,7 @@ class _WgtEmsMeterGroupAssignmentState
 
     itemInfo['is_fetching'] = true;
     try {
-      final result = await getMeterMeterGroupAssignment(
+      final result = await getMeterTenantAssignment(
         widget.appConfig,
         queryMap,
         MdlPagSvcClaim(
@@ -155,8 +154,8 @@ class _WgtEmsMeterGroupAssignmentState
           operation: 'read',
         ),
       );
-      final meterMeterGroupAssignment = result;
-      itemInfo['assignment_info'] = meterMeterGroupAssignment;
+      final meterTenantAssignment = result;
+      itemInfo['assignment_info'] = meterTenantAssignment;
     } catch (e) {
       dev.log(e.toString());
 
@@ -761,179 +760,177 @@ class _WgtMeterGroupAssignmentItemState
     bool hasAssignmentInfo = assignmentInfo != null;
     bool needToCheck = !hasAssignmentInfo;
 
-    // double barWidth = 195;
-    // double maxAssignedWidth = barWidth - 2;
-    // String tooltipMessage = '';
-    // double percentageAssignedToThisItemGroup = 0.0;
+    double barWidth = 195;
+    double maxAssignedWidth = barWidth - 2;
+    String tooltipMessage = '';
+    double percentageAssignedToThisItemGroup = 0.0;
 
-    // final List<Map<String, dynamic>> assignmentBarList = [];
-    // if (hasAssignmentInfo) {
-    //   final meterGroupAssignmentList = assignmentInfo;
-    //   for (var meterGroupAssignment in meterGroupAssignmentList) {
-    //     Map<String, dynamic> barInfo = {};
+    final List<Map<String, dynamic>> assignmentBarList = [];
+    if (hasAssignmentInfo) {
+      final meterGroupAssignmentList = assignmentInfo;
+      for (var meterGroupAssignment in meterGroupAssignmentList) {
+        Map<String, dynamic> barInfo = {};
 
-    //     if (meterGroupAssignment['meter_group_id'] ==
-    //         widget.itemGroupIndexStr) {
-    //       percentageAssignedToThisItemGroup =
-    //           double.tryParse(meterGroupAssignment['percentage']) ?? 0.0;
-    //       barInfo['mg_self_percentage'] = percentageAssignedToThisItemGroup;
-    //     }
+        if (meterGroupAssignment['meter_group_id'] ==
+            widget.itemGroupIndexStr) {
+          percentageAssignedToThisItemGroup =
+              double.tryParse(meterGroupAssignment['percentage']) ?? 0.0;
+          barInfo['mg_self_percentage'] = percentageAssignedToThisItemGroup;
+        }
 
-    //     assignmentBarList.add(barInfo);
-    //   }
-    // }
+        assignmentBarList.add(barInfo);
+      }
+    }
 
     String assignmentError = '';
 
-    List<Widget> assignmentBarWidgets = [];
+    List<Widget> assignmentBarWidgetList = [];
     if (assignmentError.isNotEmpty) {
-      // assignmentBarWidgets.add(
-      //   Tooltip(
-      //     message: tooltipMessage,
-      //     child: Container(
-      //       width: maxAssignedWidth,
-      //       color: Theme.of(context).colorScheme.error,
-      //       child: const Center(
-      //         child: Text(
-      //           'Assignment Error',
-      //           style: TextStyle(color: Colors.white, fontSize: 10),
-      //         ),
-      //       ),
-      //     ),
-      //   ),
-      // );
+      assignmentBarWidgetList.add(
+        Tooltip(
+          message: tooltipMessage,
+          child: Container(
+            width: maxAssignedWidth,
+            color: Theme.of(context).colorScheme.error,
+            child: const Center(
+              child: Text(
+                'Assignment Error',
+                style: TextStyle(color: Colors.white, fontSize: 10),
+              ),
+            ),
+          ),
+        ),
+      );
     } else {
-      // for (Map<String, dynamic> barInfo in assignmentBarList) {
-      //   double? tenantPercentage = barInfo['tenant_percentage'];
-      //   if (tenantPercentage != null) {
-      //     String tenantLcStatus = barInfo['tenant_lc_status'] ?? '';
-      //     PagTenantLcStatus? lcStatus =
-      //         PagTenantLcStatus.byValue(tenantLcStatus);
-      //     if (lcStatus == PagTenantLcStatus.terminated) {
-      //       continue; // skip terminated tenants
-      //     }
+      for (Map<String, dynamic> barInfo in assignmentBarList) {
+        double? tenantPercentage = barInfo['tenant_percentage'];
+        if (tenantPercentage != null) {
+          String tenantLcStatus = barInfo['tenant_lc_status'] ?? '';
+          PagTenantLcStatus? lcStatus =
+              PagTenantLcStatus.byValue(tenantLcStatus);
+          if (lcStatus == PagTenantLcStatus.terminated) {
+            continue; // skip terminated tenants
+          }
 
-      //     String tenantName = barInfo['tenant_name'] ?? 'Unknown Tenant';
-      //     String tenantLabel = barInfo['tenant_label'] ?? '';
+          String tenantName = barInfo['tenant_name'] ?? 'Unknown Tenant';
+          String tenantLabel = barInfo['tenant_label'] ?? '';
 
-      //     double assignedWidth =
-      //         (tenantPercentage / 100.0) * maxAssignedWidth; // Calculate width
+          double assignedWidth =
+              (tenantPercentage / 100.0) * maxAssignedWidth; // Calculate width
 
-      //     Widget barWidget = Tooltip(
-      //       message:
-      //           '$tenantName ${tenantLabel.isNotEmpty ? "($tenantLabel)" : ""} - $tenantPercentage%',
-      //       child: InkWell(
-      //         onTap: true
-      //             ? null
-      //             : () {
-      //                 if (itemInfo['is_fetching'] ?? false) {
-      //                   return;
-      //                 }
+          Widget barWidget = Tooltip(
+            message:
+                '$tenantName ${tenantLabel.isNotEmpty ? "($tenantLabel)" : ""} - $tenantPercentage%',
+            child: InkWell(
+              onTap: true
+                  ? null
+                  : () {
+                      if (itemInfo['is_fetching'] ?? false) {
+                        return;
+                      }
 
-      //                 setState(() {
-      //                   // _selectedMeterIndexStr = itemInfo['id'];
-      //                 });
-      //               },
-      //         child: Container(
-      //           width: assignedWidth,
-      //           color: Colors.grey.shade700,
-      //           child: Center(
-      //             child: Row(
-      //               children: [
-      //                 horizontalSpaceTiny,
-      //                 Icon(PagItemKind.tenant.iconData,
-      //                     size: 17, color: Colors.white),
-      //                 horizontalSpaceTiny,
-      //                 Text(
-      //                   tenantName,
-      //                   style: const TextStyle(
-      //                       color: Colors.white, fontSize: 13.5),
-      //                 ),
-      //               ],
-      //             ),
-      //           ),
-      //         ),
-      //       ),
-      //     );
-      //     assignmentBarWidgets.add(barWidget);
-      //   }
-      // }
+                      setState(() {
+                        // _selectedMeterIndexStr = itemInfo['id'];
+                      });
+                    },
+              child: Container(
+                width: assignedWidth,
+                color: Colors.grey.shade700,
+                child: Center(
+                  child: Row(
+                    children: [
+                      horizontalSpaceTiny,
+                      Icon(PagItemKind.tenant.iconData,
+                          size: 17, color: Colors.white),
+                      horizontalSpaceTiny,
+                      Text(
+                        tenantName,
+                        style: const TextStyle(
+                            color: Colors.white, fontSize: 13.5),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+          assignmentBarWidgetList.add(barWidget);
+        }
+      }
     }
 
-    // if (assignmentBarWidgets.isEmpty) {
-    //   if (percentageAssignedToThisItemGroup > 0.0) {
-    //     assignmentBarWidgets.add(
-    //       Tooltip(
-    //         message: 'Assigned to this item group - '
-    //             '${percentageAssignedToThisItemGroup.toStringAsFixed(2)}%',
-    //         child: Container(
-    //           width:
-    //               percentageAssignedToThisItemGroup / 100.0 * maxAssignedWidth,
-    //           color: Theme.of(context).colorScheme.primary,
-    //           child: const Center(
-    //             child: Text(
-    //               'this meter group (unassigned)',
-    //               // 'this meter group',
-    //               style: TextStyle(color: Colors.white, fontSize: 10),
-    //             ),
-    //           ),
-    //         ),
-    //       ),
-    //     );
-    //   }
-    // }
+    if (assignmentBarWidgetList.isEmpty) {
+      if (percentageAssignedToThisItemGroup > 0.0) {
+        assignmentBarWidgetList.add(
+          Tooltip(
+            message: 'Assigned to this item group - '
+                '${percentageAssignedToThisItemGroup.toStringAsFixed(2)}%',
+            child: Container(
+              width:
+                  percentageAssignedToThisItemGroup / 100.0 * maxAssignedWidth,
+              color: Theme.of(context).colorScheme.primary,
+              child: const Center(
+                child: Text(
+                  'this meter group (unassigned)',
+                  // 'this meter group',
+                  style: TextStyle(color: Colors.white, fontSize: 10),
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+    }
 
-    // if (assignmentBarWidgets.isEmpty) {
-    //   // to ensure the checkbox is aligned properly
-    //   assignmentBarWidgets.add(Container());
-    // }
+    if (assignmentBarWidgetList.isEmpty) {
+      // to ensure the checkbox is aligned properly
+      assignmentBarWidgetList.add(Container());
+    }
 
-    // bool disabled = false;
-    // // totalMeterGroupPercentage > 99.99999 || itemInfo['is_fetching'] == true;
+    bool disabled = false;
+    // totalMeterGroupPercentage > 99.99999 || itemInfo['is_fetching'] == true;
 
-    // bool checked = itemInfo['assigned_new'] ??
-    //     itemInfo['assigned'] ??
-    //     percentageAssignedToThisItemGroup > 0.0;
+    bool checked = itemInfo['assigned_new'] ??
+        itemInfo['assigned'] ??
+        percentageAssignedToThisItemGroup > 0.0;
 
-    // if (itemInfo['assigned_new'] == true && itemInfo['assigned'] == false) {
-    //   assignmentBarWidgets.add(
-    //     Tooltip(
-    //       message: 'Assigned to this item group',
-    //       child: Container(
-    //         width: maxAssignedWidth,
-    //         color: commitColor,
-    //         child: const Center(
-    //           child: Text(
-    //             'this meter group',
-    //             style: TextStyle(color: Colors.white, fontSize: 10),
-    //           ),
-    //         ),
-    //       ),
-    //     ),
-    //   );
-    // }
-    // if (itemInfo['assigned_new'] == false) {
-    //   assignmentBarWidgets.clear();
-    //   assignmentBarWidgets.add(
-    //     Tooltip(
-    //       message: 'Unassigned from this item group',
-    //       child: Container(
-    //         width: maxAssignedWidth,
-    //         color: Theme.of(context).colorScheme.error,
-    //         child: const Center(
-    //           child: Text(
-    //             'this meter group',
-    //             style: TextStyle(color: Colors.white, fontSize: 10),
-    //           ),
-    //         ),
-    //       ),
-    //     ),
-    //   );
-    // }
+    if (itemInfo['assigned_new'] == true && itemInfo['assigned'] == false) {
+      assignmentBarWidgetList.add(
+        Tooltip(
+          message: 'Assigned to this item group',
+          child: Container(
+            width: maxAssignedWidth,
+            color: commitColor,
+            child: const Center(
+              child: Text(
+                'this meter group',
+                style: TextStyle(color: Colors.white, fontSize: 10),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+    if (itemInfo['assigned_new'] == false) {
+      assignmentBarWidgetList.clear();
+      assignmentBarWidgetList.add(
+        Tooltip(
+          message: 'Unassigned from this item group',
+          child: Container(
+            width: maxAssignedWidth,
+            color: Theme.of(context).colorScheme.error,
+            child: const Center(
+              child: Text(
+                'this meter group',
+                style: TextStyle(color: Colors.white, fontSize: 10),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
 
     double margin = 45;
-
-    double barWidth = 195;
 
     return SizedBox(
       width: barWidth + margin,
@@ -959,56 +956,56 @@ class _WgtMeterGroupAssignmentItemState
                 });
               },
             )
-          : Container(),
-      // Tooltip(
-      //     message: tooltipMessage,
-      //     waitDuration: const Duration(milliseconds: 500),
-      //     child: Row(
-      //       children: [
-      //         Container(
-      //           height: 25,
-      //           width: barWidth,
-      //           decoration: BoxDecoration(
-      //             color: Colors.transparent,
-      //             borderRadius: BorderRadius.circular(5),
-      //             border: Border.all(color: Theme.of(context).hintColor),
-      //           ),
-      //           child: Row(
-      //             children: [
-      //               ...assignmentBarWidgets,
-      //               const Spacer(),
-      //             ],
-      //           ),
-      //         ),
-      //         horizontalSpaceTiny,
-      //         Checkbox(
-      //           value:
-      //               checked, //itemInfo['assigned_new'] ?? itemInfo['assigned'],
-      //           onChanged: disabled
-      //               ? null
-      //               : (bool? value) {
-      //                   setState(() {
-      //                     if (value == null) return;
-      //                     itemInfo['assigned_new'] = value;
-      //                     if (itemInfo['assigned_new'] == true) {
-      //                       itemInfo['percentage'] =
-      //                           100.0; // Set to 100% if assigned
-      //                     }
-      //                     // if (itemInfo['assigned_new'] == false) {
-      //                     //   itemInfo['assignment_info'] = null;
-      //                     // }
-      //                     // _checkModified();
-      //                     widget.onModified?.call();
-      //                   });
-      //                 },
-      //         ),
-      //       ],
-      //     ),
-      //   ),
+          : Tooltip(
+              message: tooltipMessage,
+              waitDuration: const Duration(milliseconds: 500),
+              child: Row(
+                children: [
+                  Container(
+                    height: 25,
+                    width: barWidth,
+                    decoration: BoxDecoration(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(5),
+                      border: Border.all(color: Theme.of(context).hintColor),
+                    ),
+                    child: Row(
+                      children: [
+                        ...assignmentBarWidgetList,
+                        const Spacer(),
+                      ],
+                    ),
+                  ),
+                  horizontalSpaceTiny,
+                  Checkbox(
+                    value:
+                        checked, //itemInfo['assigned_new'] ?? itemInfo['assigned'],
+                    onChanged: disabled
+                        ? null
+                        : (bool? value) {
+                            setState(() {
+                              if (value == null) return;
+                              itemInfo['assigned_new'] = value;
+                              if (itemInfo['assigned_new'] == true) {
+                                itemInfo['percentage'] =
+                                    100.0; // Set to 100% if assigned
+                              }
+                              // if (itemInfo['assigned_new'] == false) {
+                              //   itemInfo['assignment_info'] = null;
+                              // }
+                              // _checkModified();
+                              widget.onModified?.call();
+                            });
+                          },
+                  ),
+                ],
+              ),
+            ),
     );
   }
 
   Widget getAssignmentMap() {
+    return Container();
     Map<String, dynamic>? assignmentInfo = widget.itemInfo['assignment_info'];
     if (assignmentInfo == null) {
       if (_assignmentInfoFetched) {
