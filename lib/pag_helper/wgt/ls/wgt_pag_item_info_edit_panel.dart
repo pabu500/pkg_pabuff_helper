@@ -2,7 +2,7 @@ import 'package:buff_helper/pag_helper/comm/comm_batch_op.dart';
 import 'package:buff_helper/pag_helper/comm/comm_pag_item.dart';
 import 'package:buff_helper/pag_helper/def_helper/def_role.dart';
 import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
-import 'package:buff_helper/pag_helper/def_helper/pag_tariff_package_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_tariff_package.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
