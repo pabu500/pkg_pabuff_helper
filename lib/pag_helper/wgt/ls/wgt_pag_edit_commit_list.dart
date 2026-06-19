@@ -1,6 +1,6 @@
 import 'dart:developer' as dev;
 
-import 'package:buff_helper/pag_helper/def_helper/def_role.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_pag_acl.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_finance.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_tariff_package.dart';
 import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
@@ -1085,7 +1085,8 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
   }) {
     String tagLabel = '';
     Color tagColor = Colors.grey;
-    if (configItem['col_key'] == 'portal_type_str') {
+    if (configItem['col_key'] == 'portal_type_str' ||
+        configItem['col_key'] == 'portal_type') {
       PagPortalType portalType = PagPortalType.byValue(tagText);
       tagLabel = portalType.tag;
       tagColor = portalType.color;

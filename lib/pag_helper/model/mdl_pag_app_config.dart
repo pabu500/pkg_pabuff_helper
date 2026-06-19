@@ -1,4 +1,4 @@
-import 'package:buff_helper/pag_helper/def_helper/def_role.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_pag_acl.dart';
 import 'package:buff_helper/pag_helper/pag_project_repo.dart';
 
 class MdlPagAppConfig {
