@@ -677,4 +677,7 @@ class PagUrlBase {
   static const String getLastManualTrigger = '/job/get_last_manual_trigger';
   static const String eptUpdateLastManualTrigger =
       '/job/update_last_manual_trigger';
+
+  // Role
+  static String eptPagCreateRole = '/role/create_role';
 }

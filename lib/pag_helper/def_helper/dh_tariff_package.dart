@@ -83,8 +83,8 @@ String? validateInterestRate(String? value) {
 }
 
 enum PagInterestStartDateType {
-  dueDate('Due Date', 'due_date', 'due', Colors.teal),
-  billDate('Bill Date', 'bill_date', 'bill', Colors.red),
+  dueDate('Due Date', 'due_date', 'duedate', Colors.teal),
+  billDate('Bill Date', 'bill_date', 'billdate', Colors.purple),
   ;
 
   const PagInterestStartDateType(

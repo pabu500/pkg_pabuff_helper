@@ -103,9 +103,9 @@ class _WgtPagLsState extends State<WgtPagLs> {
         if (widget.itemKind == PagItemKind.bill) {
           itemType = PagItemKind.bill;
         }
-        // if (widget.itemKind == PagItemKind.finance) {
-        //   itemType = PagFinanceType.soa;
-        // }
+        if (widget.itemKind == PagItemKind.role) {
+          itemType = PagItemKind.role;
+        }
 
         if (widget.itemKind == PagItemKind.tenant) {
           itemType = PagItemKind.tenant;

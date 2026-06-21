@@ -30,3 +30,35 @@ enum PagPortalType {
       ) ??
       none;
 }
+
+enum PagRoleType {
+  admin('admin', 'Admin', 'admin', Colors.teal),
+  subAdmin('sub_admin', 'Sub Admin', 'subadmin', Colors.blue),
+  ops('ops', 'Ops', 'ops', Colors.indigo),
+  siteOps('site_ops', 'Site Ops', 'siteops', Colors.purple),
+  billingOps('billing_ops', 'Billing Ops', 'billingops', Colors.orange),
+  tenant('tenant', 'EMS Tenant', 'tenant', Colors.grey),
+  consumer('consumer', 'EVS Consumer', 'consumer', Colors.green),
+  unknown('unknown', 'Unknown', 'unknown', Colors.grey),
+  ;
+
+  const PagRoleType(
+    this.value,
+    this.label,
+    this.tag,
+    this.color,
+  );
+
+  final String value;
+  final String label;
+  final String tag;
+  final Color color;
+
+  static PagRoleType byValue(String? value) =>
+      enumByValue<PagRoleType>(
+        value,
+        values,
+        (e) => e.value,
+      ) ??
+      unknown;
+}

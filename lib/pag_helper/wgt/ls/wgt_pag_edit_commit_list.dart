@@ -19,6 +19,7 @@ import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:flutter/services.dart';
 
 import '../../def_helper/dh_device.dart';
+import '../../def_helper/dh_pag_tariff.dart';
 import '../../def_helper/dh_pag_tenant.dart';
 import '../../def_helper/list_helper.dart';
 import '../wgt_list_column_customize.dart';
@@ -1104,19 +1105,22 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
             PagPaymentLcStatus.byValue(tagText);
         tagLabel = financeLcStatus.tag;
         tagColor = financeLcStatus.color.withAlpha(130);
-      } else if (widget.itemType is PagItemKind) {
-        if (widget.itemType == PagItemKind.bill) {
-          PagBillingLcStatus billingLcStatus =
-              PagBillingLcStatus.byValue(tagText);
-          tagLabel = billingLcStatus.tag ?? '';
-          tagColor = billingLcStatus.color?.withAlpha(130) ??
-              Colors.grey.withAlpha(130);
-        }
-        if (widget.itemType == PagItemKind.tenant) {
-          PagTenantLcStatus tenantLcStatus = PagTenantLcStatus.byValue(tagText);
-          tagLabel = tenantLcStatus.tag;
-          tagColor = tenantLcStatus.color.withAlpha(130);
-        }
+      } else if (widget.itemType == PagItemKind.bill) {
+        PagBillingLcStatus billingLcStatus =
+            PagBillingLcStatus.byValue(tagText);
+        tagLabel = billingLcStatus.tag ?? '';
+        tagColor =
+            billingLcStatus.color?.withAlpha(130) ?? Colors.grey.withAlpha(130);
+      } else if (widget.itemType == PagItemKind.tenant) {
+        PagTenantLcStatus tenantLcStatus = PagTenantLcStatus.byValue(tagText);
+        tagLabel = tenantLcStatus.tag;
+        tagColor = tenantLcStatus.color.withAlpha(130);
+      }
+    } else if (widget.itemType == PagItemKind.role) {
+      if (configItem['col_key'] == 'type') {
+        PagRoleType roleStatus = PagRoleType.byValue(tagText);
+        tagLabel = roleStatus.tag;
+        tagColor = roleStatus.color.withAlpha(130);
       }
     } else if (widget.itemType == PagItemKind.bill) {
       if (configItem['col_key'] == 'payment_status') {
@@ -1138,8 +1142,8 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
               Colors.grey.withAlpha(130);
         }
       }
-    } else if (widget.itemType == PagItemKind.tariff) {
-      if (configItem['col_key'] == 'insterest_start_date_type') {
+    } else if (widget.itemType == PagTariff.tariffPackage) {
+      if (configItem['col_key'] == 'interest_start_date_type') {
         PagInterestStartDateType? interestStartDateType =
             PagInterestStartDateType.byValue(tagText);
         tagLabel = interestStartDateType?.tag ?? '';

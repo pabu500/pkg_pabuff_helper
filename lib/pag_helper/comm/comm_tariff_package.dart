@@ -7,7 +7,7 @@ import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
 import 'package:buff_helper/pag_helper/model/mdl_svc_query.dart';
 
-Future<dynamic> doPagTariffPackage(
+Future<dynamic> doCreatePagTariffPackage(
   MdlPagUser loggedInUser,
   MdlPagAppConfig appConfig,
   Map<String, dynamic> queryMap,
