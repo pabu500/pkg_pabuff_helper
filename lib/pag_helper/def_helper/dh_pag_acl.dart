@@ -32,12 +32,12 @@ enum PagPortalType {
 }
 
 enum PagRoleType {
-  admin('admin', 'Admin', 'admin', Colors.teal),
-  subAdmin('sub_admin', 'Sub Admin', 'subadmin', Colors.blue),
-  ops('ops', 'Ops', 'ops', Colors.indigo),
-  siteOps('site_ops', 'Site Ops', 'siteops', Colors.purple),
-  billingOps('billing_ops', 'Billing Ops', 'billingops', Colors.orange),
-  tenant('tenant', 'EMS Tenant', 'tenant', Colors.grey),
+  admin('admin', 'Admin', 'admin', Colors.red),
+  subAdmin('sub_admin', 'Sub Admin', 'subadmin', Colors.yellow),
+  ops('ops', 'Ops', 'ops', Colors.teal),
+  siteOps('site_ops', 'Site Ops', 'siteops', Colors.orange),
+  billingOps('billing_ops', 'Billing Ops', 'billingops', Colors.indigo),
+  tenant('tenant', 'EMS Tenant', 'tenant', Colors.purple),
   consumer('consumer', 'EVS Consumer', 'consumer', Colors.green),
   unknown('unknown', 'Unknown', 'unknown', Colors.grey),
   ;
@@ -61,4 +61,23 @@ enum PagRoleType {
         (e) => e.value,
       ) ??
       unknown;
+}
+
+String? validateRoleTag(String? value) {
+  if (value == null || value.trim().isEmpty) {
+    return 'required';
+  }
+
+  // Allowed:
+  // 2-8 chars
+  // alphanumeric, underscore, dash
+  final validCharacters = RegExp(
+    r"""^[a-zA-Z0-9\-_]{2,8}$""",
+  );
+
+  if (!validCharacters.hasMatch(value)) {
+    return 'must be 2-8 characters and can only contain letters, numbers, hyphens, and underscores';
+  }
+
+  return null;
 }

@@ -118,25 +118,6 @@ String? validateItemLabel(String? value) {
   return null;
 }
 
-String? validateItemTag(String? value) {
-  if (value == null || value.trim().isEmpty) {
-    return 'required';
-  }
-
-  // Allowed:
-  // 2-8 chars
-  // alphanumeric, underscore, dash
-  final validCharacters = RegExp(
-    r"""^[a-zA-Z0-9\-_]{2,8}$""",
-  );
-
-  if (!validCharacters.hasMatch(value)) {
-    return 'must be 2-8 characters and can only contain letters, numbers, hyphens, and underscores';
-  }
-
-  return null;
-}
-
 String? Function(String) getValidator(PagItemKind itemKind, String key,
     {bool isValueRequired = true}) {
   switch (itemKind) {
