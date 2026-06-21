@@ -11,12 +11,14 @@ import 'package:buff_helper/xt_ui/wdgt/info/get_error_text_prompt.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 import 'package:buff_helper/xt_ui/xt_helpers.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'dart:developer' as dev;
 
+import '../../../comm/comm_ex.dart';
 import '../../../comm/comm_meter_group.dart';
-import '../../../comm/comm_tenant.dart';
+import '../../../comm/pag_be_api_base.dart';
 import '../../../model/mdl_pag_app_config.dart';
 import '../../wgt_comm_button.dart';
 
@@ -143,10 +145,13 @@ class _WgtEmsMeterGroupAssignmentState
 
     itemInfo['is_fetching'] = true;
     try {
-      final result = await getMeterTenantAssignment(
-        widget.appConfig,
-        queryMap,
-        MdlPagSvcClaim(
+      final result = await ex(
+        endpoint: PagUrlBase.eptPagGetMeterTenantAssignment,
+        crudType: 'read',
+        opStr: 'get meter assignment',
+        appConfig: widget.appConfig,
+        queryMap: queryMap,
+        svcClaim: MdlPagSvcClaim(
           username: loggedInUser!.username,
           userId: loggedInUser!.id,
           scope: '',
@@ -154,8 +159,10 @@ class _WgtEmsMeterGroupAssignmentState
           operation: 'read',
         ),
       );
-      final meterTenantAssignment = result;
-      itemInfo['assignment_info'] = meterTenantAssignment;
+      final meterTenantAssignmentList = result;
+      // if (meterTenantAssignment is Map && meterTenantAssignment.isNotEmpty) {
+      itemInfo['assignment'] = meterTenantAssignmentList;
+      // }
     } catch (e) {
       dev.log(e.toString());
 
@@ -202,7 +209,7 @@ class _WgtEmsMeterGroupAssignmentState
 
       // clear assginment info from the item list
       for (Map<String, dynamic> itemInfo in _itemGroupScopeMatchingItemList!) {
-        itemInfo.remove('assignment_info');
+        itemInfo.remove('assignment');
         itemInfo.remove('assigned_new');
         itemInfo.remove('is_fetching');
       }
@@ -289,7 +296,7 @@ class _WgtEmsMeterGroupAssignmentState
 
   void _sortItemGroupScopeMatchingItemList() {
     for (var item in _itemGroupScopeMatchingItemList ?? []) {
-      final assignmentInfo = item['assignment_info'];
+      final assignmentInfo = item['assignment'];
       if (assignmentInfo == null) {
         dev.log('No assignment info for item: ${item['id']}, skipping.');
         continue;
@@ -750,13 +757,13 @@ class _WgtMeterGroupAssignmentItemState
             getAssignmentBox(itemInfo),
           ],
         ),
-        if (true) getAssignmentMap(),
+        if (true) getAssignmentMap(itemInfo),
       ],
     );
   }
 
   Widget getAssignmentBox(Map<String, dynamic> itemInfo) {
-    final assignmentInfo = itemInfo['assignment_info'];
+    final assignmentInfo = itemInfo['assignment'];
     bool hasAssignmentInfo = assignmentInfo != null;
     bool needToCheck = !hasAssignmentInfo;
 
@@ -947,7 +954,7 @@ class _WgtMeterGroupAssignmentItemState
                 if (itemInfo['is_fetching'] ?? false) {
                   return;
                 }
-                if (itemInfo['assignment_info'] == null) {
+                if (itemInfo['assignment'] == null) {
                   await widget.getMeterAssignment(itemInfo);
                 }
 
@@ -991,7 +998,7 @@ class _WgtMeterGroupAssignmentItemState
                                     100.0; // Set to 100% if assigned
                               }
                               // if (itemInfo['assigned_new'] == false) {
-                              //   itemInfo['assignment_info'] = null;
+                              //   itemInfo['assignment'] = null;
                               // }
                               // _checkModified();
                               widget.onModified?.call();
@@ -1004,10 +1011,10 @@ class _WgtMeterGroupAssignmentItemState
     );
   }
 
-  Widget getAssignmentMap() {
-    return Container();
-    Map<String, dynamic>? assignmentInfo = widget.itemInfo['assignment_info'];
-    if (assignmentInfo == null) {
+  Widget getAssignmentMap(Map<String, dynamic> itemInfo) {
+    // return Container();
+    final assignment = itemInfo['assignment'];
+    if (assignment == null || assignment.isEmpty) {
       if (_assignmentInfoFetched) {
         return getErrorTextPrompt(
             context: context, errorText: 'Error: Assignment info not found');
@@ -1015,7 +1022,7 @@ class _WgtMeterGroupAssignmentItemState
         return Container();
       }
     }
-    final meterTeantAssignmentList = assignmentInfo['meter_tenant_assignment'];
+    final meterTeantAssignmentList = assignment;
     if (meterTeantAssignmentList == null || meterTeantAssignmentList.isEmpty) {
       return Text(
         'This meter has not been assigned to any meter group',
