@@ -700,6 +700,7 @@ enum PagMeterCommType {
   mms('mms', 'mms', 'mms', Colors.brown),
   evs2loop('evs2loop', 'evs2_loop', 'evs2loop', Colors.deepPurple),
   evs2mcu('evs2mcu', 'evs2_mcu', 'evs2mcu', Colors.green),
+  mcu05('mcu05', 'mcu05', 'mcu05', Colors.indigo),
   unknown('unknown', 'unknown', 'unknown', Colors.grey);
 
   const PagMeterCommType(
