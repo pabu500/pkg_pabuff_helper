@@ -48,6 +48,7 @@ enum MeterCommType {
   mms,
   evs2loop,
   evs2mcu,
+  mcu05,
   unknown,
 }
 
@@ -433,6 +434,8 @@ MeterCommType getMeterCommType(String? typeStr) {
       return MeterCommType.evs2loop;
     case 'evs2_mcu':
       return MeterCommType.evs2mcu;
+    case 'mcu05':
+      return MeterCommType.mcu05;
     default:
       return MeterCommType.unknown;
   }
@@ -453,6 +456,11 @@ final Map<MeterCommType, dynamic> meterCommTypeInfo = {
     'tag': 'evs2mcu',
     'color': Colors.green,
     'tooltip': 'EVS2-MCU',
+  },
+  MeterCommType.mcu05: {
+    'tag': 'mcu05',
+    'color': Colors.indigo,
+    'tooltip': 'MCU05',
   },
   MeterCommType.unknown: {
     'tag': '',
