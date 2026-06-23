@@ -11,7 +11,6 @@ import 'package:buff_helper/xt_ui/wdgt/info/get_error_text_prompt.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 import 'package:buff_helper/xt_ui/xt_helpers.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'dart:developer' as dev;
@@ -181,7 +180,8 @@ class _WgtEmsMeterGroupAssignmentState
     // filter out items that are not modified
     final List<Map<String, dynamic>> assignmentList =
         _itemGroupScopeMatchingItemList!
-            .where((item) => item['assigned_new'] != null)
+            // .where((item) => item['assigned_new'] != null)
+            .where((item) => item['assigned_new'] != item['assigned'])
             .toList();
     Map<String, dynamic> queryMap = {
       'scope': loggedInUser!.selectedScope.toScopeMap(),
