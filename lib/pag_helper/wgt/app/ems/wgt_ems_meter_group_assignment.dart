@@ -1,4 +1,3 @@
-import 'package:buff_helper/pag_helper/def_helper/dh_device.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_tenant.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
@@ -6,6 +5,7 @@ import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
 import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_scope.dart';
+import 'package:buff_helper/pag_helper/wgt/app/ems/wgt_meter_group_assignment_item.dart';
 import 'package:buff_helper/xt_ui/style/evs2_colors.dart';
 import 'package:buff_helper/xt_ui/wdgt/info/get_error_text_prompt.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
@@ -15,6 +15,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'dart:developer' as dev;
 
+import '../../../../up_helper/exceptions.dart';
 import '../../../comm/comm_ex.dart';
 import '../../../comm/comm_meter_group.dart';
 import '../../../comm/pag_be_api_base.dart';
@@ -73,6 +74,8 @@ class _WgtEmsMeterGroupAssignmentState
 
   final TextEditingController _itemSnFilterController = TextEditingController();
   String _itemSnFilterStr = '';
+
+  UniqueKey? _mgAssignmentItemKey;
 
   Future<void> _doAutoPopulate() async {
     if (_isScopeMatchingListFetching) {
@@ -159,9 +162,8 @@ class _WgtEmsMeterGroupAssignmentState
         ),
       );
       final meterTenantAssignmentList = result;
-      // if (meterTenantAssignment is Map && meterTenantAssignment.isNotEmpty) {
       itemInfo['assignment'] = meterTenantAssignmentList;
-      // }
+      itemInfo['info_fetched'] = true;
     } catch (e) {
       dev.log(e.toString());
 
@@ -180,8 +182,8 @@ class _WgtEmsMeterGroupAssignmentState
     // filter out items that are not modified
     final List<Map<String, dynamic>> assignmentList =
         _itemGroupScopeMatchingItemList!
-            // .where((item) => item['assigned_new'] != null)
-            .where((item) => item['assigned_new'] != item['assigned'])
+            .where((item) => item['assignment_new'] != null)
+            // .where((item) => item['percentage_new'] != item['percentage'])
             .toList();
     Map<String, dynamic> queryMap = {
       'scope': loggedInUser!.selectedScope.toScopeMap(),
@@ -191,7 +193,7 @@ class _WgtEmsMeterGroupAssignmentState
     try {
       _isCommitting = true;
 
-      final data = await commitMeterGroupMeterList(
+      final result = await commitMeterGroupMeterList(
         widget.appConfig,
         queryMap,
         MdlPagSvcClaim(
@@ -203,20 +205,17 @@ class _WgtEmsMeterGroupAssignmentState
         ),
       );
 
-      if (data['error'] != null) {
-        throw Exception(data['error']);
-      }
-
       // clear assginment info from the item list
       for (Map<String, dynamic> itemInfo in _itemGroupScopeMatchingItemList!) {
         itemInfo.remove('assignment');
         itemInfo.remove('assigned_new');
         itemInfo.remove('is_fetching');
+        itemInfo.remove('info_fetched');
       }
     } catch (e) {
       dev.log(e.toString());
       setState(() {
-        _commitErrorText = 'Commit Error';
+        _commitErrorText = getErrorText(e, defaultErrorText: 'Commit error');
       });
     } finally {
       setState(() {
@@ -224,6 +223,8 @@ class _WgtEmsMeterGroupAssignmentState
         _isCommitted = true;
         _modified = false;
         // _selectedMeterIndexStr = null;
+        _mgAssignmentItemKey =
+            UniqueKey(); // reset the key to force rebuild of the assignment item widget
       });
     }
   }
@@ -231,11 +232,15 @@ class _WgtEmsMeterGroupAssignmentState
   bool _checkModified() {
     bool modified = false;
     for (Map<String, dynamic> item in _itemGroupScopeMatchingItemList ?? []) {
-      if (item['assigned_new'] != null) {
-        if (item['assigned'] != item['assigned_new']) {
-          modified = true;
-          break;
-        }
+      // if (item['percentage_new'] != null) {
+      //   if (item['percentage'] != item['percentage_new']) {
+      //     modified = true;
+      //     break;
+      //   }
+      // }
+      if (item['assignment_new'] != null) {
+        modified = true;
+        break;
       }
     }
     setState(() {
@@ -603,6 +608,7 @@ class _WgtEmsMeterGroupAssignmentState
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 3),
           child: WgtMeterGroupAssignmentItem(
+            key: _mgAssignmentItemKey,
             appConfig: widget.appConfig,
             loggedInUser: loggedInUser!,
             itemInfo: itemInfo,
@@ -623,519 +629,6 @@ class _WgtEmsMeterGroupAssignmentState
       itemBuilder: (context, index) {
         return itemWidgetList[index];
       },
-    );
-  }
-}
-
-class WgtMeterGroupAssignmentItem extends StatefulWidget {
-  const WgtMeterGroupAssignmentItem({
-    super.key,
-    required this.appConfig,
-    required this.loggedInUser,
-    required this.itemInfo,
-    required this.getMeterAssignment,
-    required this.itemGroupIndexStr,
-    this.regFresh,
-    this.onModified,
-  });
-
-  final MdlPagAppConfig appConfig;
-  final MdlPagUser loggedInUser;
-  final Map<String, dynamic> itemInfo;
-  final String itemGroupIndexStr;
-  final void Function(void Function(bool isComm, bool isEnabled))? regFresh;
-  final Future<void> Function(Map<String, dynamic> itemInfo) getMeterAssignment;
-  final void Function()? onModified;
-
-  @override
-  State<WgtMeterGroupAssignmentItem> createState() =>
-      _WgtMeterGroupAssignmentItemState();
-}
-
-class _WgtMeterGroupAssignmentItemState
-    extends State<WgtMeterGroupAssignmentItem> {
-  bool _assignmentInfoFetched = false;
-  bool _isComm = false;
-  bool _isEnabled = false;
-
-  void _refresh(bool isComm, bool isEnabled) {
-    if (!mounted) {
-      return;
-    }
-
-    setState(() {
-      _isComm = isComm;
-      _isEnabled = isEnabled;
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    widget.regFresh?.call(_refresh);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // return widget;
-    return _isComm
-        ? const WgtPagWait(size: 21)
-        : InkWell(
-            onTap: !_isEnabled ? null : () {},
-            child: getAssignmentRow(widget.itemInfo),
-          );
-  }
-
-  Widget getAssignmentRow(Map<String, dynamic> itemInfo) {
-    int index = itemInfo['index'] ?? 0;
-    String itemName = itemInfo['meter_name'] ?? '-';
-    String itemLabel = itemInfo['meter_label'] ?? '-';
-    String meterSn = itemInfo['meter_sn'] ?? '-';
-    bool assigned = itemInfo['assigned'] ?? false;
-
-    BoxDecoration boxDecoration = BoxDecoration(
-      border: Border.all(color: Theme.of(context).hintColor.withAlpha(50)),
-      borderRadius: BorderRadius.circular(5),
-    );
-
-    TextStyle disabledTextStyle = TextStyle(
-      color: Theme.of(context).hintColor.withAlpha(150),
-    );
-
-    bool disabled = false; //_hasTptMismatchAssignmentError;
-
-    return Column(
-      children: [
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: 30,
-              child: Align(
-                alignment: Alignment.centerRight,
-                child: SelectableText(
-                  index.toString(),
-                  style: TextStyle(color: Theme.of(context).hintColor),
-                ),
-              ),
-            ),
-            horizontalSpaceTiny,
-            Icon(PagDeviceCat.meter.iconData,
-                color: Theme.of(context).hintColor, size: 18),
-            horizontalSpaceTiny,
-            Container(
-              width: 150,
-              decoration: boxDecoration,
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-              child: SelectableText(
-                itemName,
-                style: disabled ? disabledTextStyle : null,
-              ),
-            ),
-            horizontalSpaceSmall,
-            Container(
-              width: 135,
-              decoration: boxDecoration,
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-              child: SelectableText(
-                meterSn,
-                style: disabled ? disabledTextStyle : null,
-              ),
-            ),
-            horizontalSpaceSmall,
-            Container(
-              width: 160,
-              decoration: boxDecoration,
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-              child: SelectableText(
-                itemLabel,
-                style: disabled ? disabledTextStyle : null,
-              ),
-            ),
-            horizontalSpaceTiny,
-            getAssignmentBox(itemInfo),
-          ],
-        ),
-        if (true) getAssignmentMap(itemInfo),
-      ],
-    );
-  }
-
-  Widget getAssignmentBox(Map<String, dynamic> itemInfo) {
-    final assignmentInfo = itemInfo['assignment'];
-    bool hasAssignmentInfo = assignmentInfo != null;
-    bool needToCheck = !hasAssignmentInfo;
-
-    double barWidth = 195;
-    double maxAssignedWidth = barWidth - 2;
-    String tooltipMessage = '';
-    double percentageAssignedToThisItemGroup = 0.0;
-
-    final List<Map<String, dynamic>> assignmentBarList = [];
-    if (hasAssignmentInfo) {
-      final meterGroupAssignmentList = assignmentInfo;
-      for (var meterGroupAssignment in meterGroupAssignmentList) {
-        Map<String, dynamic> barInfo = {};
-
-        if (meterGroupAssignment['meter_group_id'] ==
-            widget.itemGroupIndexStr) {
-          percentageAssignedToThisItemGroup =
-              double.tryParse(meterGroupAssignment['percentage']) ?? 0.0;
-          barInfo['mg_self_percentage'] = percentageAssignedToThisItemGroup;
-        }
-
-        assignmentBarList.add(barInfo);
-      }
-    }
-
-    String assignmentError = '';
-
-    List<Widget> assignmentBarWidgetList = [];
-    if (assignmentError.isNotEmpty) {
-      assignmentBarWidgetList.add(
-        Tooltip(
-          message: tooltipMessage,
-          child: Container(
-            width: maxAssignedWidth,
-            color: Theme.of(context).colorScheme.error,
-            child: const Center(
-              child: Text(
-                'Assignment Error',
-                style: TextStyle(color: Colors.white, fontSize: 10),
-              ),
-            ),
-          ),
-        ),
-      );
-    } else {
-      for (Map<String, dynamic> barInfo in assignmentBarList) {
-        double? tenantPercentage = barInfo['tenant_percentage'];
-        if (tenantPercentage != null) {
-          String tenantLcStatus = barInfo['tenant_lc_status'] ?? '';
-          PagTenantLcStatus? lcStatus =
-              PagTenantLcStatus.byValue(tenantLcStatus);
-          if (lcStatus == PagTenantLcStatus.terminated) {
-            continue; // skip terminated tenants
-          }
-
-          String tenantName = barInfo['tenant_name'] ?? 'Unknown Tenant';
-          String tenantLabel = barInfo['tenant_label'] ?? '';
-
-          double assignedWidth =
-              (tenantPercentage / 100.0) * maxAssignedWidth; // Calculate width
-
-          Widget barWidget = Tooltip(
-            message:
-                '$tenantName ${tenantLabel.isNotEmpty ? "($tenantLabel)" : ""} - $tenantPercentage%',
-            child: InkWell(
-              onTap: true
-                  ? null
-                  : () {
-                      if (itemInfo['is_fetching'] ?? false) {
-                        return;
-                      }
-
-                      setState(() {
-                        // _selectedMeterIndexStr = itemInfo['id'];
-                      });
-                    },
-              child: Container(
-                width: assignedWidth,
-                color: Colors.grey.shade700,
-                child: Center(
-                  child: Row(
-                    children: [
-                      horizontalSpaceTiny,
-                      Icon(PagItemKind.tenant.iconData,
-                          size: 17, color: Colors.white),
-                      horizontalSpaceTiny,
-                      Text(
-                        tenantName,
-                        style: const TextStyle(
-                            color: Colors.white, fontSize: 13.5),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          );
-          assignmentBarWidgetList.add(barWidget);
-        }
-      }
-    }
-
-    if (assignmentBarWidgetList.isEmpty) {
-      if (percentageAssignedToThisItemGroup > 0.0) {
-        assignmentBarWidgetList.add(
-          Tooltip(
-            message: 'Assigned to this item group - '
-                '${percentageAssignedToThisItemGroup.toStringAsFixed(2)}%',
-            child: Container(
-              width:
-                  percentageAssignedToThisItemGroup / 100.0 * maxAssignedWidth,
-              color: Theme.of(context).colorScheme.primary,
-              child: const Center(
-                child: Text(
-                  'this meter group (unassigned)',
-                  // 'this meter group',
-                  style: TextStyle(color: Colors.white, fontSize: 10),
-                ),
-              ),
-            ),
-          ),
-        );
-      }
-    }
-
-    if (assignmentBarWidgetList.isEmpty) {
-      // to ensure the checkbox is aligned properly
-      assignmentBarWidgetList.add(Container());
-    }
-
-    bool disabled = false;
-    // totalMeterGroupPercentage > 99.99999 || itemInfo['is_fetching'] == true;
-
-    bool checked = itemInfo['assigned_new'] ??
-        itemInfo['assigned'] ??
-        percentageAssignedToThisItemGroup > 0.0;
-
-    if (itemInfo['assigned_new'] == true && itemInfo['assigned'] == false) {
-      assignmentBarWidgetList.add(
-        Tooltip(
-          message: 'Assigned to this item group',
-          child: Container(
-            width: maxAssignedWidth,
-            color: commitColor,
-            child: const Center(
-              child: Text(
-                'this meter group',
-                style: TextStyle(color: Colors.white, fontSize: 10),
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-    if (itemInfo['assigned_new'] == false) {
-      assignmentBarWidgetList.clear();
-      assignmentBarWidgetList.add(
-        Tooltip(
-          message: 'Unassigned from this item group',
-          child: Container(
-            width: maxAssignedWidth,
-            color: Theme.of(context).colorScheme.error,
-            child: const Center(
-              child: Text(
-                'this meter group',
-                style: TextStyle(color: Colors.white, fontSize: 10),
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-
-    double margin = 45;
-
-    return SizedBox(
-      width: barWidth + margin,
-      // height: 26,
-      child: needToCheck
-          ? WgtCommButton(
-              label: 'Check Assignment',
-              labelStyle: TextStyle(
-                color: Theme.of(context).colorScheme.onSecondary,
-                fontSize: 13.5,
-              ),
-              width: barWidth + margin,
-              onPressed: () async {
-                if (itemInfo['is_fetching'] ?? false) {
-                  return;
-                }
-                if (itemInfo['assignment'] == null) {
-                  await widget.getMeterAssignment(itemInfo);
-                }
-
-                setState(() {
-                  // _selectedMeterIndexStr = itemInfo['id'];
-                });
-              },
-            )
-          : Tooltip(
-              message: tooltipMessage,
-              waitDuration: const Duration(milliseconds: 500),
-              child: Row(
-                children: [
-                  Container(
-                    height: 25,
-                    width: barWidth,
-                    decoration: BoxDecoration(
-                      color: Colors.transparent,
-                      borderRadius: BorderRadius.circular(5),
-                      border: Border.all(color: Theme.of(context).hintColor),
-                    ),
-                    child: Row(
-                      children: [
-                        ...assignmentBarWidgetList,
-                        const Spacer(),
-                      ],
-                    ),
-                  ),
-                  horizontalSpaceTiny,
-                  Checkbox(
-                    value:
-                        checked, //itemInfo['assigned_new'] ?? itemInfo['assigned'],
-                    onChanged: disabled
-                        ? null
-                        : (bool? value) {
-                            setState(() {
-                              if (value == null) return;
-                              itemInfo['assigned_new'] = value;
-                              if (itemInfo['assigned_new'] == true) {
-                                itemInfo['percentage'] =
-                                    100.0; // Set to 100% if assigned
-                              }
-                              // if (itemInfo['assigned_new'] == false) {
-                              //   itemInfo['assignment'] = null;
-                              // }
-                              // _checkModified();
-                              widget.onModified?.call();
-                            });
-                          },
-                  ),
-                ],
-              ),
-            ),
-    );
-  }
-
-  Widget getAssignmentMap(Map<String, dynamic> itemInfo) {
-    // return Container();
-    final assignment = itemInfo['assignment'];
-    if (assignment == null || assignment.isEmpty) {
-      if (_assignmentInfoFetched) {
-        return getErrorTextPrompt(
-            context: context, errorText: 'Error: Assignment info not found');
-      } else {
-        return Container();
-      }
-    }
-    final meterTeantAssignmentList = assignment;
-    if (meterTeantAssignmentList == null || meterTeantAssignmentList.isEmpty) {
-      return Text(
-        'This meter has not been assigned to any meter group',
-        style: TextStyle(color: Theme.of(context).hintColor),
-      );
-    }
-    List<Widget> assignmentWidgetList = [];
-    int assignedToActiveTenantCount = 0;
-    for (Map<String, dynamic> assignment in meterTeantAssignmentList ?? []) {
-      String meterName = assignment['meter_name'] ?? '';
-      String meterLabel = assignment['meter_label'] ?? '';
-      String meterSn = assignment['meter_sn'] ?? '';
-      String meterGroupName = assignment['meter_group_name'] ?? '';
-      String meterGroupLabel = assignment['meter_group_label'] ?? '';
-      double percentage =
-          double.tryParse(assignment['percentage'] ?? '0.0') ?? 0.0;
-
-      final tenantInfo = assignment['tenant_info'];
-      String tenantName = tenantInfo?['name'] ?? '';
-      String tenantLabel = tenantInfo?['label'] ?? '';
-      String tenantLcStatus = tenantInfo?['lc_status'] ?? '';
-      PagTenantLcStatus? tenantLcStatusEnum =
-          PagTenantLcStatus.byValue(tenantLcStatus);
-      // tenantLcStatusEnum ??= PagTenantLcStatus.normal;
-      if (tenantInfo != null) {
-        if (tenantLcStatusEnum == PagTenantLcStatus.normal ||
-            tenantLcStatusEnum == PagTenantLcStatus.onboarding ||
-            tenantLcStatusEnum == PagTenantLcStatus.offboarding) {
-          assignedToActiveTenantCount++;
-        }
-      }
-
-      bool meterGroupIsAssignedToActiveTenant = false;
-      if (assignedToActiveTenantCount != 0) {
-        meterGroupIsAssignedToActiveTenant = true;
-      }
-
-      if (assignedToActiveTenantCount > 1) {
-        return getErrorTextPrompt(
-          context: context,
-          errorText:
-              'Error: Multiple active tenants assigned to this meter group',
-        );
-      }
-
-      Widget assignmentWidget = Padding(
-        padding: const EdgeInsets.symmetric(vertical: 2.0),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(PagItemKind.meterGroup.iconData,
-                color: Theme.of(context).hintColor, size: 18),
-            horizontalSpaceTiny,
-            SizedBox(
-              width: 135,
-              child: Text(
-                meterGroupName,
-                style: TextStyle(
-                    color: meterGroupIsAssignedToActiveTenant
-                        ? Colors.greenAccent
-                        : Theme.of(context).hintColor),
-              ),
-            ),
-            horizontalSpaceTiny,
-            SizedBox(
-              width: 60,
-              child: Text(
-                '${percentage.toStringAsFixed(2)}%',
-                style: TextStyle(color: Theme.of(context).hintColor),
-              ),
-            ),
-            Icon(Symbols.arrow_right,
-                size: 18, color: Theme.of(context).hintColor),
-            Icon(PagItemKind.tenant.iconData,
-                color: Theme.of(context).hintColor, size: 18),
-            horizontalSpaceTiny,
-            Tooltip(
-              message: tenantLabel,
-              child: SizedBox(
-                width: 175,
-                child: tenantName.isEmpty
-                    ? Text(
-                        '-',
-                        style: TextStyle(color: Theme.of(context).hintColor),
-                      )
-                    : SelectableText(
-                        tenantName,
-                        style: TextStyle(
-                          color: tenantLcStatusEnum.color,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-              ),
-            ),
-          ],
-        ),
-      );
-      assignmentWidgetList.add(assignmentWidget);
-    }
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: Theme.of(context).hintColor.withAlpha(50)),
-        borderRadius: BorderRadius.circular(5),
-      ),
-      margin: const EdgeInsets.symmetric(horizontal: 5),
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ...assignmentWidgetList,
-        ],
-      ),
     );
   }
 }
