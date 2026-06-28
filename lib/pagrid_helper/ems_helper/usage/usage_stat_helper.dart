@@ -3,6 +3,7 @@ import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/up_helper/helper/tenant_def.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import '../../../pag_helper/def_helper/dh_tariff_package.dart';
 import '../../app_helper/pagrid_app_config.dart';
 
 Widget getTypeUsageStat(
@@ -879,6 +880,12 @@ Widget getInterestInfo(
     final colletionEndDateTimestamp = bill['collection_end_date_timestamp'];
     final daysInCycle = bill['days_in_cycle'];
 
+    PagInterestStartDateType? interestStartDateType =
+        PagInterestStartDateType.byValue(strInterestStartDateType);
+
+    PagInterestDurationType? interestDurationType =
+        PagInterestDurationType.byValue(strInterestDurationType);
+
     List<Map<String, dynamic>> paymentApplyListCasted = [];
     if (paymentApplyList != null) {
       for (var payment in paymentApplyList) {
@@ -1034,6 +1041,10 @@ Widget getInterestInfo(
                 billLabel,
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
+              horizontalSpaceTiny,
+              getInterestDurationTypeTag(interestDurationType!),
+              horizontalSpaceTiny,
+              getInterestStartDateTypeTag(interestStartDateType!),
             ],
           ),
           Text('Bill Date: ${billDate.substring(0, 10)}'),
@@ -1057,11 +1068,11 @@ Widget getInterestInfo(
           Text('Payment Term: $paymentTermDaysInt days'),
           Text('Grace Period: $gracePeriodDaysInt days'),
           Text('Due Date: ${dueDate.substring(0, 10)}'),
-          Text('Interest Start Date Type: $strInterestStartDateType'),
+          // Text('Interest Start Date Type: $strInterestStartDateType'),
           Text('Interest Start Date: ${interestStartDate.substring(0, 10)}'),
           Text('Total Overdue Days: $totalOverdueDaysInt'),
 
-          Text('Interest Duration Type: $strInterestDurationType'),
+          // Text('Interest Duration Type: $strInterestDurationType'),
           Text('Interest Bearing Days: $interestBearingDaysInt days'),
           Text('Interest Rate: ${interestRateDouble.toStringAsFixed(3)}%'),
 

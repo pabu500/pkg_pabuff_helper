@@ -39,12 +39,12 @@ enum PagTariffPackageTypeCat {
 //   return null;
 // }
 
-enum PagInterestDuration {
+enum PagInterestDurationType {
   month('Month', 'month', Colors.amberAccent),
-  annum('Annum', 'annum', Colors.greenAccent),
+  annum('Annum', 'annum', Colors.green),
   ;
 
-  const PagInterestDuration(
+  const PagInterestDurationType(
     this.label,
     this.tag,
     this.color,
@@ -54,17 +54,38 @@ enum PagInterestDuration {
   final String tag;
   final Color color;
 
-  static PagInterestDuration? byLabel(String? label) => enumByLabel(
+  static PagInterestDurationType? byValue(String? value) => enumByValue(
+        value,
+        values,
+        (e) => (e).tag,
+      );
+
+  static PagInterestDurationType? byLabel(String? label) => enumByLabel(
         label,
         values,
         (e) => (e).label,
       );
 
-  static PagInterestDuration? byTag(String? tag) => enumByTag(
+  static PagInterestDurationType? byTag(String? tag) => enumByTag(
         tag,
         values,
         (e) => (e).tag,
       );
+}
+
+Widget getInterestDurationTypeTag(PagInterestDurationType type) {
+  return Tooltip(
+    message: 'Interest Duration Type: ${type.label}',
+    waitDuration: const Duration(milliseconds: 500),
+    child: Container(
+      decoration: BoxDecoration(
+        color: type.color,
+        borderRadius: BorderRadius.circular(5.0),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+      child: Text(type.tag),
+    ),
+  );
 }
 
 String? validateInterestRate(String? value) {
@@ -83,8 +104,8 @@ String? validateInterestRate(String? value) {
 }
 
 enum PagInterestStartDateType {
-  dueDate('Due Date', 'due_date', 'duedate', Colors.teal),
-  billDate('Bill Date', 'bill_date', 'billdate', Colors.purple),
+  dueDate('Due Date', 'due_date', 'duedate', Colors.tealAccent),
+  billDate('Bill Date', 'bill_date', 'billdate', Colors.purpleAccent),
   ;
 
   const PagInterestStartDateType(
@@ -113,4 +134,19 @@ enum PagInterestStartDateType {
         values,
         (e) => (e).value,
       );
+}
+
+Widget getInterestStartDateTypeTag(PagInterestStartDateType type) {
+  return Tooltip(
+    message: 'Interest Start Date Type: ${type.label}',
+    waitDuration: const Duration(milliseconds: 500),
+    child: Container(
+      decoration: BoxDecoration(
+        color: type.color,
+        borderRadius: BorderRadius.circular(5.0),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+      child: Text(type.tag),
+    ),
+  );
 }
