@@ -153,7 +153,7 @@ class _WgtPagTenantCompositeUsageSummaryState
       Map<String, dynamic> queryMap = {
         'scope': widget.loggedInUser.selectedScope.toScopeMap(),
         'id': strBillingRecId,
-        'item_kind': PagItemKind.bill.name,
+        'item_kind': PagItemKind.bill.value,
         // 'item_type': widget.itemType is Enum
         //     ? (widget.itemType as Enum).name
         //     : widget.itemType,

@@ -57,7 +57,7 @@ class _PagPgMyProfileState extends State<PagPgMyProfile> {
       String idStr = loggedInUser!.id!.toString();
       Map<String, dynamic> queryMap = {
         'id': idStr,
-        'item_kind': PagItemKind.user.name,
+        'item_kind': PagItemKind.user.value,
         'item_id_type': ItemIdType.id.name,
         'item_id_key': 'id',
         'item_id': idStr,

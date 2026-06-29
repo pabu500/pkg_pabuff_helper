@@ -78,7 +78,7 @@ class _WgtItemDeleteOpState extends State<WgtItemDeleteOp> {
       Map<String, dynamic> queryMap = {
         'scope': _loggedInUser!.selectedScope.toScopeMap(),
         'id': widget.itemIndexStr,
-        'item_kind': widget.itemKind.name,
+        'item_kind': widget.itemKind.value,
         'item_type': itemTypeStr,
         'item_id_type': ItemIdType.id.name,
         'item_id_key': 'id',

@@ -1184,6 +1184,7 @@ Widget getPaymentApplyList(
     final appliedInterestAmountFromPayment =
         payment['interest_amount_from_payment'];
     final valueTimestamp = payment['value_timestamp'];
+    final effValueTimestamp = payment['effective_value_timestamp'];
     final reducedBilledUsageFromThisApply =
         payment['reduced_billed_usage_from_this_apply'];
     // final overdueDays = payment['overdue_days'];
@@ -1292,6 +1293,9 @@ Widget getPaymentApplyList(
               PagPaymentMethod.getTagWidget(paymentMethodEnum),
               horizontalSpaceTiny,
               Text('Payment Date: ${valueTimestamp.substring(0, 10)}'),
+              if (effValueTimestamp != null)
+                Text(
+                    ' (Effective Value Date: ${effValueTimestamp.substring(0, 10)})'),
             ],
           ),
           verticalSpaceTiny,

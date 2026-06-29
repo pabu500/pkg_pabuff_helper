@@ -61,7 +61,7 @@ class _LineItemsNotSubjectToTaxState extends State<WgtBillLineItemLabel> {
       Map<String, dynamic> queryMap = {
         'scope': widget.loggedInUser.selectedScope.toScopeMap(),
         'id': widget.strBillingRecId,
-        'item_kind': PagItemKind.bill.name,
+        'item_kind': PagItemKind.bill.value,
         'item_id_type': ItemIdType.id.name,
         'item_id_key': 'id',
         'item_id': widget.strBillingRecId,

@@ -226,7 +226,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     // when query with sort or page
     Map<String, dynamic> queryMap = {
       'scope': widget.loggedInUser.selectedScope.toScopeMap(),
-      'item_kind': widget.itemKind.name,
+      'item_kind': widget.itemKind.value,
       'item_type': itemTypeStr,
       'max_rows_per_page': '$_selectedRowsPerPage',
       'current_page': '$_currentPage',
@@ -341,7 +341,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
       MdlListColController listColController) async {
     Map<String, dynamic> queryMap = {
       'scope': widget.loggedInUser.selectedScope.toScopeMap(),
-      'item_kind': widget.itemKind.name,
+      'item_kind': widget.itemKind.value,
       'item_type': itemTypeStr,
     };
     try {

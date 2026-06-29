@@ -70,8 +70,8 @@ class _WgtPagPaymentLcStatusOpState extends State<WgtPagPaymentLcStatusOp> {
         'credit_amount': widget.paymentInfo['amount'],
       },
       'target_lc_status': _selectedLcStatus.value,
-      'item_kind': PagItemKind.finance.name,
-      'item_type': PagFinanceType.payment.name,
+      'item_kind': PagItemKind.finance.value,
+      'item_type': PagFinanceType.payment.value,
     };
     try {
       final result = await updatePaymentLcStatus(

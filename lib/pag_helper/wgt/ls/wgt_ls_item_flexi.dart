@@ -182,7 +182,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       if (_listControllerList.isEmpty) {
         Map<String, dynamic> queryMap = {
           'scope': loggedInUser!.selectedScope.toScopeMap(),
-          'item_kind': widget.itemKind.name,
+          'item_kind': widget.itemKind.value,
           'item_type_list_str': widget.itemTypeListStr ?? 'NOT_SET',
           'list_context_type': widget.listContextType.name,
         };

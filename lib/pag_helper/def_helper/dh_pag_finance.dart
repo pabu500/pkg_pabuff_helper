@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_bill.dart';
 import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:flutter/material.dart';
@@ -206,17 +208,19 @@ enum PagSoaEntryType {
 }
 
 enum PagPaymentOpType {
-  postPayment('Post Payment', 'pp', Symbols.contract),
-  matchPayment('Match Payment', 'pm', Symbols.attach_money),
-  none('None', 'none', Symbols.block),
+  postPayment('post', 'Post Payment', 'pp', Symbols.contract),
+  matchPayment('match', 'Match Payment', 'pm', Symbols.attach_money),
+  none('none', 'None', 'none', Symbols.block),
   ;
 
   const PagPaymentOpType(
+    this.value,
     this.label,
     this.tag,
     this.iconData,
   );
 
+  final String value;
   final String label;
   final String tag;
   final IconData iconData;
@@ -225,7 +229,7 @@ enum PagPaymentOpType {
       enumByLabel(
         value,
         values,
-        (e) => (e).tag,
+        (e) => (e).value,
       ) ??
       none;
 
@@ -493,4 +497,40 @@ List<Map<String, dynamic>> getListConfigBaseByPaymentOpType(
   //remove empty maps
   list.removeWhere((map) => map.isEmpty);
   return list;
+}
+
+String? Function(String) getFinanceValidator(String key, dynamic itemType,
+    {bool isValueRequired = true}) {
+  switch (itemType) {
+    case PagFinanceType.payment:
+      return getPaymentValidator(key, isValueRequired: isValueRequired);
+    default:
+      dev.log('No validator found for user key: $key');
+      return (String? value) {
+        return null;
+      };
+  }
+}
+
+String? Function(String) getPaymentValidator(String key,
+    {bool isValueRequired = true}) {
+  switch (key) {
+    case 'tenant_label':
+      return isValueRequired
+          ? validateTenantLabel
+          : validateTenantLabelNotRequired;
+    case 'soa_type':
+      return soaTypeValidator;
+    case 'payment_lc_status':
+      return validatePaymentLcStatus;
+    case 'value_date':
+      return dateValidator;
+    case 'amount':
+      return validatePaymentAmount;
+    default:
+      dev.log('No validator found for payment key: $key');
+      return (String? value) {
+        return null;
+      };
+  }
 }

@@ -58,7 +58,7 @@ class _WgtPagTenantLcStatusOpState extends State<WgtPagTenantLcStatusOp> {
         'item_id': widget.tenantInfo['id'],
         'tenant_lc_status': widget.tenantInfo['lc_status'],
       },
-      'item_kind': PagItemKind.tenant.name,
+      'item_kind': PagItemKind.tenant.value,
       'target_lc_status': _selectedLcStatus.value,
     };
     try {

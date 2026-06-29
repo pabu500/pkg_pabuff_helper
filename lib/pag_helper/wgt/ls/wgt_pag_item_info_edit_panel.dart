@@ -138,7 +138,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
       Map<String, dynamic> queryMap = {
         'scope': _loggedInUser!.selectedScope.toScopeMap(),
         'id': widget.strItemIndex,
-        'item_kind': widget.itemKind.name,
+        'item_kind': widget.itemKind.value,
         'item_type': widget.itemTypeEnum is Enum
             ? (widget.itemTypeEnum as Enum).name
             : '',
@@ -200,7 +200,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
       Map<String, dynamic> queryMap = {
         'scope': _loggedInUser!.selectedScope.toScopeMap(),
         'id': widget.strItemIndex,
-        'item_kind': widget.itemKind.name,
+        'item_kind': widget.itemKind.value,
         'item_type': itemTypeStr,
         'item_id_type': ItemIdType.id.name,
         'item_id_key': 'id',
@@ -260,7 +260,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
       Map<String, dynamic> queryMap = {
         'scope': _loggedInUser!.selectedScope.toScopeMap(),
         'payment_id': widget.strItemIndex,
-        'item_kind': widget.itemKind.name,
+        'item_kind': widget.itemKind.value,
         'item_id_type': ItemIdType.id.name,
       };
 
@@ -541,7 +541,8 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
       }
 
       String? hintText;
-      if (field['type'] == PagFilterGroupType.datetime) {
+      if (field['type'] == PagFilterGroupType.datetime ||
+          field['widget'] == 'datetime') {
         hintText = 'YYYY-MM-DD hh:mm:ss';
         if (field['validator'] == null) {
           field['validator'] = (String? value) {

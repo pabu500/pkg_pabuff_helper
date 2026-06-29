@@ -121,7 +121,7 @@ class _WgtBillCompilationState extends State<WgtBillCompilation> {
     Map<String, dynamic> queryMap = {
       'scope': widget.loggedInUser.selectedScope.toScopeMap(),
       'item_scope': itemScopeMap,
-      'item_kind': PagItemKind.bill.name,
+      'item_kind': PagItemKind.bill.value,
       // 'item_type': itemTypeStr,
       'max_rows_per_page': '$maxPerPage',
       'lc_status': 'released',

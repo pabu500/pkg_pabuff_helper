@@ -228,7 +228,7 @@ class MdlPagOpController {
     Map<String, dynamic> queryMap = {
       'scope': loggedInUser!.selectedScope.toScopeMap(),
       'op_name': opName,
-      'item_kind': itemKind.name,
+      'item_kind': itemKind.value,
       'item_type': getItemTypeStr(itemType),
       'item_id_type': itemIdType.name,
       'target_fields': targetFields.join(','),

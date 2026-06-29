@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as dev;
 
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
@@ -6,7 +7,6 @@ import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
 import 'package:buff_helper/pag_helper/model/mdl_svc_query.dart';
 import 'package:buff_helper/up_helper/up_helper.dart';
 import 'package:buff_helper/util/date_time_util.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:buff_helper/pag_helper/comm/pag_be_api_base.dart';
@@ -80,9 +80,8 @@ Future<dynamic> doPagCheckOpList(
           error = {'status': error[errorKey]};
           item['error'] = error;
         }
-        if (kDebugMode) {
-          print(item['status']);
-        }
+        dev.log(item['status']);
+
         if (item['status'].contains('csv check error')) {
         } else {
           item['prev_status'] = item['status'];
