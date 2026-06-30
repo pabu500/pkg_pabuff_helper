@@ -61,7 +61,7 @@ String getErrorText(dynamic e, {String defaultErrorText = 'general error'}) {
       }
       // case 2: if start with 'm:'
       else if (errorText.startsWith('m:') ||
-          errorText.startsWith('mq:') ||
+          // errorText.startsWith('mq:') ||
           errorText.startsWith('q:')) {
         isForUser = true;
         errorText = errorText.substring(2).trim();
@@ -76,7 +76,7 @@ String getErrorText(dynamic e, {String defaultErrorText = 'general error'}) {
   }
 
   // remove any mq:, q:, m: prefixes from errorText
-  errorText = errorText.replaceAll(RegExp(r'^[mq:]+'), '').trim();
+  // errorText = errorText.replaceAll(RegExp(r'^[mq:]+'), '').trim();
 
   return errorText;
 }

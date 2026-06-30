@@ -9,6 +9,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'dart:developer' as dev;
 
+import '../../../pag_helper/def_helper/dh_pag_tenant.dart';
 import '../../../util/string_util.dart';
 import '../../../util/util.dart';
 
@@ -445,6 +446,9 @@ class PagPdfBill {
     double depositAmount =
         double.tryParse(strDepositAmount.replaceAll(',', '')) ?? 0;
 
+    PagPaymentMethod paymentMethodEnum =
+        PagPaymentMethod.byValue(paymentMethod);
+
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       // mainAxisAlignment: pw.MainAxisAlignment.spaceAround,
@@ -489,7 +493,8 @@ class PagPdfBill {
                       ]),
                       pw.TableRow(children: [
                         pw.Text(' Mode of Payment:', style: styleNormal),
-                        pw.Text(' $paymentMethod', style: styleNormal),
+                        pw.Text(' ${paymentMethodEnum.label}',
+                            style: styleNormal),
                       ]),
                     ]),
                 pw.SizedBox(height: 10),
