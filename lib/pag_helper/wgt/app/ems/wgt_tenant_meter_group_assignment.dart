@@ -145,8 +145,7 @@ class _WgtTenantMeterGroupAssignmentState
           itemInfo['used_for_billing'] = true;
         }
       }
-      for (Map<String, dynamic> itemInfo
-          in _itemGroupScopeMatchingItemList ?? []) {
+      for (Map<String, dynamic> itemInfo in _scopeMismatchItemList ?? []) {
         itemInfo['assigned'] = false;
         if (itemInfo['meter_group_tenant_id'] != null) {
           itemInfo['assigned'] = true;
@@ -363,8 +362,12 @@ class _WgtTenantMeterGroupAssignmentState
   }
 
   Widget completedWidget() {
+    double listHeight = 500;
+    if (_scopeMismatchItemList?.isNotEmpty ?? false) {
+      listHeight = (_scopeMismatchItemList ?? []).length * 70.0;
+    }
     return Container(
-      height: 500,
+      height: listHeight + 80,
       decoration: BoxDecoration(
         border: Border.all(color: Theme.of(context).hintColor.withAlpha(50)),
         borderRadius: BorderRadius.circular(5),
@@ -373,12 +376,12 @@ class _WgtTenantMeterGroupAssignmentState
       child: (_scopeMismatchItemList ?? []).isNotEmpty
           ?
           // resolve scope mismatch item list
-          getScopeMismatchItemList()
+          getScopeMismatchItemList(listHeight)
           : getScopeItemList(),
     );
   }
 
-  Widget getScopeMismatchItemList() {
+  Widget getScopeMismatchItemList(double listHeight) {
     List<Widget> itemWidgetList = [];
     int index = 0;
 
@@ -400,19 +403,23 @@ class _WgtTenantMeterGroupAssignmentState
         border: Border.all(color: Theme.of(context).colorScheme.error),
         borderRadius: BorderRadius.circular(5),
       ),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
       child: Column(
         children: [
           const Text(
               'This following list contains the meter group(s) with mismatched scope to the tenant'),
           const Text('Clear this scope mismatch list before assignment op'),
           verticalSpaceSmall,
-          ListView.builder(
-            // shrinkWrap: true,
-            // itemExtent: 35,
-            itemCount: itemWidgetList.length,
-            itemBuilder: (context, index) {
-              return itemWidgetList[index];
-            },
+          SizedBox(
+            height: listHeight,
+            child: ListView.builder(
+              // shrinkWrap: true,
+              // itemExtent: 35,
+              itemCount: itemWidgetList.length,
+              itemBuilder: (context, index) {
+                return itemWidgetList[index];
+              },
+            ),
           ),
         ],
       ),
@@ -716,9 +723,28 @@ class _WgtTenantMeterGroupAssignmentState
 
     bool isNonScopeMatching = itemInfo['non_scope_matching'] == 'true';
 
+    Map<String, dynamic> mgScopeInfo = {
+      'location_id': mgScopeLocationId,
+      'location_name': mgScopeLocationName,
+      'location_label': mgScopeLocationLabel,
+      'location_group_id': mgScopeLocationGroupId,
+      'location_group_name': mgScopeLocationGroupName,
+      'location_group_label': mgScopeLocationGroupLabel,
+      'building_id': mgScopeBuildingId,
+      'building_name': mgScopeBuildingName,
+      'building_label': mgScopeBuildingLabel,
+      'site_id': mgScopeSiteId,
+      'site_name': mgScopeSiteName,
+      'site_label': mgScopeSiteLabel,
+      'site_group_id': mgScopeSiteGroupId,
+      'site_group_name': mgScopeSiteGroupName,
+      'site_group_label': mgScopeSiteGroupLabel,
+      'project_id': itemInfo['project_id'],
+      'project_name': itemInfo['project_name'],
+    };
     MdlPagScope? itemScope;
     // if (isNonScopeMatching) {
-    itemScope = MdlPagScope.fromJson(itemInfo);
+    itemScope = MdlPagScope.fromJson(mgScopeInfo);
     // }
 
     return Column(
