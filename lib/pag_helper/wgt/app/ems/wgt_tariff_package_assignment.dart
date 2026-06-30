@@ -617,7 +617,8 @@ class _WgtTariffPackageAssignmentState
                 : itemInfo['tpt_mismatch'] &&
                         (itemInfo['assigned_to_another_tp_name'] == null)
                     ? boxDecoration.copyWith(
-                        border: Border.all(color: Colors.yellow.withAlpha(130)))
+                        border: Border.all(
+                            color: Theme.of(context).colorScheme.error))
                     : boxDecoration,
             padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
             child: Text(meterTypeTptLabel ?? '-',
