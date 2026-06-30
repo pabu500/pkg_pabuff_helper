@@ -60,6 +60,7 @@ class _WgtTenantMeterGroupAssignmentState
   String _commitErrorText = '';
 
   List<Map<String, dynamic>>? _itemGroupScopeMatchingItemList;
+  List<Map<String, dynamic>>? _scopeMismatchItemList;
   // final List<Map<String, dynamic>> _filteredItemList = [];
 
   final TextEditingController _itemNamefilterController =
@@ -75,6 +76,9 @@ class _WgtTenantMeterGroupAssignmentState
     if (_isFetching) {
       return;
     }
+
+    dev.log(
+        'Fetching scope meter group list for item group ${widget.strItemGroupIndex}');
 
     Map<String, dynamic> queryMap = {
       'scope': loggedInUser!.selectedScope.toScopeMap(),
@@ -107,9 +111,17 @@ class _WgtTenantMeterGroupAssignmentState
       if (itemGroupScopeMatchingItemList == null) {
         throw Exception('item_group_scope_matching_item_list is null');
       }
+      final scopeMismatchItemList =
+          itemGroupScopeItemAssignment['scope_mismatch_item_list'];
+      if (scopeMismatchItemList == null) {
+        throw Exception('scope_mismatch_item_list is null');
+      }
 
       _itemGroupScopeMatchingItemList = List<Map<String, dynamic>>.from(
         itemGroupScopeMatchingItemList,
+      );
+      _scopeMismatchItemList = List<Map<String, dynamic>>.from(
+        scopeMismatchItemList,
       );
       // sort by label
       _itemGroupScopeMatchingItemList!.sort((a, b) {
@@ -132,6 +144,21 @@ class _WgtTenantMeterGroupAssignmentState
         if (itemInfo['brmg_meter_group_id'] != null) {
           itemInfo['used_for_billing'] = true;
         }
+      }
+      for (Map<String, dynamic> itemInfo
+          in _itemGroupScopeMatchingItemList ?? []) {
+        itemInfo['assigned'] = false;
+        if (itemInfo['meter_group_tenant_id'] != null) {
+          itemInfo['assigned'] = true;
+        }
+        itemInfo['assigned_to_this_tenant'] = false;
+        if (itemInfo['meter_group_tenant_id'] == widget.strItemGroupIndex) {
+          itemInfo['assigned_to_this_tenant'] = true;
+        }
+        // itemInfo['used_for_billing'] = false;
+        // if (itemInfo['brmg_meter_group_id'] != null) {
+        //   itemInfo['used_for_billing'] = true;
+        // }
       }
       // sort un-assigned items to the top
       _itemGroupScopeMatchingItemList!.sort((a, b) {
@@ -269,6 +296,7 @@ class _WgtTenantMeterGroupAssignmentState
 
   @override
   Widget build(BuildContext context) {
+    // dev.log('Building tenant meter group assignment widget');
     return Container(
       // height: 500,
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
@@ -342,7 +370,52 @@ class _WgtTenantMeterGroupAssignmentState
         borderRadius: BorderRadius.circular(5),
       ),
       margin: const EdgeInsets.symmetric(horizontal: 5),
-      child: getScopeItemList(),
+      child: (_scopeMismatchItemList ?? []).isNotEmpty
+          ?
+          // resolve scope mismatch item list
+          getScopeMismatchItemList()
+          : getScopeItemList(),
+    );
+  }
+
+  Widget getScopeMismatchItemList() {
+    List<Widget> itemWidgetList = [];
+    int index = 0;
+
+    for (Map<String, dynamic> itemInfo in (_scopeMismatchItemList ?? [])) {
+      // bool showItem = _showItem(itemInfo);
+      // if (!showItem) {
+      //   continue; // Skip this item if it doesn't match the filter
+      // }
+      Widget tile = getItemRow(itemInfo, ++index);
+      itemWidgetList.add(
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 13),
+          child: tile,
+        ),
+      );
+    }
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Theme.of(context).colorScheme.error),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      child: Column(
+        children: [
+          const Text(
+              'This following list contains the meter group(s) with mismatched scope to the tenant'),
+          const Text('Clear this scope mismatch list before assignment op'),
+          verticalSpaceSmall,
+          ListView.builder(
+            // shrinkWrap: true,
+            // itemExtent: 35,
+            itemCount: itemWidgetList.length,
+            itemBuilder: (context, index) {
+              return itemWidgetList[index];
+            },
+          ),
+        ],
+      ),
     );
   }
 
@@ -584,6 +657,27 @@ class _WgtTenantMeterGroupAssignmentState
     String tenantName = itemInfo['tenant_name'] ?? '-';
     String tenantLabel = itemInfo['tenant_label'] ?? '-';
     String? tenantLcStatus = itemInfo['tenant_lc_status'];
+
+    String? mgScopeLocationId = itemInfo['mg_scope_location_id'];
+    String? mgScopeLocationName = itemInfo['mg_scope_location_name'];
+    String? mgScopeLocationLabel = itemInfo['mg_scope_location_label'];
+
+    String? mgScopeLocationGroupId = itemInfo['mg_scope_location_group_id'];
+    String? mgScopeLocationGroupName = itemInfo['mg_scope_location_group_name'];
+    String? mgScopeLocationGroupLabel =
+        itemInfo['mg_scope_location_group_label'];
+
+    String? mgScopeBuildingId = itemInfo['mg_scope_building_id'];
+    String? mgScopeBuildingName = itemInfo['mg_scope_building_name'];
+    String? mgScopeBuildingLabel = itemInfo['mg_scope_building_label'];
+
+    String? mgScopeSiteId = itemInfo['mg_scope_site_id'];
+    String? mgScopeSiteName = itemInfo['mg_scope_site_name'];
+    String? mgScopeSiteLabel = itemInfo['mg_scope_site_label'];
+
+    String? mgScopeSiteGroupId = itemInfo['mg_scope_site_group_id'];
+    String? mgScopeSiteGroupName = itemInfo['mg_scope_site_group_name'];
+    String? mgScopeSiteGroupLabel = itemInfo['mg_scope_site_group_label'];
 
     PagTenantLcStatus? tenantLcStatusEnum =
         PagTenantLcStatus.byValue(tenantLcStatus);
