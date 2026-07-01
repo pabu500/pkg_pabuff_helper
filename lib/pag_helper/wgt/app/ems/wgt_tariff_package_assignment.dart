@@ -119,7 +119,8 @@ class _WgtTariffPackageAssignmentState
         String tenantMeterTypeTpKey =
             'tp_name_${widget.meterType.toLowerCase()}';
         String tenantMeterTypeTpTypeName =
-            tenant['tpt_name_${widget.meterType.toLowerCase()}'] ?? '';
+            tenant['tpt_name_${widget.meterType.toLowerCase()}'] ??
+                'Unknown TPT';
 
         String? tpName = tenant[tenantMeterTypeTpKey];
         bool isUnassigned = tpName == null;
@@ -560,11 +561,12 @@ class _WgtTariffPackageAssignmentState
     TextStyle disabledTextStyle =
         TextStyle(color: Theme.of(context).hintColor.withAlpha(150));
 
-    bool disabled = meterTypeTptLabel == null ||
+    bool disabled =
+        // meterTypeTptLabel == null ||
         _hasTptMismatchAssignmentError ||
-        itemInfo['assigned_to_another_tp_name'] != null ||
-        itemInfo['tpt_mismatch'] ||
-        itemInfo['tpt_mismatch_assignment_error'];
+            itemInfo['assigned_to_another_tp_name'] != null ||
+            itemInfo['tpt_mismatch'] ||
+            itemInfo['tpt_mismatch_assignment_error'];
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -600,9 +602,11 @@ class _WgtTariffPackageAssignmentState
         ),
         horizontalSpaceSmall,
         Tooltip(
-          message: meterTypeTptLabel == null
-              ? 'Tpt is not set for the tenant'
-              : itemInfo['tpt_mismatch_assignment_error']
+          message:
+              // meterTypeTptLabel == null
+              //     ? 'Tpt is not set for the tenant'
+              //     :
+              itemInfo['tpt_mismatch_assignment_error']
                   ? 'TP Type Mismatch Error'
                   : itemInfo['tpt_mismatch'] &&
                           (itemInfo['assigned_to_another_tp_name'] == null)
