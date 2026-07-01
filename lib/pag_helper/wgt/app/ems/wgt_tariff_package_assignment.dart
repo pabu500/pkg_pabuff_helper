@@ -546,8 +546,7 @@ class _WgtTariffPackageAssignmentState
     if (meterTypeTptLabel == null) {
       // if (kDebugMode) {
       // meter type tpt is not assigned for this tenant
-      dev.log(
-          'warning: meterTypeTptLabel is null for ${widget.meterType} in itemInfo: $itemInfo');
+      dev.log('meterTypeTptLabel is null for ${widget.meterType} in itemInfo');
       // }
       // return const SizedBox.shrink();
     }

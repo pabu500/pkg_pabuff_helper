@@ -6,8 +6,6 @@ import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pag_helper/model/mdl_svc_query.dart';
 import 'package:http/http.dart' as http;
 
-import 'comm_helper.dart';
-
 Future<dynamic> commitTenantMeterGroupList(
   MdlPagAppConfig appConfig,
   Map<String, dynamic> queryMap,

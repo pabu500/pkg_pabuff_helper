@@ -215,6 +215,12 @@ class _WgtTenantMeterGroupAssignmentState
         _itemGroupScopeMatchingItemList!
             .where((item) => item['assigned_new'] != null)
             .toList();
+    if ((_scopeMismatchItemList ?? []).isNotEmpty) {
+      assignmentList.clear();
+      assignmentList.addAll(_scopeMismatchItemList!
+          .where((item) => item['assigned_new'] != null)
+          .toList());
+    }
     Map<String, dynamic> queryMap = {
       'scope': loggedInUser!.selectedScope.toScopeMap(),
       'item_group_id': widget.strItemGroupIndex,
@@ -262,11 +268,22 @@ class _WgtTenantMeterGroupAssignmentState
 
   bool _checkModified() {
     bool modified = false;
-    for (Map<String, dynamic> item in _itemGroupScopeMatchingItemList ?? []) {
-      if (item['assigned_new'] != null) {
-        if (item['assigned'] != item['assigned_new']) {
-          modified = true;
-          break;
+    if ((_scopeMismatchItemList ?? []).isNotEmpty) {
+      for (Map<String, dynamic> item in _scopeMismatchItemList!) {
+        if (item['assigned_new'] != null) {
+          if (item['assigned'] != item['assigned_new']) {
+            modified = true;
+            break;
+          }
+        }
+      }
+    } else {
+      for (Map<String, dynamic> item in _itemGroupScopeMatchingItemList ?? []) {
+        if (item['assigned_new'] != null) {
+          if (item['assigned'] != item['assigned_new']) {
+            modified = true;
+            break;
+          }
         }
       }
     }
