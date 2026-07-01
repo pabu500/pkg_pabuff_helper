@@ -537,9 +537,17 @@ class _WgtEmsMeterGroupAssignmentState
             ),
             Icon(PagItemKind.meterGroup.iconData, size: 21),
             horizontalSpaceTiny,
-            SelectableText(
-              widget.itemName,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Container(
+              decoration: boxDecoration.copyWith(
+                border:
+                    Border.all(color: Theme.of(context).colorScheme.primary),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+              child: SelectableText(
+                widget.itemName,
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
             ),
             horizontalSpaceSmall,
             SelectableText(

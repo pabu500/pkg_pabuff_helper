@@ -96,9 +96,11 @@ class _WgtMeterAssignmentOpState extends State<WgtMeterAssignmentOp> {
               'Total percentage assigned to this meter exceeds 100%';
           _disableOp = true;
         } else if (_totalPercentAssignedToThisMeter! > 99.9999999) {
-          _disableOp = true;
-          _disabledMessage =
-              'Total percentage assigned to this meter is 100%, cannot assign more';
+          if (!isCurrentMeterGroup) {
+            _disableOp = true;
+            _disabledMessage =
+                'Total percentage assigned to this meter is 100%, cannot assign more';
+          }
         } else {
           _hasAssignmentError = false;
           _assignmentErrorMsg = '';
@@ -122,7 +124,7 @@ class _WgtMeterAssignmentOpState extends State<WgtMeterAssignmentOp> {
           barInfo['tenant_percentage'] = meterPercentage ?? 0.0;
         }
 
-        barMessage = '$meterGroupName ($meterGroupLabel) $meterPercentage%';
+        barMessage = '$meterPercentage% -> $meterGroupName ($meterGroupLabel) ';
 
         if (isAssignedToTenant) {
           String tenantName = barInfo['tenant_name'];
@@ -239,6 +241,9 @@ class _WgtMeterAssignmentOpState extends State<WgtMeterAssignmentOp> {
                     onChanged: (value) {
                       setState(() {
                         double? newPercentage = double.tryParse(value);
+                        if (newPercentage != null && newPercentage > 100.0) {
+                          newPercentage = 100.0;
+                        }
                         _percentAssignedToThisGroupNew = newPercentage ?? 0.0;
                         if (((_percentAssignedToThisGroupNew ?? 0.0) -
                                     (_percentAssignedToThisGroup ?? 0.0))
