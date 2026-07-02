@@ -15,7 +15,6 @@ import '../../../../up_helper/exceptions.dart';
 import '../../../../xt_ui/wdgt/datetime/wgt_date_picker.dart';
 import '../../../comm/comm_billing_cost_item.dart';
 import '../../../comm/comm_tenant.dart';
-import '../../../comm/comm_tenant_ops.dart';
 import '../../../def_helper/dh_pag_tenant.dart';
 import '../../../model/mdl_pag_app_config.dart';
 
@@ -144,30 +143,61 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
       });
       // find the item that is assigned to this tenant,
       // and move it to the top
-      for (Map<String, dynamic> itemInfo in _itemGroupScopeMatchingItemList!) {
-        if (itemInfo['is_assigned_to_this_tenant'] != true) {
-          continue;
+      // for (Map<String, dynamic> itemInfo in _itemGroupScopeMatchingItemList!) {
+      //   if (itemInfo['is_assigned_to_this_tenant'] != true) {
+      //     continue;
+      //   }
+      //   String itemIndexStr = itemInfo['bci_id'];
+      //   // move this item to the top
+      //   _itemGroupScopeMatchingItemList!.removeWhere(
+      //     (item) => item['bci_id'] == itemIndexStr,
+      //   );
+      //   _itemGroupScopeMatchingItemList!.insert(0, itemInfo);
+      // }
+      // // find the item that is non_scope_matching,
+      // // and move it to the top
+      // for (Map<String, dynamic> itemInfo in _itemGroupScopeMatchingItemList!) {
+      //   if (itemInfo['non_scope_matching'] != 'true') {
+      //     continue;
+      //   }
+      //   String itemIndexStr = itemInfo['bci_id'];
+      //   // move this item to the top
+      //   _itemGroupScopeMatchingItemList!.removeWhere(
+      //     (item) => item['bci_id'] == itemIndexStr,
+      //   );
+      //   _itemGroupScopeMatchingItemList!.insert(0, itemInfo);
+      // }
+      _itemGroupScopeMatchingItemList!.sort((a, b) {
+        int getRank(Map<String, dynamic> item) {
+          final bool nonScopeMatching = item['non_scope_matching'] == true ||
+              item['non_scope_matching'] == 'true';
+
+          if (nonScopeMatching) {
+            return 0;
+          }
+
+          if (item['is_assigned_to_this_tenant'] == true) {
+            return 1;
+          }
+
+          if (item['assigned'] != true) {
+            return 2;
+          }
+
+          return 3;
         }
-        String itemIndexStr = itemInfo['bci_id'];
-        // move this item to the top
-        _itemGroupScopeMatchingItemList!.removeWhere(
-          (item) => item['bci_id'] == itemIndexStr,
-        );
-        _itemGroupScopeMatchingItemList!.insert(0, itemInfo);
-      }
-      // find the item that is non_scope_matching,
-      // and move it to the top
-      for (Map<String, dynamic> itemInfo in _itemGroupScopeMatchingItemList!) {
-        if (itemInfo['non_scope_matching'] != 'true') {
-          continue;
+
+        final int rankComparison = getRank(a).compareTo(getRank(b));
+
+        if (rankComparison != 0) {
+          return rankComparison;
         }
-        String itemIndexStr = itemInfo['bci_id'];
-        // move this item to the top
-        _itemGroupScopeMatchingItemList!.removeWhere(
-          (item) => item['bci_id'] == itemIndexStr,
-        );
-        _itemGroupScopeMatchingItemList!.insert(0, itemInfo);
-      }
+
+        final String labelA = a['bci_label']?.toString() ?? '';
+        final String labelB = b['bci_label']?.toString() ?? '';
+
+        return labelA.compareTo(labelB);
+      });
     } catch (e) {
       dev.log('Error fetching item group scope matching item list: $e');
       _fetchErrorText =
