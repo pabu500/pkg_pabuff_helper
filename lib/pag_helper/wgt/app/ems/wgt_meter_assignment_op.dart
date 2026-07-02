@@ -46,6 +46,12 @@ class _WgtMeterAssignmentOpState extends State<WgtMeterAssignmentOp> {
 
   void _loadAssignmentBar() {
     assignmentBarWidgetList.clear();
+    _totalPercentAssignedToThisMeter = 0;
+    _currentMeterGroupAssignedToTenant = false;
+    _disableOp = false;
+    _hasAssignmentError = false;
+    _assignmentErrorMsg = '';
+    _disabledMessage = '';
 
     final assignmentInfo = widget.meterInfo['assignment'];
     // bool infoFetched = widget.meterInfo['info_fetched'] ?? false;
@@ -218,46 +224,63 @@ class _WgtMeterAssignmentOpState extends State<WgtMeterAssignmentOp> {
                 width: 95,
                 height: 30,
                 child: WgtTextField(
-                    key: _inputRefreshKey,
-                    appConfig: widget.appConfig,
-                    enabled: !_disableOp,
-                    initialValue: _percentAssignedToThisGroupNew
-                            ?.toStringAsFixed(3) ??
-                        _percentAssignedToThisGroup?.toStringAsFixed(3) ??
-                        // _totalPercentAssignedToThisMeter?.toStringAsFixed(3) ??
-                        '0.000',
-                    decoration: InputDecoration(
-                      hintText: 'percentage',
-                      hintStyle: TextStyle(color: Theme.of(context).hintColor),
-                      suffixText: '%',
-                      suffixStyle:
-                          TextStyle(color: Theme.of(context).hintColor),
-                      border: const OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(5)),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 1, horizontal: 3),
+                  key: _inputRefreshKey,
+                  appConfig: widget.appConfig,
+                  enabled: !_disableOp,
+                  initialValue: _percentAssignedToThisGroupNew
+                          ?.toStringAsFixed(3) ??
+                      _percentAssignedToThisGroup?.toStringAsFixed(3) ??
+                      // _totalPercentAssignedToThisMeter?.toStringAsFixed(3) ??
+                      '0.000',
+                  decoration: InputDecoration(
+                    hintText: 'percentage',
+                    hintStyle: TextStyle(color: Theme.of(context).hintColor),
+                    suffixText: '%',
+                    suffixStyle: TextStyle(color: Theme.of(context).hintColor),
+                    border: const OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(5)),
                     ),
-                    onChanged: (value) {
-                      setState(() {
-                        double? newPercentage = double.tryParse(value);
-                        if (newPercentage != null && newPercentage > 100.0) {
-                          newPercentage = 100.0;
-                        }
-                        _percentAssignedToThisGroupNew = newPercentage ?? 0.0;
-                        if (((_percentAssignedToThisGroupNew ?? 0.0) -
-                                    (_percentAssignedToThisGroup ?? 0.0))
-                                .abs() <
-                            0.00001) {
-                          _percentAssignedToThisGroupNew = null;
-                        }
-                        _inputRefreshKey = UniqueKey();
-                        _loadAssignmentBar();
-                        if (newPercentage != null) {
-                          widget.onPercentageChanged(newPercentage);
-                        }
-                      });
-                    }),
+                    contentPadding:
+                        const EdgeInsets.symmetric(vertical: 1, horizontal: 3),
+                  ),
+                  onChanged: (value) {
+                    setState(() {
+                      double? newPercentage = double.tryParse(value);
+                      if (newPercentage != null && newPercentage > 100.0) {
+                        newPercentage = 100.0;
+                      }
+                      _percentAssignedToThisGroupNew = newPercentage;
+                      if (((_percentAssignedToThisGroupNew ?? 0.0) -
+                                  (_percentAssignedToThisGroup ?? 0.0))
+                              .abs() <
+                          0.00001) {
+                        _percentAssignedToThisGroupNew = null;
+                      }
+                      // _inputRefreshKey = UniqueKey();
+                      // _loadAssignmentBar();
+                      // if (newPercentage != null) {
+                      //   widget.onPercentageChanged(newPercentage);
+                      // }
+                    });
+                  },
+                  onEditingComplete: () {
+                    setState(() {
+                      // if (((_percentAssignedToThisGroupNew ?? 0.0) -
+                      //             (_percentAssignedToThisGroup ?? 0.0))
+                      //         .abs() <
+                      //     0.00001) {
+                      //   _percentAssignedToThisGroupNew = null;
+                      // }
+                      _loadAssignmentBar();
+                      _inputRefreshKey = UniqueKey();
+                      FocusScope.of(context).unfocus();
+                      if (_percentAssignedToThisGroupNew != null) {
+                        widget.onPercentageChanged(
+                            _percentAssignedToThisGroupNew ?? 0.0);
+                      }
+                    });
+                  },
+                ),
               ),
             ),
             horizontalSpaceSmall,
