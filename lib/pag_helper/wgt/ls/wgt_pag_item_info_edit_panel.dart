@@ -139,9 +139,10 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
         'scope': _loggedInUser!.selectedScope.toScopeMap(),
         'id': widget.strItemIndex,
         'item_kind': widget.itemKind.value,
-        'item_type': widget.itemTypeEnum is Enum
-            ? (widget.itemTypeEnum as Enum).name
-            : '',
+        // 'item_type': widget.itemTypeEnum is Enum
+        //     ? (widget.itemTypeEnum as Enum).value
+        //     : '',
+        'item_type': getItemTypeValue(widget.itemTypeEnum),
         // : widget.itemTypeEnum ?? '',
         'item_id_type': ItemIdType.id.name,
         'item_id_key': 'id',

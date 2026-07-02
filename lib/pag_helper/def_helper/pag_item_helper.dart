@@ -4,12 +4,16 @@ import 'package:buff_helper/pag_helper/def_helper/dh_device.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_finance.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_org.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_tariff_package.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_user.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../xt_ui/xt_globals.dart';
+import 'dh_pag_acl.dart';
+import 'dh_pag_bill.dart';
 import 'dh_pag_tariff.dart';
+import 'dh_pag_tenant.dart';
 import 'enum_helper.dart';
 
 enum PagItemKind {
@@ -132,4 +136,38 @@ String? Function(String) getValidator(PagItemKind itemKind, String key,
         return null;
       };
   }
+}
+
+String getItemTypeValue(dynamic itemType) {
+  if (itemType == null) {
+    return '';
+  }
+
+  if (itemType is PagDeviceCat ||
+      itemType is PagMeterCommType ||
+      itemType is PagMeterPhaseType ||
+      itemType is PagScopeType ||
+      itemType is PagBillGenType ||
+      itemType is PagBillingLcStatus ||
+      itemType is PagBillPaymentStatus ||
+      itemType is PagBillDueStatus ||
+      itemType is PagUserOpType ||
+      itemType is PagItemKind ||
+      itemType is PagTenantLcStatus ||
+      itemType is PagTenantUnitType ||
+      itemType is PagPaymentMethod ||
+      itemType is PagTariff ||
+      itemType is PagOrgType ||
+      itemType is PagFinanceType ||
+      itemType is PagPaymentLcStatus ||
+      itemType is PaymentSoaType ||
+      itemType is PagSoaEntryType ||
+      itemType is PagPaymentOpType ||
+      itemType is PagPortalType ||
+      itemType is PagRoleType ||
+      itemType is PagInterestStartDateType) {
+    return itemType.value ?? '';
+  }
+
+  throw Exception('Unsupported item type: ${itemType.runtimeType}');
 }
