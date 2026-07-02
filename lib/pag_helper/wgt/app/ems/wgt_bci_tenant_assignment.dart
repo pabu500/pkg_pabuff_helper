@@ -86,13 +86,13 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
     if (_isFetching) {
       return;
     }
+    _isFetching = true;
 
     Map<String, dynamic> queryMap = {
       'scope': widget.loggedInUser!.selectedScope.toScopeMap(),
       'billing_cost_item_id': widget.itemGroupIndexStr,
     };
 
-    _isFetching = true;
     try {
       final result = await doGetBciScopeTenantList(
         widget.appConfig,
@@ -112,15 +112,20 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
         throw Exception(
             'No scope matching tenant found for this billing cost item');
       }
+      print('bciScopeMatchingTenantList: $bciScopeMatchingTenantList');
       _itemGroupScopeMatchingItemList =
           List<Map<String, dynamic>>.from(bciScopeMatchingTenantList);
       // sort by label
+      print(
+          '_itemGroupScopeMatchingItemList: $_itemGroupScopeMatchingItemList');
       _itemGroupScopeMatchingItemList!.sort((a, b) {
         String labelA = a['tenant_label'] ?? '';
         String labelB = b['tenant_label'] ?? '';
         return labelA.compareTo(labelB);
       });
 
+      print(
+          '_itemGroupScopeMatchingItemList after sort: $_itemGroupScopeMatchingItemList');
       for (Map<String, dynamic> tenant in _itemGroupScopeMatchingItemList!) {
         bool isassignedThisBci = tenant['is_assigned_to_this_bci'] == 'true';
 
@@ -129,6 +134,8 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
           tenant['assigned'] = true;
         }
       }
+      print(
+          '_itemGroupScopeMatchingItemList after assigned: $_itemGroupScopeMatchingItemList');
     } catch (e) {
       dev.log(e.toString());
 
