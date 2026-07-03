@@ -2,6 +2,7 @@ enum MeterRlsStatus { ON, OFF, UNKN }
 
 enum MeterCommStatus {
   OK,
+  FAIL,
   TIMEOUT,
   UNKN,
   ERR1,
