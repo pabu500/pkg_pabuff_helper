@@ -60,7 +60,10 @@ class _WgtPagBillLcStatusOpState extends State<WgtPagBillLcStatusOp> {
         'gen_type': widget.billInfo['gen_type'],
         'billing_rec_id': widget.billInfo['billing_rec_id'],
         'bill_date_timestamp': widget.billInfo['bill_date_timestamp'],
-        'billed_total_amount': widget.billInfo['billed_total_amount'],
+        // 'billed_total_amount': widget.billInfo['billed_total_amount'],
+        'billed_cycle_total_amount':
+            widget.billInfo['billed_cycle_total_amount'],
+        'billed_principal_amount': widget.billInfo['billed_principal_amount'],
         'billed_interest_amount': widget.billInfo['billed_interest_amount'],
       },
       'target_lc_status': _selectedLcStatus.value,
