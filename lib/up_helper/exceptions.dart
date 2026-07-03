@@ -97,8 +97,14 @@ void showInfoDialog(BuildContext context, String title, String text,
       return AlertDialog(
         title: Text(title),
         content: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SelectableText(text, style: defaultStyle),
+            Expanded(
+              child: SelectableText(
+                text,
+                style: defaultStyle,
+              ),
+            ),
             SizedBox(
                 width: 40,
                 child: getCopyButton(context, text, direction: 'left'))
