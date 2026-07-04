@@ -188,7 +188,7 @@ Map<String, dynamic> prepCalcedBillInfoRl(Map<String, dynamic> billInfo) {
       billedPrincipalAmount: billedPrincipalAmount,
       billedInterestAmount: billedInterestAmount,
       billedCycleTotalAmount: billedCycleTotalAmount,
-      lineItemList: [],
+      lineItemList: lineItemList,
       billedTrendingSnapShot: billedTrendingSnapShot,
       billBarFromMonth: billBarFromMonth,
     );
@@ -275,6 +275,7 @@ Map<String, dynamic> prepCalcedBillInfoRl(Map<String, dynamic> billInfo) {
     'trendingB': compositeUsageCalcRl.trendingB,
     'trendingN': compositeUsageCalcRl.trendingN,
     'trendingG': compositeUsageCalcRl.trendingG,
+    'lineItemList': compositeUsageCalcRl.lineItemList,
     'lineItemLabel1': lineItemLabel1,
     'lineItemValue1': lineItemAmount1,
     'lineItemLabel2': lineItemLabel2,
