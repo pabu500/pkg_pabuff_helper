@@ -282,9 +282,9 @@ class _WgtMeterGroupAssignmentItemState
                           : Theme.of(context).hintColor.withAlpha(50)),
                   borderRadius: BorderRadius.circular(5),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
                 child: SizedBox(
-                  width: 135,
+                  width: 150,
                   child: SelectableText(
                     meterGroupName,
                     style: TextStyle(

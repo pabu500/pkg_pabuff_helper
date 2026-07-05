@@ -115,7 +115,7 @@ class _WgtPagUsageStatCoreState extends State<WgtPagUsageStatCore> {
                               iconSize: 21,
                               iconColor:
                                   widget.statColor ?? Colors.grey.shade800),
-                          // horizontalSpaceTiny,
+                          horizontalSpaceTiny,
                           Text(
                             widget.meterId,
                             style: TextStyle(
@@ -155,7 +155,7 @@ class _WgtPagUsageStatCoreState extends State<WgtPagUsageStatCore> {
                                   iconSize: 21,
                                   iconColor:
                                       widget.statColor ?? Colors.grey.shade800),
-                              // horizontalSpaceTiny,
+                              horizontalSpaceTiny,
                               Text(
                                 widget.meterId,
                                 style: TextStyle(

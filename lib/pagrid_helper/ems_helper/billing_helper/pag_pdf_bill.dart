@@ -217,6 +217,7 @@ class PagPdfBill {
 
     // Add page to the PDF
     doc.addPage(await getPage1());
+    doc.addPage(await getPage2());
 
     // Return the PDF file content
     return doc.save();
@@ -238,7 +239,7 @@ class PagPdfBill {
           icons: await PdfGoogleFonts.materialSymbolsOutlinedRegular(),
         ),
       ),
-      header: _buildHeader,
+      header: _buildHeaderP1,
       footer: _buildFooter,
       build: (context) => [
         _contentHeader(context),
@@ -254,7 +255,31 @@ class PagPdfBill {
     );
   }
 
-  pw.Widget _buildHeader(pw.Context context) {
+  Future<pw.MultiPage> getPage2({dynamic logo}) async {
+    double pageWidth = PdfPageFormat.a4.width;
+    dev.log('Page width: $pageWidth');
+
+    if (logo != null) {
+      _logo = logo;
+    }
+
+    return pw.MultiPage(
+      pageTheme: pw.PageTheme(
+        theme: pw.ThemeData.withFont(
+          base: await PdfGoogleFonts.openSansRegular(),
+          bold: await PdfGoogleFonts.openSansBold(),
+          icons: await PdfGoogleFonts.materialSymbolsOutlinedRegular(),
+        ),
+      ),
+      header: _buildHeaderP2,
+      footer: _buildFooter,
+      build: (context) => [
+        _getMeterTypeMeterUsage(),
+      ],
+    );
+  }
+
+  pw.Widget _buildHeaderP1(pw.Context context) {
     // int codePoint = mt.Icons.abc.codePoint;
     //hex
     return pw.Column(
@@ -284,6 +309,25 @@ class PagPdfBill {
           ],
         ),
         // if (context.pageNumber > 1) pw.SizedBox(height: 20)
+      ],
+    );
+  }
+
+  pw.Widget _buildHeaderP2(pw.Context context) {
+    return pw.Column(
+      children: [
+        pw.Row(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.SizedBox(
+              width: 250,
+              child: pw.Text(
+                'Meter Usage Details for $billLabel',
+                style: styleLarge.copyWith(fontWeight: pw.FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
       ],
     );
   }
@@ -1260,35 +1304,16 @@ class PagPdfBill {
     );
   }
 
-  // pw.Widget _getLineItemRow(String label, double value) {
-  //   return pw.Container(
-  //     height: 50,
-  //     padding: const pw.EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-  //     decoration: pw.BoxDecoration(
-  //       border: pw.Border.all(
-  //         color: PdfColors.grey500,
-  //         width: 0.5,
-  //       ),
-  //     ),
-  //     child: pw.Row(
-  //       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-  //       crossAxisAlignment: pw.CrossAxisAlignment.center,
-  //       children: [
-  //         pw.Text(
-  //           label,
-  //           style: pw.TextStyle(
-  //             color: _darkColor,
-  //             fontWeight: pw.FontWeight.bold,
-  //           ),
-  //         ),
-  //         pw.Text(
-  //           _formatCurrency(value),
-  //           style: const pw.TextStyle(color: _darkColor),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
+  pw.Widget _getMeterTypeMeterUsage() {
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        pw.Text('Meter Type & Usage', style: styleNormal),
+        pw.SizedBox(height: 5),
+        _getSingularList(),
+      ],
+    );
+  }
 
   pw.Widget _getTrending(List<Map<String, dynamic>>? trending) {
     if (trending == null) {
@@ -1366,21 +1391,6 @@ class PagPdfBill {
                       child: pw.Text(''),
                     ),
                   ),
-                  // bottom: pw.Container(
-                  //   alignment: pw.Alignment.bottomCenter,
-                  //   margin: const pw.EdgeInsets.only(top: 5),
-                  //   child: pw.Text('xxx'),
-                  // ),
-                  // overlay: pw.ChartLegend(
-                  //   position: const pw.Alignment(-.7, 1),
-                  //   decoration: pw.BoxDecoration(
-                  //     color: PdfColors.white,
-                  //     border: pw.Border.all(
-                  //       color: PdfColors.black,
-                  //       width: .5,
-                  //     ),
-                  //   ),
-                  // ),
                   grid: pw.CartesianGrid(
                     xAxis: pw.FixedAxis.fromStrings(
                       color: PdfColors.white,
