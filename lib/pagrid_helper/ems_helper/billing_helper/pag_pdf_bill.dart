@@ -1311,12 +1311,12 @@ class PagPdfBillCwP2 {
       children: [
         // pw.Text('Meter Type & Usage', style: styleNormal),
         // pw.SizedBox(height: 5),
-        getSingluarStat(),
+        _getSingluarStat(),
       ],
     );
   }
 
-  pw.Widget getSingluarStat() {
+  pw.Widget _getSingluarStat() {
     List<pw.Widget> singularStatList = [];
     for (Map<String, dynamic> singularUsageInfo
         in tenantSingularUsageInfoList) {
@@ -1328,11 +1328,11 @@ class PagPdfBillCwP2 {
       }
       String slotStr =
           '  ${slotFromTimestampStr.substring(0, 10)} - ${slotToTimestampStr.substring(0, 10)}';
-      typeStatList.add(getTypeStat(singularUsageInfo, 'E'));
-      typeStatList.add(getTypeStat(singularUsageInfo, 'B'));
-      typeStatList.add(getTypeStat(singularUsageInfo, 'W'));
-      typeStatList.add(getTypeStat(singularUsageInfo, 'N'));
-      typeStatList.add(getTypeStat(singularUsageInfo, 'G'));
+      typeStatList.add(_getTypeStat(singularUsageInfo, 'E'));
+      typeStatList.add(_getTypeStat(singularUsageInfo, 'B'));
+      typeStatList.add(_getTypeStat(singularUsageInfo, 'W'));
+      typeStatList.add(_getTypeStat(singularUsageInfo, 'N'));
+      typeStatList.add(_getTypeStat(singularUsageInfo, 'G'));
       singularStatList.add(pw.Container(
         width: 550,
         decoration: pw.BoxDecoration(
@@ -1369,7 +1369,7 @@ class PagPdfBillCwP2 {
     );
   }
 
-  pw.Widget getTypeStat(
+  pw.Widget _getTypeStat(
       Map<String, dynamic> singularUsageInfo, String typeStr) {
     // List<pw.Widget> meterUsageInfoList = [];
     // for (Map<String, dynamic> singularUsageInfo in widget.tenantSingularUsageInfoList) {
@@ -1384,9 +1384,10 @@ class PagPdfBillCwP2 {
     String excludeAutoUsageStr = singularUsageInfo['exclude_auto_usage'] ?? '';
     List<pw.TableRow> typeGroupList = [];
     if ('true' == excludeAutoUsageStr) {
-      return getManualUsage(singularUsageInfo, typeStr);
+      return _getManualUsage(singularUsageInfo, typeStr);
     } else {
       final tenantUsageSummary = singularUsageInfo['tenant_usage_summary'];
+      assert(tenantUsageSummary != null, 'tenantUsageSummary cannot be null');
 
       final meterGroupUsageList =
           tenantUsageSummary['meter_group_usage_list'] ?? [];
@@ -1404,18 +1405,24 @@ class PagPdfBillCwP2 {
         PagEmsTypeUsageCalcRl? usageCalc = singularUsageInfo['usage_calc_rl'];
         assert(usageCalc != null, 'usageCalc cannot be null');
 
-        typeGroupList.add(pw.TableRow(
-          children: [
-            pw.Text('  Building',
-                style: styleNormal.copyWith(fontWeight: pw.FontWeight.bold)),
-            pw.Text('  Meter S/N',
-                style: styleNormal.copyWith(fontWeight: pw.FontWeight.bold)),
-            pw.Text('  Unit Number',
-                style: styleNormal.copyWith(fontWeight: pw.FontWeight.bold)),
-            pw.Text('  Usage',
-                style: styleNormal.copyWith(fontWeight: pw.FontWeight.bold)),
-          ],
-        ));
+        final meterGroupUsageSummary =
+            groupInfo['meter_group_usage_summary'] ?? [];
+        final meterUsageList = meterGroupUsageSummary['meter_usage_list'] ?? [];
+        for (Map<String, dynamic> meterUsageInfo in meterUsageList) {
+          final meterUsageSummary = meterUsageInfo['meter_usage_summary'];
+          String meterSn = meterUsageSummary['meter_sn'] ?? '';
+          String locatinLabel = meterUsageSummary['location_label'] ?? '';
+          String buildingLabel = meterUsageSummary['building_label'] ?? '';
+          String strUsage = meterUsageSummary['usage'] ?? '';
+          typeGroupList.add(pw.TableRow(
+            children: [
+              pw.Text('  $buildingLabel', style: styleNormal),
+              pw.Text('  $meterSn', style: styleNormal),
+              pw.Text('  $locatinLabel', style: styleNormal),
+              pw.Text('  $strUsage', style: styleNormal),
+            ],
+          ));
+        }
       }
       if (typeGroupList.isEmpty) {
         return pw.Container();
@@ -1453,7 +1460,7 @@ class PagPdfBillCwP2 {
     );
   }
 
-  pw.Widget getGroupMeterStat(
+  pw.Widget _getGroupMeterStat(
       Map<String, dynamic> groupInfo,
       MeterType? meterType,
       Map<String, dynamic> meterTypeRateInfo,
@@ -1487,7 +1494,7 @@ class PagPdfBillCwP2 {
 
       meterStatList.add(meterUsageSummary);
       meterList.add(
-        getMeterStat(meterUsageSummary, groupType, meterTypeRateInfo, false),
+        _getMeterStat(meterUsageSummary, groupType, meterTypeRateInfo, false),
       );
     }
 
@@ -1497,7 +1504,7 @@ class PagPdfBillCwP2 {
     );
   }
 
-  pw.Widget getMeterStat(Map<String, dynamic> meterUsage, String meterTypeTag,
+  pw.Widget _getMeterStat(Map<String, dynamic> meterUsage, String meterTypeTag,
       Map<String, dynamic> meterTypeRateInfo, bool calcUsageFromReadings) {
     // String meterName = meterStat['item_name'];
     String meterSn = meterUsage['meter_sn'];
@@ -1519,7 +1526,7 @@ class PagPdfBillCwP2 {
     );
   }
 
-  pw.Widget getManualUsage(
+  pw.Widget _getManualUsage(
       Map<String, dynamic> singularUsageInfo, String typeStr) {
     final manualUsageList = singularUsageInfo['manual_usage_list'] ?? [];
     if (manualUsageList.isEmpty) {
