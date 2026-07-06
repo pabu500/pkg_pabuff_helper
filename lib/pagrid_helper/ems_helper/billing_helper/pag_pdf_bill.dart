@@ -1004,7 +1004,7 @@ class PagPdfBill {
             child: pw.Column(
               children: [
                 if (lineItemLabel1 != null && lineItemValue1 != null)
-                  if (lineItemValue1! > 0.0001)
+                  if (lineItemValue1!.abs() > 0.0001)
                     pw.Row(
                       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: pw.CrossAxisAlignment.center,
@@ -1059,7 +1059,7 @@ class PagPdfBill {
                   ],
                 ),
                 pw.Divider(color: PdfColors.grey600, thickness: 0.5, height: 5),
-                if (latePaymentInterestAmount > 0.0001)
+                if (latePaymentInterestAmount.abs() > 0.0001)
                   pw.Row(
                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: pw.CrossAxisAlignment.center,
@@ -1076,7 +1076,7 @@ class PagPdfBill {
                   ),
                 // line item 2
                 if (lineItemLabel2 != null && lineItemValue2 != null)
-                  if (lineItemValue2! > 0.0001)
+                  if (lineItemValue2!.abs() > 0.0001)
                     pw.Row(
                       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: pw.CrossAxisAlignment.center,
@@ -1093,7 +1093,7 @@ class PagPdfBill {
                     ),
                 // line item 3
                 if (lineItemLabel3 != null && lineItemValue3 != null)
-                  if (lineItemValue3! > 0.0001)
+                  if (lineItemValue3!.abs() > 0.0001)
                     pw.Row(
                       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: pw.CrossAxisAlignment.center,
@@ -1109,7 +1109,7 @@ class PagPdfBill {
                       ],
                     ),
                 // sub total (non-taxable)
-                if (subTotalNonTaxable > 0.0001)
+                if (subTotalNonTaxable.abs() > 0.0001)
                   pw.Row(
                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: pw.CrossAxisAlignment.center,
@@ -1289,7 +1289,7 @@ class PagPdfBill {
             bciAmt = double.tryParse(bciAmtObj) ?? 0;
           }
         }
-        if (bciAmt < 0.0001) {
+        if (bciAmt.abs() < 0.0001) {
           return pw.SizedBox();
         }
         return pw.Row(
