@@ -14,7 +14,7 @@ Future<Uint8List> generatePagInvoice(
       loggedInUser.selectedScope.projectProfile!;
   final String assetFolder = selectedProjectProfile.assetFolder!;
 
-  final invoice = PagPdfBill(
+  final invoiceCwP2 = PagPdfBillCwP2(
     billingRecName: calcedBillInfoRl['billingRecName'] ?? '',
     billLabel: calcedBillInfoRl['billLabel'] ?? '',
     customerName: calcedBillInfoRl['customerName'] ?? '',
@@ -96,5 +96,5 @@ Future<Uint8List> generatePagInvoice(
     accentColor: PdfColors.blueGrey900,
   );
 
-  return await invoice.buildPdf(pageFormat);
+  return await invoiceCwP2.buildPdf(pageFormat);
 }

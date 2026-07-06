@@ -56,7 +56,7 @@ class WgtPagTenantCompositeUsageSummaryRl extends StatefulWidget {
   // final Map<String, dynamic> billedUsageFactor;
   final String displayContextStr;
   // final PagEmsTypeUsageCalcReleased usageCalc;
-  final ItemType itemType;
+  final dynamic itemType;
   final bool isDisabled;
   final bool isMonthly;
   final String? tenantLcs;
@@ -298,7 +298,7 @@ class _WgtPagTenantCompositeUsageSummaryRlState
     List<Widget> slotList = [];
     for (Map<String, dynamic> singularUsageInfo
         in widget.tenantSingularUsageInfoList) {
-      PagEmsTypeUsageCalcRl? usageCalc = singularUsageInfo['usage_calc'];
+      PagEmsTypeUsageCalcRl? usageCalc = singularUsageInfo['usage_calc_rl'];
 
       slotList.add(getPagTypeUsageNet(
         context,

@@ -18,7 +18,7 @@ Future<Uint8List> generatePagInvoiceCompilation(
 
   final billInfoList = billInfo['bill_info_list'] as List<Map<String, dynamic>>;
 
-  List<PagPdfBill> invoiceList = [];
+  List<PagPdfBillCwP2> invoiceList = [];
   for (var billInfo in billInfoList) {
     String genType = billInfo['gen_type'] ?? '';
     if (genType == 'initial_balance') {
@@ -27,7 +27,7 @@ Future<Uint8List> generatePagInvoiceCompilation(
 
     final calcedBillInfoRl = prepCalcedBillInfoRl(billInfo);
 
-    final invoice = PagPdfBill(
+    final invoice = PagPdfBillCwP2(
       billingRecName: calcedBillInfoRl['billingRecName'] ?? '',
       billLabel: calcedBillInfoRl['billLabel'] ?? '',
       customerName: calcedBillInfoRl['customerName'] ?? '',
@@ -116,7 +116,7 @@ Future<Uint8List> generatePagInvoiceCompilation(
 }
 
 Future<Uint8List> buildPdf(PdfPageFormat pageFormat, String assetFolder,
-    List<PagPdfBill> invoiceList) async {
+    List<PagPdfBillCwP2> invoiceList) async {
   final pdf = pw.Document();
 
   final logo = pw.MemoryImage(

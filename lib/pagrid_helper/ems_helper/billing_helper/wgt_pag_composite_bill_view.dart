@@ -6,6 +6,7 @@ import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/cw_bill/pag_
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
 
+import '../../../pag_helper/def_helper/dh_device.dart';
 import '../../../pag_helper/def_helper/list_helper.dart';
 import '../../../pag_helper/def_helper/pag_item_helper.dart';
 import '../../../pag_helper/model/mdl_pag_project_profile.dart';
@@ -606,7 +607,6 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     }
 
     List<Map<String, dynamic>> singularUsageList = [];
-
     if (_bill['singular_billing_rec_list'] != null) {
       for (var singularUsage in _bill['singular_billing_rec_list']) {
         singularUsageList.add(singularUsage);
@@ -843,7 +843,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
             isBillMode: widget.isBillMode,
             billInfo: _bill,
             showRenderModeSwitch: true,
-            itemType: ItemType.meter_iwow,
+            itemType: PagDeviceCat.meter,
             isMonthly: true,
             tenantLcs: calcedBillInfoRl['tenantLcs'] ?? '',
             fromDatetime: DateTime.parse(calcedBillInfoRl['strFrom']),

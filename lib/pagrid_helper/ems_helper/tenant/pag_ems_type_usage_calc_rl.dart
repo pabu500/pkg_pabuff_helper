@@ -293,6 +293,10 @@ class PagEmsTypeUsageCalcRl {
     }
   }
 
+  // double? getTypeUsageFactor(String typeTag) {
+  //   return _usageFactor[typeTag];
+  // }
+
   Map<String, dynamic>? getLineItem(int index) {
     if (_lineItemList == null || _lineItemList.isEmpty) {
       return null;

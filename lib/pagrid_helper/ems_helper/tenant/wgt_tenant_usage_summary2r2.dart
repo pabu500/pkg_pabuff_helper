@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 
@@ -237,9 +239,7 @@ class _WgtTenantUsageSummary2R2State extends State<WgtTenantUsageSummary2R2> {
       String usageStr = meterStat['usage'] ?? '';
       double? usageVal = double.tryParse(usageStr);
       if (usageVal == null) {
-        if (kDebugMode) {
-          print('usageVal is null');
-        }
+        dev.log('usageVal is null');
       }
       if (usageVal != null && usageFactor != null) {
         usageVal = usageVal * usageFactor;

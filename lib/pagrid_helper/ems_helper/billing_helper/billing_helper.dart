@@ -195,7 +195,7 @@ Map<String, dynamic> prepCalcedBillInfoRl(Map<String, dynamic> billInfo) {
     emsTypeUsageCalcRl.doSingularCalc();
     singularUsageCalcList.add(emsTypeUsageCalcRl);
 
-    singularUsage['usage_calc'] = emsTypeUsageCalcRl;
+    singularUsage['usage_calc_rl'] = emsTypeUsageCalcRl;
   }
 
   PagEmsTypeUsageCalcRl compositeUsageCalcRl = PagEmsTypeUsageCalcRl(
