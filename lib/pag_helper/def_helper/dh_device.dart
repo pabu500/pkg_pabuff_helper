@@ -37,35 +37,35 @@ enum PagDeviceCat {
       enumByValue(value, values, (e) => (e).value) ?? none;
 }
 
-// T? enumByLabel<T extends Enum>(String? label, List<T> values) {
-//   if (label == null) return null;
-//   for (var item in values) {
-//     if (item is PagDeviceCat && item.label.replaceAll('.', '') == label) {
-//       return item as T;
-//     }
-//   }
-//   return null;
-// }
+enum PagMeterType {
+  electricity('Electricity', 'electricity', 'E', Symbols.bolt),
+  water('Water', 'water', 'W', Symbols.water),
+  btu('BTU', 'btu', 'B', Symbols.hvac),
+  gas('Gas', 'gas', 'G', Symbols.gas_meter),
+  newWater('New Water', 'new_water', 'N', Symbols.water_drop),
+  unknown('Unknown', 'unkn', 'U', Symbols.help);
 
-// T? enumByValue<T extends Enum>(String? value, List<T> values) {
-//   if (value == null) return null;
-//   for (var item in values) {
-//     if (item is PagDeviceCat && item.value.replaceAll('.', '') == value) {
-//       return item as T;
-//     }
-//   }
-//   return null;
-// }
+  const PagMeterType(
+    this.label,
+    this.value,
+    this.tag,
+    this.iconData,
+  );
 
-// T? enumByTag<T extends Enum>(String? tag, List<T> values) {
-//   if (tag == null) return null;
-//   for (var value in values) {
-//     if (value is PagDeviceCat && value.tag.replaceAll('.', '') == tag) {
-//       return value as T;
-//     }
-//   }
-//   return null;
-// }
+  final String label;
+  final String value; // the value that is stored in the database
+  final String tag; // a short tag for the device category
+  final IconData iconData;
+
+  static PagMeterType byLabel(String? label) =>
+      enumByLabel(label, values, (e) => (e).label) ?? unknown;
+
+  static PagMeterType byValue(String? value) =>
+      enumByValue(value, values, (e) => (e).value) ?? unknown;
+
+  static PagMeterType byTag(String? tag) =>
+      enumByValue(tag, values, (e) => (e).tag) ?? unknown;
+}
 
 enum PagLinkOpType {
   gatewayToDevice,
@@ -797,8 +797,8 @@ enum PagMeterPhaseType {
 
   const PagMeterPhaseType(this.key, this.value);
 
-  final String key;    // UI display
-  final String value;  // API / storage
+  final String key; // UI display
+  final String value; // API / storage
 
   static PagMeterPhaseType? byKey(String? key) {
     for (final e in values) {

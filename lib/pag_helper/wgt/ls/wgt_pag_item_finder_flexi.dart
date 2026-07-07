@@ -386,7 +386,6 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
 
   bool _enableSearchButton() {
     if (widget.identifySingleItem) {
-      // return (_itemLabel ?? '').isNotEmpty || (_itemName ?? '').isNotEmpty;
       return widget.listController.isIdentifierSet();
     }
 
@@ -397,6 +396,22 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     if (widget.listContextType == PagListContextType.usage) {
       if (_selectedFromDate == null || _selectedToDate == null) {
         return false;
+      }
+    }
+
+    // search in list controller, if any col controller has contextRequiredOnLsList,
+    // then check if the context is in the list, if so, then check if the filterValue is set, if not, then disable search
+    for (MdlListColController colController
+        in widget.listController.listColControllerList) {
+      if (colController.contextRequiredOnLsList != null &&
+          colController.contextRequiredOnLsList!.isNotEmpty) {
+        for (String context in colController.contextRequiredOnLsList!) {
+          if (context == widget.listContextType.name) {
+            if (colController.filterValue == null) {
+              return false;
+            }
+          }
+        }
       }
     }
 
@@ -1790,37 +1805,6 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
             widget.onResult(itemFindResult);
           },
         );
-        // Navigator.of(context).push(
-        //   MaterialPageRoute<void>(
-        //     builder: (context) => WgtCodeScanner2(
-        //       onDetect: (String code) async {
-        //         if (!_enableSearch) {
-        //           return;
-        //         }
-        //         colController.filterValue = {'value': code, 'label': code};
-        //         if (code.isNotEmpty && !_enableSearch) {
-        //           setState(() {
-        //             _enableSearch = _enableSearchButton();
-        //           });
-        //         }
-        //         widget.onModified?.call();
-        //         if (colController.filterValue == null) {
-        //           return;
-        //         }
-        //         if (colController.filterValue!['label'].trim().isEmpty) {
-        //           return;
-        //         }
-        //         // Map<String, dynamic> itemFindResult = await _getItemList();
-        //         // widget.onResult(itemFindResult);
-
-        //         // Timer(const Duration(milliseconds: 500), () {
-        //         Navigator.of(context).pop();
-        //         // });
-        //       },
-        //       validator: colController.validator ?? _defaultItemIdValidator,
-        //     ),
-        //   ),
-        // );
       },
     );
   }

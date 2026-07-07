@@ -352,6 +352,7 @@ Widget getPagTypeUsageNet(
   return SizedBox(
     width: width,
     child: Column(children: [
+      verticalSpaceSmall,
       Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -370,7 +371,7 @@ Widget getPagTypeUsageNet(
       ),
       if (netUsageE != null)
         Padding(
-          padding: const EdgeInsets.only(top: 10),
+          padding: const EdgeInsets.only(top: 5),
           child: WgtPagUsageStatCore(
             loggedInUser: loggedInUser,
             appConfig: appConfig,
@@ -395,7 +396,7 @@ Widget getPagTypeUsageNet(
         ),
       if (netUsageB != null)
         Padding(
-          padding: const EdgeInsets.only(top: 10),
+          padding: const EdgeInsets.only(top: 5),
           child: WgtPagUsageStatCore(
             loggedInUser: loggedInUser,
             appConfig: appConfig,
@@ -420,7 +421,7 @@ Widget getPagTypeUsageNet(
         ),
       if (netUsageW != null)
         Padding(
-          padding: const EdgeInsets.only(top: 10),
+          padding: const EdgeInsets.only(top: 5),
           child: WgtPagUsageStatCore(
             loggedInUser: loggedInUser,
             appConfig: appConfig,
@@ -445,7 +446,7 @@ Widget getPagTypeUsageNet(
         ),
       if (netUsageN != null)
         Padding(
-          padding: const EdgeInsets.only(top: 10),
+          padding: const EdgeInsets.only(top: 5),
           child: WgtPagUsageStatCore(
             loggedInUser: loggedInUser,
             appConfig: appConfig,
@@ -470,7 +471,7 @@ Widget getPagTypeUsageNet(
         ),
       if (netUsageG != null)
         Padding(
-          padding: const EdgeInsets.only(top: 10),
+          padding: const EdgeInsets.only(top: 5),
           child: WgtPagUsageStatCore(
             loggedInUser: loggedInUser,
             appConfig: appConfig,

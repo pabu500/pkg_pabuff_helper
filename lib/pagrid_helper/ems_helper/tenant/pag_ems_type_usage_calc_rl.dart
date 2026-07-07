@@ -293,9 +293,22 @@ class PagEmsTypeUsageCalcRl {
     }
   }
 
-  // double? getTypeUsageFactor(String typeTag) {
-  //   return _usageFactor[typeTag];
-  // }
+  double? getTypeUsageFactor(String typeTag) {
+    switch (typeTag) {
+      case 'E':
+        return _billedUsageFactorE;
+      case 'W':
+        return _billedUsageFactorW;
+      case 'B':
+        return _billedUsageFactorB;
+      case 'N':
+        return _billedUsageFactorN;
+      case 'G':
+        return _billedUsageFactorG;
+      default:
+        return null;
+    }
+  }
 
   Map<String, dynamic>? getLineItem(int index) {
     if (_lineItemList == null || _lineItemList.isEmpty) {

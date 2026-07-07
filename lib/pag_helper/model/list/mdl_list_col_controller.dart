@@ -89,6 +89,8 @@ class MdlListColController {
   int? decimal;
   String? Function(String)? validator;
   List<String>? contextExcludeList;
+  List<String>? contextIncludeList;
+  List<String>? contextRequiredOnLsList;
   bool requiredOnOnb;
   bool showFilter;
   List<Map<String, dynamic>>? opInfoList;
@@ -139,6 +141,8 @@ class MdlListColController {
     this.useComma = false,
     this.validator,
     this.contextExcludeList,
+    this.contextIncludeList,
+    this.contextRequiredOnLsList,
     this.requiredOnOnb = false,
     this.showFilter = false,
     this.opInfoList,
@@ -366,9 +370,31 @@ class MdlListColController {
       }
     }
 
+    List<String> contextIncludeList = [];
+    if (json['context_include'] != null) {
+      dynamic contextIncludeListValue = json['context_include'];
+      if (contextIncludeListValue is List) {
+        contextIncludeList =
+            List<String>.from(contextIncludeListValue.map((e) => e.toString()));
+      }
+    }
+
     if (listContextType != null) {
       if (contextExcludeList.contains(listContextType.name)) {
         showColumn = false;
+      }
+      if (contextIncludeList.isNotEmpty &&
+          !contextIncludeList.contains(listContextType.name)) {
+        showColumn = false;
+      }
+    }
+
+    List<String> contextRequiredOnLsList = [];
+    if (json['context_required_on_ls'] != null) {
+      dynamic contextRequiredOnLsListValue = json['context_required_on_ls'];
+      if (contextRequiredOnLsListValue is List) {
+        contextRequiredOnLsList = List<String>.from(
+            contextRequiredOnLsListValue.map((e) => e.toString()));
       }
     }
 
@@ -521,6 +547,8 @@ class MdlListColController {
       align: align,
       decimal: decimal,
       contextExcludeList: contextExcludeList,
+      contextIncludeList: contextIncludeList,
+      contextRequiredOnLsList: contextRequiredOnLsList,
       requiredOnOnb: requiredOnOnb,
       showFilter: showFilter,
       showTimestampAsDate: showTimestampAsDate,
@@ -558,6 +586,8 @@ class MdlListColController {
     data['align'] = align;
     data['decimal'] = decimal;
     data['context_exclude'] = contextExcludeList;
+    data['context_include'] = contextIncludeList;
+    data['context_required_on_ls'] = contextRequiredOnLsList;
     data['filter_data_type'] = filterDataType.name;
     data['required_on_onb'] = requiredOnOnb.toString();
     data['show_filter'] = showFilter.toString();
