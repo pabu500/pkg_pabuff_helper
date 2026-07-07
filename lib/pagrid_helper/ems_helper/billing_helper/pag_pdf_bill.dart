@@ -244,10 +244,11 @@ class PagPdfBillCwP2 {
       footer: _buildFooter,
       build: (context) => [
         _contentHeader(context),
-        pw.SizedBox(height: 5),
+        pw.SizedBox(height: 3),
         _getBillTime(),
+        _getNote1(),
         _getSingularList(),
-        pw.SizedBox(height: 5),
+        pw.SizedBox(height: 3),
         _getTotal(),
         _getContentFooter(context),
         // pw.SizedBox(height: 10),
@@ -289,7 +290,7 @@ class PagPdfBillCwP2 {
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
             pw.SizedBox(
-              width: 250,
+              width: 270,
               child: pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 mainAxisSize: pw.MainAxisSize.min,
@@ -373,7 +374,7 @@ class PagPdfBillCwP2 {
               ),
               pw.Table(
                 columnWidths: {
-                  0: const pw.FixedColumnWidth(80),
+                  0: const pw.FixedColumnWidth(60),
                   1: const pw.FixedColumnWidth(180),
                 },
                 children: [
@@ -464,7 +465,7 @@ class PagPdfBillCwP2 {
   }
 
   pw.Widget _contentHeader(pw.Context context) {
-    return pw.SizedBox(height: 5);
+    return pw.SizedBox(height: 3);
   }
 
   pw.Widget _getPayerInfo() {
@@ -499,7 +500,7 @@ class PagPdfBillCwP2 {
       // mainAxisAlignment: pw.MainAxisAlignment.spaceAround,
       children: [
         pw.SizedBox(
-          height: 135,
+          height: 125,
           width: 210,
           child: pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -578,7 +579,7 @@ class PagPdfBillCwP2 {
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
         pw.Text('Note for GIRO tenants:',
-            style: styleNormal.copyWith(fontWeight: pw.FontWeight.bold)),
+            style: styleSmall.copyWith(fontWeight: pw.FontWeight.bold)),
         pw.Text(
           'If invoice due date falls on a non-business day, GIRO deduction (if applicable) will be processed on the next business day. If deduction is unsuccessful, late payment interest will accrue daily from the due date until the invoice is fully settled.',
           style: styleSmall,
@@ -611,7 +612,7 @@ class PagPdfBillCwP2 {
 
   pw.Widget _getBillTime() {
     return pw.SizedBox(
-      height: 10,
+      // height: 10,
       child: pw.Row(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
@@ -634,14 +635,31 @@ class PagPdfBillCwP2 {
     );
   }
 
+  pw.Widget _getNote1() {
+    return pw.Padding(
+      padding: const pw.EdgeInsets.only(top: 3),
+      child: pw.Row(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Row(children: [
+            pw.Text(
+                'For premise address(es) relating to this invoice, refer to page 2',
+                style: styleSmall),
+          ]),
+        ],
+      ),
+    );
+  }
+
   pw.Widget _getBillerInfo() {
     return pw.SizedBox(
-        height: 110,
+        height: 95,
         child: pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
             pw.Text('Issued on behalf of', style: styleSmall),
             pw.Text(billedAmgrCompanyTradingName ?? '',
+                maxLines: 2,
                 style: styleNormal.copyWith(fontWeight: pw.FontWeight.bold)),
             pw.Text('Company Reg No: ${billedAmgrCompanyRegNumber ?? ''}',
                 style: styleNormal),
@@ -739,12 +757,12 @@ class PagPdfBillCwP2 {
           border: pw.Border.all(color: PdfColors.grey600, width: 1),
           borderRadius: pw.BorderRadius.circular(5.0),
         ),
-        margin: const pw.EdgeInsets.only(top: 8),
-        padding: const pw.EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+        margin: const pw.EdgeInsets.only(top: 5),
+        padding: const pw.EdgeInsets.symmetric(horizontal: 5, vertical: 2),
         child: pw.Column(
           mainAxisSize: pw.MainAxisSize.min,
           children: [
-            pw.SizedBox(height: 5),
+            // pw.SizedBox(height: 5),
             pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.start,
               children: [
@@ -755,9 +773,9 @@ class PagPdfBillCwP2 {
                         fontSize: size2)),
               ],
             ),
-            pw.SizedBox(height: 5),
+            pw.SizedBox(height: 2),
             ...typeStatList,
-            pw.SizedBox(height: 5),
+            pw.SizedBox(height: 2),
             pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
@@ -765,11 +783,7 @@ class PagPdfBillCwP2 {
                   pw.Row(
                       crossAxisAlignment: pw.CrossAxisAlignment.start,
                       children: [
-                        pw.Text('    *: ',
-                            style: const pw.TextStyle(
-                                // fontWeight: pw.FontWeight.bold,
-                                color: _darkColor,
-                                fontSize: 9)),
+                        pw.Text('    *: ', style: styleSmall),
                         pw.SizedBox(
                             width: footnoteWidth,
                             child: pw.Text(billedTpNote,
@@ -779,15 +793,11 @@ class PagPdfBillCwP2 {
                       ]),
                 if (billedTptRateNote.isNotEmpty)
                   pw.Padding(
-                    padding: const pw.EdgeInsets.only(top: 3),
+                    padding: const pw.EdgeInsets.only(top: 2),
                     child: pw.Row(
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
-                          pw.Text('  **: ',
-                              style: const pw.TextStyle(
-                                  // fontWeight: pw.FontWeight.bold,
-                                  color: _darkColor,
-                                  fontSize: 9)),
+                          pw.Text('  **: ', style: styleSmall),
                           pw.SizedBox(
                               width: footnoteWidth,
                               child: pw.Text(billedTptRateNote,
@@ -798,15 +808,11 @@ class PagPdfBillCwP2 {
                   ),
                 if (billedTptCycleNote.isNotEmpty)
                   pw.Padding(
-                    padding: const pw.EdgeInsets.only(top: 3),
+                    padding: const pw.EdgeInsets.only(top: 2),
                     child: pw.Row(
                         crossAxisAlignment: pw.CrossAxisAlignment.start,
                         children: [
-                          pw.Text('***: ',
-                              style: const pw.TextStyle(
-                                  // fontWeight: pw.FontWeight.bold,
-                                  color: _darkColor,
-                                  fontSize: 9)),
+                          pw.Text('***: ', style: styleSmall),
                           pw.SizedBox(
                               width: footnoteWidth,
                               child: pw.Text(billedTptCycleNote,
