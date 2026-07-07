@@ -1313,7 +1313,8 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
           applyInfo['usage_amount_from_payment'] ?? '-';
       String appliedInterestAmountFromPmtStr =
           applyInfo['interest_amount_from_payment'] ?? '-';
-      double keyWidth1 = 180.0;
+
+      double keyWidth1 = 190.0;
       double keyWidth2 = 85.0;
       final keyStyle =
           TextStyle(fontSize: 13.5, color: Theme.of(context).hintColor);
@@ -1361,8 +1362,8 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
                       width: keyWidth1,
                       child: Align(
                         alignment: Alignment.centerRight,
-                        child:
-                            Text('Usage Amt. from Payment: ', style: keyStyle),
+                        child: Text('Principal Amt. from Payment: ',
+                            style: keyStyle),
                       ),
                     ),
                     Text(appliedUsageAmountFromPmtStr,
@@ -1443,7 +1444,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
       String appliedInterestAmountFromPmtStr =
           applyInfo['interest_amount_from_payment'] ?? '-';
 
-      double keyWidth1 = 180.0;
+      double keyWidth1 = 190.0;
       double keyWidth2 = 85.0;
       final keyStyle =
           TextStyle(fontSize: 13.5, color: Theme.of(context).hintColor);
@@ -1491,8 +1492,8 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
                       width: keyWidth1,
                       child: Align(
                         alignment: Alignment.centerRight,
-                        child:
-                            Text('Usage Amt. from Payment: ', style: keyStyle),
+                        child: Text('Principal Amt. from Payment: ',
+                            style: keyStyle),
                       ),
                     ),
                     Text(appliedUsageAmountFromPmtStr,

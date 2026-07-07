@@ -934,11 +934,11 @@ Widget getInterestInfo(
     } else if (lineItemAmount2 is double) {
       lineItemAmount2Double = lineItemAmount2;
     }
-    double outstandingAmountDouble = 0.0;
+    double interestBearingOsAmtDouble = 0.0;
     if (interestBearingOsAmt is String) {
-      outstandingAmountDouble = double.tryParse(interestBearingOsAmt) ?? 0.0;
+      interestBearingOsAmtDouble = double.tryParse(interestBearingOsAmt) ?? 0.0;
     } else if (interestBearingOsAmt is double) {
-      outstandingAmountDouble = interestBearingOsAmt;
+      interestBearingOsAmtDouble = interestBearingOsAmt;
     }
     double ttiRefAmountDouble = 0.0;
     if (ttiRefAmount is String) {
@@ -1050,7 +1050,7 @@ Widget getInterestInfo(
           Text('Bill Date: ${billDate.substring(0, 10)}'),
           // Text( 'Billed Total Amount: SGD${getCommaNumberStr(billedTotalAmountDouble, decimal: 2)}'),
           Text(
-              'Interest Bearing TTI Amount: SGD${getCommaNumberStr(outstandingAmountDouble, decimal: 2)}'),
+              'Interest Bearing TTI Amount: SGD${getCommaNumberStr(interestBearingOsAmtDouble, decimal: 2)}'),
           Text(
               ' - Billed Usage Cost Amount: SGD${getCommaNumberStr(billedUsageCostAmtDouble, decimal: 2)}'),
           getEffBciInfoList(effBciInfoListCasted, context),
@@ -1085,7 +1085,7 @@ Widget getInterestInfo(
           Text(
               'Collection End Date: ${colletionEndDateTimestamp.toString().substring(0, 10)}'),
           Text(
-              'Outstanding Amount: SGD${getCommaNumberStr(outstandingAmountDouble, decimal: 2)}'),
+              'Outstanding Amount: SGD${getCommaNumberStr(interestBearingOsAmtDouble, decimal: 2)}'),
           Text(
               'TTI Ref. Amount: SGD${getCommaNumberStr(ttiRefAmountDouble, decimal: 2)}'),
           Text(
@@ -1166,9 +1166,11 @@ Widget getEffBciInfoList(
         '   - $bciLabel: SGD${getCommaNumberStr(bciAmountDouble, decimal: 2)}');
     bciWidgets.add(bciWidget);
   }
-  return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [const Text(' - Billing Cost Item:'), ...bciWidgets]);
+  return bciWidgets.isEmpty
+      ? const Text(' - Billing Cost Item: -')
+      : Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [const Text(' - Billing Cost Item:'), ...bciWidgets]);
 }
 
 Widget getPaymentApplyList(
@@ -1293,11 +1295,11 @@ Widget getPaymentApplyList(
               PagPaymentMethod.getTagWidget(paymentMethodEnum),
               horizontalSpaceTiny,
               Text('Payment Date: ${valueTimestamp.substring(0, 10)}'),
-              if (effValueTimestamp != null)
-                Text(
-                    ' (Effective Value Date: ${effValueTimestamp.substring(0, 10)})'),
             ],
           ),
+          if (effValueTimestamp != null)
+            Text(
+                ' (Effective Value Date: ${effValueTimestamp.substring(0, 10)})'),
           verticalSpaceTiny,
           const Row(
             children: [

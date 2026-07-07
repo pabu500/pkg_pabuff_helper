@@ -1174,7 +1174,7 @@ class _WgtPagItemInfoEditPanelState extends State<WgtPagItemInfoEditPanel> {
                     String appliedInterestAmountStr =
                         applyInfo['applied_interest_amount'] ?? '-';
 
-                    double keyWidth1 = 70.0;
+                    double keyWidth1 = 85.0;
                     double keyWidth2 = 85.0;
 
                     appliesWidgets.add(Padding(
