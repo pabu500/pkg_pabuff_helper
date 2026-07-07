@@ -396,60 +396,60 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
 
     String tenantLcs = _bill['tenant_lcs'] ?? '';
 
-    final billedGstStr = _bill['billed_gst'] ?? '';
-    double? billedGst = double.tryParse(billedGstStr);
+    // final billedGstStr = _bill['billed_gst'] ?? '';
+    // double? billedGst = double.tryParse(billedGstStr);
 
-    final billedGstAmount = _bill['billed_gst_amount'] ?? '';
-    double billedGstAmountDouble = 0.0;
-    if (billedGstAmount is String) {
-      billedGstAmountDouble = double.tryParse(billedGstAmount) ?? 0.0;
-    } else if (billedGstAmount is num) {
-      billedGstAmountDouble = billedGstAmount.toDouble();
-    }
+    // final billedGstAmount = _bill['billed_gst_amount'] ?? '';
+    // double billedGstAmountDouble = 0.0;
+    // if (billedGstAmount is String) {
+    //   billedGstAmountDouble = double.tryParse(billedGstAmount) ?? 0.0;
+    // } else if (billedGstAmount is num) {
+    //   billedGstAmountDouble = billedGstAmount.toDouble();
+    // }
 
-    final billedUsageCostAmountStr = _bill['billed_usage_cost_amount'] ?? '';
-    double? billedUsageCostAmount =
-        double.tryParse(billedUsageCostAmountStr) ?? 0.0;
+    // final billedUsageCostAmountStr = _bill['billed_usage_cost_amount'] ?? '';
+    // double? billedUsageCostAmount =
+    //     double.tryParse(billedUsageCostAmountStr) ?? 0.0;
 
-    final billedInterestAmountStr = _bill['billed_interest_amount'] ?? '';
-    double? billedInterestAmount =
-        double.tryParse(billedInterestAmountStr) ?? 0.0;
+    // final billedInterestAmountStr = _bill['billed_interest_amount'] ?? '';
+    // double? billedInterestAmount =
+    //     double.tryParse(billedInterestAmountStr) ?? 0.0;
 
-    final billedPrincipalAmountStr = _bill['billed_principal_amount'] ?? '';
-    double? billedPrincipalAmount =
-        double.tryParse(billedPrincipalAmountStr) ?? 0.0;
+    // final billedPrincipalAmountStr = _bill['billed_principal_amount'] ?? '';
+    // double? billedPrincipalAmount =
+    //     double.tryParse(billedPrincipalAmountStr) ?? 0.0;
 
-    final billedCycleTotalAmountStr = _bill['billed_cycle_total_amount'] ?? '';
-    double? billedCycleTotalAmount =
-        double.tryParse(billedCycleTotalAmountStr) ?? 0.0;
+    // final billedCycleTotalAmountStr = _bill['billed_cycle_total_amount'] ?? '';
+    // double? billedCycleTotalAmount =
+    //     double.tryParse(billedCycleTotalAmountStr) ?? 0.0;
 
-    final billedPayableAmountStr = _bill['billed_payable_amount'] ?? '';
-    double? billedPayableAmount =
-        double.tryParse(billedPayableAmountStr) ?? 0.0;
+    // final billedPayableAmountStr = _bill['billed_payable_amount'] ?? '';
+    // double? billedPayableAmount =
+    // double.tryParse(billedPayableAmountStr) ?? 0.0;
 
-    String strBilledUsageCostAmount = _bill['billed_usage_cost_amount'] ?? '';
-    String strBilledInterestAmount = _bill['billed_interest_amount'] ?? '';
-    String strBilledPayableAmount = _bill['billed_payable_amount'] ?? '';
+    // String strBilledUsageCostAmount = _bill['billed_usage_cost_amount'] ?? '';
+    // String strBilledInterestAmount = _bill['billed_interest_amount'] ?? '';
+    // String strBilledPayableAmount = _bill['billed_payable_amount'] ?? '';
 
-    String billedAmgrCompanyTradingName =
-        _bill['billed_amgr_company_trading_name'] ?? '';
-    String billedAmgrCompanyRegNumber =
-        _bill['billed_amgr_company_reg_number'] ?? '';
-    String billedAmgrGstRegNumber = _bill['billed_amgr_gst_reg_number'] ?? '';
-    String amgrAddressLine1 = _bill['amgr_address_line_1'] ?? '';
-    String amgrAddressLine2 = _bill['amgr_address_line_2'] ?? '';
-    String amgrAddressLine3 = _bill['amgr_address_line_3'] ?? '';
+    // String billedAmgrCompanyTradingName =
+    //     _bill['billed_amgr_company_trading_name'] ?? '';
+    // String billedAmgrCompanyRegNumber =
+    //     _bill['billed_amgr_company_reg_number'] ?? '';
+    // String billedAmgrGstRegNumber = _bill['billed_amgr_gst_reg_number'] ?? '';
+    // String amgrAddressLine1 = _bill['amgr_address_line_1'] ?? '';
+    // String amgrAddressLine2 = _bill['amgr_address_line_2'] ?? '';
+    // String amgrAddressLine3 = _bill['amgr_address_line_3'] ?? '';
 
-    String amgrBankAccountName = _bill['amgr_bank_account_name'] ?? '';
-    String amgrBankAccountNumber = _bill['amgr_bank_account_number'] ?? '';
-    String amgrBankName = _bill['amgr_bank_name'] ?? '';
-    String amgrBankBranchCode = _bill['amgr_bank_branch_code'] ?? '';
-    String amgrBankSwiftCode = _bill['amgr_bank_swift_code'] ?? '';
-    String amgrBankPayNow = _bill['amgr_bank_paynow'] ?? '';
+    // String amgrBankAccountName = _bill['amgr_bank_account_name'] ?? '';
+    // String amgrBankAccountNumber = _bill['amgr_bank_account_number'] ?? '';
+    // String amgrBankName = _bill['amgr_bank_name'] ?? '';
+    // String amgrBankBranchCode = _bill['amgr_bank_branch_code'] ?? '';
+    // String amgrBankSwiftCode = _bill['amgr_bank_swift_code'] ?? '';
+    // String amgrBankPayNow = _bill['amgr_bank_paynow'] ?? '';
 
-    String billedTpNote = _bill['billed_tp_note'] ?? '';
-    String billedTptRateNote = _bill['billed_tpt_rate_note'] ?? '';
-    String billedTptCycleNote = _bill['billed_tpt_cycle_note'] ?? '';
+    // String billedTpNote = _bill['billed_tp_note'] ?? '';
+    // String billedTptRateNote = _bill['billed_tpt_rate_note'] ?? '';
+    // String billedTptCycleNote = _bill['billed_tpt_cycle_note'] ?? '';
 
     List<Map<String, dynamic>> lineItemList = [];
     final lineItemInfo = _bill['line_item_info'] ?? {};

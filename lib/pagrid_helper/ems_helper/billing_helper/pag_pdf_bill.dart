@@ -728,6 +728,7 @@ class PagPdfBillCwP2 {
         in tenantSingularUsageInfoList) {
       List<pw.Widget> typeStatList = [];
       String billedTpNote = singularUsageInfo['billed_tp_note'] ?? '';
+      String billedTpNote2 = singularUsageInfo['billed_tp_note2'] ?? '';
       String billedTptRateNote =
           singularUsageInfo['billed_tpt_rate_note'] ?? '';
       String billedTptCycleNote =
@@ -787,6 +788,18 @@ class PagPdfBillCwP2 {
                         pw.SizedBox(
                             width: footnoteWidth,
                             child: pw.Text(billedTpNote,
+                                maxLines: 2,
+                                style: styleSmall.copyWith(
+                                    fontStyle: pw.FontStyle.italic))),
+                      ]),
+                if (billedTpNote2.isNotEmpty)
+                  pw.Row(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Text('    *: ', style: styleSmall),
+                        pw.SizedBox(
+                            width: footnoteWidth,
+                            child: pw.Text(billedTpNote2,
                                 maxLines: 2,
                                 style: styleSmall.copyWith(
                                     fontStyle: pw.FontStyle.italic))),
