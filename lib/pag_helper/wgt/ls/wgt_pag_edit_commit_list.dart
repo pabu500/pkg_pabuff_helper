@@ -1149,6 +1149,12 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
         tagLabel = interestStartDateType?.tag ?? '';
         tagColor = interestStartDateType?.color.withAlpha(130) ??
             Colors.grey.withAlpha(130);
+      } else if (configItem['col_key'] == 'interest_duration') {
+        PagInterestDurationType? interestDurationType =
+            PagInterestDurationType.byValue(tagText);
+        tagLabel = interestDurationType?.tag ?? '';
+        tagColor = interestDurationType?.color.withAlpha(130) ??
+            Colors.grey.withAlpha(130);
       }
     } else if (configItem['col_key'] == 'entry_type') {
       PagSoaEntryType entryType = PagSoaEntryType.byValue(tagText);

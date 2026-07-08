@@ -49,28 +49,28 @@ enum PagItemKind {
       enumByLabel(value, values, (e) => (e).value);
 }
 
-String? getItemTypeStr(dynamic itemType) {
-  if (itemType == null) {
-    return null;
-  }
-  if (itemType is PagDeviceCat) {
-    // return getPagDeviceTypeStr(itemType);
-    return itemType.name;
-  } else if (itemType is PagScopeType) {
-    return getPagScopeTypeStr(itemType);
-  } else if (itemType is PagFinanceType) {
-    // return getPagFinanceTypeStr(itemType);
-    return itemType.value;
-  } else if (itemType is PagOrgType) {
-    return itemType.value;
-  } else if (itemType is PagTariff) {
-    return itemType.value;
-  } else if (itemType is PagItemKind) {
-    return itemType.value;
-  } else {
-    throw Exception('Unsupported item type: ${itemType.runtimeType}');
-  }
-}
+// String? getItemTypeStr(dynamic itemType) {
+//   if (itemType == null) {
+//     return null;
+//   }
+//   if (itemType is PagDeviceCat) {
+//     // return getPagDeviceTypeStr(itemType);
+//     return itemType.name;
+//   } else if (itemType is PagScopeType) {
+//     return getPagScopeTypeStr(itemType);
+//   } else if (itemType is PagFinanceType) {
+//     // return getPagFinanceTypeStr(itemType);
+//     return itemType.value;
+//   } else if (itemType is PagOrgType) {
+//     return itemType.value;
+//   } else if (itemType is PagTariff) {
+//     return itemType.value;
+//   } else if (itemType is PagItemKind) {
+//     return itemType.value;
+//   } else {
+//     throw Exception('Unsupported item type: ${itemType.runtimeType}');
+//   }
+// }
 
 String? validateItemId(String? value) {
   if (value == null || value.isEmpty) {

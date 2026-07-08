@@ -142,7 +142,8 @@ class MdlPagOpController {
     if (itemType == null) {
       itemTypeStr = itemKindStr;
     } else {
-      itemTypeStr = getItemTypeStr(itemType) ?? '';
+      // itemTypeStr = getItemTypeStr(itemType) ?? '';
+      itemTypeStr = getItemTypeValue(itemType);
     }
     assert(itemTypeStr.isNotEmpty,
         'itemTypeStr should not be empty, itemType: $itemType');
@@ -229,7 +230,8 @@ class MdlPagOpController {
       'scope': loggedInUser!.selectedScope.toScopeMap(),
       'op_name': opName,
       'item_kind': itemKind.value,
-      'item_type': getItemTypeStr(itemType),
+      // 'item_type': getItemTypeStr(itemType),
+      'item_type': getItemTypeValue(itemType),
       'item_id_type': itemIdType.name,
       'target_fields': targetFields.join(','),
       'op_list': opList,

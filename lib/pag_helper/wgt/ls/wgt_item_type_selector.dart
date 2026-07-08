@@ -90,7 +90,7 @@ class _WgtItemTypeSelectorState extends State<WgtItemTypeSelector> {
 
         _isFetchingListInfo = true;
 
-        Map<String, dynamic> data = await getListInfoList(
+        final result = await getListInfoList2(
           widget.appConfig,
           loggedInUser,
           queryMap,
@@ -103,11 +103,11 @@ class _WgtItemTypeSelectorState extends State<WgtItemTypeSelector> {
           ),
         );
 
-        if (data['list_info_list'] == null) {
-          throw Exception('Failed to get list info list');
-        }
-
-        final listInfoListJson = data['list_info_list'];
+        // if (data['list_info_list'] == null) {
+        //   throw Exception('Failed to get list info list');
+        // }
+        // final listInfoListJson = data['list_info_list'];
+        final listInfoListJson = result;
 
         // List<Map<String, dynamic>> listInfoList = [];
         _itemTypeInfoList.clear();
@@ -169,7 +169,10 @@ class _WgtItemTypeSelectorState extends State<WgtItemTypeSelector> {
   }
 
   void _saveItemTypePref() {
-    String? itemTypeStr = getItemTypeStr(_selectedListController?.itemTypeEnum);
+    // String? itemTypeStr = getItemTypeStr(_selectedListController?.itemTypeEnum);
+    String? itemTypeStr =
+        getItemTypeValue(_selectedListController?.itemTypeEnum);
+
     String itemTypePrefKey = '${widget.prefKey}_${widget.itemKind.name}';
     saveToSharedPref(itemTypePrefKey, itemTypeStr);
   }
@@ -256,7 +259,9 @@ class _WgtItemTypeSelectorState extends State<WgtItemTypeSelector> {
     if (!_listInfoFetched) {
       return Container();
     }
-    final selectedItemTypeStr = getItemTypeStr(_selectedItemType);
+    // final selectedItemTypeStr = getItemTypeStr(_selectedItemType);
+    final selectedItemTypeStr =
+        getItemTypeValue(_selectedListController?.itemTypeEnum);
 
     List<Widget> itemTypeList = [];
     if (_itemTypeInfoList.isNotEmpty) {
@@ -294,9 +299,11 @@ class _WgtItemTypeSelectorState extends State<WgtItemTypeSelector> {
 
         dynamic itemType;
         if (widget.itemKind == PagItemKind.device) {
-          itemType = PagDeviceCat.values.byName(itemTypeStr);
+          // itemType = PagDeviceCat.values.byName(itemTypeStr);
+          itemType = PagDeviceCat.byValue(itemTypeStr);
         } else if (widget.itemKind == PagItemKind.scope) {
-          itemType = PagScopeType.values.byName(itemTypeStr);
+          // itemType = PagScopeType.values.byName(itemTypeStr);
+          itemType = PagScopeType.byValue(itemTypeStr);
         } else if (widget.itemKind == PagItemKind.finance) {
           itemType = PagFinanceType.byValue(itemTypeStr);
           if (itemType == PagFinanceType.none ||

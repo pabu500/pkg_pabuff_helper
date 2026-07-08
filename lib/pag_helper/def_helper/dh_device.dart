@@ -394,9 +394,28 @@ String? validateMeterReadingValue(String val) {
 }
 
 enum PagDeviceOpType {
-  onboarding,
-  update,
-  none,
+  onboarding('Onboarding', 'onb', 'onb'),
+  update('Update', 'upd', 'upd'),
+  none('None', 'none', 'none');
+
+  const PagDeviceOpType(
+    this.label,
+    this.value,
+    this.tag,
+  );
+
+  final String label;
+  final String value; // the value that is stored in the database
+  final String tag; // a short tag for the device category
+
+  static PagDeviceOpType byLabel(String? label) =>
+      enumByLabel(label, values, (e) => (e).label) ?? none;
+
+  static PagDeviceOpType byValue(String? value) =>
+      enumByValue(value, values, (e) => (e).value) ?? none;
+
+  static PagDeviceOpType byTag(String? tag) =>
+      enumByValue(tag, values, (e) => (e).tag) ?? none;
 }
 
 final List<Map<String, dynamic>> listConfigBaseDevice = [
