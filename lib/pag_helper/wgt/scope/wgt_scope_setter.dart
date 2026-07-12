@@ -29,7 +29,7 @@ class WgtScopeSetter extends StatefulWidget {
     this.labelWidth = 150,
     this.itemScopeMap,
     this.forItemKind, // the kind of item that the scope is being set for
-    this.forScopeType, // used when the scope setter is used for a scope type
+    this.forScopeType, // used when the scope setter is used for a scope type, otherwise null
     this.onScopeSet,
     this.showCommitted = true,
     this.isEditable = true,
@@ -177,8 +177,12 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
                           ? _selectedLocationGroupProfile!.id.toString()
                           : '',
     };
+
+    dev.log(
+        'selected _selectedLocationGroupProfile: ${_selectedLocationGroupProfile?.name}');
+
     try {
-      var result = await getScopeChildrenList(
+      final result = await getScopeChildrenList(
         widget.appConfig,
         loggedInUser,
         queryMap,
@@ -190,6 +194,9 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
           operation: '',
         ),
       );
+
+      dev.log('getScopeChildrenList result');
+
       if (result['scope_info_list'] == null) {
         throw Exception('Failed to get scope_info list');
       }
@@ -212,13 +219,12 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
           break;
         default:
           // for setting scope for items other than scope
+          dev.log('forScopeType is null, calling _onLocationListFetched');
           _onLocationListFetched(result);
           break;
       }
     } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
+      dev.log(e.toString());
       rethrow;
     } finally {
       _isFetchingChildrenList = false;
@@ -243,8 +249,13 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
     if (widget.isFlexiScope) {
       _locationList.add(nullLocation);
     }
+    dev.log('locationList: ${_locationList.map((e) => e.name).toList()}');
 
     _selectedLocationGroupProfile?.locationList = _locationList;
+
+    if (_locationList.length == 1) {
+      _selectedLocation = _locationList.first;
+    }
 
     // _selectedLocation is null on first load
     // use widget.itemScopeMap to set the location
@@ -252,8 +263,12 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
     // and no longer use the value from widget.itemScopeMap
     String? locationName =
         _selectedLocation?.name ?? widget.itemScopeMap?['location_name'];
+    dev.log('_selectedLocation: ${_selectedLocation?.name}');
+    dev.log('locationName: $locationName');
     _selectedLocation =
         _selectedLocationGroupProfile!.getLocationByName(locationName);
+
+    dev.log('selected _selectedLocation: ${_selectedLocation?.name}');
 
     if (_selectedLocation != null) {
       bool hasSelectedLocation = false;
@@ -271,6 +286,8 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
 
       // _locationInputSelectController.text = _selectedLocation!.label;
     }
+
+    setState(() {});
   }
 
   void _onLocationGroupListFetched(var result) {
@@ -1051,6 +1068,7 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
               iconSize: 21,
               style: TextStyle(color: Theme.of(context).colorScheme.primary),
               onChanged: (MdlPagLocationGroupProfile? value) async {
+                dev.log('onChanged location group: ${value?.label}');
                 if (_selectedLocationGroupProfile == value) {
                   return;
                 }
@@ -1060,9 +1078,9 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
                   }
                 }
 
-                if (widget.forScopeType != PagScopeType.location) {
-                  await _getParentScopeChildrenList();
-                }
+                // if (widget.forScopeType != PagScopeType.location) {
+                //   await _getParentScopeChildrenList();
+                // }
 
                 setState(() {
                   _selectedLocationGroupProfile = value;
@@ -1078,6 +1096,10 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
 
                   _markModified();
                 });
+
+                if (widget.forScopeType != PagScopeType.location) {
+                  await _getParentScopeChildrenList();
+                }
               },
               items: _locationGroupProfileList
                   .map<DropdownMenuItem<MdlPagLocationGroupProfile>>(
