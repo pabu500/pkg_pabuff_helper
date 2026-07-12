@@ -38,23 +38,27 @@ enum PagDeviceCat {
 }
 
 enum PagMeterType {
-  electricity('Electricity', 'electricity', 'E', Symbols.bolt),
-  water('Water', 'water', 'W', Symbols.water),
-  btu('BTU', 'btu', 'B', Symbols.hvac),
-  gas('Gas', 'gas', 'G', Symbols.gas_meter),
-  newWater('New Water', 'new_water', 'N', Symbols.water_drop),
-  unknown('Unknown', 'unkn', 'U', Symbols.help);
+  electricity('Electricity', 'electricity', 'E', Symbols.bolt, 'kWh', 'MWh'),
+  water('Water', 'water', 'W', Symbols.water, 'CuM', 'kCuM'),
+  btu('BTU', 'btu', 'B', Symbols.hvac, 'TonHr', 'kTonHr'),
+  gas('Gas', 'gas', 'G', Symbols.gas_meter, 'm³', 'm³'),
+  newWater('New Water', 'new_water', 'N', Symbols.water_drop, 'CuM', 'kCuM'),
+  unknown('Unknown', 'unkn', 'U', Symbols.help, null, null);
 
   const PagMeterType(
     this.label,
     this.value,
     this.tag,
     this.iconData,
+    this.unit,
+    this.unitK,
   );
 
   final String label;
   final String value; // the value that is stored in the database
   final String tag; // a short tag for the device category
+  final String? unit;
+  final String? unitK;
   final IconData iconData;
 
   static PagMeterType byLabel(String? label) =>

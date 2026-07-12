@@ -1441,6 +1441,7 @@ class PagPdfBillCwP2 {
               meterUsageSummary['first_reading_value'] ?? '';
           String strLastReading = meterUsageSummary['last_reading_value'] ?? '';
           String strUsage = meterUsageSummary['usage'] ?? '';
+
           typeGroupList.add(pw.TableRow(
             children: [
               pw.Text('  $buildingLabel', style: styleSmall),
@@ -1451,6 +1452,7 @@ class PagPdfBillCwP2 {
               pw.Text('  x${typeUsageFactor?.toStringAsFixed(0) ?? ''}',
                   style: styleSmall),
               pw.Text('  $strUsage', style: styleSmall),
+              pw.Text('  ${meterType.unit}', style: styleSmall),
             ],
           ));
         }
@@ -1482,6 +1484,7 @@ class PagPdfBillCwP2 {
           4: const pw.FixedColumnWidth(65),
           5: const pw.FixedColumnWidth(20),
           6: const pw.FixedColumnWidth(60),
+          7: const pw.FixedColumnWidth(30),
         },
         defaultVerticalAlignment: pw.TableCellVerticalAlignment.middle,
         children: [
@@ -1500,6 +1503,8 @@ class PagPdfBillCwP2 {
               pw.Text('  M',
                   style: styleSmall.copyWith(fontWeight: pw.FontWeight.bold)),
               pw.Text('  Usage',
+                  style: styleSmall.copyWith(fontWeight: pw.FontWeight.bold)),
+              pw.Text('  Unit',
                   style: styleSmall.copyWith(fontWeight: pw.FontWeight.bold)),
             ],
           ),
