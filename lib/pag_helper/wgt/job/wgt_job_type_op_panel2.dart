@@ -793,16 +793,24 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
     );
   }
 
-  Widget getTimeRangePicker({bool forceMonthly = false, bool enabled = true}) {
+  Widget getTimeRangePicker(
+      {bool forceMonthly = false,
+      bool forceCustomRange = false,
+      bool enabled = true}) {
+    assert(!(forceMonthly && forceCustomRange),
+        'Cannot force both monthly and custom range');
+
     return WgtPagDateRangePickerMonthly(
       // key: _timePickerKey,
       enabled: enabled,
       iniEndDateTime: _selectedToDate,
       iniStartDateTime: _selectedFromDate,
+      showMonthly: !forceCustomRange,
       customRangeSelected: _customDateRangeSelected,
       monthPicked: _monthPicked,
       populateDefaultRange: false,
       allowCustomRange: !forceMonthly,
+      maxDurationDays: 500,
       onRangeSet: (startDate, endDate) async {
         if (startDate == null || endDate == null) return;
         _resetDate(resetDateRange: true);
@@ -1155,14 +1163,14 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'Billing Cycle Month',
+              'Collection Period',
               style: TextStyle(
                 color: Theme.of(context).hintColor,
                 fontSize: 16,
               ),
             ),
             horizontalSpaceSmall,
-            getTimeRangePicker(forceMonthly: true),
+            getTimeRangePicker(forceCustomRange: true),
           ],
         ),
       ],
