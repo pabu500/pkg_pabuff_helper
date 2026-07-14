@@ -504,6 +504,8 @@ String? Function(String) getFinanceValidator(String key, dynamic itemType,
   switch (itemType) {
     case PagFinanceType.payment:
       return getPaymentValidator(key, isValueRequired: isValueRequired);
+    case PagFinanceType.paymentApply:
+      return getPaymentApplyValidator(key, isValueRequired: isValueRequired);
     default:
       dev.log('No validator found for user key: $key');
       return (String? value) {
@@ -529,6 +531,35 @@ String? Function(String) getPaymentValidator(String key,
       return validatePaymentAmount;
     default:
       dev.log('No validator found for payment key: $key');
+      return (String? value) {
+        return null;
+      };
+  }
+}
+
+String? Function(String) getPaymentApplyValidator(String key,
+    {bool isValueRequired = true}) {
+  switch (key) {
+    case 'tenant_id':
+      return isValueRequired ? validateItemId : validateItemIdNotRequired;
+    case 'tenant_name':
+      return validateTenantName;
+    case 'tenant_label':
+      return isValueRequired
+          ? validateTenantLabel
+          : validateTenantLabelNotRequired;
+    case 'payment_id':
+      return isValueRequired ? validateItemId : validateItemIdNotRequired;
+    case 'soa_type':
+      return soaTypeValidator;
+    case 'payment_lc_status':
+      return validatePaymentLcStatus;
+    case 'value_date':
+      return dateValidator;
+    case 'amount':
+      return validatePaymentAmount;
+    default:
+      dev.log('No validator found for payment apply key: $key');
       return (String? value) {
         return null;
       };
