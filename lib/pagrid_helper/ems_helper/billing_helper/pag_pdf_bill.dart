@@ -724,6 +724,58 @@ class PagPdfBillCwP2 {
     List<pw.Widget> singularStatList = [];
     double footnoteWidth = 470;
 
+    // check if all billed_tp_note are the same
+    String singleBilledTpNote = '';
+    String singleBilledTpNote2 = '';
+    String singleBilledTptRateNote = '';
+    String singleBilledTptCycleNote = '';
+    for (Map<String, dynamic> singularUsageInfo
+        in tenantSingularUsageInfoList) {
+      String billedTpNote = singularUsageInfo['billed_tp_note'] ?? '';
+      if (singleBilledTpNote.isNotEmpty) {
+        if (singleBilledTpNote != billedTpNote) {
+          singleBilledTpNote = '';
+          break;
+        }
+      }
+      singleBilledTpNote = billedTpNote;
+    }
+    for (Map<String, dynamic> singularUsageInfo
+        in tenantSingularUsageInfoList) {
+      String billedTpNote2 = singularUsageInfo['billed_tp_note2'] ?? '';
+      if (singleBilledTpNote2.isNotEmpty) {
+        if (singleBilledTpNote2 != billedTpNote2) {
+          singleBilledTpNote2 = '';
+          break;
+        }
+      }
+      singleBilledTpNote2 = billedTpNote2;
+    }
+    for (Map<String, dynamic> singularUsageInfo
+        in tenantSingularUsageInfoList) {
+      String billedTptRateNote =
+          singularUsageInfo['billed_tpt_rate_note'] ?? '';
+      if (singleBilledTptRateNote.isNotEmpty) {
+        if (singleBilledTptRateNote != billedTptRateNote) {
+          singleBilledTptRateNote = '';
+          break;
+        }
+      }
+      singleBilledTptRateNote = billedTptRateNote;
+    }
+    for (Map<String, dynamic> singularUsageInfo
+        in tenantSingularUsageInfoList) {
+      String billedTptCycleNote =
+          singularUsageInfo['billed_tpt_cycle_note'] ?? '';
+      if (singleBilledTptCycleNote.isNotEmpty) {
+        if (singleBilledTptCycleNote != billedTptCycleNote) {
+          singleBilledTptCycleNote = '';
+          break;
+        }
+      }
+      singleBilledTptCycleNote = billedTptCycleNote;
+    }
+
     for (Map<String, dynamic> singularUsageInfo
         in tenantSingularUsageInfoList) {
       List<pw.Widget> typeStatList = [];
@@ -780,7 +832,7 @@ class PagPdfBillCwP2 {
             pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                if (billedTpNote.isNotEmpty)
+                if (billedTpNote.isNotEmpty && singleBilledTpNote.isEmpty)
                   pw.Row(
                       crossAxisAlignment: pw.CrossAxisAlignment.start,
                       children: [
@@ -792,7 +844,7 @@ class PagPdfBillCwP2 {
                                 style: styleSmall.copyWith(
                                     fontStyle: pw.FontStyle.italic))),
                       ]),
-                if (billedTpNote2.isNotEmpty)
+                if (billedTpNote2.isNotEmpty && singleBilledTpNote2.isEmpty)
                   pw.Row(
                       crossAxisAlignment: pw.CrossAxisAlignment.start,
                       children: [
@@ -804,7 +856,8 @@ class PagPdfBillCwP2 {
                                 style: styleSmall.copyWith(
                                     fontStyle: pw.FontStyle.italic))),
                       ]),
-                if (billedTptRateNote.isNotEmpty)
+                if (billedTptRateNote.isNotEmpty &&
+                    singleBilledTptRateNote.isEmpty)
                   pw.Padding(
                     padding: const pw.EdgeInsets.only(top: 2),
                     child: pw.Row(
@@ -819,7 +872,8 @@ class PagPdfBillCwP2 {
                                       fontStyle: pw.FontStyle.italic))),
                         ]),
                   ),
-                if (billedTptCycleNote.isNotEmpty)
+                if (billedTptCycleNote.isNotEmpty &&
+                    singleBilledTptCycleNote.isEmpty)
                   pw.Padding(
                     padding: const pw.EdgeInsets.only(top: 2),
                     child: pw.Row(
@@ -842,9 +896,70 @@ class PagPdfBillCwP2 {
     }
 
     return pw.Column(
-      crossAxisAlignment: pw.CrossAxisAlignment.start,
-      children: singularStatList,
-    );
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          ...singularStatList,
+          if (singleBilledTpNote.isNotEmpty)
+            pw.Padding(
+              padding: const pw.EdgeInsets.only(top: 2),
+              child: pw.Row(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Text('    *: ', style: styleSmall),
+                    pw.SizedBox(
+                        width: footnoteWidth,
+                        child: pw.Text(singleBilledTpNote,
+                            maxLines: 2,
+                            style: styleSmall.copyWith(
+                                fontStyle: pw.FontStyle.italic))),
+                  ]),
+            ),
+          if (singleBilledTpNote2.isNotEmpty)
+            pw.Padding(
+              padding: const pw.EdgeInsets.only(top: 2),
+              child: pw.Row(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Text('    *: ', style: styleSmall),
+                    pw.SizedBox(
+                        width: footnoteWidth,
+                        child: pw.Text(singleBilledTpNote2,
+                            maxLines: 2,
+                            style: styleSmall.copyWith(
+                                fontStyle: pw.FontStyle.italic))),
+                  ]),
+            ),
+          if (singleBilledTptRateNote.isNotEmpty)
+            pw.Padding(
+              padding: const pw.EdgeInsets.only(top: 2),
+              child: pw.Row(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Text('  **: ', style: styleSmall),
+                    pw.SizedBox(
+                        width: footnoteWidth,
+                        child: pw.Text(singleBilledTptRateNote,
+                            maxLines: 2,
+                            style: styleSmall.copyWith(
+                                fontStyle: pw.FontStyle.italic))),
+                  ]),
+            ),
+          if (singleBilledTptCycleNote.isNotEmpty)
+            pw.Padding(
+              padding: const pw.EdgeInsets.only(top: 2),
+              child: pw.Row(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Text('***: ', style: styleSmall),
+                    pw.SizedBox(
+                        width: footnoteWidth,
+                        child: pw.Text(singleBilledTptCycleNote,
+                            maxLines: 2,
+                            style: styleSmall.copyWith(
+                                fontStyle: pw.FontStyle.italic))),
+                  ]),
+            ),
+        ]);
   }
 
   pw.Widget _getTypeRow2(int codePoint, String typeStr, String typeUnit,
