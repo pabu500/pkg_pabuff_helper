@@ -384,7 +384,7 @@ class _WgtTenantMeterGroupAssignmentState
       listHeight = (_scopeMismatchItemList ?? []).length * 70.0;
     }
     return Container(
-      height: listHeight + 80,
+      height: listHeight + 85,
       decoration: BoxDecoration(
         border: Border.all(color: Theme.of(context).hintColor.withAlpha(50)),
         borderRadius: BorderRadius.circular(5),
@@ -417,15 +417,20 @@ class _WgtTenantMeterGroupAssignmentState
     }
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(color: Theme.of(context).colorScheme.error),
+        border:
+            Border.all(color: Theme.of(context).colorScheme.error, width: 5),
         borderRadius: BorderRadius.circular(5),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
       child: Column(
         children: [
-          const Text(
-              'This following list contains the meter group(s) with mismatched scope to the tenant'),
-          const Text('Clear this scope mismatch list before assignment op'),
+          Text(
+              'The following list contains the meter group(s) with mismatched scope to the tenant',
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.error, fontSize: 18)),
+          Text('Clear this scope mismatch list before assignment op',
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.error, fontSize: 18)),
           verticalSpaceSmall,
           SizedBox(
             height: listHeight,
