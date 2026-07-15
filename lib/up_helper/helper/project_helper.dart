@@ -26,6 +26,11 @@ enum SiteScope {
   NUS_RVRC,
   NUS_UTOWN,
   NUS_VH,
+  NUS_EH,
+  NUS_TH,
+  NUS_SH,
+  NUS_KRH,
+  NUS_KE7H,
   SUTD_CAMPUS,
   NTU_MR,
   NONE,
@@ -43,7 +48,7 @@ enum SiteScope {
 
   GI_DE_DEMO,
 
-  ZSP,
+  // ZSP,
 }
 
 const evs2Projects = [
@@ -51,7 +56,7 @@ const evs2Projects = [
   ProjectScope.EVS2_SUTD,
   ProjectScope.EVS2_NTU,
   ProjectScope.EVS2_PA,
-  ProjectScope.EVS2_ZSP,
+  // ProjectScope.EVS2_ZSP,
   ProjectScope.SG_ALL,
   ProjectScope.NONE,
 ];
@@ -67,11 +72,16 @@ const evs2Sites = [
   SiteScope.NUS_RVRC,
   SiteScope.NUS_UTOWN,
   SiteScope.NUS_VH,
+  SiteScope.NUS_EH,
+  SiteScope.NUS_TH,
+  SiteScope.NUS_SH,
+  SiteScope.NUS_KRH,
+  SiteScope.NUS_KE7H,
   SiteScope.SUTD_CAMPUS,
   SiteScope.NTU_MR,
   SiteScope.SG_ALL,
   SiteScope.PA_ATP,
-  SiteScope.ZSP,
+  // SiteScope.ZSP,
   SiteScope.NONE,
 ];
 
@@ -158,6 +168,11 @@ final scopeProfiles = [
       SiteScope.NUS_RVRC,
       SiteScope.NUS_UTOWN,
       SiteScope.NUS_VH,
+      SiteScope.NUS_EH,
+      SiteScope.NUS_TH,
+      SiteScope.NUS_SH,
+      SiteScope.NUS_KRH,
+      SiteScope.NUS_KE7H,
       SiteScope.SUTD_CAMPUS,
       SiteScope.NTU_MR,
     ],
@@ -187,6 +202,11 @@ final scopeProfiles = [
       SiteScope.NUS_RVRC,
       SiteScope.NUS_UTOWN,
       SiteScope.NUS_VH,
+      SiteScope.NUS_EH,
+      SiteScope.NUS_TH,
+      SiteScope.NUS_SH,
+      SiteScope.NUS_KRH,
+      SiteScope.NUS_KE7H,
     ],
     'timezone': 8,
     'currency': 'SGD',
@@ -364,19 +384,19 @@ final scopeProfiles = [
       'appId': '1:949621989494:web:2e67a89ce429494f043f57',
     },
   },
-  {
-    'project_scope': ProjectScope.EVS2_ZSP,
-    'meter_type': ItemType.meter,
-    'project_sites': [
-      {
-        'key': SiteScope.ZSP,
-        'name': 'ZSP',
-        'color': AppColors.contentColorCyan,
-      },
-    ],
-    'timezone': 8,
-    'currency': 'SGD',
-  }
+  // {
+  //   'project_scope': ProjectScope.EVS2_ZSP,
+  //   'meter_type': ItemType.meter,
+  //   'project_sites': [
+  //     {
+  //       'key': SiteScope.ZSP,
+  //       'name': 'ZSP',
+  //       'color': AppColors.contentColorCyan,
+  //     },
+  //   ],
+  //   'timezone': 8,
+  //   'currency': 'SGD',
+  // }
 ];
 
 String? mmsSnValidator(value) {
@@ -573,8 +593,8 @@ String? getSiteDisplayString(SiteScope? site) {
       return 'BTC';
     case SiteScope.CW_NUS_UTOWN:
       return 'UTown';
-    case SiteScope.ZSP:
-      return 'ZSP';
+    // case SiteScope.ZSP:
+    //   return 'ZSP';
     default:
       return 'NONE';
   }
@@ -710,8 +730,8 @@ AclScope getAclProjectScope(ProjectScope? evs2project) {
       return AclScope.project_ems_smrt;
     case ProjectScope.EMS_CW_NUS:
       return AclScope.project_ems_cw_nus;
-    case ProjectScope.EVS2_ZSP:
-      return AclScope.project_evs2_zsp;
+    // case ProjectScope.EVS2_ZSP:
+    //   return AclScope.project_evs2_zsp;
     default:
       return AclScope.self;
   }
@@ -731,6 +751,16 @@ AclScope getAclSiteScope(SiteScope? siteScope) {
       return AclScope.site_nus_utown;
     case SiteScope.NUS_VH:
       return AclScope.site_nus_vh;
+    case SiteScope.NUS_EH:
+      return AclScope.site_nus_eh;
+    case SiteScope.NUS_TH:
+      return AclScope.site_nus_th;
+    case SiteScope.NUS_SH:
+      return AclScope.site_nus_sh;
+    case SiteScope.NUS_KRH:
+      return AclScope.site_nus_krh;
+    case SiteScope.NUS_KE7H:
+      return AclScope.site_nus_ke7h;
     case SiteScope.SUTD_CAMPUS:
       return AclScope.site_sutd_campus;
     case SiteScope.NTU_MR:
