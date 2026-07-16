@@ -194,18 +194,21 @@ enum PagPaymentMethod {
 }
 
 String? validateTenantName(String value) {
-  if (value.trim().isEmpty) {
+  final trimmedValue = value.trim();
+
+  if (trimmedValue.isEmpty) {
     return 'required';
   }
-  // must be in aaa-bb-123456-123 format,
-  // where a is alphanumeric is between 3-21 char
-  // b is alphanumeric is with 1-8 char
 
-  String pattern = r'^[a-zA-Z0-9&]{3,21}-[a-zA-Z0-9]{1,8}-\d{6}-\d{3,5}$';
-  RegExp regExp = RegExp(pattern);
-  if (!regExp.hasMatch(value)) {
-    return 'invalid format, must be in aaa-bb-123456-123 format';
+  // Format: aa-bb-123456-123 or aaa-bb-123456-123
+  // First segment: 2–21 alphanumeric or '&' characters
+  // Second segment: 1–8 alphanumeric characters
+  const pattern = r'^[a-zA-Z0-9&]{2,21}-[a-zA-Z0-9]{1,8}-\d{6}-\d{3,5}$';
+
+  if (!RegExp(pattern).hasMatch(trimmedValue)) {
+    return 'invalid format, must be in aa-bb-123456-123 format';
   }
+
   return null;
 }
 
