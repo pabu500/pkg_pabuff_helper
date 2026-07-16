@@ -1229,6 +1229,8 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
         break;
       case PagItemKind.meterGroup:
         break;
+      case PagItemKind.role:
+        break;
       default:
         if (_selectedLocation == null) {
           enableCommit = false;
