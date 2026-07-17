@@ -88,7 +88,7 @@ class _WgtTenantMeterGroupAssignmentState
 
     _isFetching = true;
     try {
-      final data = await doGetScopeMeterGroupList(
+      final result = await doGetScopeMeterGroupList(
         widget.appConfig,
         queryMap,
         MdlPagSvcClaim(
@@ -100,7 +100,7 @@ class _WgtTenantMeterGroupAssignmentState
         ),
       );
       final itemGroupScopeItemAssignment =
-          data['item_group_scope_item_assignment'];
+          result['item_group_scope_item_assignment'];
       if (itemGroupScopeItemAssignment == null ||
           itemGroupScopeItemAssignment.isEmpty) {
         throw Exception('No item found for this item group');
@@ -687,26 +687,27 @@ class _WgtTenantMeterGroupAssignmentState
     String tenantLabel = itemInfo['tenant_label'] ?? '-';
     String? tenantLcStatus = itemInfo['tenant_lc_status'];
 
-    String? mgScopeLocationId = itemInfo['mg_scope_location_id'];
-    String? mgScopeLocationName = itemInfo['mg_scope_location_name'];
-    String? mgScopeLocationLabel = itemInfo['mg_scope_location_label'];
+    String? itemScopeLocationId = itemInfo['mg_scope_location_id'];
+    String? itemScopeLocationName = itemInfo['mg_scope_location_name'];
+    String? itemScopeLocationLabel = itemInfo['mg_scope_location_label'];
 
-    String? mgScopeLocationGroupId = itemInfo['mg_scope_location_group_id'];
-    String? mgScopeLocationGroupName = itemInfo['mg_scope_location_group_name'];
-    String? mgScopeLocationGroupLabel =
+    String? itemScopeLocationGroupId = itemInfo['mg_scope_location_group_id'];
+    String? itemScopeLocationGroupName =
+        itemInfo['mg_scope_location_group_name'];
+    String? itemScopeLocationGroupLabel =
         itemInfo['mg_scope_location_group_label'];
 
-    String? mgScopeBuildingId = itemInfo['mg_scope_building_id'];
-    String? mgScopeBuildingName = itemInfo['mg_scope_building_name'];
-    String? mgScopeBuildingLabel = itemInfo['mg_scope_building_label'];
+    String? itemScopeBuildingId = itemInfo['mg_scope_building_id'];
+    String? itemScopeBuildingName = itemInfo['mg_scope_building_name'];
+    String? itemScopeBuildingLabel = itemInfo['mg_scope_building_label'];
 
-    String? mgScopeSiteId = itemInfo['mg_scope_site_id'];
-    String? mgScopeSiteName = itemInfo['mg_scope_site_name'];
-    String? mgScopeSiteLabel = itemInfo['mg_scope_site_label'];
+    String? itemScopeSiteId = itemInfo['mg_scope_site_id'];
+    String? itemScopeSiteName = itemInfo['mg_scope_site_name'];
+    String? itemScopeSiteLabel = itemInfo['mg_scope_site_label'];
 
-    String? mgScopeSiteGroupId = itemInfo['mg_scope_site_group_id'];
-    String? mgScopeSiteGroupName = itemInfo['mg_scope_site_group_name'];
-    String? mgScopeSiteGroupLabel = itemInfo['mg_scope_site_group_label'];
+    String? itemScopeSiteGroupId = itemInfo['mg_scope_site_group_id'];
+    String? itemScopeSiteGroupName = itemInfo['mg_scope_site_group_name'];
+    String? itemScopeSiteGroupLabel = itemInfo['mg_scope_site_group_label'];
 
     PagTenantLcStatus? tenantLcStatusEnum =
         PagTenantLcStatus.byValue(tenantLcStatus);
@@ -745,28 +746,28 @@ class _WgtTenantMeterGroupAssignmentState
 
     bool isNonScopeMatching = itemInfo['non_scope_matching'] == 'true';
 
-    Map<String, dynamic> mgScopeInfo = {
-      'location_id': mgScopeLocationId,
-      'location_name': mgScopeLocationName,
-      'location_label': mgScopeLocationLabel,
-      'location_group_id': mgScopeLocationGroupId,
-      'location_group_name': mgScopeLocationGroupName,
-      'location_group_label': mgScopeLocationGroupLabel,
-      'building_id': mgScopeBuildingId,
-      'building_name': mgScopeBuildingName,
-      'building_label': mgScopeBuildingLabel,
-      'site_id': mgScopeSiteId,
-      'site_name': mgScopeSiteName,
-      'site_label': mgScopeSiteLabel,
-      'site_group_id': mgScopeSiteGroupId,
-      'site_group_name': mgScopeSiteGroupName,
-      'site_group_label': mgScopeSiteGroupLabel,
+    Map<String, dynamic> itemScopeInfo = {
+      'location_id': itemScopeLocationId,
+      'location_name': itemScopeLocationName,
+      'location_label': itemScopeLocationLabel,
+      'location_group_id': itemScopeLocationGroupId,
+      'location_group_name': itemScopeLocationGroupName,
+      'location_group_label': itemScopeLocationGroupLabel,
+      'building_id': itemScopeBuildingId,
+      'building_name': itemScopeBuildingName,
+      'building_label': itemScopeBuildingLabel,
+      'site_id': itemScopeSiteId,
+      'site_name': itemScopeSiteName,
+      'site_label': itemScopeSiteLabel,
+      'site_group_id': itemScopeSiteGroupId,
+      'site_group_name': itemScopeSiteGroupName,
+      'site_group_label': itemScopeSiteGroupLabel,
       'project_id': itemInfo['project_id'],
       'project_name': itemInfo['project_name'],
     };
     MdlPagScope? itemScope;
     // if (isNonScopeMatching) {
-    itemScope = MdlPagScope.fromJson(mgScopeInfo);
+    itemScope = MdlPagScope.fromJson(itemScopeInfo);
     // }
 
     return Column(
@@ -785,7 +786,6 @@ class _WgtTenantMeterGroupAssignmentState
                 ),
               ),
             ),
-
             horizontalSpaceSmall,
             Tooltip(
               message: 'Show/Hide Scope',
@@ -847,21 +847,6 @@ class _WgtTenantMeterGroupAssignmentState
                       },
               ),
             ),
-            // SizedBox(
-            //   width: 25,
-            //   child: isNonScopeMatching
-            //       ? Tooltip(
-            //           message:
-            //               'This meter group is assigned to this tenant but does not match the item group scope',
-            //           child: Icon(
-            //             Symbols.warning,
-            //             color: Theme.of(context).colorScheme.error,
-            //             size: 21,
-            //           ),
-            //         )
-            //       : null,
-            // ),
-            // button to show/hide scope label
           ],
         ),
         // if (isNonScopeMatching || (checked && !disabled))

@@ -60,6 +60,7 @@ class _WgtEmsMeterGroupAssignmentState
   bool _isScopeMatchingListFetching = false;
   bool _isScopeMathingItemListFetched = false;
   bool _modified = false;
+  String _fetchErrorText = '';
 
   bool _isCommitting = false;
   bool _isCommitted = false;
@@ -67,6 +68,7 @@ class _WgtEmsMeterGroupAssignmentState
 
   List<Map<String, dynamic>>? _itemGroupScopeMatchingItemList;
   // List<Map<String, dynamic>>? _itemGroupItemList;
+  List<Map<String, dynamic>>? _scopeMismatchItemList;
 
   // String? _selectedMeterIndexStr;
   bool _isFetchingAllAssignmentInfo = false;
@@ -106,10 +108,16 @@ class _WgtEmsMeterGroupAssignmentState
       if (itemGroupScopeMatchingItemList == null) {
         throw Exception('item_group_scope_matching_item_list is null');
       }
+      final scopeMismatchItemList = result['scope_mismatch_item_list'];
+      if (scopeMismatchItemList == null) {
+        throw Exception('scope_mismatch_item_list is null');
+      }
       _itemGroupScopeMatchingItemList = List<Map<String, dynamic>>.from(
         itemGroupScopeMatchingItemList,
       );
-      // _itemGroupItemList = List<Map<String, dynamic>>.from(itemGroupItemList);
+      _scopeMismatchItemList =
+          List<Map<String, dynamic>>.from(scopeMismatchItemList);
+
       // sort by label
       _itemGroupScopeMatchingItemList!.sort((a, b) {
         String labelA = a['label'] ?? '';
@@ -124,7 +132,8 @@ class _WgtEmsMeterGroupAssignmentState
       }
     } catch (e) {
       dev.log(e.toString());
-
+      _fetchErrorText =
+          getErrorText(e, defaultErrorText: 'Error fetching item group data');
       rethrow;
     } finally {
       setState(() {
@@ -185,6 +194,12 @@ class _WgtEmsMeterGroupAssignmentState
             .where((item) => item['assignment_new'] != null)
             // .where((item) => item['percentage_new'] != item['percentage'])
             .toList();
+    if ((_scopeMismatchItemList ?? []).isNotEmpty) {
+      assignmentList.clear();
+      assignmentList.addAll(_scopeMismatchItemList!
+          .where((item) => item['assignment_new'] != null)
+          .toList());
+    }
     Map<String, dynamic> queryMap = {
       'scope': loggedInUser!.selectedScope.toScopeMap(),
       'item_group_id': widget.itemGroupIndexStr,
@@ -208,7 +223,7 @@ class _WgtEmsMeterGroupAssignmentState
       // clear assginment info from the item list
       for (Map<String, dynamic> itemInfo in _itemGroupScopeMatchingItemList!) {
         itemInfo.remove('assignment');
-        itemInfo.remove('assigned_new');
+        itemInfo.remove('assignment_new');
         itemInfo.remove('is_fetching');
         itemInfo.remove('info_fetched');
       }
@@ -231,16 +246,24 @@ class _WgtEmsMeterGroupAssignmentState
 
   bool _checkModified() {
     bool modified = false;
-    for (Map<String, dynamic> item in _itemGroupScopeMatchingItemList ?? []) {
-      // if (item['percentage_new'] != null) {
-      //   if (item['percentage'] != item['percentage_new']) {
-      //     modified = true;
-      //     break;
-      //   }
-      // }
-      if (item['assignment_new'] != null) {
-        modified = true;
-        break;
+    if ((_scopeMismatchItemList ?? []).isNotEmpty) {
+      for (Map<String, dynamic> item in _scopeMismatchItemList!) {
+        if (item['assignment_new'] != null) {
+          String percentageNew = item['assignment_new']?['percentage'] ?? '';
+          if (percentageNew.isNotEmpty) {
+            modified = true;
+            break;
+          }
+        }
+      }
+    } else {
+      for (Map<String, dynamic> item in _itemGroupScopeMatchingItemList ?? []) {
+        if (item['assignment_new'] != null) {
+          if (item['assigned'] != item['assigned_new']) {
+            modified = true;
+            break;
+          }
+        }
       }
     }
     setState(() {
@@ -382,6 +405,12 @@ class _WgtEmsMeterGroupAssignmentState
     if (!_isScopeMathingItemListFetched) {
       fetchData = true;
     }
+    if (_fetchErrorText.isNotEmpty) {
+      return getErrorTextPrompt(
+        context: context,
+        errorText: _fetchErrorText,
+      );
+    }
     return fetchData
         ? FutureBuilder(
             future: _doAutoPopulate(),
@@ -405,15 +434,77 @@ class _WgtEmsMeterGroupAssignmentState
   }
 
   Widget completedWidget() {
+    double listHeight = 500;
+    if (_scopeMismatchItemList?.isNotEmpty ?? false) {
+      listHeight = (_scopeMismatchItemList ?? []).length * 120.0;
+    }
     return Container(
-      height: 500,
-      // width: 500,
+      height: listHeight + 150,
       decoration: BoxDecoration(
         border: Border.all(color: Theme.of(context).hintColor.withAlpha(50)),
         borderRadius: BorderRadius.circular(5),
       ),
       margin: const EdgeInsets.symmetric(horizontal: 5),
-      child: getScopeItemList(),
+      child: (_scopeMismatchItemList ?? []).isNotEmpty
+          ?
+          // resolve scope mismatch item list
+          getScopeMismatchItemList(listHeight)
+          : getScopeItemList(),
+    );
+  }
+
+  Widget getScopeMismatchItemList(double listHeight) {
+    List<Widget> itemWidgetList = [];
+    int index = 0;
+
+    for (Map<String, dynamic> itemInfo in (_scopeMismatchItemList ?? [])) {
+      itemWidgetList.add(
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 3),
+          child: WgtMeterGroupAssignmentItem(
+            key: _mgAssignmentItemKey,
+            appConfig: widget.appConfig,
+            loggedInUser: loggedInUser!,
+            itemInfo: itemInfo,
+            itemGroupIndexStr: widget.itemGroupIndexStr,
+            getMeterAssignment: _getMeterAssignment,
+            onModified: () {
+              _checkModified();
+            },
+          ),
+        ),
+      );
+    }
+    return Container(
+      decoration: BoxDecoration(
+        border:
+            Border.all(color: Theme.of(context).colorScheme.error, width: 5),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      child: Column(
+        children: [
+          Text(
+              'The following list contains the meter(s) with mismatched scope to the meter group',
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.error, fontSize: 18)),
+          Text('Clear this scope mismatch list before assignment op',
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.error, fontSize: 18)),
+          verticalSpaceSmall,
+          SizedBox(
+            height: listHeight,
+            child: ListView.builder(
+              // shrinkWrap: true,
+              // itemExtent: 35,
+              itemCount: itemWidgetList.length,
+              itemBuilder: (context, index) {
+                return itemWidgetList[index];
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -446,7 +537,9 @@ class _WgtEmsMeterGroupAssignmentState
               color: Theme.of(context).colorScheme.onSecondary,
               fontSize: 15,
             ),
-            onPressed: _isAllAssignmentInfoFetched || tooManyRows
+            onPressed: (_itemGroupScopeMatchingItemList ?? []).isEmpty ||
+                    _isAllAssignmentInfoFetched ||
+                    tooManyRows
                 ? null
                 : () async {
                     await _checkAllAssignments();
@@ -483,7 +576,8 @@ class _WgtEmsMeterGroupAssignmentState
           onTap: !_modified ||
                   _isCommitting ||
                   _isCommitted ||
-                  (_itemGroupScopeMatchingItemList ?? []).isEmpty
+                  ((_scopeMismatchItemList ?? []).isEmpty &&
+                      (_itemGroupScopeMatchingItemList ?? []).isEmpty)
               ? null
               : () async {
                   await _doCommit();

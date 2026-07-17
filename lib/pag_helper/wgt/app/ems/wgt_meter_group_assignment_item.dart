@@ -6,9 +6,11 @@ import '../../../../xt_ui/wdgt/wgt_pag_wait.dart';
 import '../../../../xt_ui/xt_helpers.dart';
 import '../../../def_helper/dh_device.dart';
 import '../../../def_helper/dh_pag_tenant.dart';
+import '../../../def_helper/dh_scope.dart';
 import '../../../def_helper/pag_item_helper.dart';
 import '../../../model/mdl_pag_app_config.dart';
 import '../../../model/mdl_pag_user.dart';
+import '../../../model/scope/mdl_pag_scope.dart';
 import '../../wgt_comm_button.dart';
 import '../ems/wgt_meter_assignment_op.dart';
 
@@ -43,6 +45,10 @@ class _WgtMeterGroupAssignmentItemState
   bool _isComm = false;
   bool _isEnabled = false;
 
+  bool _showScope = false;
+
+  MdlPagScope? _itemScope;
+
   void _refresh(bool isComm, bool isEnabled) {
     if (!mounted) {
       return;
@@ -58,6 +64,49 @@ class _WgtMeterGroupAssignmentItemState
   void initState() {
     super.initState();
     widget.regFresh?.call(_refresh);
+
+    String? itemLocationId = widget.itemInfo['item_location_id'];
+    String? itemLocationName = widget.itemInfo['item_location_name'];
+    String? itemLocationLabel = widget.itemInfo['item_location_label'];
+
+    String? itemLocationGroupId = widget.itemInfo['item_location_group_id'];
+    String? itemLocationGroupName = widget.itemInfo['item_location_group_name'];
+    String? itemLocationGroupLabel =
+        widget.itemInfo['item_location_group_label'];
+
+    String? itemBuildingId = widget.itemInfo['item_building_id'];
+    String? itemBuildingName = widget.itemInfo['item_building_name'];
+    String? itemBuildingLabel = widget.itemInfo['item_building_label'];
+
+    String? itemSiteId = widget.itemInfo['item_site_id'];
+    String? itemSiteName = widget.itemInfo['item_site_name'];
+    String? itemSiteLabel = widget.itemInfo['item_site_label'];
+
+    String? itemSiteGroupId = widget.itemInfo['item_site_group_id'];
+    String? itemSiteGroupName = widget.itemInfo['item_site_group_name'];
+    String? itemSiteGroupLabel = widget.itemInfo['item_site_group_label'];
+
+    Map<String, dynamic> itemScopeInfo = {
+      'location_id': itemLocationId,
+      'location_name': itemLocationName,
+      'location_label': itemLocationLabel,
+      'location_group_id': itemLocationGroupId,
+      'location_group_name': itemLocationGroupName,
+      'location_group_label': itemLocationGroupLabel,
+      'building_id': itemBuildingId,
+      'building_name': itemBuildingName,
+      'building_label': itemBuildingLabel,
+      'site_id': itemSiteId,
+      'site_name': itemSiteName,
+      'site_label': itemSiteLabel,
+      'site_group_id': itemSiteGroupId,
+      'site_group_name': itemSiteGroupName,
+      'site_group_label': itemSiteGroupLabel,
+      'project_id': widget.itemInfo['project_id'],
+      'project_name': widget.itemInfo['project_name'],
+    };
+    _itemScope = MdlPagScope.fromJson(itemScopeInfo);
+    assert(_itemScope != null, 'Failed to create scope from item info');
   }
 
   @override
@@ -95,6 +144,21 @@ class _WgtMeterGroupAssignmentItemState
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Tooltip(
+              message: 'Show/Hide Scope',
+              waitDuration: const Duration(milliseconds: 500),
+              child: InkWell(
+                onTap: () {
+                  setState(() {
+                    _showScope = !_showScope;
+                  });
+                },
+                child: Icon(
+                  _showScope ? Symbols.expand_less : Symbols.expand_more,
+                  color: Theme.of(context).hintColor,
+                ),
+              ),
+            ),
             SizedBox(
               width: 30,
               child: Align(
@@ -142,6 +206,15 @@ class _WgtMeterGroupAssignmentItemState
             getAssignmentBox(itemInfo),
           ],
         ),
+        if (_showScope && _itemScope != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 3, bottom: 5),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [getScopeLabel(context, _itemScope!)],
+            ),
+          ),
         if (true) getAssignmentMap(itemInfo),
       ],
     );
