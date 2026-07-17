@@ -93,8 +93,8 @@ String? validateEnabled(String? value) {
   if (value == null || value.isEmpty) {
     return 'required';
   }
-  if (value != 'yes' && value != 'no') {
-    return 'must be either yes or no';
+  if (value != 'true' && value != 'false') {
+    return 'must be either true or false';
   }
   return null;
 }
