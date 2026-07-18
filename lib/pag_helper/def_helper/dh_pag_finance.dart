@@ -507,7 +507,7 @@ String? Function(String) getFinanceValidator(String key, dynamic itemType,
     case PagFinanceType.paymentApply:
       return getPaymentApplyValidator(key, isValueRequired: isValueRequired);
     default:
-      dev.log('No validator found for user key: $key');
+      dev.log('No validator found for key: $key');
       return (String? value) {
         return null;
       };

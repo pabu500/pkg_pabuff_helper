@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/xt_ui/wdgt/input/wgt_text_field2.dart';
 import 'package:flutter/material.dart';
@@ -130,6 +132,8 @@ class _WgtPagFinderFieldInputState extends State<WgtPagFinderFieldInput> {
                 }
               },
               onEditingComplete: () async {
+                dev.log(
+                    'onEditingComplete: value: ${_controller.text}, _value: $_value');
                 if (_controller.text == _value) {
                   return;
                 }

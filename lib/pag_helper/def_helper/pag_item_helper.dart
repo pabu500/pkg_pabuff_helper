@@ -127,6 +127,8 @@ String? Function(String) getValidator(PagItemKind itemKind, String key,
   switch (itemKind) {
     case PagItemKind.user:
       return getUserValidator(key, isValueRequired: isValueRequired);
+    case PagItemKind.tenant:
+      return getTenantValidator(key, isValueRequired: isValueRequired);
     case PagItemKind.finance:
       return getFinanceValidator(key, itemType,
           isValueRequired: isValueRequired);

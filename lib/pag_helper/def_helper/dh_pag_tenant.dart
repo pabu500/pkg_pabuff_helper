@@ -1,3 +1,5 @@
+import 'dart:developer' as dev show log;
+
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:buff_helper/xt_ui/util/xt_util_InputFieldValidator.dart';
 import 'package:flutter/material.dart';
@@ -65,16 +67,6 @@ enum PagTenantLcStatus {
     );
   }
 }
-
-// T? enumByTag<T extends Enum>(String? tag, List<T> values) {
-//   if (tag == null) return null;
-//   for (var value in values) {
-//     if (value is PagTenantLcStatus && value.tag.replaceAll('.', '') == tag) {
-//       return value as T;
-//     }
-//   }
-//   return null;
-// }
 
 enum PagTenantUnitType {
   beautyWellness(
@@ -284,7 +276,7 @@ String? validateCompanyTradingName(String value) {
   return null;
 }
 
-String? validateBillingAddress(String value) {
+String? validateBillingAddressRequired(String value) {
   if (value.trim().isEmpty) {
     return 'required';
   }
@@ -298,13 +290,16 @@ String? validateBillingAddress(String value) {
   return null;
 }
 
-String? validateBillingAddressLine1(String value) {
-  // if (value.trim().isEmpty) {
-  //   return 'required';
-  // }
+String? validateBillingAddress(String value) {
   if (value.trim().isEmpty) {
-    // return 'required';
     return null;
+  }
+  return validateBillingAddressRequired(value);
+}
+
+String? validateBillingAddressLine1(String value) {
+  if (value.trim().isEmpty) {
+    return 'required';
   }
   //length 5-255, alphanumeric, space, /, ', -,  #, @ only
   String pattern = r"^[-a-zA-Z0-9 .,/'#&@]{5,255}$";
@@ -317,8 +312,7 @@ String? validateBillingAddressLine1(String value) {
 
 String? validateBillingAddressLine2(String value) {
   if (value.trim().isEmpty) {
-    // return 'required';
-    return null;
+    return 'required';
   }
   //length 5-255, alphanumeric, space, /, ', -, @, #,() only
   String pattern = r"^[-a-zA-Z0-9 ./'#@&()]{5,255}$";
@@ -331,8 +325,7 @@ String? validateBillingAddressLine2(String value) {
 
 String? validateBillingAddressLine3(String value) {
   if (value.trim().isEmpty) {
-    // return 'required';
-    return null;
+    return 'required';
   }
   //length 5-21, alphanumeric, space, /, ', -, # only
   String pattern = r"^[-a-zA-Z0-9 ./'#&]{5,21}$";
@@ -345,8 +338,7 @@ String? validateBillingAddressLine3(String value) {
 
 String? validateBankAccountNumber(String value) {
   if (value.trim().isEmpty) {
-    // return 'required';
-    return null;
+    return 'required';
   }
 
   // validate number, letter, underscore, and dash,
@@ -358,19 +350,6 @@ String? validateBankAccountNumber(String value) {
   }
   return null;
 }
-
-// String? validatePaymentAmount(String value) {
-//   if (value.isEmpty) {
-//     return 'Payment amount is required';
-//   }
-//   // Add more validation logic if needed
-//   // numeric, 0 to 1 billion, up to 2 decimal places
-//   final RegExp numeric = RegExp(r'^\d{1,9}(\.\d{0,2})?$');
-//   if (!numeric.hasMatch(value)) {
-//     return 'Invalid payment amount format';
-//   }
-//   return null;
-// }
 
 String? validatePaymentAmount(String value) {
   if (value.isEmpty) {
@@ -436,38 +415,19 @@ String? validateCreditTerm(String value) {
 
 String? validateGfa(String value) {
   if (value.isEmpty) {
-    // return 'GFA is required';
-    return null;
+    return 'required';
   }
   // numeric, 0 to 1 billion, up to 2 decimal places
   final RegExp numeric = RegExp(r'^\d{1,9}(\.\d{0,2})?$');
   if (!numeric.hasMatch(value)) {
     return 'Invalid GFA format';
   }
-  return '';
+  return null;
 }
 
-// String? validateLabel(String value) {
-//   if (value.trim().isEmpty) {
-//     return 'required';
-//   }
-
-//   // validate number, letter, underscore, and dash, space,
-//   // and minimum 5 characters
-//   String pattern = r'^[a-zA-Z0-9_ -]{5,}$';
-//   RegExp regExp = RegExp(pattern);
-//   if (!regExp.hasMatch(value)) {
-//     return 'min length is 5 and letter, number, space, _, - only';
-//   }
-//   return null;
-// }
-
 String? validateTenantAccountNumber(String value) {
-  // if (value.trim().isEmpty) {
-  //   return 'required';
-  // }
   if (value.trim().isEmpty) {
-    return null;
+    return 'required';
   }
   // validate number, letter, underscore, and dash,
   // and minimum 5 characters
@@ -522,7 +482,7 @@ String? validateDepositAmount(String value) {
   return null;
 }
 
-String? validateFloorArea(String value) {
+String? validateFloorAreaRequired(String value) {
   double max = 1000000;
   if (value.trim().isEmpty) {
     return 'required';
@@ -537,6 +497,13 @@ String? validateFloorArea(String value) {
     return 'must be between 1 and $max';
   }
   return null;
+}
+
+String? validateFloorArea(String value) {
+  if (value.trim().isEmpty) {
+    return null;
+  }
+  return validateFloorAreaRequired(value);
 }
 
 String? validateBillingContactEmail(String value) {
@@ -701,8 +668,7 @@ String? validateLastReadingValue(String value) {
 
 String? validateBillingDid(String value) {
   if (value.trim().isEmpty) {
-    // return 'required';
-    return null;
+    return 'required';
   }
   return validatePhone(value);
 }
@@ -749,10 +715,29 @@ String? validateInitialBalance(String value) {
 // }
 
 enum PagTenantOpType {
-  onboarding,
-  mgAssign1on1,
-  update,
-  none,
+  onboarding('Onboarding', 'onb', 'onb'),
+  mgAssign1on1('MG Assignment 1on1', 'mg1', 'mg1'),
+  update('Update', 'update', 'upd'),
+  none('None', 'none', 'none');
+
+  final String label;
+  final String value;
+  final String tag;
+
+  const PagTenantOpType(
+    this.label,
+    this.value, // the value that is stored in the database
+    this.tag,
+  );
+
+  static PagTenantOpType? byLabel(String? label) =>
+      enumByLabel(label, values, (e) => (e).label) ?? none;
+
+  static PagTenantOpType byValue(String? value) =>
+      enumByValue(value, values, (e) => (e).value) ?? none;
+
+  static PagTenantOpType byTag(String? tag) =>
+      enumByTag(tag, values, (e) => (e).tag) ?? none;
 }
 
 /*
@@ -1152,4 +1137,79 @@ Widget getTenantLcStatusTagWidget(
           ),
     ),
   );
+}
+
+String? Function(String) getTenantValidator(String key,
+    {bool isValueRequired = true}) {
+  switch (key) {
+    case 'label':
+      return validateTenantLabel;
+    case 'displayname':
+      return validateDisplayName;
+    case 'company_trading_name':
+      return validateCompanyTradingName;
+    case 'billing_address':
+      return validateBillingAddress;
+    case 'billing_address_line_1':
+      return validateBillingAddressLine1;
+    case 'billing_address_line_2':
+      return validateBillingAddressLine2;
+    case 'billing_address_line_3':
+      return validateBillingAddressLine3;
+    case 'account_number':
+      return isValueRequired
+          ? validateTenantAccountNumber2
+          : validateTenantAccountNumberNotRequired;
+    case 'giro_account_number':
+      return validateBankAccountNumber;
+    case 'billing_contact_name':
+      return validateBillingContactName;
+    case 'billing_email_1':
+      return validateEmail;
+    case 'billing_email_2':
+      return validateOptionalEmail;
+    case 'billing_email_3':
+      return validateOptionalEmail;
+    case 'billing_did':
+      return validateBillingDid;
+    case 'payment_method':
+      return validatePaymentMethod;
+    case 'credit_term':
+      return validateCreditTerm;
+    case 'bank_account_number':
+      return validateBankAccountNumber;
+    case 'deposit_amount':
+      return validateDepositAmount;
+    case 'unit_type':
+      return validateUnitType;
+    case 'gfa':
+      return validateGfa;
+    case 'supply_cap_kva':
+      return validateSupplyCapKva;
+    case 'supply_cap_v':
+      return validateSupplyCapV;
+    case 'supply_cap_amp':
+      return validateSupplyCapAmp;
+    case 'requested_turn_on_timestamp':
+      return validateRequestedTurnOnDate;
+    case 'ftf_start_timestamp':
+      return validateFtfStartDate;
+    case 'dda_number':
+      return validateDdaNumber;
+    case 'site_label':
+      return validateLabelScope;
+    case 'building_label':
+      return validateLabelScope;
+    case 'location_label':
+      return validateLabelScope;
+    case 'remark':
+      return validateRemark;
+    case 'initial_balance':
+      return validateInitialBalance;
+    default:
+      dev.log('No validator found for key: $key');
+      return (String? value) {
+        return null;
+      };
+  }
 }

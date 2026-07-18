@@ -8,49 +8,49 @@ import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
 import 'package:buff_helper/pag_helper/model/mdl_svc_query.dart';
 
-Future<dynamic> doPagCreateTenant(
-  MdlPagUser loggedInUser,
-  MdlPagAppConfig appConfig,
-  Map<String, dynamic> queryMap,
-  MdlPagSvcClaim svcClaim,
-) async {
-  svcClaim.svcName = PagSvcType.oresvc2.name;
-  svcClaim.endpoint = PagUrlBase.eptPagCreateTenant;
+// Future<dynamic> doPagCreateTenant(
+//   MdlPagUser loggedInUser,
+//   MdlPagAppConfig appConfig,
+//   Map<String, dynamic> queryMap,
+//   MdlPagSvcClaim svcClaim,
+// ) async {
+//   svcClaim.svcName = PagSvcType.oresvc2.name;
+//   svcClaim.endpoint = PagUrlBase.eptPagCreateTenant;
 
-  String svcToken = '';
-  // try {
-  //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
-  // } catch (err) {
-  //   throw Exception(err);
-  // }
+//   String svcToken = '';
+//   // try {
+//   //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
+//   // } catch (err) {
+//   //   throw Exception(err);
+//   // }
 
-  try {
-    final response = await http.post(
-      Uri.parse(PagUrlController(loggedInUser, appConfig)
-          .getUrl(PagSvcType.oresvc2, svcClaim.endpoint!)),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $svcToken',
-      },
-      body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
-    );
+//   try {
+//     final response = await http.post(
+//       Uri.parse(PagUrlController(loggedInUser, appConfig)
+//           .getUrl(PagSvcType.oresvc2, svcClaim.endpoint!)),
+//       headers: <String, String>{
+//         'Content-Type': 'application/json; charset=UTF-8',
+//         'Authorization': 'Bearer $svcToken',
+//       },
+//       body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
+//     );
 
-    if (response.statusCode == 201) {
-      // If the server did return a 201 CREATED response, parse the JSON.
-      final respJson = jsonDecode(response.body);
-      if (respJson['error'] != null) {
-        throw Exception(respJson['error']['message']);
-      }
-      return respJson;
-    } else {
-      Map<String, dynamic> responseBody = jsonDecode(response.body);
-      throw Exception(
-          responseBody['error']['message'] ?? 'Failed to create tenant');
-    }
-  } catch (err) {
-    throw Exception(err);
-  }
-}
+//     if (response.statusCode == 201) {
+//       // If the server did return a 201 CREATED response, parse the JSON.
+//       final respJson = jsonDecode(response.body);
+//       if (respJson['error'] != null) {
+//         throw Exception(respJson['error']['message']);
+//       }
+//       return respJson;
+//     } else {
+//       Map<String, dynamic> responseBody = jsonDecode(response.body);
+//       throw Exception(
+//           responseBody['error']['message'] ?? 'Failed to create tenant');
+//     }
+//   } catch (err) {
+//     throw Exception(err);
+//   }
+// }
 
 Future<dynamic> doPagOffboardTenant(
   MdlPagUser loggedInUser,

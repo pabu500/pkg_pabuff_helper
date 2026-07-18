@@ -38,9 +38,10 @@ class WgtTextField extends StatefulWidget {
     this.decoration,
     this.isPag = false,
     this.suffix,
-    this.unfocusOnEditingComplete = false,
+    this.unfocusOnEditingComplete = true,
     this.textStyle,
     this.requireUnique = false,
+    this.validateOnChange = false,
   });
 
   final dynamic appConfig;
@@ -75,6 +76,7 @@ class WgtTextField extends StatefulWidget {
   final bool unfocusOnEditingComplete;
   final TextStyle? textStyle;
   final bool requireUnique;
+  final bool validateOnChange;
 
   @override
   State<WgtTextField> createState() => _WgtTextFieldState();
@@ -162,6 +164,23 @@ class _WgtTextFieldState extends State<WgtTextField> {
       canRequestFocus: widget.enabled,
       onFocusChange: (value) {
         if (!value) {
+          if (widget.validator != null) {
+            _isValidated = false;
+            final result = widget.validator?.call(_controller.text);
+            widget.onValidate?.call(result);
+            if (result != null) {
+              setState(() {
+                _isValidated = false;
+                _errorText = result!;
+              });
+              return;
+            } else {
+              setState(() {
+                _isValidated = true;
+                _errorText = '';
+              });
+            }
+          }
           widget.onEditingComplete?.call();
           if (_controller.text.trim().isNotEmpty) {
             if (widget.requireUnique) {
@@ -205,10 +224,34 @@ class _WgtTextFieldState extends State<WgtTextField> {
                   return;
                 }
               }
-              // String? result;
+              if (widget.validateOnChange) {
+                if (widget.validator != null) {
+                  _isValidated = false;
+                  final result = await widget.validator?.call(value);
+                  widget.onValidate?.call(result);
+                  if (result != null) {
+                    setState(() {
+                      _isValidated = false;
+                      _errorText = result!;
+                    });
+                    return;
+                  } else {
+                    setState(() {
+                      _isValidated = true;
+                      _errorText = '';
+                    });
+                  }
+                }
+              }
+
+              widget.onChanged(value);
+            },
+            onEditingComplete: () {
+              dev.log('onEditingComplete: value: ${_controller.text}');
+
               if (widget.validator != null) {
                 _isValidated = false;
-                final result = await widget.validator?.call(value);
+                final result = widget.validator?.call(_controller.text);
                 widget.onValidate?.call(result);
                 if (result != null) {
                   setState(() {
@@ -223,10 +266,6 @@ class _WgtTextFieldState extends State<WgtTextField> {
                   });
                 }
               }
-
-              widget.onChanged(value);
-            },
-            onEditingComplete: () {
               if (!_isValidated) {
                 return;
               }

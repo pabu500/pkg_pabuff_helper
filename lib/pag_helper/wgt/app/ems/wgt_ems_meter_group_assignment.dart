@@ -259,7 +259,7 @@ class _WgtEmsMeterGroupAssignmentState
     } else {
       for (Map<String, dynamic> item in _itemGroupScopeMatchingItemList ?? []) {
         if (item['assignment_new'] != null) {
-          if (item['assigned'] != item['assigned_new']) {
+          if (item['assignment'] != item['assignment_new']) {
             modified = true;
             break;
           }

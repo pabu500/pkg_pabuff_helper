@@ -91,7 +91,9 @@ class MdlListColController {
   List<String>? contextExcludeList;
   List<String>? contextIncludeList;
   List<String>? contextRequiredOnLsList;
-  bool requiredOnOnb;
+  // bool requiredOnOnb;
+  bool requiredOnFormCreate;
+  bool showInputOnFormCreate;
   bool showFilter;
   List<Map<String, dynamic>>? opInfoList;
 
@@ -143,7 +145,9 @@ class MdlListColController {
     this.contextExcludeList,
     this.contextIncludeList,
     this.contextRequiredOnLsList,
-    this.requiredOnOnb = false,
+    // this.requiredOnOnb = false,
+    this.requiredOnFormCreate = false,
+    this.showInputOnFormCreate = false,
     this.showFilter = false,
     this.opInfoList,
   }) {
@@ -398,13 +402,31 @@ class MdlListColController {
       }
     }
 
-    bool requiredOnOnb = false;
-    if (json['required_on_onb'] != null) {
-      dynamic requiredOnOnbValue = json['required_on_onb'];
-      if (requiredOnOnbValue is bool) {
-        requiredOnOnb = requiredOnOnbValue;
-      } else if (requiredOnOnbValue is String) {
-        requiredOnOnb = requiredOnOnbValue.toLowerCase() == 'true';
+    // bool requiredOnOnb = false;
+    // if (json['required_on_onb'] != null) {
+    //   dynamic requiredOnOnbValue = json['required_on_onb'];
+    //   if (requiredOnOnbValue is bool) {
+    //     requiredOnOnb = requiredOnOnbValue;
+    //   } else if (requiredOnOnbValue is String) {
+    //     requiredOnOnb = requiredOnOnbValue.toLowerCase() == 'true';
+    //   }
+    // }
+    bool requiredOnFormCreate = false;
+    bool showInputOnFormCreate = false;
+    if (json['op_info_list'] != null) {
+      final dynamic opInfoListValue = json['op_info_list'];
+      if (opInfoListValue is List) {
+        final List<Map<String, dynamic>> opInfoList =
+            List<Map<String, dynamic>>.from(opInfoListValue);
+        for (final opInfo in opInfoList) {
+          if (opInfo['op'] == 'form_create') {
+            requiredOnFormCreate = opInfo['is_value_required'] == 'true';
+            // when there's opInfo for form_create,
+            // we will show the input on form
+            showInputOnFormCreate = true;
+            break;
+          }
+        }
       }
     }
 
@@ -549,7 +571,9 @@ class MdlListColController {
       contextExcludeList: contextExcludeList,
       contextIncludeList: contextIncludeList,
       contextRequiredOnLsList: contextRequiredOnLsList,
-      requiredOnOnb: requiredOnOnb,
+      // requiredOnOnb: requiredOnOnb,
+      requiredOnFormCreate: requiredOnFormCreate,
+      showInputOnFormCreate: showInputOnFormCreate,
       showFilter: showFilter,
       showTimestampAsDate: showTimestampAsDate,
       rowOrder: rowOrder,
@@ -589,7 +613,9 @@ class MdlListColController {
     data['context_include'] = contextIncludeList;
     data['context_required_on_ls'] = contextRequiredOnLsList;
     data['filter_data_type'] = filterDataType.name;
-    data['required_on_onb'] = requiredOnOnb.toString();
+    // data['required_on_onb'] = requiredOnOnb.toString();
+    data['required_on_form_create'] = requiredOnFormCreate.toString();
+    data['show_input_on_form_create'] = showInputOnFormCreate.toString();
     data['show_filter'] = showFilter.toString();
     data['show_timestamp_as_date'] = showTimestampAsDate.toString();
     data['row_order'] = rowOrder;

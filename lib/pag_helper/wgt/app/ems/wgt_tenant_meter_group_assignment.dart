@@ -14,8 +14,10 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../up_helper/exceptions.dart';
-import '../../../comm/comm_tenant.dart';
+import '../../../comm/comm_ex.dart';
+
 import '../../../comm/comm_tenant_ops.dart';
+import '../../../comm/pag_be_api_base.dart';
 import '../../../def_helper/dh_pag_tenant.dart';
 import '../../../model/mdl_pag_app_config.dart';
 
@@ -88,10 +90,13 @@ class _WgtTenantMeterGroupAssignmentState
 
     _isFetching = true;
     try {
-      final result = await doGetScopeMeterGroupList(
-        widget.appConfig,
-        queryMap,
-        MdlPagSvcClaim(
+      final result = await ex(
+        endpoint: PagUrlBase.eptPagGetTenantScopeMeterGroupList,
+        appConfig: widget.appConfig,
+        crudType: 'read',
+        opStr: 'get tenant scope meter group list',
+        queryMap: queryMap,
+        svcClaim: MdlPagSvcClaim(
           username: loggedInUser!.username,
           userId: loggedInUser!.id,
           scope: '',
@@ -99,20 +104,18 @@ class _WgtTenantMeterGroupAssignmentState
           operation: 'read',
         ),
       );
-      final itemGroupScopeItemAssignment =
-          result['item_group_scope_item_assignment'];
-      if (itemGroupScopeItemAssignment == null ||
-          itemGroupScopeItemAssignment.isEmpty) {
-        throw Exception('No item found for this item group');
-      }
+      // final itemGroupScopeMatchingItemAssignment =
+      //     result['item_group_scope_matching_item_list'];
+      // if (itemGroupScopeMatchingItemAssignment == null) {
+      //   throw Exception('item_group_scope_matching_item_assignment is null');
+      // }
       // list of items that are matching the item group scope
       final itemGroupScopeMatchingItemList =
-          itemGroupScopeItemAssignment['item_group_scope_matching_item_list'];
+          result['item_group_scope_matching_item_list'];
       if (itemGroupScopeMatchingItemList == null) {
         throw Exception('item_group_scope_matching_item_list is null');
       }
-      final scopeMismatchItemList =
-          itemGroupScopeItemAssignment['scope_mismatch_item_list'];
+      final scopeMismatchItemList = result['scope_mismatch_item_list'];
       if (scopeMismatchItemList == null) {
         throw Exception('scope_mismatch_item_list is null');
       }
@@ -483,31 +486,31 @@ class _WgtTenantMeterGroupAssignmentState
           ),
         ),
         horizontalSpaceSmall,
-        // Container(
-        //   padding: const EdgeInsets.symmetric(horizontal: 5),
-        //   child: SizedBox(
-        //     width: 180,
-        //     height: 39,
-        //     child: TextField(
-        //       controller: _itemLabelFilterController,
-        //       readOnly: _isCommitting ||
-        //           _isCommitted ||
-        //           {_itemGroupScopeMatchingItemList ?? []}.isEmpty,
-        //       decoration: InputDecoration(
-        //           hintText: 'Meter Group Label',
-        //           hintStyle: TextStyle(
-        //               color: Theme.of(context)
-        //                   .hintColor) // prefixIcon: Icon(Icons.search),
-        //           ),
-        //       onChanged: (value) {
-        //         setState(() {
-        //           _itemLabelFilterStr = value.trim().toLowerCase();
-        //         });
-        //       },
-        //     ),
-        //   ),
-        // ),
-        // horizontalSpaceSmall,
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 5),
+          child: SizedBox(
+            width: 180,
+            height: 39,
+            child: TextField(
+              controller: _itemLabelFilterController,
+              readOnly: _isCommitting ||
+                  _isCommitted ||
+                  {_itemGroupScopeMatchingItemList ?? []}.isEmpty,
+              decoration: InputDecoration(
+                  hintText: 'Meter Group Label',
+                  hintStyle: TextStyle(
+                      color: Theme.of(context)
+                          .hintColor) // prefixIcon: Icon(Icons.search),
+                  ),
+              onChanged: (value) {
+                setState(() {
+                  _itemLabelFilterStr = value.trim().toLowerCase();
+                });
+              },
+            ),
+          ),
+        ),
+        horizontalSpaceSmall,
         // virtical separator
         Container(
           width: 1,
