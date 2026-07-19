@@ -10,7 +10,7 @@ class WgtMeterAssignmentOp extends StatefulWidget {
   final MdlPagAppConfig appConfig;
   final String strMeterGroupId;
   final Map<String, dynamic> meterInfo;
-  final ValueChanged<double> onPercentageChanged;
+  final void Function(double, String) onPercentageChanged;
 
   const WgtMeterAssignmentOp({
     super.key,
@@ -97,8 +97,11 @@ class _WgtMeterAssignmentOpState extends State<WgtMeterAssignmentOp> {
       String meterGroupName = meterGroupAssignment['meter_group_name'] ?? '';
       String meterGroupLabel = meterGroupAssignment['meter_group_label'] ?? '';
 
-      double? meterPercentage = _percentAssignedToThisGroupNew ??
+      double? meterPercentage =
           double.tryParse(meterGroupAssignment['percentage']);
+      if (isCurrentMeterGroup && _percentAssignedToThisGroupNew != null) {
+        meterPercentage = _percentAssignedToThisGroupNew;
+      }
 
       double barWidth = (meterPercentage ?? 0.0) / 100.0 * maxAssignedWidth;
 
@@ -292,7 +295,8 @@ class _WgtMeterAssignmentOpState extends State<WgtMeterAssignmentOp> {
                       FocusScope.of(context).unfocus();
                       if (_percentAssignedToThisGroupNew != null) {
                         widget.onPercentageChanged(
-                            _percentAssignedToThisGroupNew ?? 0.0);
+                            _percentAssignedToThisGroupNew ?? 0.0,
+                            _assignmentErrorMsg);
                       }
                     });
                   },
@@ -314,7 +318,8 @@ class _WgtMeterAssignmentOpState extends State<WgtMeterAssignmentOp> {
                           _percentAssignedToThisGroupNew = null;
                           _loadAssignmentBar();
                           widget.onPercentageChanged(
-                              _percentAssignedToThisGroup ?? 0.0);
+                              _percentAssignedToThisGroup ?? 0.0,
+                              _assignmentErrorMsg);
                         });
                       },
                 child: Icon(

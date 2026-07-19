@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../../../xt_ui/style/evs2_colors.dart';
 import '../../../../xt_ui/wdgt/info/get_error_text_prompt.dart';
 import '../../../../xt_ui/wdgt/wgt_pag_wait.dart';
 import '../../../../xt_ui/xt_helpers.dart';
@@ -21,7 +22,7 @@ class WgtMeterGroupAssignmentItem extends StatefulWidget {
     required this.loggedInUser,
     required this.itemInfo,
     required this.getMeterAssignment,
-    required this.itemGroupIndexStr,
+    required this.strItemGroupIndex,
     this.regFresh,
     this.onModified,
   });
@@ -29,10 +30,10 @@ class WgtMeterGroupAssignmentItem extends StatefulWidget {
   final MdlPagAppConfig appConfig;
   final MdlPagUser loggedInUser;
   final Map<String, dynamic> itemInfo;
-  final String itemGroupIndexStr;
+  final String strItemGroupIndex;
   final void Function(void Function(bool isComm, bool isEnabled))? regFresh;
   final Future<void> Function(Map<String, dynamic> itemInfo) getMeterAssignment;
-  final void Function()? onModified;
+  final void Function(String)? onModified;
 
   @override
   State<WgtMeterGroupAssignmentItem> createState() =>
@@ -41,7 +42,8 @@ class WgtMeterGroupAssignmentItem extends StatefulWidget {
 
 class _WgtMeterGroupAssignmentItemState
     extends State<WgtMeterGroupAssignmentItem> {
-  // bool _assignmentInfoFetched = false;
+  late Map<String, dynamic> _itemInfo;
+
   bool _isComm = false;
   bool _isEnabled = false;
 
@@ -65,26 +67,27 @@ class _WgtMeterGroupAssignmentItemState
     super.initState();
     widget.regFresh?.call(_refresh);
 
-    String? itemLocationId = widget.itemInfo['item_location_id'];
-    String? itemLocationName = widget.itemInfo['item_location_name'];
-    String? itemLocationLabel = widget.itemInfo['item_location_label'];
+    _itemInfo = widget.itemInfo;
 
-    String? itemLocationGroupId = widget.itemInfo['item_location_group_id'];
-    String? itemLocationGroupName = widget.itemInfo['item_location_group_name'];
-    String? itemLocationGroupLabel =
-        widget.itemInfo['item_location_group_label'];
+    String? itemLocationId = _itemInfo['item_location_id'];
+    String? itemLocationName = _itemInfo['item_location_name'];
+    String? itemLocationLabel = _itemInfo['item_location_label'];
 
-    String? itemBuildingId = widget.itemInfo['item_building_id'];
-    String? itemBuildingName = widget.itemInfo['item_building_name'];
-    String? itemBuildingLabel = widget.itemInfo['item_building_label'];
+    String? itemLocationGroupId = _itemInfo['item_location_group_id'];
+    String? itemLocationGroupName = _itemInfo['item_location_group_name'];
+    String? itemLocationGroupLabel = _itemInfo['item_location_group_label'];
 
-    String? itemSiteId = widget.itemInfo['item_site_id'];
-    String? itemSiteName = widget.itemInfo['item_site_name'];
-    String? itemSiteLabel = widget.itemInfo['item_site_label'];
+    String? itemBuildingId = _itemInfo['item_building_id'];
+    String? itemBuildingName = _itemInfo['item_building_name'];
+    String? itemBuildingLabel = _itemInfo['item_building_label'];
 
-    String? itemSiteGroupId = widget.itemInfo['item_site_group_id'];
-    String? itemSiteGroupName = widget.itemInfo['item_site_group_name'];
-    String? itemSiteGroupLabel = widget.itemInfo['item_site_group_label'];
+    String? itemSiteId = _itemInfo['item_site_id'];
+    String? itemSiteName = _itemInfo['item_site_name'];
+    String? itemSiteLabel = _itemInfo['item_site_label'];
+
+    String? itemSiteGroupId = _itemInfo['item_site_group_id'];
+    String? itemSiteGroupName = _itemInfo['item_site_group_name'];
+    String? itemSiteGroupLabel = _itemInfo['item_site_group_label'];
 
     Map<String, dynamic> itemScopeInfo = {
       'location_id': itemLocationId,
@@ -102,8 +105,8 @@ class _WgtMeterGroupAssignmentItemState
       'site_group_id': itemSiteGroupId,
       'site_group_name': itemSiteGroupName,
       'site_group_label': itemSiteGroupLabel,
-      'project_id': widget.itemInfo['project_id'],
-      'project_name': widget.itemInfo['project_name'],
+      'project_id': _itemInfo['project_id'],
+      'project_name': _itemInfo['project_name'],
     };
     _itemScope = MdlPagScope.fromJson(itemScopeInfo);
     assert(_itemScope != null, 'Failed to create scope from item info');
@@ -116,15 +119,15 @@ class _WgtMeterGroupAssignmentItemState
         ? const WgtPagWait(size: 21)
         : InkWell(
             onTap: !_isEnabled ? null : () {},
-            child: getAssignmentRow(widget.itemInfo),
+            child: getAssignmentRow(),
           );
   }
 
-  Widget getAssignmentRow(Map<String, dynamic> itemInfo) {
-    int index = itemInfo['index'] ?? 0;
-    String itemName = itemInfo['meter_name'] ?? '-';
-    String itemLabel = itemInfo['meter_label'] ?? '-';
-    String meterSn = itemInfo['meter_sn'] ?? '-';
+  Widget getAssignmentRow() {
+    int index = _itemInfo['index'] ?? 0;
+    String itemName = _itemInfo['meter_name'] ?? '-';
+    String itemLabel = _itemInfo['meter_label'] ?? '-';
+    String meterSn = _itemInfo['meter_sn'] ?? '-';
     // bool assigned = itemInfo['assigned'] ?? false;
 
     BoxDecoration boxDecoration = BoxDecoration(
@@ -203,7 +206,7 @@ class _WgtMeterGroupAssignmentItemState
               ),
             ),
             horizontalSpaceTiny,
-            getAssignmentBox(itemInfo),
+            getAssignmentBox(),
           ],
         ),
         if (_showScope && _itemScope != null)
@@ -215,12 +218,13 @@ class _WgtMeterGroupAssignmentItemState
               children: [getScopeLabel(context, _itemScope!)],
             ),
           ),
-        if (true) getAssignmentMap(itemInfo),
+        if (true) getAssignmentMap(),
       ],
     );
   }
 
-  Widget getAssignmentBox(Map<String, dynamic> itemInfo) {
+  Widget getAssignmentBox() {
+    Map<String, dynamic> itemInfo = _itemInfo;
     final assignmentInfo = itemInfo['assignment'];
     bool infoFetched = itemInfo['info_fetched'] ?? false;
     bool hasAssignmentInfo = assignmentInfo != null;
@@ -254,31 +258,60 @@ class _WgtMeterGroupAssignmentItemState
 
     return WgtMeterAssignmentOp(
       appConfig: widget.appConfig,
-      strMeterGroupId: widget.itemGroupIndexStr,
+      strMeterGroupId: widget.strItemGroupIndex,
       meterInfo: itemInfo,
-      onPercentageChanged: (newPercentage) {
-        Map<String, dynamic> assignmentNew = itemInfo['assignment_new'] ?? {};
-        assignmentNew['percentage'] = newPercentage.toString();
-        assignmentNew['meter_group_id'] = widget.itemGroupIndexStr;
-        assignmentNew['meter_id'] = itemInfo['id'];
+      onPercentageChanged: (newPercentage, assignmentErrorMessage) {
+        final assignment = itemInfo['assignment'] ?? [];
+
+        // find the assignment to this meter group
+        Map<String, dynamic> assignmentToThisMeterGroup = assignment.firstWhere(
+          (assignment) =>
+              assignment['meter_group_id'] == widget.strItemGroupIndex,
+          orElse: () => {},
+        );
+        assert(assignmentToThisMeterGroup.isNotEmpty,
+            'Assignment to this meter group not found');
+
+        // update the assignment to this meter group with the new percentage
+        Map<String, dynamic> updatedAssignmentToThisMeterGroup = {};
+        updatedAssignmentToThisMeterGroup.addAll(assignmentToThisMeterGroup);
+        updatedAssignmentToThisMeterGroup['percentage'] =
+            newPercentage.toString();
 
         setState(() {
-          // itemInfo['assigned_new'] = newPercentage > 0.0;
-          // itemInfo['percentage_new'] = newPercentage;
-          itemInfo['assignment_new'] = assignmentNew;
+          itemInfo['updated_meter_assignment_to_this_meter_group'] =
+              updatedAssignmentToThisMeterGroup;
+          itemInfo['assignment_error_message'] = assignmentErrorMessage;
 
-          widget.onModified?.call();
+          widget.onModified?.call(assignmentErrorMessage);
         });
       },
     );
   }
 
-  Widget getAssignmentMap(Map<String, dynamic> itemInfo) {
-    bool infoFetched = itemInfo['info_fetched'] ?? false;
+  Widget getAssignmentMap() {
+    bool infoFetched = _itemInfo['info_fetched'] ?? false;
     if (!infoFetched) {
       return Container();
     }
-    final assignment = itemInfo['assignment'];
+    bool isCurrentMeterGroupAssignmentUpdated =
+        _itemInfo['updated_meter_assignment_to_this_meter_group'] != null;
+    final assignmentList = _itemInfo['assignment'];
+    String assignmentErrorMessage = _itemInfo['assignment_error_message'] ?? '';
+    if (_itemInfo['updated_meter_assignment_to_this_meter_group'] != null) {
+      // replace the assginment of the current meter group with the updated assignment
+      final updatedAssignment =
+          _itemInfo['updated_meter_assignment_to_this_meter_group'];
+      if (assignmentList is List) {
+        int index = assignmentList.indexWhere((assignment) =>
+            assignment['meter_group_id'] == widget.strItemGroupIndex);
+        if (index != -1) {
+          assignmentList[index] = updatedAssignment;
+        } else {
+          assignmentList.add(updatedAssignment);
+        }
+      }
+    }
     // if (assignment == null || assignment.isEmpty) {
     //   if (_assignmentInfoFetched) {
     //     return getErrorTextPrompt(
@@ -287,7 +320,7 @@ class _WgtMeterGroupAssignmentItemState
     //     return Container();
     //   }
     // }
-    final meterTeantAssignmentList = assignment;
+    final meterTeantAssignmentList = assignmentList;
     if (meterTeantAssignmentList == null || meterTeantAssignmentList.isEmpty) {
       return Text(
         'This meter has not been assigned to any meter group',
@@ -306,7 +339,7 @@ class _WgtMeterGroupAssignmentItemState
           double.tryParse(assignment['percentage'] ?? '0.0') ?? 0.0;
 
       bool isThisMeterGroup =
-          assignment['meter_group_id'] == widget.itemGroupIndexStr;
+          assignment['meter_group_id'] == widget.strItemGroupIndex;
 
       final tenantInfo = assignment['tenant_info'];
       String tenantName = tenantInfo?['name'] ?? '';
@@ -351,7 +384,9 @@ class _WgtMeterGroupAssignmentItemState
                 decoration: BoxDecoration(
                   border: Border.all(
                       color: isThisMeterGroup
-                          ? Theme.of(context).colorScheme.primary
+                          ? assignmentErrorMessage.isNotEmpty
+                              ? Theme.of(context).colorScheme.error
+                              : Theme.of(context).colorScheme.primary
                           : Theme.of(context).hintColor.withAlpha(50)),
                   borderRadius: BorderRadius.circular(5),
                 ),
@@ -375,7 +410,14 @@ class _WgtMeterGroupAssignmentItemState
               width: 60,
               child: Text(
                 '${percentage.toStringAsFixed(2)}%',
-                style: TextStyle(color: Theme.of(context).hintColor),
+                style: TextStyle(
+                  color:
+                      isCurrentMeterGroupAssignmentUpdated && isThisMeterGroup
+                          ? assignmentErrorMessage.isNotEmpty
+                              ? Theme.of(context).colorScheme.error
+                              : commitColor.withAlpha(210)
+                          : Theme.of(context).hintColor,
+                ),
               ),
             ),
             Icon(Symbols.arrow_right,

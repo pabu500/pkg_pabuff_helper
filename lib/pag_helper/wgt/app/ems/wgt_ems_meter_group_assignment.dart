@@ -26,7 +26,7 @@ class WgtEmsMeterGroupAssignment extends StatefulWidget {
   const WgtEmsMeterGroupAssignment({
     super.key,
     required this.appConfig,
-    required this.itemGroupIndexStr,
+    required this.strItemGroupIndex,
     required this.itemName,
     required this.itemLabel,
     required this.itemScope,
@@ -37,7 +37,7 @@ class WgtEmsMeterGroupAssignment extends StatefulWidget {
   });
 
   final MdlPagAppConfig appConfig;
-  final String itemGroupIndexStr;
+  final String strItemGroupIndex;
   final String itemName;
   final String itemLabel;
   final String meterType;
@@ -86,7 +86,7 @@ class _WgtEmsMeterGroupAssignmentState
 
     Map<String, dynamic> queryMap = {
       'scope': loggedInUser!.selectedScope.toScopeMap(),
-      'item_group_id': widget.itemGroupIndexStr,
+      'item_group_id': widget.strItemGroupIndex,
     };
 
     _isScopeMatchingListFetching = true;
@@ -191,18 +191,20 @@ class _WgtEmsMeterGroupAssignmentState
     // filter out items that are not modified
     final List<Map<String, dynamic>> assignmentList =
         _itemGroupScopeMatchingItemList!
-            .where((item) => item['assignment_new'] != null)
+            .where((item) =>
+                item['updated_meter_assignment_to_this_meter_group'] != null)
             // .where((item) => item['percentage_new'] != item['percentage'])
             .toList();
     if ((_scopeMismatchItemList ?? []).isNotEmpty) {
       assignmentList.clear();
       assignmentList.addAll(_scopeMismatchItemList!
-          .where((item) => item['assignment_new'] != null)
+          .where((item) =>
+              item['updated_meter_assignment_to_this_meter_group'] != null)
           .toList());
     }
     Map<String, dynamic> queryMap = {
       'scope': loggedInUser!.selectedScope.toScopeMap(),
-      'item_group_id': widget.itemGroupIndexStr,
+      'item_group_id': widget.strItemGroupIndex,
       'item_assignment_list': assignmentList,
     };
     try {
@@ -223,7 +225,8 @@ class _WgtEmsMeterGroupAssignmentState
       // clear assginment info from the item list
       for (Map<String, dynamic> itemInfo in _itemGroupScopeMatchingItemList!) {
         itemInfo.remove('assignment');
-        itemInfo.remove('assignment_new');
+        // itemInfo.remove('assignment_new');
+        itemInfo.remove('updated_meter_assignment_to_this_meter_group');
         itemInfo.remove('is_fetching');
         itemInfo.remove('info_fetched');
       }
@@ -244,12 +247,18 @@ class _WgtEmsMeterGroupAssignmentState
     }
   }
 
-  bool _checkModified() {
+  bool _checkModified({String assignmentErrorMessage = ''}) {
     bool modified = false;
+    if (assignmentErrorMessage.isNotEmpty) {
+      return false; // if there is an assignment error, do not consider it modified
+    }
     if ((_scopeMismatchItemList ?? []).isNotEmpty) {
       for (Map<String, dynamic> item in _scopeMismatchItemList!) {
-        if (item['assignment_new'] != null) {
-          String percentageNew = item['assignment_new']?['percentage'] ?? '';
+        if (item['updated_meter_assignment_to_this_meter_group'] != null) {
+          String percentageNew =
+              item['updated_meter_assignment_to_this_meter_group']
+                      ?['percentage'] ??
+                  '';
           if (percentageNew.isNotEmpty) {
             modified = true;
             break;
@@ -258,8 +267,12 @@ class _WgtEmsMeterGroupAssignmentState
       }
     } else {
       for (Map<String, dynamic> item in _itemGroupScopeMatchingItemList ?? []) {
-        if (item['assignment_new'] != null) {
-          if (item['assignment'] != item['assignment_new']) {
+        if (item['updated_meter_assignment_to_this_meter_group'] != null) {
+          String percentageNew =
+              item['updated_meter_assignment_to_this_meter_group']
+                      ?['percentage'] ??
+                  '';
+          if (percentageNew.isNotEmpty) {
             modified = true;
             break;
           }
@@ -466,10 +479,10 @@ class _WgtEmsMeterGroupAssignmentState
             appConfig: widget.appConfig,
             loggedInUser: loggedInUser!,
             itemInfo: itemInfo,
-            itemGroupIndexStr: widget.itemGroupIndexStr,
+            strItemGroupIndex: widget.strItemGroupIndex,
             getMeterAssignment: _getMeterAssignment,
-            onModified: () {
-              _checkModified();
+            onModified: (assignmentErrorMessage) {
+              _checkModified(assignmentErrorMessage: assignmentErrorMessage);
             },
           ),
         ),
@@ -714,10 +727,10 @@ class _WgtEmsMeterGroupAssignmentState
             appConfig: widget.appConfig,
             loggedInUser: loggedInUser!,
             itemInfo: itemInfo,
-            itemGroupIndexStr: widget.itemGroupIndexStr,
+            strItemGroupIndex: widget.strItemGroupIndex,
             getMeterAssignment: _getMeterAssignment,
-            onModified: () {
-              _checkModified();
+            onModified: (assignmentErrorMessage) {
+              _checkModified(assignmentErrorMessage: assignmentErrorMessage);
             },
           ),
         ),

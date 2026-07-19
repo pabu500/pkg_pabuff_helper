@@ -1005,7 +1005,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                         opWidget = WgtEmsMeterGroupAssignment(
                           appConfig: widget.appConfig,
                           meterType: item['meter_type'] ?? '',
-                          itemGroupIndexStr: item['id'],
+                          strItemGroupIndex: item['id'],
                           itemName: item['name'],
                           itemLabel: item['label'] ?? '',
                           itemScope: itemScope,
