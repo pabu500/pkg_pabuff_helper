@@ -262,9 +262,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     Map<String, dynamic> fliterMap = widget.listController.getFilterMap(
       getFilterValueKey: (MdlListColController colController) {
         if (colController.filterGroupType == PagFilterGroupType.spec ||
-            colController.filterGroupType ==
-                PagFilterGroupType
-                    .status /* || colController.filterGroupType == PagFilterGroupType.LOCATION*/) {
+            colController.filterGroupType == PagFilterGroupType.status) {
           return "value";
         }
         return "label";
@@ -540,32 +538,54 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     _selectedSiteGroupProfile = widget
         .loggedInUser.selectedScope.projectProfile!
         .getSiteGroupProfileById(selectedSiteGroup?.id.toString());
-    _selectedSiteGroupProfile
-        ?.bindFilterColController(_selectedSiteColController);
-    _selectedSiteColController?.resetFilter();
-    _selectedSiteProfile = _selectedSiteGroupProfile?.getDefaultSiteProfile();
+    dev.log(
+        '_selectedSiteGroupProfile.name: ${_selectedSiteGroupProfile?.name}');
+    if (_selectedSiteGroupProfile == null) {
+      _selectedSiteProfile = null;
+      _selectedBuildingProfile = null;
+      _selectedLocationGroupProfile = null;
+      _selectedSiteColController?.clearFilter();
+    } else {
+      _selectedSiteGroupProfile
+          ?.bindFilterColController(_selectedSiteColController);
+      _selectedSiteColController?.resetFilter();
+      _selectedSiteProfile = _selectedSiteGroupProfile?.getDefaultSiteProfile();
+    }
     _onUpdateSite(_selectedSiteProfile);
   }
 
   void _onUpdateSite(MdlPagSiteProfile? selectedSite) {
     _selectedSiteProfile = _selectedSiteGroupProfile
         ?.getSiteProfileById(selectedSite?.id.toString());
-    _selectedSiteProfile
-        ?.bindFilterColController(_selectedBuildingColController);
-    _selectedBuildingColController?.resetFilter();
-    _selectedBuildingProfile =
-        _selectedSiteProfile?.getDefaultBuildingProfile();
+    dev.log('_selectedSiteProfile.name: ${_selectedSiteProfile?.name}');
+    if (_selectedSiteProfile == null) {
+      _selectedBuildingProfile = null;
+      _selectedLocationGroupProfile = null;
+      _selectedBuildingColController?.clearFilter();
+    } else {
+      _selectedSiteProfile
+          ?.bindFilterColController(_selectedBuildingColController);
+      _selectedBuildingColController?.resetFilter();
+      _selectedBuildingProfile =
+          _selectedSiteProfile?.getDefaultBuildingProfile();
+    }
     _onUpdateBuilding(_selectedBuildingProfile);
   }
 
   void _onUpdateBuilding(MdlPagBuildingProfile? selectedBuilding) {
     _selectedBuildingProfile = _selectedSiteProfile
         ?.getBuildingProfileById(selectedBuilding?.id.toString());
-    _selectedBuildingProfile
-        ?.bindFilterColController(_selectedLocationGroupColController);
-    _selectedLocationGroupColController?.resetFilter();
-    _selectedLocationGroupProfile =
-        _selectedBuildingProfile?.getDefaultLocationGroupProfile();
+    dev.log('_selectedBuildingProfile.name: ${_selectedBuildingProfile?.name}');
+    if (_selectedBuildingProfile == null) {
+      _selectedLocationGroupProfile = null;
+      _selectedLocationGroupColController?.clearFilter();
+    } else {
+      _selectedBuildingProfile
+          ?.bindFilterColController(_selectedLocationGroupColController);
+      _selectedLocationGroupColController?.resetFilter();
+      _selectedLocationGroupProfile =
+          _selectedBuildingProfile?.getDefaultLocationGroupProfile();
+    }
     _onUpdateLocationGroup(_selectedLocationGroupProfile);
   }
 
@@ -573,10 +593,16 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
       MdlPagLocationGroupProfile? selectedLocationGroup) {
     _selectedLocationGroupProfile = _selectedBuildingProfile
         ?.getLocationGroupProfileById(selectedLocationGroup?.id.toString());
-    _selectedLocationGroupProfile?.filterColController?.filterValue =
-        selectedLocationGroup?.toJson();
-    _selectedLocationGroupProfile?.filterColController?.filterWidgetController
-        ?.text = selectedLocationGroup?.label ?? '';
+    dev.log(
+        '_selectedLocationGroupProfile.name: ${_selectedLocationGroupProfile?.name}');
+    if (_selectedLocationGroupProfile == null) {
+      _selectedLocationGroupColController?.clearFilter();
+    } else {
+      _selectedLocationGroupProfile?.filterColController?.filterValue =
+          selectedLocationGroup?.toJson();
+      _selectedLocationGroupProfile?.filterColController?.filterWidgetController
+          ?.text = selectedLocationGroup?.label ?? '';
+    }
   }
 
   void _onClearSiteGroup() {
@@ -1426,7 +1452,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
                 if (_isFullPanel && !widget.isCompactMode)
                   getPin(listColController: colController),
                 if (_isFullPanel && !widget.isCompactMode) horizontalSpaceTiny,
-                getInputDropdown(colController, _isFullPanel,
+                getScopeLevelInputDropdown(colController, _isFullPanel,
                     dropdownWidth: dropdownWidth)
               ],
             ),
@@ -1480,7 +1506,8 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     return list;
   }
 
-  Widget getInputDropdown(MdlListColController colController, bool isFull,
+  Widget getScopeLevelInputDropdown(
+      MdlListColController colController, bool isFull,
       {double dropdownWidth = 250}) {
     List<Map<String, dynamic>> items = [];
     for (var item in colController.valueList ?? []) {
@@ -1494,8 +1521,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           WgtInputDropdown(
-            key:
-                UniqueKey(), // prevent reuse of the same widget (and its state)
+            // key:UniqueKey(), // prevent reuse of the same widget (and its state)
             hint: colController.filterLabel,
             items: items,
             // if null the widget will use its own controller
@@ -1507,29 +1533,27 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
             height: 50,
             width: dropdownWidth,
             onSelected: (Map<String, dynamic>? item) async {
-              setState(() {
-                colController.filterValue = item;
-                if (colController.colKey == 'site_group_label') {
-                  MdlPagSiteGroupProfile? selectedSiteGroup = widget
-                      .loggedInUser.selectedScope.projectProfile!
-                      .getSiteGroupProfileById(item?['value']);
-                  _onUpdateSiteGroup(selectedSiteGroup);
-                } else if (colController.colKey == 'site_label') {
-                  MdlPagSiteProfile? selectedSite = _selectedSiteGroupProfile!
-                      .getSiteProfileById(item?['value']);
-                  _selectedSiteProfile = _selectedSiteGroupProfile!
-                      .getSiteProfileById(item?['value']);
-                  _onUpdateSite(selectedSite);
-                } else if (colController.colKey == 'building_label') {
-                  MdlPagBuildingProfile? selectedBuilding =
-                      _selectedSiteProfile!
-                          .getBuildingProfileById(item?['value']);
-                  _onUpdateBuilding(selectedBuilding);
-                } else if (colController.colKey == 'location_group_label') {
-                  _onUpdateLocationGroup(_selectedBuildingProfile!
-                      .getLocationGroupProfileById(item?['value']));
-                }
-              });
+              colController.filterValue = item;
+              if (colController.colKey == 'site_group_label') {
+                MdlPagSiteGroupProfile? selectedSiteGroup = widget
+                    .loggedInUser.selectedScope.projectProfile!
+                    .getSiteGroupProfileById(item?['value']);
+                _onUpdateSiteGroup(selectedSiteGroup);
+              } else if (colController.colKey == 'site_label') {
+                MdlPagSiteProfile? selectedSite = _selectedSiteGroupProfile!
+                    .getSiteProfileById(item?['value']);
+                _selectedSiteProfile = _selectedSiteGroupProfile!
+                    .getSiteProfileById(item?['value']);
+                _onUpdateSite(selectedSite);
+              } else if (colController.colKey == 'building_label') {
+                MdlPagBuildingProfile? selectedBuilding = _selectedSiteProfile!
+                    .getBuildingProfileById(item?['value']);
+                _onUpdateBuilding(selectedBuilding);
+              } else if (colController.colKey == 'location_group_label') {
+                _onUpdateLocationGroup(_selectedBuildingProfile!
+                    .getLocationGroupProfileById(item?['value']));
+              }
+              setState(() {});
             },
             onClear: () {
               setState(() {
