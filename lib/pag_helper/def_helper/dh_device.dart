@@ -139,11 +139,8 @@ Widget getSensorTypeIcon(SensorType sensorType) {
 }
 
 String? validateDeviceLabel(String val) {
-  // if (val.trim().isEmpty) {
-  //   return 'required';
-  // }
   if (val.trim().isEmpty) {
-    return null;
+    return 'required';
   }
 
   // validate number, letter, underscore, and dash, space,
@@ -232,11 +229,11 @@ String? validateModel(String val) {
   return null;
 }
 
-String? validateCwP2Model(String val) {
+String? validateDeviceModel(String val) {
   val = val.trim();
 
   if (val.isEmpty) {
-    return null;
+    return 'required';
   }
 
   // Alphanumeric, space, dot, underscore, hyphen
@@ -350,7 +347,7 @@ String? validateTag(String val) {
   val = val.trim();
 
   if (val.isEmpty) {
-    return null;
+    return 'required';
   }
 
   // tag pattern: letter, number, underscore, dash, space, 0 to 55 characters
@@ -368,7 +365,7 @@ String? validateServiceType(String val) {
   String pattern = r'^[a-zA-Z0-9_ -]{1,21}$';
   RegExp regExp = RegExp(pattern);
   if (!regExp.hasMatch(val)) {
-    return 'invalid IP address';
+    return '1-21 characters, letter, number, space, _, - only';
   }
 
   return null;
