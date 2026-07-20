@@ -11,7 +11,15 @@ import 'package:buff_helper/xt_ui/wdgt/datetime/wgt_date_picker.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 import 'package:flutter/material.dart';
 
+import '../../def_helper/list_helper.dart';
+import '../../def_helper/pag_item_helper.dart';
+import '../../model/list/mdl_list_col_controller.dart';
 import '../../model/mdl_pag_app_config.dart';
+import '../../model/scope/mdl_pag_building_profile.dart';
+import '../../model/scope/mdl_pag_location_group_profile.dart';
+import '../../model/scope/mdl_pag_site_group_profile.dart';
+import '../../model/scope/mdl_pag_site_profile.dart';
+import '../ls/wgt_pag_item_finder_flexi.dart';
 
 class WgtJobTypeOpPanel2 extends StatefulWidget {
   const WgtJobTypeOpPanel2({
@@ -87,6 +95,10 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
 
   String? _selectedItemIdTypeStr;
   String? _selectedItemIdStr;
+
+  UniqueKey? _finderRefreshKey;
+
+  late MdlPagListController _scopeListController;
 
   Future<dynamic> _triggerJob() async {
     if (_isPosting) return;
@@ -267,6 +279,10 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
     }
   }
 
+  void _resetFinder() {
+    setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
@@ -274,6 +290,19 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
     // _loggedInUser =
     //     Provider.of<PagUserProvider>(context, listen: false).currentUser;
     _itemDisplayName = widget.itemDisplayName;
+
+    // initialize the scope list controller
+    // by fliter the list controller and remove the non-scope columns
+    _scopeListController = MdlPagListController(
+      itemTypeEnum: PagItemKind.scope,
+      listColControllerList: [],
+    );
+    for (MdlListColController colController
+        in widget.listController?.listColControllerList ?? []) {
+      if (colController.filterGroupType == PagFilterGroupType.location) {
+        _scopeListController.listColControllerList.add(colController);
+      }
+    }
   }
 
   @override
@@ -318,6 +347,8 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
             ),
             const Divider(height: 1),
             verticalSpaceSmall,
+            getScopeFilter(),
+            verticalSpaceSmall,
             Container(
               decoration: BoxDecoration(
                 border: Border.all(
@@ -336,6 +367,36 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget getScopeFilter() {
+    return WgtPagItemFinderFlexi(
+      key: _finderRefreshKey, //_listContentRefreshKey,
+      isScopeProvider: true,
+      loggedInUser: widget.loggedInUser,
+      appConfig: widget.appConfig,
+      itemKind: PagItemKind.scope,
+      itemType: null,
+      listContextType: PagListContextType.jobOption,
+      listController: _scopeListController,
+      onSearching: () {},
+      onClearSearch: () {
+        _resetFinder();
+      },
+      onModified: () {
+        _resetFinder();
+      },
+      onScopeChanged: (
+        MdlPagSiteGroupProfile? siteGroup,
+        MdlPagSiteProfile? site,
+        MdlPagBuildingProfile? building,
+        MdlPagLocationGroupProfile? locationGroup,
+      ) {
+        dev.log(
+            'Scope changed: siteGroup=${siteGroup?.name}, site=${site?.name}, building=${building?.name}, locationGroup=${locationGroup?.name}');
+      },
+      onResult: (Map<String, dynamic> itemFindResult) {},
     );
   }
 

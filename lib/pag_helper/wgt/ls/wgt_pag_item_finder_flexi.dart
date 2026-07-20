@@ -80,6 +80,8 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
     this.maxDurationDays,
     this.sortBy,
     this.sortOrder,
+    this.isScopeProvider = false,
+    this.onScopeChanged,
   });
 
   final MdlPagUser loggedInUser;
@@ -122,6 +124,9 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
   final int? maxDurationDays;
   final String? sortBy;
   final String? sortOrder;
+  final bool isScopeProvider;
+  final void Function(MdlPagSiteGroupProfile?, MdlPagSiteProfile?,
+      MdlPagBuildingProfile?, MdlPagLocationGroupProfile?)? onScopeChanged;
 
   @override
   State<WgtPagItemFinderFlexi> createState() => _WgtPagItemFinderFlexiState();
@@ -773,14 +778,41 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   }
 
   Widget completedWidget(double width) {
-    return widget.isCompactMode
-        ? getCompactFinder()
-        : width > 800
-            ? Padding(
-                padding: widget.sidePadding,
-                child: getItemPickerWide(width),
-              )
-            : getItemPickerNarrow();
+    return widget.isScopeProvider
+        ? getScopeProvider()
+        : widget.isCompactMode
+            ? getCompactFinder()
+            : width > 800
+                ? Padding(
+                    padding: widget.sidePadding,
+                    child: getItemPickerWide(width),
+                  )
+                : getItemPickerNarrow();
+  }
+
+  Widget getScopeProvider() {
+    return Container(
+      width: widget.width,
+      padding: const EdgeInsets.symmetric(horizontal: 1, vertical: 5),
+      margin: const EdgeInsets.symmetric(horizontal: 2),
+      decoration: BoxDecoration(
+        // color: Theme.of(context).colorScheme.background,
+        borderRadius: BorderRadius.circular(5),
+        border: Border.all(
+            color: Theme.of(context).hintColor /*.withOpacity(0.3)*/, width: 1),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          getOptions(),
+          getFilterCore(isCompactMode: true),
+          // horizontalSpaceTiny,
+          // getSearchButton(),
+        ],
+      ),
+    );
   }
 
   Widget getCompactFinder() {
@@ -1571,6 +1603,12 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
                 _onUpdateLocationGroup(_selectedBuildingProfile!
                     .getLocationGroupProfileById(item?['value']));
               }
+              widget.onScopeChanged?.call(
+                _selectedSiteGroupProfile,
+                _selectedSiteProfile,
+                _selectedBuildingProfile,
+                _selectedLocationGroupProfile,
+              );
               setState(() {});
             },
             onClear: () {

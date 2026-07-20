@@ -11,6 +11,7 @@ enum PagListContextType {
   paymentMatching,
   paymentApply,
   billCompilation,
+  jobOption,
 }
 
 enum PagListTypeName {
