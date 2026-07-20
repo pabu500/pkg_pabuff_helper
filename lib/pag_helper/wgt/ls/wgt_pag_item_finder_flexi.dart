@@ -470,69 +470,69 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     }
   }
 
-  void _iniScopesPreload() {
-    // get loc profiles form logged in user
-    _selectedSiteGroupProfile =
-        widget.loggedInUser.selectedScope.siteGroupProfile;
-    _selectedSiteProfile = widget.loggedInUser.selectedScope.siteProfile;
-    _selectedBuildingProfile =
-        widget.loggedInUser.selectedScope.buildingProfile;
-    _selectedLocationGroupProfile =
-        widget.loggedInUser.selectedScope.locationGroupProfile;
+  // void _iniScopesPreload() {
+  //   // get loc profiles form logged in user
+  //   _selectedSiteGroupProfile =
+  //       widget.loggedInUser.selectedScope.siteGroupProfile;
+  //   _selectedSiteProfile = widget.loggedInUser.selectedScope.siteProfile;
+  //   _selectedBuildingProfile =
+  //       widget.loggedInUser.selectedScope.buildingProfile;
+  //   _selectedLocationGroupProfile =
+  //       widget.loggedInUser.selectedScope.locationGroupProfile;
 
-    // get filter list col controllers from list controller
-    for (MdlListColController colController
-        in widget.listController.listColControllerList) {
-      if (colController.colKey == 'site_group_label') {
-        _selectedSiteGroupColController = colController;
-        _selectedSiteGroupColController!.filterWidgetController =
-            siteGroupController;
-      }
-      if (colController.colKey == 'site_label') {
-        _selectedSiteColController = colController;
-        _selectedSiteColController!.filterWidgetController = siteController;
-      }
-      if (colController.colKey == 'building_label') {
-        _selectedBuildingColController = colController;
-        _selectedBuildingColController!.filterWidgetController =
-            buildingController;
-      }
-      if (colController.colKey == 'location_group_label') {
-        _selectedLocationGroupColController = colController;
-        _selectedLocationGroupColController!.filterWidgetController =
-            locationGroupController;
-      }
-    }
+  //   // get filter list col controllers from list controller
+  //   for (MdlListColController colController
+  //       in widget.listController.listColControllerList) {
+  //     if (colController.colKey == 'site_group_label') {
+  //       _selectedSiteGroupColController = colController;
+  //       _selectedSiteGroupColController!.filterWidgetController =
+  //           siteGroupController;
+  //     }
+  //     if (colController.colKey == 'site_label') {
+  //       _selectedSiteColController = colController;
+  //       _selectedSiteColController!.filterWidgetController = siteController;
+  //     }
+  //     if (colController.colKey == 'building_label') {
+  //       _selectedBuildingColController = colController;
+  //       _selectedBuildingColController!.filterWidgetController =
+  //           buildingController;
+  //     }
+  //     if (colController.colKey == 'location_group_label') {
+  //       _selectedLocationGroupColController = colController;
+  //       _selectedLocationGroupColController!.filterWidgetController =
+  //           locationGroupController;
+  //     }
+  //   }
 
-    _updateBind();
-  }
+  //   _updateBind();
+  // }
 
-  void _updateBind() {
-    // bind filter col controllers with loc profile
-    // during wich value list will be populated with children loc profiles
-    widget.loggedInUser.selectedScope.projectProfile?.bindFilterColController(
-        _selectedSiteGroupColController,
-        defaultSiteGroupProfile:
-            widget.loggedInUser.selectedScope.siteGroupProfile,
-        limitToDefault: true);
-    _selectedSiteGroupProfile?.bindFilterColController(
-        _selectedSiteColController,
-        defaultSiteProfile: widget.loggedInUser.selectedScope.siteProfile,
-        limitToDefault: true);
-    _selectedSiteProfile?.bindFilterColController(
-        _selectedBuildingColController,
-        defaultBuildingProfile:
-            widget.loggedInUser.selectedScope.buildingProfile,
-        limitToDefault: true);
-    _selectedBuildingProfile?.bindFilterColController(
-        _selectedLocationGroupColController,
-        defaultLocationGroupProfile:
-            widget.loggedInUser.selectedScope.locationGroupProfile,
-        limitToDefault: true);
-    // _selectedLocationGroupProfile?.bindFilterColController(
-    //   _selectedLocationGroupColController,
-    // );
-  }
+  // void _updateBind() {
+  //   // bind filter col controllers with loc profile
+  //   // during wich value list will be populated with children loc profiles
+  //   widget.loggedInUser.selectedScope.projectProfile?.bindFilterColController(
+  //       _selectedSiteGroupColController,
+  //       defaultSiteGroupProfile:
+  //           widget.loggedInUser.selectedScope.siteGroupProfile,
+  //       limitToDefault: true);
+  //   _selectedSiteGroupProfile?.bindFilterColController(
+  //       _selectedSiteColController,
+  //       defaultSiteProfile: widget.loggedInUser.selectedScope.siteProfile,
+  //       limitToDefault: true);
+  //   _selectedSiteProfile?.bindFilterColController(
+  //       _selectedBuildingColController,
+  //       defaultBuildingProfile:
+  //           widget.loggedInUser.selectedScope.buildingProfile,
+  //       limitToDefault: true);
+  //   _selectedBuildingProfile?.bindFilterColController(
+  //       _selectedLocationGroupColController,
+  //       defaultLocationGroupProfile:
+  //           widget.loggedInUser.selectedScope.locationGroupProfile,
+  //       limitToDefault: true);
+  //   // _selectedLocationGroupProfile?.bindFilterColController(
+  //   //   _selectedLocationGroupColController,
+  //   // );
+  // }
 
   void _onUpdateSiteGroup(MdlPagSiteGroupProfile? selectedSiteGroup) {
     _selectedSiteGroupProfile = widget
@@ -690,7 +690,25 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
       _rowsPerPage.sort();
     }
 
-    _iniScopesPreload();
+    // _iniScopesPreload();
+    final result = iniScopesPreload(
+      widget.loggedInUser.selectedScope,
+      widget.listController.listColControllerList,
+      siteGroupController,
+      siteController,
+      buildingController,
+      locationGroupController,
+    );
+
+    _selectedSiteGroupProfile = result.siteGroupProfile;
+    _selectedSiteProfile = result.siteProfile;
+    _selectedBuildingProfile = result.buildingProfile;
+    _selectedLocationGroupProfile = result.locationGroupProfile;
+
+    _selectedSiteGroupColController = result.siteGroupColController;
+    _selectedSiteColController = result.siteColController;
+    _selectedBuildingColController = result.buildingColController;
+    _selectedLocationGroupColController = result.locationGroupColController;
 
     _enableSearch = _enableSearchButton();
 
@@ -1716,7 +1734,28 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
       icon: Icon(Icons.restart_alt, color: Theme.of(context).colorScheme.error),
       onPressed: () {
         _clearSearch();
-        _iniScopesPreload();
+        // _iniScopesPreload();
+        final result = iniScopesPreload(
+          widget.loggedInUser.selectedScope,
+          widget.listController.listColControllerList,
+          siteGroupController,
+          siteController,
+          buildingController,
+          locationGroupController,
+        );
+
+        setState(() {
+          _selectedSiteGroupProfile = result.siteGroupProfile;
+          _selectedSiteProfile = result.siteProfile;
+          _selectedBuildingProfile = result.buildingProfile;
+          _selectedLocationGroupProfile = result.locationGroupProfile;
+
+          _selectedSiteGroupColController = result.siteGroupColController;
+          _selectedSiteColController = result.siteColController;
+          _selectedBuildingColController = result.buildingColController;
+          _selectedLocationGroupColController =
+              result.locationGroupColController;
+        });
       },
     );
   }

@@ -1,8 +1,14 @@
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_scope.dart';
+import 'package:buff_helper/pag_helper/model/scope/mdl_pag_scope_profile.dart';
 import 'package:buff_helper/xt_ui/xt_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../model/list/mdl_list_col_controller.dart';
+import '../model/scope/mdl_pag_building_profile.dart';
+import '../model/scope/mdl_pag_location_group_profile.dart';
+import '../model/scope/mdl_pag_site_group_profile.dart';
+import '../model/scope/mdl_pag_site_profile.dart';
 import 'enum_helper.dart';
 
 enum PagScopeType {
@@ -277,4 +283,91 @@ List<Map<String, dynamic>> getScopeOpsConfigList(PagScopeOpType opType) {
   //remove empty maps
   list.removeWhere((map) => map.isEmpty);
   return list;
+}
+
+({
+  MdlPagSiteGroupProfile? siteGroupProfile,
+  MdlPagSiteProfile? siteProfile,
+  MdlPagBuildingProfile? buildingProfile,
+  MdlPagLocationGroupProfile? locationGroupProfile,
+  MdlListColController? siteGroupColController,
+  MdlListColController? siteColController,
+  MdlListColController? buildingColController,
+  MdlListColController? locationGroupColController,
+}) iniScopesPreload(
+  MdlPagScopeProfile scopeProfile,
+  List<MdlListColController> listColControllerList,
+  TextEditingController siteGroupController,
+  TextEditingController siteController,
+  TextEditingController buildingController,
+  TextEditingController locationGroupController,
+) {
+  final siteGroupProfile = scopeProfile.siteGroupProfile;
+  final siteProfile = scopeProfile.siteProfile;
+  final buildingProfile = scopeProfile.buildingProfile;
+  final locationGroupProfile = scopeProfile.locationGroupProfile;
+
+  MdlListColController? siteGroupColController;
+  MdlListColController? siteColController;
+  MdlListColController? buildingColController;
+  MdlListColController? locationGroupColController;
+
+  for (final colController in listColControllerList) {
+    switch (colController.colKey) {
+      case 'site_group_label':
+        siteGroupColController = colController;
+        colController.filterWidgetController = siteGroupController;
+        break;
+
+      case 'site_label':
+        siteColController = colController;
+        colController.filterWidgetController = siteController;
+        break;
+
+      case 'building_label':
+        buildingColController = colController;
+        colController.filterWidgetController = buildingController;
+        break;
+
+      case 'location_group_label':
+        locationGroupColController = colController;
+        colController.filterWidgetController = locationGroupController;
+        break;
+    }
+  }
+
+  scopeProfile.projectProfile?.bindFilterColController(
+    siteGroupColController,
+    defaultSiteGroupProfile: siteGroupProfile,
+    limitToDefault: true,
+  );
+
+  siteGroupProfile?.bindFilterColController(
+    siteColController,
+    defaultSiteProfile: siteProfile,
+    limitToDefault: true,
+  );
+
+  siteProfile?.bindFilterColController(
+    buildingColController,
+    defaultBuildingProfile: buildingProfile,
+    limitToDefault: true,
+  );
+
+  buildingProfile?.bindFilterColController(
+    locationGroupColController,
+    defaultLocationGroupProfile: locationGroupProfile,
+    limitToDefault: true,
+  );
+
+  return (
+    siteGroupProfile: siteGroupProfile,
+    siteProfile: siteProfile,
+    buildingProfile: buildingProfile,
+    locationGroupProfile: locationGroupProfile,
+    siteGroupColController: siteGroupColController,
+    siteColController: siteColController,
+    buildingColController: buildingColController,
+    locationGroupColController: locationGroupColController,
+  );
 }
