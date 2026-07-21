@@ -5,6 +5,7 @@ import 'package:buff_helper/pag_helper/wgt/tree/wgt_tree_element.dart';
 import '../../def_helper/dh_scope.dart';
 import '../app/mdl_project_config.dart';
 import '../mdl_pag_app_context.dart';
+import 'mdl_pag_scope.dart';
 import 'mdl_pag_site_group_profile.dart';
 import 'mdl_pag_building_profile.dart';
 import 'mdl_pag_location_group_profile.dart';
@@ -176,6 +177,88 @@ class MdlPagScopeProfile {
     } else {
       return projectProfile;
     }
+  }
+
+  // scope conent sample"
+  // {
+  //   "project_id": "1",
+  //   "project_name": "Project A",
+  //   "site_group_id": null,
+  //   "site_group_name": null,
+  //   "site_id": null,
+  //   "site_name": null,
+  //   "building_id": "4",
+  //   "building_name": "Building A",
+  //   "location_group_id": null,
+  //   "location_group_name": null,
+  // }
+  MdlPagScopeProfile? getScopeProfileByScope(MdlPagScope? scope) {
+    if (scope == null) {
+      return null;
+    }
+    for (MdlPagSiteGroupProfile siteGroupProfile
+        in projectProfile!.siteGroupProfileList) {
+      if (scope.siteGroupId != null) {
+        String strSiteGroupId = siteGroupProfile.id.toString();
+        if (strSiteGroupId == scope.siteGroupId) {
+          return MdlPagScopeProfile(
+            projectProfile: projectProfile,
+            siteGroupProfile: siteGroupProfile,
+          );
+        }
+      } else if (scope.siteId != null) {
+        for (MdlPagSiteProfile siteProfile
+            in siteGroupProfile.siteProfileList) {
+          String strSiteId = siteProfile.id.toString();
+          if (strSiteId == scope.siteId) {
+            return MdlPagScopeProfile(
+              projectProfile: projectProfile,
+              siteGroupProfile: siteGroupProfile,
+              siteProfile: siteProfile,
+            );
+          }
+        }
+      } else if (scope.buildingId != null) {
+        for (MdlPagSiteProfile siteProfile
+            in siteGroupProfile.siteProfileList) {
+          for (MdlPagBuildingProfile buildingProfile
+              in siteProfile.buildingProfileList) {
+            String strBuildingId = buildingProfile.id.toString();
+            if (strBuildingId == scope.buildingId) {
+              return MdlPagScopeProfile(
+                projectProfile: projectProfile,
+                siteGroupProfile: siteGroupProfile,
+                siteProfile: siteProfile,
+                buildingProfile: buildingProfile,
+              );
+            }
+          }
+        }
+      } else if (scope.locationGroupId != null) {
+        for (MdlPagSiteProfile siteProfile
+            in siteGroupProfile.siteProfileList) {
+          for (MdlPagBuildingProfile buildingProfile
+              in siteProfile.buildingProfileList) {
+            for (MdlPagLocationGroupProfile locationGroupProfile
+                in buildingProfile.locationGroupProfileList) {
+              String strLocationGroupId = locationGroupProfile.id.toString();
+              if (strLocationGroupId == scope.locationGroupId) {
+                return MdlPagScopeProfile(
+                  projectProfile: projectProfile,
+                  siteGroupProfile: siteGroupProfile,
+                  siteProfile: siteProfile,
+                  buildingProfile: buildingProfile,
+                  locationGroupProfile: locationGroupProfile,
+                );
+              }
+            }
+          }
+        }
+      }
+    }
+    return MdlPagScopeProfile(
+      projectProfile: projectProfile,
+    );
   }
 
   List<dynamic> getScopeProfileList() {

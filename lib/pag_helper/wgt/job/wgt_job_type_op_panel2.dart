@@ -17,6 +17,7 @@ import '../../model/list/mdl_list_col_controller.dart';
 import '../../model/mdl_pag_app_config.dart';
 import '../../model/scope/mdl_pag_building_profile.dart';
 import '../../model/scope/mdl_pag_location_group_profile.dart';
+import '../../model/scope/mdl_pag_scope_profile.dart';
 import '../../model/scope/mdl_pag_site_group_profile.dart';
 import '../../model/scope/mdl_pag_site_profile.dart';
 import '../ls/wgt_pag_item_finder_flexi.dart';
@@ -99,6 +100,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
   UniqueKey? _finderRefreshKey;
 
   late MdlPagListController _scopeListController;
+  MdlPagScopeProfile? _selectedScopeProfile;
 
   Future<dynamic> _triggerJob() async {
     if (_isPosting) return;
@@ -116,8 +118,15 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
     }
 
     try {
-      Map<String, dynamic> jobScope = widget.jobTypeScope?.toScopeMap() ??
-          widget.loggedInUser.selectedScope.toScopeMap();
+      assert(_selectedScopeProfile != null, 'Selected scope profile is null');
+      Map<String, dynamic> jobScope =
+          // widget.jobTypeScope?.toScopeMap() ??
+          //     widget.loggedInUser.selectedScope.toScopeMap();
+          _selectedScopeProfile!.toScopeMap();
+      jobScope['project_id'] =
+          widget.loggedInUser.selectedScope.projectProfile!.id.toString();
+      jobScope['project_name'] =
+          widget.loggedInUser.selectedScope.projectProfile!.name;
 
       Map<String, dynamic> jobRequest = {
         'job_type': widget.jobTypeName,
@@ -303,6 +312,9 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
         _scopeListController.listColControllerList.add(colController);
       }
     }
+
+    _selectedScopeProfile = widget.loggedInUser.selectedScope
+        .getScopeProfileByScope(widget.jobTypeScope);
   }
 
   @override
@@ -347,7 +359,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
             ),
             const Divider(height: 1),
             verticalSpaceSmall,
-            // getScopeFilter(),
+            getScopeFilter(),
             verticalSpaceSmall,
             Container(
               decoration: BoxDecoration(
@@ -373,9 +385,10 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
   Widget getScopeFilter() {
     return WgtPagItemFinderFlexi(
       key: _finderRefreshKey, //_listContentRefreshKey,
-      isScopeProvider: true,
       loggedInUser: widget.loggedInUser,
       appConfig: widget.appConfig,
+      isScopeProvider: true,
+      prevailingScopeProfile: _selectedScopeProfile,
       itemKind: PagItemKind.scope,
       itemType: null,
       listContextType: PagListContextType.jobOption,
@@ -388,13 +401,19 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
         _resetFinder();
       },
       onScopeChanged: (
-        MdlPagSiteGroupProfile? siteGroup,
-        MdlPagSiteProfile? site,
-        MdlPagBuildingProfile? building,
-        MdlPagLocationGroupProfile? locationGroup,
+        MdlPagSiteGroupProfile? siteGroupProfile,
+        MdlPagSiteProfile? userSiteProfile,
+        MdlPagBuildingProfile? buildingProfile,
+        MdlPagLocationGroupProfile? locationGroupProfile,
       ) {
         dev.log(
-            'Scope changed: siteGroup=${siteGroup?.name}, site=${site?.name}, building=${building?.name}, locationGroup=${locationGroup?.name}');
+            'Scope changed: siteGroup=${siteGroupProfile?.name}, site=${userSiteProfile?.name}, building=${buildingProfile?.name}, locationGroup=${locationGroupProfile?.name}');
+        _selectedScopeProfile = MdlPagScopeProfile(
+          siteGroupProfile: siteGroupProfile,
+          siteProfile: userSiteProfile,
+          buildingProfile: buildingProfile,
+          locationGroupProfile: locationGroupProfile,
+        );
       },
       onResult: (Map<String, dynamic> itemFindResult) {},
     );

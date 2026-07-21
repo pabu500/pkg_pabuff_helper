@@ -33,6 +33,7 @@ import '../../comm/comm_list.dart';
 import '../../def_helper/dh_device.dart';
 import '../../def_helper/dh_pag_tariff.dart';
 import '../../model/mdl_pag_user.dart';
+import '../../model/scope/mdl_pag_scope_profile.dart';
 import '../wgt_custom_pin.dart';
 import 'wgt_finder_field_input.dart';
 import '../wgt_input_dropdown.dart';
@@ -82,6 +83,7 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
     this.sortOrder,
     this.isScopeProvider = false,
     this.onScopeChanged,
+    this.prevailingScopeProfile,
   });
 
   final MdlPagUser loggedInUser;
@@ -125,6 +127,7 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
   final String? sortBy;
   final String? sortOrder;
   final bool isScopeProvider;
+  final MdlPagScopeProfile? prevailingScopeProfile;
   final void Function(MdlPagSiteGroupProfile?, MdlPagSiteProfile?,
       MdlPagBuildingProfile?, MdlPagLocationGroupProfile?)? onScopeChanged;
 
@@ -697,7 +700,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
 
     // _iniScopesPreload();
     final result = iniScopesPreload(
-      widget.loggedInUser.selectedScope,
+      widget.prevailingScopeProfile ?? widget.loggedInUser.selectedScope,
       widget.listController.listColControllerList,
       siteGroupController,
       siteController,
@@ -1774,7 +1777,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
         _clearSearch();
         // _iniScopesPreload();
         final result = iniScopesPreload(
-          widget.loggedInUser.selectedScope,
+          widget.prevailingScopeProfile ?? widget.loggedInUser.selectedScope,
           widget.listController.listColControllerList,
           siteGroupController,
           siteController,
