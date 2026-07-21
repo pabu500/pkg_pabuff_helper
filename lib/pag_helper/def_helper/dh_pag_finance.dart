@@ -518,17 +518,15 @@ String? Function(String) getPaymentValidator(String key,
     {bool isValueRequired = true}) {
   switch (key) {
     case 'tenant_label':
-      return isValueRequired
-          ? validateTenantLabel
-          : validateTenantLabelNotRequired;
+      return getValidator(validateTenantLabel, isValueRequired);
     case 'soa_type':
-      return soaTypeValidator;
+      return getValidator(soaTypeValidator, isValueRequired);
     case 'payment_lc_status':
-      return validatePaymentLcStatus;
+      return getValidator(validatePaymentLcStatus, isValueRequired);
     case 'value_date':
-      return dateValidator;
+      return getValidator(dateValidator, isValueRequired);
     case 'amount':
-      return validatePaymentAmount;
+      return getValidator(validatePaymentAmount, isValueRequired);
     default:
       dev.log('No validator found for payment key: $key');
       return (String? value) {
@@ -541,23 +539,21 @@ String? Function(String) getPaymentApplyValidator(String key,
     {bool isValueRequired = true}) {
   switch (key) {
     case 'tenant_id':
-      return isValueRequired ? validateItemId : validateItemIdNotRequired;
+      return getValidator(validateItemId, isValueRequired);
     case 'tenant_name':
-      return validateTenantName;
+      return getValidator(validateTenantName, isValueRequired);
     case 'tenant_label':
-      return isValueRequired
-          ? validateTenantLabel
-          : validateTenantLabelNotRequired;
+      return getValidator(validateTenantLabel, isValueRequired);
     case 'payment_id':
-      return isValueRequired ? validateItemId : validateItemIdNotRequired;
+      return getValidator(validateItemId, isValueRequired);
     case 'soa_type':
-      return soaTypeValidator;
+      return getValidator(soaTypeValidator, isValueRequired);
     case 'payment_lc_status':
-      return validatePaymentLcStatus;
+      return getValidator(validatePaymentLcStatus, isValueRequired);
     case 'value_date':
-      return dateValidator;
+      return getValidator(dateValidator, isValueRequired);
     case 'amount':
-      return validatePaymentAmount;
+      return getValidator(validatePaymentAmount, isValueRequired);
     default:
       dev.log('No validator found for payment apply key: $key');
       return (String? value) {

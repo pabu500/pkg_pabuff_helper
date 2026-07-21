@@ -60,7 +60,7 @@ List<Map<String, dynamic>> getOpListConfig(
           'width': colController.colWidth,
           'is_column_mapping_required': isMappingRequired,
           'is_value_required': isValueRequired,
-          'validator': getValidator(
+          'validator': getItemKindValidator(
             itemKind,
             colKey,
             isValueRequired: isValueRequired,

@@ -122,7 +122,7 @@ String? validateItemLabel(String? value) {
   return null;
 }
 
-String? Function(String) getValidator(PagItemKind itemKind, String key,
+String? Function(String) getItemKindValidator(PagItemKind itemKind, String key,
     {bool isValueRequired = true, dynamic itemType}) {
   switch (itemKind) {
     case PagItemKind.user:
@@ -137,6 +137,20 @@ String? Function(String) getValidator(PagItemKind itemKind, String key,
       return (String value) {
         return null;
       };
+  }
+}
+
+String? Function(String) getValidator(
+    String? Function(String) validator, bool isValueRequired) {
+  if (!isValueRequired) {
+    return (String value) {
+      if (value.isEmpty) {
+        return null;
+      }
+      return validator(value);
+    };
+  } else {
+    return validator;
   }
 }
 

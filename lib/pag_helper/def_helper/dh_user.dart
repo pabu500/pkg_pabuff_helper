@@ -1,6 +1,7 @@
 import 'dart:developer' as dev;
 
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_tenant.dart';
+import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -49,37 +50,33 @@ String? Function(String) getUserValidator(String key,
     {bool isValueRequired = true}) {
   switch (key) {
     case 'username':
-      return validateUsername;
+      return getValidator(validateUsername, isValueRequired);
     case 'initial_password':
-      return validateInitialPassword;
+      return getValidator(validateInitialPassword, isValueRequired);
     case 'fullname':
-      return validateFullName;
+      return getValidator(validateFullName, isValueRequired);
     case 'email':
-      return validateEmail;
+      return getValidator(validateEmail, isValueRequired);
     case 'contact_number':
-      return isValueRequired ? validatePhone : validatePhoneNotRequired;
+      return getValidator(validatePhone, isValueRequired);
     case 'designation':
-      return validateDesignation;
+      return getValidator(validateDesignation, isValueRequired);
     case 'remark':
-      return validateUserRemark;
+      return getValidator(validateUserRemark, isValueRequired);
     case 'auth_provider':
-      return validateAuthProvider;
+      return getValidator(validateAuthProvider, isValueRequired);
     case 'portal_type_str':
-      return validatePortalTypeStr;
+      return getValidator(validatePortalTypeStr, isValueRequired);
     case 'role_label_str':
-      return validateRoleLabelStr;
+      return getValidator(validateRoleLabelStr, isValueRequired);
     case 'tenant_label':
-      return isValueRequired
-          ? validateTenantLabel
-          : validateTenantLabelNotRequired;
+      return getValidator(validateTenantLabel, isValueRequired);
     case 'tenaant_account_number':
-      return isValueRequired
-          ? validateTenantAccountNumber
-          : validateTenantAccountNumberNotRequired;
+      return getValidator(validateTenantAccountNumber, isValueRequired);
     case 'receive_billing_notification':
-      return validateReceiveBillingNotification;
+      return getValidator(validateReceiveBillingNotification, isValueRequired);
     case 'enabled':
-      return validateEnabled;
+      return getValidator(validateEnabled, isValueRequired);
     default:
       dev.log('No validator found for user key: $key');
       return (String? value) {

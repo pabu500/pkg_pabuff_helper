@@ -1,6 +1,7 @@
 import 'dart:developer' as dev show log;
 
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
+import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/xt_ui/util/xt_util_InputFieldValidator.dart';
 import 'package:flutter/material.dart';
 
@@ -456,19 +457,19 @@ String? validateTenantAccountNumber2(String value) {
   return null;
 }
 
-String? validateTenantAccountNumberNotRequired(String value) {
-  if (value.trim().isEmpty) {
-    return null;
-  }
-  // validate number, letter, underscore, and dash,
-  // and minimum 5 characters
-  String pattern = r'^[a-zA-Z0-9_ -]{5,}$';
-  RegExp regExp = RegExp(pattern);
-  if (!regExp.hasMatch(value)) {
-    return 'min length is 5 and letter, number, _, - only';
-  }
-  return null;
-}
+// String? validateTenantAccountNumberNotRequired(String value) {
+//   if (value.trim().isEmpty) {
+//     return null;
+//   }
+//   // validate number, letter, underscore, and dash,
+//   // and minimum 5 characters
+//   String pattern = r'^[a-zA-Z0-9_ -]{5,}$';
+//   RegExp regExp = RegExp(pattern);
+//   if (!regExp.hasMatch(value)) {
+//     return 'min length is 5 and letter, number, _, - only';
+//   }
+//   return null;
+// }
 
 String? validateDepositAmount(String value) {
   if (value.trim().isEmpty) {
@@ -1143,69 +1144,67 @@ String? Function(String) getTenantValidator(String key,
     {bool isValueRequired = true}) {
   switch (key) {
     case 'label':
-      return validateTenantLabel;
+      return getValidator(validateTenantLabel, isValueRequired);
     case 'displayname':
-      return validateDisplayName;
+      return getValidator(validateDisplayName, isValueRequired);
     case 'company_trading_name':
-      return validateCompanyTradingName;
+      return getValidator(validateCompanyTradingName, isValueRequired);
     case 'billing_address':
-      return validateBillingAddress;
+      return getValidator(validateBillingAddress, isValueRequired);
     case 'billing_address_line_1':
-      return validateBillingAddressLine1;
+      return getValidator(validateBillingAddressLine1, isValueRequired);
     case 'billing_address_line_2':
-      return validateBillingAddressLine2;
+      return getValidator(validateBillingAddressLine2, isValueRequired);
     case 'billing_address_line_3':
-      return validateBillingAddressLine3;
+      return getValidator(validateBillingAddressLine3, isValueRequired);
     case 'account_number':
-      return isValueRequired
-          ? validateTenantAccountNumber2
-          : validateTenantAccountNumberNotRequired;
+      return getValidator(validateTenantAccountNumber, isValueRequired);
     case 'giro_account_number':
-      return validateBankAccountNumber;
+      return getValidator(validateBankAccountNumber, isValueRequired);
     case 'billing_contact_name':
-      return validateBillingContactName;
+      return getValidator(validateBillingContactName, isValueRequired);
     case 'billing_email_1':
-      return validateEmail;
+      return getValidator(validateEmail, isValueRequired);
     case 'billing_email_2':
-      return validateOptionalEmail;
+      return getValidator(validateOptionalEmail, isValueRequired);
     case 'billing_email_3':
-      return validateOptionalEmail;
+      return getValidator(validateOptionalEmail, isValueRequired);
     case 'billing_did':
-      return validateBillingDid;
+      return getValidator(validateBillingDid, isValueRequired);
     case 'payment_method':
-      return validatePaymentMethod;
+      return getValidator(validatePaymentMethod, isValueRequired);
     case 'credit_term':
-      return validateCreditTerm;
+      return getValidator(validateCreditTerm, isValueRequired);
     case 'bank_account_number':
-      return validateBankAccountNumber;
+      return getValidator(validateBankAccountNumber, isValueRequired);
     case 'deposit_amount':
-      return validateDepositAmount;
+      return getValidator(validateDepositAmount, isValueRequired);
     case 'unit_type':
-      return validateUnitType;
+      return getValidator(validateUnitType, isValueRequired);
     case 'gfa':
-      return validateGfa;
+      return getValidator(validateGfa, isValueRequired);
     case 'supply_cap_kva':
-      return validateSupplyCapKva;
+      return getValidator(validateSupplyCapKva, isValueRequired);
     case 'supply_cap_v':
-      return validateSupplyCapV;
+      return getValidator(validateSupplyCapV, isValueRequired);
     case 'supply_cap_amp':
-      return validateSupplyCapAmp;
+      return getValidator(validateSupplyCapAmp, isValueRequired);
     case 'requested_turn_on_timestamp':
-      return validateRequestedTurnOnDate;
+      return getValidator(validateRequestedTurnOnDate, isValueRequired);
     case 'ftf_start_timestamp':
-      return validateFtfStartDate;
+      return getValidator(validateFtfStartDate, isValueRequired);
     case 'dda_number':
-      return validateDdaNumber;
+      return getValidator(validateDdaNumber, isValueRequired);
     case 'site_label':
-      return validateLabelScope;
+      return getValidator(validateLabelScope, isValueRequired);
     case 'building_label':
-      return validateLabelScope;
+      return getValidator(validateLabelScope, isValueRequired);
     case 'location_label':
-      return validateLabelScope;
+      return getValidator(validateLabelScope, isValueRequired);
     case 'remark':
-      return validateRemark;
+      return getValidator(validateRemark, isValueRequired);
     case 'initial_balance':
-      return validateInitialBalance;
+      return getValidator(validateInitialBalance, isValueRequired);
     default:
       dev.log('No validator found for key: $key');
       return (String? value) {
