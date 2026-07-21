@@ -190,7 +190,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
 
         _isFetchingListInfo = true;
 
-        Map<String, dynamic> data = await getListInfoList(
+        final result = await getListInfoList2(
           widget.appConfig,
           loggedInUser,
           queryMap,
@@ -204,21 +204,21 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         );
 
         if (widget.listContextType == PagListContextType.usage) {
-          if (data['meter_type_list'] == null) {
+          if (result['meter_type_list'] == null) {
             throw Exception('Failed to get meter type list');
           }
           meterTypeList.clear();
-          var meterTypeListJson = data['meter_type_list'];
+          var meterTypeListJson = result['meter_type_list'];
           for (String meterType in meterTypeListJson) {
             meterTypeList.add(meterType);
           }
         }
 
-        if (data['list_info_list'] == null) {
+        if (result['list_info_list'] == null) {
           throw Exception('Failed to get list info list');
         }
 
-        final listInfoListJson = data['list_info_list'];
+        final listInfoListJson = result['list_info_list'];
 
         List<Map<String, dynamic>> listInfoList = [];
         if (listInfoListJson != null) {

@@ -8,49 +8,49 @@ import 'dart:convert';
 
 import '../model/mdl_pag_app_config.dart';
 
-Future<dynamic> getListInfoList(
-  MdlPagAppConfig appConfig,
-  MdlPagUser? loggedInUser,
-  Map<String, dynamic> queryMap,
-  MdlPagSvcClaim svcClaim,
-) async {
-  svcClaim.svcName = PagSvcType.oresvc2.name;
-  svcClaim.endpoint = PagUrlBase.eptGetListInfoList;
+// Future<dynamic> getListInfoList(
+//   MdlPagAppConfig appConfig,
+//   MdlPagUser? loggedInUser,
+//   Map<String, dynamic> queryMap,
+//   MdlPagSvcClaim svcClaim,
+// ) async {
+//   svcClaim.svcName = PagSvcType.oresvc2.name;
+//   svcClaim.endpoint = PagUrlBase.eptGetListInfoList;
 
-  String svcToken = '';
-  // try {
-  //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
-  // } catch (err) {
-  //   throw Exception(err);
-  // }
+//   String svcToken = '';
+//   // try {
+//   //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
+//   // } catch (err) {
+//   //   throw Exception(err);
+//   // }
 
-  final response = await http.post(
-    Uri.parse(PagUrlController(loggedInUser, appConfig)
-        .getUrl(PagSvcType.oresvc2, svcClaim.endpoint!)),
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-      'Authorization': 'Bearer $svcToken',
-    },
-    body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
-  );
+//   final response = await http.post(
+//     Uri.parse(PagUrlController(loggedInUser, appConfig)
+//         .getUrl(PagSvcType.oresvc2, svcClaim.endpoint!)),
+//     headers: <String, String>{
+//       'Content-Type': 'application/json; charset=UTF-8',
+//       'Authorization': 'Bearer $svcToken',
+//     },
+//     body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
+//   );
 
-  if (response.statusCode == 200) {
-    final respJson = jsonDecode(response.body);
-    if (respJson['error'] != null) {
-      throw Exception(respJson['error']);
-    }
-    if (respJson['data'] == null) {
-      throw Exception('Failed to get list info list');
-    }
+//   if (response.statusCode == 200) {
+//     final respJson = jsonDecode(response.body);
+//     if (respJson['error'] != null) {
+//       throw Exception(respJson['error']);
+//     }
+//     if (respJson['data'] == null) {
+//       throw Exception('Failed to get list info list');
+//     }
 
-    var data = respJson['data'];
-    return data;
-  } else if (response.statusCode == 403) {
-    throw Exception("You are not authorized to perform this operation");
-  } else {
-    throw Exception(jsonDecode(response.body)['error']);
-  }
-}
+//     var data = respJson['data'];
+//     return data;
+//   } else if (response.statusCode == 403) {
+//     throw Exception("You are not authorized to perform this operation");
+//   } else {
+//     throw Exception(jsonDecode(response.body)['error']);
+//   }
+// }
 
 Future<dynamic> getListInfoList2(
   MdlPagAppConfig appConfig,
