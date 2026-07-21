@@ -203,22 +203,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           ),
         );
 
-        if (widget.listContextType == PagListContextType.usage) {
-          if (result['meter_type_list'] == null) {
-            throw Exception('Failed to get meter type list');
-          }
-          meterTypeList.clear();
-          var meterTypeListJson = result['meter_type_list'];
-          for (String meterType in meterTypeListJson) {
-            meterTypeList.add(meterType);
-          }
-        }
-
-        if (result['list_info_list'] == null) {
-          throw Exception('Failed to get list info list');
-        }
-
-        final listInfoListJson = result['list_info_list'];
+        final listInfoListJson = result;
 
         List<Map<String, dynamic>> listInfoList = [];
         if (listInfoListJson != null) {
@@ -269,6 +254,19 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           _addPagAppContextColumns(listController);
         }
         // _addPagAppContextColumns();
+
+        if (widget.listContextType == PagListContextType.usage) {
+          meterTypeList.clear();
+          for (MdlListColController colController
+              in _selectedListController!.listColControllerList) {
+            if (colController.colKey == 'meter_type') {
+              for (var value in colController.valueList ?? []) {
+                meterTypeList.add(value['value']);
+              }
+              break;
+            }
+          }
+        }
 
         _updateCustomize();
 
