@@ -201,9 +201,7 @@ Widget getScopeLabel(BuildContext context, MdlPagScope scope) {
 }
 
 enum PagScopeOpType {
-  onboardingLocation('Onboard Location', 'onboard_location', 'onb'),
-  onboardingLocationGroup(
-      'Onboard Location Group', 'onboard_location_group', 'onb'),
+  onboarding('Onboard', 'onb', 'onb'),
   update('Update', 'update', 'upd'),
   none('None', 'none', 'none');
 
@@ -289,22 +287,22 @@ final List<Map<String, dynamic>> listConfigScopeOpOnbLocationGroup = [
   },
 ];
 
-List<Map<String, dynamic>> getScopeOpsConfigList(PagScopeOpType opType) {
-  final List<Map<String, dynamic>> list = [];
-  switch (opType) {
-    case PagScopeOpType.onboardingLocation:
-      list.addAll(listConfigScopeOpsBase + listConfigScopeOpOnbLocation);
-      break;
-    case PagScopeOpType.onboardingLocationGroup:
-      list.addAll(listConfigScopeOpsBase + listConfigScopeOpOnbLocationGroup);
-      break;
-    default:
-      list.addAll(listConfigScopeOpsBase);
-  }
-  //remove empty maps
-  list.removeWhere((map) => map.isEmpty);
-  return list;
-}
+// List<Map<String, dynamic>> getScopeOpsConfigList(PagScopeOpType opType) {
+//   final List<Map<String, dynamic>> list = [];
+//   switch (opType) {
+//     case PagScopeOpType.onboardingLocation:
+//       list.addAll(listConfigScopeOpsBase + listConfigScopeOpOnbLocation);
+//       break;
+//     case PagScopeOpType.onboardingLocationGroup:
+//       list.addAll(listConfigScopeOpsBase + listConfigScopeOpOnbLocationGroup);
+//       break;
+//     default:
+//       list.addAll(listConfigScopeOpsBase);
+//   }
+//   //remove empty maps
+//   list.removeWhere((map) => map.isEmpty);
+//   return list;
+// }
 
 ({
   MdlPagSiteGroupProfile? siteGroupProfile,
