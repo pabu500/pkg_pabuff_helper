@@ -347,7 +347,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
             ),
             const Divider(height: 1),
             verticalSpaceSmall,
-            getScopeFilter(),
+            // getScopeFilter(),
             verticalSpaceSmall,
             Container(
               decoration: BoxDecoration(
