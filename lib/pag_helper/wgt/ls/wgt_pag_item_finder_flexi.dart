@@ -750,6 +750,14 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
         }
       }
     }
+
+    // find filter count
+    for (MdlListColController colController
+        in widget.listController.listColControllerList) {
+      if (colController.includeColKeyAsFilter) {
+        _filterCount++;
+      }
+    }
   }
 
   @override
@@ -836,13 +844,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
         children: [
           if (_filterCount > 0) getOptions(),
           // horizontalSpaceTiny,
-          getFilterCore(
-              isCompactMode: true,
-              onGetList: (itemCount) {
-                setState(() {
-                  _filterCount = itemCount;
-                });
-              }),
+          getFilterCore(isCompactMode: true),
           // horizontalSpaceTiny,
           getSearchButton(),
         ],
@@ -941,17 +943,18 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     );
   }
 
-  Widget getFilterCore(
-      {bool isCompactMode = false, Function(int itemCount)? onGetList}) {
+  Widget getFilterCore({
+    bool isCompactMode = false,
+  }) {
     if (isCompactMode) {
       // _isFullPanel = true;
       String? singleIdFilterKey = getSingleIdFilterKey();
       return Column(children: [
         getItemIdFilterGroup(
-            isCompactMode: isCompactMode,
-            singleIdFilterKey: singleIdFilterKey,
-            inputWidth: 200,
-            onGetList: onGetList),
+          isCompactMode: isCompactMode,
+          singleIdFilterKey: singleIdFilterKey,
+          inputWidth: 200,
+        ),
         Padding(
           padding: const EdgeInsets.only(top: 5),
           child: getItemLocationFilterGroup(dropdownWidth: 222),
@@ -964,7 +967,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
         Wrap(
           children: [
             if (widget.listContextType != PagListContextType.infoTp)
-              getItemIdFilterGroup(onGetList: onGetList),
+              getItemIdFilterGroup(),
             if (widget.listContextType != PagListContextType.infoTp)
               getItemSpecFilterGroup(),
             if (widget.listContextType != PagListContextType.infoTp)
@@ -999,23 +1002,20 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     return null;
   }
 
-  Widget getItemIdFilterGroup(
-      {bool isCompactMode = false,
-      String? singleIdFilterKey,
-      double inputWidth = 160,
-      Function(int itemCount)? onGetList}) {
+  Widget getItemIdFilterGroup({
+    bool isCompactMode = false,
+    String? singleIdFilterKey,
+    double inputWidth = 160,
+  }) {
     List<Widget> list = getItemIdGroupList(
         singleIdFilter: singleIdFilterKey,
         showScanner: isCompactMode,
         inputWidth: inputWidth);
     if (list.isEmpty) {
       // return Container();
-      onGetList?.call(0);
 
       return SizedBox(width: widget.width ?? 308);
-    } else {
-      onGetList?.call(list.length);
-    }
+    } else {}
     return Container(
       decoration: blockDecoration,
       margin: const EdgeInsets.symmetric(horizontal: 3),
