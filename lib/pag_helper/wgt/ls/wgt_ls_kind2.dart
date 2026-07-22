@@ -104,6 +104,7 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
     }
 
     try {
+      _selectedListController = null;
       for (var listController in _listControllerList) {
         if (
             // _getItemTypeStr(itemType) ==
