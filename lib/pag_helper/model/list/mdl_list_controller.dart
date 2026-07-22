@@ -98,7 +98,7 @@ class MdlPagListController /*extends ChangeNotifier*/ {
         case 'meter':
           itemTypeEnum = PagDeviceCat.meter;
           break;
-        case 'meterGroup':
+        case 'meter_group':
           itemTypeEnum = PagDeviceCat.meterGroup;
           break;
         case 'sensor':
@@ -125,7 +125,8 @@ class MdlPagListController /*extends ChangeNotifier*/ {
         case 'project':
           itemTypeEnum = PagScopeType.project;
           break;
-        case 'site_group' || 'siteGroup':
+        // case 'site_group' || 'siteGroup':
+        case 'site_group':
           itemTypeEnum = PagScopeType.siteGroup;
           break;
         case 'site':
@@ -134,7 +135,8 @@ class MdlPagListController /*extends ChangeNotifier*/ {
         case 'building':
           itemTypeEnum = PagScopeType.building;
           break;
-        case 'location_group' || 'locationGroup':
+        // case 'location_group' || 'locationGroup':
+        case 'location_group':
           itemTypeEnum = PagScopeType.locationGroup;
           break;
         case 'location':
