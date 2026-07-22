@@ -96,6 +96,8 @@ class MdlListColController {
   bool showInputOnFormCreate;
   bool showFilter;
   List<Map<String, dynamic>>? opInfoList;
+  bool isCompactFilter;
+  bool showScanner;
 
   MdlListColController({
     required this.colKey,
@@ -150,6 +152,8 @@ class MdlListColController {
     this.showInputOnFormCreate = false,
     this.showFilter = false,
     this.opInfoList,
+    this.isCompactFilter = false,
+    this.showScanner = false,
   }) {
     pinned = pinned ?? false;
   }
@@ -533,6 +537,26 @@ class MdlListColController {
       }
     }
 
+    bool isCompactFilter = false;
+    if (json['compact_filter'] != null) {
+      dynamic isCompactFilterValue = json['compact_filter'];
+      if (isCompactFilterValue is bool) {
+        isCompactFilter = isCompactFilterValue;
+      } else if (isCompactFilterValue is String) {
+        isCompactFilter = isCompactFilterValue.toLowerCase() == 'true';
+      }
+    }
+
+    bool showScanner = false;
+    if (json['show_scanner'] != null) {
+      dynamic showScannerValue = json['show_scanner'];
+      if (showScannerValue is bool) {
+        showScanner = showScannerValue;
+      } else if (showScannerValue is String) {
+        showScanner = showScannerValue.toLowerCase() == 'true';
+      }
+    }
+
     return MdlListColController(
       colKey: colKey,
       joinKey: json['join_key'],
@@ -577,6 +601,8 @@ class MdlListColController {
       showFilter: showFilter,
       showTimestampAsDate: showTimestampAsDate,
       rowOrder: rowOrder,
+      isCompactFilter: isCompactFilter,
+      showScanner: showScanner,
       opInfoList: opInfoList,
     );
   }
@@ -620,6 +646,8 @@ class MdlListColController {
     data['show_timestamp_as_date'] = showTimestampAsDate.toString();
     data['row_order'] = rowOrder;
     data['op_info_list'] = opInfoList;
+    data['is_compact_filter'] = isCompactFilter.toString();
+    data['show_scanner'] = showScanner.toString();
 
     return data;
   }

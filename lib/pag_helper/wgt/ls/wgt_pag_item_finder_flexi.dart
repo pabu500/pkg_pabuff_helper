@@ -138,14 +138,13 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
 class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   bool _isPhone = false;
 
+  bool _isCompactMode = false;
+
   int _filterCount = 0;
 
   late final String listName;
   late final String itemTypeStr;
   BoxDecoration? blockDecoration;
-
-  bool _showScanner = false;
-  String? _code;
 
   late DateTime _lastLoadingTime;
   DateTime? _lastRequestTime;
@@ -663,6 +662,8 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   void initState() {
     super.initState();
 
+    _isCompactMode = widget.isCompactMode;
+
     assert(widget.itemType is PagDeviceCat ||
         widget.itemType is PagScopeType ||
         widget.itemType is PagItemKind ||
@@ -769,14 +770,14 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   @override
   Widget build(BuildContext context) {
     _isPhone = context.isPhone;
-
-    _dropDownListTextStyle =
-        const TextStyle(fontSize: 13, fontWeight: FontWeight.w500);
+    _dropDownListTextStyle = TextStyle(
+        fontSize: 15, color: Theme.of(context).textTheme.bodyMedium?.color);
     _dropDownListHintStyle =
         TextStyle(fontSize: 15, color: Theme.of(context).hintColor);
     _dropDownUnderline =
         Container(height: 1, color: Theme.of(context).hintColor.withAlpha(75));
-    double width = widget.width ?? MediaQuery.of(context).size.width - 130;
+
+    double width = widget.width ?? MediaQuery.of(context).size.width;
     width = width + widget.widthOffset;
 
     blockDecoration = BoxDecoration(
@@ -785,20 +786,20 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
       borderRadius: BorderRadius.circular(5),
     );
 
+    _isCompactMode = widget.isCompactMode || width < 800;
+
     return completedWidget(width);
   }
 
   Widget completedWidget(double width) {
     return widget.isScopeProvider
         ? getScopeProvider()
-        : widget.isCompactMode
-            ? getCompactFinder()
-            : width > 800
-                ? Padding(
-                    padding: widget.sidePadding,
-                    child: getItemPickerWide(width),
-                  )
-                : getItemPickerNarrow();
+        : _isCompactMode
+            ? getCompactFinder(width)
+            : Padding(
+                padding: widget.sidePadding,
+                child: getItemPickerWide(width),
+              );
   }
 
   Widget getScopeProvider() {
@@ -818,84 +819,104 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           getOptions(),
-          getFilterCore(isCompactMode: true),
-          // horizontalSpaceTiny,
-          // getSearchButton(),
+          getFilterCore(),
         ],
       ),
     );
   }
 
-  Widget getCompactFinder() {
-    return Container(
-      width: widget.width,
-      padding: const EdgeInsets.symmetric(horizontal: 1, vertical: 5),
-      margin: const EdgeInsets.symmetric(horizontal: 2),
-      decoration: BoxDecoration(
-        // color: Theme.of(context).colorScheme.background,
-        borderRadius: BorderRadius.circular(5),
-        border: Border.all(
-            color: Theme.of(context).hintColor /*.withOpacity(0.3)*/, width: 1),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          if (_filterCount > 0) getOptions(),
-          // horizontalSpaceTiny,
-          getFilterCore(isCompactMode: true),
-          // horizontalSpaceTiny,
-          getSearchButton(),
-        ],
-      ),
-    );
+  Widget getCompactFinder(double width) {
+    if (_showPanel) {
+      return Container(
+        width: widget.width ?? width - 20,
+        padding: const EdgeInsets.symmetric(horizontal: 1, vertical: 5),
+        margin: const EdgeInsets.symmetric(horizontal: 2),
+        decoration: BoxDecoration(
+          // color: Theme.of(context).colorScheme.background,
+          borderRadius: BorderRadius.circular(5),
+          border: Border.all(
+              color: Theme.of(context).hintColor /*.withOpacity(0.3)*/,
+              width: 1),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            if (_filterCount > 0) getOptions(),
+            getFilterCore(),
+            getSearchButton(),
+          ],
+        ),
+      );
+    } else {
+      return getCollapsedBar(
+        context: context,
+        saveToSharedPref: saveToSharedPref,
+        color: Theme.of(context).colorScheme.primary,
+        width: widget.width,
+        height: 38,
+        sectionName: widget.sectionName,
+        panelTitle: widget.panelTitle,
+        panelName: widget.panelName,
+        onTap: () {
+          setState(() {
+            _showPanel = true;
+            widget.onShowPanel?.call(true);
+          });
+        },
+      );
+    }
   }
 
-  Widget getItemPickerNarrow() {
-    _showScanner = _showScanner /* && isPhone8 */;
-    return _showPanel
-        ? Container(
-            width: widget.width,
-            padding: const EdgeInsets.symmetric(horizontal: 21, vertical: 5),
-            decoration: BoxDecoration(
-              // color: Theme.of(context).colorScheme.background,
-              borderRadius: BorderRadius.circular(5),
-              border: Border.all(
-                  color: Theme.of(context).hintColor /*.withOpacity(0.3)*/,
-                  width: 1),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // getItemPropertySelector(330),
-                verticalSpaceTiny,
-                // getScopeSelector(),
-                if (widget.timeRangePickerWidget != null) verticalSpaceTiny,
-                if (widget.timeRangePickerWidget != null)
-                  Row(children: [widget.timeRangePickerWidget!]),
-                verticalSpaceSmall,
-                getOptions(),
-              ],
-            ),
-          )
-        : getCollapsedBar(
-            context: context,
-            saveToSharedPref: saveToSharedPref,
-            color: Theme.of(context).colorScheme.primary,
-            width: widget.width,
-            height: 38,
-            sectionName: widget.sectionName,
-            panelTitle: widget.panelTitle,
-            panelName: widget.panelName,
-            onTap: () {
-              setState(() {
-                _showPanel = true;
-                widget.onShowPanel?.call(true);
-              });
-            },
-          );
-  }
+  // Widget getItemPickerNarrow() {
+  //   return _showPanel
+  //       ? Container(
+  //           width: widget.width,
+  //           padding: const EdgeInsets.symmetric(horizontal: 21, vertical: 5),
+  //           decoration: BoxDecoration(
+  //             // color: Theme.of(context).colorScheme.background,
+  //             borderRadius: BorderRadius.circular(5),
+  //             border: Border.all(
+  //                 color: Theme.of(context).hintColor /*.withOpacity(0.3)*/,
+  //                 width: 1),
+  //           ),
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [
+  //               // getItemPropertySelector(330),
+  //               verticalSpaceTiny,
+  //               // getScopeSelector(),
+  //               if (widget.timeRangePickerWidget != null) verticalSpaceTiny,
+  //               if (widget.timeRangePickerWidget != null)
+  //                 Row(children: [widget.timeRangePickerWidget!]),
+
+  //               getFilterCore(isCompactMode: true),
+  //               verticalSpaceSmall,
+  //               Row(children: [
+  //                 getOptions(),
+  //                 getSearchButton(),
+  //               ]),
+  //             ],
+  //           ),
+  //         )
+  //       : getCollapsedBar(
+  //           context: context,
+  //           saveToSharedPref: saveToSharedPref,
+  //           color: Theme.of(context).colorScheme.primary,
+  //           width: widget.width,
+  //           height: 38,
+  //           sectionName: widget.sectionName,
+  //           panelTitle: widget.panelTitle,
+  //           panelName: widget.panelName,
+  //           onTap: () {
+  //             setState(() {
+  //               _showPanel = true;
+  //               widget.onShowPanel?.call(true);
+  //             });
+  //           },
+  //         );
+  // }
 
   Widget getItemPickerWide(double width) {
     bool showHint = !_isFullPanel;
@@ -907,7 +928,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
       }
     }
     return Container(
-      width: width,
+      width: width - 130,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(5),
         border: Border.all(color: Theme.of(context).hintColor, width: 1),
@@ -943,21 +964,24 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     );
   }
 
-  Widget getFilterCore({
-    bool isCompactMode = false,
-  }) {
-    if (isCompactMode) {
-      // _isFullPanel = true;
+  Widget getFilterCore() {
+    if (_isCompactMode) {
       String? singleIdFilterKey = getSingleIdFilterKey();
+
       return Column(children: [
         getItemIdFilterGroup(
-          isCompactMode: isCompactMode,
-          singleIdFilterKey: singleIdFilterKey,
-          inputWidth: 200,
+            singleIdFilterKey: singleIdFilterKey, inputWidth: 210),
+        Padding(
+          padding: const EdgeInsets.only(top: 5),
+          child: getItemSpecFilterGroup(),
         ),
         Padding(
           padding: const EdgeInsets.only(top: 5),
-          child: getItemLocationFilterGroup(dropdownWidth: 222),
+          child: getItemStatusFilterGroup(),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 5),
+          child: getItemLocationFilterGroup(dropdownWidth: 210),
         ),
       ]);
     }
@@ -1002,20 +1026,15 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     return null;
   }
 
-  Widget getItemIdFilterGroup({
-    bool isCompactMode = false,
-    String? singleIdFilterKey,
-    double inputWidth = 160,
-  }) {
+  Widget getItemIdFilterGroup(
+      {String? singleIdFilterKey, double inputWidth = 160}) {
     List<Widget> list = getItemIdGroupList(
-        singleIdFilter: singleIdFilterKey,
-        showScanner: isCompactMode,
-        inputWidth: inputWidth);
-    if (list.isEmpty) {
-      // return Container();
+        singleIdFilter: singleIdFilterKey, inputWidth: inputWidth);
 
+    if (list.isEmpty) {
       return SizedBox(width: widget.width ?? 308);
     } else {}
+
     return Container(
       decoration: blockDecoration,
       margin: const EdgeInsets.symmetric(horizontal: 3),
@@ -1186,7 +1205,12 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     for (MdlListColController colController
         in widget.listController.listColControllerList) {
       if (colController.showFilter == false) continue;
+
       if (!_isFullPanel && !colController.pinned && !widget.isCompactMode) {
+        continue;
+      }
+
+      if (_isCompactMode && !colController.isCompactFilter) {
         continue;
       }
 
@@ -1270,9 +1294,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   }
 
   List<Widget> getItemIdGroupList(
-      {String? singleIdFilter,
-      bool showScanner = false,
-      double inputWidth = 160}) {
+      {String? singleIdFilter, double inputWidth = 160}) {
     List<Widget> list = [];
     for (var colController in widget.listController.listColControllerList) {
       if (singleIdFilter != null && colController.colKey != singleIdFilter) {
@@ -1280,7 +1302,12 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
       }
 
       if (colController.showFilter == false) continue;
-      if (!_isFullPanel && !colController.pinned && !widget.isCompactMode) {
+
+      if (!_isFullPanel && !colController.pinned && !_isCompactMode) {
+        continue;
+      }
+
+      if (_isCompactMode && !colController.isCompactFilter) {
         continue;
       }
 
@@ -1301,6 +1328,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
           continue;
         }
         UniqueKey? resetKey = colController.filterResetKey;
+        bool showScanner = colController.showScanner && _isCompactMode;
         list.add(
           Padding(
             padding: const EdgeInsets.only(left: 8, right: 8, bottom: 3),
@@ -1358,7 +1386,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
                     //     ? getScanner(colController)
                     //     : null,
                   ),
-                  if (_showScanner || showScanner) getScanner(colController),
+                  if (showScanner) getScanner(colController),
                 ],
               ),
             ),
@@ -1384,6 +1412,10 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
       // need to pull the filter value list regardless of the panel status
       // because the value list is needed to populate for the info edit panel
       // if (!_isFullPanel && !colController.pinned) continue;
+
+      if (_isCompactMode && !colController.isCompactFilter) {
+        continue;
+      }
 
       if (colController.filterGroupType == PagFilterGroupType.spec) {
         Widget wdiget;
@@ -1490,6 +1522,10 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
 
       if (!_isFullPanel && !colController.pinned) continue;
 
+      if (_isCompactMode && !colController.isCompactFilter) {
+        continue;
+      }
+
       if (colController.filterGroupType == PagFilterGroupType.location) {
         // skip location filter
         if (colController.colKey == 'location_label') {
@@ -1525,6 +1561,10 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
       // need to pull the filter value list regardless of the panel status
       // because the value list is needed to populate for the info edit panel
       // if (!_isFullPanel && !item.pinned) continue;
+
+      if (_isCompactMode && !item.isCompactFilter) {
+        continue;
+      }
 
       if (item.filterGroupType == PagFilterGroupType.status) {
         //dropdown
@@ -1696,7 +1736,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   }
 
   Widget getOptions({showPanelModeButton = true}) {
-    return widget.isCompactMode
+    return _isCompactMode
         ? Column(
             children: [
               getClearButton(),
