@@ -149,10 +149,10 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
           ),
           margin: const EdgeInsets.symmetric(horizontal: 5),
           child: _isPhone
-              ? SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width - 10,
+              ? SizedBox(
+                  width: MediaQuery.of(context).size.width - 10,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,
