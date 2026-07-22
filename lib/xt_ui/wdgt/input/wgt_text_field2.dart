@@ -181,7 +181,9 @@ class _WgtTextFieldState extends State<WgtTextField> {
               });
             }
           }
+          // onFocusChnage will be called when edit complete
           widget.onEditingComplete?.call();
+
           if (_controller.text.trim().isNotEmpty) {
             if (widget.requireUnique) {
               if (!_uniqueChecked && _isValidated) {
