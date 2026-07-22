@@ -151,13 +151,16 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
           child: _isPhone
               ? SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ..._buildMenuItemList(appModel)
-                      // Container(width: 30, height: 30, color: Colors.red),
-                    ],
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width - 10,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ..._buildMenuItemList(appModel)
+                        // Container(width: 30, height: 30, color: Colors.red),
+                      ],
+                    ),
                   ),
                 )
               : Column(
