@@ -105,8 +105,11 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
 
     try {
       for (var listController in _listControllerList) {
-        if (_getItemTypeStr(itemType) ==
-            _getItemTypeStr(listController.itemTypeEnum)) {
+        if (
+            // _getItemTypeStr(itemType) ==
+            //   _getItemTypeStr(listController.itemTypeEnum))
+            getItemTypeValue(itemType) ==
+                getItemTypeValue(listController.itemTypeEnum)) {
           _selectedListController = listController;
           break;
         }
@@ -210,28 +213,29 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
 
   void _saveItemTypePref() {
     String? itemTypeStr =
-        _getItemTypeStr(_selectedListController?.itemTypeEnum);
+        // _getItemTypeStr(_selectedListController?.itemTypeEnum);
+        getItemTypeValue(_selectedListController?.itemTypeEnum);
     String itemTypePrefKey = '${widget.prefKey}_${widget.itemKind.name}';
     saveToSharedPref(itemTypePrefKey, itemTypeStr);
   }
 
-  String? _getItemTypeStr(dynamic itemType) {
-    if (itemType is PagDeviceCat) {
-      // return getPagDeviceTypeStr(itemType);
-      return itemType.name;
-    } else if (itemType is PagScopeType) {
-      return getPagScopeTypeStr(itemType);
-    } else if (itemType is PagFinanceType) {
-      // return getPagFinanceTypeStr(itemType);
-      return itemType.value;
-    } else if (itemType is PagOrgType) {
-      return itemType.value;
-    } else if (itemType is PagTariff) {
-      return itemType.value;
-    } else {
-      throw Exception('Unsupported item type: ${itemType.runtimeType}');
-    }
-  }
+  // String? _getItemTypeStr(dynamic itemType) {
+  //   if (itemType is PagDeviceCat) {
+  //     // return getPagDeviceTypeStr(itemType);
+  //     return itemType.name;
+  //   } else if (itemType is PagScopeType) {
+  //     return getPagScopeTypeStr(itemType);
+  //   } else if (itemType is PagFinanceType) {
+  //     // return getPagFinanceTypeStr(itemType);
+  //     return itemType.value;
+  //   } else if (itemType is PagOrgType) {
+  //     return itemType.value;
+  //   } else if (itemType is PagTariff) {
+  //     return itemType.value;
+  //   } else {
+  //     throw Exception('Unsupported item type: ${itemType.runtimeType}');
+  //   }
+  // }
 
   @override
   void initState() {
