@@ -269,7 +269,9 @@ class _WgtTextFieldState extends State<WgtTextField> {
               if (!_isValidated) {
                 return;
               }
-              widget.onEditingComplete?.call();
+
+              // will be handled by onFocusChange
+              // widget.onEditingComplete?.call();
 
               if (widget.requireUnique) {
                 if (!_uniqueChecked) {
