@@ -1483,6 +1483,9 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       colTitle: ' ',
       includeColKeyAsFilter: false,
       showColumn: true,
+      showOnCard: true,
+      rowOnCard: 2,
+      rowOrder: 3,
       colWidth: 35,
       colWidgetType: PagColWidgetType.CUSTOM,
       getCustomWidget: (item, fullList) {
