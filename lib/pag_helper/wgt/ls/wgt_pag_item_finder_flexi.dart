@@ -797,9 +797,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
         : _isCompactMode
             ? getCompactFinder(width)
             : Padding(
-                padding: widget.sidePadding,
-                child: getItemPickerWide(width),
-              );
+                padding: widget.sidePadding, child: getItemPickerWide(width));
   }
 
   Widget getScopeProvider() {
@@ -1032,7 +1030,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
         singleIdFilter: singleIdFilterKey, inputWidth: inputWidth);
 
     if (list.isEmpty) {
-      return SizedBox(width: widget.width ?? 308);
+      return SizedBox(width: widget.width ?? (_isCompactMode ? 210 : 308));
     } else {}
 
     return Container(
@@ -1325,7 +1323,12 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
 
       if (colController.filterGroupType == PagFilterGroupType.identity) {
         if (widget.initialFilterMap.isNotEmpty && initialValue == null) {
-          continue;
+          // continue;
+          for (var entry in widget.initialFilterMap.entries) {
+            if (entry.key == colController.colKey) {
+              continue;
+            }
+          }
         }
         UniqueKey? resetKey = colController.filterResetKey;
         bool showScanner = colController.showScanner && _isCompactMode;
