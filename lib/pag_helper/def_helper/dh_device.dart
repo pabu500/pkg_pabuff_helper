@@ -849,16 +849,16 @@ enum PagSimPackageEnum {
       enumByLabel(label, values, (e) => e.label);
 }
 
-enum PagModelEnum {
-  gen1("Gen1"),
-  gen2("Gen2"),
-  gen3("Gen3"),
-  ;
+// enum PagGwGenEnum {
+//   gen1("Gen1"),
+//   gen2("Gen2"),
+//   gen3("Gen3"),
+//   ;
 
-  const PagModelEnum(this.label);
+//   const PagGwGenEnum(this.label);
 
-  final String label;
+//   final String label;
 
-  static PagModelEnum? byLabel(String? label) =>
-      enumByLabel(label, values, (e) => e.label);
-}
+//   static PagGwGenEnum? byLabel(String? label) =>
+//       enumByLabel(label, values, (e) => e.label);
+// }
