@@ -190,7 +190,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
 
         _isFetchingListInfo = true;
 
-        Map<String, dynamic> data = await getListInfoList(
+        final result = await getListInfoList2(
           widget.appConfig,
           loggedInUser,
           queryMap,
@@ -203,22 +203,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           ),
         );
 
-        if (widget.listContextType == PagListContextType.usage) {
-          if (data['meter_type_list'] == null) {
-            throw Exception('Failed to get meter type list');
-          }
-          meterTypeList.clear();
-          var meterTypeListJson = data['meter_type_list'];
-          for (String meterType in meterTypeListJson) {
-            meterTypeList.add(meterType);
-          }
-        }
-
-        if (data['list_info_list'] == null) {
-          throw Exception('Failed to get list info list');
-        }
-
-        final listInfoListJson = data['list_info_list'];
+        final listInfoListJson = result;
 
         List<Map<String, dynamic>> listInfoList = [];
         if (listInfoListJson != null) {
@@ -269,6 +254,19 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           _addPagAppContextColumns(listController);
         }
         // _addPagAppContextColumns();
+
+        if (widget.listContextType == PagListContextType.usage) {
+          meterTypeList.clear();
+          for (MdlListColController colController
+              in _selectedListController!.listColControllerList) {
+            if (colController.colKey == 'meter_type') {
+              for (var value in colController.valueList ?? []) {
+                meterTypeList.add(value['value']);
+              }
+              break;
+            }
+          }
+        }
 
         _updateCustomize();
 

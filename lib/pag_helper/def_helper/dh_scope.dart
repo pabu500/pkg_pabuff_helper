@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_scope.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_scope_profile.dart';
 import 'package:buff_helper/xt_ui/xt_helpers.dart';
@@ -10,6 +12,7 @@ import '../model/scope/mdl_pag_location_group_profile.dart';
 import '../model/scope/mdl_pag_site_group_profile.dart';
 import '../model/scope/mdl_pag_site_profile.dart';
 import 'enum_helper.dart';
+import 'pag_item_helper.dart';
 
 enum PagScopeType {
   project('Project', 'project', Symbols.flag),
@@ -198,10 +201,26 @@ Widget getScopeLabel(BuildContext context, MdlPagScope scope) {
 }
 
 enum PagScopeOpType {
-  onboardingLocation,
-  onboardingLocationGroup,
-  update,
-  none,
+  onboarding('Onboard', 'onb', 'onb'),
+  update('Update', 'update', 'upd'),
+  none('None', 'none', 'none');
+
+  final String label;
+  final String value;
+  final String tag;
+
+  const PagScopeOpType(
+    this.label,
+    this.value,
+    this.tag,
+  );
+
+  static PagScopeOpType byLabel(String? label) =>
+      enumByLabel(label, values, (e) => e.label) ?? none;
+  static PagScopeOpType byValue(String? value) =>
+      enumByValue(value, values, (e) => e.value) ?? none;
+  static PagScopeOpType byTag(String? tag) =>
+      enumByValue(tag, values, (e) => e.tag) ?? none;
 }
 
 final List<Map<String, dynamic>> listConfigScopeOpsBase = [
@@ -268,22 +287,22 @@ final List<Map<String, dynamic>> listConfigScopeOpOnbLocationGroup = [
   },
 ];
 
-List<Map<String, dynamic>> getScopeOpsConfigList(PagScopeOpType opType) {
-  final List<Map<String, dynamic>> list = [];
-  switch (opType) {
-    case PagScopeOpType.onboardingLocation:
-      list.addAll(listConfigScopeOpsBase + listConfigScopeOpOnbLocation);
-      break;
-    case PagScopeOpType.onboardingLocationGroup:
-      list.addAll(listConfigScopeOpsBase + listConfigScopeOpOnbLocationGroup);
-      break;
-    default:
-      list.addAll(listConfigScopeOpsBase);
-  }
-  //remove empty maps
-  list.removeWhere((map) => map.isEmpty);
-  return list;
-}
+// List<Map<String, dynamic>> getScopeOpsConfigList(PagScopeOpType opType) {
+//   final List<Map<String, dynamic>> list = [];
+//   switch (opType) {
+//     case PagScopeOpType.onboardingLocation:
+//       list.addAll(listConfigScopeOpsBase + listConfigScopeOpOnbLocation);
+//       break;
+//     case PagScopeOpType.onboardingLocationGroup:
+//       list.addAll(listConfigScopeOpsBase + listConfigScopeOpOnbLocationGroup);
+//       break;
+//     default:
+//       list.addAll(listConfigScopeOpsBase);
+//   }
+//   //remove empty maps
+//   list.removeWhere((map) => map.isEmpty);
+//   return list;
+// }
 
 ({
   MdlPagSiteGroupProfile? siteGroupProfile,
@@ -370,4 +389,25 @@ List<Map<String, dynamic>> getScopeOpsConfigList(PagScopeOpType opType) {
     buildingColController: buildingColController,
     locationGroupColController: locationGroupColController,
   );
+}
+
+String? Function(String) getScopeValidator(String key,
+    {bool isValueRequired = true}) {
+  switch (key) {
+    case 'label':
+      return getValidator(validateLabelScope, isValueRequired);
+    case 'location_group_label':
+      return getValidator(validateLabelScope, isValueRequired);
+    case 'building_label':
+      return getValidator(validateLabelScope, isValueRequired);
+    case 'site_label':
+      return getValidator(validateLabelScope, isValueRequired);
+    case 'site_group_label':
+      return getValidator(validateLabelScope, isValueRequired);
+    default:
+      dev.log('No validator found for key: $key');
+      return (String? value) {
+        return null;
+      };
+  }
 }

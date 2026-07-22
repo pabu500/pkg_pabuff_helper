@@ -132,6 +132,8 @@ String? Function(String) getItemKindValidator(PagItemKind itemKind, String key,
     case PagItemKind.finance:
       return getFinanceValidator(key, itemType,
           isValueRequired: isValueRequired);
+    case PagItemKind.scope:
+      return getScopeValidator(key, isValueRequired: isValueRequired);
     default:
       dev.log('No validator found for item kind: $itemKind, key: $key');
       return (String value) {
@@ -167,7 +169,6 @@ String getItemTypeValue(dynamic itemType) {
       itemType is PagBillingLcStatus ||
       itemType is PagBillPaymentStatus ||
       itemType is PagBillDueStatus ||
-      itemType is PagUserOpType ||
       itemType is PagItemKind ||
       itemType is PagTenantLcStatus ||
       itemType is PagTenantUnitType ||
@@ -178,10 +179,12 @@ String getItemTypeValue(dynamic itemType) {
       itemType is PagPaymentLcStatus ||
       itemType is PaymentSoaType ||
       itemType is PagSoaEntryType ||
-      itemType is PagPaymentOpType ||
       itemType is PagPortalType ||
       itemType is PagRoleType ||
-      itemType is PagInterestStartDateType) {
+      itemType is PagInterestStartDateType ||
+      itemType is PagPaymentOpType ||
+      itemType is PagUserOpType ||
+      itemType is PagScopeOpType) {
     return itemType.value ?? '';
   }
 
