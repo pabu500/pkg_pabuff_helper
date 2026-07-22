@@ -396,6 +396,7 @@ String? validateMeterReadingValue(String val) {
 
 enum PagDeviceOpType {
   onboarding('Onboarding', 'onb', 'onb'),
+  // mbOnb1on1('Meter Group Onboarding 1-on-1', 'mg_onb_1on1', 'mg_onb_1on1'),
   update('Update', 'upd', 'upd'),
   none('None', 'none', 'none');
 
