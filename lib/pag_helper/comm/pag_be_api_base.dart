@@ -416,12 +416,12 @@ class PagUrlBase {
       '/ems/meter_group/create_meter_group';
   static const String eptPagGetMeterGroupMetertList =
       '/ems/meter_group/get_meter_group_meter_list';
-  static const String eptPagGetMeterGroupScopeMeterList =
-      '/ems/meter_group/get_meter_group_scope_meter_list';
-  static const String eptUpdateMetrGroupMeterList =
-      '/ems/meter_group/update_meter_group_meter_list';
-  static const String eptGetMeterMeterGroupAssignment =
-      '/ems/meter_group/get_meter_meter_group_assignment';
+  // static const String eptGetMeterMeterGroupAssignment =
+  //     '/ems/meter_group/get_meter_meter_group_assignment';
+  static const String eptPagGetEmsMeterGroupScopeMeterList =
+      '/ems/meter_group/get_ems_meter_group_scope_meter_list';
+  static const String eptUpdateEmsMeterGroupMeterList =
+      '/ems/meter_group/update_ems_meter_group_meter_list';
 
   // AM - Device Manager
   static const String eptPagCreateDevice = '/am/device/create_device';
@@ -450,6 +450,10 @@ class PagUrlBase {
   //     '/am/get_meter_group_scope_meter_list';
   // static const String eptAmUpdateMetrGroupMeterList =
   //     '/am/update_meter_group_meter_list';
+  static const String eptPagGetAmMeterGroupScopeMeterList =
+      '/am/meter_group/get_am_meter_group_scope_meter_list';
+  static const String eptUpdateAmMeterGroupMeterList =
+      '/am/meter_group/update_am_meter_group_meter_list';
 
   //meter_ops
   static const String eptMeterOpGetManualMeterList =

@@ -2,7 +2,7 @@ import 'package:buff_helper/pag_helper/def_helper/dh_device.dart';
 import 'package:buff_helper/pag_helper/def_helper/enum_helper.dart';
 
 enum PagEmsMeterGroupOpType {
-  onboarding1o1('Onboarding 1-on-1', 'onb_1o1', 'onb_1o1'),
+  onboarding1o1('EMS Onboarding 1-on-1', 'ems_onb_1o1', 'ems_onb_1o1'),
   update('Update', 'update', 'update'),
   none('None', 'none', 'none'),
   ;

@@ -642,6 +642,10 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
       }
     }
 
+    if (_isModified && widget.isFlexiScope && _selectedLocation == null) {
+      pullChildrenList = false;
+    }
+
     String initialScopeLabel = widget.initialScope?.getLeafScopeLabel() ?? '';
     Widget? scopeIcon;
     PagScopeType? itemScopeType = widget.initialScope?.getScopeType();
@@ -696,16 +700,13 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
                           builder: (context, AsyncSnapshot<void> snapshot) {
                             switch (snapshot.connectionState) {
                               case ConnectionState.waiting:
-                                if (kDebugMode) {
-                                  print('waiting scope list...');
-                                }
+                                dev.log('waiting scope list...');
+
                                 return const SizedBox(
                                     height: 35, child: WgtPagWait(size: 21));
                               default:
                                 if (snapshot.hasError) {
-                                  if (kDebugMode) {
-                                    print(snapshot.error);
-                                  }
+                                  dev.log(snapshot.error.toString());
 
                                   _errorText = 'Error getting scope list';
 

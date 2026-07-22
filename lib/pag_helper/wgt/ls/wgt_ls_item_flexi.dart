@@ -14,7 +14,6 @@ import 'package:buff_helper/pag_helper/model/mdl_pag_app_context.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
 import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_scope.dart';
-import 'package:buff_helper/pag_helper/wgt/app/am/wgt_am_meter_group_assignment.dart';
 import 'package:buff_helper/pag_helper/wgt/app/ems/wgt_tenant_soa2.dart';
 import 'package:buff_helper/pagrid_helper/comm_helper/local_storage.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/wgt_pag_composite_bill_view.dart';
@@ -34,6 +33,7 @@ import 'package:provider/provider.dart';
 
 import '../../comm/comm_list.dart';
 import '../../model/mdl_pag_app_config.dart';
+import '../app/am/wgt_am_meter_group_assignment2.dart';
 import '../app/ems/wgt_bci_tenant_assignment.dart';
 import '../app/ems/wgt_bill_compilation.dart';
 import '../app/ems/wgt_ems_meter_group_assignment.dart';
@@ -984,10 +984,10 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                       case PagItemKind.device:
                         _selectedListController?.itemTypeEnum ==
                                 PagDeviceCat.meterGroup
-                            ? opWidget = WgtAmMeterGroupAssignment(
+                            ? opWidget = WgtAmMeterGroupAssignment2(
                                 appConfig: widget.appConfig,
                                 meterType: item['meter_type'] ?? '',
-                                itemGroupIndexStr: item['id'],
+                                strItemGroupIndex: item['id'],
                                 itemName: item['name'],
                                 itemLabel: item['label'] ?? '',
                                 itemScope: itemScope,
