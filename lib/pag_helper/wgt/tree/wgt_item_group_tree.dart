@@ -18,7 +18,6 @@ import 'package:buff_helper/xt_ui/wdgt/info/get_error_text_prompt.dart';
 import 'package:buff_helper/xt_ui/wdgt/input/wgt_text_field2.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 import 'package:buff_helper/xt_ui/xt_helpers.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_fancy_tree_view2/flutter_fancy_tree_view2.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -1505,7 +1504,7 @@ class _WgtItemGroupTreeState extends State<WgtItemGroupTree> {
             },
             validator: widget.newItemNameValidator ?? _validateNewItemName,
             onEditingComplete: () async {
-              _getItemInfo();
+              await _getItemInfo();
             },
           ),
         ),

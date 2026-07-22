@@ -149,13 +149,25 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
           ),
           margin: const EdgeInsets.symmetric(horizontal: 5),
           child: _isPhone
-              ? Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ..._buildMenuItemList(appModel)
-                    // Container(width: 30, height: 30, color: Colors.red),
-                  ],
+              ? LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minWidth: constraints.maxWidth,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            ..._buildMenuItemList(appModel),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
                 )
               : Column(
                   mainAxisSize: MainAxisSize.min,
