@@ -1416,7 +1416,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                         appConfig: widget.appConfig,
                         loggedInUser: loggedInUser!,
                         pagAppContext: widget.pagAppContext!,
-                        teneantInfo: item,
+                        tenantInfo: item,
                       ),
                       onClosed: () {},
                     );

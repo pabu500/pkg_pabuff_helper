@@ -342,13 +342,13 @@ class _WgtMeterGroupAssignmentItemState
           assignment['meter_group_id'] == widget.strItemGroupIndex;
 
       final tenantInfo = assignment['tenant_info'];
+      bool isAssignedToTenant = tenantInfo != null && tenantInfo.isNotEmpty;
       String tenantName = tenantInfo?['name'] ?? '';
       String tenantLabel = tenantInfo?['label'] ?? '';
       String tenantLcStatus = tenantInfo?['lc_status'] ?? '';
-      PagTenantLcStatus? tenantLcStatusEnum =
-          PagTenantLcStatus.byValue(tenantLcStatus);
-      // tenantLcStatusEnum ??= PagTenantLcStatus.normal;
-      if (tenantInfo != null) {
+      PagTenantLcStatus? tenantLcStatusEnum;
+      if (isAssignedToTenant) {
+        tenantLcStatusEnum = PagTenantLcStatus.byValue(tenantLcStatus);
         if (tenantLcStatusEnum == PagTenantLcStatus.normal ||
             tenantLcStatusEnum == PagTenantLcStatus.onboarding ||
             tenantLcStatusEnum == PagTenantLcStatus.offboarding) {
@@ -437,7 +437,7 @@ class _WgtMeterGroupAssignmentItemState
                     : SelectableText(
                         tenantName,
                         style: TextStyle(
-                          color: tenantLcStatusEnum.color,
+                          color: tenantLcStatusEnum!.color,
                           fontWeight: FontWeight.bold,
                         ),
                       ),

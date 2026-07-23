@@ -1,13 +1,19 @@
+import 'dart:developer' as dev;
+
 import 'package:buff_helper/pag_helper/def_helper/list_helper.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
 
+import '../../../comm/comm_ex.dart';
+import '../../../comm/pag_be_api_base.dart';
 import '../../../def_helper/dh_pag_finance.dart';
 import '../../../def_helper/pag_item_helper.dart';
+import '../../../model/acl/mdl_pag_svc_claim.dart';
 import '../../../model/mdl_pag_app_config.dart';
 import '../../../model/mdl_pag_app_context.dart';
 import '../../datetime/wgt_date_range_picker_monthly.dart';
 import '../../ls/wgt_ls_item_flexi.dart';
+import '../../wgt_comm_button.dart';
 
 class WgtTenantSoA2 extends StatefulWidget {
   const WgtTenantSoA2({
@@ -15,13 +21,13 @@ class WgtTenantSoA2 extends StatefulWidget {
     required this.appConfig,
     required this.loggedInUser,
     required this.pagAppContext,
-    required this.teneantInfo,
+    required this.tenantInfo,
   });
 
   final MdlPagAppConfig appConfig;
   final MdlPagUser loggedInUser;
   final MdlPagAppContext pagAppContext;
-  final Map<String, dynamic> teneantInfo;
+  final Map<String, dynamic> tenantInfo;
 
   @override
   State<WgtTenantSoA2> createState() => _WgtTenantSoA2State();
@@ -38,117 +44,53 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
   bool _isMTD = false;
   DateTime? _pickedMonth;
 
-  bool _fetching = false;
-  bool _fetched = false;
+  bool _isUpdating = false;
+  bool _updated = false;
   String _errorText = '';
 
-  final List<Map<String, dynamic>> _soaData = [];
+  String _updateErrorText = '';
 
-  // Future<dynamic> _doFetchSoaData() async {
-  //   if (_fetching) {
-  //     return;
-  //   }
-  //   if (_fromDate == null || _toDate == null) {
-  //     _errorText = 'Please select both From and To dates.';
-  //     setState(() {});
-  //     return;
-  //   }
-  //   Map<String, dynamic> queryMap = {
-  //     'scope': widget.loggedInUser.selectedScope.toScopeMap(),
-  //     'tenant_id': widget.teneantInfo['id'],
-  //     'from_timestamp': _fromDate?.toIso8601String() ?? '',
-  //     'to_timestamp': _toDate?.toIso8601String() ?? '',
-  //   };
+  Future<void> _populateMissingSoaEntry() async {
+    if (_isUpdating) return;
 
-  //   _errorText = '';
-  //   _fetched = false;
-  //   _fetching = true;
+    _isUpdating = true;
+    _updateErrorText = '';
 
-  //   try {
-  //     final result = await doGetTenantSoa(
-  //       widget.appConfig,
-  //       queryMap,
-  //       MdlPagSvcClaim(
-  //         username: widget.loggedInUser.username,
-  //         userId: widget.loggedInUser.id,
-  //         scope: '',
-  //         target: '',
-  //         operation: '',
-  //       ),
-  //     );
+    Map<String, dynamic> queryMap = {
+      'scope': widget.loggedInUser.selectedScope.toScopeMap(),
+      'tenant_id': widget.tenantInfo['id'],
+    };
 
-  //     // List<Map<String, dynamic>> debitList = [];
-  //     // List<Map<String, dynamic>> creditList = [];
-  //     // if (result['debit_list'] != null) {
-  //     //   debitList = List<Map<String, dynamic>>.from(result['debit_list']);
-  //     // }
-  //     // if (result['credit_list'] != null) {
-  //     //   creditList = List<Map<String, dynamic>>.from(result['credit_list']);
-  //     // }
-  //     // _updateSoAData(debitList, creditList);
-  //     final soaData = result;
-  //     _soaData.clear();
-  //     if (soaData is List && soaData.isNotEmpty) {
-  //       _soaData.addAll(List<Map<String, dynamic>>.from(soaData));
-  //     }
-  //   } catch (e) {
-  //     if (kDebugMode) {
-  //       print('error: $e');
-  //     }
-
-  //     _errorText = 'Error fetching SoA data';
-
-  //     return;
-  //   } finally {
-  //     setState(() {
-  //       _fetched = true;
-  //       _fetching = false;
-  //       _enableSearch = _enableSearchButton();
-  //     });
-  //   }
-  // }
-
-  // void _updateSoAData(List<Map<String, dynamic>> debitList,
-  //     List<Map<String, dynamic>> creditList) {
-  //   _soaData.clear();
-
-  //   if (debitList.isNotEmpty) {
-  //     for (var item in debitList) {
-  //       _soaData.add({
-  //         'entry_type': 'debit',
-  //         'date': item['date'],
-  //         'amount': item['amount'],
-  //         'description': item['description'] ?? '',
-  //       });
-  //     }
-  //   }
-  //   if (creditList.isNotEmpty) {
-  //     for (var item in creditList) {
-  //       _soaData.add({
-  //         'entry_type': 'credit',
-  //         'date': item['date'],
-  //         'description': item['description'],
-  //         'amount': item['amount'],
-  //       });
-  //     }
-  //   }
-  //   _soaData.sort((a, b) => a['date'].compareTo(b['date']));
-  //   // insert header
-  //   if (_soaData.isNotEmpty) {
-  //     _soaData.insert(0, {
-  //       'entry_type': 'header',
-  //       'date': 'Date',
-  //       'amount': 'Amount',
-  //       'description': 'Description',
-  //     });
-  //   }
-  // }
+    try {
+      final result = await ex(
+        endpoint: PagUrlBase.eptUpdateMissingSoaBuckets,
+        crudType: 'update',
+        opStr: 'populate missing SoA entry',
+        appConfig: widget.appConfig,
+        queryMap: queryMap,
+        svcClaim: MdlPagSvcClaim(
+          username: widget.loggedInUser.username,
+          userId: widget.loggedInUser.id,
+          scope: '',
+          target: '',
+          operation: 'update',
+        ),
+      );
+    } catch (e) {
+      dev.log(e.toString());
+      _updateErrorText = getErrorText(e,
+          defaultErrorText: 'Error populating missing SoA entry');
+      rethrow;
+    } finally {
+      setState(() {
+        _isUpdating = false;
+        _updated = true;
+      });
+    }
+  }
 
   bool _enableSearchButton() {
-    if (_fetching) {
-      return false;
-    }
-    if (_fetched) {
+    if (_isUpdating) {
       return false;
     }
 
@@ -176,8 +118,8 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
   @override
   void initState() {
     super.initState();
-    tenantName = widget.teneantInfo['name'] ?? '';
-    tenantLabel = widget.teneantInfo['label'] ?? '';
+    tenantName = widget.tenantInfo['name'] ?? '';
+    tenantLabel = widget.tenantInfo['label'] ?? '';
     _enableSearch = _enableSearchButton();
   }
 
@@ -202,17 +144,42 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
           ),
         ),
         verticalSpaceSmall,
-        Text(
-          'Tenant: $tenantName ($tenantLabel)',
-          style: TextStyle(
-            fontSize: 16,
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            getPopulateMissingSoaEntryButton(),
+            horizontalSpaceSmall,
+            Text(
+              'Tenant: $tenantName ($tenantLabel)',
+              style: TextStyle(
+                fontSize: 16,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+          ],
         ),
+        if (_updateErrorText.isNotEmpty)
+          getErrorTextPrompt(context: context, errorText: _updateErrorText),
         verticalSpaceSmall,
         getSoAContainer(),
         verticalSpaceSmall,
       ],
+    );
+  }
+
+  Widget getPopulateMissingSoaEntryButton() {
+    return WgtCommButton(
+      label: 'Check SoA Entry',
+      enabled: !_isUpdating && !_updated && _updateErrorText.isEmpty,
+      labelStyle: TextStyle(
+        color: Theme.of(context).colorScheme.onSecondary,
+        fontSize: 13.5,
+      ),
+      // width: barWidth + margin,
+      onPressed: () async {
+        await _populateMissingSoaEntry();
+      },
     );
   }
 
@@ -232,7 +199,7 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
       showTimeRangePicker: true,
       timeRangePickerWidget: getTimeRangePicker(),
       initialFilterMap: {
-        'tenant_id': widget.teneantInfo['id'],
+        'tenant_id': widget.tenantInfo['id'],
         'tenant_name': tenantName,
         'tenant_label': tenantLabel,
       },

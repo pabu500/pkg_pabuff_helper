@@ -341,6 +341,8 @@ class PagUrlBase {
   static const String eptCommitPaymentApply = '/ems/fin/commit_payment_apply';
   static const String eptCreateAdjustmentNote =
       '/ems/fin/create_adjustment_note';
+  static const String eptUpdateMissingSoaBuckets =
+      '/ems/fin/update_missing_soa_buckets';
 
   // Tariff Package Manager
   static const String eptGetTariffPackageTariffRateInfo =

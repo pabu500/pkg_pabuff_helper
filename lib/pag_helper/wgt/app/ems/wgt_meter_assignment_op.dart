@@ -106,11 +106,28 @@ class _WgtMeterAssignmentOpState extends State<WgtMeterAssignmentOp> {
       double barWidth = (meterPercentage ?? 0.0) / 100.0 * maxAssignedWidth;
 
       final tenantInfo = meterGroupAssignment['tenant_info'];
-      final tenantLcStatusStr =
-          tenantInfo != null ? (tenantInfo['lc_status'] ?? '') : '';
-      final tenantLcStatus = PagTenantLcStatus.byValue(tenantLcStatusStr);
-      if (tenantLcStatus == PagTenantLcStatus.terminated) {
-        continue; // skip terminated tenants
+      bool isAssignedToTenant = tenantInfo != null && tenantInfo.isNotEmpty;
+
+      // // do not count unassigned meter groups in the total percentage
+      // // assigned to this meter
+      // // so that percentage assigned to unassigned meter groups
+      // // is available for assignment to other tenants
+      // if (!isAssignedToTenant) {
+      //   continue; // skip unassigned meter groups
+      // }
+
+      if (isAssignedToTenant) {
+        final tenantLcStatusStr = tenantInfo['lc_status'] ?? '';
+        final tenantLcStatus = PagTenantLcStatus.byValue(tenantLcStatusStr);
+
+        // NOTE: not counting terminated and MFD tenants
+        // in the total percentage assigned to this meter
+        // so percentage assigned to terminated or MFD tenants
+        // is available for assignment to other tenants
+        if (tenantLcStatus == PagTenantLcStatus.terminated ||
+            tenantLcStatus == PagTenantLcStatus.mfd) {
+          continue; // skip terminated tenants
+        }
       }
 
       _totalPercentAssignedToThisMeter =
@@ -132,7 +149,7 @@ class _WgtMeterAssignmentOpState extends State<WgtMeterAssignmentOp> {
         _disableOp = false;
       }
 
-      bool isAssignedToTenant = tenantInfo != null && tenantInfo.isNotEmpty;
+      // bool isAssignedToTenant = tenantInfo != null && tenantInfo.isNotEmpty;
       if (isAssignedToTenant) {
         // tenantAssignmentList.add(tenantInfo);
         if (isCurrentMeterGroup) {
