@@ -188,6 +188,21 @@ String? validateSerialNumber(String val) {
   return null;
 }
 
+String? validateSerialNumber2(String val) {
+  if (val.trim().isEmpty) {
+    return null;
+  }
+  // validate number, letter, underscore, and dash,
+  // and minimum 5 characters
+  // String pattern = r'^[a-zA-Z0-9_ -]{5,}$';
+  String pattern = r'^[a-zA-Z0-9_<>\-/ ]{5,}$';
+  RegExp regExp = RegExp(pattern);
+  if (!regExp.hasMatch(val)) {
+    return 'min length is 5 and letter, number, _, - only';
+  }
+  return null;
+}
+
 String? validateServiceType2(String val) {
   final normalizedString = val.trim().toLowerCase();
 
@@ -269,7 +284,8 @@ String? validateDeviceIccid(String val) {
   val = val.trim();
 
   if (val.isEmpty) {
-    return 'required';
+    // return 'required';
+    return null;
   }
 
   // At least 7 digits
@@ -286,7 +302,8 @@ String? validateIp(String val) {
   val = val.trim();
 
   if (val.isEmpty) {
-    return 'required';
+    // return 'required';
+    return null;
   }
 
   // IPv4 pattern: 0-255.0-255.0-255.0-255
