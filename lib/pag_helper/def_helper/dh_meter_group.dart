@@ -1,5 +1,8 @@
+import 'dart:developer' as dev;
+
 import 'package:buff_helper/pag_helper/def_helper/dh_device.dart';
 import 'package:buff_helper/pag_helper/def_helper/enum_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 
 enum PagEmsMeterGroupOpType {
   onboarding1on1('EMS Onboarding 1-on-1', 'ems_onb_1on1', 'ems_onb_1on1'),
@@ -139,4 +142,21 @@ List<Map<String, dynamic>> getListConfigBaseByOpType(
   //remove empty maps
   list.removeWhere((map) => map.isEmpty);
   return list;
+}
+
+String? Function(String) getMeterGroupValidator(String key,
+    {bool isValueRequired = true}) {
+  switch (key) {
+    case 'meter_sn':
+      return getValidator(validateSerialNumber, isValueRequired);
+    case 'onb_type':
+      return getValidator(validateMeterGroupOnbType, isValueRequired);
+    case 'service_type':
+      return getValidator(validateServiceType, isValueRequired);
+    default:
+      dev.log('No validator found for meter group key: $key');
+      return (String value) {
+        return null;
+      };
+  }
 }

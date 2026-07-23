@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_tenant.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
@@ -850,16 +852,47 @@ enum PagSimPackageEnum {
       enumByLabel(label, values, (e) => e.label);
 }
 
-// enum PagGwGenEnum {
-//   gen1("Gen1"),
-//   gen2("Gen2"),
-//   gen3("Gen3"),
-//   ;
+String? Function(String) getDeviceValidator(String key, dynamic itemType,
+    {bool isValueRequired = true}) {
+  switch (itemType) {
+    case PagDeviceCat.meter:
+    case PagDeviceCat.meterGroup:
+    case PagDeviceCat.gateway:
+    case PagDeviceCat.mcu:
+    case PagDeviceCat.motherboard:
+    case PagDeviceCat.sensor:
+      return getDefaultDeviceValidator(key, isValueRequired: isValueRequired);
+    default:
+      dev.log('No validator found for key: $key');
+      return (String? value) {
+        return null;
+      };
+  }
+}
 
-//   const PagGwGenEnum(this.label);
-
-//   final String label;
-
-//   static PagGwGenEnum? byLabel(String? label) =>
-//       enumByLabel(label, values, (e) => e.label);
-// }
+String? Function(String) getDefaultDeviceValidator(String key,
+    {bool isValueRequired = true}) {
+  switch (key) {
+    case 'sn':
+      return (String value) => validateSerialNumber(value);
+    case 'label':
+      return (String value) => validateDeviceLabel(value);
+    case 'displayname':
+      return (String value) => validateDeviceLabel(value);
+    case 'tag':
+      return (String value) => validateTag(value);
+    case 'type':
+      return (String value) => validateDeviceType(value);
+    case 'model':
+      return (String value) => validateModel(value);
+    case 'iccid':
+      return (String value) => validateDeviceIccid(value);
+    case 'description':
+      return (String value) => validateDescription(value);
+    default:
+      dev.log('No validator found for key: $key');
+      return (String? value) {
+        return null;
+      };
+  }
+}

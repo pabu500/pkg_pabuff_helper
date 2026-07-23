@@ -1,6 +1,7 @@
 import 'dart:developer' as dev;
 
 import 'package:buff_helper/pag_helper/def_helper/dh_device.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_meter_group.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_finance.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_org.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
@@ -134,6 +135,11 @@ String? Function(String) getItemKindValidator(PagItemKind itemKind, String key,
           isValueRequired: isValueRequired);
     case PagItemKind.scope:
       return getScopeValidator(key, isValueRequired: isValueRequired);
+    case PagItemKind.device:
+      return getDeviceValidator(key, itemType,
+          isValueRequired: isValueRequired);
+    case PagItemKind.meterGroup:
+      return getMeterGroupValidator(key, isValueRequired: isValueRequired);
     default:
       dev.log('No validator found for item kind: $itemKind, key: $key');
       return (String value) {
