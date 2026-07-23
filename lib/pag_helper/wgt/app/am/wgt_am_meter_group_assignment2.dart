@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:provider/provider.dart';
 import 'dart:developer' as dev;
 
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
@@ -9,13 +12,11 @@ import 'package:buff_helper/xt_ui/style/evs2_colors.dart';
 import 'package:buff_helper/xt_ui/wdgt/info/get_error_text_prompt.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 import 'package:buff_helper/xt_ui/xt_helpers.dart';
-import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
-import 'package:provider/provider.dart';
 
 import '../../../../up_helper/exceptions.dart';
 import '../../../comm/comm_ex.dart';
 import '../../../comm/pag_be_api_base.dart';
+import '../../../def_helper/dh_meter_group.dart';
 import '../../../model/mdl_pag_app_config.dart';
 
 class WgtAmMeterGroupAssignment2 extends StatefulWidget {
@@ -79,25 +80,15 @@ class _WgtAmMeterGroupAssignment2State
     Map<String, dynamic> queryMap = {
       'scope': loggedInUser!.selectedScope.toScopeMap(),
       'item_group_id': widget.strItemGroupIndex,
+      'service_type': MeterGroupServiceType.comm.value,
     };
 
     _isScopeMatchingListFetching = true;
     try {
-      // final result = await doGetScopeMeterList(
-      //   widget.appConfig,
-      //   queryMap,
-      //   MdlPagSvcClaim(
-      //     username: loggedInUser!.username,
-      //     userId: loggedInUser!.id,
-      //     scope: '',
-      //     target: '',
-      //     operation: 'read',
-      //   ),
-      // );
       final result = await ex(
         endpoint: PagUrlBase.eptPagGetAmMeterGroupScopeMeterList,
         crudType: 'read',
-        opStr: 'get scope meter list',
+        opStr: 'get scope matching meter list',
         appConfig: widget.appConfig,
         queryMap: queryMap,
         svcClaim: MdlPagSvcClaim(
@@ -167,23 +158,12 @@ class _WgtAmMeterGroupAssignment2State
     Map<String, dynamic> queryMap = {
       'scope': loggedInUser!.selectedScope.toScopeMap(),
       'item_group_id': widget.strItemGroupIndex,
+      'service_type': MeterGroupServiceType.comm.value,
       'item_assignment_list': assignmentList,
-      'service_type': 'comm',
     };
     try {
       _isCommitting = true;
 
-      // final result = await commitMeterGroupMeterList(
-      //   widget.appConfig,
-      //   queryMap,
-      //   MdlPagSvcClaim(
-      //     username: loggedInUser!.username,
-      //     userId: loggedInUser!.id,
-      //     scope: '',
-      //     target: '',
-      //     operation: 'update',
-      //   ),
-      // );
       final result = await ex(
         endpoint: PagUrlBase.eptUpdateAmMeterGroupMeterList,
         crudType: 'update',
@@ -581,8 +561,8 @@ class _WgtAmMeterGroupAssignment2State
   }
 
   Widget getItemRow(Map<String, dynamic> itemInfo, int index) {
-    String itemName = itemInfo['meter_name'] ?? '-';
-    String itemLabel = itemInfo['meter_label'] ?? '-';
+    String itemName = itemInfo['item_name'] ?? '-';
+    String itemLabel = itemInfo['item_label'] ?? '-';
     String meterSn = itemInfo['meter_sn'] ?? '-';
     // bool assigned = itemInfo['assigned'] ?? false;
 
@@ -652,12 +632,12 @@ class _WgtAmMeterGroupAssignment2State
   }
 
   Widget getAssignmentBox(Map<String, dynamic> itemInfo) {
-    String? meterGroupName = itemInfo['meter_group_name'];
-    String? meterGroupLabel = itemInfo['meter_group_label'];
+    String? meterGroupName = itemInfo['assigned_item_group_name'];
+    String? meterGroupLabel = itemInfo['assigned_item_group_label'];
     bool hasAssignmentInfo = meterGroupName != null;
 
     double barWidth = 180;
-    String tooltipMessage = '';
+    String tooltipMessage = 'assigned to: ${meterGroupName ?? 'None'}';
 
     double margin = 45;
     bool checked = itemInfo['assigned_new'] ?? hasAssignmentInfo;

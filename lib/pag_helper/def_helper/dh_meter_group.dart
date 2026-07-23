@@ -37,6 +37,45 @@ enum PagEmsMeterGroupOpType {
       );
 }
 
+enum MeterGroupServiceType {
+  comm('comm', 'comm', 'comm'),
+  ems('ems', 'ems', 'ems'),
+  unknown('unknown', 'unknown', 'unknown');
+
+  const MeterGroupServiceType(
+    this.label,
+    this.value,
+    this.tag,
+  );
+  final String label;
+  final String value;
+  final String tag;
+
+  static MeterGroupServiceType byValue(String? value) =>
+      enumByValue(
+        value,
+        values,
+        (e) => (e).value,
+      ) ??
+      unknown;
+
+  static MeterGroupServiceType byLabel(String? label) =>
+      enumByLabel(
+        label,
+        values,
+        (e) => (e).label,
+      ) ??
+      unknown;
+
+  static MeterGroupServiceType byTag(String? tag) =>
+      enumByTag(
+        tag,
+        values,
+        (e) => (e).tag,
+      ) ??
+      unknown;
+}
+
 // must be 'auto-1-on-1'
 String? validateMeterGroupOnbType(dynamic value) {
   if (value == null || value.toString().isEmpty) {
