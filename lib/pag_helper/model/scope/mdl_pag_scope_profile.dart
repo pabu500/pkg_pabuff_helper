@@ -198,43 +198,64 @@ class MdlPagScopeProfile {
     }
     for (MdlPagSiteGroupProfile siteGroupProfile
         in projectProfile!.siteGroupProfileList) {
-      if (scope.siteGroupId != null) {
-        String strSiteGroupId = siteGroupProfile.id.toString();
-        if (strSiteGroupId == scope.siteGroupId) {
-          return MdlPagScopeProfile(
-            projectProfile: projectProfile,
-            siteGroupProfile: siteGroupProfile,
-          );
-        }
-      } else if (scope.siteId != null) {
-        for (MdlPagSiteProfile siteProfile
-            in siteGroupProfile.siteProfileList) {
-          String strSiteId = siteProfile.id.toString();
-          if (strSiteId == scope.siteId) {
-            return MdlPagScopeProfile(
-              projectProfile: projectProfile,
-              siteGroupProfile: siteGroupProfile,
-              siteProfile: siteProfile,
-            );
-          }
-        }
-      } else if (scope.buildingId != null) {
-        for (MdlPagSiteProfile siteProfile
-            in siteGroupProfile.siteProfileList) {
-          for (MdlPagBuildingProfile buildingProfile
-              in siteProfile.buildingProfileList) {
-            String strBuildingId = buildingProfile.id.toString();
-            if (strBuildingId == scope.buildingId) {
-              return MdlPagScopeProfile(
-                projectProfile: projectProfile,
-                siteGroupProfile: siteGroupProfile,
-                siteProfile: siteProfile,
-                buildingProfile: buildingProfile,
-              );
-            }
-          }
-        }
-      } else if (scope.locationGroupId != null) {
+      // if (scope.siteGroupId != null) {
+      //   String strSiteGroupId = siteGroupProfile.id.toString();
+      //   if (strSiteGroupId == scope.siteGroupId) {
+      //     return MdlPagScopeProfile(
+      //       projectProfile: projectProfile,
+      //       siteGroupProfile: siteGroupProfile,
+      //     );
+      //   }
+      // } else if (scope.siteId != null) {
+      //   for (MdlPagSiteProfile siteProfile
+      //       in siteGroupProfile.siteProfileList) {
+      //     String strSiteId = siteProfile.id.toString();
+      //     if (strSiteId == scope.siteId) {
+      //       return MdlPagScopeProfile(
+      //         projectProfile: projectProfile,
+      //         siteGroupProfile: siteGroupProfile,
+      //         siteProfile: siteProfile,
+      //       );
+      //     }
+      //   }
+      // } else if (scope.buildingId != null) {
+      //   for (MdlPagSiteProfile siteProfile
+      //       in siteGroupProfile.siteProfileList) {
+      //     for (MdlPagBuildingProfile buildingProfile
+      //         in siteProfile.buildingProfileList) {
+      //       String strBuildingId = buildingProfile.id.toString();
+      //       if (strBuildingId == scope.buildingId) {
+      //         return MdlPagScopeProfile(
+      //           projectProfile: projectProfile,
+      //           siteGroupProfile: siteGroupProfile,
+      //           siteProfile: siteProfile,
+      //           buildingProfile: buildingProfile,
+      //         );
+      //       }
+      //     }
+      //   }
+      // } else if (scope.locationGroupId != null) {
+      //   for (MdlPagSiteProfile siteProfile
+      //       in siteGroupProfile.siteProfileList) {
+      //     for (MdlPagBuildingProfile buildingProfile
+      //         in siteProfile.buildingProfileList) {
+      //       for (MdlPagLocationGroupProfile locationGroupProfile
+      //           in buildingProfile.locationGroupProfileList) {
+      //         String strLocationGroupId = locationGroupProfile.id.toString();
+      //         if (strLocationGroupId == scope.locationGroupId) {
+      //           return MdlPagScopeProfile(
+      //             projectProfile: projectProfile,
+      //             siteGroupProfile: siteGroupProfile,
+      //             siteProfile: siteProfile,
+      //             buildingProfile: buildingProfile,
+      //             locationGroupProfile: locationGroupProfile,
+      //           );
+      //         }
+      //       }
+      //     }
+      //   }
+      // }
+      if (scope.locationGroupId != null) {
         for (MdlPagSiteProfile siteProfile
             in siteGroupProfile.siteProfileList) {
           for (MdlPagBuildingProfile buildingProfile
@@ -253,6 +274,42 @@ class MdlPagScopeProfile {
               }
             }
           }
+        }
+      } else if (scope.buildingId != null) {
+        for (MdlPagSiteProfile siteProfile
+            in siteGroupProfile.siteProfileList) {
+          for (MdlPagBuildingProfile buildingProfile
+              in siteProfile.buildingProfileList) {
+            String strBuildingId = buildingProfile.id.toString();
+            if (strBuildingId == scope.buildingId) {
+              return MdlPagScopeProfile(
+                projectProfile: projectProfile,
+                siteGroupProfile: siteGroupProfile,
+                siteProfile: siteProfile,
+                buildingProfile: buildingProfile,
+              );
+            }
+          }
+        }
+      } else if (scope.siteId != null) {
+        for (MdlPagSiteProfile siteProfile
+            in siteGroupProfile.siteProfileList) {
+          String strSiteId = siteProfile.id.toString();
+          if (strSiteId == scope.siteId) {
+            return MdlPagScopeProfile(
+              projectProfile: projectProfile,
+              siteGroupProfile: siteGroupProfile,
+              siteProfile: siteProfile,
+            );
+          }
+        }
+      } else if (scope.siteGroupId != null) {
+        String strSiteGroupId = siteGroupProfile.id.toString();
+        if (strSiteGroupId == scope.siteGroupId) {
+          return MdlPagScopeProfile(
+            projectProfile: projectProfile,
+            siteGroupProfile: siteGroupProfile,
+          );
         }
       }
     }
