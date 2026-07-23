@@ -167,6 +167,10 @@ String getItemTypeValue(dynamic itemType) {
     return '';
   }
 
+  if (itemType is String) {
+    return itemType;
+  }
+
   if (itemType is PagDeviceCat ||
       itemType is PagMeterCommType ||
       itemType is PagMeterPhaseType ||

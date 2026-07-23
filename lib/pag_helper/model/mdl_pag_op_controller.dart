@@ -133,7 +133,7 @@ class MdlPagOpController {
       item.removeWhere((key, value) => key.contains('_color'));
     }
 
-    String itemKindStr = itemKind.name;
+    String itemKindStr = itemKind.value;
 
     String itemTypeStr = '';
     // if (itemType is PagFinanceType) {
