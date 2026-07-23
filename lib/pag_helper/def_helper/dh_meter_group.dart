@@ -2,7 +2,7 @@ import 'package:buff_helper/pag_helper/def_helper/dh_device.dart';
 import 'package:buff_helper/pag_helper/def_helper/enum_helper.dart';
 
 enum PagEmsMeterGroupOpType {
-  onboarding1o1('EMS Onboarding 1-on-1', 'ems_onb_1o1', 'ems_onb_1o1'),
+  onboarding1on1('EMS Onboarding 1-on-1', 'ems_onb_1on1', 'ems_onb_1on1'),
   update('Update', 'update', 'update'),
   none('None', 'none', 'none'),
   ;
@@ -90,7 +90,7 @@ String? validateMeterGroupOnbType(dynamic value) {
 
 final List<Map<String, dynamic>> listConfigBaseMeterGroup = [];
 
-final List<Map<String, dynamic>> listConfigOnb1o1 = [
+final List<Map<String, dynamic>> listConfigOnb1on1 = [
   {
     'col_key': 'meter_sn',
     'title': 'Meter Serial Number',
@@ -127,8 +127,8 @@ List<Map<String, dynamic>> getListConfigBaseByOpType(
     PagEmsMeterGroupOpType opType) {
   final List<Map<String, dynamic>> list = [];
   switch (opType) {
-    case PagEmsMeterGroupOpType.onboarding1o1:
-      list.addAll(listConfigBaseMeterGroup + listConfigOnb1o1);
+    case PagEmsMeterGroupOpType.onboarding1on1:
+      list.addAll(listConfigBaseMeterGroup + listConfigOnb1on1);
       break;
     case PagEmsMeterGroupOpType.update:
       list.addAll(listConfigBaseMeterGroup + []);
