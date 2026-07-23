@@ -125,8 +125,8 @@ class _WgtMeterGroupAssignmentItemState
 
   Widget getAssignmentRow() {
     int index = _itemInfo['index'] ?? 0;
-    String itemName = _itemInfo['meter_name'] ?? '-';
-    String itemLabel = _itemInfo['meter_label'] ?? '-';
+    String itemName = _itemInfo['item_name'] ?? '-';
+    String itemLabel = _itemInfo['item_label'] ?? '-';
     String meterSn = _itemInfo['meter_sn'] ?? '-';
     // bool assigned = itemInfo['assigned'] ?? false;
 
