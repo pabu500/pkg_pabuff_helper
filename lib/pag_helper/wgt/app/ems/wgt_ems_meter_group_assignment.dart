@@ -299,9 +299,11 @@ class _WgtEmsMeterGroupAssignmentState
       String? sn = item['meter_sn'];
       bool snMatches = (sn ?? '').isNotEmpty &&
           (sn ?? '').toLowerCase().contains(_itemSnFilterStr);
+      if (snMatches) {
+        dev.log('Item ${item['meter_sn']} matches filter $_itemSnFilterStr');
+      }
       return snMatches;
     }
-
     return true; // Include item if no filter is applied
   }
 
@@ -588,6 +590,7 @@ class _WgtEmsMeterGroupAssignmentState
                   ),
               onChanged: (value) {
                 setState(() {
+                  dev.log('Filter string changed to: $value');
                   _itemSnFilterStr = value.trim().toLowerCase();
                 });
               },
@@ -725,6 +728,9 @@ class _WgtEmsMeterGroupAssignmentState
     int index = 0;
     for (Map<String, dynamic> itemInfo in _itemGroupScopeMatchingItemList!) {
       bool showItem = _showItem(itemInfo);
+      if (showItem) {
+        dev.log('Item ${itemInfo['meter_sn']} is included in the list');
+      }
       itemInfo['index'] = ++index;
       if (!showItem) {
         continue; // Skip this item if it doesn't match the filter
@@ -748,6 +754,7 @@ class _WgtEmsMeterGroupAssignmentState
     }
 
     return ListView.builder(
+      key: UniqueKey(), // Add a key to force rebuild when the list changes
       // shrinkWrap: true,
       // itemExtent: 35,
       itemCount: itemWidgetList.length,
