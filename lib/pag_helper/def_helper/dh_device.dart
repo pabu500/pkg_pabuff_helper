@@ -779,22 +779,32 @@ enum PagMeterCommType {
 }
 
 enum PagDeviceLsStatus {
-  cip('Commission in Progress', 'cip', Colors.lime),
-  normal('Noraml', 'norm.', Colors.lightGreen),
-  maintenance('Maintenance', 'maint.', Colors.orangeAccent),
-  dc('Decommissioned', 'dc', Colors.brown),
-  mfd('Marked for Delete', 'mfd', Colors.redAccent),
+  cip('Commission in Progress', 'cip', 'cip', Colors.lime),
+  normal('Noraml', 'normal', 'norm', Colors.lightGreen),
+  maintenance('Maintenance', 'maint', 'maint.', Colors.orangeAccent),
+  dc('Decommissioned', 'dc', 'dc', Colors.brown),
+  mfd('Marked for Delete', 'mfd', 'mfd', Colors.redAccent),
   ;
 
   const PagDeviceLsStatus(
     this.label,
+    this.value,
     this.tag,
     this.color,
   );
 
   final String label;
+  final String value;
   final String tag;
   final Color color;
+
+  static PagDeviceLsStatus byValue(String? value) =>
+      enumByValue(
+        value,
+        values,
+        (e) => (e).value,
+      ) ??
+      normal;
 
   static PagDeviceLsStatus byLabel(String? label) =>
       enumByLabel(
