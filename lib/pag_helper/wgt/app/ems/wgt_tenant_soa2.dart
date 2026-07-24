@@ -43,18 +43,22 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
   bool _customDateRangeSelected = false;
   bool _isMTD = false;
   DateTime? _pickedMonth;
+  bool _isFetchingSoa = false;
+  // UniqueKey? _finderFreshKey;
 
-  bool _isUpdating = false;
+  bool _isUpdatingSoa = false;
   bool _updated = false;
   String _errorText = '';
 
-  String _updateErrorText = '';
+  String _updateSoaErrorText = '';
 
   Future<void> _populateMissingSoaEntry() async {
-    if (_isUpdating) return;
+    if (_isUpdatingSoa) return;
 
-    _isUpdating = true;
-    _updateErrorText = '';
+    // await Future.delayed(const Duration(milliseconds: 5000));
+
+    _isUpdatingSoa = true;
+    _updateSoaErrorText = '';
 
     Map<String, dynamic> queryMap = {
       'scope': widget.loggedInUser.selectedScope.toScopeMap(),
@@ -78,24 +82,25 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
       );
     } catch (e) {
       dev.log(e.toString());
-      _updateErrorText = getErrorText(e,
+      _updateSoaErrorText = getErrorText(e,
           defaultErrorText: 'Error populating missing SoA entry');
       rethrow;
     } finally {
       setState(() {
-        _isUpdating = false;
+        _isUpdatingSoa = false;
         _updated = true;
+        _enableSearch = _enableSearchButton();
       });
     }
   }
 
   bool _enableSearchButton() {
-    if (_isUpdating) {
+    if (_isUpdatingSoa) {
       return false;
     }
 
     if (_fromDate == null || _toDate == null) {
-      return false;
+      // return false;
     }
 
     return true;
@@ -159,8 +164,8 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
             ),
           ],
         ),
-        if (_updateErrorText.isNotEmpty)
-          getErrorTextPrompt(context: context, errorText: _updateErrorText),
+        if (_updateSoaErrorText.isNotEmpty)
+          getErrorTextPrompt(context: context, errorText: _updateSoaErrorText),
         verticalSpaceSmall,
         getSoAContainer(),
         verticalSpaceSmall,
@@ -171,13 +176,18 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
   Widget getPopulateMissingSoaEntryButton() {
     return WgtCommButton(
       label: 'Check SoA Entry',
-      enabled: !_isUpdating && !_updated && _updateErrorText.isEmpty,
+      enabled: !_isFetchingSoa ||
+          !_isUpdatingSoa && !_updated && _updateSoaErrorText.isEmpty,
       labelStyle: TextStyle(
         color: Theme.of(context).colorScheme.onSecondary,
         fontSize: 13.5,
       ),
       // width: barWidth + margin,
       onPressed: () async {
+        setState(() {
+          _enableSearch = false;
+          // _finderFreshKey = UniqueKey();
+        });
         await _populateMissingSoaEntry();
       },
     );
@@ -189,6 +199,7 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
 
   Widget getSoA2() {
     return WgtListSearchItemFlexi(
+      // key: _finderFreshKey,
       appConfig: widget.appConfig,
       pagAppContext: widget.pagAppContext,
       itemKind: PagItemKind.finance,
@@ -202,6 +213,18 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
         'tenant_id': widget.tenantInfo['id'],
         'tenant_name': tenantName,
         'tenant_label': tenantLabel,
+      },
+      enableSearch: _enableSearch,
+      onSearching: () {
+        setState(() {
+          _isFetchingSoa = true;
+          _enableSearch = _enableSearchButton();
+        });
+      },
+      onResult: (itemList) {
+        setState(() {
+          _isFetchingSoa = false;
+        });
       },
       sortBy: 'entry_timestamp',
       sortOrder: 'desc',

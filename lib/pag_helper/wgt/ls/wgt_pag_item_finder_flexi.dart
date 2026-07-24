@@ -1,5 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'dart:developer' as dev;
 
 import 'package:buff_helper/pag_helper/comm/comm_pag_item.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_finance.dart';
@@ -15,15 +19,11 @@ import 'package:buff_helper/pag_helper/model/scope/mdl_pag_site_profile.dart';
 import 'package:buff_helper/pag_helper/wgt/cam/wgt_code_scanner2.dart';
 import 'package:buff_helper/pag_helper/wgt/datetime/wgt_date_range_picker_monthly.dart';
 import 'package:buff_helper/xt_ui/wdgt/show_model_bottom_sheet.dart';
-import 'dart:developer' as dev;
-
-import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:material_symbols_icons/material_symbols_icons.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_controller.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
+import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
+
 import '../../../pagrid_helper/comm_helper/local_storage.dart';
 import '../../../util/date_time_util.dart';
 import '../../../xt_ui/wdgt/get_collapsed_bar.dart';
@@ -84,6 +84,7 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
     this.isScopeProvider = false,
     this.onScopeChanged,
     this.prevailingScopeProfile,
+    this.enableSearch = true,
   });
 
   final MdlPagUser loggedInUser;
@@ -127,6 +128,7 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
   final String? sortBy;
   final String? sortOrder;
   final bool isScopeProvider;
+  final bool enableSearch;
   final MdlPagScopeProfile? prevailingScopeProfile;
   final void Function(MdlPagSiteGroupProfile?, MdlPagSiteProfile?,
       MdlPagBuildingProfile?, MdlPagLocationGroupProfile?)? onScopeChanged;
@@ -390,6 +392,10 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   }
 
   bool _enableSearchButton() {
+    if (widget.enableSearch == false) {
+      return false;
+    }
+
     if (widget.identifySingleItem) {
       return widget.listController.isIdentifierSet();
     }
@@ -769,6 +775,8 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
 
   @override
   Widget build(BuildContext context) {
+    _enableSearch = _enableSearchButton();
+
     _isPhone = context.isPhone;
     _dropDownListTextStyle = TextStyle(
         fontSize: 15, color: Theme.of(context).textTheme.bodyMedium?.color);

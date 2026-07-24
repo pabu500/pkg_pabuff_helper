@@ -84,6 +84,7 @@ class WgtListSearchItemFlexi extends StatefulWidget {
     this.additionalQuery = const {},
     this.sortBy,
     this.sortOrder,
+    this.enableSearch = true,
   });
 
   final MdlPagAppConfig appConfig;
@@ -123,6 +124,7 @@ class WgtListSearchItemFlexi extends StatefulWidget {
   final Map<String, dynamic> additionalQuery;
   final String? sortBy;
   final String? sortOrder;
+  final bool enableSearch;
 
   @override
   State<WgtListSearchItemFlexi> createState() => _WgtListSearchItemFlexiState();
@@ -1720,6 +1722,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       // if (_selectedListController != null)
       WgtPagItemFinderFlexi(
         key: _finderRefreshKey, //_listContentRefreshKey,
+        enableSearch: widget.enableSearch,
         width: widget.width,
         widthOffset: widget.widthOffset,
         loggedInUser: loggedInUser!,
