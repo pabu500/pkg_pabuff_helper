@@ -483,122 +483,121 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     }
   }
 
-  // void _iniScopesPreload() {
-  //   // get loc profiles form logged in user
-  //   _selectedSiteGroupProfile =
-  //       widget.loggedInUser.selectedScope.siteGroupProfile;
-  //   _selectedSiteProfile = widget.loggedInUser.selectedScope.siteProfile;
-  //   _selectedBuildingProfile =
-  //       widget.loggedInUser.selectedScope.buildingProfile;
-  //   _selectedLocationGroupProfile =
-  //       widget.loggedInUser.selectedScope.locationGroupProfile;
+  void _iniScopesPreload() {
+    MdlPagScopeProfile scopeProfile =
+        widget.prevailingScopeProfile ?? widget.loggedInUser.selectedScope;
+    // get loc profiles form logged in user
+    // _selectedSiteGroupProfile =
+    //     widget.loggedInUser.selectedScope.siteGroupProfile;
+    // _selectedSiteProfile = widget.loggedInUser.selectedScope.siteProfile;
+    // _selectedBuildingProfile =
+    //     widget.loggedInUser.selectedScope.buildingProfile;
+    // _selectedLocationGroupProfile =
+    //     widget.loggedInUser.selectedScope.locationGroupProfile;
+    _selectedSiteGroupProfile = scopeProfile.siteGroupProfile;
+    _selectedSiteProfile = scopeProfile.siteProfile;
+    _selectedBuildingProfile = scopeProfile.buildingProfile;
+    _selectedLocationGroupProfile = scopeProfile.locationGroupProfile;
 
-  //   // get filter list col controllers from list controller
-  //   for (MdlListColController colController
-  //       in widget.listController.listColControllerList) {
-  //     if (colController.colKey == 'site_group_label') {
-  //       _selectedSiteGroupColController = colController;
-  //       _selectedSiteGroupColController!.filterWidgetController =
-  //           siteGroupController;
-  //     }
-  //     if (colController.colKey == 'site_label') {
-  //       _selectedSiteColController = colController;
-  //       _selectedSiteColController!.filterWidgetController = siteController;
-  //     }
-  //     if (colController.colKey == 'building_label') {
-  //       _selectedBuildingColController = colController;
-  //       _selectedBuildingColController!.filterWidgetController =
-  //           buildingController;
-  //     }
-  //     if (colController.colKey == 'location_group_label') {
-  //       _selectedLocationGroupColController = colController;
-  //       _selectedLocationGroupColController!.filterWidgetController =
-  //           locationGroupController;
-  //     }
-  //   }
+    // get filter list col controllers from list controller
+    for (MdlListColController colController
+        in widget.listController.listColControllerList) {
+      if (colController.colKey == 'site_group_label') {
+        _selectedSiteGroupColController = colController;
+        _selectedSiteGroupColController!.filterWidgetController =
+            siteGroupController;
+      }
+      if (colController.colKey == 'site_label') {
+        _selectedSiteColController = colController;
+        _selectedSiteColController!.filterWidgetController = siteController;
+      }
+      if (colController.colKey == 'building_label') {
+        _selectedBuildingColController = colController;
+        _selectedBuildingColController!.filterWidgetController =
+            buildingController;
+      }
+      if (colController.colKey == 'location_group_label') {
+        _selectedLocationGroupColController = colController;
+        _selectedLocationGroupColController!.filterWidgetController =
+            locationGroupController;
+      }
+    }
 
-  //   _updateBind();
-  // }
+    // _updateBind(scopeProfile);
+    // bind filter col controllers with loc profile
+    // during wich value list will be populated with children loc profiles
+    scopeProfile.projectProfile?.bindFilterColController(
+        _selectedSiteGroupColController,
+        defaultSiteGroupProfile: scopeProfile.siteGroupProfile,
+        limitToDefault: true);
+    _selectedSiteGroupProfile?.bindFilterColController(
+        _selectedSiteColController,
+        defaultSiteProfile: scopeProfile.siteProfile,
+        limitToDefault: true);
+    _selectedSiteProfile?.bindFilterColController(
+        _selectedBuildingColController,
+        defaultBuildingProfile: scopeProfile.buildingProfile,
+        limitToDefault: true);
+    _selectedBuildingProfile?.bindFilterColController(
+        _selectedLocationGroupColController,
+        defaultLocationGroupProfile: scopeProfile.locationGroupProfile,
+        limitToDefault: true);
+  }
 
-  // void _updateBind() {
-  //   // bind filter col controllers with loc profile
-  //   // during wich value list will be populated with children loc profiles
-  //   widget.loggedInUser.selectedScope.projectProfile?.bindFilterColController(
-  //       _selectedSiteGroupColController,
-  //       defaultSiteGroupProfile:
-  //           widget.loggedInUser.selectedScope.siteGroupProfile,
-  //       limitToDefault: true);
-  //   _selectedSiteGroupProfile?.bindFilterColController(
-  //       _selectedSiteColController,
-  //       defaultSiteProfile: widget.loggedInUser.selectedScope.siteProfile,
-  //       limitToDefault: true);
-  //   _selectedSiteProfile?.bindFilterColController(
-  //       _selectedBuildingColController,
-  //       defaultBuildingProfile:
-  //           widget.loggedInUser.selectedScope.buildingProfile,
-  //       limitToDefault: true);
-  //   _selectedBuildingProfile?.bindFilterColController(
-  //       _selectedLocationGroupColController,
-  //       defaultLocationGroupProfile:
-  //           widget.loggedInUser.selectedScope.locationGroupProfile,
-  //       limitToDefault: true);
-  //   // _selectedLocationGroupProfile?.bindFilterColController(
-  //   //   _selectedLocationGroupColController,
-  //   // );
-  // }
+  void _updateBind(MdlPagScopeProfile scopeProfile) {
+    // bind filter col controllers with loc profile
+    // during wich value list will be populated with children loc profiles
+    scopeProfile.projectProfile?.bindFilterColController(
+        _selectedSiteGroupColController,
+        defaultSiteGroupProfile: scopeProfile.siteGroupProfile,
+        limitToDefault: true);
+    _selectedSiteGroupProfile?.bindFilterColController(
+        _selectedSiteColController,
+        defaultSiteProfile: scopeProfile.siteProfile,
+        limitToDefault: true);
+    _selectedSiteProfile?.bindFilterColController(
+        _selectedBuildingColController,
+        defaultBuildingProfile: scopeProfile.buildingProfile,
+        limitToDefault: true);
+    _selectedBuildingProfile?.bindFilterColController(
+        _selectedLocationGroupColController,
+        defaultLocationGroupProfile: scopeProfile.locationGroupProfile,
+        limitToDefault: true);
+    // _selectedLocationGroupProfile?.bindFilterColController(
+    //   _selectedLocationGroupColController,
+    // );
+  }
 
   void _onUpdateSiteGroup(MdlPagSiteGroupProfile? selectedSiteGroup) {
     _selectedSiteGroupProfile = widget
         .loggedInUser.selectedScope.projectProfile!
         .getSiteGroupProfileById(selectedSiteGroup?.id.toString());
-    dev.log(
-        '_selectedSiteGroupProfile.name: ${_selectedSiteGroupProfile?.name}');
-    if (_selectedSiteGroupProfile == null) {
-      _selectedSiteProfile = null;
-      _selectedBuildingProfile = null;
-      _selectedLocationGroupProfile = null;
-      _selectedSiteColController?.clearFilter();
-    } else {
-      _selectedSiteGroupProfile
-          ?.bindFilterColController(_selectedSiteColController);
-      _selectedSiteColController?.resetFilter();
-      _selectedSiteProfile = _selectedSiteGroupProfile?.getDefaultSiteProfile();
-    }
+    _selectedSiteGroupProfile
+        ?.bindFilterColController(_selectedSiteColController);
+    _selectedSiteColController?.resetFilter();
+    _selectedSiteProfile = _selectedSiteGroupProfile?.getDefaultSiteProfile();
     _onUpdateSite(_selectedSiteProfile);
   }
 
   void _onUpdateSite(MdlPagSiteProfile? selectedSite) {
     _selectedSiteProfile = _selectedSiteGroupProfile
         ?.getSiteProfileById(selectedSite?.id.toString());
-    dev.log('_selectedSiteProfile.name: ${_selectedSiteProfile?.name}');
-    if (_selectedSiteProfile == null) {
-      _selectedBuildingProfile = null;
-      _selectedLocationGroupProfile = null;
-      _selectedBuildingColController?.clearFilter();
-    } else {
-      _selectedSiteProfile
-          ?.bindFilterColController(_selectedBuildingColController);
-      _selectedBuildingColController?.resetFilter();
-      _selectedBuildingProfile =
-          _selectedSiteProfile?.getDefaultBuildingProfile();
-    }
+    _selectedSiteProfile
+        ?.bindFilterColController(_selectedBuildingColController);
+    _selectedBuildingColController?.resetFilter();
+    _selectedBuildingProfile =
+        _selectedSiteProfile?.getDefaultBuildingProfile();
     _onUpdateBuilding(_selectedBuildingProfile);
   }
 
   void _onUpdateBuilding(MdlPagBuildingProfile? selectedBuilding) {
     _selectedBuildingProfile = _selectedSiteProfile
         ?.getBuildingProfileById(selectedBuilding?.id.toString());
-    dev.log('_selectedBuildingProfile.name: ${_selectedBuildingProfile?.name}');
-    if (_selectedBuildingProfile == null) {
-      _selectedLocationGroupProfile = null;
-      _selectedLocationGroupColController?.clearFilter();
-    } else {
-      _selectedBuildingProfile
-          ?.bindFilterColController(_selectedLocationGroupColController);
-      _selectedLocationGroupColController?.resetFilter();
-      _selectedLocationGroupProfile =
-          _selectedBuildingProfile?.getDefaultLocationGroupProfile();
-    }
+    _selectedBuildingProfile
+        ?.bindFilterColController(_selectedLocationGroupColController);
+    _selectedLocationGroupColController?.resetFilter();
+    _selectedLocationGroupProfile =
+        _selectedBuildingProfile?.getDefaultLocationGroupProfile();
     _onUpdateLocationGroup(_selectedLocationGroupProfile);
   }
 
@@ -606,17 +605,87 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
       MdlPagLocationGroupProfile? selectedLocationGroup) {
     _selectedLocationGroupProfile = _selectedBuildingProfile
         ?.getLocationGroupProfileById(selectedLocationGroup?.id.toString());
-    dev.log(
-        '_selectedLocationGroupProfile.name: ${_selectedLocationGroupProfile?.name}');
-    if (_selectedLocationGroupProfile == null) {
-      _selectedLocationGroupColController?.clearFilter();
-    } else {
-      _selectedLocationGroupProfile?.filterColController?.filterValue =
-          selectedLocationGroup?.toJson();
-      _selectedLocationGroupProfile?.filterColController?.filterWidgetController
-          ?.text = selectedLocationGroup?.label ?? '';
-    }
+    _selectedLocationGroupProfile?.filterColController?.filterValue =
+        selectedLocationGroup?.toJson();
+    _selectedLocationGroupProfile?.filterColController?.filterWidgetController
+        ?.text = selectedLocationGroup?.label ?? '';
   }
+
+  // void _onUpdateSiteGroup(MdlPagSiteGroupProfile? selectedSiteGroup) {
+  //   _selectedSiteGroupProfile = widget
+  //       .loggedInUser.selectedScope.projectProfile!
+  //       .getSiteGroupProfileById(selectedSiteGroup?.id.toString());
+  //   dev.log(
+  //       '_selectedSiteGroupProfile.name: ${_selectedSiteGroupProfile?.name}');
+  //   if (_selectedSiteGroupProfile == null) {
+  //     _selectedSiteProfile = null;
+  //     _selectedBuildingProfile = null;
+  //     _selectedLocationGroupProfile = null;
+  //     _selectedSiteColController?.clearFilter();
+  //   } else {
+  //     _selectedSiteGroupProfile
+  //         ?.bindFilterColController(_selectedSiteColController);
+  //     _selectedSiteColController?.resetFilter();
+  //     _selectedSiteProfile = _selectedSiteGroupProfile?.getDefaultSiteProfile();
+  //   }
+  //   _onUpdateSite(_selectedSiteProfile);
+  // }
+
+  // void _onUpdateSite(MdlPagSiteProfile? selectedSite) {
+  //   _selectedSiteProfile = _selectedSiteGroupProfile
+  //       ?.getSiteProfileById(selectedSite?.id.toString());
+  //   dev.log('_selectedSiteProfile.name: ${_selectedSiteProfile?.name}');
+  //   if (_selectedSiteProfile == null) {
+  //     _selectedBuildingProfile = null;
+  //     _selectedLocationGroupProfile = null;
+  //     _selectedBuildingColController?.clearFilter();
+  //   } else {
+  //     _selectedSiteProfile
+  //         ?.bindFilterColController(_selectedBuildingColController);
+  //     _selectedBuildingColController?.resetFilter();
+  //     _selectedBuildingProfile =
+  //         _selectedSiteProfile?.getDefaultBuildingProfile();
+  //   }
+  //   _onUpdateBuilding(_selectedBuildingProfile);
+  // }
+
+  // void _onUpdateBuilding(MdlPagBuildingProfile? selectedBuilding) {
+  //   _selectedBuildingProfile = _selectedSiteProfile
+  //       ?.getBuildingProfileById(selectedBuilding?.id.toString());
+  //   dev.log('_selectedBuildingProfile.name: ${_selectedBuildingProfile?.name}');
+  //   if (_selectedBuildingProfile == null) {
+  //     _selectedLocationGroupProfile = null;
+  //     _selectedLocationGroupColController?.clearFilter();
+  //   } else {
+  //     _selectedBuildingProfile
+  //         ?.bindFilterColController(_selectedLocationGroupColController);
+  //     _selectedLocationGroupColController?.resetFilter();
+  //     _selectedLocationGroupProfile =
+  //         _selectedBuildingProfile?.getDefaultLocationGroupProfile();
+  //   }
+  //   _onUpdateLocationGroup(_selectedLocationGroupProfile);
+  // }
+
+  // void _onUpdateLocationGroup(
+  //     MdlPagLocationGroupProfile? selectedLocationGroup) {
+  //   _selectedLocationGroupProfile = _selectedBuildingProfile
+  //       ?.getLocationGroupProfileById(selectedLocationGroup?.id.toString());
+  //   dev.log(
+  //       '_selectedLocationGroupProfile.name: ${_selectedLocationGroupProfile?.name}');
+  //   if (_selectedLocationGroupProfile == null) {
+  //     _selectedLocationGroupColController?.clearFilter();
+  //   } else {
+  //     // _selectedLocationGroupProfile?.filterColController?.filterValue =
+  //     //     selectedLocationGroup?.toJson();
+  //     // _selectedLocationGroupProfile?.filterColController?.filterWidgetController
+  //     //     ?.text = selectedLocationGroup?.label ?? '';
+  //     _selectedLocationGroupProfile
+  //         ?.bindFilterColController(_selectedLocationGroupColController);
+  //     _selectedLocationGroupColController?.resetFilter();
+  //     _selectedLocationGroupProfile =
+  //         _selectedBuildingProfile?.getDefaultLocationGroupProfile();
+  //   }
+  // }
 
   void _onClearSiteGroup() {
     _selectedSiteGroupProfile = null;
@@ -678,21 +747,22 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
         widget.itemType is PagTariff ||
         widget.itemType == null);
 
-    if (widget.itemType is PagDeviceCat) {
-      itemTypeStr = (widget.itemType as PagDeviceCat).value.toLowerCase();
-    } else if (widget.itemType is PagScopeType) {
-      itemTypeStr = (widget.itemType as PagScopeType).value.toLowerCase();
-    } else if (widget.itemType is PagItemKind) {
-      itemTypeStr = (widget.itemType as PagItemKind).name.toLowerCase();
-    } else if (widget.itemType is PagFinanceType) {
-      itemTypeStr = (widget.itemType as PagFinanceType).value;
-    } else if (widget.itemType is PagOrgType) {
-      itemTypeStr = (widget.itemType as PagOrgType).name.toLowerCase();
-    } else if (widget.itemType is PagTariff) {
-      itemTypeStr = (widget.itemType as PagTariff).value.toLowerCase();
-    } else {
-      itemTypeStr = 'unknown_item_type';
-    }
+    // if (widget.itemType is PagDeviceCat) {
+    //   itemTypeStr = (widget.itemType as PagDeviceCat).value.toLowerCase();
+    // } else if (widget.itemType is PagScopeType) {
+    //   itemTypeStr = (widget.itemType as PagScopeType).value.toLowerCase();
+    // } else if (widget.itemType is PagItemKind) {
+    //   itemTypeStr = (widget.itemType as PagItemKind).name.toLowerCase();
+    // } else if (widget.itemType is PagFinanceType) {
+    //   itemTypeStr = (widget.itemType as PagFinanceType).value;
+    // } else if (widget.itemType is PagOrgType) {
+    //   itemTypeStr = (widget.itemType as PagOrgType).name.toLowerCase();
+    // } else if (widget.itemType is PagTariff) {
+    //   itemTypeStr = (widget.itemType as PagTariff).value.toLowerCase();
+    // } else {
+    //   itemTypeStr = 'unknown_item_type';
+    // }
+    itemTypeStr = getItemTypeValue(widget.itemType);
 
     listName = '${widget.itemKind.name}_$itemTypeStr';
 
@@ -705,25 +775,25 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
       _rowsPerPage.sort();
     }
 
-    // _iniScopesPreload();
-    final result = iniScopesPreload(
-      widget.prevailingScopeProfile ?? widget.loggedInUser.selectedScope,
-      widget.listController.listColControllerList,
-      siteGroupController,
-      siteController,
-      buildingController,
-      locationGroupController,
-    );
+    _iniScopesPreload();
+    // final result = iniScopesPreload(
+    //   widget.prevailingScopeProfile ?? widget.loggedInUser.selectedScope,
+    //   widget.listController.listColControllerList,
+    //   siteGroupController,
+    //   siteController,
+    //   buildingController,
+    //   locationGroupController,
+    // );
 
-    _selectedSiteGroupProfile = result.siteGroupProfile;
-    _selectedSiteProfile = result.siteProfile;
-    _selectedBuildingProfile = result.buildingProfile;
-    _selectedLocationGroupProfile = result.locationGroupProfile;
+    // _selectedSiteGroupProfile = result.siteGroupProfile;
+    // _selectedSiteProfile = result.siteProfile;
+    // _selectedBuildingProfile = result.buildingProfile;
+    // _selectedLocationGroupProfile = result.locationGroupProfile;
 
-    _selectedSiteGroupColController = result.siteGroupColController;
-    _selectedSiteColController = result.siteColController;
-    _selectedBuildingColController = result.buildingColController;
-    _selectedLocationGroupColController = result.locationGroupColController;
+    // _selectedSiteGroupColController = result.siteGroupColController;
+    // _selectedSiteColController = result.siteColController;
+    // _selectedBuildingColController = result.buildingColController;
+    // _selectedLocationGroupColController = result.locationGroupColController;
 
     _enableSearch = _enableSearchButton();
 
@@ -1826,27 +1896,27 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
       icon: Icon(Icons.restart_alt, color: Theme.of(context).colorScheme.error),
       onPressed: () {
         _clearSearch();
-        // _iniScopesPreload();
-        final result = iniScopesPreload(
-          widget.prevailingScopeProfile ?? widget.loggedInUser.selectedScope,
-          widget.listController.listColControllerList,
-          siteGroupController,
-          siteController,
-          buildingController,
-          locationGroupController,
-        );
+        _iniScopesPreload();
+        // final result = iniScopesPreload(
+        //   widget.prevailingScopeProfile ?? widget.loggedInUser.selectedScope,
+        //   widget.listController.listColControllerList,
+        //   siteGroupController,
+        //   siteController,
+        //   buildingController,
+        //   locationGroupController,
+        // );
 
         setState(() {
-          _selectedSiteGroupProfile = result.siteGroupProfile;
-          _selectedSiteProfile = result.siteProfile;
-          _selectedBuildingProfile = result.buildingProfile;
-          _selectedLocationGroupProfile = result.locationGroupProfile;
+          //   _selectedSiteGroupProfile = result.siteGroupProfile;
+          //   _selectedSiteProfile = result.siteProfile;
+          //   _selectedBuildingProfile = result.buildingProfile;
+          //   _selectedLocationGroupProfile = result.locationGroupProfile;
 
-          _selectedSiteGroupColController = result.siteGroupColController;
-          _selectedSiteColController = result.siteColController;
-          _selectedBuildingColController = result.buildingColController;
-          _selectedLocationGroupColController =
-              result.locationGroupColController;
+          //   _selectedSiteGroupColController = result.siteGroupColController;
+          //   _selectedSiteColController = result.siteColController;
+          //   _selectedBuildingColController = result.buildingColController;
+          //   _selectedLocationGroupColController =
+          //       result.locationGroupColController;
         });
       },
     );

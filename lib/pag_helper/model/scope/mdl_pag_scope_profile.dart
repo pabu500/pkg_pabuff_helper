@@ -179,15 +179,15 @@ class MdlPagScopeProfile {
     }
   }
 
-  // scope conent sample"
+  // scope content sample"
   // {
   //   "project_id": "1",
   //   "project_name": "Project A",
-  //   "site_group_id": null,
-  //   "site_group_name": null,
-  //   "site_id": null,
-  //   "site_name": null,
-  //   "building_id": "4",
+  //   "site_group_id": '2',
+  //   "site_group_name": 'Site Group A',
+  //   "site_id": '3',
+  //   "site_name": 'Site A',
+  //   "building_id": "5",
   //   "building_name": "Building A",
   //   "location_group_id": null,
   //   "location_group_name": null,
