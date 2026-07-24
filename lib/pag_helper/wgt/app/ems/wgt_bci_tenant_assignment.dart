@@ -491,6 +491,7 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
     }
 
     return ListView.builder(
+      key: UniqueKey(), // Add a key to force rebuild when the list changes
       itemExtent: 35,
       itemCount: itemWidgetList.length,
       itemBuilder: (context, index) {

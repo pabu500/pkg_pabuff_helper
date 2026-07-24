@@ -544,6 +544,7 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
     }
 
     return ListView.builder(
+      key: UniqueKey(), // Add a key to force rebuild when the list changes
       // shrinkWrap: true,
       // itemExtent: 35,
       itemCount: itemWidgetList.length,

@@ -551,6 +551,7 @@ class _WgtAmMeterGroupAssignment2State
     }
 
     return ListView.builder(
+      key: UniqueKey(), // Add a key to force rebuild when the list changess
       // shrinkWrap: true,
       // itemExtent: 35,
       itemCount: itemWidgetList.length,
