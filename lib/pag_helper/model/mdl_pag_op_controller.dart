@@ -226,12 +226,17 @@ class MdlPagOpController {
       targetFields.add(opTargets['fieldKey']);
     }
 
+    String itemTypeStr = getItemTypeValue(itemType);
+    if (itemTypeStr.isEmpty) {
+      itemTypeStr = 'NOT_SET';
+    }
+
     Map<String, dynamic> queryMap = {
       'scope': loggedInUser!.selectedScope.toScopeMap(),
       'op_name': opName,
       'item_kind': itemKind.value,
       // 'item_type': getItemTypeStr(itemType),
-      'item_type': getItemTypeValue(itemType),
+      'item_type': itemTypeStr,
       'item_id_type': itemIdType.name,
       'target_fields': targetFields.join(','),
       'op_list': opList,
