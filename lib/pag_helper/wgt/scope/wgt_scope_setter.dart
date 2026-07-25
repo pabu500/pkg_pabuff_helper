@@ -14,7 +14,6 @@ import 'package:buff_helper/pag_helper/model/scope/mdl_pag_site_group_profile.da
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_site_profile.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -713,9 +712,18 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
                                   return Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      getErrorTextPrompt(
-                                          context: context,
-                                          errorText: _errorText),
+                                      LayoutBuilder(
+                                        builder: (context, constraints) {
+                                          return ConstrainedBox(
+                                            constraints: BoxConstraints(
+                                                maxWidth: constraints.maxWidth),
+                                            child: getErrorTextPrompt(
+                                              context: context,
+                                              errorText: _errorText,
+                                            ),
+                                          );
+                                        },
+                                      ),
                                       getControl(errorText: _errorText),
                                     ],
                                   );
@@ -1455,9 +1463,22 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
                                     _committedMessage =
                                         result['message'] ?? 'Change committed';
                                   } else {
-                                    _committedMessage = 'Error setting scope';
-                                    _errorText =
-                                        'Error setting scope'; //result['error'];
+                                    dev.log(
+                                        'Error setting scope: ${result['error']}');
+                                    if (result['error'] is Map) {
+                                      String? status =
+                                          result['error']['status'];
+                                      if (status != null) {
+                                        status = 'm:$status';
+                                      }
+                                      _errorText = getErrorText(status,
+                                          defaultErrorText:
+                                              'Error setting scope');
+                                      _committedMessage = _errorText;
+                                    } else {
+                                      _committedMessage = 'Error setting scope';
+                                      _errorText = 'Error setting scope';
+                                    }
                                   }
 
                                   setState(() {

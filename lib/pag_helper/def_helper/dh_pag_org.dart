@@ -22,24 +22,28 @@ enum PagOrgType {
   final IconData iconData;
 
   static PagOrgType byValue(String? value) =>
-      enumByLabel(
+      enumByValue(
         value,
         values,
         (e) => (e).value,
       ) ??
       none;
 
-  static PagOrgType? byLabel(String? label) => enumByLabel(
+  static PagOrgType byLabel(String? label) =>
+      enumByLabel(
         label,
         values,
         (e) => (e).label,
-      );
+      ) ??
+      none;
 
-  static PagOrgType? byTag(String? tag) => enumByTag(
+  static PagOrgType byTag(String? tag) =>
+      enumByTag(
         tag,
         values,
         (e) => (e).tag,
-      );
+      ) ??
+      none;
 }
 
 String getPagOrgTypeStr(dynamic itemType) {

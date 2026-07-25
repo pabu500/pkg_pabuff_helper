@@ -135,16 +135,8 @@ class MdlPagOpController {
 
     String itemKindStr = itemKind.value;
 
-    String itemTypeStr = '';
-    // if (itemType is PagFinanceType) {
-    //   itemTypeStr = (itemType as PagFinanceType).toString();
-    // }
-    if (itemType == null) {
-      itemTypeStr = itemKindStr;
-    } else {
-      // itemTypeStr = getItemTypeStr(itemType) ?? '';
-      itemTypeStr = getItemTypeValue(itemType);
-    }
+    String itemTypeStr = getItemTypeValue(itemType);
+
     assert(itemTypeStr.isNotEmpty,
         'itemTypeStr should not be empty, itemType: $itemType');
 

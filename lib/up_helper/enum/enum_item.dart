@@ -1,3 +1,5 @@
+import '../../pag_helper/def_helper/enum_helper.dart';
+
 enum ItemType {
   meter,
   meter_3p,
@@ -44,4 +46,45 @@ enum ItemIdType {
   alt_name,
   site_tag,
   scope_str,
+}
+
+enum PagIdType {
+  indexType('id', 'ID', 'id'),
+  nameType('name', 'Name', 'name'),
+  labelType('label', 'Label', 'label'),
+  snType('sn', 'Serial Number', 'sn'),
+  tagType('tag', 'Tag', 'tag'),
+  usernameType('username', 'Username', 'username'),
+  emailType('email', 'Email', 'email'),
+  phoneNumberType('phone_number', 'Phone Number', 'phone_number'),
+  accountNumberType('account_number', 'Account Number', 'account_number'),
+  iccidType('iccid', 'ICCID', 'iccid'),
+  ipType('ip', 'IP Address', 'ip'),
+  macType('mac', 'MAC Address', 'mac');
+
+  final String label;
+  final String value;
+  final String tag;
+
+  const PagIdType(
+    this.label,
+    this.value,
+    this.tag,
+  );
+
+  static PagIdType? byValue(String? value) => enumByValue(
+        value,
+        values,
+        (e) => (e).value,
+      );
+  static PagIdType? byLabel(String? label) => enumByLabel(
+        label,
+        values,
+        (e) => (e).label,
+      );
+  static PagIdType? byTag(String? tag) => enumByTag(
+        tag,
+        values,
+        (e) => (e).tag,
+      );
 }

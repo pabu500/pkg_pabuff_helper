@@ -41,11 +41,12 @@ import '../app/ems/wgt_match_payment_op_item.dart';
 import '../app/ems/wgt_tenant_item_assignment.dart';
 import '../app/fh/wgt_fh_device_health.dart';
 import '../job/wgt_job_type_op_panel2.dart';
-import 'wgt_pag_item_info_edit_panel.dart';
 import 'wgt_list_pane.dart';
 import 'wgt_pag_item_finder_flexi.dart';
 import '../app/ems/wgt_tariff_package_assignment.dart';
 import 'dart:developer' as dev;
+
+import 'wgt_pag_item_info_edit_panel2.dart';
 
 class WgtListSearchItemFlexi extends StatefulWidget {
   const WgtListSearchItemFlexi({
@@ -712,7 +713,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
 
                     xtShowModelBottomSheet(
                       context,
-                      WgtPagItemInfoEditPanel(
+                      WgtPagItemInfoEditPanel2(
                         appConfig: widget.appConfig,
                         itemKind: widget.itemKind,
                         itemTypeEnum: widget.itemTypeEnum ??

@@ -164,7 +164,7 @@ String? Function(String) getValidator(
 
 String getItemTypeValue(dynamic itemType) {
   if (itemType == null) {
-    return '';
+    return 'NOT_SET';
   }
 
   if (itemType is String) {
@@ -195,7 +195,7 @@ String getItemTypeValue(dynamic itemType) {
       itemType is PagPaymentOpType ||
       itemType is PagUserOpType ||
       itemType is PagScopeOpType) {
-    return itemType.value ?? '';
+    return itemType.value ?? 'NOT_SET';
   }
 
   throw Exception('Unsupported item type: ${itemType.runtimeType}');

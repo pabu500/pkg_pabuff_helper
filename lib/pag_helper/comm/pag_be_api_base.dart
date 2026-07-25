@@ -543,6 +543,7 @@ class PagUrlBase {
   static const String eptPollingAutogenProgress = '/batch_op/progress_update';
   static const String eptPollingBatchCreditOpProgress =
       '/batch_op/progress_update';
+  static const String eptDoOpUpdateMultiKeyVal = '/key_val_update/do_op_multi';
 
   //credit_op
   static const String eptCreditOpDoOp = '/credit_op/do_op_batch_credit';
@@ -568,7 +569,8 @@ class PagUrlBase {
       '/key_val_update/get_meter_key_val_list';
   static const String eptDoOpUpdateSingleKeyVal =
       '/key_val_update/do_op_single';
-  static const String eptDoOpUpdateMultiKeyVal = '/key_val_update/do_op_multi';
+  static const String eptDoOpKeyValUpdate =
+      '/key_val_update/do_op_key_val_update';
   //comm_data
   static const String eptCommDataGetRecentComsumption =
       '/comm_data/get_active_consumption';
