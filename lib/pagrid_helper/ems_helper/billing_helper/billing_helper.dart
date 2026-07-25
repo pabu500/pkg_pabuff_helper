@@ -99,6 +99,7 @@ Map<String, dynamic> prepCalcedBillInfoRl(Map<String, dynamic> billInfo) {
   String amgrBankAccountName = billInfo['amgr_bank_account_name'] ?? '';
   String amgrBankAccountNumber = billInfo['amgr_bank_account_number'] ?? '';
   String amgrBankName = billInfo['amgr_bank_label'] ?? '';
+  String amgrBankCode = billInfo['amgr_bank_code'] ?? '';
   String amgrBankBranchCode = billInfo['amgr_bank_branch_code'] ?? '';
   String amgrBankSwiftCode = billInfo['amgr_bank_swift_code'] ?? '';
   String amgrBankPayNow = billInfo['amgr_bank_paynow'] ?? '';
@@ -295,6 +296,7 @@ Map<String, dynamic> prepCalcedBillInfoRl(Map<String, dynamic> billInfo) {
     'amgrBankAccountName': amgrBankAccountName,
     'amgrBankAccountNumber': amgrBankAccountNumber,
     'amgrBankName': amgrBankName,
+    'amgrBankCode': amgrBankCode,
     'amgrBankBranchCode': amgrBankBranchCode,
     'amgrBankSwiftCode': amgrBankSwiftCode,
     'amgrBankPayNow': amgrBankPayNow,

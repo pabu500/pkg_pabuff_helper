@@ -95,6 +95,7 @@ class PagPdfBillCwP2 {
     required this.amgrBankAccountName,
     required this.amgrBankAccountNumber,
     required this.amgrBankName,
+    required this.amgrBankCode,
     required this.amgrBankBranchCode,
     required this.amgrBankSwiftCode,
     required this.amgrBankPayNow,
@@ -170,6 +171,7 @@ class PagPdfBillCwP2 {
   final String? amgrBankAccountName;
   final String? amgrBankAccountNumber;
   final String? amgrBankName;
+  final String? amgrBankCode;
   final String? amgrBankBranchCode;
   final String? amgrBankSwiftCode;
   final String? amgrBankPayNow;
@@ -389,6 +391,10 @@ class PagPdfBillCwP2 {
                   pw.TableRow(children: [
                     pw.Text('Bank Name:', style: styleSmall),
                     pw.Text(amgrBankName ?? '-', style: styleSmall),
+                  ]),
+                  pw.TableRow(children: [
+                    pw.Text('Bank Code:', style: styleSmall),
+                    pw.Text(amgrBankCode ?? '-', style: styleSmall),
                   ]),
                   pw.TableRow(children: [
                     pw.Text('Branch Code:', style: styleSmall),

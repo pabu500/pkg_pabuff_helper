@@ -99,6 +99,7 @@ Future<Uint8List> generatePagInvoiceCompilation(
       amgrBankAccountName: calcedBillInfoRl['amgrBankAccountName'] ?? '',
       amgrBankAccountNumber: calcedBillInfoRl['amgrBankAccountNumber'] ?? '',
       amgrBankName: calcedBillInfoRl['amgrBankName'] ?? '',
+      amgrBankCode: calcedBillInfoRl['amgrBankCode'] ?? '',
       amgrBankBranchCode: calcedBillInfoRl['amgrBankBranchCode'] ?? '',
       amgrBankSwiftCode: calcedBillInfoRl['amgrBankSwiftCode'] ?? '',
       amgrBankPayNow: calcedBillInfoRl['amgrBankPayNow'] ?? '',
