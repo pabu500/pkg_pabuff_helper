@@ -24,6 +24,18 @@ bool isNumeric(String input) {
   return false;
 }
 
+String? validateNumeric(String? input) {
+  if (input == null || input.isEmpty) {
+    return 'required';
+  }
+
+  if (!isNumeric(input)) {
+    return 'Input must be a numeric value';
+  }
+
+  return null; // Valid input
+}
+
 bool isAlphaNumeric(String input) {
   if (input.isEmpty) {
     return false;

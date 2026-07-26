@@ -32,6 +32,7 @@ import '../../def_helper/dh_pag_tariff.dart';
 import '../../def_helper/dh_pag_tenant.dart';
 import '../../def_helper/tariff_package_helper.dart';
 import '../../model/mdl_pag_app_config.dart';
+import '../app/am/wgt_meter_reset.dart';
 import '../app/ems/wgt_tenant_lc_status_op.dart';
 import '../scope/wgt_scope_setter.dart';
 import '../tree/wgt_item_group_tree.dart';
@@ -370,14 +371,13 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
     }
 
     return SizedBox(
-      width: width,
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Stack(
-              children: [
+        width: width,
+        child: SingleChildScrollView(
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+              Stack(children: [
                 if (isDeleteableItem && isDeleteableByAcl && isItemMFD)
                   _isDeleting
                       ? const WgtPagWait(size: 35)
@@ -395,132 +395,112 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
                           : Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                IconButton(
-                                  icon: const Icon(Icons.delete,
-                                      color: Colors.red),
-                                  onPressed: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return WgtConfirmBox(
-                                          title: 'Delete Confirmation',
-                                          message1:
-                                              'This operation will delete the selected item',
-                                          message2:
-                                              'It\'s recommended to double check before proceeding',
-                                          opName: 'item_delete',
-                                          keyInConfirmStrList: [
-                                            'delete',
-                                            itemName,
-                                          ],
-                                          itemCount: 1,
-                                          onConfirm: () async {
-                                            await _doDelete(itemName).then(
-                                              (result) {
-                                                if (result is Map) {
-                                                  if (result['error'] != null) {
-                                                    setState(() {
-                                                      _deleteResultText =
-                                                          result['error'];
+                                  IconButton(
+                                      icon: const Icon(Icons.delete,
+                                          color: Colors.red),
+                                      onPressed: () {
+                                        showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return WgtConfirmBox(
+                                                  title: 'Delete Confirmation',
+                                                  message1:
+                                                      'This operation will delete the selected item',
+                                                  message2:
+                                                      'It\'s recommended to double check before proceeding',
+                                                  opName: 'item_delete',
+                                                  keyInConfirmStrList: [
+                                                    'delete',
+                                                    itemName,
+                                                  ],
+                                                  itemCount: 1,
+                                                  onConfirm: () async {
+                                                    await _doDelete(itemName)
+                                                        .then((result) {
+                                                      if (result is Map) {
+                                                        if (result['error'] !=
+                                                            null) {
+                                                          setState(() {
+                                                            _deleteResultText =
+                                                                result['error'];
+                                                          });
+                                                        } else {
+                                                          setState(() {
+                                                            _deleteResultText =
+                                                                'Item deleted';
+                                                          });
+                                                        }
+                                                      }
+                                                      widget.onUpdate?.call();
                                                     });
-                                                  } else {
-                                                    setState(() {
-                                                      _deleteResultText =
-                                                          'Item deleted';
-                                                    });
-                                                  }
-                                                }
-                                                widget.onUpdate?.call();
-                                              },
-                                            );
-                                          },
-                                        );
-                                      },
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
+                                                  });
+                                            });
+                                      })
+                                ]),
                 Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        _itemDisplayName ?? '',
-                        style: TextStyle(
-                            fontSize: 21,
-                            fontWeight: FontWeight.w500,
-                            color: Theme.of(context).hintColor),
-                      ),
-                      SizedBox(
-                          width: 40,
-                          child: getCopyButton(context, _itemDisplayName ?? '',
-                              direction: 'left'))
-                    ],
-                  ),
-                ),
+                    alignment: Alignment.bottomCenter,
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(_itemDisplayName ?? '',
+                              style: TextStyle(
+                                  fontSize: 21,
+                                  fontWeight: FontWeight.w500,
+                                  color: Theme.of(context).hintColor)),
+                          SizedBox(
+                              width: 40,
+                              child: getCopyButton(
+                                  context, _itemDisplayName ?? '',
+                                  direction: 'left'))
+                        ])),
                 Row(
-                  // mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
-                      child: getLcStatusOp(
-                        widget.fields.firstWhere(
-                            (element) => element['col_key'] == 'lc_status',
-                            orElse: () => {}),
-                      ),
-                    ),
-                    const Spacer(),
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        if (_fieldUpdated) {
-                          widget.onClose?.call();
-                        }
-                      },
-                    ),
-                    horizontalSpaceMedium,
-                  ],
-                ),
-              ],
-            ),
-            // verticalSpaceSmall,
-            const Divider(height: 1),
-            verticalSpaceSmall,
-            _deleteResultText == 'Item deleted'
-                ? Container()
-                : Column(
-                    // alignment: WrapAlignment.center,
+                    // mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      getPaymentApplyList(),
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                              color: Theme.of(context).hintColor.withAlpha(50)),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 3, vertical: 3),
-                        width: width,
-                        child: Column(
-                          children: [
-                            ...getFields(),
-                          ],
-                        ),
-                      ),
-                      getUserRoleSetter(),
-                      getUserPasswordReset(),
-                      getItemScopeSetter(),
-                      getItemGroupTree(),
-                    ],
-                  ),
-            verticalSpaceSmall,
-          ],
-        ),
-      ),
-    );
+                      Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: getLcStatusOp(widget.fields.firstWhere(
+                              (element) => element['col_key'] == 'lc_status',
+                              orElse: () => {}))),
+                      const Spacer(),
+                      IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            if (_fieldUpdated) {
+                              widget.onClose?.call();
+                            }
+                          }),
+                      horizontalSpaceMedium,
+                    ])
+              ]),
+              // verticalSpaceSmall,
+              const Divider(height: 1),
+              verticalSpaceSmall,
+              _deleteResultText == 'Item deleted'
+                  ? Container()
+                  : Column(
+                      // alignment: WrapAlignment.center,
+                      children: [
+                          getPaymentApplyList(),
+                          Container(
+                              decoration: BoxDecoration(
+                                  border: Border.all(
+                                      color: Theme.of(context)
+                                          .hintColor
+                                          .withAlpha(50)),
+                                  borderRadius: BorderRadius.circular(5)),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 3, vertical: 3),
+                              width: width,
+                              child: Column(children: [...getFields()])),
+                          getUserRoleSetter(),
+                          getUserPasswordReset(),
+                          getItemScopeSetter(),
+                          getItemGroupTree(),
+                          getMeterReset(),
+                        ]),
+              verticalSpaceSmall,
+            ])));
   }
 
   List<Widget> getFields() {
@@ -564,116 +544,111 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
         }
       }
 
-      fields.add(
-        (field['widget'] ?? 'input') == 'input'
-            ? Padding(
-                padding: const EdgeInsets.only(top: 5.0),
-                child: WgtViewEditField(
-                    width: width,
-                    editable: isEditableByAcl && (field['editable'] ?? false),
-                    showCopy: field['show_copy'] ?? false,
-                    useDatePicker: field['useDatePicker'] ?? false,
-                    showLabel: true,
-                    labelWidth: labelWidth,
-                    hintText: hintText,
-                    labelText: field['label'] ?? field['title'],
-                    originalValue: field['value'] ?? field['val'] ?? '',
-                    onFocus: (hasFocus) {
+      fields.add((field['widget'] ?? 'input') == 'input'
+          ? Padding(
+              padding: const EdgeInsets.only(top: 5.0),
+              child: WgtViewEditField(
+                  width: width,
+                  editable: isEditableByAcl && (field['editable'] ?? false),
+                  showCopy: field['show_copy'] ?? false,
+                  useDatePicker: field['useDatePicker'] ?? false,
+                  showLabel: true,
+                  labelWidth: labelWidth,
+                  hintText: hintText,
+                  labelText: field['label'] ?? field['title'],
+                  originalValue: field['value'] ?? field['val'] ?? '',
+                  onFocus: (hasFocus) {
+                    setState(() {
+                      _currentField = field['col_key'];
+                    });
+                  },
+                  hasFocus: _currentField == field['col_key'],
+                  onSetValue: (newValue) async {
+                    List<Map<String, dynamic>> result =
+                        await _updateProfile(field['col_key'], newValue);
+                    Map<String, dynamic> resultMap = result[0];
+                    if (resultMap['error'] == null) {
                       setState(() {
-                        _currentField = field['col_key'];
+                        field['value'] = newValue;
+                        field['val'] = newValue;
+                        _fieldUpdated = true;
+                        widget.onUpdate?.call();
                       });
-                    },
-                    hasFocus: _currentField == field['col_key'],
-                    onSetValue: (newValue) async {
-                      List<Map<String, dynamic>> result =
-                          await _updateProfile(field['col_key'], newValue);
-                      Map<String, dynamic> resultMap = result[0];
-                      if (resultMap['error'] == null) {
-                        setState(() {
-                          field['value'] = newValue;
-                          field['val'] = newValue;
-                          _fieldUpdated = true;
-                          widget.onUpdate?.call();
-                        });
-                      } else {
-                        Map<String, dynamic> errorMap =
-                            resultMap['error'] is String
-                                ? {'message': resultMap['error']}
-                                : resultMap['error'];
-                        String? status = errorMap['status'];
-                        dev.log('Status: $status');
-                        setState(() {
-                          _errorText = 'Error updating field';
-                        });
-                      }
-
-                      // if it's scope update, need to update scope tree
-                      if (widget.itemKind == PagItemKind.scope) {
-                        widget.onScopeTreeUpdate?.call();
-                      }
-
-                      return resultMap;
-                    },
-                    validator: field['validator'],
-                    textStyle: null,
-                    onPullRefVal: field['onPullRefVal'] == null
-                        ? null
-                        : () {
-                            // return field['onPullRefVal'].call(itemNameField['val']);
-                          }
-                    // field['onPullRefVal'].call(itemNameField['val']),
-                    ),
-              )
-            : field['widget'] == 'dropdown' && field['value_list'] != null
-                ? WgtViewEditDropdown(
-                    width: width,
-                    readOnly:
-                        !(isEditableByAcl && (field['editable'] ?? false)),
-                    hasFocus: _currentField == field['col_key'],
-                    showLabel: true,
-                    labelWidth: labelWidth,
-                    dropdownValueListMap: field['value_list'],
-                    originalValueMap: field['value'] ?? field['val'],
-                    hint: 'NOT SET', //field['label'] ?? field['title'],
-                    labelText: field['label'] ?? field['title'],
-                    onFocus: (hasFocus) {
+                    } else {
+                      Map<String, dynamic> errorMap =
+                          resultMap['error'] is String
+                              ? {'message': resultMap['error']}
+                              : resultMap['error'];
+                      String? status = errorMap['status'];
+                      dev.log('Status: $status');
                       setState(() {
-                        _currentField = field['col_key'];
+                        _errorText = 'Error updating field';
                       });
-                    },
-                    onSetValue: (newValue) async {
-                      String value;
-                      if (newValue is Map) {
-                        value = newValue['value'] ?? newValue['val'];
-                      } else {
-                        value = newValue;
-                      }
-                      List<Map<String, dynamic>> result = await _updateProfile(
-                        field['col_key'],
-                        value,
-                      );
-                      Map<String, dynamic> resultMap = result[0];
+                    }
 
-                      if (resultMap['error'] == null) {
-                        setState(() {
-                          field['value'] = newValue;
-                          field['val'] = newValue;
-                          _fieldUpdated = true;
-                          widget.onUpdate?.call();
-                        });
-                      } else {
-                        Map<String, dynamic> errorMap = resultMap['error'];
-                        String? status = errorMap['status'];
-                        dev.log('Status: $status');
-                        setState(() {
-                          _errorText = 'Error updating field';
-                        });
-                      }
-                      return resultMap;
-                    },
-                  )
-                : Container(),
-      );
+                    // if it's scope update, need to update scope tree
+                    if (widget.itemKind == PagItemKind.scope) {
+                      widget.onScopeTreeUpdate?.call();
+                    }
+
+                    return resultMap;
+                  },
+                  validator: field['validator'],
+                  textStyle: null,
+                  onPullRefVal: field['onPullRefVal'] == null
+                      ? null
+                      : () {
+                          // return field['onPullRefVal'].call(itemNameField['val']);
+                        }
+                  // field['onPullRefVal'].call(itemNameField['val']),
+                  ))
+          : field['widget'] == 'dropdown' && field['value_list'] != null
+              ? WgtViewEditDropdown(
+                  width: width,
+                  readOnly: !(isEditableByAcl && (field['editable'] ?? false)),
+                  hasFocus: _currentField == field['col_key'],
+                  showLabel: true,
+                  labelWidth: labelWidth,
+                  dropdownValueListMap: field['value_list'],
+                  originalValueMap: field['value'] ?? field['val'],
+                  hint: 'NOT SET', //field['label'] ?? field['title'],
+                  labelText: field['label'] ?? field['title'],
+                  onFocus: (hasFocus) {
+                    setState(() {
+                      _currentField = field['col_key'];
+                    });
+                  },
+                  onSetValue: (newValue) async {
+                    String value;
+                    if (newValue is Map) {
+                      value = newValue['value'] ?? newValue['val'];
+                    } else {
+                      value = newValue;
+                    }
+                    List<Map<String, dynamic>> result = await _updateProfile(
+                      field['col_key'],
+                      value,
+                    );
+                    Map<String, dynamic> resultMap = result[0];
+
+                    if (resultMap['error'] == null) {
+                      setState(() {
+                        field['value'] = newValue;
+                        field['val'] = newValue;
+                        _fieldUpdated = true;
+                        widget.onUpdate?.call();
+                      });
+                    } else {
+                      Map<String, dynamic> errorMap = resultMap['error'];
+                      String? status = errorMap['status'];
+                      dev.log('Status: $status');
+                      setState(() {
+                        _errorText = 'Error updating field';
+                      });
+                    }
+                    return resultMap;
+                  })
+              : Container());
       // fields.add(verticalSpaceSmall);
     }
     return fields;
@@ -685,22 +660,20 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
     }
 
     return Padding(
-      padding: const EdgeInsets.only(top: 8.0),
-      child: WgtOpResetPassword(
-        appConfig: widget.appConfig,
-        loggedInUser: _loggedInUser!,
-        targetUserIndexStr: widget.strItemIndex,
-        targetUsername: widget.itemInfoMap?['username'] ?? '',
-        targetUserAuthProvider: widget.itemInfoMap?['auth_provider'] ?? '',
-        // height: 200,
-        onPasswordReset: () {
-          // setState(() {
-          //   _fieldUpdated = true;
-          //   widget.onUpdate?.call();
-          // });
-        },
-      ),
-    );
+        padding: const EdgeInsets.only(top: 8.0),
+        child: WgtOpResetPassword(
+            appConfig: widget.appConfig,
+            loggedInUser: _loggedInUser!,
+            targetUserIndexStr: widget.strItemIndex,
+            targetUsername: widget.itemInfoMap?['username'] ?? '',
+            targetUserAuthProvider: widget.itemInfoMap?['auth_provider'] ?? '',
+            // height: 200,
+            onPasswordReset: () {
+              // setState(() {
+              //   _fieldUpdated = true;
+              //   widget.onUpdate?.call();
+              // });
+            }));
   }
 
   Widget getUserRoleSetter() {
@@ -709,35 +682,33 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
     }
 
     return Padding(
-      padding: const EdgeInsets.only(top: 8.0),
-      child: WgtUesrRoleSetter(
-        appConfig: widget.appConfig,
-        loggedInUser: _loggedInUser!,
-        userIndexStr: widget.strItemIndex,
-        height: 350,
-        onUserRoleListLoaded: (List<Map<String, dynamic>> userRoleList) {
-          if (userRoleList.isEmpty) {
-            return;
-          }
-          _updateIsTenantUser(userRoleList);
-          // for (Map<String, dynamic> roleInfo in userRoleList) {
-          //   if (roleInfo['portal_type'] == 'ems-tp') {
-          //     setState(() {
-          //       _isTenantUser = true;
-          //     });
-          //     break;
-          //   }
-          // }
-        },
-        onUserRoleListSet: (List<Map<String, dynamic>> userRoleList) {
-          _updateIsTenantUser(userRoleList);
-          setState(() {
-            _fieldUpdated = true;
-            widget.onUpdate?.call();
-          });
-        },
-      ),
-    );
+        padding: const EdgeInsets.only(top: 8.0),
+        child: WgtUesrRoleSetter(
+            appConfig: widget.appConfig,
+            loggedInUser: _loggedInUser!,
+            userIndexStr: widget.strItemIndex,
+            height: 350,
+            onUserRoleListLoaded: (List<Map<String, dynamic>> userRoleList) {
+              if (userRoleList.isEmpty) {
+                return;
+              }
+              _updateIsTenantUser(userRoleList);
+              // for (Map<String, dynamic> roleInfo in userRoleList) {
+              //   if (roleInfo['portal_type'] == 'ems-tp') {
+              //     setState(() {
+              //       _isTenantUser = true;
+              //     });
+              //     break;
+              //   }
+              // }
+            },
+            onUserRoleListSet: (List<Map<String, dynamic>> userRoleList) {
+              _updateIsTenantUser(userRoleList);
+              setState(() {
+                _fieldUpdated = true;
+                widget.onUpdate?.call();
+              });
+            }));
   }
 
   Widget getItemScopeSetter() {
@@ -763,9 +734,7 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
       isSingleLabel = true;
       isEditableByKind = false;
 
-      initialScope = MdlPagScope.fromJson(
-        widget.itemScopeMap!,
-      );
+      initialScope = MdlPagScope.fromJson(widget.itemScopeMap!);
       // leafScopeLabel = scope.getLeafScopeLabel();
     }
 
@@ -784,77 +753,77 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
     }
 
     return Padding(
-      padding: const EdgeInsets.only(top: 8.0),
-      child: WgtScopeSetter(
-        appConfig: widget.appConfig,
-        isEditable: isEditableByKind && isEditableByAcl && isEditableByMapping,
-        isSingleLabel: isSingleLabel,
-        // singleScopeLabel: leafScopeLabel,
-        initialScope: initialScope,
-        width: width,
-        labelWidth: 130,
-        itemScopeMap: widget.itemScopeMap!,
-        forItemKind: widget.itemKind,
-        isFlexiScope: isFlexiScope,
-        forScopeType:
-            widget.itemTypeEnum is PagScopeType ? widget.itemTypeEnum : null,
-        onScopeSet: (dynamic profile) async {
-          if (profile == null) {
-            dev.log('Profile is null');
-            return {};
-          }
-          String scopeIdColName = '';
-          if (profile is MdlPagSiteGroupProfile) {
-            scopeIdColName = 'site_group_id';
-            // widget.onScopeTreeUpdate?.call();
-          } else if (profile is MdlPagSiteProfile) {
-            scopeIdColName = 'site_id';
-            // widget.onScopeTreeUpdate?.call();
-          } else if (profile is MdlPagBuildingProfile) {
-            scopeIdColName = 'building_id';
-            // widget.onScopeTreeUpdate?.call();
-          } else if (profile is MdlPagLocationGroupProfile) {
-            scopeIdColName = 'location_group_id';
-            // widget.onScopeTreeUpdate?.call();
-          } else if (profile is MdlPagLocation) {
-            scopeIdColName = 'location_id';
-          }
-
-          if (scopeIdColName.isEmpty) {
-            dev.log('Invalid profile type');
-            return {};
-          }
-          List<Map<String, dynamic>> result = await _updateProfile(
-            isFlexiScope ? 'scope_id' : scopeIdColName,
-            profile.id.toString(),
-            scopeProfileIdColName: scopeIdColName,
-          );
-          Map<String, dynamic> resultMap = result[0];
-          if (resultMap['error'] == null) {
-            setState(() {
-              _fieldUpdated = true;
-              widget.onScopeTreeUpdate?.call();
-              widget.onUpdate?.call();
-            });
-          } else {
-            dev.log('Error updating scope: ${resultMap['error']}');
-            setState(() {
-              Map<String, dynamic> errorMap = resultMap['error'];
-              String? status = errorMap['status'];
-              if (status != null) {
-                status = 'm:$status';
+        padding: const EdgeInsets.only(top: 8.0),
+        child: WgtScopeSetter(
+            appConfig: widget.appConfig,
+            isEditable:
+                isEditableByKind && isEditableByAcl && isEditableByMapping,
+            isSingleLabel: isSingleLabel,
+            // singleScopeLabel: leafScopeLabel,
+            initialScope: initialScope,
+            width: width,
+            labelWidth: 130,
+            itemScopeMap: widget.itemScopeMap!,
+            forItemKind: widget.itemKind,
+            isFlexiScope: isFlexiScope,
+            forScopeType: widget.itemTypeEnum is PagScopeType
+                ? widget.itemTypeEnum
+                : null,
+            onScopeSet: (dynamic profile) async {
+              if (profile == null) {
+                dev.log('Profile is null');
+                return {};
               }
-              // _errorText = status != null
-              //     ? 'Error updating scope: $status'
-              //     : 'Error updating scope';
-              _errorText = getErrorText(status,
-                  defaultErrorText: 'Error updating scope');
-            });
-          }
-          return resultMap;
-        },
-      ),
-    );
+              String scopeIdColName = '';
+              if (profile is MdlPagSiteGroupProfile) {
+                scopeIdColName = 'site_group_id';
+                // widget.onScopeTreeUpdate?.call();
+              } else if (profile is MdlPagSiteProfile) {
+                scopeIdColName = 'site_id';
+                // widget.onScopeTreeUpdate?.call();
+              } else if (profile is MdlPagBuildingProfile) {
+                scopeIdColName = 'building_id';
+                // widget.onScopeTreeUpdate?.call();
+              } else if (profile is MdlPagLocationGroupProfile) {
+                scopeIdColName = 'location_group_id';
+                // widget.onScopeTreeUpdate?.call();
+              } else if (profile is MdlPagLocation) {
+                scopeIdColName = 'location_id';
+              }
+
+              if (scopeIdColName.isEmpty) {
+                dev.log('Invalid profile type');
+                return {};
+              }
+              List<Map<String, dynamic>> result = await _updateProfile(
+                isFlexiScope ? 'scope_id' : scopeIdColName,
+                profile.id.toString(),
+                scopeProfileIdColName: scopeIdColName,
+              );
+              Map<String, dynamic> resultMap = result[0];
+              if (resultMap['error'] == null) {
+                setState(() {
+                  _fieldUpdated = true;
+                  widget.onScopeTreeUpdate?.call();
+                  widget.onUpdate?.call();
+                });
+              } else {
+                dev.log('Error updating scope: ${resultMap['error']}');
+                setState(() {
+                  Map<String, dynamic> errorMap = resultMap['error'];
+                  String? status = errorMap['status'];
+                  if (status != null) {
+                    status = 'm:$status';
+                  }
+                  // _errorText = status != null
+                  //     ? 'Error updating scope: $status'
+                  //     : 'Error updating scope';
+                  _errorText = getErrorText(status,
+                      defaultErrorText: 'Error updating scope');
+                });
+              }
+              return resultMap;
+            }));
   }
 
   Widget getItemGroupTree() {
@@ -1122,199 +1091,199 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
       return Container();
     }
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: Container(
-        width: width,
-        decoration: BoxDecoration(
-          border: Border.all(color: Theme.of(context).hintColor.withAlpha(50)),
-          borderRadius: BorderRadius.circular(5),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 3),
-        child: Center(
-          child: FutureBuilder(
-              future: _getPaymentApplies(),
-              builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const WgtPagWait(size: 30);
-                } else if (snapshot.hasError) {
-                  return getErrorTextPrompt(
-                      context: context, errorText: _getPaymentAppliesErrorText);
-                  // } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  //   return const Text('No Payment Applies found');
-                } else {
-                  if (_paymentApplyList.isEmpty) {
-                    return const Text('No Payment Applies found');
-                  }
-                  List<Widget> appliesWidgets = [];
-                  appliesWidgets.add(Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8.0, vertical: 5.0),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Payment Applies (${_paymentApplyList.length})',
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: Theme.of(context).hintColor),
-                      ),
-                    ),
-                  ));
-                  for (Map<String, dynamic> applyInfo in _paymentApplyList) {
-                    String tenantLabel = applyInfo['tenant_label'] ?? '-';
-                    String billLabel = applyInfo['bill_label'] ?? '-';
-                    String billedTotalCost =
-                        applyInfo['billed_total_cost'] ?? '-';
-                    String appliedTimestamp =
-                        applyInfo['applied_timestamp'] ?? '-';
-                    String appliedByOpName =
-                        applyInfo['applied_by_op_username'] ?? '-';
-                    String appliedUsageAmountStr =
-                        applyInfo['applied_usage_amount'] ?? '-';
-                    String appliedInterestAmountStr =
-                        applyInfo['applied_interest_amount'] ?? '-';
-
-                    double keyWidth1 = 85.0;
-                    double keyWidth2 = 85.0;
-
-                    appliesWidgets.add(Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8.0, vertical: 5.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  SizedBox(
-                                    width: keyWidth1,
-                                    child: const Align(
-                                      alignment: Alignment.centerRight,
-                                      child: Text('Tenant: ',
-                                          style: TextStyle(fontSize: 13.5)),
-                                    ),
-                                  ),
-                                  Text(
-                                    tenantLabel,
-                                    style: const TextStyle(fontSize: 13.5),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  SizedBox(
-                                    width: keyWidth1,
-                                    child: const Align(
-                                      alignment: Alignment.centerRight,
-                                      child: Text('Bill: ',
-                                          style: TextStyle(fontSize: 13.5)),
-                                    ),
-                                  ),
-                                  Text(
-                                    billLabel,
-                                    style: const TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  SizedBox(
-                                    width: keyWidth1,
-                                    child: const Align(
-                                      alignment: Alignment.centerRight,
-                                      child: Text('Applied by ',
-                                          style: TextStyle(fontSize: 13.5)),
-                                    ),
-                                  ),
-                                  Text(
-                                    appliedByOpName,
-                                    style: const TextStyle(fontSize: 13.5),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  SizedBox(
-                                    width: keyWidth1,
-                                    child: const Align(
-                                      alignment: Alignment.centerRight,
-                                      child: Text('Applied on ',
-                                          style: TextStyle(fontSize: 13.5)),
-                                    ),
-                                  ),
-                                  Text(
-                                    appliedTimestamp,
-                                    style: const TextStyle(fontSize: 13.5),
-                                  ),
-                                ],
-                              ),
-                            ],
+        padding: const EdgeInsets.only(bottom: 8.0),
+        child: Container(
+            width: width,
+            decoration: BoxDecoration(
+              border:
+                  Border.all(color: Theme.of(context).hintColor.withAlpha(50)),
+              borderRadius: BorderRadius.circular(5),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 3),
+            child: Center(
+              child: FutureBuilder(
+                  future: _getPaymentApplies(),
+                  builder:
+                      (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const WgtPagWait(size: 30);
+                    } else if (snapshot.hasError) {
+                      return getErrorTextPrompt(
+                          context: context,
+                          errorText: _getPaymentAppliesErrorText);
+                      // } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      //   return const Text('No Payment Applies found');
+                    } else {
+                      if (_paymentApplyList.isEmpty) {
+                        return const Text('No Payment Applies found');
+                      }
+                      List<Widget> appliesWidgets = [];
+                      appliesWidgets.add(Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8.0, vertical: 5.0),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Payment Applies (${_paymentApplyList.length})',
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Theme.of(context).hintColor),
                           ),
-                          const Spacer(),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
+                        ),
+                      ));
+                      for (Map<String, dynamic> applyInfo
+                          in _paymentApplyList) {
+                        String tenantLabel = applyInfo['tenant_label'] ?? '-';
+                        String billLabel = applyInfo['bill_label'] ?? '-';
+                        String billedTotalCost =
+                            applyInfo['billed_total_cost'] ?? '-';
+                        String appliedTimestamp =
+                            applyInfo['applied_timestamp'] ?? '-';
+                        String appliedByOpName =
+                            applyInfo['applied_by_op_username'] ?? '-';
+                        String appliedUsageAmountStr =
+                            applyInfo['applied_usage_amount'] ?? '-';
+                        String appliedInterestAmountStr =
+                            applyInfo['applied_interest_amount'] ?? '-';
+
+                        double keyWidth1 = 85.0;
+                        double keyWidth2 = 85.0;
+
+                        appliesWidgets.add(Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8.0, vertical: 5.0),
+                            child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  SizedBox(
-                                    width: keyWidth2,
-                                    child: const Align(
-                                      alignment: Alignment.centerRight,
-                                      child: Text('Billed Total ',
-                                          style: TextStyle(fontSize: 13.5)),
-                                    ),
-                                  ),
-                                  Text(billedTotalCost,
-                                      style: const TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold)),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  SizedBox(
-                                    width: keyWidth2,
-                                    child: const Align(
-                                      alignment: Alignment.centerRight,
-                                      child: Text('Usage Amt.',
-                                          style: TextStyle(fontSize: 13.5)),
-                                    ),
-                                  ),
-                                  Text(appliedUsageAmountStr,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold)),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  SizedBox(
-                                    width: keyWidth2,
-                                    child: const Align(
-                                      alignment: Alignment.centerRight,
-                                      child: Text('Interest Amt.',
-                                          style: TextStyle(fontSize: 13.5)),
-                                    ),
-                                  ),
-                                  Text(appliedInterestAmountStr,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold)),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ));
-                  }
-                  return Column(children: appliesWidgets);
-                }
-              }),
-        ),
-      ),
-    );
+                                  Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(children: [
+                                          SizedBox(
+                                              width: keyWidth1,
+                                              child: const Align(
+                                                  alignment:
+                                                      Alignment.centerRight,
+                                                  child: Text('Tenant: ',
+                                                      style: TextStyle(
+                                                          fontSize: 13.5)))),
+                                          Text(tenantLabel,
+                                              style: const TextStyle(
+                                                  fontSize: 13.5))
+                                        ]),
+                                        Row(children: [
+                                          SizedBox(
+                                            width: keyWidth1,
+                                            child: const Align(
+                                                alignment:
+                                                    Alignment.centerRight,
+                                                child: Text('Bill: ',
+                                                    style: TextStyle(
+                                                        fontSize: 13.5))),
+                                          ),
+                                          Text(
+                                            billLabel,
+                                            style: const TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold),
+                                          )
+                                        ]),
+                                        Row(children: [
+                                          SizedBox(
+                                              width: keyWidth1,
+                                              child: const Align(
+                                                  alignment:
+                                                      Alignment.centerRight,
+                                                  child: Text('Applied by ',
+                                                      style: TextStyle(
+                                                          fontSize: 13.5)))),
+                                          Text(appliedByOpName,
+                                              style: const TextStyle(
+                                                  fontSize: 13.5))
+                                        ]),
+                                        Row(children: [
+                                          SizedBox(
+                                              width: keyWidth1,
+                                              child: const Align(
+                                                  alignment:
+                                                      Alignment.centerRight,
+                                                  child: Text('Applied on ',
+                                                      style: TextStyle(
+                                                          fontSize: 13.5)))),
+                                          Text(appliedTimestamp,
+                                              style: const TextStyle(
+                                                  fontSize: 13.5))
+                                        ]),
+                                      ]),
+                                  const Spacer(),
+                                  Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(children: [
+                                          SizedBox(
+                                              width: keyWidth2,
+                                              child: const Align(
+                                                  alignment:
+                                                      Alignment.centerRight,
+                                                  child: Text('Billed Total ',
+                                                      style: TextStyle(
+                                                          fontSize: 13.5)))),
+                                          Text(billedTotalCost,
+                                              style: const TextStyle(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold))
+                                        ]),
+                                        Row(children: [
+                                          SizedBox(
+                                              width: keyWidth2,
+                                              child: const Align(
+                                                  alignment:
+                                                      Alignment.centerRight,
+                                                  child: Text('Usage Amt.',
+                                                      style: TextStyle(
+                                                          fontSize: 13.5)))),
+                                          Text(appliedUsageAmountStr,
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold))
+                                        ]),
+                                        Row(children: [
+                                          SizedBox(
+                                              width: keyWidth2,
+                                              child: const Align(
+                                                  alignment:
+                                                      Alignment.centerRight,
+                                                  child: Text('Interest Amt.',
+                                                      style: TextStyle(
+                                                          fontSize: 13.5)))),
+                                          Text(appliedInterestAmountStr,
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold))
+                                        ])
+                                      ])
+                                ])));
+                      }
+                      return Column(children: appliesWidgets);
+                    }
+                  }),
+            )));
+  }
+
+  Widget getMeterReset() {
+    if (widget.itemKind != PagItemKind.device ||
+        widget.itemTypeEnum != PagDeviceCat.meter) {
+      return Container();
+    }
+
+    return Padding(
+        padding: const EdgeInsets.only(top: 8.0),
+        child: WgtMeterReset(
+          appConfig: widget.appConfig,
+          loggedInUser: _loggedInUser!,
+          width: width,
+          meterInfo: widget.itemInfoMap ?? {},
+        ));
   }
 }

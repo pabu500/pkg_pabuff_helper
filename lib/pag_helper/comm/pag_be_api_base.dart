@@ -429,12 +429,9 @@ class PagUrlBase {
   static const String eptPagCreateDevice = '/am/device/create_device';
   static const String eptPagCreateDevice2 = '/am/device/create_device2';
 
-  // static const String eptBatchOpDeviceOnboarding =
-  // '/am/device/batch_op/device_onboarding';
-  // '/batch_op/do_op';
-  // static const String eptBatchOpDeviceUpdate =
-  // '/am/device/batch_op/device_update';
-  // '/batch_op/do_op';
+  static const String eptGetMeterResetInfo = '/am/device/get_meter_reset_info';
+  static const String eptAddMeterReset = '/am/device/add_meter_reset';
+  static const String eptDeleteMeterReset = '/am/device/delete_meter_reset';
 
   // AM - Comms Manager
   static const String eptAmCommsUpdateDeviceLinkage =
