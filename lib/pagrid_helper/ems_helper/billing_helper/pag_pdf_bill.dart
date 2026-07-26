@@ -676,7 +676,7 @@ class PagPdfBillCwP2 {
         children: [
           pw.Row(children: [
             pw.Text(
-                'For premise address(es) relating to this invoice, refer to page 2',
+                'For premise address(es) relating to this invoice, refer meter usage details page',
                 style: styleSmall),
           ]),
         ],
