@@ -10,30 +10,35 @@ class PagEmsTypeUsageCalcRl {
   late final double? _billedAutoUsageB;
   late final double? _billedAutoUsageN;
   late final double? _billedAutoUsageG;
+  late final double? _billedAutoUsageSE1;
 
   late final double? _billedSubTenantUsageE;
   late final double? _billedSubTenantUsageW;
   late final double? _billedSubTenantUsageB;
   late final double? _billedSubTenantUsageN;
   late final double? _billedSubTenantUsageG;
+  late final double? _billedSubTenantUsageSE1;
 
   late final double? _billedManualUsageE;
   late final double? _billedManualUsageW;
   late final double? _billedManualUsageB;
   late final double? _billedManualUsageN;
   late final double? _billedManualUsageG;
+  late final double? _billedManualUsageSE1;
 
   late final double? _billedUsageFactorE;
   late final double? _billedUsageFactorW;
   late final double? _billedUsageFactorB;
   late final double? _billedUsageFactorN;
   late final double? _billedUsageFactorG;
+  late final double? _billedUsageFactorSE1;
 
   late final double? _billedRateE;
   late final double? _billedRateW;
   late final double? _billedRateB;
   late final double? _billedRateN;
   late final double? _billedRateG;
+  late final double? _billedRateSE1;
 
   late final double? _billedGst;
 
@@ -59,12 +64,14 @@ class PagEmsTypeUsageCalcRl {
   EmsTypeUsageR2? _typeUsageB;
   EmsTypeUsageR2? _typeUsageN;
   EmsTypeUsageR2? _typeUsageG;
+  EmsTypeUsageR2? _typeUsageSE1;
 
   final List<Map<String, dynamic>> _trendingE = [];
   final List<Map<String, dynamic>> _trendingW = [];
   final List<Map<String, dynamic>> _trendingB = [];
   final List<Map<String, dynamic>> _trendingN = [];
   final List<Map<String, dynamic>> _trendingG = [];
+  final List<Map<String, dynamic>> _trendingSE1 = [];
 
   double? _totalUsageCost;
   double? _subTotalCost;
@@ -79,12 +86,14 @@ class PagEmsTypeUsageCalcRl {
   EmsTypeUsageR2? get typeUsageB => _typeUsageB;
   EmsTypeUsageR2? get typeUsageN => _typeUsageN;
   EmsTypeUsageR2? get typeUsageG => _typeUsageG;
+  EmsTypeUsageR2? get typeUsageSE1 => _typeUsageSE1;
 
   List<Map<String, dynamic>> get trendingE => _trendingE;
   List<Map<String, dynamic>> get trendingW => _trendingW;
   List<Map<String, dynamic>> get trendingB => _trendingB;
   List<Map<String, dynamic>> get trendingN => _trendingN;
   List<Map<String, dynamic>> get trendingG => _trendingG;
+  List<Map<String, dynamic>> get trendingSE1 => _trendingSE1;
 
   double? get billedGst => _billedGst;
   double? get totalUsageCost => _totalUsageCost;
@@ -116,26 +125,31 @@ class PagEmsTypeUsageCalcRl {
     double? billedAutoUsageB,
     double? billedAutoUsageN,
     double? billedAutoUsageG,
+    double? billedAutoUsageSE1,
     double? billedSubTenantUsageE,
     double? billedSubTenantUsageW,
     double? billedSubTenantUsageB,
     double? billedSubTenantUsageN,
     double? billedSubTenantUsageG,
+    double? billedSubTenantUsageSE1,
     double? billedManualUsageE,
     double? billedManualUsageW,
     double? billedManualUsageB,
     double? billedManualUsageN,
     double? billedManualUsageG,
+    double? billedManualUsageSE1,
     double? billedUsageFactorE,
     double? billedUsageFactorW,
     double? billedUsageFactorB,
     double? billedUsageFactorN,
     double? billedUsageFactorG,
+    double? billedUsageFactorSE1,
     double? billedRateE,
     double? billedRateW,
     double? billedRateB,
     double? billedRateN,
     double? billedRateG,
+    double? billedRateSE1,
     required List<Map<String, dynamic>> lineItemList,
     List<Map<String, dynamic>>? billedTrendingSnapShot,
     String? billBarFromMonth,
@@ -159,26 +173,31 @@ class PagEmsTypeUsageCalcRl {
     _billedAutoUsageB = billedAutoUsageB;
     _billedAutoUsageN = billedAutoUsageN;
     _billedAutoUsageG = billedAutoUsageG;
+    _billedAutoUsageSE1 = billedAutoUsageSE1;
     _billedSubTenantUsageE = billedSubTenantUsageE;
     _billedSubTenantUsageW = billedSubTenantUsageW;
     _billedSubTenantUsageB = billedSubTenantUsageB;
     _billedSubTenantUsageN = billedSubTenantUsageN;
     _billedSubTenantUsageG = billedSubTenantUsageG;
+    _billedSubTenantUsageSE1 = billedSubTenantUsageSE1;
     _billedManualUsageE = billedManualUsageE;
     _billedManualUsageW = billedManualUsageW;
     _billedManualUsageB = billedManualUsageB;
     _billedManualUsageN = billedManualUsageN;
     _billedManualUsageG = billedManualUsageG;
+    _billedManualUsageSE1 = billedManualUsageSE1;
     _billedUsageFactorE = billedUsageFactorE;
     _billedUsageFactorW = billedUsageFactorW;
     _billedUsageFactorB = billedUsageFactorB;
     _billedUsageFactorN = billedUsageFactorN;
     _billedUsageFactorG = billedUsageFactorG;
+    _billedUsageFactorSE1 = billedUsageFactorSE1;
     _billedRateE = billedRateE;
     _billedRateW = billedRateW;
     _billedRateB = billedRateB;
     _billedRateN = billedRateN;
     _billedRateG = billedRateG;
+    _billedRateSE1 = billedRateSE1;
 
     _lineItemList = lineItemList;
     _billBarFromMonth = billBarFromMonth;
@@ -244,6 +263,7 @@ class PagEmsTypeUsageCalcRl {
     _calcTypeUsage('B');
     _calcTypeUsage('N');
     _calcTypeUsage('G');
+    _calcTypeUsage('SE1');
 
     // _calcTotalCost();
     _getBilledTotalCost();
@@ -254,6 +274,7 @@ class PagEmsTypeUsageCalcRl {
       'B': _billedUsageFactorB,
       'N': _billedUsageFactorN,
       'G': _billedUsageFactorG,
+      'SE1': _billedUsageFactorSE1,
     });
   }
 
@@ -263,6 +284,7 @@ class PagEmsTypeUsageCalcRl {
     _calcTypeUsage('B');
     _calcTypeUsage('N');
     _calcTypeUsage('G');
+    _calcTypeUsage('SE1');
 
     // _calcTotalCost();
 
@@ -288,6 +310,8 @@ class PagEmsTypeUsageCalcRl {
         return _typeUsageN!;
       case 'G':
         return _typeUsageG!;
+      case 'SE1':
+        return _typeUsageSE1!;
       default:
         throw Exception('Invalid usage type');
     }
@@ -305,6 +329,8 @@ class PagEmsTypeUsageCalcRl {
         return _billedUsageFactorN;
       case 'G':
         return _billedUsageFactorG;
+      case 'SE1':
+        return _billedUsageFactorSE1;
       default:
         return null;
     }
@@ -350,6 +376,8 @@ class PagEmsTypeUsageCalcRl {
         return _billedAutoUsageN;
       case 'G':
         return _billedAutoUsageG;
+      case 'SE1':
+        return _billedAutoUsageSE1;
       default:
         return null;
     }
@@ -367,6 +395,8 @@ class PagEmsTypeUsageCalcRl {
         return _billedSubTenantUsageN;
       case 'G':
         return _billedSubTenantUsageG;
+      case 'SE1':
+        return _billedSubTenantUsageSE1;
       default:
         return null;
     }
@@ -384,6 +414,8 @@ class PagEmsTypeUsageCalcRl {
         return _billedManualUsageN;
       case 'G':
         return _billedManualUsageG;
+      case 'SE1':
+        return _billedManualUsageSE1;
       default:
         return null;
     }
@@ -401,6 +433,8 @@ class PagEmsTypeUsageCalcRl {
         return _billedUsageFactorN;
       case 'G':
         return _billedUsageFactorG;
+      case 'SE1':
+        return _billedUsageFactorSE1;
       default:
         return null;
     }
@@ -418,6 +452,8 @@ class PagEmsTypeUsageCalcRl {
         return _billedRateN;
       case 'G':
         return _billedRateG;
+      case 'SE1':
+        return _billedRateSE1;
       default:
         return null;
     }
@@ -486,6 +522,9 @@ class PagEmsTypeUsageCalcRl {
       case 'G':
         _typeUsageG = typeUsage;
         break;
+      case 'SE1':
+        _typeUsageSE1 = typeUsage;
+        break;
     }
   }
 
@@ -545,16 +584,19 @@ class PagEmsTypeUsageCalcRl {
     double? compositeUsageB;
     double? compositeUsageN;
     double? compositeUsageG;
+    double? compositeUsageSE1;
     double? compositeUsageFactoredE;
     double? compositeUsageFactoredW;
     double? compositeUsageFactoredB;
     double? compositeUsageFactoredN;
     double? compositeUsageFactoredG;
+    double? compositeUsageFactoredSE1;
     double? compositeCostE;
     double? compositeCostW;
     double? compositeCostB;
     double? compositeCostN;
     double? compositeCostG;
+    double? compositeCostSE1;
 
     for (var singularCalc in _singularCalcList) {
       if (singularCalc.typeUsageE?.usage != null) {
@@ -598,6 +640,10 @@ class PagEmsTypeUsageCalcRl {
         compositeUsageFactoredG ??= 0;
         compositeUsageFactoredG += singularCalc.typeUsageG!.usageFactored!;
       }
+      if (singularCalc.typeUsageSE1?.usage != null) {
+        compositeUsageSE1 ??= 0;
+        compositeUsageSE1 += singularCalc.typeUsageSE1!.usage!;
+      }
 
       if (singularCalc.typeUsageE?.cost != null) {
         compositeCostE ??= 0;
@@ -618,6 +664,10 @@ class PagEmsTypeUsageCalcRl {
       if (singularCalc.typeUsageG?.cost != null) {
         compositeCostG ??= 0;
         compositeCostG += singularCalc.typeUsageG!.cost!;
+      }
+      if (singularCalc.typeUsageSE1?.cost != null) {
+        compositeCostSE1 ??= 0;
+        compositeCostSE1 += singularCalc.typeUsageSE1!.cost!;
       }
     }
 
@@ -664,6 +714,15 @@ class PagEmsTypeUsageCalcRl {
       factor: _billedUsageFactorG,
       // rate: _typeRateInfo['G'],
       cost: compositeCostG,
+      costDecimals: _costDecimals,
+    );
+    _typeUsageSE1 = EmsTypeUsageR2(
+      typeTag: 'SE1',
+      usage: compositeUsageSE1,
+      usageFactored: compositeUsageFactoredSE1,
+      factor: _billedUsageFactorSE1,
+      // rate: _typeRateInfo['SE1'],
+      cost: compositeCostSE1,
       costDecimals: _costDecimals,
     );
 
@@ -726,18 +785,21 @@ class PagEmsTypeUsageCalcRl {
       double? billedTotalUsageB = item['billed_total_usage_b'];
       double? billedTotalUsageN = item['billed_total_usage_n'];
       double? billedTotalUsageG = item['billed_total_usage_g'];
+      double? billedTotalUsageSE1 = item['billed_total_usage_se1'];
 
       double? usageFactorE = usageFactor['E'];
       double? usageFactorW = usageFactor['W'];
       double? usageFactorB = usageFactor['B'];
       double? usageFactorN = usageFactor['N'];
       double? usageFactorG = usageFactor['G'];
+      double? usageFactorSE1 = usageFactor['SE1'];
 
       double? billedTotalUsageFactoredE;
       double? billedTotalUsageFactoredW;
       double? billedTotalUsageFactoredB;
       double? billedTotalUsageFactoredN;
       double? billedTotalUsageFactoredG;
+      double? billedTotalUsageFactoredSE1;
 
       if (billedTotalUsageE != null && usageFactorE != null) {
         billedTotalUsageFactoredE = billedTotalUsageE * usageFactorE;
@@ -757,6 +819,9 @@ class PagEmsTypeUsageCalcRl {
 
       if (billedTotalUsageG != null && usageFactorG != null) {
         billedTotalUsageFactoredG = billedTotalUsageG * usageFactorG;
+      }
+      if (billedTotalUsageSE1 != null && usageFactorSE1 != null) {
+        billedTotalUsageFactoredSE1 = billedTotalUsageSE1 * usageFactorSE1;
       }
 
       if (item['billed_time_label'] != null) {
@@ -814,6 +879,13 @@ class PagEmsTypeUsageCalcRl {
           'time': item['billed_time_label'],
           'label': item['billed_time_label'],
           'value': billedTotalUsageFactoredG,
+        });
+      }
+      if (billedTotalUsageSE1 != null) {
+        _trendingSE1.add({
+          'time': item['billed_time_label'],
+          'label': item['billed_time_label'],
+          'value': billedTotalUsageFactoredSE1,
         });
       }
     }
