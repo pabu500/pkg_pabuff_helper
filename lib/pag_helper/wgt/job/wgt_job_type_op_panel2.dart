@@ -283,6 +283,8 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
         } else {
           return false;
         }
+      case 'gen-billing-reminder-list':
+        return _selectedDate1 != null && _selectedItemTypeStr != null;
       default:
         return false;
     }
@@ -385,6 +387,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
   Widget getScopeFilter() {
     return WgtPagItemFinderFlexi(
       key: _finderRefreshKey, //_listContentRefreshKey,
+      // key: UniqueKey(),
       loggedInUser: widget.loggedInUser,
       appConfig: widget.appConfig,
       isScopeProvider: true,
@@ -436,19 +439,21 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
       case 'payment-lc-status-update':
         return getPaymentLcStatusUpdateOptions();
       case 'gen-payment-matching-form':
-        return genPaymentMatchingFormOptions();
+        return getGenPaymentMatchingFormOptions();
       case 'payment-matching':
-        return paymentMatchingOptions();
+        return getPaymentMatchingOptions();
       case 'item-history':
         return getItemHistoryOptions();
       case 'item-list':
         return getItemListOptions();
       case 'collection-report':
-        return collectionReportOptions();
+        return getCollectionReportOptions();
       case 'ar-aging-report':
-        return arAgingReportOptions();
+        return getArAgingReportOptions();
       case 'email-blast':
-        return blastEmailOptions();
+        return getBlastEmailOptions();
+      case 'gen-billing-reminder-list':
+        return getGenBillingReminderListOptions();
       default:
         return const SizedBox();
     }
@@ -1157,11 +1162,11 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
     );
   }
 
-  Widget genPaymentMatchingFormOptions() {
+  Widget getGenPaymentMatchingFormOptions() {
     return Container();
   }
 
-  Widget paymentMatchingOptions() {
+  Widget getPaymentMatchingOptions() {
     return Container();
   }
 
@@ -1236,7 +1241,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
     );
   }
 
-  Widget collectionReportOptions() {
+  Widget getCollectionReportOptions() {
     return Column(
       children: [
         Row(
@@ -1257,7 +1262,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
     );
   }
 
-  Widget arAgingReportOptions() {
+  Widget getArAgingReportOptions() {
     return Column(
       children: [
         Row(
@@ -1292,7 +1297,7 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
     );
   }
 
-  Widget blastEmailOptions() {
+  Widget getBlastEmailOptions() {
     List<String> blastTypeOptions = [
       'billing-notification',
     ];
@@ -1344,6 +1349,73 @@ class _WgtJobTypeOpPanel2State extends State<WgtJobTypeOpPanel2> {
               ],
             ),
           ),
+      ],
+    );
+  }
+
+  Widget getGenBillingReminderListOptions() {
+    List<String> billingReminderTypeOptions = [
+      'first-reminder',
+      'second-reminder',
+    ];
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'As Of Date',
+              style: TextStyle(
+                color: Theme.of(context).hintColor,
+                fontSize: 16,
+              ),
+            ),
+            horizontalSpaceSmall,
+            WgtDatePicker(
+              key: _date1PickerKey,
+              labelFontSize: 15,
+              defaultFirstDate:
+                  DateTime.now().subtract(const Duration(days: 365)),
+              defaultLastDate: DateTime.now(),
+              initialDate: _selectedDate1,
+              timeZone: widget.loggedInUser.selectedScope.getProjectTimezone(),
+              label: 'Set As Of Date',
+              onDateChanged: (DateTime selectedDate) {
+                setState(() {
+                  _selectedDate1 = selectedDate;
+                });
+              },
+            ),
+          ],
+        ),
+        verticalSpaceSmall,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Reminder Type',
+              style: TextStyle(
+                color: Theme.of(context).hintColor,
+                fontSize: 16,
+              ),
+            ),
+            horizontalSpaceSmall,
+            DropdownButton<String>(
+              value: _selectedItemTypeStr,
+              items: billingReminderTypeOptions
+                  .map((type) => DropdownMenuItem<String>(
+                        value: type,
+                        child: Text(type),
+                      ))
+                  .toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedItemTypeStr = newValue;
+                });
+              },
+            ),
+          ],
+        )
       ],
     );
   }

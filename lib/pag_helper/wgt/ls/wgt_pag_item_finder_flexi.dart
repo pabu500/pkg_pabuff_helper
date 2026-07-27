@@ -523,6 +523,19 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
       }
     }
 
+    if (_selectedSiteGroupProfile == null) {
+      _selectedSiteColController?.clearFilter();
+      _selectedBuildingColController?.clearFilter();
+      _selectedLocationGroupColController?.clearFilter();
+    }
+    if (_selectedSiteProfile == null) {
+      _selectedBuildingColController?.clearFilter();
+      _selectedLocationGroupColController?.clearFilter();
+    }
+    if (_selectedBuildingProfile == null) {
+      _selectedLocationGroupColController?.clearFilter();
+    }
+
     // _updateBind(scopeProfile);
     // bind filter col controllers with loc profile
     // during wich value list will be populated with children loc profiles
