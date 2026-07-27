@@ -1,9 +1,11 @@
+import 'package:buff_helper/pag_helper/def_helper/enum_helper.dart';
 import 'package:flutter/material.dart';
 
 enum PagBillGenType {
   manual('Manual', 'manual', 'm', Colors.orangeAccent),
   auto('Auto', 'auto', 'a', Colors.teal),
-  initalBalance('Initial Balance', 'initial_balance', 'ini', Colors.lightGreen);
+  initialBalance(
+      'Initial Balance', 'initial_balance', 'ini', Colors.lightGreen);
 
   const PagBillGenType([this.label, this.value, this.tag, this.color]);
 
@@ -325,4 +327,26 @@ String? validateBillGenTypeNotRequired(dynamic value) {
     return 'Invalid Gen Type';
   }
   return null;
+}
+
+enum BillingReminderType {
+  firstAndSecond('First and Second', 'fs', 'fs', Colors.orangeAccent),
+  firstOnly('First Only', 'fo', 'fo', Colors.teal),
+  none('None', 'none', 'none', Colors.grey);
+
+  const BillingReminderType(this.label, this.value, this.tag, this.color);
+
+  final String label;
+  final String value;
+  final String tag;
+  final Color color;
+
+  static BillingReminderType byLabel(String? label) =>
+      enumByLabel(label, values, (e) => (e).label) ?? firstAndSecond;
+
+  static BillingReminderType byValue(String? value) =>
+      enumByValue(value, values, (e) => (e).value) ?? firstAndSecond;
+
+  static BillingReminderType byTag(String? tag) =>
+      enumByTag(tag, values, (e) => (e).tag) ?? firstAndSecond;
 }
