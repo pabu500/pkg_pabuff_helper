@@ -719,6 +719,7 @@ enum PagTenantOpType {
   onboarding('Onboarding', 'onb', 'onb'),
   mgAssign1on1('MG Assignment 1on1', 'mg1', 'mg1'),
   update('Update', 'update', 'upd'),
+  sendBillingReminder('Send Billing Reminder', 'sbr', 'sbr'),
   none('None', 'none', 'none');
 
   final String label;
@@ -1140,6 +1141,28 @@ Widget getTenantLcStatusTagWidget(
   );
 }
 
+String? validateSendReminder(String value) {
+  if (value.trim().isEmpty) {
+    return 'required';
+  }
+  // must be 'yes' or 'no'
+  if (value != 'yes' && value != 'no') {
+    return 'must be yes or no';
+  }
+  return null;
+}
+
+String? validateSendReminderType(String value) {
+  if (value.trim().isEmpty) {
+    return 'required';
+  }
+
+  if (value != 'first-reminder' && value != 'second-reminder') {
+    return 'must be first-reminder or second-reminder';
+  }
+  return null;
+}
+
 String? Function(String) getTenantValidator(String key,
     {bool isValueRequired = true}) {
   switch (key) {
@@ -1205,6 +1228,10 @@ String? Function(String) getTenantValidator(String key,
       return getValidator(validateRemark, isValueRequired);
     case 'initial_balance':
       return getValidator(validateInitialBalance, isValueRequired);
+    case 'send_reminder':
+      return getValidator(validateSendReminder, isValueRequired);
+    case 'send_reminder_type':
+      return getValidator(validateSendReminderType, isValueRequired);
     default:
       dev.log('No validator found for key: $key');
       return (String? value) {

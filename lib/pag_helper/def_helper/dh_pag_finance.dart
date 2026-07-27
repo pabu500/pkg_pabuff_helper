@@ -226,24 +226,28 @@ enum PagPaymentOpType {
   final IconData iconData;
 
   static PagPaymentOpType byValue(String? value) =>
-      enumByLabel(
+      enumByValue(
         value,
         values,
         (e) => (e).value,
       ) ??
       none;
 
-  static PagPaymentOpType? byLabel(String? label) => enumByLabel(
+  static PagPaymentOpType byLabel(String? label) =>
+      enumByLabel(
         label,
         values,
         (e) => (e).label,
-      );
+      ) ??
+      none;
 
-  static PagPaymentOpType? byTag(String? tag) => enumByTag(
+  static PagPaymentOpType byTag(String? tag) =>
+      enumByTag(
         tag,
         values,
         (e) => (e).tag,
-      );
+      ) ??
+      none;
 }
 
 String? soaTypeValidator(String? value) {

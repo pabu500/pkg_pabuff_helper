@@ -98,6 +98,7 @@ class MdlListColController {
   List<Map<String, dynamic>>? opInfoList;
   bool isCompactFilter;
   bool showScanner;
+  bool noSel;
 
   MdlListColController({
     required this.colKey,
@@ -138,6 +139,7 @@ class MdlListColController {
     this.valueList,
     this.getTag,
     bool? pinned,
+    this.noSel = false,
     this.getCustomWidget,
     this.scopeType,
     this.align,
@@ -557,6 +559,16 @@ class MdlListColController {
       }
     }
 
+    bool noSel = false;
+    if (json['no_sel'] != null) {
+      dynamic noSelValue = json['no_sel'];
+      if (noSelValue is bool) {
+        noSel = noSelValue;
+      } else if (noSelValue is String) {
+        noSel = noSelValue.toLowerCase() == 'true';
+      }
+    }
+
     return MdlListColController(
       colKey: colKey,
       joinKey: json['join_key'],
@@ -604,6 +616,7 @@ class MdlListColController {
       isCompactFilter: isCompactFilter,
       showScanner: showScanner,
       opInfoList: opInfoList,
+      noSel: noSel,
     );
   }
 
@@ -648,6 +661,7 @@ class MdlListColController {
     data['op_info_list'] = opInfoList;
     data['is_compact_filter'] = isCompactFilter.toString();
     data['show_scanner'] = showScanner.toString();
+    data['no_sel'] = noSel.toString();
 
     return data;
   }
