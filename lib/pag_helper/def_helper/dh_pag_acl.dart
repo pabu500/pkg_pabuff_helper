@@ -1,5 +1,8 @@
-import 'package:buff_helper/pag_helper/def_helper/enum_helper.dart';
 import 'package:flutter/material.dart';
+import 'dart:developer' as dev;
+
+import 'package:buff_helper/pag_helper/def_helper/enum_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 
 enum PagPortalType {
   pagConsole('pag-console', 'Ops Console', 'op', Colors.teal),
@@ -80,4 +83,20 @@ String? validateRoleTag(String? value) {
   }
 
   return null;
+}
+
+String? Function(String) getRoleValidator(String key,
+    {bool isValueRequired = true}) {
+  switch (key) {
+    case 'label':
+      return getValidator(validateItemLabel, isValueRequired);
+    case 'tag':
+      return getValidator(validateRoleTag, isValueRequired);
+
+    default:
+      dev.log('No validator found for user key: $key');
+      return (String? value) {
+        return null;
+      };
+  }
 }

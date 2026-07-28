@@ -36,7 +36,7 @@ class WgtViewEditField extends StatefulWidget {
   final TextStyle? textStyle;
   final Function(String) onSetValue;
   final Function(bool) onFocus;
-  final String? Function(String? val)? validator;
+  final String? Function(String val)? validator;
   final bool hasFocus;
   // final String? errorText;
   final bool? showCommitted;

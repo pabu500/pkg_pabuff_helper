@@ -71,7 +71,7 @@ String? Function(String) getUserValidator(String key,
       return getValidator(validateRoleLabelStr, isValueRequired);
     case 'tenant_label':
       return getValidator(validateTenantLabel, isValueRequired);
-    case 'tenaant_account_number':
+    case 'tenant_account_number':
       return getValidator(validateTenantAccountNumber, isValueRequired);
     case 'receive_billing_notification':
       return getValidator(validateReceiveBillingNotification, isValueRequired);
@@ -126,14 +126,22 @@ String? validateReceiveBillingNotification(String? value) {
   return null;
 }
 
-// comma separated role labels, each label must be 3-20 characters, only alphanumeric, comma, space, dash and underscore allowed
+// comma separated role labels, max 3 labels
 String? validateRoleLabelStr(String? value) {
   if (value == null || value.isEmpty) {
     return 'required';
   }
 
-  if (value.length < 3 || value.length > 20) {
-    return 'must be between 3 and 20 characters';
+  List<String> labels = value.trim().split(',');
+  if (labels.length > 3) {
+    return 'must have at most 3 labels';
+  }
+  for (var label in labels) {
+    label = label.trim();
+    String? error = validateItemLabel(label);
+    if (error != null) {
+      return error;
+    }
   }
 
   //alphanumeric, comma, space, dash and underscore only

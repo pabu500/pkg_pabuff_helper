@@ -720,7 +720,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                             widget.listController?.itemTypeEnum,
                         // widget.listController?.itemType?.value,
                         strItemIndex: item['id'],
-                        fields: fieldList,
+                        fieldList: fieldList,
                         itemDisplayName:
                             itemDisplayName, //item[displayNameKey] ?? '',
                         listController: _selectedListController,

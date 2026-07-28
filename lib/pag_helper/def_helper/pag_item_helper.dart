@@ -104,8 +104,11 @@ String? validateItemLabel(String? value) {
     return 'required';
   }
 
-  if (value.length > maxFullNameLength) {
-    return 'must be at most $maxFullNameLength characters';
+  // if (value.length > maxFullNameLength) {
+  //   return 'must be at most $maxFullNameLength characters';
+  // }
+  if (value.length < 3 || value.length > 55) {
+    return 'must be between 3 and 55 characters';
   }
 
   // Allowed:
@@ -128,6 +131,8 @@ String? Function(String) getItemKindValidator(PagItemKind itemKind, String key,
   switch (itemKind) {
     case PagItemKind.user:
       return getUserValidator(key, isValueRequired: isValueRequired);
+    case PagItemKind.role:
+      return getRoleValidator(key, isValueRequired: isValueRequired);
     case PagItemKind.tenant:
       return getTenantValidator(key, isValueRequired: isValueRequired);
     case PagItemKind.finance:

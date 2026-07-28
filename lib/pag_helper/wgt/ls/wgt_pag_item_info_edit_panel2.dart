@@ -46,7 +46,7 @@ class WgtPagItemInfoEditPanel2 extends StatefulWidget {
     required this.strItemIndex,
     required this.itemKind,
     required this.itemDisplayName,
-    required this.fields,
+    required this.fieldList,
     this.itemTypeEnum,
     this.listController,
     this.itemScopeMap,
@@ -65,7 +65,7 @@ class WgtPagItemInfoEditPanel2 extends StatefulWidget {
   final MdlPagListController? listController;
   final Map<String, dynamic>? itemScopeMap;
   final Map<String, dynamic>? itemInfoMap;
-  final List<Map<String, dynamic>> fields;
+  final List<Map<String, dynamic>> fieldList;
   final dynamic itemTypeEnum;
   final Function? onClose;
   final Function? onUpdate;
@@ -125,12 +125,8 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
     return total;
   }
 
-  Future<List<Map<String, dynamic>>> _updateProfile(
-    String key,
-    String value, {
-    String? oldVal,
-    String? scopeProfileIdColName,
-  }) async {
+  Future<List<Map<String, dynamic>>> _updateProfile(String key, String value,
+      {String? oldVal, String? scopeProfileIdColName}) async {
     try {
       Map<String, dynamic> opItem = {
         'id': widget.strItemIndex,
@@ -347,7 +343,7 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
   @override
   Widget build(BuildContext context) {
     bool isItemMFD = false;
-    for (Map<String, dynamic> field in widget.fields) {
+    for (Map<String, dynamic> field in widget.fieldList) {
       if (field['col_key'] != 'lc_status') {
         continue;
       }
@@ -360,7 +356,7 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
       break;
     }
     String itemName = '';
-    for (Map<String, dynamic> field in widget.fields) {
+    for (Map<String, dynamic> field in widget.fieldList) {
       if (field['col_key'] == 'name') {
         itemName = field['value'];
         break;
@@ -411,7 +407,7 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
                                                   opName: 'item_delete',
                                                   keyInConfirmStrList: [
                                                     'delete',
-                                                    itemName,
+                                                    itemName
                                                   ],
                                                   itemCount: 1,
                                                   onConfirm: () async {
@@ -458,7 +454,7 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
                     children: [
                       Padding(
                           padding: const EdgeInsets.only(bottom: 8.0),
-                          child: getLcStatusOp(widget.fields.firstWhere(
+                          child: getLcStatusOp(widget.fieldList.firstWhere(
                               (element) => element['col_key'] == 'lc_status',
                               orElse: () => {}))),
                       const Spacer(),
@@ -507,7 +503,7 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
     // List<Widget> fields = [];
 
     fields.clear();
-    for (Map<String, dynamic> field in widget.fields) {
+    for (Map<String, dynamic> field in widget.fieldList) {
       if (field['show_edit_panel'] == false) {
         continue;
       }
@@ -593,7 +589,13 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
 
                     return resultMap;
                   },
-                  validator: field['validator'],
+                  validator: field['validator'] ??
+                      getItemKindValidator(
+                        widget.itemKind,
+                        field['col_key'],
+                        isValueRequired: true,
+                        itemType: widget.itemTypeEnum,
+                      ),
                   textStyle: null,
                   onPullRefVal: field['onPullRefVal'] == null
                       ? null
@@ -843,7 +845,7 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
         itemGroupType = PagItemGroupType.userTenant;
 
         String userId = widget.strItemIndex;
-        String userName = widget.fields
+        String userName = widget.fieldList
             .firstWhere((element) => element['col_key'] == 'username')['value'];
 
         queryMap = {'user_id': userId, 'username': userName};
@@ -855,7 +857,7 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
         itemGroupType = PagItemGroupType.tenantUser;
 
         String tenantId = widget.strItemIndex;
-        String tenantName = widget.fields
+        String tenantName = widget.fieldList
             .firstWhere((element) => element['col_key'] == 'name')['value'];
 
         queryMap = {'tenant_id': tenantId, 'tenantName': tenantName};
