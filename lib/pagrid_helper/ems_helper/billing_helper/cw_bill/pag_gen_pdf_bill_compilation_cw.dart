@@ -132,6 +132,7 @@ Future<Uint8List> buildPdf(PdfPageFormat pageFormat, String assetFolder,
 
   for (var invoice in invoiceList) {
     pdf.addPage(await invoice.getPage1(logo: logo));
+    pdf.addPage(await invoice.getPage2(logo: logo));
   }
   return await pdf.save();
 }
