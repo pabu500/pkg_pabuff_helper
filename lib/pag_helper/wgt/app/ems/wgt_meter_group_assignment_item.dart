@@ -329,6 +329,7 @@ class _WgtMeterGroupAssignmentItemState
     }
     List<Widget> assignmentWidgetList = [];
     int assignedToActiveTenantCount = 0;
+    double totalPercentageAssignedToActiveTenant = 0.0;
     for (Map<String, dynamic> assignment in meterTeantAssignmentList ?? []) {
       String meterName = assignment['meter_name'] ?? '';
       String meterLabel = assignment['meter_label'] ?? '';
@@ -353,6 +354,7 @@ class _WgtMeterGroupAssignmentItemState
             tenantLcStatusEnum == PagTenantLcStatus.onboarding ||
             tenantLcStatusEnum == PagTenantLcStatus.offboarding) {
           assignedToActiveTenantCount++;
+          totalPercentageAssignedToActiveTenant += percentage;
         }
       }
 
@@ -361,11 +363,12 @@ class _WgtMeterGroupAssignmentItemState
         meterGroupIsAssignedToActiveTenant = true;
       }
 
-      if (assignedToActiveTenantCount > 1) {
+      // if (assignedToActiveTenantCount > 1) {
+      if (totalPercentageAssignedToActiveTenant > 100.0) {
         return getErrorTextPrompt(
           context: context,
           errorText:
-              'Error: Multiple active tenants assigned to this meter group',
+              'Error: Total percentage assigned to active tenants exceeds 100% (${totalPercentageAssignedToActiveTenant.toStringAsFixed(2)}%)',
         );
       }
 
