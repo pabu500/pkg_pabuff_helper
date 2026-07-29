@@ -314,14 +314,14 @@ class _WgtMeterResetState extends State<WgtMeterReset> {
           width: 350,
           child: WgtTextField(
             appConfig: widget.appConfig,
-            hintText: 'Reset Reading',
-            labelText: 'Reset Reading',
+            hintText: 'Reset At Reading',
+            labelText: 'Reset At Reading',
             validator: getValidator(validateNumeric, true),
             validateOnChange: false,
             onChanged: (val) {
               setState(() {
                 _resetAtReading = val;
-                dev.log('Reset reading changed: $_resetAtReading');
+                dev.log('Reset At Reading changed: $_resetAtReading');
               });
             },
             onEditingComplete: () {},
