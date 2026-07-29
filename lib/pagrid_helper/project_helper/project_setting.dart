@@ -557,6 +557,14 @@ String? isPGPR(String displayname) {
   return null;
 }
 
+String? isNusFiveHalls(String displayname) {
+  int displaynameInt = int.parse(displayname);
+  if ((displaynameInt < 10014100 || displaynameInt > 10014434)) {
+    return 'Invalid displayname';
+  }
+  return null;
+}
+
 // String? isNUSC(String displayname) {
 //   int displaynameInt = int.parse(displayname);
 //   if (displaynameInt < 10002801  || (displaynameInt > 10003925 && displaynameInt != 10003963 && displaynameInt != 10003982 && displaynameInt != 10003985 && displaynameInt != 10009999)) {
