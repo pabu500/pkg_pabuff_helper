@@ -1,0 +1,1408 @@
+import 'dart:async';
+import 'dart:developer' as dev;
+
+import 'package:buff_helper/pag_helper/comm/comm_pag_job.dart';
+import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
+import 'package:buff_helper/pag_helper/model/list/mdl_list_controller.dart';
+import 'package:buff_helper/pag_helper/model/scope/mdl_pag_scope.dart';
+import 'package:buff_helper/pag_helper/wgt/datetime/wgt_date_range_picker_monthly.dart';
+import 'package:buff_helper/pkg_buff_helper.dart';
+import 'package:buff_helper/xt_ui/wdgt/datetime/wgt_date_picker.dart';
+import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
+import 'package:flutter/material.dart';
+
+import '../../comm/comm_ex.dart';
+import '../../comm/pag_be_api_base.dart';
+import '../../def_helper/list_helper.dart';
+import '../../def_helper/pag_item_helper.dart';
+import '../../model/list/mdl_list_col_controller.dart';
+import '../../model/mdl_pag_app_config.dart';
+import '../../model/scope/mdl_pag_building_profile.dart';
+import '../../model/scope/mdl_pag_location_group_profile.dart';
+import '../../model/scope/mdl_pag_scope_profile.dart';
+import '../../model/scope/mdl_pag_site_group_profile.dart';
+import '../../model/scope/mdl_pag_site_profile.dart';
+import '../ls/wgt_pag_item_finder_flexi.dart';
+
+class WgtJobTypeOpPanel3 extends StatefulWidget {
+  const WgtJobTypeOpPanel3({
+    super.key,
+    required this.appConfig,
+    required this.loggedInUser,
+    required this.itemDisplayName,
+    required this.jobTypeName,
+    required this.jobTaskType,
+    this.jobScopeLabel,
+    this.jobTypeScope,
+    this.listController,
+    this.onClose,
+    this.onUpdate,
+    this.onScopeTreeUpdate,
+  });
+
+  final MdlPagAppConfig appConfig;
+  final MdlPagUser loggedInUser;
+  final String itemDisplayName;
+  final String jobTypeName;
+  final String jobTaskType;
+  final String? jobScopeLabel;
+  final MdlPagScope? jobTypeScope;
+  final MdlPagListController? listController;
+
+  final Function? onClose;
+  final Function? onUpdate;
+  final Function? onScopeTreeUpdate;
+
+  @override
+  State<WgtJobTypeOpPanel3> createState() => _WgtJobTypeOpPanel3State();
+}
+
+class _WgtJobTypeOpPanel3State extends State<WgtJobTypeOpPanel3> {
+  // late MdlPagUser? _loggedInUser;
+
+  final double width = 550;
+
+  String? _itemDisplayName;
+  final List<Widget> fields = [];
+
+  // UniqueKey? _timePickerKey;
+  DateTime? _selectedFromDate;
+  DateTime? _selectedToDate;
+  bool _customDateRangeSelected = false;
+  bool _isMTD = false;
+  DateTime? _monthPicked;
+
+  bool _isPosting = false;
+  bool _postDone = false;
+  String _postResultErrorText = '';
+
+  bool _mainMeterSelected = true;
+  bool _subMeterSelected = true;
+
+  DateTime? _selectedDate1;
+  DateTime? _selectedDate2;
+  UniqueKey? _date1PickerKey;
+  UniqueKey? _date2PickerKey;
+
+  DateTime? _selectedDate3;
+  bool _useCustomCollectionStartDate = false;
+  UniqueKey? _timePickerKeyCollectionStartDate;
+
+  String? _selectedLcStatusStr;
+
+  bool _isOption1 = false;
+
+  String? _selectedItemTypeStr;
+
+  bool _sendToAll = false;
+
+  String? _selectedItemIdTypeStr;
+  String? _selectedItemIdStr;
+
+  UniqueKey? _finderRefreshKey;
+
+  late MdlPagListController _scopeListController;
+  MdlPagScopeProfile? _selectedScopeProfile;
+
+  Future<dynamic> _triggerJob() async {
+    if (_isPosting) return;
+
+    setState(() {
+      _isPosting = true;
+      _postDone = false;
+      _postResultErrorText = '';
+    });
+
+    // align to the midnight of the next day
+    if (_selectedToDate != null) {
+      _selectedToDate = DateTime(_selectedToDate!.year, _selectedToDate!.month,
+          _selectedToDate!.day + 1, 0, 0, 0);
+    }
+
+    try {
+      assert(_selectedScopeProfile != null, 'Selected scope profile is null');
+      Map<String, dynamic> jobScope =
+          // widget.jobTypeScope?.toScopeMap() ??
+          //     widget.loggedInUser.selectedScope.toScopeMap();
+          _selectedScopeProfile!.toScopeMap();
+      jobScope['project_id'] =
+          widget.loggedInUser.selectedScope.projectProfile!.id.toString();
+      jobScope['project_name'] =
+          widget.loggedInUser.selectedScope.projectProfile!.name;
+
+      Map<String, dynamic> jobRequest = {
+        'job_type': widget.jobTypeName,
+        'job_task_type': widget.jobTaskType,
+        'scope_prefix': widget.jobScopeLabel ?? '',
+        'send_to_all': _sendToAll ? 'true' : 'false',
+        'recipient_email': widget.loggedInUser.email,
+        'recipient_name': widget.loggedInUser.username,
+        'selected_timestamp': _selectedDate1?.toIso8601String(),
+        'selected_timestamp_2': _selectedDate2?.toIso8601String(),
+        'selected_timestamp_3': _selectedDate3?.toIso8601String(),
+        'from_timestamp': _selectedFromDate?.toIso8601String(),
+        'to_timestamp': _selectedToDate?.toIso8601String(),
+        'target_lc_status': _selectedLcStatusStr,
+        'is_option_1': _isOption1.toString(),
+        'selected_item_type': _selectedItemTypeStr,
+        'selected_item_id_type': _selectedItemIdTypeStr,
+        'selected_item_id': _selectedItemIdStr,
+        'main_sub_str': _mainMeterSelected && _subMeterSelected
+            ? 'main,sub'
+            : _mainMeterSelected
+                ? 'main'
+                : 'sub',
+      };
+
+      Map<String, dynamic> queryMap = {
+        'scope': widget.loggedInUser.selectedScope.toScopeMap(),
+        'job_scope': jobScope,
+        'job_request': jobRequest,
+        'op_list': [],
+      };
+
+      var result = await ex(
+        endpoint: PagUrlBase.eptPostJob2,
+        crudType: 'create',
+        opStr: 'post job',
+        appConfig: widget.appConfig,
+        queryMap: queryMap,
+        svcClaim: MdlPagSvcClaim(
+          userId: widget.loggedInUser.id,
+          username: widget.loggedInUser.username,
+          scope: '',
+          target: '',
+          operation: 'create',
+        ),
+      );
+
+      return result;
+    } catch (e) {
+      dev.log(e.toString());
+
+      _postResultErrorText = 'Error posting task';
+      if (e is TooManyRequestsException) {
+        String remainingMillisStr = e.message;
+        int remainingMillis = int.tryParse(remainingMillisStr) ?? -1;
+        _postResultErrorText = 'Too many requests';
+        if (remainingMillis > 0) {
+          _postResultErrorText =
+              'This task is in cooldown with ${(remainingMillis / 1000).toStringAsFixed(0)} seconds remaining';
+        }
+      }
+    } finally {
+      setState(() {
+        _postDone = true;
+        _isPosting = false;
+      });
+    }
+  }
+
+  void _resetDate({bool resetDateRange = false}) {
+    setState(() {
+      if (resetDateRange) {
+        _selectedToDate = null;
+        _selectedFromDate = null;
+        // _timePickerKey = UniqueKey();
+        _customDateRangeSelected = false;
+        _monthPicked = null;
+        _isMTD = false;
+        _selectedDate1 = null;
+        _selectedDate2 = null;
+        _date1PickerKey = null;
+        _date2PickerKey = null;
+      }
+    });
+  }
+
+  bool _checkEnableSubmit() {
+    switch (widget.jobTaskType) {
+      case 'usage-report' || 'meter-reading-report-consolidated':
+      case 'tenant-usage-report':
+        return _selectedFromDate != null && _selectedToDate != null;
+      case 'billing-task':
+        bool ok = _selectedFromDate != null &&
+            _selectedToDate != null &&
+            _selectedDate1 != null &&
+            _selectedDate2 != null;
+        if (_useCustomCollectionStartDate) {
+          if (_selectedDate3 == null) {
+            ok = false;
+          }
+        }
+        return ok;
+      case 'giro-file':
+        return _selectedFromDate != null && _selectedToDate != null;
+      case 'billing-report':
+        return _selectedFromDate != null && _selectedToDate != null;
+      case 'bill-lc-status-update':
+        if (_isOption1) {
+          return _selectedLcStatusStr != null;
+        } else {
+          return _selectedFromDate != null &&
+              _selectedToDate != null &&
+              _selectedLcStatusStr != null;
+        }
+      case 'payment-lc-status-update':
+        return _selectedFromDate != null &&
+            _selectedToDate != null &&
+            _selectedLcStatusStr != null;
+      case 'gen-payment-matching-form':
+        return true;
+      case 'payment-matching':
+        return true;
+      case 'item-history':
+        return _selectedItemTypeStr != null &&
+            _selectedItemIdTypeStr != null &&
+            _selectedItemIdStr != null &&
+            _selectedFromDate != null &&
+            _selectedToDate != null;
+      case 'item-list':
+        return _selectedItemTypeStr != null;
+      case 'collection-report':
+        return _selectedFromDate != null && _selectedToDate != null;
+      case 'ar-aging-report':
+        return _selectedDate1 != null;
+      case 'email-blast':
+        if (_selectedItemTypeStr == 'billing-notification') {
+          return _selectedFromDate != null && _selectedToDate != null;
+        } else {
+          return false;
+        }
+      case 'gen-billing-reminder-list':
+        return _selectedDate1 != null && _selectedItemTypeStr != null;
+      default:
+        return false;
+    }
+  }
+
+  void _resetFinder() {
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    // _loggedInUser =
+    //     Provider.of<PagUserProvider>(context, listen: false).currentUser;
+    _itemDisplayName = widget.itemDisplayName;
+
+    // initialize the scope list controller
+    // by fliter the list controller and remove the non-scope columns
+    _scopeListController = MdlPagListController(
+      itemTypeEnum: PagItemKind.scope,
+      listColControllerList: [],
+    );
+    for (MdlListColController colController
+        in widget.listController?.listColControllerList ?? []) {
+      if (colController.filterGroupType == PagFilterGroupType.location) {
+        _scopeListController.listColControllerList.add(colController);
+      }
+    }
+
+    _selectedScopeProfile = widget.loggedInUser.selectedScope
+        .getScopeProfileByScope(widget.jobTypeScope);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: width,
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Stack(
+              children: [
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        _itemDisplayName ?? '',
+                        style: TextStyle(
+                            fontSize: 21,
+                            fontWeight: FontWeight.w500,
+                            color: Theme.of(context).hintColor),
+                      ),
+                    ],
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    horizontalSpaceMedium,
+                  ],
+                ),
+              ],
+            ),
+            const Divider(height: 1),
+            verticalSpaceSmall,
+            getScopeFilter(),
+            verticalSpaceSmall,
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                    color: Theme.of(context).hintColor.withAlpha(50)),
+                borderRadius: BorderRadius.circular(5),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 3),
+              width: width,
+              child: getOptions(),
+            ),
+            verticalSpaceSmall,
+            getTriggerButton(),
+            verticalSpaceSmall,
+            getResultText(),
+            verticalSpaceRegular,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget getScopeFilter() {
+    return WgtPagItemFinderFlexi(
+      key: _finderRefreshKey, //_listContentRefreshKey,
+      // key: UniqueKey(),
+      loggedInUser: widget.loggedInUser,
+      appConfig: widget.appConfig,
+      isScopeProvider: true,
+      prevailingScopeProfile: _selectedScopeProfile,
+      itemKind: PagItemKind.scope,
+      itemType: null,
+      listContextType: PagListContextType.jobOption,
+      listController: _scopeListController,
+      onSearching: () {},
+      onClearSearch: () {
+        _resetFinder();
+      },
+      onModified: () {
+        _resetFinder();
+      },
+      onScopeChanged: (
+        MdlPagSiteGroupProfile? siteGroupProfile,
+        MdlPagSiteProfile? userSiteProfile,
+        MdlPagBuildingProfile? buildingProfile,
+        MdlPagLocationGroupProfile? locationGroupProfile,
+      ) {
+        dev.log(
+            'Scope changed: siteGroup=${siteGroupProfile?.name}, site=${userSiteProfile?.name}, building=${buildingProfile?.name}, locationGroup=${locationGroupProfile?.name}');
+        _selectedScopeProfile = MdlPagScopeProfile(
+          siteGroupProfile: siteGroupProfile,
+          siteProfile: userSiteProfile,
+          buildingProfile: buildingProfile,
+          locationGroupProfile: locationGroupProfile,
+        );
+      },
+      onResult: (Map<String, dynamic> itemFindResult) {},
+    );
+  }
+
+  Widget getOptions() {
+    switch (widget.jobTaskType) {
+      case 'usage-report' || 'meter-reading-report-consolidated':
+        return getUsageReportOptions();
+      case 'tenant-usage-report':
+        return getTenantUsageReportOptions();
+      case 'billing-task':
+        return getBillingTaskOptions();
+      case 'giro-file':
+        return getGiroFileOptions();
+      case 'billing-report':
+        return getBillingReportOptions();
+      case 'bill-lc-status-update':
+        return getBillLcStatusUpdateOptions();
+      case 'payment-lc-status-update':
+        return getPaymentLcStatusUpdateOptions();
+      case 'gen-payment-matching-form':
+        return getGenPaymentMatchingFormOptions();
+      case 'payment-matching':
+        return getPaymentMatchingOptions();
+      case 'item-history':
+        return getItemHistoryOptions();
+      case 'item-list':
+        return getItemListOptions();
+      case 'collection-report':
+        return getCollectionReportOptions();
+      case 'ar-aging-report':
+        return getArAgingReportOptions();
+      case 'email-blast':
+        return getBlastEmailOptions();
+      case 'gen-billing-reminder-list':
+        return getGenBillingReminderListOptions();
+      default:
+        return const SizedBox();
+    }
+  }
+
+  Widget getBillingTaskOptions() {
+    DateTime? leftMostDate;
+    DateTime? rightMostDate;
+    DateTime? initDate;
+    if ((_selectedFromDate == null || _selectedToDate == null)) {
+    } else {
+      leftMostDate = _selectedToDate!.add(const Duration(days: 1));
+      rightMostDate = leftMostDate.add(const Duration(days: 30));
+      initDate = leftMostDate;
+    }
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Billing Month',
+              style: TextStyle(
+                color: Theme.of(context).hintColor,
+                fontSize: 16,
+              ),
+            ),
+            horizontalSpaceSmall,
+            getTimeRangePicker(),
+          ],
+        ),
+        verticalSpaceSmall,
+        (_selectedFromDate == null || _selectedToDate == null)
+            ? const SizedBox()
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    width: 160,
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: Text(
+                        'Bill Date',
+                        style: TextStyle(
+                          color: Theme.of(context).hintColor,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                  horizontalSpaceSmall,
+                  WgtDatePicker(
+                    key: _date1PickerKey,
+                    labelFontSize: 15,
+                    defaultFirstDate: leftMostDate,
+                    defaultLastDate: rightMostDate,
+                    initialDate: _selectedDate1,
+                    timeZone:
+                        widget.loggedInUser.selectedScope.getProjectTimezone(),
+                    label: 'Set Bill Date',
+                    onDateChanged: (DateTime selectedDate) {
+                      setState(() {
+                        _selectedDate1 = selectedDate;
+                      });
+                    },
+                  ),
+                ],
+              ),
+        verticalSpaceSmall,
+        getCollectionStartDate(),
+        verticalSpaceSmall,
+        (_selectedFromDate == null || _selectedToDate == null)
+            ? const SizedBox()
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    width: 160,
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: Text(
+                        'Collection End Date',
+                        style: TextStyle(
+                          color: Theme.of(context).hintColor,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                  horizontalSpaceSmall,
+                  WgtDatePicker(
+                    key: _date2PickerKey,
+                    labelFontSize: 15,
+                    enabled: true,
+                    defaultFirstDate: leftMostDate,
+                    defaultLastDate: rightMostDate,
+                    initialDate: _selectedDate2,
+                    timeZone:
+                        widget.loggedInUser.selectedScope.getProjectTimezone(),
+                    label: 'Set Collection End Date',
+                    onDateChanged: (DateTime selectedDate) {
+                      setState(() {
+                        _selectedDate2 = selectedDate;
+                        _selectedDate3 = DateTime(_selectedDate2!.year,
+                            _selectedDate2!.month - 1, _selectedDate2!.day + 1);
+                        _useCustomCollectionStartDate = false;
+                        _timePickerKeyCollectionStartDate = UniqueKey();
+                      });
+                    },
+                  ),
+                ],
+              ),
+      ],
+    );
+  }
+
+  Widget getUsageReportOptions() {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Time Range',
+              style: TextStyle(
+                color: Theme.of(context).hintColor,
+                fontSize: 16,
+              ),
+            ),
+            horizontalSpaceSmall,
+            getTimeRangePicker(),
+          ],
+        ),
+        verticalSpaceSmall,
+        getMainMeterSwitcher(),
+        verticalSpaceSmall,
+        //check box to check full report
+        if (_monthPicked != null && !_isMTD)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Checkbox(
+                value: _isOption1,
+                onChanged: (bool? value) {
+                  setState(() {
+                    _isOption1 = value ?? false;
+                  });
+                },
+              ),
+              const Text('Full Report'),
+            ],
+          ),
+      ],
+    );
+  }
+
+  Widget getCollectionStartDate() {
+    if (_selectedDate2 == null) {
+      return Container();
+    }
+    DateTime? leftMostDate = _selectedDate2?.subtract(const Duration(days: 55));
+
+    return Column(
+      children: [
+        // check box to enable custom collection start date
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Checkbox(
+              value: _useCustomCollectionStartDate,
+              onChanged: (bool? value) {
+                setState(() {
+                  _useCustomCollectionStartDate = value ?? false;
+                });
+              },
+            ),
+            const Text('Set Custom Collection Start Date'),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: 160,
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: Text(
+                  'Collection Start Date',
+                  style: TextStyle(
+                    color: Theme.of(context).hintColor,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ),
+            horizontalSpaceSmall,
+            WgtDatePicker(
+              key: _timePickerKeyCollectionStartDate,
+              labelFontSize: 15,
+              enabled: _useCustomCollectionStartDate,
+              defaultFirstDate: leftMostDate,
+              defaultLastDate:
+                  _selectedDate2!.subtract(const Duration(days: 1)),
+              initialDate: _selectedDate3,
+              timeZone: widget.loggedInUser.selectedScope.getProjectTimezone(),
+              label: 'Set Collection Start Date',
+              onDateChanged: (DateTime selectedDate) {
+                setState(() {
+                  _selectedDate3 = selectedDate;
+                });
+              },
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget getTenantUsageReportOptions() {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Time Range',
+              style: TextStyle(
+                color: Theme.of(context).hintColor,
+                fontSize: 16,
+              ),
+            ),
+            horizontalSpaceSmall,
+            getTimeRangePicker(),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget getGiroFileOptions() {
+    if ((_selectedFromDate == null || _selectedToDate == null)) {}
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Duration',
+              style: TextStyle(
+                color: Theme.of(context).hintColor,
+                fontSize: 16,
+              ),
+            ),
+            horizontalSpaceSmall,
+            getTimeRangePicker(),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget getBillingReportOptions() {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Billing Month',
+              style: TextStyle(
+                color: Theme.of(context).hintColor,
+                fontSize: 16,
+              ),
+            ),
+            horizontalSpaceSmall,
+            getTimeRangePicker(forceMonthly: true),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget getBillLcStatusUpdateOptions() {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Billing Month',
+              style: TextStyle(
+                color: Theme.of(context).hintColor,
+                fontSize: 16,
+              ),
+            ),
+            horizontalSpaceSmall,
+            getTimeRangePicker(forceMonthly: true, enabled: !_isOption1),
+            VerticalDivider(
+              color: Theme.of(context).hintColor,
+              width: 20,
+            ),
+            Row(
+              children: [
+                Checkbox(
+                  value: _isOption1,
+                  onChanged: (value) {
+                    setState(() {
+                      _isOption1 = value ?? false;
+                      if (_isOption1) {
+                      } else {
+                        _resetDate(resetDateRange: true);
+                      }
+                    });
+                  },
+                ),
+                Text(
+                  'Initial Bill',
+                  style: TextStyle(
+                    color: Theme.of(context).hintColor,
+                    fontSize: 16,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        verticalSpaceSmall,
+        getTargetBillLcStatusSelector(),
+      ],
+    );
+  }
+
+  Widget getTargetBillLcStatusSelector() {
+    List<String> targetBilllcStatusOptions = ['pv', 'released', 'mfd'];
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          'Target Bill LC Status',
+          style: TextStyle(
+            color: Theme.of(context).hintColor,
+            fontSize: 16,
+          ),
+        ),
+        horizontalSpaceSmall,
+        DropdownButton<String>(
+          value: _selectedLcStatusStr,
+          items: targetBilllcStatusOptions
+              .map((status) => DropdownMenuItem<String>(
+                    value: status,
+                    child: Text(status),
+                  ))
+              .toList(),
+          onChanged: (String? newValue) {
+            setState(() {
+              _selectedLcStatusStr = newValue;
+            });
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget getPaymentLcStatusUpdateOptions() {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Payment Date Range',
+              style: TextStyle(
+                color: Theme.of(context).hintColor,
+                fontSize: 16,
+              ),
+            ),
+            horizontalSpaceSmall,
+            getTimeRangePicker(),
+          ],
+        ),
+        verticalSpaceSmall,
+        getTargetPaymentLcStatusSelector(),
+      ],
+    );
+  }
+
+  Widget getTargetPaymentLcStatusSelector() {
+    List<String> targetPaymentLcStatusOptions = ['released', 'mfd'];
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          'Target Payment LC Status',
+          style: TextStyle(
+            color: Theme.of(context).hintColor,
+            fontSize: 16,
+          ),
+        ),
+        horizontalSpaceSmall,
+        DropdownButton<String>(
+          value: _selectedLcStatusStr,
+          items: targetPaymentLcStatusOptions
+              .map((status) => DropdownMenuItem<String>(
+                    value: status,
+                    child: Text(status),
+                  ))
+              .toList(),
+          onChanged: (String? newValue) {
+            setState(() {
+              _selectedLcStatusStr = newValue;
+            });
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget getTimeRangePicker(
+      {bool forceMonthly = false,
+      bool forceCustomRange = false,
+      bool enabled = true}) {
+    assert(!(forceMonthly && forceCustomRange),
+        'Cannot force both monthly and custom range');
+
+    return WgtPagDateRangePickerMonthly(
+      // key: _timePickerKey,
+      enabled: enabled,
+      iniEndDateTime: _selectedToDate,
+      iniStartDateTime: _selectedFromDate,
+      showMonthly: !forceCustomRange,
+      customRangeSelected: _customDateRangeSelected,
+      monthPicked: _monthPicked,
+      populateDefaultRange: false,
+      allowCustomRange: !forceMonthly,
+      maxDurationDays: 500,
+      onRangeSet: (startDate, endDate) async {
+        if (startDate == null || endDate == null) return;
+        _resetDate(resetDateRange: true);
+        setState(() {
+          _selectedFromDate = startDate;
+          _selectedToDate = endDate;
+
+          _customDateRangeSelected = true;
+          _isMTD = false;
+          _monthPicked = null;
+
+          // _timePickerKey = UniqueKey();
+          _selectedDate1 = null;
+          _selectedDate2 = null;
+          _date1PickerKey = UniqueKey();
+          _date2PickerKey = UniqueKey();
+        });
+      },
+      onMonthPicked: (selected) {
+        _resetDate(resetDateRange: true);
+        setState(() {
+          // _timePickerKey = UniqueKey();
+          _monthPicked = selected;
+          _selectedFromDate = DateTime(selected.year, selected.month, 1);
+          _selectedToDate = DateTime(selected.year, selected.month + 1, 0);
+          // _customRange = false;
+          DateTime localNow = getTargetLocalDatetimeNow(
+              widget.loggedInUser.selectedScope.getProjectTimezone());
+          _isMTD = false;
+          if (localNow.year == selected.year &&
+              localNow.month == selected.month) {
+            _isMTD = true;
+          }
+
+          _selectedDate1 = null;
+          _selectedDate2 = null;
+          _date1PickerKey = UniqueKey();
+          _date2PickerKey = UniqueKey();
+        });
+      },
+    );
+  }
+
+  Widget getMainMeterSwitcher() {
+    bool enableMainMeterSelect = true;
+    if (!_subMeterSelected && _mainMeterSelected) {
+      enableMainMeterSelect = false;
+    }
+    bool enableSubMeterSelect = true;
+    if (!_mainMeterSelected && _subMeterSelected) {
+      enableSubMeterSelect = false;
+    }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primary.withAlpha(180),
+        borderRadius: BorderRadius.circular(5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(30),
+            spreadRadius: 3,
+            blurRadius: 5,
+            offset: const Offset(1, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Checkbox(
+                value: _mainMeterSelected,
+                onChanged: !enableMainMeterSelect
+                    ? null
+                    : (value) {
+                        setState(() {
+                          _mainMeterSelected = value!;
+                        });
+                        // widget.onUpdateMainSubMeterSel?.call({
+                        //   'main': value!,
+                        //   'sub': _subMeterSelected,
+                        // });
+                      },
+              ),
+              Text('Main',
+                  style: TextStyle(
+                      color: enableMainMeterSelect
+                          ? Theme.of(context).colorScheme.onPrimary
+                          : Theme.of(context)
+                              .colorScheme
+                              .onPrimary
+                              .withAlpha(130))),
+            ],
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Checkbox(
+                value: _subMeterSelected,
+                onChanged: !enableSubMeterSelect
+                    ? null
+                    : (value) {
+                        setState(() {
+                          _subMeterSelected = value!;
+                        });
+                        // widget.onUpdateMainSubMeterSel?.call({
+                        //   'main': _mainMeterSelected,
+                        //   'sub': value!,
+                        // });
+                      },
+              ),
+              Text('Sub',
+                  style: TextStyle(
+                      color: enableSubMeterSelect
+                          ? Theme.of(context).colorScheme.onPrimary
+                          : Theme.of(context)
+                              .colorScheme
+                              .onPrimary
+                              .withAlpha(130))),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget getItemIdSelector() {
+    List<String> itemIdTypeOptions = ['id', 'name', 'label', 'sn'];
+
+    TextStyle dropDownListHintStyle =
+        TextStyle(fontSize: 15, color: Theme.of(context).hintColor);
+    Widget dropDownUnderline =
+        Container(height: 1, color: Theme.of(context).hintColor.withAlpha(75));
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // dropdown to select item id type
+        Container(
+          decoration: BoxDecoration(
+            border:
+                Border.all(color: Theme.of(context).hintColor.withAlpha(50)),
+            borderRadius: BorderRadius.circular(5),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+          child: DropdownButton<String>(
+            hint: Text('Select ID Type', style: dropDownListHintStyle),
+            value: _selectedItemIdTypeStr,
+            underline: dropDownUnderline,
+            items: itemIdTypeOptions
+                .map((type) => DropdownMenuItem<String>(
+                      value: type,
+                      child: Text(type.toUpperCase()),
+                    ))
+                .toList(),
+            onChanged: (String? newValue) {
+              setState(() {
+                _selectedItemIdTypeStr = newValue;
+              });
+            },
+          ),
+        ),
+        horizontalSpaceSmall,
+        Container(
+          width: 200,
+          decoration: BoxDecoration(
+              border:
+                  Border.all(color: Theme.of(context).hintColor.withAlpha(50)),
+              borderRadius: BorderRadius.circular(5)),
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+          child: WgtTextField(
+            appConfig: widget.appConfig,
+            hintText: 'Enter Item ID',
+            labelText: 'Item ID',
+            onChanged: (value) {
+              setState(() {
+                _selectedItemIdStr = value;
+              });
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget getResultText() {
+    if (_postDone) {
+      if (_postResultErrorText.isNotEmpty) {
+        return getErrorTextPrompt(
+            context: context, errorText: _postResultErrorText);
+      } else {
+        return Text(
+          'Task submitted successfully',
+          style: TextStyle(color: Theme.of(context).hintColor),
+        );
+      }
+    } else {
+      return const SizedBox();
+    }
+  }
+
+  Widget getTriggerButton() {
+    bool enableSubmit = _checkEnableSubmit();
+    if (_isPosting || _postDone || _postResultErrorText.isNotEmpty) {
+      enableSubmit = false;
+    }
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Text('Self', style: TextStyle(fontSize: 13)),
+        Transform.scale(
+          scale: 0.8,
+          child: Switch(
+            value: _sendToAll,
+            onChanged: !enableSubmit
+                ? null
+                : (value) {
+                    setState(() {
+                      _sendToAll = value;
+                    });
+                  },
+          ),
+        ),
+        const Text('All', style: TextStyle(fontSize: 13)),
+        horizontalSpaceSmall,
+        Container(
+          decoration: BoxDecoration(
+            color: !enableSubmit
+                ? Theme.of(context).colorScheme.secondary.withAlpha(55)
+                : Theme.of(context).colorScheme.secondary,
+            borderRadius: BorderRadius.circular(5),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              InkWell(
+                onTap: !enableSubmit
+                    ? null
+                    : () async {
+                        await _triggerJob();
+                        // Timer.periodic(const Duration(milliseconds: 300), (timer) {
+                        //   Navigator.of(context).pop();
+                        // });
+                      },
+                child: Text('Submit Task',
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSecondary)),
+              ),
+              if (_isPosting)
+                const Padding(
+                  padding: EdgeInsets.only(left: 5),
+                  child: WgtPagWait(size: 21),
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget getGenPaymentMatchingFormOptions() {
+    return Container();
+  }
+
+  Widget getPaymentMatchingOptions() {
+    return Container();
+  }
+
+  Widget getItemHistoryOptions() {
+    List<String> itemTypeOptions = ['meter'];
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Item Type',
+              style: TextStyle(
+                color: Theme.of(context).hintColor,
+                fontSize: 16,
+              ),
+            ),
+            horizontalSpaceSmall,
+            DropdownButton<String>(
+              value: _selectedItemTypeStr,
+              items: itemTypeOptions
+                  .map((type) => DropdownMenuItem<String>(
+                        value: type,
+                        child: Text(type),
+                      ))
+                  .toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedItemTypeStr = newValue;
+                });
+              },
+            ),
+          ],
+        ),
+        verticalSpaceSmall,
+        getItemIdSelector(),
+        verticalSpaceSmall,
+        getTimeRangePicker(),
+        verticalSpaceSmall,
+      ],
+    );
+  }
+
+  Widget getItemListOptions() {
+    List<String> itemTypeOptions = ['tenant' /*, 'meter', 'user'*/];
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          'Item Type',
+          style: TextStyle(
+            color: Theme.of(context).hintColor,
+            fontSize: 16,
+          ),
+        ),
+        horizontalSpaceSmall,
+        DropdownButton<String>(
+          value: _selectedItemTypeStr,
+          items: itemTypeOptions
+              .map((type) => DropdownMenuItem<String>(
+                    value: type,
+                    child: Text(type),
+                  ))
+              .toList(),
+          onChanged: (String? newValue) {
+            setState(() {
+              _selectedItemTypeStr = newValue;
+            });
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget getCollectionReportOptions() {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Collection Period',
+              style: TextStyle(
+                color: Theme.of(context).hintColor,
+                fontSize: 16,
+              ),
+            ),
+            horizontalSpaceSmall,
+            getTimeRangePicker(forceCustomRange: true),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget getArAgingReportOptions() {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'As Of Date',
+              style: TextStyle(
+                color: Theme.of(context).hintColor,
+                fontSize: 16,
+              ),
+            ),
+            horizontalSpaceSmall,
+            WgtDatePicker(
+              key: _date1PickerKey,
+              labelFontSize: 15,
+              defaultFirstDate:
+                  DateTime.now().subtract(const Duration(days: 365)),
+              defaultLastDate: DateTime.now(),
+              initialDate: _selectedDate1,
+              timeZone: widget.loggedInUser.selectedScope.getProjectTimezone(),
+              label: 'Set As Of Date',
+              onDateChanged: (DateTime selectedDate) {
+                setState(() {
+                  _selectedDate1 = selectedDate;
+                });
+              },
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget getBlastEmailOptions() {
+    List<String> blastTypeOptions = [
+      'billing-notification',
+    ];
+
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Type',
+              style: TextStyle(
+                color: Theme.of(context).hintColor,
+                fontSize: 16,
+              ),
+            ),
+            horizontalSpaceSmall,
+            DropdownButton<String>(
+              value: _selectedItemTypeStr,
+              items: blastTypeOptions
+                  .map((type) => DropdownMenuItem<String>(
+                        value: type,
+                        child: Text(type),
+                      ))
+                  .toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedItemTypeStr = newValue;
+                });
+              },
+            ),
+          ],
+        ),
+        if (_selectedItemTypeStr == 'billing-notification')
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Cycle Month',
+                  style: TextStyle(
+                    color: Theme.of(context).hintColor,
+                    fontSize: 16,
+                  ),
+                ),
+                horizontalSpaceSmall,
+                getTimeRangePicker(forceMonthly: true),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget getGenBillingReminderListOptions() {
+    List<String> billingReminderTypeOptions = [
+      'first-reminder',
+      'second-reminder',
+    ];
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'As Of Date',
+              style: TextStyle(
+                color: Theme.of(context).hintColor,
+                fontSize: 16,
+              ),
+            ),
+            horizontalSpaceSmall,
+            WgtDatePicker(
+              key: _date1PickerKey,
+              labelFontSize: 15,
+              defaultFirstDate:
+                  DateTime.now().subtract(const Duration(days: 365)),
+              defaultLastDate: DateTime.now(),
+              initialDate: _selectedDate1,
+              timeZone: widget.loggedInUser.selectedScope.getProjectTimezone(),
+              label: 'Set As Of Date',
+              onDateChanged: (DateTime selectedDate) {
+                setState(() {
+                  _selectedDate1 = selectedDate;
+                });
+              },
+            ),
+          ],
+        ),
+        verticalSpaceSmall,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Reminder Type',
+              style: TextStyle(
+                color: Theme.of(context).hintColor,
+                fontSize: 16,
+              ),
+            ),
+            horizontalSpaceSmall,
+            DropdownButton<String>(
+              value: _selectedItemTypeStr,
+              items: billingReminderTypeOptions
+                  .map((type) => DropdownMenuItem<String>(
+                        value: type,
+                        child: Text(type),
+                      ))
+                  .toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedItemTypeStr = newValue;
+                });
+              },
+            ),
+          ],
+        )
+      ],
+    );
+  }
+}

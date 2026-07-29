@@ -676,6 +676,7 @@ class PagUrlBase {
 
   //Job
   static const String eptPostJob = '/job/post_job';
+  static const String eptPostJob2 = '/job/post_job2';
   static const String eptGetJobTypeSubs = '/job/get_job_type_subs';
   static const String eptAddJobTypeSub = '/job/add_job_type_sub';
   static const String eptDeleteJobTypeSub = '/job/delete_job_type_sub';
