@@ -1224,23 +1224,30 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       getCustomWidget: (item, fullList) {
         bool showDetail = false;
         final tenantUsageSummary = item['tenant_usage_summary'];
-        if (tenantUsageSummary != null && tenantUsageSummary.isNotEmpty) {
-          final meterGroupUsageList =
-              tenantUsageSummary['meter_group_usage_list'];
-          if (meterGroupUsageList != null && meterGroupUsageList.isNotEmpty) {
-            final meterGroupUsageSummary0 = meterGroupUsageList.first;
-            if (meterGroupUsageSummary0 != null &&
-                meterGroupUsageSummary0.isNotEmpty) {
-              final meterGroupUsageSummary =
-                  meterGroupUsageSummary0['meter_group_usage_summary'];
-              if (meterGroupUsageSummary != null &&
-                  meterGroupUsageSummary.isNotEmpty) {
-                final meterUsageList =
-                    meterGroupUsageSummary['meter_usage_list'];
-                if (meterUsageList != null && meterUsageList.isNotEmpty) {
-                  final meterUsageList0 = meterUsageList.first;
-                  if (meterUsageList0 != null && meterUsageList0.isNotEmpty) {
-                    showDetail = true;
+        String? tenantUsageSummaryError = item['tenant_usage_summary_error'];
+
+        if (tenantUsageSummaryError != null &&
+            tenantUsageSummaryError.isNotEmpty) {
+          tenantUsageSummaryError = tenantUsageSummaryError;
+        } else {
+          if (tenantUsageSummary != null && tenantUsageSummary.isNotEmpty) {
+            final meterGroupUsageList =
+                tenantUsageSummary['meter_group_usage_list'];
+            if (meterGroupUsageList != null && meterGroupUsageList.isNotEmpty) {
+              final meterGroupUsageSummary0 = meterGroupUsageList.first;
+              if (meterGroupUsageSummary0 != null &&
+                  meterGroupUsageSummary0.isNotEmpty) {
+                final meterGroupUsageSummary =
+                    meterGroupUsageSummary0['meter_group_usage_summary'];
+                if (meterGroupUsageSummary != null &&
+                    meterGroupUsageSummary.isNotEmpty) {
+                  final meterUsageList =
+                      meterGroupUsageSummary['meter_usage_list'];
+                  if (meterUsageList != null && meterUsageList.isNotEmpty) {
+                    final meterUsageList0 = meterUsageList.first;
+                    if (meterUsageList0 != null && meterUsageList0.isNotEmpty) {
+                      showDetail = true;
+                    }
                   }
                 }
               }
@@ -1251,11 +1258,20 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         return Padding(
           padding: const EdgeInsets.only(right: 0),
           child: IconButton(
+            tooltip: tenantUsageSummaryError != null &&
+                    tenantUsageSummaryError.isNotEmpty
+                ? tenantUsageSummaryError
+                : showDetail
+                    ? 'View tenant usage summary'
+                    : 'No tenant usage summary available',
             icon: Icon(
               Symbols.pageview,
-              color: showDetail
-                  ? Theme.of(context).colorScheme.primary.withAlpha(200)
-                  : Theme.of(context).hintColor.withAlpha(130),
+              color: tenantUsageSummaryError != null &&
+                      tenantUsageSummaryError.isNotEmpty
+                  ? Theme.of(context).colorScheme.error.withAlpha(200)
+                  : showDetail
+                      ? Theme.of(context).colorScheme.primary.withAlpha(200)
+                      : Theme.of(context).hintColor.withAlpha(130),
             ),
             onPressed: !showDetail
                 ? null
