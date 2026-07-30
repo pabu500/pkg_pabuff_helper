@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:developer' as dev;
 
-import 'package:buff_helper/pag_helper/comm/comm_pag_job.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_controller.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_scope.dart';
@@ -271,6 +270,9 @@ class _WgtJobTypeOpPanel3State extends State<WgtJobTypeOpPanel3> {
         }
       case 'gen-billing-reminder-list':
         return _selectedDate1 != null && _selectedItemTypeStr != null;
+      case 'gen-initial-bill':
+        // return _selectedFromDate != null && _selectedToDate != null;
+        return true;
       default:
         return false;
     }
@@ -440,6 +442,8 @@ class _WgtJobTypeOpPanel3State extends State<WgtJobTypeOpPanel3> {
         return getBlastEmailOptions();
       case 'gen-billing-reminder-list':
         return getGenBillingReminderListOptions();
+      case 'gen-initial-bill':
+        return getGenInitialBillOptions();
       default:
         return const SizedBox();
     }
@@ -1404,5 +1408,9 @@ class _WgtJobTypeOpPanel3State extends State<WgtJobTypeOpPanel3> {
         )
       ],
     );
+  }
+
+  Widget getGenInitialBillOptions() {
+    return Container();
   }
 }
