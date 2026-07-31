@@ -51,10 +51,13 @@ List<Map<String, dynamic>> getOpListConfig(
         if (opInfo['is_value_required'] == 'false') {
           isValueRequired = false;
         }
+        bool isIdentityColumn = false;
+        if (opInfo['is_id_col'] == 'true') {
+          isIdentityColumn = true;
+        }
         opListConfig.add({
           'col_key': colKey,
-          'is_id_col':
-              colController.filterGroupType == PagFilterGroupType.identity,
+          'is_id_col': isIdentityColumn,
           'title': colController.colTitle,
           'col_type': colController.colType,
           'width': colController.colWidth,
