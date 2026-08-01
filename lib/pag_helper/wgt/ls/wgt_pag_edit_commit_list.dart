@@ -401,6 +401,9 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
           !widget.colKeyShowList.contains(item.colKey)) {
         continue;
       }
+      if (item.hidden) {
+        continue;
+      }
       // the space for checkbox column title is taken by save table icon
       if (widget.multiSelection &&
           item.colWidgetType == PagColWidgetType.CHECKBOX) {
@@ -512,6 +515,9 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
     // for (Map<String, dynamic> configItem in _listConfig) {
     for (var ctrlItem in widget.listController.listColControllerList) {
       if (!ctrlItem.showColumn) {
+        continue;
+      }
+      if (ctrlItem.hidden) {
         continue;
       }
       if (widget.colKeyShowList.isNotEmpty &&

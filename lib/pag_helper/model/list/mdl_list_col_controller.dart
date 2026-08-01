@@ -95,7 +95,8 @@ class MdlListColController {
   bool requiredOnFormCreate;
   bool showInputOnFormCreate;
   bool showFilter;
-  List<Map<String, dynamic>>? opInfoList;
+  // List<Map<String, dynamic>>? opInfoList;
+  Map<String, dynamic>? opInfo;
   bool isCompactFilter;
   bool showScanner;
   bool noSel;
@@ -153,7 +154,8 @@ class MdlListColController {
     this.requiredOnFormCreate = false,
     this.showInputOnFormCreate = false,
     this.showFilter = false,
-    this.opInfoList,
+    // this.opInfoList,
+    this.opInfo,
     this.isCompactFilter = false,
     this.showScanner = false,
   }) {
@@ -531,11 +533,19 @@ class MdlListColController {
       }
     }
 
-    List<Map<String, dynamic>>? opInfoList;
-    if (json['op_info_list'] != null) {
-      dynamic opsInfoListValue = json['op_info_list'];
-      if (opsInfoListValue is List) {
-        opInfoList = List<Map<String, dynamic>>.from(opsInfoListValue);
+    // List<Map<String, dynamic>>? opInfoList;
+    // if (json['op_info_list'] != null) {
+    //   dynamic opsInfoListValue = json['op_info_list'];
+    //   if (opsInfoListValue is List) {
+    //     opInfoList = List<Map<String, dynamic>>.from(opsInfoListValue);
+    //   }
+    // }
+
+    Map<String, dynamic>? opInfo;
+    if (json['op_info'] != null) {
+      dynamic opInfoValue = json['op_info'];
+      if (opInfoValue is Map<String, dynamic>) {
+        opInfo = opInfoValue;
       }
     }
 
@@ -615,7 +625,8 @@ class MdlListColController {
       rowOrder: rowOrder,
       isCompactFilter: isCompactFilter,
       showScanner: showScanner,
-      opInfoList: opInfoList,
+      // opInfoList: opInfoList,
+      opInfo: opInfo,
       noSel: noSel,
     );
   }
@@ -658,7 +669,8 @@ class MdlListColController {
     data['show_filter'] = showFilter.toString();
     data['show_timestamp_as_date'] = showTimestampAsDate.toString();
     data['row_order'] = rowOrder;
-    data['op_info_list'] = opInfoList;
+    // data['op_info_list'] = opInfoList;
+    data['op_info'] = opInfo;
     data['is_compact_filter'] = isCompactFilter.toString();
     data['show_scanner'] = showScanner.toString();
     data['no_sel'] = noSel.toString();

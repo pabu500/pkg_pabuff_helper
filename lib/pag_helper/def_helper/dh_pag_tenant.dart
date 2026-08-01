@@ -717,7 +717,7 @@ String? validateInitialBalance(String value) {
 
 enum PagTenantOpType {
   onboarding('Onboarding', 'onb', 'onb'),
-  mgAssign1on1('MG Assignment 1on1', 'mg1', 'mg1'),
+  mgAssignment1on1('MG Assignment 1on1', 'mg_assignment_1on1', 'mg1'),
   update('Update', 'update', 'upd'),
   sendBillingReminder('Send Billing Reminder', 'sbr', 'sbr'),
   none('None', 'none', 'none');
@@ -1046,13 +1046,13 @@ final List<Map<String, dynamic>> listConfigBaseTenantExt = [
 ];
 
 // must be 'mg-1-on-1'
-String? validateMgAssign1on1Type(dynamic value) {
+String? validateMgAssignmentType(dynamic value) {
   if (value == null || value.toString().isEmpty) {
-    return 'Onb Type is required';
+    return 'required';
   }
   final validTypes = ['auto-1-on-1'];
   if (!validTypes.contains(value.toString())) {
-    return 'Invalid Onb Type';
+    return 'must be one of: ${validTypes.join(', ')}';
   }
   return null;
 }
@@ -1088,7 +1088,7 @@ final List<Map<String, dynamic>> listConfigMgAssign1on1 = [
     'col_type': 'string',
     'width': 200,
     'is_mapping_required': false,
-    'validator': validateMgAssign1on1Type,
+    'validator': validateMgAssignmentType,
   },
 ];
 
@@ -1102,7 +1102,7 @@ List<Map<String, dynamic>> getListConfigBaseByTenantOpType(
     case PagTenantOpType.update:
       list.addAll(listConfigBaseTenant + listConfigBaseTenantExt);
       break;
-    case PagTenantOpType.mgAssign1on1:
+    case PagTenantOpType.mgAssignment1on1:
       final accountNumberConfig = listConfigBaseTenant
           .firstWhere((element) => element['col_key'] == 'account_number');
       accountNumberConfig['validator'] = validateTenantAccountNumber2;
@@ -1232,6 +1232,8 @@ String? Function(String) getTenantValidator(String key,
       return getValidator(validateSendReminder, isValueRequired);
     case 'send_reminder_type':
       return getValidator(validateSendReminderType, isValueRequired);
+    case 'mg_assignment_type':
+      return getValidator(validateMgAssignmentType, isValueRequired);
     default:
       dev.log('No validator found for key: $key');
       return (String? value) {

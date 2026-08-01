@@ -90,6 +90,7 @@ String? validateEnabled(String? value) {
   if (value == null || value.isEmpty) {
     return 'required';
   }
+  value = value.toLowerCase();
   if (value != 'true' && value != 'false') {
     return 'must be either true or false';
   }

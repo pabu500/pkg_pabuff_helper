@@ -28,60 +28,78 @@ List<Map<String, dynamic>> getOpListConfig(
 
   // dev.log('list controller list: size ${listColControllerList.length}');
 
-  if (listColControllerList.isNotEmpty) {
-    for (MdlListColController colController in listColControllerList) {
-      final colKey = colController.colKey;
+  for (MdlListColController colController in listColControllerList) {
+    final colKey = colController.colKey;
 
-      List<Map<String, dynamic>>? opInfoList = colController.opInfoList;
-      // e.g. [{'op':'onb', 'is_column_mapping_required': 'true'}]
-      if (opInfoList == null) {
-        continue;
-      }
+    // List<Map<String, dynamic>>? opInfoList = colController.opInfoList;
+    // e.g. [{'op':'onb', 'is_column_mapping_required': 'true'}]
+    // if (opInfoList == null) {
+    //   continue;
+    // }
 
-      for (var opInfo in opInfoList) {
-        String op = opInfo['op'] ?? '';
-        if (op != selectedOpType?.value) {
-          continue;
-        }
-        bool isMappingRequired = true;
-        if (opInfo['is_column_mapping_required'] == 'false') {
-          isMappingRequired = false;
-        }
-        bool isValueRequired = true;
-        if (opInfo['is_value_required'] == 'false') {
-          isValueRequired = false;
-        }
-        bool isIdentityColumn = false;
-        if (opInfo['is_id_col'] == 'true') {
-          isIdentityColumn = true;
-        }
-        opListConfig.add({
-          'col_key': colKey,
-          'is_id_col': isIdentityColumn,
-          'title': colController.colTitle,
-          'col_type': colController.colType,
-          'width': colController.colWidth,
-          'is_column_mapping_required': isMappingRequired,
-          'is_value_required': isValueRequired,
-          'validator': getItemKindValidator(
-            itemKind,
-            colKey,
-            isValueRequired: isValueRequired,
-            itemType: itemType,
-          ),
-        });
-      }
-      // sort id col to the top
-      opListConfig.sort((a, b) {
-        if (a['is_id_col'] == true) {
-          return -1;
-        } else if (b['is_id_col'] == true) {
-          return 1;
-        } else {
-          return 0;
-        }
-      });
+    // for (var opInfo in opInfoList) {
+    //   String op = opInfo['op'] ?? '';
+    //   if (op != selectedOpType?.value) {
+    //     continue;
+    //   }
+    //   bool isMappingRequired = true;
+    //   if (opInfo['is_column_mapping_required'] == 'false') {
+    //     isMappingRequired = false;
+    //   }
+    //   bool isValueRequired = true;
+    //   if (opInfo['is_value_required'] == 'false') {
+    //     isValueRequired = false;
+    //   }
+    //   bool isIdentityColumn = false;
+    //   if (opInfo['is_id_col'] == 'true') {
+    //     isIdentityColumn = true;
+    //   }
+
+    Map<String, dynamic>? opInfo = colController.opInfo;
+    if (opInfo == null) {
+      continue;
     }
+    bool isIdentityColumn = false;
+    bool isMappingRequired = true;
+    bool isValueRequired = true;
+    if (opInfo['is_id_col'] == 'true') {
+      isIdentityColumn = true;
+    }
+    if (opInfo['is_column_mapping_required'] == 'false') {
+      isMappingRequired = false;
+    }
+    if (opInfo['is_value_required'] == 'false') {
+      isValueRequired = false;
+    }
+
+    opListConfig.add({
+      'col_key': colKey,
+      'is_id_col': isIdentityColumn,
+      'title': colController.colTitle,
+      'col_type': colController.colType,
+      'width': colController.colWidth,
+      'is_column_mapping_required': isMappingRequired,
+      'is_value_required': isValueRequired,
+      'validator': getItemKindValidator(
+        itemKind,
+        colKey,
+        isValueRequired: isValueRequired,
+        itemType: itemType,
+      ),
+    });
+    // }
+
+    // sort id col to the top
+    opListConfig.sort((a, b) {
+      if (a['is_id_col'] == true) {
+        return -1;
+      } else if (b['is_id_col'] == true) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
   }
+
   return opListConfig;
 }
