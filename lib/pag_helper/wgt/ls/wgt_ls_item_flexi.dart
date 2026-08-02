@@ -40,7 +40,6 @@ import '../app/ems/wgt_ems_meter_group_assignment.dart';
 import '../app/ems/wgt_match_payment_op_item.dart';
 import '../app/ems/wgt_tenant_item_assignment.dart';
 import '../app/fh/wgt_fh_device_health.dart';
-import '../job/wgt_job_type_op_panel2.dart';
 import '../job/wgt_job_type_op_panel3.dart';
 import 'wgt_list_pane.dart';
 import 'wgt_pag_item_finder_flexi.dart';

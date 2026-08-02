@@ -238,7 +238,7 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
 
   void _onLocationListFetched(var result) {
     if (widget.isFlexiScope && _selectedLocation?.id == -1) {
-      return;
+      // return;
     }
 
     _locationList.clear();

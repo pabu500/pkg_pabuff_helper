@@ -2,6 +2,7 @@ import 'dart:developer' as dev;
 
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_tenant.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
+import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -883,22 +884,33 @@ String? Function(String) getDeviceValidator(String key, dynamic itemType,
 String? Function(String) getDefaultDeviceValidator(String key,
     {bool isValueRequired = true}) {
   switch (key) {
-    case 'sn':
-      return (String value) => validateSerialNumber(value);
     case 'label':
-      return (String value) => validateDeviceLabel(value);
     case 'displayname':
-      return (String value) => validateDeviceLabel(value);
-    case 'tag':
-      return (String value) => validateTag(value);
+      // return (String value) => validateDeviceLabel(value);
+      return getValidator(validateDeviceLabel, isValueRequired);
+    case 'sn':
+    case 'meter_sn':
+      // return (String value) => validateSerialNumber(value);
+      return getValidator(validateSerialNumber, isValueRequired);
     case 'type':
-      return (String value) => validateDeviceType(value);
+    case 'meter_type':
+      // return (String value) => validateDeviceType(value);
+      return getValidator(validateDeviceType, isValueRequired);
+    case 'tag':
+      // return (String value) => validateTag(value);
+      return getValidator(validateTag, isValueRequired);
+    case 'phase_type':
+      // return (String value) => validatePhaseType(value);
+      return getValidator(validatePhaseType, isValueRequired);
     case 'model':
-      return (String value) => validateModel(value);
+      // return (String value) => validateModel(value);
+      return getValidator(validateModel, isValueRequired);
     case 'iccid':
-      return (String value) => validateDeviceIccid(value);
+      // return (String value) => validateDeviceIccid(value);
+      return getValidator(validateDeviceIccid, isValueRequired);
     case 'description':
-      return (String value) => validateDescription(value);
+      // return (String value) => validateDescription(value);
+      return getValidator(validateDescription, isValueRequired);
     default:
       dev.log('No validator found for key: $key');
       return (String? value) {
