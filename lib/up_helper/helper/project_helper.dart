@@ -843,7 +843,7 @@ bool is2402EVS1(String displayname) {
   }
 }
 
-bool isNusFiveHalls(String? siteTag) {
+bool isNusFiveHallsBySiteTag(String? siteTag) {
   if(siteTag == null){
     return false;
   }
