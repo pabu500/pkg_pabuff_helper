@@ -533,7 +533,7 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
 
       if (field['col_key'] == 'tag') {
         if (field['validator'] == null) {
-          // field['validator'] = validateTag;
+          field['validator'] = validateTag;
         }
         if (widget.itemKind == PagItemKind.role) {
           field['validator'] = validateRoleTag;

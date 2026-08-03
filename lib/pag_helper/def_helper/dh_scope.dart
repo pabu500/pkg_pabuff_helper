@@ -121,7 +121,7 @@ String? validateScopeTag(String? value) {
 
   // validate alphanumeric, _, -,
   // and minimum 3 characters, maximum 21
-  String pattern = r"^[a-zA-Z0-9_\-]{3,21}$";
+  String pattern = r"^[a-zA-Z0-9_-]{3,21}$";
   RegExp regExp = RegExp(pattern);
   if (!regExp.hasMatch(value)) {
     return 'alphanumeric, _, - only and length 3-21';
@@ -410,7 +410,7 @@ String? Function(String) getScopeValidator(String key,
     {bool isValueRequired = true}) {
   switch (key) {
     case 'tag':
-      return getValidator(validateLabelScope, isValueRequired);
+      return getValidator(validateScopeTag, isValueRequired);
     case 'label':
       return getValidator(validateLabelScope, isValueRequired);
     case 'location_group_label':

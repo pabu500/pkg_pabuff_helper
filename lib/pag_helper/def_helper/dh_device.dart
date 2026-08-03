@@ -353,11 +353,11 @@ String? validateTag(String val) {
     return 'required';
   }
 
-  // tag pattern: letter, number, underscore, dash, space, 0 to 55 characters
-  String pattern = r'^[a-zA-Z0-9_ -]{0,55}$';
+  // alphanumeric, underscore, dash, 3 to 21 characters
+  String pattern = r"^[a-zA-Z0-9_-]{3,21}$";
   RegExp regExp = RegExp(pattern);
   if (!regExp.hasMatch(val)) {
-    return 'max length is 55 and letter, number, space, _, - only';
+    return 'alphanumeric, _, - only, 3-21 characters';
   }
   return null;
 }
