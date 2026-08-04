@@ -452,25 +452,21 @@ class _WgtJobTypeOpPanel3State extends State<WgtJobTypeOpPanel3> {
   Widget getBillingTaskOptions() {
     DateTime? leftMostDate;
     DateTime? rightMostDate;
-    DateTime? initDate;
+    // DateTime? initDate;
     if ((_selectedFromDate == null || _selectedToDate == null)) {
     } else {
       leftMostDate = _selectedToDate!.add(const Duration(days: 1));
       rightMostDate = leftMostDate.add(const Duration(days: 30));
-      initDate = leftMostDate;
+      // initDate = leftMostDate;
     }
     return Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              'Billing Month',
-              style: TextStyle(
-                color: Theme.of(context).hintColor,
-                fontSize: 16,
-              ),
-            ),
+            Text('Billing Month',
+                style: TextStyle(
+                    color: Theme.of(context).hintColor, fontSize: 16)),
             horizontalSpaceSmall,
             getTimeRangePicker(),
           ],
@@ -523,24 +519,20 @@ class _WgtJobTypeOpPanel3State extends State<WgtJobTypeOpPanel3> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   SizedBox(
-                    width: 160,
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: Text(
-                        'Collection End Date',
-                        style: TextStyle(
-                          color: Theme.of(context).hintColor,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                  ),
+                      width: 160,
+                      child: Align(
+                          alignment: Alignment.centerRight,
+                          child: Text('Collection End Date',
+                              style: TextStyle(
+                                  color: Theme.of(context).hintColor,
+                                  fontSize: 16)))),
                   horizontalSpaceSmall,
                   WgtDatePicker(
                     key: _date2PickerKey,
                     labelFontSize: 15,
                     enabled: true,
-                    defaultFirstDate: leftMostDate,
+                    defaultFirstDate:
+                        leftMostDate!.subtract(const Duration(days: 1)),
                     defaultLastDate: rightMostDate,
                     initialDate: _selectedDate2,
                     timeZone:
