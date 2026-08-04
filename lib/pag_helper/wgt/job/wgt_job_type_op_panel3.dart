@@ -504,6 +504,13 @@ class _WgtJobTypeOpPanel3State extends State<WgtJobTypeOpPanel3> {
                     onDateChanged: (DateTime selectedDate) {
                       setState(() {
                         _selectedDate1 = selectedDate;
+                        _date2PickerKey = UniqueKey();
+                      });
+                    },
+                    onDateCleared: () {
+                      setState(() {
+                        _selectedDate1 = null;
+                        _date2PickerKey = UniqueKey();
                       });
                     },
                   ),
@@ -533,7 +540,9 @@ class _WgtJobTypeOpPanel3State extends State<WgtJobTypeOpPanel3> {
                     enabled: true,
                     defaultFirstDate:
                         leftMostDate!.subtract(const Duration(days: 1)),
-                    defaultLastDate: rightMostDate,
+                    defaultLastDate: _selectedDate1 != null
+                        ? _selectedDate1!.add(const Duration(days: 31))
+                        : rightMostDate,
                     initialDate: _selectedDate2,
                     timeZone:
                         widget.loggedInUser.selectedScope.getProjectTimezone(),
