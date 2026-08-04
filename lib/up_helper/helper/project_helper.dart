@@ -842,3 +842,17 @@ bool is2402EVS1(String displayname) {
     return false;
   }
 }
+
+bool isNusFiveHallsBySiteTag(String? siteTag) {
+  if(siteTag == null){
+    return false;
+  }
+  if (siteTag == 'nus_eh' ||
+      siteTag == 'nus_th' ||
+      siteTag == 'nus_sh' ||
+      siteTag == 'nus_krh' ||
+      siteTag == 'nus_ke7h') {
+    return true;
+  }
+  return false;
+}
