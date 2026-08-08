@@ -1602,6 +1602,13 @@ class PagPdfBillCwP2 {
 
   pw.Widget _getSingluarStat() {
     List<pw.Widget> singularStatList = [];
+    // sort by from_timestamp ascending
+    tenantSingularUsageInfoList.sort((a, b) {
+      String fromTimestampA = a['from_timestamp'] ?? '';
+      String fromTimestampB = b['from_timestamp'] ?? '';
+      return fromTimestampA.compareTo(fromTimestampB);
+    });
+
     for (Map<String, dynamic> singularUsageInfo
         in tenantSingularUsageInfoList) {
       List<pw.Widget> typeStatList = [];
