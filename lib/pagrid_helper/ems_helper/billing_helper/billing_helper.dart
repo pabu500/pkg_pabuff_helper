@@ -148,7 +148,18 @@ Map<String, dynamic> prepCalcedBillInfoRl(Map<String, dynamic> billInfo) {
     }
 
     Map<String, dynamic> billedSubTenantUsages = {};
+
     Map<String, dynamic> billedManualUsages = {};
+    for (String typeTag in usageTypeTags) {
+      typeTag = typeTag.toLowerCase();
+      String typebilledManualUsageStr =
+          singularUsage['manual_usage_$typeTag'] ?? '';
+      double? usage = double.tryParse(typebilledManualUsageStr);
+      if (usage != null) {
+        billedManualUsages['manual_usage_$typeTag'] = usage;
+      }
+    }
+
     List<Map<String, dynamic>> billedTrendingSnapShot = [];
 
     double? billedGstRate;

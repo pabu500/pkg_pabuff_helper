@@ -1613,8 +1613,8 @@ class PagPdfBillCwP2 {
       String slotStr =
           '  ${slotFromTimestampStr.substring(0, 10)} - ${slotToTimestampStr.substring(0, 10)}';
       typeStatList.add(_getTypeStat(singularUsageInfo, 'E'));
-      typeStatList.add(_getTypeStat(singularUsageInfo, 'B'));
       typeStatList.add(_getTypeStat(singularUsageInfo, 'W'));
+      typeStatList.add(_getTypeStat(singularUsageInfo, 'B'));
       typeStatList.add(_getTypeStat(singularUsageInfo, 'N'));
       typeStatList.add(_getTypeStat(singularUsageInfo, 'G'));
       singularStatList.add(pw.Container(
@@ -1668,7 +1668,7 @@ class PagPdfBillCwP2 {
     String excludeAutoUsageStr = singularUsageInfo['exclude_auto_usage'] ?? '';
     List<pw.TableRow> typeGroupList = [];
     if ('true' == excludeAutoUsageStr) {
-      return _getManualUsage(singularUsageInfo, targetMeterTypeTag);
+      return _getManualUsage2(singularUsageInfo, targetMeterTypeTag);
     } else {
       final tenantUsageSummary = singularUsageInfo['tenant_usage_summary'];
       assert(tenantUsageSummary != null, 'tenantUsageSummary cannot be null');
@@ -1805,6 +1805,30 @@ class PagPdfBillCwP2 {
       );
     }
     return pw.Column(children: [...manualUsageWidgets]);
+  }
+
+  pw.Widget _getManualUsage2(
+      Map<String, dynamic> singularUsageInfo, String meterTypeTag) {
+    String? typeUsage =
+        singularUsageInfo['manual_usage_${meterTypeTag.toLowerCase()}'];
+    double? usage = double.tryParse(typeUsage ?? '');
+    if (usage == null) {
+      return pw.Container();
+    }
+
+    PagMeterType? meterType = PagMeterType.byTag(meterTypeTag);
+    assert(meterType != PagMeterType.unknown, 'meterType cannot be unknown');
+    String unit = meterType.unit ?? '';
+
+    return pw.Row(
+      mainAxisAlignment: pw.MainAxisAlignment.start,
+      children: [
+        pw.SizedBox(width: 5),
+        pw.Text('Manual Usage $meterTypeTag', style: styleNormal),
+        pw.SizedBox(width: 20),
+        pw.Text('${getCommaNumberStr(usage)} ($unit)', style: styleNormal),
+      ],
+    );
   }
 
   pw.Widget _getTrending(List<Map<String, dynamic>>? trending) {
