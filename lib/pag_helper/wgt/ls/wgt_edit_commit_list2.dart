@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_acl.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_finance.dart';
 import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
@@ -16,7 +18,6 @@ import 'package:flutter/material.dart';
 
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
-import 'dart:developer' as dev;
 
 import '../../def_helper/dh_device.dart';
 import '../../def_helper/dh_pag_tenant.dart';
@@ -1073,6 +1074,12 @@ class _WgtPagEditCommitList2State extends State<WgtPagEditCommitList2> {
       PagPaymentMethod paymentMethod = PagPaymentMethod.byValue(tagText);
       tagLabel = paymentMethod.tag;
       tagColor = paymentMethod.color.withAlpha(130);
+    } else if (widget.itemType is PagDeviceCat) {
+      if (configItem['col_key'] == 'data_type') {
+        MeterDataType deviceType = MeterDataType.byValue(tagText);
+        tagLabel = deviceType.tag;
+        tagColor = deviceType.color.withAlpha(130);
+      }
     } else {
       tagLabel = tagText;
     }

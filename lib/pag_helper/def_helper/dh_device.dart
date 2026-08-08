@@ -74,6 +74,33 @@ enum PagMeterType {
       enumByValue(tag, values, (e) => (e).tag) ?? unknown;
 }
 
+enum MeterDataType {
+  amr('AMR', 'amr', 'amr', Colors.blue),
+  manual('Manual', 'manual', 'man', Colors.brown),
+  unknown('Unknown', 'unknown', 'unkn', Colors.grey);
+
+  const MeterDataType(
+    this.label,
+    this.value,
+    this.tag,
+    this.color,
+  );
+
+  final String label;
+  final String value; // the value that is stored in the database
+  final String tag; // a short tag for the device category
+  final Color color;
+
+  static MeterDataType byLabel(String? label) =>
+      enumByLabel(label, values, (e) => (e).label) ?? amr;
+
+  static MeterDataType byValue(String? value) =>
+      enumByValue(value, values, (e) => (e).value) ?? amr;
+
+  static MeterDataType byTag(String? tag) =>
+      enumByValue(tag, values, (e) => (e).tag) ?? amr;
+}
+
 enum PagLinkOpType {
   gatewayToDevice,
   none,
@@ -246,6 +273,22 @@ String? validateDeviceModel(String val) {
 
   if (val.length > 55 || !regExp.hasMatch(val)) {
     return 'invalid model format, length must be less than 55 and only alphanumeric, space, dot, underscore, hyphen allowed';
+  }
+
+  return null;
+}
+
+String? validateMeterMultiplierFactor(String val) {
+  val = val.trim();
+
+  if (val.isEmpty) {
+    return 'required';
+  }
+
+  // number, 1-100
+  double? factor = double.tryParse(val);
+  if (factor == null || factor < 1 || factor > 100) {
+    return 'multiplier factor must be a number between 1 and 100';
   }
 
   return null;

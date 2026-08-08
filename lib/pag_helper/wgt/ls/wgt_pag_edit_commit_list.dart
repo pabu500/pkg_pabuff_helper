@@ -1174,6 +1174,12 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
       PagPaymentMethod paymentMethod = PagPaymentMethod.byValue(tagText);
       tagLabel = paymentMethod.tag;
       tagColor = paymentMethod.color.withAlpha(130);
+    } else if (widget.itemType is PagDeviceCat) {
+      if (configItem['col_key'] == 'data_type') {
+        MeterDataType deviceType = MeterDataType.byValue(tagText);
+        tagLabel = deviceType.tag;
+        tagColor = deviceType.color.withAlpha(130);
+      }
     } else {
       tagLabel = tagText;
     }
