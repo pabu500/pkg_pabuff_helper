@@ -1886,6 +1886,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
               context,
               WgtCreateDevice(
                 appConfig: widget.appConfig,
+                loggedInUser: loggedInUser!,
                 itemTypeEnum: _selectedListController?.itemTypeEnum,
                 onCreated: () {
                   setState(() {
@@ -1908,6 +1909,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
               context,
               WgtCreateRole(
                 appConfig: widget.appConfig,
+                loggedInUser: loggedInUser!,
                 onCreated: () {
                   setState(() {
                     _itemUpdated = true;
@@ -1929,6 +1931,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
               context,
               WgtCreateUser2(
                 appConfig: widget.appConfig,
+                loggedInUser: loggedInUser!,
                 onCreated: () {
                   setState(() {
                     _itemUpdated = true;
@@ -1950,6 +1953,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
               context,
               WgtCreateScope(
                 appConfig: widget.appConfig,
+                loggedInUser: loggedInUser!,
                 itemTypeEnum: _selectedListController?.itemTypeEnum,
                 onCreated: () {
                   setState(() {
@@ -1972,6 +1976,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
               context,
               WgtCreateMeterGroup(
                 appConfig: widget.appConfig,
+                loggedInUser: loggedInUser!,
                 serviceType: MeterGroupServiceType.ems,
                 onCreated: () {
                   setState(() {
@@ -1994,6 +1999,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
               context,
               WgtCreateTariffItem(
                 appConfig: widget.appConfig,
+                loggedInUser: loggedInUser!,
                 itemTypeEnum: _selectedListController?.itemTypeEnum,
                 onCreated: () {
                   setState(() {
@@ -2016,6 +2022,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
               context,
               WgtCreateOrg(
                 appConfig: widget.appConfig,
+                loggedInUser: loggedInUser!,
                 itemTypeEnum: _selectedListController?.itemTypeEnum,
                 onCreated: () {
                   setState(() {
@@ -2038,6 +2045,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
               context,
               WgtCreateResourceType(
                 appConfig: widget.appConfig,
+                loggedInUser: loggedInUser!,
                 onCreated: () {
                   setState(() {
                     _itemUpdated = true;
@@ -2059,6 +2067,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
               context,
               WgtCreateAclItem(
                 appConfig: widget.appConfig,
+                loggedInUser: loggedInUser!,
                 itemTypeEnum: _selectedListController?.itemTypeEnum,
                 onCreated: () {
                   setState(() {
