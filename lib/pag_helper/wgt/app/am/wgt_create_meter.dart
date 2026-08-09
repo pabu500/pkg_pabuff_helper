@@ -26,6 +26,7 @@ class WgtCreateMeter extends StatefulWidget {
   const WgtCreateMeter({
     super.key,
     required this.appConfig,
+    required this.loggedInUser,
     this.showTitle = true,
     this.showPortalType = true,
     this.showEnabled = true,
@@ -33,6 +34,7 @@ class WgtCreateMeter extends StatefulWidget {
   });
 
   final MdlPagAppConfig appConfig;
+  final MdlPagUser loggedInUser;
   final bool showTitle;
   final bool showPortalType;
   final bool showEnabled;
@@ -43,7 +45,7 @@ class WgtCreateMeter extends StatefulWidget {
 }
 
 class _CreateItemState extends State<WgtCreateMeter> {
-  late MdlPagUser? _loggedInUser;
+  // late MdlPagUser? _loggedInUser;
   final double width = 395;
 
   bool _isEditing = false;
@@ -110,9 +112,9 @@ class _CreateItemState extends State<WgtCreateMeter> {
   Future<dynamic> _getListConfig() async {
     dev.log('fetching list config');
 
-    if (_loggedInUser == null) {
-      return;
-    }
+    // if (widget.loggedInUser == null) {
+    //   return;
+    // }
 
     if (_isFetchingListConfig) {
       return;
@@ -124,7 +126,7 @@ class _CreateItemState extends State<WgtCreateMeter> {
 
     try {
       Map<String, dynamic> queryMap = {
-        'scope': _loggedInUser!.selectedScope.toScopeMap(),
+        'scope': widget.loggedInUser.selectedScope.toScopeMap(),
         'item_kind': PagItemKind.device.value,
         'item_type': PagDeviceCat.meter.value,
         // 'item_type_list_str': widget.itemTypeListStr ?? 'NOT_SET',
@@ -139,8 +141,8 @@ class _CreateItemState extends State<WgtCreateMeter> {
         appConfig: widget.appConfig,
         queryMap: queryMap,
         svcClaim: MdlPagSvcClaim(
-          userId: _loggedInUser!.id,
-          username: _loggedInUser!.username,
+          userId: widget.loggedInUser.id,
+          username: widget.loggedInUser.username,
           scope: '',
           target: '',
           operation: '',
@@ -217,12 +219,12 @@ class _CreateItemState extends State<WgtCreateMeter> {
 
     try {
       _itemScopeMap['project_id'] =
-          _loggedInUser!.selectedScope.projectProfile!.id.toString();
+          widget.loggedInUser.selectedScope.projectProfile!.id.toString();
       _itemScopeMap['project_name'] =
-          _loggedInUser!.selectedScope.projectProfile!.name;
+          widget.loggedInUser.selectedScope.projectProfile!.name;
 
       Map<String, dynamic> queryMap = {
-        'scope': _loggedInUser!.selectedScope.toScopeMap(),
+        'scope': widget.loggedInUser.selectedScope.toScopeMap(),
         'item_scope_info': _itemScopeMap,
         'item_kind': PagItemKind.device.value,
         'device_cat': PagDeviceCat.meter.value,
@@ -239,12 +241,12 @@ class _CreateItemState extends State<WgtCreateMeter> {
       };
 
       final result = await doPagCreateDevice(
-        _loggedInUser!,
+        widget.loggedInUser,
         widget.appConfig,
         queryMap,
         MdlPagSvcClaim(
-          username: _loggedInUser!.username,
-          userId: _loggedInUser!.id,
+          username: widget.loggedInUser.username,
+          userId: widget.loggedInUser.id,
           scope: '',
           target: '',
           operation: '',
@@ -335,8 +337,8 @@ class _CreateItemState extends State<WgtCreateMeter> {
   void initState() {
     super.initState();
 
-    _loggedInUser =
-        Provider.of<PagUserProvider>(context, listen: false).currentUser;
+    // _loggedInUser =
+    //     Provider.of<PagUserProvider>(context, listen: false).currentUser;
   }
 
   @override
@@ -476,7 +478,7 @@ class _CreateItemState extends State<WgtCreateMeter> {
   }
 
   Widget getItemBlock() {
-    MdlPagScopeProfile scopeProfile = _loggedInUser!.selectedScope;
+    MdlPagScopeProfile scopeProfile = widget.loggedInUser.selectedScope;
     String projectName = scopeProfile.projectProfile!.name;
 
     return Column(

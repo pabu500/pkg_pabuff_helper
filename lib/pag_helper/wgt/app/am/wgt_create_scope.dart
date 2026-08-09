@@ -27,12 +27,14 @@ class WgtCreateScope extends StatefulWidget {
   const WgtCreateScope({
     super.key,
     required this.appConfig,
+    required this.loggedInUser,
     this.itemTypeEnum,
     this.onScopeTreeUpdate,
     this.onCreated,
   });
 
   final MdlPagAppConfig appConfig;
+  final MdlPagUser loggedInUser;
   final Function? onScopeTreeUpdate;
   final Function? onCreated;
   final PagScopeType? itemTypeEnum;
@@ -42,7 +44,7 @@ class WgtCreateScope extends StatefulWidget {
 }
 
 class _CreateScopeState extends State<WgtCreateScope> {
-  late MdlPagUser? _loggedInUser;
+  // late MdlPagUser? _loggedInUser;
   final double width = 395;
 
   final String defaultErrorText = 'Error creating scope';
@@ -92,7 +94,7 @@ class _CreateScopeState extends State<WgtCreateScope> {
 
     try {
       Map<String, dynamic> queryMap = {};
-      queryMap['scope'] = _loggedInUser!.selectedScope.toScopeMap();
+      queryMap['scope'] = widget.loggedInUser.selectedScope.toScopeMap();
       queryMap['label'] = _label;
       queryMap['item_type'] = _selectedScopeType!.name;
       queryMap['lat'] = _lat;
@@ -104,13 +106,13 @@ class _CreateScopeState extends State<WgtCreateScope> {
       }
 
       final result = await doPagCreateScope(
-        _loggedInUser!,
+        widget.loggedInUser,
         widget.appConfig,
         queryMap,
         MdlPagSvcClaim(
-          username: _loggedInUser!.username,
-          userId: _loggedInUser!.id,
-          selectedRoleId: _loggedInUser!.selectedRole!.id,
+          username: widget.loggedInUser.username,
+          userId: widget.loggedInUser.id,
+          selectedRoleId: widget.loggedInUser.selectedRole!.id,
           scope: '',
           target: '',
           operation: '',
@@ -160,8 +162,8 @@ class _CreateScopeState extends State<WgtCreateScope> {
   void initState() {
     super.initState();
 
-    _loggedInUser =
-        Provider.of<PagUserProvider>(context, listen: false).currentUser;
+    // _loggedInUser =
+    //     Provider.of<PagUserProvider>(context, listen: false).currentUser;
   }
 
   @override
@@ -276,7 +278,7 @@ class _CreateScopeState extends State<WgtCreateScope> {
   }
 
   Widget getItemPropBlock() {
-    MdlPagScopeProfile scopeProfile = _loggedInUser!.selectedScope;
+    MdlPagScopeProfile scopeProfile = widget.loggedInUser.selectedScope;
     String projectName = scopeProfile.projectProfile!.name;
 
     TextStyle dropDownListTextStyle = TextStyle(

@@ -16,6 +16,7 @@ class WgtCreateSim extends StatefulWidget {
   const WgtCreateSim({
     super.key,
     required this.appConfig,
+    required this.loggedInUser,
     this.showTitle = true,
     this.showPortalType = true,
     this.showEnabled = true,
@@ -23,6 +24,7 @@ class WgtCreateSim extends StatefulWidget {
   });
 
   final MdlPagAppConfig appConfig;
+  final MdlPagUser loggedInUser;
   final bool showTitle;
   final bool showPortalType;
   final bool showEnabled;
@@ -33,7 +35,7 @@ class WgtCreateSim extends StatefulWidget {
 }
 
 class _WgtCreateSimState extends State<WgtCreateSim> {
-  late MdlPagUser? _loggedInUser;
+  // late MdlPagUser? _loggedInUser;
   final double width = 395;
 
   bool _isEditing = false;
@@ -74,7 +76,7 @@ class _WgtCreateSimState extends State<WgtCreateSim> {
     try {
       Map<String, dynamic> queryMap = {};
       queryMap['device_cat'] = PagDeviceCat.sim.value;
-      queryMap['scope'] = _loggedInUser!.selectedScope.toScopeMap();
+      queryMap['scope'] = widget.loggedInUser.selectedScope.toScopeMap();
       queryMap['iccid'] = _iccid;
       queryMap['ip'] = _ip;
       queryMap['package'] = _package!.name;
@@ -84,12 +86,12 @@ class _WgtCreateSimState extends State<WgtCreateSim> {
       dynamic result;
 
       result = await doPagCreateDevice(
-        _loggedInUser!,
+        widget.loggedInUser,
         widget.appConfig,
         queryMap,
         MdlPagSvcClaim(
-          username: _loggedInUser!.username,
-          userId: _loggedInUser!.id,
+          username: widget.loggedInUser.username,
+          userId: widget.loggedInUser.id,
           scope: '',
           target: '',
           operation: '',
@@ -159,8 +161,8 @@ class _WgtCreateSimState extends State<WgtCreateSim> {
   void initState() {
     super.initState();
 
-    _loggedInUser =
-        Provider.of<PagUserProvider>(context, listen: false).currentUser;
+    // _loggedInUser =
+    //     Provider.of<PagUserProvider>(context, listen: false).currentUser;
   }
 
   @override
@@ -240,7 +242,7 @@ class _WgtCreateSimState extends State<WgtCreateSim> {
   }
 
   Widget getItemBlock() {
-    MdlPagScopeProfile scopeProfile = _loggedInUser!.selectedScope;
+    MdlPagScopeProfile scopeProfile = widget.loggedInUser.selectedScope;
     String projectName = scopeProfile.projectProfile!.name;
 
     return Column(

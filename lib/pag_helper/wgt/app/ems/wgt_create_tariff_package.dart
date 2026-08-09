@@ -28,6 +28,7 @@ class WgtCreateTariffPackage extends StatefulWidget {
   const WgtCreateTariffPackage({
     super.key,
     required this.appConfig,
+    required this.loggedInUser,
     this.showTitle = true,
     this.showPortalType = true,
     this.showEnabled = true,
@@ -35,6 +36,7 @@ class WgtCreateTariffPackage extends StatefulWidget {
   });
 
   final MdlPagAppConfig appConfig;
+  final MdlPagUser loggedInUser;
   final bool showTitle;
   final bool showPortalType;
   final bool showEnabled;
@@ -45,7 +47,7 @@ class WgtCreateTariffPackage extends StatefulWidget {
 }
 
 class _CreateTariffPackageState extends State<WgtCreateTariffPackage> {
-  late MdlPagUser? _loggedInUser;
+  // late MdlPagUser? _loggedInUser;
   final double width = 395;
 
   final int minCycleDay = 1;
@@ -142,7 +144,7 @@ class _CreateTariffPackageState extends State<WgtCreateTariffPackage> {
 
     try {
       Map<String, dynamic> queryMap = {};
-      queryMap['scope'] = _loggedInUser!.selectedScope.toScopeMap();
+      queryMap['scope'] = widget.loggedInUser.selectedScope.toScopeMap();
       queryMap['label'] = _newItemLabel;
 
       dynamic result;
@@ -176,12 +178,12 @@ class _CreateTariffPackageState extends State<WgtCreateTariffPackage> {
           _selectedInterestStartDateType!.value.toLowerCase();
 
       result = await doCreatePagTariffPackage(
-        _loggedInUser!,
+        widget.loggedInUser,
         widget.appConfig,
         queryMap,
         MdlPagSvcClaim(
-          username: _loggedInUser!.username,
-          userId: _loggedInUser!.id,
+          username: widget.loggedInUser.username,
+          userId: widget.loggedInUser.id,
           scope: '',
           target: '',
           operation: '',
@@ -239,12 +241,12 @@ class _CreateTariffPackageState extends State<WgtCreateTariffPackage> {
   void initState() {
     super.initState();
 
-    _loggedInUser =
-        Provider.of<PagUserProvider>(context, listen: false).currentUser;
+    // _loggedInUser =
+    //     Provider.of<PagUserProvider>(context, listen: false).currentUser;
 
     _visibleRoleList.clear();
-    _visibleRoleList.addAll(
-        _loggedInUser!.selectedScope.projectProfile!.getVisibleRoleInfoList());
+    _visibleRoleList.addAll(widget.loggedInUser.selectedScope.projectProfile!
+        .getVisibleRoleInfoList());
   }
 
   @override
@@ -1029,7 +1031,7 @@ class _CreateTariffPackageState extends State<WgtCreateTariffPackage> {
         mode: 'create',
         allowAddButton: false,
         width: width,
-        loggedInUser: _loggedInUser!,
+        loggedInUser: widget.loggedInUser,
         groupItemId: '',
         itemGroupType: PagItemGroupType.tariffPackageTariffRate,
         queryMap: queryMap,
@@ -1042,7 +1044,7 @@ class _CreateTariffPackageState extends State<WgtCreateTariffPackage> {
               tpTypeCat: _selectedPackageTypeCat!,
               rateList: childreanList,
               tpComingMonthCount: _tpComingMonthCount,
-              timezone: _loggedInUser!.selectedScope.getProjectTimezone());
+              timezone: widget.loggedInUser.selectedScope.getProjectTimezone());
           if (validatedResult != 'valid') {
             dev.log('Invalid list');
 

@@ -20,6 +20,7 @@ class WgtCreateDevice extends StatefulWidget {
   const WgtCreateDevice({
     super.key,
     required this.appConfig,
+    required this.loggedInUser,
     this.itemTypeEnum,
     this.showTitle = true,
     this.showPortalType = true,
@@ -28,10 +29,12 @@ class WgtCreateDevice extends StatefulWidget {
   });
 
   final MdlPagAppConfig appConfig;
+  final MdlPagUser loggedInUser;
   final PagDeviceCat? itemTypeEnum;
   final bool showTitle;
   final bool showPortalType;
   final bool showEnabled;
+
   final Function? onCreated;
 
   @override
@@ -39,7 +42,7 @@ class WgtCreateDevice extends StatefulWidget {
 }
 
 class _CreateItemState extends State<WgtCreateDevice> {
-  late MdlPagUser? _loggedInUser;
+  // late MdlPagUser? _loggedInUser;
 
   dynamic _selectedItemType;
 
@@ -47,8 +50,8 @@ class _CreateItemState extends State<WgtCreateDevice> {
   void initState() {
     super.initState();
 
-    _loggedInUser =
-        Provider.of<PagUserProvider>(context, listen: false).currentUser;
+    // _loggedInUser =
+    //     Provider.of<PagUserProvider>(context, listen: false).currentUser;
   }
 
   @override
@@ -96,32 +99,38 @@ class _CreateItemState extends State<WgtCreateDevice> {
     if (itemType == PagDeviceCat.meter) {
       return WgtCreateMeter(
         appConfig: widget.appConfig,
+        loggedInUser: widget.loggedInUser,
         onCreated: widget.onCreated,
       );
     } else if (itemType == PagDeviceCat.meterGroup) {
       return WgtCreateMeterGroup(
         appConfig: widget.appConfig,
+        loggedInUser: widget.loggedInUser,
         serviceType: MeterGroupServiceType.comm,
         onCreated: widget.onCreated,
       );
     } else if (itemType == PagDeviceCat.gateway) {
       return WgtCreateGateway(
         appConfig: widget.appConfig,
+        loggedInUser: widget.loggedInUser,
         onCreated: widget.onCreated,
       );
     } else if (itemType == PagDeviceCat.mcu) {
       return WgtCreateMcu(
         appConfig: widget.appConfig,
+        loggedInUser: widget.loggedInUser,
         onCreated: widget.onCreated,
       );
     } else if (itemType == PagDeviceCat.sim) {
       return WgtCreateSim(
         appConfig: widget.appConfig,
+        loggedInUser: widget.loggedInUser,
         onCreated: widget.onCreated,
       );
     } else if (itemType == PagDeviceCat.motherboard) {
       return WgtCreateMotherboard(
         appConfig: widget.appConfig,
+        loggedInUser: widget.loggedInUser,
         onCreated: widget.onCreated,
       );
     } else if (itemType == PagDeviceCat.sensor) {

@@ -13,6 +13,7 @@ class WgtCreateTariffItem extends StatefulWidget {
   const WgtCreateTariffItem({
     super.key,
     required this.appConfig,
+    required this.loggedInUser,
     this.itemTypeEnum,
     this.showTitle = true,
     this.showPortalType = true,
@@ -21,6 +22,7 @@ class WgtCreateTariffItem extends StatefulWidget {
   });
 
   final MdlPagAppConfig appConfig;
+  final MdlPagUser loggedInUser;
   final PagTariff? itemTypeEnum;
   final bool showTitle;
   final bool showPortalType;
@@ -82,11 +84,13 @@ class _CreateTariffItemState extends State<WgtCreateTariffItem> {
     if (itemType == PagTariff.tariffPackage) {
       return WgtCreateTariffPackage(
         appConfig: widget.appConfig,
+        loggedInUser: widget.loggedInUser,
         onCreated: widget.onCreated,
       );
     } else if (itemType == PagTariff.billingCostItem) {
       return WgtCreateBillingCostItem(
         appConfig: widget.appConfig,
+        loggedInUser: widget.loggedInUser,
         onCreated: widget.onCreated,
       );
     } else {

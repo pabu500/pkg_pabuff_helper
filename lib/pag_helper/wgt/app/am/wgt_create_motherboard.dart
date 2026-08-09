@@ -16,6 +16,7 @@ class WgtCreateMotherboard extends StatefulWidget {
   const WgtCreateMotherboard({
     super.key,
     required this.appConfig,
+    required this.loggedInUser,
     this.showTitle = true,
     this.showPortalType = true,
     this.showEnabled = true,
@@ -23,6 +24,7 @@ class WgtCreateMotherboard extends StatefulWidget {
   });
 
   final MdlPagAppConfig appConfig;
+  final MdlPagUser loggedInUser;
   final bool showTitle;
   final bool showPortalType;
   final bool showEnabled;
@@ -33,7 +35,7 @@ class WgtCreateMotherboard extends StatefulWidget {
 }
 
 class _WgtCreateMotherboardState extends State<WgtCreateMotherboard> {
-  late MdlPagUser? _loggedInUser;
+  // late MdlPagUser? _loggedInUser;
   final double width = 395;
 
   bool _isEditing = false;
@@ -68,7 +70,7 @@ class _WgtCreateMotherboardState extends State<WgtCreateMotherboard> {
     try {
       Map<String, dynamic> queryMap = {};
       queryMap['device_cat'] = PagDeviceCat.motherboard.name;
-      queryMap['scope'] = _loggedInUser!.selectedScope.toScopeMap();
+      queryMap['scope'] = widget.loggedInUser.selectedScope.toScopeMap();
       queryMap['sn'] = _sn;
       queryMap['model'] = _model;
       queryMap['type'] = _selectedType;
@@ -76,12 +78,12 @@ class _WgtCreateMotherboardState extends State<WgtCreateMotherboard> {
       dynamic result;
 
       result = await doPagCreateDevice(
-        _loggedInUser!,
+        widget.loggedInUser,
         widget.appConfig,
         queryMap,
         MdlPagSvcClaim(
-          username: _loggedInUser!.username,
-          userId: _loggedInUser!.id,
+          username: widget.loggedInUser.username,
+          userId: widget.loggedInUser.id,
           scope: '',
           target: '',
           operation: '',
@@ -138,8 +140,8 @@ class _WgtCreateMotherboardState extends State<WgtCreateMotherboard> {
   void initState() {
     super.initState();
 
-    _loggedInUser =
-        Provider.of<PagUserProvider>(context, listen: false).currentUser;
+    // _loggedInUser =
+    //     Provider.of<PagUserProvider>(context, listen: false).currentUser;
   }
 
   @override
@@ -211,7 +213,7 @@ class _WgtCreateMotherboardState extends State<WgtCreateMotherboard> {
   }
 
   Widget getItemBlock() {
-    MdlPagScopeProfile scopeProfile = _loggedInUser!.selectedScope;
+    MdlPagScopeProfile scopeProfile = widget.loggedInUser.selectedScope;
     String projectName = scopeProfile.projectProfile!.name;
 
     return Column(
@@ -274,7 +276,7 @@ class _WgtCreateMotherboardState extends State<WgtCreateMotherboard> {
   }
 
   Widget getModel() {
-    MdlPagScopeProfile scopeProfile = _loggedInUser!.selectedScope;
+    MdlPagScopeProfile scopeProfile = widget.loggedInUser.selectedScope;
     String projectName = scopeProfile.projectProfile!.name;
 
     return Column(

@@ -5,12 +5,10 @@ import 'package:buff_helper/pag_helper/comm/comm_org.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_org.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_tenant.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
-import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_scope_profile.dart';
 import 'package:buff_helper/pag_helper/wgt/wgt_comm_button.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../../../model/mdl_pag_app_config.dart';
 
@@ -18,6 +16,7 @@ class WgtCreateAmgr extends StatefulWidget {
   const WgtCreateAmgr({
     super.key,
     required this.appConfig,
+    required this.loggedInUser,
     this.showTitle = true,
     this.showPortalType = true,
     this.showEnabled = true,
@@ -25,17 +24,19 @@ class WgtCreateAmgr extends StatefulWidget {
   });
 
   final MdlPagAppConfig appConfig;
+  final MdlPagUser loggedInUser;
   final bool showTitle;
   final bool showPortalType;
+
   final bool showEnabled;
   final Function? onCreated;
 
   @override
-  State<WgtCreateAmgr> createState() => _CreateItemState();
+  State<WgtCreateAmgr> createState() => _CreateAmgrState();
 }
 
-class _CreateItemState extends State<WgtCreateAmgr> {
-  late MdlPagUser? _loggedInUser;
+class _CreateAmgrState extends State<WgtCreateAmgr> {
+  // late MdlPagUser? _loggedInUser;
   final double width = 395;
 
   bool _isEditing = false;
@@ -91,7 +92,7 @@ class _CreateItemState extends State<WgtCreateAmgr> {
     try {
       Map<String, dynamic> queryMap = {};
       queryMap['item_type'] = PagOrgType.amgr.name;
-      queryMap['scope'] = _loggedInUser!.selectedScope.toScopeMap();
+      queryMap['scope'] = widget.loggedInUser.selectedScope.toScopeMap();
       queryMap['label'] = _label;
       queryMap['company_trading_name'] = _companyTradingName;
       queryMap['company_reg_number'] = _coRegNumber;
@@ -104,12 +105,12 @@ class _CreateItemState extends State<WgtCreateAmgr> {
       dynamic result;
 
       result = await doPagCreateOrg(
-        _loggedInUser!,
+        widget.loggedInUser,
         widget.appConfig,
         queryMap,
         MdlPagSvcClaim(
-          username: _loggedInUser!.username,
-          userId: _loggedInUser!.id,
+          username: widget.loggedInUser.username,
+          userId: widget.loggedInUser.id,
           scope: '',
           target: '',
           operation: '',
@@ -172,8 +173,8 @@ class _CreateItemState extends State<WgtCreateAmgr> {
   void initState() {
     super.initState();
 
-    _loggedInUser =
-        Provider.of<PagUserProvider>(context, listen: false).currentUser;
+    // _loggedInUser =
+    //     Provider.of<PagUserProvider>(context, listen: false).currentUser;
   }
 
   @override
@@ -260,7 +261,7 @@ class _CreateItemState extends State<WgtCreateAmgr> {
   }
 
   Widget getItemBlock() {
-    MdlPagScopeProfile scopeProfile = _loggedInUser!.selectedScope;
+    MdlPagScopeProfile scopeProfile = widget.loggedInUser.selectedScope;
     String projectName = scopeProfile.projectProfile!.name;
 
     return Column(

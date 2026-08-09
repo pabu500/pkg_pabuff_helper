@@ -1,12 +1,10 @@
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_org.dart';
 import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
-import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
 import 'package:buff_helper/pag_helper/pag_app_context_list.dart';
 import 'package:buff_helper/pag_helper/wgt/ls/wgt_item_type_selector.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:buff_helper/pag_helper/wgt/app/am/wgt_create_amgr.dart';
-import 'package:provider/provider.dart';
 
 import '../../../model/mdl_pag_app_config.dart';
 import 'wgt_create_bank.dart';
@@ -15,6 +13,7 @@ class WgtCreateOrg extends StatefulWidget {
   const WgtCreateOrg({
     super.key,
     required this.appConfig,
+    required this.loggedInUser,
     this.itemTypeEnum,
     this.showTitle = true,
     this.showPortalType = true,
@@ -23,6 +22,7 @@ class WgtCreateOrg extends StatefulWidget {
   });
 
   final MdlPagAppConfig appConfig;
+  final MdlPagUser loggedInUser;
   final PagOrgType? itemTypeEnum;
   final bool showTitle;
   final bool showPortalType;
@@ -34,7 +34,7 @@ class WgtCreateOrg extends StatefulWidget {
 }
 
 class _CreateOrgState extends State<WgtCreateOrg> {
-  late MdlPagUser? _loggedInUser;
+  // late MdlPagUser? _loggedInUser;
 
   dynamic _selectedItemType;
 
@@ -42,8 +42,8 @@ class _CreateOrgState extends State<WgtCreateOrg> {
   void initState() {
     super.initState();
 
-    _loggedInUser =
-        Provider.of<PagUserProvider>(context, listen: false).currentUser;
+    // _loggedInUser =
+    //     Provider.of<PagUserProvider>(context, listen: false).currentUser;
   }
 
   @override
@@ -87,6 +87,7 @@ class _CreateOrgState extends State<WgtCreateOrg> {
     if (itemType == PagOrgType.amgr) {
       return WgtCreateAmgr(
         appConfig: widget.appConfig,
+        loggedInUser: widget.loggedInUser,
         onCreated: widget.onCreated,
       );
     } else if (itemType == PagOrgType.landlord) {
@@ -95,6 +96,7 @@ class _CreateOrgState extends State<WgtCreateOrg> {
     } else if (itemType == PagOrgType.bank) {
       return WgtCreateBank(
         appConfig: widget.appConfig,
+        loggedInUser: widget.loggedInUser,
         onCreated: widget.onCreated,
       );
     } else {

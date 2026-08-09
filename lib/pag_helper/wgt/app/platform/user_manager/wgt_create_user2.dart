@@ -27,6 +27,7 @@ class WgtCreateUser2 extends StatefulWidget {
   const WgtCreateUser2({
     super.key,
     required this.appConfig,
+    required this.loggedInUser,
     this.showTitle = true,
     this.showPortalType = true,
     this.showEnabled = true,
@@ -39,6 +40,7 @@ class WgtCreateUser2 extends StatefulWidget {
   });
 
   final MdlPagAppConfig appConfig;
+  final MdlPagUser loggedInUser;
   final bool showTitle;
   final bool showPortalType;
   final bool showEnabled;
@@ -53,7 +55,7 @@ class WgtCreateUser2 extends StatefulWidget {
 }
 
 class _CreateUserState extends State<WgtCreateUser2> {
-  late MdlPagUser? _loggedInUser;
+  // late MdlPagUser? _loggedInUser;
   final double width = 395;
 
   bool _passwordVisible = false;
@@ -125,7 +127,7 @@ class _CreateUserState extends State<WgtCreateUser2> {
 
     try {
       Map<String, dynamic> queryMap = {};
-      queryMap['scope'] = _loggedInUser!.selectedScope.toScopeMap();
+      queryMap['scope'] = widget.loggedInUser.selectedScope.toScopeMap();
       // queryMap['user_scope'] = _userScope!.toScopeMap();
       // queryMap['portal_type'] = _portalType!.name;
       queryMap['fullname'] = _fullName;
@@ -145,12 +147,12 @@ class _CreateUserState extends State<WgtCreateUser2> {
       queryMap['role_list'] = _selectedRoleList;
 
       await doCreateUser(
-        _loggedInUser!,
+        widget.loggedInUser,
         widget.appConfig,
         queryMap,
         MdlPagSvcClaim(
-          username: _loggedInUser!.username,
-          userId: _loggedInUser!.id,
+          username: widget.loggedInUser.username,
+          userId: widget.loggedInUser.id,
           scope: '',
           target: '',
           operation: '',
@@ -197,20 +199,20 @@ class _CreateUserState extends State<WgtCreateUser2> {
     dev.log('_getVisibleRoleList()');
 
     Map<String, dynamic> queryMap = {
-      'scope': _loggedInUser!.selectedScope.toScopeMap(),
-      'user_id': _loggedInUser!.id.toString(),
+      'scope': widget.loggedInUser.selectedScope.toScopeMap(),
+      'user_id': widget.loggedInUser.id.toString(),
     };
 
     _errorTextRoleList = '';
 
     try {
       var result = await doGetVisibleRoleList(
-        _loggedInUser!,
+        widget.loggedInUser,
         widget.appConfig,
         queryMap,
         MdlPagSvcClaim(
-          username: _loggedInUser!.username,
-          userId: _loggedInUser!.id,
+          username: widget.loggedInUser.username,
+          userId: widget.loggedInUser.id,
           scope: '',
           target: '',
           operation: '',
@@ -386,7 +388,8 @@ class _CreateUserState extends State<WgtCreateUser2> {
         'portal_type': scope['portal_type'],
       };
       if (isProjectLevelRole) {
-        String projectName = _loggedInUser!.selectedScope.projectProfile!.name;
+        String projectName =
+            widget.loggedInUser.selectedScope.projectProfile!.name;
         bool projectNameExists = false;
         for (var scope in _sortedScopeList) {
           if (scope['scope_label'] == projectName) {
@@ -563,12 +566,12 @@ class _CreateUserState extends State<WgtCreateUser2> {
   void initState() {
     super.initState();
 
-    _loggedInUser =
-        Provider.of<PagUserProvider>(context, listen: false).currentUser;
+    // _loggedInUser =
+    //     Provider.of<PagUserProvider>(context, listen: false).currentUser;
 
     _visibleRoleList.clear();
-    _visibleRoleList.addAll(
-        _loggedInUser!.selectedScope.projectProfile!.getVisibleRoleInfoList());
+    _visibleRoleList.addAll(widget.loggedInUser.selectedScope.projectProfile!
+        .getVisibleRoleInfoList());
     _sortScopeList();
   }
 

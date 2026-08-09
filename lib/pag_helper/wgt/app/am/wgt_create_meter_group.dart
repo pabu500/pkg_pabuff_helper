@@ -28,11 +28,13 @@ class WgtCreateMeterGroup extends StatefulWidget {
   const WgtCreateMeterGroup({
     super.key,
     required this.appConfig,
+    required this.loggedInUser,
     required this.serviceType,
     this.onCreated,
   });
 
   final MdlPagAppConfig appConfig;
+  final MdlPagUser loggedInUser;
   final MeterGroupServiceType serviceType;
   final Function? onCreated;
 
@@ -41,7 +43,7 @@ class WgtCreateMeterGroup extends StatefulWidget {
 }
 
 class _CreateItemState extends State<WgtCreateMeterGroup> {
-  late MdlPagUser? _loggedInUser;
+  // late MdlPagUser? _loggedInUser;
   final double width = 395;
 
   bool _isEditing = false;
@@ -72,12 +74,12 @@ class _CreateItemState extends State<WgtCreateMeterGroup> {
 
     try {
       _itemScopeMap['project_id'] =
-          _loggedInUser!.selectedScope.projectProfile!.id.toString();
+          widget.loggedInUser.selectedScope.projectProfile!.id.toString();
       _itemScopeMap['project_name'] =
-          _loggedInUser!.selectedScope.projectProfile!.name;
+          widget.loggedInUser.selectedScope.projectProfile!.name;
 
       Map<String, dynamic> queryMap = {
-        'scope': _loggedInUser!.selectedScope.toScopeMap(),
+        'scope': widget.loggedInUser.selectedScope.toScopeMap(),
         'item_kind': PagItemKind.meterGroup.value,
         'device_cat': PagDeviceCat.meterGroup.value,
         'label': _newItemLabel,
@@ -90,12 +92,12 @@ class _CreateItemState extends State<WgtCreateMeterGroup> {
 
       if (selectedServiceType == MeterGroupServiceType.comm) {
         final result = await doPagCreateDevice(
-          _loggedInUser!,
+          widget.loggedInUser,
           widget.appConfig,
           queryMap,
           MdlPagSvcClaim(
-            username: _loggedInUser!.username,
-            userId: _loggedInUser!.id,
+            username: widget.loggedInUser.username,
+            userId: widget.loggedInUser.id,
             scope: '',
             target: '',
             operation: '',
@@ -111,8 +113,8 @@ class _CreateItemState extends State<WgtCreateMeterGroup> {
           appConfig: widget.appConfig,
           queryMap: queryMap,
           svcClaim: MdlPagSvcClaim(
-            userId: _loggedInUser!.id,
-            username: _loggedInUser!.username,
+            userId: widget.loggedInUser.id,
+            username: widget.loggedInUser.username,
             scope: '',
             target: '',
             operation: 'create',
@@ -174,8 +176,8 @@ class _CreateItemState extends State<WgtCreateMeterGroup> {
   void initState() {
     super.initState();
 
-    _loggedInUser =
-        Provider.of<PagUserProvider>(context, listen: false).currentUser;
+    // _loggedInUser =
+    //     Provider.of<PagUserProvider>(context, listen: false).currentUser;
 
     selectedServiceType = widget.serviceType;
     assert([MeterGroupServiceType.comm, MeterGroupServiceType.ems]
@@ -329,7 +331,7 @@ class _CreateItemState extends State<WgtCreateMeterGroup> {
   // }
 
   Widget getBasicInfoBlock() {
-    MdlPagScopeProfile scopeProfile = _loggedInUser!.selectedScope;
+    MdlPagScopeProfile scopeProfile = widget.loggedInUser.selectedScope;
     String projectName = scopeProfile.projectProfile!.name;
 
     return Column(

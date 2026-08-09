@@ -25,6 +25,7 @@ class WgtCreateRole extends StatefulWidget {
   const WgtCreateRole({
     super.key,
     required this.appConfig,
+    required this.loggedInUser,
     this.showTitle = true,
     this.showPortalType = true,
     this.showEnabled = true,
@@ -32,6 +33,7 @@ class WgtCreateRole extends StatefulWidget {
   });
 
   final MdlPagAppConfig appConfig;
+  final MdlPagUser loggedInUser;
   final bool showTitle;
   final bool showPortalType;
   final bool showEnabled;
@@ -42,7 +44,7 @@ class WgtCreateRole extends StatefulWidget {
 }
 
 class _CreateRoleState extends State<WgtCreateRole> {
-  late MdlPagUser? _loggedInUser;
+  // late MdlPagUser? _loggedInUser;
   final double width = 395;
 
   bool _isEditing = false;
@@ -78,7 +80,7 @@ class _CreateRoleState extends State<WgtCreateRole> {
 
     try {
       Map<String, dynamic> queryMap = {};
-      queryMap['scope'] = _loggedInUser!.selectedScope.toScopeMap();
+      queryMap['scope'] = widget.loggedInUser.selectedScope.toScopeMap();
       queryMap['label'] = _newItemLabel;
       queryMap['tag'] = _tag;
       queryMap['portal_type'] = _portalType?.value;
@@ -92,8 +94,8 @@ class _CreateRoleState extends State<WgtCreateRole> {
         appConfig: widget.appConfig,
         queryMap: queryMap,
         svcClaim: MdlPagSvcClaim(
-          username: _loggedInUser!.username,
-          userId: _loggedInUser!.id,
+          username: widget.loggedInUser.username,
+          userId: widget.loggedInUser.id,
           scope: '',
           target: '',
           operation: '',
@@ -152,12 +154,12 @@ class _CreateRoleState extends State<WgtCreateRole> {
   void initState() {
     super.initState();
 
-    _loggedInUser =
-        Provider.of<PagUserProvider>(context, listen: false).currentUser;
+    // _loggedInUser =
+    //     Provider.of<PagUserProvider>(context, listen: false).currentUser;
 
     _visibleRoleList.clear();
-    _visibleRoleList.addAll(
-        _loggedInUser!.selectedScope.projectProfile!.getVisibleRoleInfoList());
+    _visibleRoleList.addAll(widget.loggedInUser.selectedScope.projectProfile!
+        .getVisibleRoleInfoList());
   }
 
   @override
@@ -232,7 +234,7 @@ class _CreateRoleState extends State<WgtCreateRole> {
   }
 
   Widget getItemBlock() {
-    MdlPagScopeProfile scopeProfile = _loggedInUser!.selectedScope;
+    MdlPagScopeProfile scopeProfile = widget.loggedInUser.selectedScope;
     String projectName = scopeProfile.projectProfile!.name;
 
     _isTagRequired = false;
@@ -468,7 +470,7 @@ class _CreateRoleState extends State<WgtCreateRole> {
   }
 
   Widget getItemScopeSetter() {
-    String projectName = _loggedInUser!.selectedScope.projectProfile!.name;
+    String projectName = widget.loggedInUser.selectedScope.projectProfile!.name;
 
     return Padding(
       padding: const EdgeInsets.only(top: 8.0),

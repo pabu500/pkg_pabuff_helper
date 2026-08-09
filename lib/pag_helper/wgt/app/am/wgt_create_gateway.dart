@@ -24,6 +24,7 @@ class WgtCreateGateway extends StatefulWidget {
   const WgtCreateGateway({
     super.key,
     required this.appConfig,
+    required this.loggedInUser,
     this.showTitle = true,
     this.showPortalType = true,
     this.showEnabled = true,
@@ -34,6 +35,7 @@ class WgtCreateGateway extends StatefulWidget {
   final bool showTitle;
   final bool showPortalType;
   final bool showEnabled;
+  final MdlPagUser loggedInUser;
   final Function? onCreated;
 
   @override
@@ -41,7 +43,7 @@ class WgtCreateGateway extends StatefulWidget {
 }
 
 class _WgtCreateGatewayState extends State<WgtCreateGateway> {
-  late MdlPagUser? _loggedInUser;
+  // late MdlPagUser? _loggedInUser;
   final double width = 395;
 
   bool _isEditing = false;
@@ -89,9 +91,9 @@ class _WgtCreateGatewayState extends State<WgtCreateGateway> {
   Future<dynamic> _getListConfig() async {
     dev.log('fetching list config');
 
-    if (_loggedInUser == null) {
-      return;
-    }
+    // if (widget.loggedInUser == null) {
+    //   return;
+    // }
 
     if (_isFetchingListConfig) {
       return;
@@ -103,7 +105,7 @@ class _WgtCreateGatewayState extends State<WgtCreateGateway> {
 
     try {
       Map<String, dynamic> queryMap = {
-        'scope': _loggedInUser!.selectedScope.toScopeMap(),
+        'scope': widget.loggedInUser.selectedScope.toScopeMap(),
         'item_kind': PagItemKind.device.value,
         'item_type': PagDeviceCat.gateway.value,
         // 'item_type_list_str': widget.itemTypeListStr ?? 'NOT_SET',
@@ -118,8 +120,8 @@ class _WgtCreateGatewayState extends State<WgtCreateGateway> {
         appConfig: widget.appConfig,
         queryMap: queryMap,
         svcClaim: MdlPagSvcClaim(
-          userId: _loggedInUser!.id,
-          username: _loggedInUser!.username,
+          userId: widget.loggedInUser.id,
+          username: widget.loggedInUser.username,
           scope: '',
           target: '',
           operation: '',
@@ -193,7 +195,7 @@ class _WgtCreateGatewayState extends State<WgtCreateGateway> {
       // queryMap['sn'] = _sn;
       // queryMap['gen'] = _gwGen!.name;
       Map<String, dynamic> queryMap = {
-        'scope': _loggedInUser!.selectedScope.toScopeMap(),
+        'scope': widget.loggedInUser.selectedScope.toScopeMap(),
         'item_kind': PagItemKind.device.value,
         'device_cat': PagDeviceCat.gateway.value,
         'iccid': _iccid,
@@ -205,12 +207,12 @@ class _WgtCreateGatewayState extends State<WgtCreateGateway> {
       dynamic result;
 
       result = await doPagCreateDevice(
-        _loggedInUser!,
+        widget.loggedInUser,
         widget.appConfig,
         queryMap,
         MdlPagSvcClaim(
-          username: _loggedInUser!.username,
-          userId: _loggedInUser!.id,
+          username: widget.loggedInUser.username,
+          userId: widget.loggedInUser.id,
           scope: '',
           target: '',
           operation: '',
@@ -312,8 +314,8 @@ class _WgtCreateGatewayState extends State<WgtCreateGateway> {
   void initState() {
     super.initState();
 
-    _loggedInUser =
-        Provider.of<PagUserProvider>(context, listen: false).currentUser;
+    // _loggedInUser =
+    //     Provider.of<PagUserProvider>(context, listen: false).currentUser;
   }
 
   @override
@@ -432,7 +434,7 @@ class _WgtCreateGatewayState extends State<WgtCreateGateway> {
   }
 
   Widget getItemBlock() {
-    MdlPagScopeProfile scopeProfile = _loggedInUser!.selectedScope;
+    MdlPagScopeProfile scopeProfile = widget.loggedInUser.selectedScope;
     String projectName = scopeProfile.projectProfile!.name;
     // bool isNotGen3Gateway =
     //     _model == PagModelEnum.gen1 || _model == PagModelEnum.gen2;

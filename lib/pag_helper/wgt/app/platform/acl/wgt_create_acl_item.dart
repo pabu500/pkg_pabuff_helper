@@ -13,6 +13,7 @@ class WgtCreateAclItem extends StatefulWidget {
   const WgtCreateAclItem({
     super.key,
     required this.appConfig,
+    required this.loggedInUser,
     this.itemTypeEnum,
     this.showTitle = true,
     this.showPortalType = true,
@@ -21,6 +22,7 @@ class WgtCreateAclItem extends StatefulWidget {
   });
 
   final MdlPagAppConfig appConfig;
+  final MdlPagUser loggedInUser;
   final PagAclType? itemTypeEnum;
   final bool showTitle;
   final bool showPortalType;
@@ -80,11 +82,13 @@ class _CreateAclItemState extends State<WgtCreateAclItem> {
     if (itemType == PagAclType.resource) {
       return WgtCreateResource(
         appConfig: widget.appConfig,
+        loggedInUser: widget.loggedInUser,
         onCreated: widget.onCreated,
       );
     } else if (itemType == PagAclType.permission) {
       return WgtCreatePermission(
         appConfig: widget.appConfig,
+        loggedInUser: widget.loggedInUser,
         onCreated: widget.onCreated,
       );
     } else {
