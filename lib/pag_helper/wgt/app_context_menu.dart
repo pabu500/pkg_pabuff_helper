@@ -190,7 +190,7 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
         bool show = true;
 
         if (appModel.appName == 'pag_ems_tp') {
-          if (pr == PagPageRoute.consoleHomeTaskManager ||
+          if (pr == PagPageRoute.platformTaskManager ||
                   pr == PagPageRoute.emsDashboard ||
                   pr == PagPageRoute.emsMeterGroupManager ||
                   // pr == PagPageRoute.billingManager ||
@@ -208,8 +208,8 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
         }
 
         if (appModel.appName == 'pag_ems_op') {
-          if (pr == PagPageRoute.consoleHomeAcl ||
-              pr == PagPageRoute.consoleHomeSettings ||
+          if (pr == PagPageRoute.platformAcl ||
+              pr == PagPageRoute.platformSettings ||
               pr == PagPageRoute.billingManager ||
               pr == PagPageRoute.tariffManager ||
               pr == PagPageRoute.paymentManager ||
@@ -226,7 +226,7 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
         if (widget.loggedInUser.selectedRole?.name
                 .contains('project-billing-') ??
             false) {
-          if (pr != PagPageRoute.consoleHomeTaskManager &&
+          if (pr != PagPageRoute.platformTaskManager &&
               pr != PagPageRoute.emsMeterGroupManager &&
               pr != PagPageRoute.billingManager &&
               pr != PagPageRoute.paymentManager &&
@@ -242,7 +242,7 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
 
         if (widget.loggedInUser.selectedRole?.name.contains('project-ops-') ??
             false) {
-          if (pr != PagPageRoute.consoleHomeTaskManager &&
+          if (pr != PagPageRoute.platformTaskManager &&
               // pr != PagPageRoute.meterGroupManager &&
               pr != PagPageRoute.billingManager &&
               // pr != PagPageRoute.paymentManager &&

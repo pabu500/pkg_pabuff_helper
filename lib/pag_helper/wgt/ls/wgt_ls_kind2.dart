@@ -13,6 +13,7 @@ import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:provider/provider.dart';
+import '../../def_helper/dh_acl.dart';
 import '../../def_helper/dh_device.dart';
 import '../../def_helper/dh_pag_finance.dart';
 import '../../def_helper/dh_pag_org.dart';
@@ -167,6 +168,10 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
           itemTypeStr = itemType.value;
           listControllerItemTypeStr =
               (listController.itemTypeEnum as PagTariff).value;
+        } else if (itemType is PagAclType) {
+          itemTypeStr = itemType.value;
+          listControllerItemTypeStr =
+              (listController.itemTypeEnum as PagAclType).value;
         } else {
           throw Exception('Unsupported item type: ${itemType.runtimeType}');
         }
@@ -288,6 +293,9 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
         _itemTypeInfoList.add({'item_type': PagTariff.tariffRate});
         _itemTypeInfoList.add({'item_type': PagTariff.tariffPackageType});
         _itemTypeInfoList.add({'item_type': PagTariff.billingCostItem});
+      } else if (widget.itemKind == PagItemKind.acl) {
+        _itemTypeInfoList.add({'item_type': PagAclType.resource});
+        _itemTypeInfoList.add({'item_type': PagAclType.permission});
       } else {
         throw Exception('Unsupported item kind: ${widget.itemKind.name}');
       }

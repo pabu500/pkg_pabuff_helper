@@ -37,25 +37,30 @@ enum PagPageRoute {
     'console_home_dashboard',
     Symbols.home,
   ),
-  consoleHomeUserService(
+  platformUserService(
     'User Service',
     'user_service',
     Symbols.person,
   ),
-  consoleHomeAcl(
+  platformAcl(
     'Role & Access',
-    'console_home_acl',
+    'platform_acl',
     Symbols.admin_panel_settings,
   ),
-  consoleHomeSettings(
+  platformSettings(
     'Settings',
-    'console_home_settings',
+    'platform_settings',
     Symbols.settings,
   ),
-  consoleHomeTaskManager(
+  platformTaskManager(
     'Task Manager',
-    'console_home_task_manager',
+    'platform_task_manager',
     Symbols.overview,
+  ),
+  platformDashboard(
+    'Platform',
+    'platform_dashboard',
+    Symbols.grid_view,
   ),
   meterManager(
     'Meter Manager',

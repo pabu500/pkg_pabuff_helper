@@ -62,7 +62,8 @@ class _WgtPagLsState extends State<WgtPagLs> {
             PagItemKind.scope ||
             PagItemKind.finance ||
             PagItemKind.tariff ||
-            PagItemKind.org:
+            PagItemKind.org ||
+            PagItemKind.acl:
         if (widget.listContextType == PagListContextType.paymentMatching) {
           return WgtListSearchItemFlexi(
             appConfig: widget.appConfig,
@@ -98,7 +99,8 @@ class _WgtPagLsState extends State<WgtPagLs> {
             // PagItemKind.tariffPackage ||
             // PagItemKind.tariffPackageType ||
             PagItemKind.bill ||
-            PagItemKind.role:
+            PagItemKind.role ||
+            PagItemKind.resourceType:
         dynamic itemType;
         if (widget.itemKind == PagItemKind.bill) {
           itemType = PagItemKind.bill;

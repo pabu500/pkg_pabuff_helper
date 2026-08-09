@@ -10,7 +10,7 @@ import 'package:buff_helper/pag_helper/def_helper/dh_user.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-import '../../xt_ui/xt_globals.dart';
+import 'dh_acl.dart';
 import 'dh_pag_acl.dart';
 import 'dh_pag_bill.dart';
 import 'dh_pag_tariff.dart';
@@ -31,7 +31,9 @@ enum PagItemKind {
   bill('Bill', 'bill', Symbols.request_quote),
   meterGroup('Meter Group', 'meter_group', Symbols.atr),
   finance('Finance', 'finance', Symbols.account_balance),
-  tariff('Tariff', 'tariff', Symbols.price_change);
+  tariff('Tariff', 'tariff', Symbols.price_change),
+  resourceType('Resource Type', 'resource_type', Symbols.file_copy),
+  acl('ACL', 'acl', Symbols.security);
 
   const PagItemKind(
     this.label,
@@ -199,7 +201,8 @@ String getItemTypeValue(dynamic itemType) {
       itemType is PagInterestStartDateType ||
       itemType is PagPaymentOpType ||
       itemType is PagUserOpType ||
-      itemType is PagScopeOpType) {
+      itemType is PagScopeOpType ||
+      itemType is PagAclType) {
     return itemType.value ?? 'NOT_SET';
   }
 

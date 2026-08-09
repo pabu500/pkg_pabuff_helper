@@ -4,6 +4,7 @@ import 'package:buff_helper/pag_helper/def_helper/def_page_route.dart';
 enum PagAppContextType {
   none,
   consoleHome,
+  platform,
   ems,
   evs,
   cm,

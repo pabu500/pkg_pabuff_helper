@@ -30,6 +30,7 @@ import '../../../xt_ui/wdgt/get_collapsed_bar.dart';
 import '../../../xt_ui/wdgt/info/get_error_text_prompt.dart';
 import '../../../xt_ui/xt_helpers.dart';
 import '../../comm/comm_list.dart';
+import '../../def_helper/dh_acl.dart';
 import '../../def_helper/dh_device.dart';
 import '../../def_helper/dh_pag_tariff.dart';
 import '../../model/mdl_pag_user.dart';
@@ -758,6 +759,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
         widget.itemType is PagFinanceType ||
         widget.itemType is PagOrgType ||
         widget.itemType is PagTariff ||
+        widget.itemType is PagAclType ||
         widget.itemType == null);
 
     // if (widget.itemType is PagDeviceCat) {
@@ -878,6 +880,10 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     );
 
     _isCompactMode = widget.isCompactMode || width < 800;
+
+    if (!_isCompactMode) {
+      width = width - 20;
+    }
 
     return completedWidget(width);
   }

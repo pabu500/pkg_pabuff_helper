@@ -5,6 +5,7 @@ import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 
+import '../../def_helper/dh_acl.dart';
 import '../../def_helper/dh_device.dart';
 import '../../def_helper/dh_pag_finance.dart';
 import '../../def_helper/dh_pag_org.dart';
@@ -174,6 +175,12 @@ class MdlPagListController /*extends ChangeNotifier*/ {
           break;
         case 'billing_cost_item':
           itemTypeEnum = PagTariff.billingCostItem;
+          break;
+        case 'res':
+          itemTypeEnum = PagAclType.resource;
+          break;
+        case 'perm':
+          itemTypeEnum = PagAclType.permission;
           break;
         default:
           itemTypeEnum = null;

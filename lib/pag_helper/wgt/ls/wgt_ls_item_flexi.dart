@@ -32,14 +32,26 @@ import 'package:buff_helper/pag_helper/pag_app_context_list.dart';
 import 'package:provider/provider.dart';
 
 import '../../comm/comm_list.dart';
+import '../../def_helper/dh_meter_group.dart';
+import '../../def_helper/dh_pag_finance.dart';
 import '../../model/mdl_pag_app_config.dart';
 import '../app/am/wgt_am_meter_group_assignment2.dart';
+import '../app/am/wgt_create_device.dart';
+import '../app/am/wgt_create_meter_group.dart';
+import '../app/am/wgt_create_org.dart';
+import '../app/am/wgt_create_scope.dart';
 import '../app/ems/wgt_bci_tenant_assignment.dart';
 import '../app/ems/wgt_bill_compilation.dart';
+import '../app/ems/wgt_create_pag_composite_bill.dart';
+import '../app/ems/wgt_create_tariff_item.dart';
 import '../app/ems/wgt_ems_meter_group_assignment.dart';
 import '../app/ems/wgt_match_payment_op_item.dart';
 import '../app/ems/wgt_tenant_item_assignment.dart';
 import '../app/fh/wgt_fh_device_health.dart';
+import '../app/platform/acl/wgt_create_acl_item.dart';
+import '../app/platform/acl/wgt_create_resource_type.dart';
+import '../app/platform/acl/wgt_create_role.dart';
+import '../app/platform/user_manager/wgt_create_user2.dart';
 import '../job/wgt_job_type_op_panel3.dart';
 import 'wgt_list_pane.dart';
 import 'wgt_pag_item_finder_flexi.dart';
@@ -1737,99 +1749,108 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     return Column(children: [
       verticalSpaceTiny,
       // if (_selectedListController != null)
-      WgtPagItemFinderFlexi(
-        key: _finderRefreshKey, //_listContentRefreshKey,
-        enableSearch: widget.enableSearch,
-        width: widget.width,
-        widthOffset: widget.widthOffset,
-        loggedInUser: loggedInUser!,
-        appConfig: widget.appConfig,
-        itemKind: widget.itemKind,
-        itemType: _selectedListController!.itemTypeEnum,
-        listContextType: widget.listContextType,
-        listController: _selectedListController!,
-        selectedItemInfoList: widget.selectedItemInfoList,
-        isCompactMode: widget.isCompactFinder,
-        isSingleItemMode: widget.isSingleItemMode,
-        meterTypeList: meterTypeList,
-        // right padding as clerance for context menu
-        sidePadding: const EdgeInsets.only(left: 0, right: 60),
-        showTimeRangePicker: widget.showTimeRangePicker,
-        timeRangePickerWidget: widget.timeRangePickerWidget,
-        maxDurationDays:
-            widget.listContextType == PagListContextType.usage ? 1100 : null,
-        initialFilterMap: widget.initialFilterMap,
-        initialFilterGroupType: widget.initialFilterGroupType,
-        isInitialValueMutable: isInitialValueMutable,
-        allowFlexiLabel: widget.allowFlexiLabel,
-        hint: widget.hint,
-        additionalQuery: widget.additionalQuery,
-        sortBy: _sortBy,
-        sortOrder: _sortOrder,
-        onSearching: () {
-          setState(() {
-            _isFetchingItemList = true;
-          });
-          widget.onSearching?.call();
-        },
-        onClearSearch: () {
-          _resetFinder();
-        },
-        onModified: () {
-          _resetFinder();
-        },
-        onResult: (Map<String, dynamic> itemFindResult) {
-          if (itemFindResult['error'] != null) {
-            setState(() {
-              _isFetchingItemList = false;
-              _errorText = itemFindResult['error'];
-            });
-            return;
-          }
-          _errorText = '';
+      Row(
+        children: [
+          getAddItemButton(),
+          horizontalSpaceTiny,
+          WgtPagItemFinderFlexi(
+            key: _finderRefreshKey, //_listContentRefreshKey,
+            enableSearch: widget.enableSearch,
+            width: widget.width,
+            widthOffset: widget.widthOffset,
+            loggedInUser: loggedInUser!,
+            appConfig: widget.appConfig,
+            itemKind: widget.itemKind,
+            itemType: _selectedListController!.itemTypeEnum,
+            listContextType: widget.listContextType,
+            listController: _selectedListController!,
+            selectedItemInfoList: widget.selectedItemInfoList,
+            isCompactMode: widget.isCompactFinder,
+            isSingleItemMode: widget.isSingleItemMode,
+            meterTypeList: meterTypeList,
+            // right padding as clerance for context menu
+            sidePadding: const EdgeInsets.only(left: 0, right: 60),
+            showTimeRangePicker: widget.showTimeRangePicker,
+            timeRangePickerWidget: widget.timeRangePickerWidget,
+            maxDurationDays: widget.listContextType == PagListContextType.usage
+                ? 1100
+                : null,
+            initialFilterMap: widget.initialFilterMap,
+            initialFilterGroupType: widget.initialFilterGroupType,
+            isInitialValueMutable: isInitialValueMutable,
+            allowFlexiLabel: widget.allowFlexiLabel,
+            hint: widget.hint,
+            additionalQuery: widget.additionalQuery,
+            sortBy: _sortBy,
+            sortOrder: _sortOrder,
+            onSearching: () {
+              setState(() {
+                _isFetchingItemList = true;
+              });
+              widget.onSearching?.call();
+            },
+            onClearSearch: () {
+              _resetFinder();
+            },
+            onModified: () {
+              _resetFinder();
+            },
+            onResult: (Map<String, dynamic> itemFindResult) {
+              if (itemFindResult['error'] != null) {
+                setState(() {
+                  _isFetchingItemList = false;
+                  _errorText = itemFindResult['error'];
+                });
+                return;
+              }
+              _errorText = '';
 
-          if (_listControllerList.isEmpty) {
-            if (itemFindResult['list_config'] == null) {
+              if (_listControllerList.isEmpty) {
+                if (itemFindResult['list_config'] == null) {
+                  setState(() {
+                    _isFetchingItemList = false;
+                    _errorText = 'Failed to get list config';
+                  });
+                  return;
+                }
+
+                for (var config in itemFindResult['list_config']) {
+                  _listControllerList
+                      .add(MdlPagListController.fromJson(config));
+                }
+              }
+
+              if (_currentPage == 1) {
+                _totalItemCount = itemFindResult['count'];
+              }
+              _entityItems.clear();
+              _entityItems.addAll(itemFindResult['item_list']);
+
+              setState(() {
+                _totalItemCount = itemFindResult['count'];
+
+                // copy the query map from the item finder
+                _queryMap = itemFindResult['query_map'];
+
+                _maxRowsPerPage =
+                    int.parse(_queryMap['max_rows_per_page'] ?? '20');
+
+                if (_totalItemCount == 0) {
+                  _showEmptyResult = true;
+                } else {
+                  _showEmptyResult = false;
+                }
+                _isFetchingItemList = false;
+              });
+
               setState(() {
                 _isFetchingItemList = false;
-                _errorText = 'Failed to get list config';
               });
-              return;
-            }
 
-            for (var config in itemFindResult['list_config']) {
-              _listControllerList.add(MdlPagListController.fromJson(config));
-            }
-          }
-
-          if (_currentPage == 1) {
-            _totalItemCount = itemFindResult['count'];
-          }
-          _entityItems.clear();
-          _entityItems.addAll(itemFindResult['item_list']);
-
-          setState(() {
-            _totalItemCount = itemFindResult['count'];
-
-            // copy the query map from the item finder
-            _queryMap = itemFindResult['query_map'];
-
-            _maxRowsPerPage = int.parse(_queryMap['max_rows_per_page'] ?? '20');
-
-            if (_totalItemCount == 0) {
-              _showEmptyResult = true;
-            } else {
-              _showEmptyResult = false;
-            }
-            _isFetchingItemList = false;
-          });
-
-          setState(() {
-            _isFetchingItemList = false;
-          });
-
-          widget.onResult?.call(itemFindResult);
-        },
+              widget.onResult?.call(itemFindResult);
+            },
+          ),
+        ],
       ),
       verticalSpaceRegular,
       _isFetchingItemList
@@ -1843,6 +1864,246 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                           context: context, emptyResultText: 'No result found')
                   : getResultList()
     ]);
+  }
+
+  Widget getAddItemButton() {
+    Color buttonColor = Theme.of(context).colorScheme.primary;
+
+    if (widget.itemKind == PagItemKind.tenant ||
+        widget.itemKind == PagItemKind.finance ||
+        widget.listContextType == PagListContextType.billCompilation ||
+        (widget.pagAppContext == appCtxEms &&
+            widget.itemKind == PagItemKind.device)) {
+      return IconButton(
+          onPressed: null, icon: const Icon(Symbols.add), color: buttonColor);
+    }
+
+    return IconButton(
+      onPressed: () {
+        switch (widget.itemKind) {
+          case PagItemKind.device:
+            xtShowModelBottomSheet(
+              context,
+              WgtCreateDevice(
+                appConfig: widget.appConfig,
+                itemTypeEnum: _selectedListController?.itemTypeEnum,
+                onCreated: () {
+                  setState(() {
+                    _itemUpdated = true;
+                  });
+                },
+              ),
+              onClosed: () async {
+                if (_itemUpdated) {
+                  setState(() {
+                    _listContentRefreshKey = UniqueKey();
+                    _itemUpdated = false;
+                  });
+                }
+              },
+            );
+            break;
+          case PagItemKind.role:
+            xtShowModelBottomSheet(
+              context,
+              WgtCreateRole(
+                appConfig: widget.appConfig,
+                onCreated: () {
+                  setState(() {
+                    _itemUpdated = true;
+                  });
+                },
+              ),
+              onClosed: () async {
+                if (_itemUpdated) {
+                  setState(() {
+                    _listContentRefreshKey = UniqueKey();
+                    _itemUpdated = false;
+                  });
+                }
+              },
+            );
+            break;
+          case PagItemKind.user:
+            xtShowModelBottomSheet(
+              context,
+              WgtCreateUser2(
+                appConfig: widget.appConfig,
+                onCreated: () {
+                  setState(() {
+                    _itemUpdated = true;
+                  });
+                },
+              ),
+              onClosed: () async {
+                if (_itemUpdated) {
+                  setState(() {
+                    _listContentRefreshKey = UniqueKey();
+                    _itemUpdated = false;
+                  });
+                }
+              },
+            );
+            break;
+          case PagItemKind.scope:
+            xtShowModelBottomSheet(
+              context,
+              WgtCreateScope(
+                appConfig: widget.appConfig,
+                itemTypeEnum: _selectedListController?.itemTypeEnum,
+                onCreated: () {
+                  setState(() {
+                    _itemUpdated = true;
+                  });
+                },
+              ),
+              onClosed: () async {
+                if (_itemUpdated) {
+                  setState(() {
+                    _listContentRefreshKey = UniqueKey();
+                    _itemUpdated = false;
+                  });
+                }
+              },
+            );
+            break;
+          case PagItemKind.meterGroup:
+            xtShowModelBottomSheet(
+              context,
+              WgtCreateMeterGroup(
+                appConfig: widget.appConfig,
+                serviceType: MeterGroupServiceType.ems,
+                onCreated: () {
+                  setState(() {
+                    _itemUpdated = true;
+                  });
+                },
+              ),
+              onClosed: () async {
+                if (_itemUpdated) {
+                  setState(() {
+                    _listContentRefreshKey = UniqueKey();
+                    _itemUpdated = false;
+                  });
+                }
+              },
+            );
+            break;
+          case PagItemKind.tariff:
+            xtShowModelBottomSheet(
+              context,
+              WgtCreateTariffItem(
+                appConfig: widget.appConfig,
+                itemTypeEnum: _selectedListController?.itemTypeEnum,
+                onCreated: () {
+                  setState(() {
+                    _itemUpdated = true;
+                  });
+                },
+              ),
+              onClosed: () async {
+                if (_itemUpdated) {
+                  setState(() {
+                    _listContentRefreshKey = UniqueKey();
+                    _itemUpdated = false;
+                  });
+                }
+              },
+            );
+            break;
+          case PagItemKind.org:
+            xtShowModelBottomSheet(
+              context,
+              WgtCreateOrg(
+                appConfig: widget.appConfig,
+                itemTypeEnum: _selectedListController?.itemTypeEnum,
+                onCreated: () {
+                  setState(() {
+                    _itemUpdated = true;
+                  });
+                },
+              ),
+              onClosed: () async {
+                if (_itemUpdated) {
+                  setState(() {
+                    _listContentRefreshKey = UniqueKey();
+                    _itemUpdated = false;
+                  });
+                }
+              },
+            );
+            break;
+          case PagItemKind.resourceType:
+            xtShowModelBottomSheet(
+              context,
+              WgtCreateResourceType(
+                appConfig: widget.appConfig,
+                onCreated: () {
+                  setState(() {
+                    _itemUpdated = true;
+                  });
+                },
+              ),
+              onClosed: () async {
+                if (_itemUpdated) {
+                  setState(() {
+                    _listContentRefreshKey = UniqueKey();
+                    _itemUpdated = false;
+                  });
+                }
+              },
+            );
+            break;
+          case PagItemKind.acl:
+            xtShowModelBottomSheet(
+              context,
+              WgtCreateAclItem(
+                appConfig: widget.appConfig,
+                itemTypeEnum: _selectedListController?.itemTypeEnum,
+                onCreated: () {
+                  setState(() {
+                    _itemUpdated = true;
+                  });
+                },
+              ),
+              onClosed: () async {
+                if (_itemUpdated) {
+                  setState(() {
+                    _listContentRefreshKey = UniqueKey();
+                    _itemUpdated = false;
+                  });
+                }
+              },
+            );
+            break;
+          case PagItemKind.bill:
+            xtShowModelBottomSheet(
+              context,
+              WgtCreatePagCompositeBill(
+                appConfig: widget.appConfig,
+                pagAppContext: widget.pagAppContext!,
+                loggedInUser: loggedInUser!,
+                onCreated: () {
+                  setState(() {
+                    _itemUpdated = true;
+                  });
+                },
+              ),
+              onClosed: () async {
+                if (_itemUpdated) {
+                  setState(() {
+                    _listContentRefreshKey = UniqueKey();
+                    _itemUpdated = false;
+                  });
+                }
+              },
+            );
+          default:
+            break;
+        }
+      },
+      icon: Icon(Icons.add, color: buttonColor),
+    );
   }
 
   Widget getResultList() {

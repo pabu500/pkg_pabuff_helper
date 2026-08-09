@@ -21,10 +21,41 @@ MdlPagAppContext appCtxConsoleHome = MdlPagAppContext(
   // ],
   routeList: [
     PagPageRoute.consoleHomeDashboard,
-    PagPageRoute.consoleHomeUserService,
-    PagPageRoute.consoleHomeAcl,
-    PagPageRoute.consoleHomeTaskManager,
-    PagPageRoute.consoleHomeSettings,
+  ],
+);
+MdlPagAppContext appCtxPlatform = MdlPagAppContext(
+  name: 'platform',
+  label: 'Platform',
+  shortLabel: 'SVC',
+  route: 'platform_dashboard',
+  appContextType: PagAppContextType.platform,
+  routeType: PagAppRouteType.route,
+  routeList: [
+    PagPageRoute.platformDashboard,
+    PagPageRoute.platformUserService,
+    PagPageRoute.platformAcl,
+    PagPageRoute.platformTaskManager,
+    PagPageRoute.platformSettings,
+  ],
+);
+MdlPagAppContext appCtxAm = MdlPagAppContext(
+  name: 'am',
+  label: 'Asset Management',
+  shortLabel: 'AM',
+  route: 'am_dashboard',
+  appContextType: PagAppContextType.am,
+  routeType: PagAppRouteType.route,
+  // menuRouteList: [
+  //   getMenueItem(PagPageRoute.amDashboard),
+  //   getMenueItem(PagPageRoute.amDeviceManager),
+  //   getMenueItem(PagPageRoute.amScopeManager),
+  // ],
+  routeList: [
+    PagPageRoute.amDashboard,
+    PagPageRoute.amDeviceManager,
+    PagPageRoute.amScopeManager,
+    PagPageRoute.amOrgManager,
+    PagPageRoute.amCommsManager,
   ],
 );
 MdlPagAppContext appCtxEms = MdlPagAppContext(
@@ -154,26 +185,7 @@ MdlPagAppContext appCtxFh = MdlPagAppContext(
     // PagPageRoute.fhTaskReportManager,
   ],
 );
-MdlPagAppContext appCtxAm = MdlPagAppContext(
-  name: 'am',
-  label: 'Asset Management',
-  shortLabel: 'AM',
-  route: 'am_dashboard',
-  appContextType: PagAppContextType.am,
-  routeType: PagAppRouteType.route,
-  // menuRouteList: [
-  //   getMenueItem(PagPageRoute.amDashboard),
-  //   getMenueItem(PagPageRoute.amDeviceManager),
-  //   getMenueItem(PagPageRoute.amScopeManager),
-  // ],
-  routeList: [
-    PagPageRoute.amDashboard,
-    PagPageRoute.amDeviceManager,
-    PagPageRoute.amScopeManager,
-    PagPageRoute.amOrgManager,
-    PagPageRoute.amCommsManager,
-  ],
-);
+
 MdlPagAppContext appCtxQq = MdlPagAppContext(
   name: 'pq',
   label: 'Power Quality',
@@ -239,6 +251,7 @@ MdlPagAppContext appCtxEs = MdlPagAppContext(
 
 final List<MdlPagAppContext> appContextList = [
   appCtxConsoleHome,
+  appCtxPlatform,
   appCtxAm,
   appCtxFh,
   appCtxEms,
@@ -275,7 +288,7 @@ void routeGuard(BuildContext context, MdlPagUser? loggedInUser,
   bool noAccess = false;
   if (loggedInUser.selectedRole?.name.contains('project-billing-') ?? false) {
     if (pr != PagPageRoute.consoleHomeDashboard &&
-        pr != PagPageRoute.consoleHomeTaskManager &&
+        pr != PagPageRoute.platformTaskManager &&
         pr != PagPageRoute.emsMeterGroupManager &&
         pr != PagPageRoute.billingManager &&
         pr != PagPageRoute.paymentManager &&
@@ -291,7 +304,7 @@ void routeGuard(BuildContext context, MdlPagUser? loggedInUser,
 
   if (loggedInUser.selectedRole?.name.contains('project-ops-') ?? false) {
     if (pr != PagPageRoute.consoleHomeDashboard &&
-        pr != PagPageRoute.consoleHomeTaskManager &&
+        pr != PagPageRoute.platformTaskManager &&
         // pr != PagPageRoute.emsMeterGroupManager &&
         pr != PagPageRoute.billingManager &&
         // pr != PagPageRoute.paymentManager &&
