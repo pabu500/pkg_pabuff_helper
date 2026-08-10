@@ -33,7 +33,6 @@ import 'package:provider/provider.dart';
 
 import '../../comm/comm_list.dart';
 import '../../def_helper/dh_meter_group.dart';
-import '../../def_helper/dh_pag_finance.dart';
 import '../../model/mdl_pag_app_config.dart';
 import '../app/am/wgt_am_meter_group_assignment2.dart';
 import '../app/am/wgt_create_device.dart';
@@ -51,6 +50,7 @@ import '../app/fh/wgt_fh_device_health.dart';
 import '../app/platform/acl/wgt_create_acl_item.dart';
 import '../app/platform/acl/wgt_create_resource_type.dart';
 import '../app/platform/acl/wgt_create_role.dart';
+import '../app/platform/acl/wgt_role_perm_assignment.dart';
 import '../app/platform/user_manager/wgt_create_user2.dart';
 import '../job/wgt_job_type_op_panel3.dart';
 import 'wgt_list_pane.dart';
@@ -431,6 +431,8 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         widget.listContextType == PagListContextType.billCompilation;
     bool isPaymentApply =
         widget.listContextType == PagListContextType.paymentApply;
+    bool isRoleManager = widget.pagAppContext == appCtxPlatform &&
+        widget.itemKind == PagItemKind.role;
     if (isEmsDeviceLs ||
         isEmsMeterUsage ||
         isEmsTenantUsage ||
@@ -527,6 +529,11 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       addBillCompilationColumn = true;
     }
 
+    bool addPermColumn = false;
+    if (isRoleManager) {
+      addPermColumn = true;
+    }
+
     if (hasOpColumn) {
       addOpColumn = false;
     }
@@ -536,6 +543,10 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     }
     if (addOpColumn) {
       _addOpColumn(listController);
+    }
+
+    if (addPermColumn) {
+      _addPermColumn(listController);
     }
 
     if (addMeterUsageColumn) {
@@ -1048,6 +1059,62 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                   },
                 ),
               );
+      },
+    );
+    // _selectedListController?.listColControllerList.add(appCtxCol);
+    listController.listColControllerList.insert(0, appCtxCol);
+  }
+
+  void _addPermColumn(MdlPagListController listController) {
+    //add property edit column
+    MdlListColController appCtxCol = MdlListColController(
+      colKey: 'perm',
+      colTitle: 'Perm',
+      includeColKeyAsFilter: false,
+      showColumn: true,
+      colWidth: 50,
+      colWidgetType: PagColWidgetType.CUSTOM,
+      getCustomWidget: (item, fullList) {
+        item['project_id'] =
+            loggedInUser!.selectedScope.projectProfile!.id.toString();
+        item['project_name'] = loggedInUser!.selectedScope.projectProfile!.name;
+        MdlPagScope itemScope = MdlPagScope.fromJson(item);
+
+        return Padding(
+          padding: const EdgeInsets.only(left: 0),
+          child: IconButton(
+            icon: Icon(
+              Symbols.lock_open,
+              color: Theme.of(context).colorScheme.primary.withAlpha(200),
+            ),
+            onPressed: () {
+              xtShowModelBottomSheet(
+                context,
+                WgtRolePermAssignment(
+                  appConfig: widget.appConfig,
+                  loggedInUser: loggedInUser!,
+                  strItemGroupIndex: item['id'],
+                  itemName: item['name'],
+                  itemLabel: item['label'] ?? '',
+                  itemScope: itemScope,
+                  onUpdate: () {
+                    setState(() {
+                      _itemUpdated = true;
+                    });
+                  },
+                ),
+                onClosed: () {
+                  if (_itemUpdated) {
+                    setState(() {
+                      _listContentRefreshKey = UniqueKey();
+                      _itemUpdated = false;
+                    });
+                  }
+                },
+              );
+            },
+          ),
+        );
       },
     );
     // _selectedListController?.listColControllerList.add(appCtxCol);
@@ -1873,7 +1940,8 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         widget.itemKind == PagItemKind.finance ||
         widget.listContextType == PagListContextType.billCompilation ||
         (widget.pagAppContext == appCtxEms &&
-            widget.itemKind == PagItemKind.device)) {
+            widget.itemKind == PagItemKind.device) ||
+        (widget.listContextType == PagListContextType.rolePermAssignment)) {
       return IconButton(
           onPressed: null, icon: const Icon(Symbols.add), color: buttonColor);
     }

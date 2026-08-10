@@ -12,6 +12,7 @@ enum PagListContextType {
   paymentApply,
   billCompilation,
   jobOption,
+  rolePermAssignment,
 }
 
 enum PagListTypeName {

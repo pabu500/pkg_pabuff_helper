@@ -26,6 +26,7 @@ import 'dart:developer' as dev;
 import '../../comm/comm_ex.dart';
 import '../../comm/comm_fin_ops.dart';
 import '../../comm/pag_be_api_base.dart';
+import '../../def_helper/dh_acl.dart';
 import '../../def_helper/dh_device.dart';
 import '../../def_helper/dh_pag_finance.dart';
 import '../../def_helper/dh_pag_tariff.dart';
@@ -725,7 +726,9 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
         widget.itemKind == PagItemKind.finance ||
         widget.itemKind == PagItemKind.tariff ||
         widget.itemKind == PagItemKind.org ||
-        widget.itemKind == PagItemKind.resourceType) {
+        widget.itemKind == PagItemKind.resourceType ||
+        (widget.itemKind == PagItemKind.acl &&
+            widget.itemTypeEnum == PagAclType.permission)) {
       return Container();
     }
 

@@ -75,8 +75,8 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
       Map<String, dynamic> queryMap = {
         'scope': widget.loggedInUser.selectedScope.toScopeMap(),
         'item_kind': PagItemKind.acl.value,
-        'label': _newItemLabel,
         'acl_type': PagAclType.resource.value,
+        'label': _newItemLabel,
         'res_type_name': _resourceTypeName,
         'item_scope_info': _itemScopeMap,
       };

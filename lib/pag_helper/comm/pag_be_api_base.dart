@@ -319,6 +319,9 @@ class PagUrlBase {
   // acl
   static const String eptCreateResourceType = '/acl/create_resource_type';
   static const String eptCreateAclItem = '/acl/create_acl_item';
+  static const String eptPagGetRoleScopePermList =
+      '/acl/role/get_role_scope_perm_list';
+  static const String eptUpdateRolePermList = '/acl/role/update_role_perm_list';
 
   //job
   // static const String eptPostJob = '/job/post_job';

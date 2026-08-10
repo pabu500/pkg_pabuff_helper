@@ -3,7 +3,6 @@ import 'dart:developer' as dev;
 import 'package:buff_helper/pag_helper/comm/comm_pag_item.dart';
 import 'package:buff_helper/pag_helper/comm/comm_org.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_org.dart';
-import 'package:buff_helper/pag_helper/def_helper/dh_pag_tenant.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_scope_profile.dart';
@@ -11,6 +10,8 @@ import 'package:buff_helper/pag_helper/wgt/wgt_comm_button.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../comm/comm_ex.dart';
+import '../../../../comm/pag_be_api_base.dart';
 import '../../../../def_helper/dh_acl.dart';
 import '../../../../def_helper/dh_pag_item.dart';
 
@@ -55,9 +56,6 @@ class _CreatePermissionState extends State<WgtCreatePermission> {
   bool _isLabelValidated = false;
   UniqueKey? _labelResetKey;
 
-  String? _roleName;
-  bool _isRoleNameValidated = false;
-
   String? _resName;
   bool _isResNameValidated = false;
   UniqueKey? _resNameResetKey;
@@ -75,19 +73,21 @@ class _CreatePermissionState extends State<WgtCreatePermission> {
       Map<String, dynamic> queryMap = {
         'item_type': PagOrgType.amgr.name,
         'scope': widget.loggedInUser.selectedScope.toScopeMap(),
+        'acl_type': PagAclType.permission.value,
         'label': _label,
-        'role_name': _roleName,
         'res_name': _resName,
         'operation': _selectedOperationType?.value,
       };
 
-      final result = await doPagCreateOrg(
-        widget.loggedInUser,
-        widget.appConfig,
-        queryMap,
-        MdlPagSvcClaim(
-          username: widget.loggedInUser.username,
+      final result = await ex(
+        endpoint: PagUrlBase.eptCreateAclItem,
+        crudType: 'create',
+        opStr: 'create permission',
+        appConfig: widget.appConfig,
+        queryMap: queryMap,
+        svcClaim: MdlPagSvcClaim(
           userId: widget.loggedInUser.id,
+          username: widget.loggedInUser.username,
           scope: '',
           target: '',
           operation: '',
@@ -105,7 +105,8 @@ class _CreatePermissionState extends State<WgtCreatePermission> {
       // setState(() {
       // _errorText = 'Error creating item';
       // String eStr = e.toString().toLowerCase();
-      _errorText = getErrorText(e, defaultErrorText: 'Error creating resource');
+      _errorText =
+          getErrorText(e, defaultErrorText: 'Error creating permission');
 
       // dev.log('error: $eStr');
 
@@ -133,10 +134,6 @@ class _CreatePermissionState extends State<WgtCreatePermission> {
     }
 
     if (!_isLabelValidated) {
-      return false;
-    }
-
-    if (!_isRoleNameValidated) {
       return false;
     }
 
@@ -174,8 +171,6 @@ class _CreatePermissionState extends State<WgtCreatePermission> {
                 children: [
                   // verticalSpaceRegular,
                   getItemBlock(),
-                  verticalSpaceTiny,
-                  getRoleName(),
                   verticalSpaceTiny,
                   getResourceName(),
                   verticalSpaceTiny,
@@ -260,7 +255,7 @@ class _CreatePermissionState extends State<WgtCreatePermission> {
                 labelText: 'Label (Required)',
                 maxLength: maxFullNameLength,
                 maxLines: 1,
-                validator: validateTenantLabel,
+                validator: validateItemLabel,
                 checkUnique: doPagCheckUnique,
                 uniqueKey: 'label',
                 itemTableName: '$projectName.acl_perm_$projectName',
@@ -328,57 +323,6 @@ class _CreatePermissionState extends State<WgtCreatePermission> {
     );
   }
 
-  Widget getRoleName() {
-    return Column(
-      children: [
-        verticalSpaceTiny,
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Theme.of(context).hintColor.withAlpha(30),
-            ),
-            borderRadius: BorderRadius.circular(5),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-          child: Column(
-            children: [
-              WgtTextField(
-                key: _resNameResetKey,
-                appConfig: widget.appConfig,
-                hintText: 'Role Name (Required)',
-                labelText: 'Role Name (Required)',
-                maxLength: maxFullNameLength,
-                maxLines: 1,
-                validator: validateItemName,
-                onChanged: (val) {
-                  setState(() {
-                    _isEditing = true;
-                    if (val != _roleName) {
-                      _errorText = '';
-                    }
-                  });
-                  if (val.trim().isNotEmpty) {
-                    setState(() {
-                      _newCreate = true;
-                      _createSuccess = false;
-                    });
-                  }
-                  _roleName = val;
-                  return null;
-                },
-                onEditingComplete: () {
-                  setState(() {
-                    _isEditing = false;
-                  });
-                },
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget getResourceName() {
     return Column(
       children: [
@@ -420,6 +364,15 @@ class _CreatePermissionState extends State<WgtCreatePermission> {
                 onEditingComplete: () {
                   setState(() {
                     _isEditing = false;
+                  });
+                },
+                onValidate: (String? result) {
+                  setState(() {
+                    if (result == null) {
+                      _isResNameValidated = true;
+                    } else {
+                      _isResNameValidated = false;
+                    }
                   });
                 },
               ),
