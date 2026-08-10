@@ -8,7 +8,7 @@ import '../../../util/util.dart';
 import '../../comm/comm_pag_item.dart';
 import '../../def_helper/dh_device.dart';
 import '../../def_helper/dh_scope.dart';
-import '../../def_helper/pag_item_helper.dart';
+import '../../def_helper/dh_pag_item.dart';
 import '../../model/acl/mdl_pag_svc_claim.dart';
 import '../../model/mdl_pag_user.dart';
 import '../../model/provider/pag_user_provider.dart';

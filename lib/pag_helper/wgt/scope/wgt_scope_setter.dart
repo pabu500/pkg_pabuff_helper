@@ -1,7 +1,7 @@
 import 'dart:developer' as dev;
 
 import 'package:buff_helper/pag_helper/comm/comm_scope.dart';
-import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_pag_item.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
@@ -135,6 +135,12 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
   bool _isReset = false;
   bool _isModified = false;
   bool _childrenListFetched = false;
+
+  UniqueKey? _siteGroupInputSelectKey;
+  UniqueKey? _siteInputSelectKey;
+  UniqueKey? _buildingInputSelectKey;
+  UniqueKey? _locationGroupInputSelectKey;
+  UniqueKey? _locationInputSelectKey;
 
   // late final TextEditingController _locationInputSelectController = TextEditingController();
 
@@ -561,6 +567,13 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
     _isModified = true;
     _isCommitted = false;
     _committedMessage = '';
+    _childrenListFetched = false;
+
+    _siteGroupInputSelectKey = UniqueKey();
+    _siteInputSelectKey = UniqueKey();
+    _buildingInputSelectKey = UniqueKey();
+    _locationGroupInputSelectKey = UniqueKey();
+    _locationInputSelectKey = UniqueKey();
   }
 
   @override
@@ -801,6 +814,7 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
         IgnorePointer(
           ignoring: !_isEditing,
           child: DropdownButton<MdlPagSiteGroupProfile>(
+              key: _siteGroupInputSelectKey,
               hint: Padding(
                   padding: const EdgeInsets.only(bottom: 3.0),
                   child: Text('Site Group', style: dropDownListHintStyle)),
@@ -896,6 +910,7 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
         IgnorePointer(
           ignoring: !_isEditing,
           child: DropdownButton<MdlPagSiteProfile>(
+              key: _siteInputSelectKey,
               hint: Padding(
                   padding: const EdgeInsets.only(bottom: 3.0),
                   child: Text('Site', style: dropDownListHintStyle)),
@@ -985,6 +1000,7 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
         IgnorePointer(
           ignoring: !_isEditing,
           child: DropdownButton<MdlPagBuildingProfile>(
+              key: _buildingInputSelectKey,
               hint: Padding(
                   padding: const EdgeInsets.only(bottom: 3.0),
                   child: Text('Building', style: dropDownListHintStyle)),
@@ -1067,6 +1083,7 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
         IgnorePointer(
           ignoring: !_isEditing,
           child: DropdownButton<MdlPagLocationGroupProfile>(
+              key: _locationGroupInputSelectKey,
               hint: Padding(
                   padding: const EdgeInsets.only(bottom: 3.0),
                   child: Text('Location Group', style: dropDownListHintStyle)),
@@ -1145,6 +1162,7 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
         IgnorePointer(
           ignoring: !_isEditing,
           child: WgtInputDropdown(
+            key: _locationInputSelectKey,
             // height: 50,
             width: 150,
             // key: UniqueKey(), // prevent reuse of the same widget (and its state)

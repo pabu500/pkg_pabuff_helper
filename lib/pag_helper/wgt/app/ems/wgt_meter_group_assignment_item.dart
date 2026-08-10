@@ -8,7 +8,7 @@ import '../../../../xt_ui/xt_helpers.dart';
 import '../../../def_helper/dh_device.dart';
 import '../../../def_helper/dh_pag_tenant.dart';
 import '../../../def_helper/dh_scope.dart';
-import '../../../def_helper/pag_item_helper.dart';
+import '../../../def_helper/dh_pag_item.dart';
 import '../../../model/mdl_pag_app_config.dart';
 import '../../../model/mdl_pag_user.dart';
 import '../../../model/scope/mdl_pag_scope.dart';

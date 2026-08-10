@@ -1,8 +1,8 @@
 import 'dart:developer' as dev;
 
 import 'package:buff_helper/pag_helper/comm/comm_pag_item.dart';
-import 'package:buff_helper/pag_helper/def_helper/dh_pag_org.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_tenant.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_pag_item.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_scope_profile.dart';
@@ -63,13 +63,13 @@ class _CreateResourceTypeState extends State<WgtCreateResourceType> {
 
     try {
       Map<String, dynamic> queryMap = {
-        'item_type': PagOrgType.amgr.name,
+        'item_kind': PagItemKind.resourceType.value,
         'scope': widget.loggedInUser.selectedScope.toScopeMap(),
         'label': _label,
       };
 
       final result = await ex(
-        endpoint: PagUrlBase.eptGetListInfoList2,
+        endpoint: PagUrlBase.eptCreateResourceType,
         crudType: 'create',
         opStr: 'create resource type',
         appConfig: widget.appConfig,
@@ -92,10 +92,11 @@ class _CreateResourceTypeState extends State<WgtCreateResourceType> {
       dev.log('error: $e');
 
       // setState(() {
-      _errorText = 'Error creating item';
-      String eStr = e.toString().toLowerCase();
+      // _errorText = 'Error creating item';
+      // String eStr = e.toString().toLowerCase();
+      _errorText = getErrorText(e, defaultErrorText: 'Error creating resource');
 
-      dev.log('error: $eStr');
+      // dev.log('error: $eStr');
 
       _newItem = true;
       _createSuccess = false;
@@ -154,10 +155,10 @@ class _CreateResourceTypeState extends State<WgtCreateResourceType> {
                   WgtCommButton(
                     enabled: _checkEnableButton(),
                     label: _createWait
-                        ? 'Adding Asset Manager...'
+                        ? 'Adding Resource Type...'
                         : _createSuccess
-                            ? '✓ Asset Manager added'
-                            : 'Add Asset Manager',
+                            ? '✓ Resource Type added'
+                            : 'Add Resource Type',
                     onPressed:
                         !_checkEnableButton() //_selectedProjectScope == null
                             ? null
@@ -187,7 +188,7 @@ class _CreateResourceTypeState extends State<WgtCreateResourceType> {
                     Padding(
                       padding: const EdgeInsets.all(5.0),
                       child: Text(
-                        'Asset Manager ${_newItemName ?? ''} created',
+                        'Resource Type ${_newItemName ?? ''} created',
                         style: TextStyle(
                             color: Theme.of(context).colorScheme.primary),
                       ),
@@ -225,7 +226,7 @@ class _CreateResourceTypeState extends State<WgtCreateResourceType> {
                 hintText: 'Label (Required)',
                 labelText: 'Label (Required)',
                 maxLength: maxFullNameLength,
-                maxLines: 2,
+                maxLines: 1,
                 validateOnChange: false,
                 validator: validateTenantLabel,
                 checkUnique: doPagCheckUnique,

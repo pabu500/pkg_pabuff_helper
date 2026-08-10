@@ -7,10 +7,10 @@ import 'package:buff_helper/pag_helper/def_helper/dh_pag_org.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_tariff_package.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_user.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_acl.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-import 'dh_acl.dart';
 import 'dh_pag_acl.dart';
 import 'dh_pag_bill.dart';
 import 'dh_pag_tariff.dart';
@@ -32,7 +32,7 @@ enum PagItemKind {
   meterGroup('Meter Group', 'meter_group', Symbols.atr),
   finance('Finance', 'finance', Symbols.account_balance),
   tariff('Tariff', 'tariff', Symbols.price_change),
-  resourceType('Resource Type', 'resource_type', Symbols.file_copy),
+  resourceType('Resource Type', 'res_type', Symbols.file_copy),
   acl('ACL', 'acl', Symbols.security);
 
   const PagItemKind(
@@ -49,7 +49,7 @@ enum PagItemKind {
       enumByLabel(label, values, (e) => (e).label);
 
   static PagItemKind? byValue(String? value) =>
-      enumByLabel(value, values, (e) => (e).value);
+      enumByValue(value, values, (e) => (e).value);
 }
 
 // String? getItemTypeStr(dynamic itemType) {
@@ -88,15 +88,35 @@ String? validateItemId(String? value) {
   return null;
 }
 
-String? validateItemIdNotRequired(String? value) {
-  if (value == null || value.isEmpty) {
-    return null;
+// String? validateItemIdNotRequired(String? value) {
+//   if (value == null || value.isEmpty) {
+//     return null;
+//   }
+
+//   // must be a integer greater than 0
+//   int? intValue = int.tryParse(value);
+//   if (intValue == null || intValue <= 0) {
+//     return 'must be a integer greater than 0';
+//   }
+//   return null;
+// }
+
+String? validateItemName(String? value) {
+  if (value == null || value.trim().isEmpty) {
+    return 'required';
   }
 
-  // must be a integer greater than 0
-  int? intValue = int.tryParse(value);
-  if (intValue == null || intValue <= 0) {
-    return 'must be a integer greater than 0';
+  if (value.length < 3 || value.length > 55) {
+    return 'must be between 3 and 55 characters';
+  }
+
+  // Allowed:
+  // alphanumeric, dash only
+  final validCharacters = RegExp(
+    r"""^[a-zA-Z0-9-]+$""",
+  );
+  if (!validCharacters.hasMatch(value)) {
+    return 'must be alphanumeric and can only contain hyphens';
   }
   return null;
 }
@@ -147,6 +167,10 @@ String? Function(String) getItemKindValidator(PagItemKind itemKind, String key,
           isValueRequired: isValueRequired);
     case PagItemKind.meterGroup:
       return getMeterGroupValidator(key, isValueRequired: isValueRequired);
+    case PagItemKind.resourceType:
+      return getResourceTypeValidator(key, isValueRequired: isValueRequired);
+    case PagItemKind.acl:
+      return getAclValidator(key, itemType, isValueRequired: isValueRequired);
     default:
       dev.log('No validator found for item kind: $itemKind, key: $key');
       return (String value) {
@@ -178,7 +202,8 @@ String getItemTypeValue(dynamic itemType) {
     return itemType;
   }
 
-  if (itemType is PagDeviceCat ||
+  if (itemType is PagItemKind ||
+      itemType is PagDeviceCat ||
       itemType is PagMeterCommType ||
       itemType is PagMeterPhaseType ||
       itemType is PagScopeType ||
@@ -186,7 +211,6 @@ String getItemTypeValue(dynamic itemType) {
       itemType is PagBillingLcStatus ||
       itemType is PagBillPaymentStatus ||
       itemType is PagBillDueStatus ||
-      itemType is PagItemKind ||
       itemType is PagTenantLcStatus ||
       itemType is PagTenantUnitType ||
       itemType is PagPaymentMethod ||

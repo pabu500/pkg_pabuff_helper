@@ -316,6 +316,10 @@ class PagUrlBase {
   static const String eptDeleteItem = '/item/delete_item';
   static const String eptUpdateItemLcStatus = '/item/update_item_lc_status';
 
+  // acl
+  static const String eptCreateResourceType = '/acl/create_resource_type';
+  static const String eptCreateAclItem = '/acl/create_acl_item';
+
   //job
   // static const String eptPostJob = '/job/post_job';
   static const String eptGetJobTypeSubList = '/job/get_job_type_sub_list';

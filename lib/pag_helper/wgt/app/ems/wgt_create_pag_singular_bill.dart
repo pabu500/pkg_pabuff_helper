@@ -1,6 +1,6 @@
 import 'package:buff_helper/pag_helper/def_helper/dh_device.dart';
 import 'package:buff_helper/pag_helper/def_helper/list_helper.dart';
-import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_pag_item.dart';
 import 'package:buff_helper/pag_helper/ems/comm_ems.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';

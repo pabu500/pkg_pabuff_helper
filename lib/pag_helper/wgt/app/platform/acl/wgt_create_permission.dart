@@ -11,6 +11,9 @@ import 'package:buff_helper/pag_helper/wgt/wgt_comm_button.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../def_helper/dh_acl.dart';
+import '../../../../def_helper/dh_pag_item.dart';
+
 class WgtCreatePermission extends StatefulWidget {
   const WgtCreatePermission({
     super.key,
@@ -52,33 +55,14 @@ class _CreatePermissionState extends State<WgtCreatePermission> {
   bool _isLabelValidated = false;
   UniqueKey? _labelResetKey;
 
-  String? _companyTradingName;
-  bool _isCompanyTradingNameValidated = false;
-  UniqueKey? _companyTradingNameResetKey;
+  String? _roleName;
+  bool _isRoleNameValidated = false;
 
-  String? _coRegNumber;
-  bool _isCoRegNumberValidated = false;
-  UniqueKey? _coRegNumberResetKey;
+  String? _resName;
+  bool _isResNameValidated = false;
+  UniqueKey? _resNameResetKey;
 
-  String? _gstRegNumber;
-  bool _isGstRegNumberValidated = false;
-  UniqueKey? _gstRegNumberResetKey;
-
-  String? _uen;
-  bool _isUenValidated = false;
-  UniqueKey? _uenResetKey;
-
-  String? _addressLine1;
-  bool _isAddressLine1Validated = false;
-  UniqueKey? _addressLine1ResetKey;
-
-  String? _addressLine2;
-  bool _isAddressLine2Validated = false;
-  UniqueKey? _addressLine2ResetKey;
-
-  String? _addressLine3;
-  bool _isAddressLine3Validated = false;
-  UniqueKey? _addressLine3ResetKey;
+  PagAclOperationType? _selectedOperationType;
 
   Future<dynamic> _createItem() async {
     setState(() {
@@ -88,21 +72,16 @@ class _CreatePermissionState extends State<WgtCreatePermission> {
     });
 
     try {
-      Map<String, dynamic> queryMap = {};
-      queryMap['item_type'] = PagOrgType.amgr.name;
-      queryMap['scope'] = widget.loggedInUser.selectedScope.toScopeMap();
-      queryMap['label'] = _label;
-      queryMap['company_trading_name'] = _companyTradingName;
-      queryMap['company_reg_number'] = _coRegNumber;
-      queryMap['gst_reg_number'] = _gstRegNumber;
-      queryMap['uen'] = _uen;
-      queryMap['address_line_1'] = _addressLine1;
-      queryMap['address_line_2'] = _addressLine2;
-      queryMap['address_line_3'] = _addressLine3;
+      Map<String, dynamic> queryMap = {
+        'item_type': PagOrgType.amgr.name,
+        'scope': widget.loggedInUser.selectedScope.toScopeMap(),
+        'label': _label,
+        'role_name': _roleName,
+        'res_name': _resName,
+        'operation': _selectedOperationType?.value,
+      };
 
-      dynamic result;
-
-      result = await doPagCreateOrg(
+      final result = await doPagCreateOrg(
         widget.loggedInUser,
         widget.appConfig,
         queryMap,
@@ -124,10 +103,11 @@ class _CreatePermissionState extends State<WgtCreatePermission> {
       dev.log('error: $e');
 
       // setState(() {
-      _errorText = 'Error creating item';
-      String eStr = e.toString().toLowerCase();
+      // _errorText = 'Error creating item';
+      // String eStr = e.toString().toLowerCase();
+      _errorText = getErrorText(e, defaultErrorText: 'Error creating resource');
 
-      dev.log('error: $eStr');
+      // dev.log('error: $eStr');
 
       _newItem = true;
       _createSuccess = false;
@@ -152,15 +132,19 @@ class _CreatePermissionState extends State<WgtCreatePermission> {
       return false;
     }
 
-    if (!_isLabelValidated ||
-        ((_companyTradingName ?? '').isNotEmpty &&
-            !_isCompanyTradingNameValidated) ||
-        ((_coRegNumber ?? '').isNotEmpty && !_isCoRegNumberValidated) ||
-        ((_gstRegNumber ?? '').isNotEmpty && !_isGstRegNumberValidated) ||
-        ((_uen ?? '').isNotEmpty && !_isUenValidated) ||
-        ((_addressLine1 ?? '').isNotEmpty && !_isAddressLine1Validated) ||
-        ((_addressLine2 ?? '').isNotEmpty && !_isAddressLine2Validated) ||
-        ((_addressLine3 ?? '').isNotEmpty && !_isAddressLine3Validated)) {
+    if (!_isLabelValidated) {
+      return false;
+    }
+
+    if (!_isRoleNameValidated) {
+      return false;
+    }
+
+    if (!_isResNameValidated) {
+      return false;
+    }
+
+    if (_selectedOperationType == null) {
       return false;
     }
 
@@ -190,14 +174,20 @@ class _CreatePermissionState extends State<WgtCreatePermission> {
                 children: [
                   // verticalSpaceRegular,
                   getItemBlock(),
+                  verticalSpaceTiny,
+                  getRoleName(),
+                  verticalSpaceTiny,
+                  getResourceName(),
+                  verticalSpaceTiny,
+                  getOperationSelector(),
                   verticalSpaceRegular,
                   WgtCommButton(
                     enabled: _checkEnableButton(),
                     label: _createWait
-                        ? 'Adding Asset Manager...'
+                        ? 'Adding Permission...'
                         : _createSuccess
-                            ? '✓ Asset Manager added'
-                            : 'Add Asset Manager',
+                            ? '✓ Permission added'
+                            : 'Add Permission',
                     onPressed:
                         !_checkEnableButton() //_selectedProjectScope == null
                             ? null
@@ -214,24 +204,12 @@ class _CreatePermissionState extends State<WgtCreatePermission> {
                                   // _newItem = true;
 
                                   _label = null;
-                                  _companyTradingName = null;
-                                  _coRegNumber = null;
-                                  _gstRegNumber = null;
-                                  _uen = null;
-                                  _addressLine1 = null;
-                                  _addressLine2 = null;
-                                  _addressLine3 = null;
-
                                   _isLabelValidated = false;
-                                  _isCompanyTradingNameValidated = false;
                                   _labelResetKey = UniqueKey();
-                                  _companyTradingNameResetKey = UniqueKey();
-                                  _coRegNumberResetKey = UniqueKey();
-                                  _gstRegNumberResetKey = UniqueKey();
-                                  _uenResetKey = UniqueKey();
-                                  _addressLine1ResetKey = UniqueKey();
-                                  _addressLine2ResetKey = UniqueKey();
-                                  _addressLine3ResetKey = UniqueKey();
+
+                                  _resName = null;
+                                  _isResNameValidated = false;
+                                  _resNameResetKey = UniqueKey();
                                 });
 
                                 widget.onCreated?.call();
@@ -243,7 +221,7 @@ class _CreatePermissionState extends State<WgtCreatePermission> {
                     Padding(
                       padding: const EdgeInsets.all(5.0),
                       child: Text(
-                        'Asset Manager ${_newItemName ?? ''} created',
+                        'Permission ${_newItemName ?? ''} created',
                         style: TextStyle(
                             color: Theme.of(context).colorScheme.primary),
                       ),
@@ -281,11 +259,11 @@ class _CreatePermissionState extends State<WgtCreatePermission> {
                 hintText: 'Label (Required)',
                 labelText: 'Label (Required)',
                 maxLength: maxFullNameLength,
-                maxLines: 2,
+                maxLines: 1,
                 validator: validateTenantLabel,
                 checkUnique: doPagCheckUnique,
                 uniqueKey: 'label',
-                itemTableName: '$projectName.meter_$projectName',
+                itemTableName: '$projectName.acl_perm_$projectName',
                 onUniqueCheck: (dynamic result) {
                   if (result is bool) {
                     if (result) {
@@ -343,21 +321,39 @@ class _CreatePermissionState extends State<WgtCreatePermission> {
                   });
                 },
               ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget getRoleName() {
+    return Column(
+      children: [
+        verticalSpaceTiny,
+        Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Theme.of(context).hintColor.withAlpha(30),
+            ),
+            borderRadius: BorderRadius.circular(5),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+          child: Column(
+            children: [
               WgtTextField(
-                key: _companyTradingNameResetKey,
+                key: _resNameResetKey,
                 appConfig: widget.appConfig,
-                hintText: 'Company Trading Name (Required)',
-                labelText: 'Company Trading Name (Required)',
+                hintText: 'Role Name (Required)',
+                labelText: 'Role Name (Required)',
                 maxLength: maxFullNameLength,
-                maxLines: 2,
-                validator: validateCompanyTradingName,
-                checkUnique: doPagCheckUnique,
-                uniqueKey: 'company_trading_name',
-                itemTableName: '$projectName.amgr_$projectName',
+                maxLines: 1,
+                validator: validateItemName,
                 onChanged: (val) {
                   setState(() {
                     _isEditing = true;
-                    if (val != _companyTradingName) {
+                    if (val != _roleName) {
                       _errorText = '';
                     }
                   });
@@ -367,272 +363,138 @@ class _CreatePermissionState extends State<WgtCreatePermission> {
                       _createSuccess = false;
                     });
                   }
-                  _companyTradingName = val;
+                  _roleName = val;
                   return null;
                 },
                 onEditingComplete: () {
                   setState(() {
                     _isEditing = false;
-                  });
-                },
-                onValidate: (String? result) {
-                  setState(() {
-                    if (result == null) {
-                      _isCompanyTradingNameValidated = true;
-                    } else {
-                      _isCompanyTradingNameValidated = false;
-                    }
-                  });
-                },
-              ),
-              WgtTextField(
-                key: _coRegNumberResetKey,
-                appConfig: widget.appConfig,
-                hintText: 'Company Registration Number (Required)',
-                labelText: 'Company Registration Number (Required)',
-                maxLength: maxFullNameLength,
-                validator: validateTenantAccountNumber,
-                checkUnique: doPagCheckUnique,
-                uniqueKey: 'company_reg_number',
-                itemTableName: '$projectName.amgr_$projectName',
-                onChanged: (val) {
-                  setState(() {
-                    _isEditing = true;
-                    if (val != _coRegNumber) {
-                      _errorText = '';
-                    }
-                  });
-                  if (val.trim().isNotEmpty) {
-                    setState(() {
-                      _newCreate = true;
-                      _createSuccess = false;
-                    });
-                  }
-                  _coRegNumber = val;
-                  return null;
-                },
-                onEditingComplete: () {
-                  setState(() {
-                    _isEditing = false;
-                  });
-                },
-                onValidate: (String? result) {
-                  setState(() {
-                    if (result == null) {
-                      _isCoRegNumberValidated = true;
-                    } else {
-                      _isCoRegNumberValidated = false;
-                    }
-                  });
-                },
-              ),
-              WgtTextField(
-                key: _gstRegNumberResetKey,
-                appConfig: widget.appConfig,
-                hintText: 'GST Registration Number',
-                labelText: 'GST Registration Number',
-                maxLength: maxFullNameLength,
-                validator: validateTenantAccountNumber,
-                checkUnique: doPagCheckUnique,
-                uniqueKey: 'gst_reg_number',
-                itemTableName: '$projectName.amgr_$projectName',
-                onChanged: (val) {
-                  setState(() {
-                    _isEditing = true;
-                    if (val != _gstRegNumber) {
-                      _errorText = '';
-                    }
-                  });
-                  if (val.trim().isNotEmpty) {
-                    setState(() {
-                      _newCreate = true;
-                      _createSuccess = false;
-                    });
-                  }
-                  _gstRegNumber = val;
-                  return null;
-                },
-                onEditingComplete: () {
-                  setState(() {
-                    _isEditing = false;
-                  });
-                },
-                onValidate: (String? result) {
-                  setState(() {
-                    if (result == null) {
-                      _isGstRegNumberValidated = true;
-                    } else {
-                      _isGstRegNumberValidated = false;
-                    }
-                  });
-                },
-              ),
-              WgtTextField(
-                key: _uenResetKey,
-                appConfig: widget.appConfig,
-                hintText: 'UEN',
-                labelText: 'UEN',
-                maxLength: maxFullNameLength,
-                validator: validateTenantAccountNumber,
-                checkUnique: doPagCheckUnique,
-                uniqueKey: 'uen',
-                itemTableName: '$projectName.amgr_$projectName',
-                onChanged: (val) {
-                  setState(() {
-                    _isEditing = true;
-                    if (val != _uen) {
-                      _errorText = '';
-                    }
-                  });
-                  if (val.trim().isNotEmpty) {
-                    setState(() {
-                      _newCreate = true;
-                      _createSuccess = false;
-                    });
-                  }
-                  _uen = val;
-                  return null;
-                },
-                onEditingComplete: () {
-                  setState(() {
-                    _isEditing = false;
-                  });
-                },
-                onValidate: (String? result) {
-                  setState(() {
-                    if (result == null) {
-                      _isUenValidated = true;
-                    } else {
-                      _isUenValidated = false;
-                    }
-                  });
-                },
-              ),
-              WgtTextField(
-                key: _addressLine1ResetKey,
-                appConfig: widget.appConfig,
-                hintText: 'Address Line 1 (Required)',
-                labelText: 'Address Line 1 (Required)',
-                maxLength: maxFullNameLength,
-                validator: validateBillingAddressLine1,
-                checkUnique: doPagCheckUnique,
-                uniqueKey: 'address_line_1',
-                itemTableName: '$projectName.amgr_$projectName',
-                onChanged: (val) {
-                  setState(() {
-                    _isEditing = true;
-                    if (val != _addressLine1) {
-                      _errorText = '';
-                    }
-                  });
-                  if (val.trim().isNotEmpty) {
-                    setState(() {
-                      _newCreate = true;
-                      _createSuccess = false;
-                    });
-                  }
-                  _addressLine1 = val;
-                  return null;
-                },
-                onEditingComplete: () {
-                  setState(() {
-                    _isEditing = false;
-                  });
-                },
-                onValidate: (String? result) {
-                  setState(() {
-                    if (result == null) {
-                      _isAddressLine1Validated = true;
-                    } else {
-                      _isAddressLine1Validated = false;
-                    }
-                  });
-                },
-              ),
-              WgtTextField(
-                key: _addressLine2ResetKey,
-                appConfig: widget.appConfig,
-                hintText: 'Address Line 2',
-                labelText: 'Address Line 2',
-                maxLength: maxFullNameLength,
-                validator: validateBillingAddressLine2,
-                checkUnique: doPagCheckUnique,
-                uniqueKey: 'address_line_2',
-                itemTableName: '$projectName.amgr_$projectName',
-                onChanged: (val) {
-                  setState(() {
-                    _isEditing = true;
-                    if (val != _addressLine2) {
-                      _errorText = '';
-                    }
-                  });
-                  if (val.trim().isNotEmpty) {
-                    setState(() {
-                      _newCreate = true;
-                      _createSuccess = false;
-                    });
-                  }
-                  _addressLine2 = val;
-                  return null;
-                },
-                onEditingComplete: () {
-                  setState(() {
-                    _isEditing = false;
-                  });
-                },
-                onValidate: (String? result) {
-                  setState(() {
-                    if (result == null) {
-                      _isAddressLine2Validated = true;
-                    } else {
-                      _isAddressLine2Validated = false;
-                    }
-                  });
-                },
-              ),
-              WgtTextField(
-                key: _addressLine3ResetKey,
-                appConfig: widget.appConfig,
-                hintText: 'Address Line 3',
-                labelText: 'Address Line 3',
-                maxLength: maxFullNameLength,
-                validator: validateBillingAddressLine3,
-                checkUnique: doPagCheckUnique,
-                uniqueKey: 'address_line_3',
-                itemTableName: '$projectName.amgr_$projectName',
-                onChanged: (val) {
-                  setState(() {
-                    _isEditing = true;
-                    if (val != _addressLine3) {
-                      _errorText = '';
-                    }
-                  });
-                  if (val.trim().isNotEmpty) {
-                    setState(() {
-                      _newCreate = true;
-                      _createSuccess = false;
-                    });
-                  }
-                  _addressLine3 = val;
-                  return null;
-                },
-                onEditingComplete: () {
-                  setState(() {
-                    _isEditing = false;
-                  });
-                },
-                onValidate: (String? result) {
-                  setState(() {
-                    if (result == null) {
-                      _isAddressLine3Validated = true;
-                    } else {
-                      _isAddressLine3Validated = false;
-                    }
                   });
                 },
               ),
             ],
           ),
+        ),
+      ],
+    );
+  }
+
+  Widget getResourceName() {
+    return Column(
+      children: [
+        verticalSpaceTiny,
+        Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Theme.of(context).hintColor.withAlpha(30),
+            ),
+            borderRadius: BorderRadius.circular(5),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+          child: Column(
+            children: [
+              WgtTextField(
+                key: _resNameResetKey,
+                appConfig: widget.appConfig,
+                hintText: 'Resource Name (Required)',
+                labelText: 'Resource Name (Required)',
+                maxLength: maxFullNameLength,
+                maxLines: 1,
+                validator: validateItemName,
+                onChanged: (val) {
+                  setState(() {
+                    _isEditing = true;
+                    if (val != _resName) {
+                      _errorText = '';
+                    }
+                  });
+                  if (val.trim().isNotEmpty) {
+                    setState(() {
+                      _newCreate = true;
+                      _createSuccess = false;
+                    });
+                  }
+                  _resName = val;
+                  return null;
+                },
+                onEditingComplete: () {
+                  setState(() {
+                    _isEditing = false;
+                  });
+                },
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget getOperationSelector() {
+    // hard code for now
+    List<PagAclOperationType> meterTypeList = [
+      PagAclOperationType.create,
+      PagAclOperationType.read,
+      PagAclOperationType.update,
+      PagAclOperationType.delete,
+      PagAclOperationType.list,
+      PagAclOperationType.all,
+    ];
+    TextStyle dropDownListTextStyle = TextStyle(
+        fontSize: 15,
+        color: Theme.of(context).colorScheme.onSurface,
+        fontWeight: FontWeight.w500);
+    TextStyle dropDownListHintStyle =
+        TextStyle(fontSize: 15, color: Theme.of(context).hintColor);
+    Widget dropDownUnderline =
+        Container(height: 1, color: Theme.of(context).hintColor.withAlpha(75));
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 120,
+          child: Align(
+            alignment: AlignmentDirectional.centerEnd,
+            child: Text('Operation Type:',
+                style: TextStyle(color: Theme.of(context).hintColor)),
+          ),
+        ),
+        horizontalSpaceSmall,
+        SizedBox(
+          width: 130,
+          child: DropdownButton<PagAclOperationType>(
+              alignment: AlignmentDirectional.centerStart,
+              hint: Padding(
+                  padding: const EdgeInsets.only(bottom: 3.0),
+                  child: Text('Operation Type', style: dropDownListHintStyle)),
+              value: _selectedOperationType,
+              focusColor: Theme.of(context).hoverColor,
+              underline: dropDownUnderline,
+              icon: const Icon(Icons.arrow_drop_down),
+              iconSize: 21,
+              style: TextStyle(color: Theme.of(context).colorScheme.primary),
+              onChanged: (PagAclOperationType? value) async {
+                if (value != null) {
+                  if (value == _selectedOperationType) {
+                    return;
+                  }
+                }
+                setState(() {
+                  _selectedOperationType = value!;
+                  _newItem = true;
+                  _createSuccess = false;
+                });
+              },
+              items: meterTypeList.map<DropdownMenuItem<PagAclOperationType>>(
+                  (PagAclOperationType value) {
+                return DropdownMenuItem<PagAclOperationType>(
+                  value: value,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 3.0),
+                    child: Text(value.name),
+                  ),
+                );
+              }).toList()),
         ),
       ],
     );

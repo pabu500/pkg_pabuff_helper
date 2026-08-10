@@ -12,7 +12,7 @@ import '../model/scope/mdl_pag_location_group_profile.dart';
 import '../model/scope/mdl_pag_site_group_profile.dart';
 import '../model/scope/mdl_pag_site_profile.dart';
 import 'enum_helper.dart';
-import 'pag_item_helper.dart';
+import 'dh_pag_item.dart';
 
 enum PagScopeType {
   project('Project', 'project', Symbols.flag),

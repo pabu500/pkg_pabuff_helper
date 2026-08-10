@@ -4,7 +4,7 @@ import 'package:buff_helper/pag_helper/comm/comm_pag_item.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_device.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_tariff.dart';
 import 'package:buff_helper/pag_helper/def_helper/list_helper.dart';
-import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_pag_item.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_tariff_package.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';

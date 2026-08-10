@@ -2,7 +2,7 @@ import 'dart:developer' as dev;
 
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_tenant.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
-import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_pag_item.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';

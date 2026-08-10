@@ -7,9 +7,8 @@ import 'package:buff_helper/pag_helper/comm/pag_be_api_base.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_device.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_meter_group.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_tenant.dart';
-import 'package:buff_helper/pag_helper/def_helper/pag_item_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_pag_item.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
-import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_building_profile.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_location.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_location_group_profile.dart';
@@ -20,7 +19,6 @@ import 'package:buff_helper/pag_helper/wgt/scope/wgt_scope_setter.dart';
 import 'package:buff_helper/pag_helper/wgt/wgt_comm_button.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../../../model/mdl_pag_app_config.dart';
 
