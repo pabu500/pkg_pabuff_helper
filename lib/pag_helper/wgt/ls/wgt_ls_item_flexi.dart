@@ -1190,7 +1190,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           padding: const EdgeInsets.only(left: 0),
           child: IconButton(
             icon: Icon(
-              Symbols.lock_open,
+              Symbols.assignment,
               color: Theme.of(context).colorScheme.primary.withAlpha(200),
             ),
             onPressed: () {
@@ -1246,7 +1246,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           padding: const EdgeInsets.only(left: 0),
           child: IconButton(
             icon: Icon(
-              Symbols.lock_open,
+              Symbols.assignment,
               color: Theme.of(context).colorScheme.primary.withAlpha(200),
             ),
             onPressed: () {

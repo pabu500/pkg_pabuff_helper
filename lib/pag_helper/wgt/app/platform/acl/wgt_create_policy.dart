@@ -289,7 +289,7 @@ class _WgtCreatePolicyState extends State<WgtCreatePolicy> {
         width: width,
         labelWidth: 130,
         // itemScopeMap: widget.itemScopeMap!,
-        forItemKind: PagItemKind.tariff,
+        forItemKind: PagItemKind.acl,
         // forScopeType: widget.itemType is PagScopeType ? widget.itemType : null,
         onScopeSet: (dynamic profile) {
           if (profile == null) {

@@ -648,7 +648,8 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
     // for scope, or for item kinds with flexi scope
     if (widget.forItemKind == PagItemKind.scope ||
         widget.forItemKind == PagItemKind.meterGroup ||
-        widget.forItemKind == PagItemKind.tariff) {
+        widget.forItemKind == PagItemKind.tariff ||
+        widget.forItemKind == PagItemKind.acl) {
       if (_selectedLocationGroupProfile == null) {
         pullChildrenList = false;
       }
@@ -1257,6 +1258,8 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
       case PagItemKind.meterGroup:
         break;
       case PagItemKind.role:
+        break;
+      case PagItemKind.acl:
         break;
       default:
         if (_selectedLocation == null) {

@@ -75,7 +75,6 @@ class _CreatePermissionState extends State<WgtCreatePermission> {
 
     try {
       Map<String, dynamic> queryMap = {
-        'item_type': PagOrgType.amgr.name,
         'scope': widget.loggedInUser.selectedScope.toScopeMap(),
         'acl_type': PagAclType.permission.value,
         'label': _label,
@@ -142,6 +141,10 @@ class _CreatePermissionState extends State<WgtCreatePermission> {
     }
 
     if (_selectedOperationType == null) {
+      return false;
+    }
+
+    if (_itemScopeMap.isEmpty) {
       return false;
     }
 
@@ -398,7 +401,7 @@ class _CreatePermissionState extends State<WgtCreatePermission> {
         width: width,
         labelWidth: 130,
         // itemScopeMap: widget.itemScopeMap!,
-        forItemKind: PagItemKind.tariff,
+        forItemKind: PagItemKind.acl,
         // forScopeType: widget.itemType is PagScopeType ? widget.itemType : null,
         onScopeSet: (dynamic profile) {
           if (profile == null) {

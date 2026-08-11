@@ -67,10 +67,10 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
     });
 
     try {
-      _itemScopeMap['project_id'] =
-          widget.loggedInUser.selectedScope.projectProfile!.id.toString();
-      _itemScopeMap['project_name'] =
-          widget.loggedInUser.selectedScope.projectProfile!.name;
+      // _itemScopeMap['project_id'] =
+      //     widget.loggedInUser.selectedScope.projectProfile!.id.toString();
+      // _itemScopeMap['project_name'] =
+      //     widget.loggedInUser.selectedScope.projectProfile!.name;
 
       Map<String, dynamic> queryMap = {
         'scope': widget.loggedInUser.selectedScope.toScopeMap(),
@@ -357,7 +357,7 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
         width: width,
         labelWidth: 130,
         // itemScopeMap: widget.itemScopeMap!,
-        forItemKind: PagItemKind.tariff,
+        forItemKind: PagItemKind.acl,
         // forScopeType: widget.itemType is PagScopeType ? widget.itemType : null,
         onScopeSet: (dynamic profile) {
           if (profile == null) {

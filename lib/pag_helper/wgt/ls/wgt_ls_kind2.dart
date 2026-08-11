@@ -363,6 +363,7 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
               finderRefreshKey: _itemTypeRefreshKey,
               pagAppContext: widget.pagAppContext,
               itemKind: widget.itemKind,
+              itemTypeEnum: _selectedListController?.itemTypeEnum,
               // itemType: _selectedItemType,
               listController: _selectedListController,
               selectedItemInfoList: widget.selectedItemInfoList,
