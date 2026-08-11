@@ -252,7 +252,8 @@ class _WgtListPaneState extends State<WgtListPane> {
       //insert switcher to list controller
       //remove existing switcher with colKey 'info'
       widget.listController.listColControllerList.removeWhere((col) =>
-          col.colKey == 'info' && col.colWidgetType == PagColWidgetType.CUSTOM);
+          (col.colKey == 'info') &&
+          col.colWidgetType == PagColWidgetType.CUSTOM);
       MdlListColController switcherCol = MdlListColController(
           colKey: 'info',
           colTitle: _listPaneMode == ListPaneMode.list ? 'Info' : '',

@@ -32,6 +32,7 @@ import 'package:buff_helper/pag_helper/pag_app_context_list.dart';
 import 'package:provider/provider.dart';
 
 import '../../comm/comm_list.dart';
+import '../../def_helper/dh_acl.dart';
 import '../../def_helper/dh_meter_group.dart';
 import '../../model/mdl_pag_app_config.dart';
 import '../app/am/wgt_am_meter_group_assignment2.dart';
@@ -50,6 +51,7 @@ import '../app/fh/wgt_fh_device_health.dart';
 import '../app/platform/acl/wgt_create_acl_item.dart';
 import '../app/platform/acl/wgt_create_resource_type.dart';
 import '../app/platform/acl/wgt_create_role.dart';
+import '../app/platform/acl/wgt_perm_res_assignment.dart';
 import '../app/platform/acl/wgt_policy_perm_assignment.dart';
 import '../app/platform/acl/wgt_role_policy_assignment.dart';
 import '../app/platform/user_manager/wgt_create_user2.dart';
@@ -184,6 +186,9 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
   bool _matchPaymentColumnExists = false;
   bool _deviceHealthColumnExists = false;
   bool _billCompilationColumnExists = false;
+  bool _rolePolicyColumnExists = false;
+  bool _policyPermColumnExists = false;
+  bool _permResColumnExists = false;
 
   Future<dynamic> _getListInfo() async {
     if (loggedInUser == null) {
@@ -434,6 +439,13 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         widget.listContextType == PagListContextType.paymentApply;
     bool isRoleManager = widget.pagAppContext == appCtxPlatform &&
         widget.itemKind == PagItemKind.role;
+    bool isPolicyManager = widget.pagAppContext == appCtxPlatform &&
+        widget.itemKind == PagItemKind.acl &&
+        widget.itemTypeEnum == PagAclType.policy;
+    bool isPermManager = widget.pagAppContext == appCtxPlatform &&
+        widget.itemKind == PagItemKind.acl &&
+        widget.itemTypeEnum == PagAclType.permission;
+
     if (isEmsDeviceLs ||
         isEmsMeterUsage ||
         isEmsTenantUsage ||
@@ -505,8 +517,8 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     }
     bool addViewBillColumn = false;
     if (widget.itemKind == PagItemKind.bill &&
-            widget.listContextType == PagListContextType.info ||
-        widget.listContextType == PagListContextType.infoTp) {
+        (widget.listContextType == PagListContextType.info ||
+            widget.listContextType == PagListContextType.infoTp)) {
       addViewBillColumn = true;
     }
 
@@ -530,9 +542,19 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       addBillCompilationColumn = true;
     }
 
-    bool addPermColumn = false;
+    bool addRolePolicyColumn = false;
     if (isRoleManager) {
-      addPermColumn = true;
+      addRolePolicyColumn = true;
+    }
+
+    bool addPolicyPermColumn = false;
+    if (isPolicyManager) {
+      addPolicyPermColumn = true;
+    }
+
+    bool addPermResColumn = false;
+    if (isPermManager) {
+      addPermResColumn = true;
     }
 
     if (hasOpColumn) {
@@ -546,8 +568,25 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       _addOpColumn(listController);
     }
 
-    if (addPermColumn) {
-      _addPolicyColumn(listController);
+    if (addRolePolicyColumn) {
+      if (!_rolePolicyColumnExists) {
+        _addRolePolicyColumn(listController);
+      }
+      _rolePolicyColumnExists = true;
+    }
+
+    if (addPolicyPermColumn) {
+      if (!_policyPermColumnExists) {
+        _addPolicyPermColumn(listController);
+      }
+      _policyPermColumnExists = true;
+    }
+
+    if (addPermResColumn) {
+      if (!_permResColumnExists) {
+        _addPermResColumn(listController);
+      }
+      _permResColumnExists = true;
     }
 
     if (addMeterUsageColumn) {
@@ -557,23 +596,33 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       _meterUsageColumnExists = true;
     }
     if (addTenantUsageColumn) {
-      _addTenantUsageColumns(listController);
+      if (!_tenantUsageColumnExists) {
+        _addTenantUsageColumns(listController);
+      }
       _tenantUsageColumnExists = true;
     }
     if (addViewBillColumn) {
-      _addViewBillColumn(listController);
+      if (!_viewBillColumnExists) {
+        _addViewBillColumn(listController);
+      }
       _viewBillColumnExists = true;
     }
     if (addViewSoAColumn) {
-      _addViewSoAColumn(listController);
+      if (!_viewSoAColumnExists) {
+        _addViewSoAColumn(listController);
+      }
       _viewSoAColumnExists = true;
     }
     if (addMatchPaymentColumn) {
-      _addMatchPaymentColumn(listController);
+      if (!_matchPaymentColumnExists) {
+        _addMatchPaymentColumn(listController);
+      }
       _matchPaymentColumnExists = true;
     }
     if (addDeviceHealthColumn && !hasDetailColumn) {
-      _addDeviceHealthColumn(listController);
+      if (!_deviceHealthColumnExists) {
+        _addDeviceHealthColumn(listController);
+      }
       _deviceHealthColumnExists = true;
     }
     if (addBillCompilationColumn) {
@@ -1066,7 +1115,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     listController.listColControllerList.insert(0, appCtxCol);
   }
 
-  void _addPolicyColumn(MdlPagListController listController) {
+  void _addRolePolicyColumn(MdlPagListController listController) {
     //add property edit column
     MdlListColController appCtxCol = MdlListColController(
       colKey: 'policy',
@@ -1122,7 +1171,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     listController.listColControllerList.insert(0, appCtxCol);
   }
 
-  void _addPermColumn(MdlPagListController listController) {
+  void _addPolicyPermColumn(MdlPagListController listController) {
     //add property edit column
     MdlListColController appCtxCol = MdlListColController(
       colKey: 'perm',
@@ -1148,6 +1197,62 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
               xtShowModelBottomSheet(
                 context,
                 WgtPolicyPermAssignment(
+                  appConfig: widget.appConfig,
+                  loggedInUser: loggedInUser!,
+                  strItemGroupIndex: item['id'],
+                  itemName: item['name'],
+                  itemLabel: item['label'] ?? '',
+                  itemScope: itemScope,
+                  onUpdate: () {
+                    setState(() {
+                      _itemUpdated = true;
+                    });
+                  },
+                ),
+                onClosed: () {
+                  if (_itemUpdated) {
+                    setState(() {
+                      _listContentRefreshKey = UniqueKey();
+                      _itemUpdated = false;
+                    });
+                  }
+                },
+              );
+            },
+          ),
+        );
+      },
+    );
+    // _selectedListController?.listColControllerList.add(appCtxCol);
+    listController.listColControllerList.insert(0, appCtxCol);
+  }
+
+  void _addPermResColumn(MdlPagListController listController) {
+    //add property edit column
+    MdlListColController appCtxCol = MdlListColController(
+      colKey: 'res',
+      colTitle: 'Res',
+      includeColKeyAsFilter: false,
+      showColumn: true,
+      colWidth: 50,
+      colWidgetType: PagColWidgetType.CUSTOM,
+      getCustomWidget: (item, fullList) {
+        item['project_id'] =
+            loggedInUser!.selectedScope.projectProfile!.id.toString();
+        item['project_name'] = loggedInUser!.selectedScope.projectProfile!.name;
+        MdlPagScope itemScope = MdlPagScope.fromJson(item);
+
+        return Padding(
+          padding: const EdgeInsets.only(left: 0),
+          child: IconButton(
+            icon: Icon(
+              Symbols.lock_open,
+              color: Theme.of(context).colorScheme.primary.withAlpha(200),
+            ),
+            onPressed: () {
+              xtShowModelBottomSheet(
+                context,
+                WgtPermResAssignment(
                   appConfig: widget.appConfig,
                   loggedInUser: loggedInUser!,
                   strItemGroupIndex: item['id'],

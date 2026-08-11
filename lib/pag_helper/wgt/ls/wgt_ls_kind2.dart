@@ -313,7 +313,8 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
     bool enablePaneModeSwitcher = false;
     if (widget.pagAppContext == appCtxEms &&
         widget.itemKind == PagItemKind.device &&
-        widget.listContextType == PagListContextType.info) {
+        (widget.listContextType == PagListContextType.info ||
+            widget.listContextType == PagListContextType.infoTp)) {
       enablePaneModeSwitcher = true;
     }
     if (widget.pagAppContext == appCtxCm &&
