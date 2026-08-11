@@ -16,8 +16,8 @@ import '../../../../../up_helper/exceptions.dart';
 import '../../../../comm/comm_ex.dart';
 import '../../../../comm/pag_be_api_base.dart';
 
-class WgtRolePermAssignment extends StatefulWidget {
-  const WgtRolePermAssignment({
+class WgtPolicyPermAssignment extends StatefulWidget {
+  const WgtPolicyPermAssignment({
     super.key,
     required this.appConfig,
     required this.loggedInUser,
@@ -39,10 +39,11 @@ class WgtRolePermAssignment extends StatefulWidget {
   final Function? onUpdate;
 
   @override
-  State<WgtRolePermAssignment> createState() => _WgtRolePermAssignmentState();
+  State<WgtPolicyPermAssignment> createState() =>
+      _WgtPolicyPermAssignmentState();
 }
 
-class _WgtRolePermAssignmentState extends State<WgtRolePermAssignment> {
+class _WgtPolicyPermAssignmentState extends State<WgtPolicyPermAssignment> {
   // late final MdlPagUser? loggedInUser;
 
   final double width = 395.0;
@@ -64,8 +65,9 @@ class _WgtRolePermAssignmentState extends State<WgtRolePermAssignment> {
   bool _isFetchingAllAssignmentInfo = false;
   bool _isAllAssignmentInfoFetched = false;
 
-  final TextEditingController _itemSnFilterController = TextEditingController();
-  String _itemSnFilterStr = '';
+  final TextEditingController _itemLabelFilterController =
+      TextEditingController();
+  String _itemLabelFilterStr = '';
 
   Future<void> _doAutoPopulate() async {
     if (_isScopeMatchingListFetching) {
@@ -80,7 +82,7 @@ class _WgtRolePermAssignmentState extends State<WgtRolePermAssignment> {
     _isScopeMatchingListFetching = true;
     try {
       final result = await ex(
-        endpoint: PagUrlBase.eptPagGetRoleScopePermList,
+        endpoint: PagUrlBase.eptGetRoleScopePolicyList,
         crudType: 'read',
         opStr: 'get scope matching meter list',
         appConfig: widget.appConfig,
@@ -152,7 +154,7 @@ class _WgtRolePermAssignmentState extends State<WgtRolePermAssignment> {
       _isCommitting = true;
 
       final result = await ex(
-        endpoint: PagUrlBase.eptUpdateRolePermList,
+        endpoint: PagUrlBase.eptUpdateRolePolicyList,
         crudType: 'update',
         opStr: 'commit assignment',
         appConfig: widget.appConfig,
@@ -228,11 +230,11 @@ class _WgtRolePermAssignmentState extends State<WgtRolePermAssignment> {
   }
 
   bool _showItem(Map<String, dynamic> item) {
-    if (_itemSnFilterStr.isNotEmpty) {
-      String? sn = item['meter_sn'];
-      bool snMatches = (sn ?? '').isNotEmpty &&
-          (sn ?? '').toLowerCase().contains(_itemSnFilterStr);
-      return snMatches;
+    if (_itemLabelFilterStr.isNotEmpty) {
+      String? label = item['item_label'];
+      bool labelMatches = (label ?? '').isNotEmpty &&
+          (label ?? '').toLowerCase().contains(_itemLabelFilterStr);
+      return labelMatches;
     }
 
     return true; // Include item if no filter is applied
@@ -402,19 +404,19 @@ class _WgtRolePermAssignmentState extends State<WgtRolePermAssignment> {
             width: 180,
             height: 39,
             child: TextField(
-              controller: _itemSnFilterController,
+              controller: _itemLabelFilterController,
               readOnly: _isCommitting ||
                   _isCommitted ||
-                  {_itemGroupScopeMatchingItemList ?? []}.isEmpty,
+                  (_itemGroupScopeMatchingItemList ?? []).isEmpty,
               decoration: InputDecoration(
-                  hintText: 'Item S/N',
+                  hintText: 'Item Label',
                   hintStyle: TextStyle(
                       color: Theme.of(context)
                           .hintColor) // prefixIcon: Icon(Icons.search),
                   ),
               onChanged: (value) {
                 setState(() {
-                  _itemSnFilterStr = value.trim().toLowerCase();
+                  _itemLabelFilterStr = value.trim().toLowerCase();
                 });
               },
             ),
@@ -544,7 +546,7 @@ class _WgtRolePermAssignmentState extends State<WgtRolePermAssignment> {
   Widget getItemRow(Map<String, dynamic> itemInfo, int index) {
     String itemName = itemInfo['item_name'] ?? '-';
     String itemLabel = itemInfo['item_label'] ?? '-';
-    String meterSn = itemInfo['meter_sn'] ?? '-';
+    // String meterSn = itemInfo['meter_sn'] ?? '-';
     // bool assigned = itemInfo['assigned'] ?? false;
 
     BoxDecoration boxDecoration = BoxDecoration(
@@ -576,7 +578,7 @@ class _WgtRolePermAssignmentState extends State<WgtRolePermAssignment> {
             ),
             horizontalSpaceSmall,
             Container(
-              width: 150,
+              width: 175,
               decoration: boxDecoration,
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
               child: SelectableText(
@@ -584,19 +586,19 @@ class _WgtRolePermAssignmentState extends State<WgtRolePermAssignment> {
                 style: disabled ? disabledTextStyle : null,
               ),
             ),
+            // horizontalSpaceSmall,
+            // Container(
+            //   width: 135,
+            //   decoration: boxDecoration,
+            //   padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+            //   child: SelectableText(
+            //     meterSn,
+            //     style: disabled ? disabledTextStyle : null,
+            //   ),
+            // ),
             horizontalSpaceSmall,
             Container(
-              width: 135,
-              decoration: boxDecoration,
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-              child: SelectableText(
-                meterSn,
-                style: disabled ? disabledTextStyle : null,
-              ),
-            ),
-            horizontalSpaceSmall,
-            Container(
-              width: 160,
+              width: 250,
               decoration: boxDecoration,
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
               child: SelectableText(
@@ -631,18 +633,6 @@ class _WgtRolePermAssignmentState extends State<WgtRolePermAssignment> {
         waitDuration: const Duration(milliseconds: 500),
         child: Row(
           children: [
-            Container(
-              height: 25,
-              width: barWidth,
-              decoration: BoxDecoration(
-                color: Colors.transparent,
-                borderRadius: BorderRadius.circular(5),
-                border: Border.all(color: Theme.of(context).hintColor),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 5),
-              child: Text(meterGroupLabel ?? ''),
-            ),
-            horizontalSpaceTiny,
             Checkbox(
               value:
                   checked, //itemInfo['assigned_new'] ?? itemInfo['assigned'],

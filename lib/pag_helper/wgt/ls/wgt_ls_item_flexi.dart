@@ -50,7 +50,8 @@ import '../app/fh/wgt_fh_device_health.dart';
 import '../app/platform/acl/wgt_create_acl_item.dart';
 import '../app/platform/acl/wgt_create_resource_type.dart';
 import '../app/platform/acl/wgt_create_role.dart';
-import '../app/platform/acl/wgt_role_perm_assignment.dart';
+import '../app/platform/acl/wgt_policy_perm_assignment.dart';
+import '../app/platform/acl/wgt_role_policy_assignment.dart';
 import '../app/platform/user_manager/wgt_create_user2.dart';
 import '../job/wgt_job_type_op_panel3.dart';
 import 'wgt_list_pane.dart';
@@ -546,7 +547,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     }
 
     if (addPermColumn) {
-      _addPermColumn(listController);
+      _addPolicyColumn(listController);
     }
 
     if (addMeterUsageColumn) {
@@ -1065,6 +1066,62 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     listController.listColControllerList.insert(0, appCtxCol);
   }
 
+  void _addPolicyColumn(MdlPagListController listController) {
+    //add property edit column
+    MdlListColController appCtxCol = MdlListColController(
+      colKey: 'policy',
+      colTitle: 'Policy',
+      includeColKeyAsFilter: false,
+      showColumn: true,
+      colWidth: 50,
+      colWidgetType: PagColWidgetType.CUSTOM,
+      getCustomWidget: (item, fullList) {
+        item['project_id'] =
+            loggedInUser!.selectedScope.projectProfile!.id.toString();
+        item['project_name'] = loggedInUser!.selectedScope.projectProfile!.name;
+        MdlPagScope itemScope = MdlPagScope.fromJson(item);
+
+        return Padding(
+          padding: const EdgeInsets.only(left: 0),
+          child: IconButton(
+            icon: Icon(
+              Symbols.lock_open,
+              color: Theme.of(context).colorScheme.primary.withAlpha(200),
+            ),
+            onPressed: () {
+              xtShowModelBottomSheet(
+                context,
+                WgtRolePolicyAssignment(
+                  appConfig: widget.appConfig,
+                  loggedInUser: loggedInUser!,
+                  strItemGroupIndex: item['id'],
+                  itemName: item['name'],
+                  itemLabel: item['label'] ?? '',
+                  itemScope: itemScope,
+                  onUpdate: () {
+                    setState(() {
+                      _itemUpdated = true;
+                    });
+                  },
+                ),
+                onClosed: () {
+                  if (_itemUpdated) {
+                    setState(() {
+                      _listContentRefreshKey = UniqueKey();
+                      _itemUpdated = false;
+                    });
+                  }
+                },
+              );
+            },
+          ),
+        );
+      },
+    );
+    // _selectedListController?.listColControllerList.add(appCtxCol);
+    listController.listColControllerList.insert(0, appCtxCol);
+  }
+
   void _addPermColumn(MdlPagListController listController) {
     //add property edit column
     MdlListColController appCtxCol = MdlListColController(
@@ -1090,7 +1147,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
             onPressed: () {
               xtShowModelBottomSheet(
                 context,
-                WgtRolePermAssignment(
+                WgtPolicyPermAssignment(
                   appConfig: widget.appConfig,
                   loggedInUser: loggedInUser!,
                   strItemGroupIndex: item['id'],

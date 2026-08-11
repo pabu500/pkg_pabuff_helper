@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../model/mdl_pag_app_config.dart';
 import 'wgt_create_permission.dart';
+import 'wgt_create_policy.dart';
 import 'wgt_create_resource.dart';
 
 class WgtCreateAclItem extends StatefulWidget {
@@ -57,6 +58,7 @@ class _CreateAclItemState extends State<WgtCreateAclItem> {
                 : [
                     PagAclType.resource.value,
                     PagAclType.permission.value,
+                    PagAclType.policy.value,
                   ],
             onItemTypeSelected: (itemType) {
               setState(() {
@@ -87,6 +89,12 @@ class _CreateAclItemState extends State<WgtCreateAclItem> {
       );
     } else if (itemType == PagAclType.permission) {
       return WgtCreatePermission(
+        appConfig: widget.appConfig,
+        loggedInUser: widget.loggedInUser,
+        onCreated: widget.onCreated,
+      );
+    } else if (itemType == PagAclType.policy) {
+      return WgtCreatePolicy(
         appConfig: widget.appConfig,
         loggedInUser: widget.loggedInUser,
         onCreated: widget.onCreated,

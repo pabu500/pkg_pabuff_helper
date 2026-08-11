@@ -20,8 +20,8 @@ import 'package:flutter/material.dart';
 import '../../../../def_helper/dh_acl.dart';
 import '../../../../model/mdl_pag_app_config.dart';
 
-class WgtCreateResource extends StatefulWidget {
-  const WgtCreateResource({
+class WgtCreatePolicy extends StatefulWidget {
+  const WgtCreatePolicy({
     super.key,
     required this.appConfig,
     required this.loggedInUser,
@@ -33,10 +33,10 @@ class WgtCreateResource extends StatefulWidget {
   final Function? onCreated;
 
   @override
-  State<WgtCreateResource> createState() => _WgtCreateResourceState();
+  State<WgtCreatePolicy> createState() => _WgtCreatePolicyState();
 }
 
-class _WgtCreateResourceState extends State<WgtCreateResource> {
+class _WgtCreatePolicyState extends State<WgtCreatePolicy> {
   // late MdlPagUser? _loggedInUser;
   final double width = 395;
 
@@ -50,10 +50,6 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
   String? _newItemName;
   bool _isNewItemLabelValidated = false;
   UniqueKey? _newItemLabelResetKey;
-
-  String? _resourceTypeName;
-  bool _isResourceTypeNameValidated = false;
-  UniqueKey? _resourceTypeNameResetKey;
 
   final Map<String, dynamic> _itemScopeMap = {};
   UniqueKey? _scopeSetterKey;
@@ -75,16 +71,15 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
       Map<String, dynamic> queryMap = {
         'scope': widget.loggedInUser.selectedScope.toScopeMap(),
         'item_kind': PagItemKind.acl.value,
-        'acl_type': PagAclType.resource.value,
+        'acl_type': PagAclType.policy.value,
         'label': _newItemLabel,
-        'res_type_name': _resourceTypeName,
         'item_scope_info': _itemScopeMap,
       };
 
       final result = await ex(
         endpoint: PagUrlBase.eptCreateAclItem,
         crudType: 'create',
-        opStr: 'create resource',
+        opStr: 'create policy',
         appConfig: widget.appConfig,
         queryMap: queryMap,
         svcClaim: MdlPagSvcClaim(
@@ -106,7 +101,7 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
 
       // _errorText = 'Error creating resource';
       // String eStr = e.toString().toLowerCase();
-      _errorText = getErrorText(e, defaultErrorText: 'Error creating resource');
+      _errorText = getErrorText(e, defaultErrorText: 'Error creating policy');
 
       _newItem = true;
       _createSuccess = false;
@@ -162,18 +157,15 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
                   // verticalSpaceTiny,
                   getBasicInfoBlock(),
                   verticalSpaceTiny,
-                  getResourceInfo(),
-
-                  verticalSpaceTiny,
                   getItemScopeSetter(),
                   verticalSpaceRegular,
                   WgtCommButton(
                     enabled: _checkEnableButton(),
                     label: _createWait
-                        ? 'Creating resource...'
+                        ? 'Creating policy...'
                         : _createSuccess
-                            ? '✓ Resource created'
-                            : 'Create Resource',
+                            ? '✓ Policy created'
+                            : 'Create Policy',
                     onPressed:
                         !_checkEnableButton() //_selectedProjectScope == null
                             ? null
@@ -210,7 +202,7 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
                     Padding(
                       padding: const EdgeInsets.all(5.0),
                       child: Text(
-                        'Resource ${_newItemName ?? ''} created',
+                        'Policy ${_newItemName ?? ''} created',
                         style: TextStyle(
                             color: Theme.of(context).colorScheme.primary),
                       ),
@@ -250,7 +242,7 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
               validator: validateTenantLabel,
               checkUnique: doPagCheckUnique,
               uniqueKey: 'label',
-              itemTableName: '$projectName.acl_res_$projectName',
+              itemTableName: '$projectName.acl_policy_$projectName',
               onChanged: (val) {
                 setState(() {
                   _isEditing = true;
@@ -278,66 +270,6 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
                     _isNewItemLabelValidated = true;
                   } else {
                     _isNewItemLabelValidated = false;
-                  }
-                });
-              },
-            ),
-          ]),
-        ),
-      ],
-    );
-  }
-
-  Widget getResourceInfo() {
-    MdlPagScopeProfile scopeProfile = widget.loggedInUser.selectedScope;
-    String projectName = scopeProfile.projectProfile!.name;
-
-    return Column(
-      children: [
-        verticalSpaceTiny,
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Theme.of(context).hintColor.withAlpha(30),
-            ),
-            borderRadius: BorderRadius.circular(5),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-          child: Column(children: [
-            WgtTextField(
-              key: _resourceTypeNameResetKey,
-              appConfig: widget.appConfig,
-              hintText: 'Resource Type Name',
-              labelText: 'Resource Type Name',
-              maxLength: maxFullNameLength,
-              validator: validateItemLabel,
-              onChanged: (val) {
-                setState(() {
-                  _isEditing = true;
-                  if (val != _resourceTypeName) {
-                    _errorText = '';
-                  }
-                });
-                if (val.trim().isNotEmpty) {
-                  setState(() {
-                    _newItem = true;
-                    _createSuccess = false;
-                  });
-                }
-                _resourceTypeName = val;
-                return null;
-              },
-              onEditingComplete: () {
-                setState(() {
-                  _isEditing = false;
-                });
-              },
-              onValidate: (String? result) {
-                setState(() {
-                  if (result == null) {
-                    _isResourceTypeNameValidated = true;
-                  } else {
-                    _isResourceTypeNameValidated = false;
                   }
                 });
               },

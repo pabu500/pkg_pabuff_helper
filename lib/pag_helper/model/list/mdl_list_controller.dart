@@ -182,6 +182,9 @@ class MdlPagListController /*extends ChangeNotifier*/ {
         case 'perm':
           itemTypeEnum = PagAclType.permission;
           break;
+        case 'policy':
+          itemTypeEnum = PagAclType.policy;
+          break;
         default:
           itemTypeEnum = null;
 

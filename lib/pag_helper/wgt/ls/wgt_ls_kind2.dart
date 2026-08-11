@@ -296,6 +296,7 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
       } else if (widget.itemKind == PagItemKind.acl) {
         _itemTypeInfoList.add({'item_type': PagAclType.resource});
         _itemTypeInfoList.add({'item_type': PagAclType.permission});
+        _itemTypeInfoList.add({'item_type': PagAclType.policy});
       } else {
         throw Exception('Unsupported item kind: ${widget.itemKind.name}');
       }

@@ -319,9 +319,18 @@ class PagUrlBase {
   // acl
   static const String eptCreateResourceType = '/acl/create_resource_type';
   static const String eptCreateAclItem = '/acl/create_acl_item';
-  static const String eptPagGetRoleScopePermList =
-      '/acl/role/get_role_scope_perm_list';
-  static const String eptUpdateRolePermList = '/acl/role/update_role_perm_list';
+  static const String eptGetRoleScopePolicyList =
+      '/acl/role/get_role_scope_policy_list';
+  static const String eptUpdateRolePolicyList =
+      '/acl/role/update_role_policy_list';
+  static const String eptGetPolicyScopePermList =
+      '/acl/policy/get_policy_scope_perm_list';
+  static const String eptUpdatePolicyPermList =
+      '/acl/policy/update_policy_perm_list';
+  static const String eptGetPermScopeResList =
+      '/acl/permission/get_perm_scope_res_list';
+  static const String eptUpdatePermResList =
+      '/acl/permission/update_perm_res_list';
 
   //job
   // static const String eptPostJob = '/job/post_job';

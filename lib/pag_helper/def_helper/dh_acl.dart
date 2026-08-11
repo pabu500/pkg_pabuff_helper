@@ -9,6 +9,7 @@ import 'dh_pag_item.dart';
 enum PagAclType {
   resource('Resource', 'res', 'res', Symbols.topic),
   permission('Permission', 'perm', 'perm', Symbols.key),
+  policy('Policy', 'policy', 'policy', Symbols.policy),
   ;
 
   const PagAclType(
