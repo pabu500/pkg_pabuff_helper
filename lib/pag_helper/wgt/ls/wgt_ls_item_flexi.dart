@@ -32,6 +32,7 @@ import 'package:buff_helper/pag_helper/pag_app_context_list.dart';
 import 'package:provider/provider.dart';
 
 import '../../comm/comm_list.dart';
+import '../../comm/pag_be_api_base.dart';
 import '../../def_helper/dh_acl.dart';
 import '../../def_helper/dh_meter_group.dart';
 import '../../model/mdl_pag_app_config.dart';
@@ -51,6 +52,7 @@ import '../app/fh/wgt_fh_device_health.dart';
 import '../app/platform/acl/wgt_create_acl_item.dart';
 import '../app/platform/acl/wgt_create_resource_type.dart';
 import '../app/platform/acl/wgt_create_role.dart';
+import '../app/platform/acl/wgt_item_group_item_assignment.dart';
 import '../app/platform/acl/wgt_perm_res_assignment.dart';
 import '../app/platform/acl/wgt_policy_perm_assignment.dart';
 import '../app/platform/acl/wgt_role_policy_assignment.dart';
@@ -1140,13 +1142,31 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
             onPressed: () {
               xtShowModelBottomSheet(
                 context,
-                WgtRolePolicyAssignment(
+                // WgtRolePolicyAssignment(
+                //   appConfig: widget.appConfig,
+                //   loggedInUser: loggedInUser!,
+                //   strItemGroupIndex: item['id'],
+                //   itemName: item['name'],
+                //   itemLabel: item['label'] ?? '',
+                //   itemScope: itemScope,
+                //   onUpdate: () {
+                //     setState(() {
+                //       _itemUpdated = true;
+                //     });
+                //   },
+                // ),
+                WgtItemGroupItemAssignment(
                   appConfig: widget.appConfig,
                   loggedInUser: loggedInUser!,
                   strItemGroupIndex: item['id'],
                   itemName: item['name'],
                   itemLabel: item['label'] ?? '',
                   itemScope: itemScope,
+                  eptGetItemGroupScopeMatchingItemList:
+                      PagUrlBase.eptGetRoleScopePolicyList,
+                  eptUpdateItemGroupItemAssignment:
+                      PagUrlBase.eptUpdateRolePolicyList,
+                  maxAssignmentCount: 1000,
                   onUpdate: () {
                     setState(() {
                       _itemUpdated = true;
@@ -1196,13 +1216,18 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
             onPressed: () {
               xtShowModelBottomSheet(
                 context,
-                WgtPolicyPermAssignment(
+                WgtItemGroupItemAssignment(
                   appConfig: widget.appConfig,
                   loggedInUser: loggedInUser!,
                   strItemGroupIndex: item['id'],
                   itemName: item['name'],
                   itemLabel: item['label'] ?? '',
                   itemScope: itemScope,
+                  eptGetItemGroupScopeMatchingItemList:
+                      PagUrlBase.eptGetPolicyScopePermList,
+                  eptUpdateItemGroupItemAssignment:
+                      PagUrlBase.eptUpdatePolicyPermList,
+                  maxAssignmentCount: 1000,
                   onUpdate: () {
                     setState(() {
                       _itemUpdated = true;
@@ -1252,13 +1277,18 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
             onPressed: () {
               xtShowModelBottomSheet(
                 context,
-                WgtPermResAssignment(
+                WgtItemGroupItemAssignment(
                   appConfig: widget.appConfig,
                   loggedInUser: loggedInUser!,
                   strItemGroupIndex: item['id'],
                   itemName: item['name'],
                   itemLabel: item['label'] ?? '',
                   itemScope: itemScope,
+                  eptGetItemGroupScopeMatchingItemList:
+                      PagUrlBase.eptGetPermScopeResList,
+                  eptUpdateItemGroupItemAssignment:
+                      PagUrlBase.eptUpdatePermResList,
+                  maxAssignmentCount: 1,
                   onUpdate: () {
                     setState(() {
                       _itemUpdated = true;

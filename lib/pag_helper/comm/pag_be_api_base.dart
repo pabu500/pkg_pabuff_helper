@@ -328,9 +328,8 @@ class PagUrlBase {
   static const String eptUpdatePolicyPermList =
       '/acl/policy/update_policy_perm_list';
   static const String eptGetPermScopeResList =
-      '/acl/permission/get_perm_scope_res_list';
-  static const String eptUpdatePermResList =
-      '/acl/permission/update_perm_res_list';
+      '/acl/perm/get_perm_scope_res_list';
+  static const String eptUpdatePermResList = '/acl/perm/update_perm_res_list';
 
   //job
   // static const String eptPostJob = '/job/post_job';

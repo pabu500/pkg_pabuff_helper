@@ -58,7 +58,7 @@ Future<dynamic> fetchItemList(
   dev.log('fetching item list');
 
   final portalType = pagAppConfig.portalType;
-  queryMap['portal_type'] = portalType.name;
+  queryMap['query_check_portal_type'] = portalType.name;
 
   final response = await http.post(
     Uri.parse(PagUrlController(loggedInUser, pagAppConfig)

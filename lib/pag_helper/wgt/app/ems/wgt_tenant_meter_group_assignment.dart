@@ -300,10 +300,8 @@ class _WgtTenantMeterGroupAssignmentState
   void initState() {
     super.initState();
 
-    loggedInUser = Provider.of<PagUserProvider>(
-      context,
-      listen: false,
-    ).currentUser;
+    loggedInUser =
+        Provider.of<PagUserProvider>(context, listen: false).currentUser;
   }
 
   @override

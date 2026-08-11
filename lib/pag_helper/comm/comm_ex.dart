@@ -33,6 +33,9 @@ Future<dynamic> ex({
   //   meterList.add(item);
   // }
 
+  final portalType = appConfig.portalType;
+  queryMap['query_check_portal_type'] = portalType.name;
+
   try {
     final response = await http.post(
       Uri.parse(PagUrlController(null, appConfig)

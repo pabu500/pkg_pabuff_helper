@@ -14,10 +14,9 @@ import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 
 import '../../../../../up_helper/exceptions.dart';
 import '../../../../comm/comm_ex.dart';
-import '../../../../comm/pag_be_api_base.dart';
 
-class WgtRolePolicyAssignment extends StatefulWidget {
-  const WgtRolePolicyAssignment({
+class WgtItemGroupItemAssignment extends StatefulWidget {
+  const WgtItemGroupItemAssignment({
     super.key,
     required this.appConfig,
     required this.loggedInUser,
@@ -25,8 +24,11 @@ class WgtRolePolicyAssignment extends StatefulWidget {
     required this.itemName,
     required this.itemLabel,
     required this.itemScope,
+    required this.eptGetItemGroupScopeMatchingItemList,
+    required this.eptUpdateItemGroupItemAssignment,
     this.onScopeTreeUpdate,
     this.onUpdate,
+    this.maxAssignmentCount,
   });
 
   final MdlPagAppConfig appConfig;
@@ -35,15 +37,19 @@ class WgtRolePolicyAssignment extends StatefulWidget {
   final String itemName;
   final String itemLabel;
   final MdlPagScope itemScope;
+  final String eptGetItemGroupScopeMatchingItemList;
+  final String eptUpdateItemGroupItemAssignment;
   final Function? onScopeTreeUpdate;
   final Function? onUpdate;
+  final int? maxAssignmentCount;
 
   @override
-  State<WgtRolePolicyAssignment> createState() =>
-      _WgtRolePolicyAssignmentState();
+  State<WgtItemGroupItemAssignment> createState() =>
+      _WgtItemGroupItemAssignmentState();
 }
 
-class _WgtRolePolicyAssignmentState extends State<WgtRolePolicyAssignment> {
+class _WgtItemGroupItemAssignmentState
+    extends State<WgtItemGroupItemAssignment> {
   // late final MdlPagUser? loggedInUser;
 
   final double width = 395.0;
@@ -71,6 +77,8 @@ class _WgtRolePolicyAssignmentState extends State<WgtRolePolicyAssignment> {
 
   String? _selectedItemIndexStr;
 
+  String _assignmentErrorText = '';
+
   Future<void> _doAutoPopulate() async {
     if (_isScopeMatchingListFetching) {
       return;
@@ -84,7 +92,7 @@ class _WgtRolePolicyAssignmentState extends State<WgtRolePolicyAssignment> {
     _isScopeMatchingListFetching = true;
     try {
       final result = await ex(
-        endpoint: PagUrlBase.eptGetRoleScopePolicyList,
+        endpoint: widget.eptGetItemGroupScopeMatchingItemList,
         crudType: 'read',
         opStr: 'get scope matching meter list',
         appConfig: widget.appConfig,
@@ -211,7 +219,7 @@ class _WgtRolePolicyAssignmentState extends State<WgtRolePolicyAssignment> {
       _isCommitting = true;
 
       final result = await ex(
-        endpoint: PagUrlBase.eptUpdateRolePolicyList,
+        endpoint: widget.eptUpdateItemGroupItemAssignment,
         crudType: 'update',
         opStr: 'commit assignment',
         appConfig: widget.appConfig,
@@ -297,14 +305,38 @@ class _WgtRolePolicyAssignmentState extends State<WgtRolePolicyAssignment> {
     return true; // Include item if no filter is applied
   }
 
+  bool _checkAssignmentCount(bool? isAssigning) {
+    if (isAssigning == null) {
+      return false;
+    }
+    if (widget.maxAssignmentCount == null) {
+      return false;
+    }
+    if ((_itemGroupScopeMatchingItemList ?? []).isEmpty) {
+      return false;
+    }
+    final assignedCount = (_itemGroupScopeMatchingItemList ?? [])
+        .where((item) => item['assigned'] == true)
+        .length;
+    final assignedNewCount = (_itemGroupScopeMatchingItemList ?? [])
+        .where((item) => item['assigned_new'] == true)
+        .length;
+    if (assignedCount + assignedNewCount > widget.maxAssignmentCount!) {
+      setState(() {
+        _assignmentErrorText =
+            'Cannot assign more than ${widget.maxAssignmentCount} items to this item group.';
+      });
+    } else {
+      setState(() {
+        _assignmentErrorText = '';
+      });
+    }
+    return assignedCount + assignedNewCount > widget.maxAssignmentCount!;
+  }
+
   @override
   void initState() {
     super.initState();
-
-    // loggedInUser = Provider.of<PagUserProvider>(
-    //   context,
-    //   listen: false,
-    // ).currentUser;
   }
 
   @override
@@ -336,6 +368,14 @@ class _WgtRolePolicyAssignmentState extends State<WgtRolePolicyAssignment> {
             'List of item matching the scope of this item group:',
             style: TextStyle(color: Theme.of(context).hintColor),
           ),
+          if (_assignmentErrorText.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 5.0),
+              child: getErrorTextPrompt(
+                context: context,
+                errorText: _assignmentErrorText,
+              ),
+            ),
           Padding(
             padding: const EdgeInsets.only(top: 5.0),
             child: getAssignmentOpList(),
@@ -666,7 +706,7 @@ class _WgtRolePolicyAssignmentState extends State<WgtRolePolicyAssignment> {
       children: [
         Row(
           mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             SizedBox(
               width: 30,
@@ -748,14 +788,14 @@ class _WgtRolePolicyAssignmentState extends State<WgtRolePolicyAssignment> {
   }
 
   Widget getAssignmentBox(Map<String, dynamic> itemInfo) {
-    String? meterGroupName = itemInfo['assigned_item_group_name'];
-    String? meterGroupLabel = itemInfo['assigned_item_group_label'];
-    bool hasAssignmentInfo = meterGroupName != null;
+    String? itemName = itemInfo['assigned_item_group_name'];
+    String? itemLabel = itemInfo['assigned_item_group_label'];
+    bool hasAssignmentInfo = itemName != null;
 
-    double barWidth = 180;
-    String tooltipMessage = 'assigned to: ${meterGroupName ?? 'None'}';
+    double barWidth = 50;
+    String tooltipMessage = 'assigned to: ${itemName ?? 'None'}';
 
-    double margin = 45;
+    double margin = 0;
     bool checked = itemInfo['assigned_new'] ?? hasAssignmentInfo;
     bool disabled = false;
     return SizedBox(
@@ -767,21 +807,19 @@ class _WgtRolePolicyAssignmentState extends State<WgtRolePolicyAssignment> {
         child: Row(
           children: [
             Checkbox(
-              value:
-                  checked, //itemInfo['assigned_new'] ?? itemInfo['assigned'],
+              value: checked,
               onChanged: disabled
                   ? null
                   : (bool? value) {
                       setState(() {
                         if (value == null) return;
                         itemInfo['assigned_new'] = value;
-                        if (itemInfo['assigned_new'] == true) {
-                          itemInfo['percentage'] =
-                              100.0; // Set to 100% if assigned
+
+                        bool overflowed = _checkAssignmentCount(value);
+                        if (overflowed) {
+                          return; // Do not allow assignment if it exceeds the limit
                         }
-                        // if (itemInfo['assigned_new'] == false) {
-                        //   itemInfo['assignment_info'] = null;
-                        // }
+
                         _checkModified();
                       });
                     },
