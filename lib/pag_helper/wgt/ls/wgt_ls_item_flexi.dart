@@ -1876,7 +1876,6 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       Row(
         children: [
           getAddItemButton(),
-          horizontalSpaceTiny,
           WgtPagItemFinderFlexi(
             key: _finderRefreshKey, //_listContentRefreshKey,
             enableSearch: widget.enableSearch,
@@ -1991,6 +1990,9 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
   }
 
   Widget getAddItemButton() {
+    if (widget.listContextType == PagListContextType.infoTp) {
+      return Container();
+    }
     Color buttonColor = Theme.of(context).colorScheme.primary;
 
     if (widget.itemKind == PagItemKind.tenant ||
@@ -1999,8 +2001,11 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         (widget.pagAppContext == appCtxEms &&
             widget.itemKind == PagItemKind.device) ||
         (widget.listContextType == PagListContextType.rolePermAssignment)) {
-      return IconButton(
-          onPressed: null, icon: const Icon(Symbols.add), color: buttonColor);
+      return Padding(
+        padding: const EdgeInsets.only(right: 10),
+        child: IconButton(
+            onPressed: null, icon: const Icon(Symbols.add), color: buttonColor),
+      );
     }
 
     return IconButton(
