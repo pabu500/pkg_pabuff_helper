@@ -450,6 +450,21 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
 
       _onClearSiteGroup();
 
+      // set initial filter values if any
+      String initialValue = '';
+      for (var colController in widget.listController.listColControllerList) {
+        for (var entry in widget.initialFilterMap.entries) {
+          if (entry.key == colController.colKey) {
+            initialValue = entry.value.toString();
+            colController.filterValue = {
+              'value': initialValue,
+              'label': initialValue
+            };
+            break;
+          }
+        }
+      }
+
       _enableSearch = _enableSearchButton();
     });
 
