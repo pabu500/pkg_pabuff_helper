@@ -207,6 +207,8 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           'item_kind': widget.itemKind.value,
           'item_type_list_str': widget.itemTypeListStr ?? 'NOT_SET',
           'list_context_type': widget.listContextType.name,
+          'op': 'info_edit',
+          'require_all_columns': 'true',
         };
         queryMap.addAll(widget.additionalQuery);
 

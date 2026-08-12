@@ -596,7 +596,8 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
                       getItemKindValidator(
                         widget.itemKind,
                         field['col_key'],
-                        isValueRequired: true,
+                        isValueRequired:
+                            isValueRequiredByField(field['col_key']),
                         itemType: widget.itemTypeEnum,
                       ),
                   textStyle: null,
@@ -657,6 +658,19 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
       // fields.add(verticalSpaceSmall);
     }
     return fields;
+  }
+
+  bool isValueRequiredByField(String fieldColKey) {
+    for (MdlListColController colController
+        in widget.listController?.listColControllerList ?? []) {
+      if (colController.colKey == fieldColKey) {
+        final opInfo = colController.opInfo;
+        if (opInfo != null && opInfo['is_value_required'] == 'false') {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   Widget getUserPasswordReset() {

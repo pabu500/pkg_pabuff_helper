@@ -130,6 +130,7 @@ class _CreateItemState extends State<WgtCreateMeter> {
         'item_kind': PagItemKind.device.value,
         'item_type': PagDeviceCat.meter.value,
         // 'item_type_list_str': widget.itemTypeListStr ?? 'NOT_SET',
+        'op': 'form_create',
       };
 
       _isFetchingListConfig = true;
@@ -173,15 +174,15 @@ class _CreateItemState extends State<WgtCreateMeter> {
       for (MdlListColController colController in listColControllerList) {
         final colKey = colController.colKey;
         if (colKey == 'label') {
-          _isLabelRequired = colController.requiredOnFormCreate;
+          _isLabelRequired = colController.requiredForOp('form_create');
         } else if (colKey == 'sn' || colKey == 'meter_sn') {
-          _isSnRequired = colController.requiredOnFormCreate;
+          _isSnRequired = colController.requiredForOp('form_create');
         } else if (colKey == 'tag') {
-          _isTagRequired = colController.requiredOnFormCreate;
+          _isTagRequired = colController.requiredForOp('form_create');
         } else if (colKey == 'model') {
-          _isModelRequired = colController.requiredOnFormCreate;
+          _isModelRequired = colController.requiredForOp('form_create');
         } else if (colKey == 'meter_type') {
-          _isMeterTypeRequired = colController.requiredOnFormCreate;
+          _isMeterTypeRequired = colController.requiredForOp('form_create');
         } else if (colKey == 'main_sub_meter') {
           // no action needed
         } else if (colKey == 'lc_status') {
@@ -189,9 +190,10 @@ class _CreateItemState extends State<WgtCreateMeter> {
         } else if (colKey == 'phase_type') {
           // no action needed
         } else if (colKey == 'data_type') {
-          _isMeterDataTypeRequired = colController.requiredOnFormCreate;
+          _isMeterDataTypeRequired = colController.requiredForOp('form_create');
         } else if (colKey == 'multiplier_factor') {
-          _isMultiplierFactorRequired = colController.requiredOnFormCreate;
+          _isMultiplierFactorRequired =
+              colController.requiredForOp('form_create');
         } else {
           dev.log('unrecognized col key: $colKey');
         }

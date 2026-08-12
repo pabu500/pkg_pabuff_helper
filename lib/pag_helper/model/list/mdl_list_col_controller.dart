@@ -92,7 +92,7 @@ class MdlListColController {
   List<String>? contextIncludeList;
   List<String>? contextRequiredOnLsList;
   // bool requiredOnOnb;
-  bool requiredOnFormCreate;
+  // bool requiredOnFormCreate;
   bool showInputOnFormCreate;
   bool showFilter;
   // List<Map<String, dynamic>>? opInfoList;
@@ -151,7 +151,7 @@ class MdlListColController {
     this.contextIncludeList,
     this.contextRequiredOnLsList,
     // this.requiredOnOnb = false,
-    this.requiredOnFormCreate = false,
+    // this.requiredOnFormCreate = false,
     this.showInputOnFormCreate = false,
     this.showFilter = false,
     // this.opInfoList,
@@ -183,6 +183,17 @@ class MdlListColController {
     filterValue = null;
     filterWidgetController?.clear();
     filterResetKey = UniqueKey();
+  }
+
+  bool requiredForOp(String op) {
+    if (opInfo == null) {
+      return false;
+    }
+
+    String? opType = opInfo?['op'];
+    bool isValueRequired = opInfo?['is_value_required'] == 'true';
+
+    return opType == op && isValueRequired;
   }
 
   factory MdlListColController.fromJson(Map<String, dynamic> json,
@@ -410,34 +421,6 @@ class MdlListColController {
       }
     }
 
-    // bool requiredOnOnb = false;
-    // if (json['required_on_onb'] != null) {
-    //   dynamic requiredOnOnbValue = json['required_on_onb'];
-    //   if (requiredOnOnbValue is bool) {
-    //     requiredOnOnb = requiredOnOnbValue;
-    //   } else if (requiredOnOnbValue is String) {
-    //     requiredOnOnb = requiredOnOnbValue.toLowerCase() == 'true';
-    //   }
-    // }
-    bool requiredOnFormCreate = false;
-    bool showInputOnFormCreate = false;
-    if (json['op_info_list'] != null) {
-      final dynamic opInfoListValue = json['op_info_list'];
-      if (opInfoListValue is List) {
-        final List<Map<String, dynamic>> opInfoList =
-            List<Map<String, dynamic>>.from(opInfoListValue);
-        for (final opInfo in opInfoList) {
-          if (opInfo['op'] == 'form_create') {
-            requiredOnFormCreate = opInfo['is_value_required'] == 'true';
-            // when there's opInfo for form_create,
-            // we will show the input on form
-            showInputOnFormCreate = true;
-            break;
-          }
-        }
-      }
-    }
-
     Widget Function(
             Map<String, dynamic> row, List<Map<String, dynamic>> fullList)?
         getCustomWidget;
@@ -541,11 +524,46 @@ class MdlListColController {
     //   }
     // }
 
+    // NOTE: op info is the result of filitering opInfoList by selectedOpType,
+    // so we only need to store the filtered opInfo
     Map<String, dynamic>? opInfo;
     if (json['op_info'] != null) {
       dynamic opInfoValue = json['op_info'];
       if (opInfoValue is Map<String, dynamic>) {
         opInfo = opInfoValue;
+      }
+    }
+
+    // bool requiredOnOnb = false;
+    // if (json['required_on_onb'] != null) {
+    //   dynamic requiredOnOnbValue = json['required_on_onb'];
+    //   if (requiredOnOnbValue is bool) {
+    //     requiredOnOnb = requiredOnOnbValue;
+    //   } else if (requiredOnOnbValue is String) {
+    //     requiredOnOnb = requiredOnOnbValue.toLowerCase() == 'true';
+    //   }
+    // }
+    // bool requiredOnFormCreate = false;
+    bool showInputOnFormCreate = false;
+    if (json['op_info_list'] != null) {
+      final dynamic opInfoListValue = json['op_info_list'];
+      if (opInfoListValue is List) {
+        final List<Map<String, dynamic>> opInfoList =
+            List<Map<String, dynamic>>.from(opInfoListValue);
+        for (final opInfo in opInfoList) {
+          if (opInfo['op'] == 'form_create') {
+            // requiredOnFormCreate = opInfo['is_value_required'] == 'true';
+            // when there's opInfo for form_create,
+            // we will show the input on form
+            showInputOnFormCreate = true;
+            break;
+          }
+        }
+      }
+    } else if (opInfo != null) {
+      if (opInfo['op'] == 'form_create') {
+        // requiredOnFormCreate = opInfo?['is_value_required'] == 'true';
+        showInputOnFormCreate = true;
       }
     }
 
@@ -618,7 +636,7 @@ class MdlListColController {
       contextIncludeList: contextIncludeList,
       contextRequiredOnLsList: contextRequiredOnLsList,
       // requiredOnOnb: requiredOnOnb,
-      requiredOnFormCreate: requiredOnFormCreate,
+      // requiredOnFormCreate: requiredOnFormCreate,
       showInputOnFormCreate: showInputOnFormCreate,
       showFilter: showFilter,
       showTimestampAsDate: showTimestampAsDate,
@@ -664,7 +682,7 @@ class MdlListColController {
     data['context_required_on_ls'] = contextRequiredOnLsList;
     data['filter_data_type'] = filterDataType.name;
     // data['required_on_onb'] = requiredOnOnb.toString();
-    data['required_on_form_create'] = requiredOnFormCreate.toString();
+    // data['required_on_form_create'] = requiredOnFormCreate.toString();
     data['show_input_on_form_create'] = showInputOnFormCreate.toString();
     data['show_filter'] = showFilter.toString();
     data['show_timestamp_as_date'] = showTimestampAsDate.toString();

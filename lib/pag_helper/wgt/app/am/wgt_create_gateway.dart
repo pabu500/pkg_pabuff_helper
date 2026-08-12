@@ -109,6 +109,7 @@ class _WgtCreateGatewayState extends State<WgtCreateGateway> {
         'item_kind': PagItemKind.device.value,
         'item_type': PagDeviceCat.gateway.value,
         // 'item_type_list_str': widget.itemTypeListStr ?? 'NOT_SET',
+        'op': 'form_create',
       };
 
       _isFetchingListConfig = true;
@@ -152,15 +153,15 @@ class _WgtCreateGatewayState extends State<WgtCreateGateway> {
       for (MdlListColController colController in listColControllerList) {
         final colKey = colController.colKey;
         if (colKey == 'label') {
-          _isLabelRequired = colController.requiredOnFormCreate;
+          _isLabelRequired = colController.requiredForOp('form_create');
         } else if (colKey == 'sn' || colKey == 'motherboard_sn') {
-          _isSnRequired = colController.requiredOnFormCreate;
+          _isSnRequired = colController.requiredForOp('form_create');
         } else if (colKey == 'iccid') {
-          _isIccidRequired = colController.requiredOnFormCreate;
+          _isIccidRequired = colController.requiredForOp('form_create');
         } else if (colKey == 'ip') {
-          _isIpRequired = colController.requiredOnFormCreate;
+          _isIpRequired = colController.requiredForOp('form_create');
         } else if (colKey == 'model') {
-          _isModelRequired = colController.requiredOnFormCreate;
+          _isModelRequired = colController.requiredForOp('form_create');
         } else {
           dev.log('unrecognized col key: $colKey');
         }

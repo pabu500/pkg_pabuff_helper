@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_item.dart';
 
 import '../model/list/mdl_list_col_controller.dart';
@@ -72,6 +74,7 @@ List<Map<String, dynamic>> getOpListConfig(
       isValueRequired = false;
     }
 
+    // dev.log( 'adding colKey: $colKey, is_id_col: $isIdentityColumn, is_column_mapping_required: $isMappingRequired, is_value_required: $isValueRequired');
     opListConfig.add({
       'col_key': colKey,
       'is_id_col': isIdentityColumn,
@@ -88,18 +91,18 @@ List<Map<String, dynamic>> getOpListConfig(
       ),
     });
     // }
-
-    // sort id col to the top
-    opListConfig.sort((a, b) {
-      if (a['is_id_col'] == true) {
-        return -1;
-      } else if (b['is_id_col'] == true) {
-        return 1;
-      } else {
-        return 0;
-      }
-    });
   }
+
+  // sort id col to the top
+  opListConfig.sort((a, b) {
+    if (a['is_id_col'] == true) {
+      return -1;
+    } else if (b['is_id_col'] == true) {
+      return 1;
+    } else {
+      return 0;
+    }
+  });
 
   return opListConfig;
 }
