@@ -117,3 +117,17 @@ enum PagAclOperationType {
   static PagAclOperationType? byTag(String? tag) =>
       enumByValue(tag, values, (e) => (e).tag);
 }
+
+String? validateResLabel(String? value) {
+  if (value == null || value.isEmpty) {
+    return 'required';
+  }
+
+  // alphanumeric, ., *, _, -, 1-255 characters
+  final regex = RegExp(r'^[a-zA-Z0-9.\*\_\-]{1,255}$');
+  if (!regex.hasMatch(value)) {
+    return 'alphanumeric, ., *, _, -, and 1-255 length';
+  }
+
+  return null;
+}

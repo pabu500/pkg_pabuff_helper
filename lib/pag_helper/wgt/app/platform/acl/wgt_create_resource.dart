@@ -332,7 +332,7 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
               hintText: 'Label',
               labelText: 'Label',
               maxLength: maxFullNameLength,
-              validator: validateTenantLabel,
+              validator: validateResLabel,
               checkUnique: doPagCheckUnique,
               uniqueKey: 'label',
               itemTableName: '$projectName.acl_res_$projectName',
