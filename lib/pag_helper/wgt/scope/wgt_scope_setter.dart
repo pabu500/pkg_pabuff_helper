@@ -1416,7 +1416,8 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
                                 bool updateUiOnly = false;
                                 if (widget.forItemKind == PagItemKind.tariff ||
                                     widget.forItemKind == PagItemKind.tenant ||
-                                    widget.forItemKind == PagItemKind.device) {
+                                    widget.forItemKind == PagItemKind.device ||
+                                    widget.forItemKind == PagItemKind.acl) {
                                   updateUiOnly = true;
                                 }
                                 if (widget.updateUiOnly) {

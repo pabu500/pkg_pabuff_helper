@@ -129,7 +129,7 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
         'item_kind': PagItemKind.acl.value,
         'acl_type': PagAclType.resource.value,
         'label': _newItemLabel,
-        'res_type_name': _resTypeLabel,
+        'res_type_label': _resTypeLabel,
         'item_scope_info': _itemScopeMap,
       };
 
