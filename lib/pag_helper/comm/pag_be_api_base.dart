@@ -317,6 +317,7 @@ class PagUrlBase {
   static const String eptUpdateItemLcStatus = '/item/update_item_lc_status';
 
   // acl
+  static const String eptGetResTypeInfoList = '/acl/get_res_type_info_list';
   static const String eptCreateResourceType = '/acl/create_resource_type';
   static const String eptCreateAclItem = '/acl/create_acl_item';
   static const String eptGetRoleScopePolicyList =

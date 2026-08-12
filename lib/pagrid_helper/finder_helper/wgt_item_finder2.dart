@@ -46,7 +46,7 @@ class WgtItemFinder2 extends StatefulWidget {
     this.sidePadding = EdgeInsets.zero,
     this.useItemLabelDropdownSelector = false,
     this.dropdownSelectorFilter,
-    this.itemLableList = const [],
+    this.itemLabelList = const [],
     this.onLabelSelected,
   });
 
@@ -87,7 +87,7 @@ class WgtItemFinder2 extends StatefulWidget {
   final EdgeInsets sidePadding;
   final bool useItemLabelDropdownSelector;
   final String? dropdownSelectorFilter;
-  final List<String> itemLableList;
+  final List<String> itemLabelList;
   final void Function(String)? onLabelSelected;
 
   @override
@@ -540,7 +540,7 @@ class _WgtItemFinder2State extends State<WgtItemFinder2> {
           child: widget.useItemLabelDropdownSelector
               ? WgtDropdownSelector(
                   hint: widget.itemLabelText,
-                  items: widget.itemLableList,
+                  items: widget.itemLabelList,
                   controller: _labelController,
                   initialValue: _itemLabel,
                   isInitialValueMutable: widget.fixedItemLabel == null,

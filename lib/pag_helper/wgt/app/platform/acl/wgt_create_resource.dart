@@ -17,6 +17,7 @@ import 'package:buff_helper/pag_helper/wgt/wgt_comm_button.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../../xt_ui/wdgt/wgt_pag_wait.dart';
 import '../../../../def_helper/dh_acl.dart';
 import '../../../../model/mdl_pag_app_config.dart';
 
@@ -51,12 +52,63 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
   bool _isNewItemLabelValidated = false;
   UniqueKey? _newItemLabelResetKey;
 
-  String? _resourceTypeName;
-  bool _isResourceTypeNameValidated = false;
-  UniqueKey? _resourceTypeNameResetKey;
+  String? _resTypeLabel;
+  // bool _isResourceTypeNameValidated = false;
+  UniqueKey? _resTypeNameResetKey;
+  final TextEditingController resTypeLabelController = TextEditingController();
 
   final Map<String, dynamic> _itemScopeMap = {};
   UniqueKey? _scopeSetterKey;
+
+  List<String> _resTypeLabelList = [];
+  bool _isFetchingResTypeList = false;
+  bool _isResTypeListFetched = false;
+  String _resTypeListErrorText = '';
+
+  Future<dynamic> _getResTypeLabelList() async {
+    if (_isFetchingResTypeList || _isResTypeListFetched) {
+      return;
+    }
+
+    setState(() {
+      _isFetchingResTypeList = true;
+      _resTypeListErrorText = '';
+    });
+
+    try {
+      final result = await ex(
+        endpoint: PagUrlBase.eptGetResTypeInfoList,
+        crudType: 'read',
+        opStr: 'get resource type list',
+        appConfig: widget.appConfig,
+        queryMap: {
+          'scope': widget.loggedInUser.selectedScope.toScopeMap(),
+        },
+        svcClaim: MdlPagSvcClaim(
+          userId: widget.loggedInUser.id,
+          username: widget.loggedInUser.username,
+          scope: '',
+          target: '',
+          operation: '',
+        ),
+      );
+
+      final resTypeInfoList = result['res_type_info_list'] as List<dynamic>;
+      for (var resTypeInfo in resTypeInfoList) {
+        String label = resTypeInfo['label'] as String;
+        _resTypeLabelList.add(label);
+      }
+    } catch (e) {
+      dev.log('error: $e');
+      _resTypeListErrorText = getErrorText(e,
+          defaultErrorText: 'Error fetching resource type list');
+    } finally {
+      setState(() {
+        _isFetchingResTypeList = false;
+        _isResTypeListFetched = true;
+      });
+    }
+  }
 
   Future<dynamic> _createItem() async {
     setState(() {
@@ -77,7 +129,7 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
         'item_kind': PagItemKind.acl.value,
         'acl_type': PagAclType.resource.value,
         'label': _newItemLabel,
-        'res_type_name': _resourceTypeName,
+        'res_type_name': _resTypeLabel,
         'item_scope_info': _itemScopeMap,
       };
 
@@ -146,6 +198,40 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
 
   @override
   Widget build(BuildContext context) {
+    bool fetchResTypeList = false;
+    if (!_isResTypeListFetched && !_isFetchingResTypeList) {
+      fetchResTypeList = true;
+    }
+    if (fetchResTypeList) {
+      // future builder to fetch resource type list
+      return FutureBuilder(
+        future: _getResTypeLabelList(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: WgtPagWait());
+          } else if (snapshot.hasError) {
+            return Center(
+              child: getErrorTextPrompt(
+                  context: context,
+                  errorText: 'Error fetching resource type list'),
+            );
+          } else {
+            return _buildForm();
+          }
+        },
+      );
+    } else {
+      return _buildForm();
+    }
+  }
+
+  Widget _buildForm() {
+    if (_resTypeListErrorText.isNotEmpty) {
+      return Center(
+        child: getErrorTextPrompt(
+            context: context, errorText: _resTypeListErrorText),
+      );
+    }
     return SingleChildScrollView(
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -162,8 +248,7 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
                   // verticalSpaceTiny,
                   getBasicInfoBlock(),
                   verticalSpaceTiny,
-                  getResourceInfo(),
-
+                  getResourceType(),
                   verticalSpaceTiny,
                   getItemScopeSetter(),
                   verticalSpaceRegular,
@@ -288,7 +373,7 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
     );
   }
 
-  Widget getResourceInfo() {
+  Widget getResourceType() {
     MdlPagScopeProfile scopeProfile = widget.loggedInUser.selectedScope;
     String projectName = scopeProfile.projectProfile!.name;
 
@@ -304,42 +389,77 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
           ),
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
           child: Column(children: [
-            WgtTextField(
-              key: _resourceTypeNameResetKey,
-              appConfig: widget.appConfig,
-              hintText: 'Resource Type Name',
-              labelText: 'Resource Type Name',
-              maxLength: maxFullNameLength,
-              validator: validateItemLabel,
-              onChanged: (val) {
-                setState(() {
-                  _isEditing = true;
-                  if (val != _resourceTypeName) {
-                    _errorText = '';
-                  }
-                });
-                if (val.trim().isNotEmpty) {
-                  setState(() {
-                    _newItem = true;
-                    _createSuccess = false;
-                  });
+            // WgtTextField(
+            //   key: _resourceTypeNameResetKey,
+            //   appConfig: widget.appConfig,
+            //   hintText: 'Resource Type Name',
+            //   labelText: 'Resource Type Name',
+            //   maxLength: maxFullNameLength,
+            //   validator: validateItemLabel,
+            //   onChanged: (val) {
+            //     setState(() {
+            //       _isEditing = true;
+            //       if (val != _resourceTypeName) {
+            //         _errorText = '';
+            //       }
+            //     });
+            //     if (val.trim().isNotEmpty) {
+            //       setState(() {
+            //         _newItem = true;
+            //         _createSuccess = false;
+            //       });
+            //     }
+            //     _resourceTypeName = val;
+            //     return null;
+            //   },
+            //   onEditingComplete: () {
+            //     setState(() {
+            //       _isEditing = false;
+            //     });
+            //   },
+            //   onValidate: (String? result) {
+            //     setState(() {
+            //       if (result == null) {
+            //         _isResourceTypeNameValidated = true;
+            //       } else {
+            //         _isResourceTypeNameValidated = false;
+            //       }
+            //     });
+            //   },
+            // ),
+            WgtDropdownSelector(
+              key: _resTypeNameResetKey,
+              hint: 'Select Resource Type',
+              items: _resTypeLabelList,
+              controller: resTypeLabelController,
+              initialValue: _resTypeLabel,
+              // isInitialValueMutable: widget.fixedItemLabel == null,
+              height: 50,
+              width: 420,
+              onSelected: (String? value) async {
+                // if (value != null) {
+                if (value == _resTypeLabel) {
+                  return;
                 }
-                _resourceTypeName = val;
-                return null;
-              },
-              onEditingComplete: () {
+                // }
                 setState(() {
+                  _resTypeLabel = value;
+                  // _enableSearch = _enableSearchButton();
+                  _errorText = '';
+                  _newItem = true;
+                  _createSuccess = false;
                   _isEditing = false;
                 });
+                // widget.onModified?.call();
+                // widget.onLabelSelected?.call(_resourceTypeLabel!);
               },
-              onValidate: (String? result) {
+              onClear: () {
                 setState(() {
-                  if (result == null) {
-                    _isResourceTypeNameValidated = true;
-                  } else {
-                    _isResourceTypeNameValidated = false;
-                  }
+                  _resTypeLabel = null;
+                  // _enableSearch = _enableSearchButton();
                 });
+                // widget.onModified?.call();
+                // widget.onLabelSelected?.call(_resourceTypeLabel!);
               },
             ),
           ]),

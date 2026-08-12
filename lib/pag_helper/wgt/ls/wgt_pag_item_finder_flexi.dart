@@ -1862,9 +1862,16 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
           )
         : Row(
             children: [
-              getClearButton(),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: getClearButton(),
+              ),
               horizontalSpaceRegular,
-              if (showPanelModeButton) getPanelModeButton(),
+              if (showPanelModeButton)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: getPanelModeButton(),
+                ),
             ],
           );
   }

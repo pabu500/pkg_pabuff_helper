@@ -281,7 +281,7 @@ class _WgtTenantFinder2State extends State<WgtTenantFinder2> {
       showSiteScopeSelector: false,
       sectionName: widget.sectionName,
       useItemLabelDropdownSelector: true,
-      itemLableList: _tenantLabelTypeList,
+      itemLabelList: _tenantLabelTypeList,
       panelTitle: panelTitle,
       panelName: panelName,
       sidePadding: widget.sidePadding,

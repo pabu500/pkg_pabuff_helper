@@ -300,7 +300,7 @@ class _WgtBillingRecFinderState extends State<WgtBillingRecFinder> {
       scopeProfile: widget.scopeProfile,
       showSiteScopeSelector: false,
       useItemLabelDropdownSelector: true,
-      itemLableList: _tenantLabelList,
+      itemLabelList: _tenantLabelList,
       sidePadding: widget.sidePadding,
       sectionName: widget.sectionName,
       panelTitle: panelTitle,
