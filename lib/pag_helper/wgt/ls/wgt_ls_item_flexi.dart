@@ -2005,7 +2005,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     }
 
     return Column(children: [
-      verticalSpaceTiny,
+      // verticalSpaceTiny,
       // if (_selectedListController != null)
       Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -2110,7 +2110,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           ),
         ],
       ),
-      verticalSpaceRegular,
+      verticalSpaceTiny,
       _isFetchingItemList
           ? const WgtPagWait()
           : _errorText.isNotEmpty

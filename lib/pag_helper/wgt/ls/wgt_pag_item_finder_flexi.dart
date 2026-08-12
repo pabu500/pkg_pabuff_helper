@@ -1446,9 +1446,9 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
         bool showScanner = colController.showScanner && _isCompactMode;
         list.add(
           Padding(
-            padding: const EdgeInsets.only(left: 8, right: 8, bottom: 3),
+            padding: const EdgeInsets.only(left: 8, right: 8, bottom: 0),
             child: SizedBox(
-              height: 56,
+              height: 55,
               child: Row(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -1855,7 +1855,9 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
         ? Column(
             children: [
               getClearButton(),
+              verticalSpaceSmall,
               if (showPanelModeButton) getPanelModeButton(),
+              verticalSpaceTiny,
             ],
           )
         : Row(
@@ -1909,12 +1911,10 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   }
 
   Widget getPanelModeButton() {
-    return IconButton(
-      iconSize: 25,
-      tooltip: 'Switch mode',
-      icon: Icon(_isFullPanel ? Icons.unfold_less : Icons.unfold_more,
-          color: Theme.of(context).colorScheme.primary),
-      onPressed: () {
+    return InkWell(
+      child: Icon(_isFullPanel ? Icons.unfold_less : Icons.unfold_more,
+          size: 25, color: Theme.of(context).colorScheme.primary),
+      onTap: () {
         setState(() {
           _isFullPanel = !_isFullPanel;
           dev.log('Toggle panel mode to: $_isFullPanel');
@@ -1924,11 +1924,13 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   }
 
   Widget getClearButton() {
-    return IconButton(
-      iconSize: 25,
-      tooltip: 'Clear search',
-      icon: Icon(Icons.restart_alt, color: Theme.of(context).colorScheme.error),
-      onPressed: () {
+    return InkWell(
+      // iconSize: 25,
+      // tooltip: 'Clear search',
+      // icon: Icon(Icons.restart_alt, color: Theme.of(context).colorScheme.error),
+      child: Icon(Icons.restart_alt,
+          size: 21, color: Theme.of(context).colorScheme.error),
+      onTap: () {
         _clearSearch();
         _iniScopesPreload();
         // final result = iniScopesPreload(
@@ -2003,12 +2005,10 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   }
 
   Widget getCollapseButton() {
-    return IconButton(
-      iconSize: 25,
-      // tooltip: 'Hide search panel',
-      icon: Icon(Symbols.expand_circle_up,
-          color: Theme.of(context).colorScheme.primary),
-      onPressed: () {
+    return InkWell(
+      child: Icon(Symbols.expand_circle_up,
+          size: 21, color: Theme.of(context).colorScheme.primary),
+      onTap: () {
         setState(() {
           _showPanel = false;
           widget.onShowPanel?.call(false);
