@@ -13,6 +13,7 @@ enum PagListContextType {
   billCompilation,
   jobOption,
   rolePermAssignment,
+  linkAssetOp,
 }
 
 enum PagListTypeName {

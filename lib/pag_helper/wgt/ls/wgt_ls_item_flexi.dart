@@ -27,6 +27,7 @@ import 'package:buff_helper/xt_ui/wdgt/show_model_bottom_sheet.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 import 'package:buff_helper/xt_ui/xt_helpers.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:buff_helper/pag_helper/pag_app_context_list.dart';
 import 'package:provider/provider.dart';
@@ -35,6 +36,7 @@ import '../../comm/comm_list.dart';
 import '../../comm/pag_be_api_base.dart';
 import '../../def_helper/dh_acl.dart';
 import '../../def_helper/dh_meter_group.dart';
+import '../../def_helper/dh_pag_acl.dart';
 import '../../model/mdl_pag_app_config.dart';
 import '../app/am/wgt_am_meter_group_assignment2.dart';
 import '../app/am/wgt_create_device.dart';
@@ -2006,6 +2008,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       verticalSpaceTiny,
       // if (_selectedListController != null)
       Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           getAddItemButton(),
           WgtPagItemFinderFlexi(
@@ -2122,9 +2125,31 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
   }
 
   Widget getAddItemButton() {
+    if (context.isPhone) {
+      return Container();
+    }
+    if (widget.appConfig.portalType != PagPortalType.pagConsole) {
+      return Container();
+    }
     if (widget.listContextType == PagListContextType.infoTp) {
       return Container();
     }
+    if (widget.listContextType == PagListContextType.usage) {
+      return Container();
+    }
+    if (widget.listContextType == PagListContextType.billCompilation) {
+      return Container();
+    }
+    if (widget.listContextType == PagListContextType.rolePermAssignment) {
+      return Container();
+    }
+    if (widget.listContextType == PagListContextType.linkAssetOp) {
+      return Container();
+    }
+    if (widget.pagAppContext == appCtxFh) {
+      return Container();
+    }
+
     Color buttonColor = Theme.of(context).colorScheme.primary;
 
     if (widget.itemKind == PagItemKind.tenant ||
