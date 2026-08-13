@@ -3,7 +3,6 @@ import 'dart:developer' as dev;
 import 'package:buff_helper/pag_helper/comm/comm_ex.dart';
 import 'package:buff_helper/pag_helper/comm/comm_pag_item.dart';
 import 'package:buff_helper/pag_helper/comm/pag_be_api_base.dart';
-import 'package:buff_helper/pag_helper/def_helper/dh_pag_tenant.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_item.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_building_profile.dart';
@@ -64,6 +63,8 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
   bool _isFetchingResTypeList = false;
   bool _isResTypeListFetched = false;
   String _resTypeListErrorText = '';
+
+  bool _isProjectScope = false;
 
   Future<dynamic> _getResTypeLabelList() async {
     if (_isFetchingResTypeList || _isResTypeListFetched) {
@@ -131,6 +132,7 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
         'label': _newItemLabel,
         'res_type_label': _resTypeLabel,
         'item_scope_info': _itemScopeMap,
+        'is_project_scope': _isProjectScope.toString(),
       };
 
       final result = await ex(
@@ -185,7 +187,9 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
       return false;
     }
 
-    return _newItemLabel != null && _itemScopeMap.isNotEmpty;
+    return _newItemLabel != null &&
+        _resTypeLabel != null &&
+        (_itemScopeMap.isNotEmpty || _isProjectScope);
   }
 
   @override
@@ -332,6 +336,7 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
               hintText: 'Label',
               labelText: 'Label',
               maxLength: maxFullNameLength,
+              requireUnique: true,
               validator: validateResLabel,
               checkUnique: doPagCheckUnique,
               uniqueKey: 'label',
@@ -449,6 +454,8 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
                   _newItem = true;
                   _createSuccess = false;
                   _isEditing = false;
+
+                  _checkEnableButton();
                 });
                 // widget.onModified?.call();
                 // widget.onLabelSelected?.call(_resourceTypeLabel!);
@@ -456,7 +463,8 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
               onClear: () {
                 setState(() {
                   _resTypeLabel = null;
-                  // _enableSearch = _enableSearchButton();
+
+                  _checkEnableButton();
                 });
                 // widget.onModified?.call();
                 // widget.onLabelSelected?.call(_resourceTypeLabel!);
@@ -476,13 +484,15 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
         appConfig: widget.appConfig,
         width: width,
         labelWidth: 130,
+        allowProjectScope: true,
         // itemScopeMap: widget.itemScopeMap!,
         forItemKind: PagItemKind.acl,
         // forScopeType: widget.itemType is PagScopeType ? widget.itemType : null,
         onScopeSet: (dynamic profile) {
           if (profile == null) {
-            dev.log('Profile is null');
-            return {};
+            // dev.log('Profile is null');
+            // return {};
+            // null means project scope
           }
           String scopeIdColName = '';
           String scopeNameColName = '';
@@ -503,12 +513,19 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
             scopeNameColName = 'location_name';
           }
           if (scopeIdColName.isEmpty) {
-            dev.log('Invalid profile type');
-            return {};
+            // dev.log('Invalid profile type');
+            // null means project scope, so we can return an empty map
+            _isProjectScope = true;
           }
           setState(() {
-            _itemScopeMap[scopeIdColName] = profile.id.toString();
-            _itemScopeMap[scopeNameColName] = profile.name;
+            if (!_isProjectScope) {
+              _itemScopeMap[scopeIdColName] = profile.id.toString();
+              _itemScopeMap[scopeNameColName] = profile.name;
+            }
+            if (_itemScopeMap.isNotEmpty) {
+              _isProjectScope = false;
+            }
+            _checkEnableButton();
           });
         },
       ),

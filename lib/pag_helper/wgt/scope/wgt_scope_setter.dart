@@ -40,6 +40,7 @@ class WgtScopeSetter extends StatefulWidget {
     // if false, the scope must be set from SG all the way down to L
     this.isFlexiScope = false,
     this.updateUiOnly = false,
+    this.allowProjectScope = false,
   });
 
   final MdlPagAppConfig appConfig;
@@ -58,6 +59,7 @@ class WgtScopeSetter extends StatefulWidget {
   final bool isFlexiScope;
   final bool
       updateUiOnly; // if true, the scope setter will not commit the scope
+  final bool allowProjectScope;
 
   @override
   State<WgtScopeSetter> createState() => _WgtScopeSetterState();
@@ -141,6 +143,8 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
   UniqueKey? _buildingInputSelectKey;
   UniqueKey? _locationGroupInputSelectKey;
   UniqueKey? _locationInputSelectKey;
+
+  bool _isProjectScope = false;
 
   // late final TextEditingController _locationInputSelectController = TextEditingController();
 
@@ -544,6 +548,9 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
 
   bool _isNullScope() {
     bool isNull = false;
+    if (_isProjectScope) {
+      return true;
+    }
     if (widget.forScopeType == PagScopeType.siteGroup) {
       isNull = isNull || _selectedSiteProfile == null;
     }
@@ -767,6 +774,32 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
                       ),
               ],
             ),
+    );
+  }
+
+  Widget getProjectScopeSelector() {
+    return Row(
+      children: [
+        //checkbox to select project scope
+        Checkbox(
+            value: _isProjectScope,
+            onChanged: !_isEditing
+                ? null
+                : (bool? value) {
+                    setState(() {
+                      _isProjectScope = value ?? false;
+                      if (_isProjectScope) {
+                        _selectedSiteGroupProfile = null;
+                        _selectedSiteProfile = null;
+                        _selectedBuildingProfile = null;
+                        _selectedLocationGroupProfile = null;
+                        _selectedLocation = null;
+                      }
+                      _markModified();
+                    });
+                  }),
+        Text('Project Scope', style: dropDownListHintStyle),
+      ],
     );
   }
 
@@ -1260,23 +1293,30 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
       case PagItemKind.role:
         break;
       case PagItemKind.acl:
+        if (widget.allowProjectScope && _isProjectScope) {
+          enableCommit = true;
+        }
         break;
       default:
-        if (_selectedLocation == null) {
-          enableCommit = false;
+        if (widget.allowProjectScope && _isProjectScope) {
+          enableCommit = true;
+        } else {
+          if (_selectedLocation == null) {
+            enableCommit = false;
+          }
         }
         break;
     }
 
-    bool isNull = _isNullScope();
+    bool isNullScope = _isNullScope();
 
-    if (isNull) {
+    if (isNullScope && !widget.allowProjectScope) {
       enableCommit = false;
     }
     /////////////////////////
 
     bool showClear = true;
-    if (isNull) {
+    if (isNullScope) {
       showClear = false;
     }
     if (_committedMessage.isNotEmpty) {
@@ -1309,6 +1349,7 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
                     )
                   : Container(),
             ),
+            if (widget.allowProjectScope) getProjectScopeSelector(),
             Expanded(child: Container()),
             if (_showCommitted ?? false)
               Row(
@@ -1340,48 +1381,54 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
                             : () async {
                                 bool isNull = _isNullScope();
 
-                                if (isNull) {
+                                if (isNull && !widget.allowProjectScope) {
                                   setState(() {
                                     _isEditing = false;
                                   });
                                   return;
                                 }
-                                bool isEqual = true;
-                                if (widget.forScopeType !=
-                                    PagScopeType.siteGroup) {
-                                  isEqual = isEqual &&
-                                      (_selectedSiteGroupProfile ==
-                                          originalSiteGroupProfile);
-                                }
-                                if (widget.forScopeType != PagScopeType.site) {
-                                  isEqual = isEqual &&
-                                      (_selectedSiteProfile ==
-                                          originalSiteProfile);
-                                }
-                                if (widget.forScopeType !=
-                                    PagScopeType.building) {
-                                  isEqual = isEqual &&
-                                      (_selectedBuildingProfile ==
-                                          originalBuildingProfile);
-                                }
-                                if (widget.forScopeType !=
-                                    PagScopeType.locationGroup) {
-                                  isEqual = isEqual &&
-                                      (_selectedLocationGroupProfile ==
-                                          originalLocationGroupProfile);
-                                }
-                                // if (widget.forItemKind != PagItemKind.scope) {
-                                if ((widget.forScopeType !=
-                                        PagScopeType.location) ||
-                                    (widget.forItemKind != PagItemKind.scope)) {
-                                  isEqual = isEqual &&
-                                      (_selectedLocation == originalLocation);
-                                }
-                                if (isEqual) {
-                                  setState(() {
-                                    _isEditing = false;
-                                  });
-                                  return;
+                                if (widget.allowProjectScope &&
+                                    _isProjectScope) {
+                                } else {
+                                  bool isEqual = true;
+                                  if (widget.forScopeType !=
+                                      PagScopeType.siteGroup) {
+                                    isEqual = isEqual &&
+                                        (_selectedSiteGroupProfile ==
+                                            originalSiteGroupProfile);
+                                  }
+                                  if (widget.forScopeType !=
+                                      PagScopeType.site) {
+                                    isEqual = isEqual &&
+                                        (_selectedSiteProfile ==
+                                            originalSiteProfile);
+                                  }
+                                  if (widget.forScopeType !=
+                                      PagScopeType.building) {
+                                    isEqual = isEqual &&
+                                        (_selectedBuildingProfile ==
+                                            originalBuildingProfile);
+                                  }
+                                  if (widget.forScopeType !=
+                                      PagScopeType.locationGroup) {
+                                    isEqual = isEqual &&
+                                        (_selectedLocationGroupProfile ==
+                                            originalLocationGroupProfile);
+                                  }
+                                  // if (widget.forItemKind != PagItemKind.scope) {
+                                  if ((widget.forScopeType !=
+                                          PagScopeType.location) ||
+                                      (widget.forItemKind !=
+                                          PagItemKind.scope)) {
+                                    isEqual = isEqual &&
+                                        (_selectedLocation == originalLocation);
+                                  }
+                                  if (isEqual) {
+                                    setState(() {
+                                      _isEditing = false;
+                                    });
+                                    return;
+                                  }
                                 }
 
                                 if (!_isModified) {

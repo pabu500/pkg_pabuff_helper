@@ -1,7 +1,6 @@
 import 'package:buff_helper/pag_helper/def_helper/dh_device.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_meter_group.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_item.dart';
-import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
 import 'package:buff_helper/pag_helper/pag_app_context_list.dart';
 import 'package:buff_helper/pag_helper/wgt/ls/wgt_item_type_selector.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
@@ -11,7 +10,6 @@ import 'package:buff_helper/pag_helper/wgt/app/am/wgt_create_mcu.dart';
 import 'package:buff_helper/pag_helper/wgt/app/am/wgt_create_meter.dart';
 import 'package:buff_helper/pag_helper/wgt/app/am/wgt_create_motherboard.dart';
 import 'package:buff_helper/pag_helper/wgt/app/am/wgt_create_sim.dart';
-import 'package:provider/provider.dart';
 
 import '../../../model/mdl_pag_app_config.dart';
 import 'wgt_create_meter_group.dart';
