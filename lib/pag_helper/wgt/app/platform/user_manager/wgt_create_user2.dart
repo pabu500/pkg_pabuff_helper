@@ -3,7 +3,6 @@ import 'dart:developer' as dev;
 import 'package:buff_helper/pag_helper/comm/comm_user_service.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
-import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
 import 'package:buff_helper/pag_helper/wgt/wgt_comm_button.dart';
 import 'package:buff_helper/up_helper/helper/auth_helper.dart';
 import 'package:buff_helper/xt_ui/util/xt_util_InputFieldValidator.dart';
@@ -19,7 +18,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:buff_helper/pag_helper/comm/comm_pag_item.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_user.dart';
-import 'package:provider/provider.dart';
 
 import '../../../../model/mdl_pag_app_config.dart';
 
@@ -80,6 +78,7 @@ class _CreateUserState extends State<WgtCreateUser2> {
   bool _isPhoneValidated = false;
   String? _password;
   bool _isPasswordValidated = false;
+  String? _passwordValidateResult;
   String? _confirmPassword;
   bool _isConfirmPasswordValidated = false;
   String? _designation;
@@ -1031,8 +1030,11 @@ class _CreateUserState extends State<WgtCreateUser2> {
                     setState(() {
                       if (result == null) {
                         _isPasswordValidated = true;
+                        _passwordValidateResult = null;
                       } else {
+                        // dev.log('password validation failed: $result');
                         _isPasswordValidated = false;
+                        _passwordValidateResult = result;
                       }
                     });
                   },
@@ -1041,6 +1043,7 @@ class _CreateUserState extends State<WgtCreateUser2> {
                     prefixIcon: Icon(Icons.password_rounded,
                         color: Theme.of(context).hintColor),
                     hintText: 'Password',
+                    errorText: _passwordValidateResult,
                     suffix: Focus(
                       descendantsAreFocusable: false,
                       canRequestFocus: false,

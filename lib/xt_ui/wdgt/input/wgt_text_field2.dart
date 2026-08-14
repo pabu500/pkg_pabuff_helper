@@ -172,6 +172,7 @@ class _WgtTextFieldState extends State<WgtTextField> {
               setState(() {
                 _isValidated = false;
                 _errorText = result!;
+                dev.log('onFocusChange: errorText: $_errorText');
               });
               return;
             } else {
@@ -235,6 +236,7 @@ class _WgtTextFieldState extends State<WgtTextField> {
                     setState(() {
                       _isValidated = false;
                       _errorText = result!;
+                      dev.log('onChanged: errorText: $_errorText');
                     });
                     return;
                   } else {
@@ -259,6 +261,7 @@ class _WgtTextFieldState extends State<WgtTextField> {
                   setState(() {
                     _isValidated = false;
                     _errorText = result!;
+                    dev.log('onEditingComplete: errorText: $_errorText');
                   });
                   return;
                 } else {
