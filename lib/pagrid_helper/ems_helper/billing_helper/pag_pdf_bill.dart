@@ -191,6 +191,7 @@ class PagPdfBillCwP2 {
 
   dynamic _logo;
 
+  final double size0 = 7;
   final double size1 = 8.5;
   final double size2 = 9.5;
   final double size3 = 10;
@@ -198,18 +199,15 @@ class PagPdfBillCwP2 {
   final double size5 = 12;
   final double size6 = 13;
 
-  late final pw.TextStyle styleSmall = pw.TextStyle(
-    fontSize: size1,
-    color: _darkColor,
-  );
-  late final pw.TextStyle styleNormal = pw.TextStyle(
-    fontSize: size2,
-    color: _darkColor,
-  );
-  late final pw.TextStyle styleLarge = pw.TextStyle(
-    fontSize: size3,
-    color: _darkColor,
-  );
+  late final pw.TextStyle styleTiny =
+      pw.TextStyle(fontSize: size0, color: _darkColor);
+
+  late final pw.TextStyle styleSmall =
+      pw.TextStyle(fontSize: size1, color: _darkColor);
+  late final pw.TextStyle styleNormal =
+      pw.TextStyle(fontSize: size2, color: _darkColor);
+  late final pw.TextStyle styleLarge =
+      pw.TextStyle(fontSize: size3, color: _darkColor);
 
   final double footnoteWidth = 470;
 
@@ -1709,22 +1707,35 @@ class PagPdfBillCwP2 {
           String meterSn = meterUsageSummary['meter_sn'] ?? '';
           String locatinLabel = meterUsageSummary['location_label'] ?? '';
           String buildingLabel = meterUsageSummary['building_label'] ?? '';
+          String strFirstReadingTime =
+              meterUsageSummary['first_reading_timestamp'] ?? '';
           String strFirstReading =
               meterUsageSummary['first_reading_value'] ?? '';
+
+          String strLastReadingTime =
+              meterUsageSummary['last_reading_timestamp'] ?? '';
           String strLastReading = meterUsageSummary['last_reading_value'] ?? '';
           String strUsage = meterUsageSummary['usage'] ?? '';
+          if (strFirstReadingTime.length > 10) {
+            strFirstReadingTime = strFirstReadingTime.substring(0, 10);
+          }
+          if (strLastReadingTime.length > 10) {
+            strLastReadingTime = strLastReadingTime.substring(0, 10);
+          }
 
           typeGroupList.add(pw.TableRow(
             children: [
-              pw.Text('  $buildingLabel', style: styleSmall),
-              pw.Text('  $meterSn', style: styleSmall),
-              pw.Text('  $locatinLabel', style: styleSmall),
+              pw.Text('  $buildingLabel', style: styleTiny),
+              pw.Text('  $meterSn', style: styleTiny),
+              pw.Text('  $locatinLabel', style: styleTiny),
               pw.Text('  $strFirstReading', style: styleSmall),
+              pw.Text('  $strFirstReadingTime', style: styleTiny),
               pw.Text('  $strLastReading', style: styleSmall),
+              pw.Text('  $strLastReadingTime', style: styleTiny),
               pw.Text('  x${typeUsageFactor?.toStringAsFixed(0) ?? ''}',
-                  style: styleSmall),
+                  style: styleTiny),
               pw.Text('  $strUsage', style: styleSmall),
-              pw.Text('  ${meterType.unit}', style: styleSmall),
+              pw.Text('  ${meterType.unit}', style: styleTiny),
             ],
           ));
         }
@@ -1749,35 +1760,31 @@ class PagPdfBillCwP2 {
       pw.Table(
         border: pw.TableBorder.all(color: PdfColors.grey600, width: 0.5),
         columnWidths: {
-          0: const pw.FixedColumnWidth(120),
-          1: const pw.FixedColumnWidth(55),
-          2: const pw.FixedColumnWidth(65),
-          3: const pw.FixedColumnWidth(65),
-          4: const pw.FixedColumnWidth(65),
-          5: const pw.FixedColumnWidth(20),
-          6: const pw.FixedColumnWidth(60),
-          7: const pw.FixedColumnWidth(30),
+          0: const pw.FixedColumnWidth(115),
+          1: const pw.FixedColumnWidth(70),
+          2: const pw.FixedColumnWidth(60),
+          3: const pw.FixedColumnWidth(85),
+          4: const pw.FixedColumnWidth(85),
+          5: const pw.FixedColumnWidth(85),
+          6: const pw.FixedColumnWidth(85),
+          7: const pw.FixedColumnWidth(20),
+          8: const pw.FixedColumnWidth(60),
+          9: const pw.FixedColumnWidth(30),
         },
         defaultVerticalAlignment: pw.TableCellVerticalAlignment.middle,
         children: [
           pw.TableRow(
             children: [
-              pw.Text('  Building',
-                  style: styleSmall.copyWith(fontWeight: pw.FontWeight.bold)),
-              pw.Text('  Meter S/N',
-                  style: styleSmall.copyWith(fontWeight: pw.FontWeight.bold)),
-              pw.Text('  Unit Number',
-                  style: styleSmall.copyWith(fontWeight: pw.FontWeight.bold)),
-              pw.Text('  First Reading',
-                  style: styleSmall.copyWith(fontWeight: pw.FontWeight.bold)),
-              pw.Text('  Last Reading',
-                  style: styleSmall.copyWith(fontWeight: pw.FontWeight.bold)),
-              pw.Text('  M',
-                  style: styleSmall.copyWith(fontWeight: pw.FontWeight.bold)),
-              pw.Text('  Usage',
-                  style: styleSmall.copyWith(fontWeight: pw.FontWeight.bold)),
-              pw.Text('  Unit',
-                  style: styleSmall.copyWith(fontWeight: pw.FontWeight.bold)),
+              pw.Text('  Building', style: styleTiny),
+              pw.Text('  Meter S/N', style: styleTiny),
+              pw.Text('  Unit #', style: styleTiny),
+              pw.Text('  First Reading V', style: styleTiny),
+              pw.Text('  First Reading T', style: styleTiny),
+              pw.Text('  Last Reading V', style: styleTiny),
+              pw.Text('  Last Reading T', style: styleTiny),
+              pw.Text('  M', style: styleTiny),
+              pw.Text('  Usage', style: styleTiny),
+              pw.Text('  Unit', style: styleTiny),
             ],
           ),
           // ...meterUsageInfoList,
