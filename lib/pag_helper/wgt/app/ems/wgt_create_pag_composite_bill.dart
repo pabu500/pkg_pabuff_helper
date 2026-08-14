@@ -784,6 +784,11 @@ class _WgtCreatePagCompositeBillState extends State<WgtCreatePagCompositeBill> {
                       }
                       setState(() {
                         _timePickerKey = UniqueKey();
+
+                        _billDate = null;
+                        _collectionEndDate = null;
+                        _collectionStartDate = null;
+
                         _singularBillListOK =
                             _singularBillInfoList.isNotEmpty &&
                                 _singularBillInfoList.every((element) =>
