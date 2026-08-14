@@ -1244,7 +1244,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
     if (_lcStatusDisplay == PagPaymentLcStatus.matched) {
       return const SizedBox.shrink();
     }
-    bool isEnabled = true;
+    bool isEnabled = _paymentApplyInfoListNew.isEmpty;
     return Row(
       children: [
         Text('Auto ', style: billKeyStyle),
@@ -1257,13 +1257,11 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
                     if (_inManualOverride) {
                       _isPopulated = false;
                       _paymentApplyInfoListNew.clear();
-                      _availablePaymentAmountToApply =
-                          _initialPaymentAmountToApply;
+                      // _availablePaymentAmountToApply = _initialPaymentAmountToApply;
                     } else {
                       _isPopulated = false;
                       _paymentApplyInfoListNew.clear();
-                      _availablePaymentAmountToApply =
-                          _initialPaymentAmountToApply;
+                      // _availablePaymentAmountToApply = _initialPaymentAmountToApply;
                     }
                   });
                 }
