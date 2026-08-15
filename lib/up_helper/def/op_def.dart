@@ -439,8 +439,10 @@ MeterCommType getMeterCommType(String? typeStr) {
     case 'mms':
       return MeterCommType.mms;
     case 'evs2_loop':
+    case 'evs2loop':
       return MeterCommType.evs2loop;
     case 'evs2_mcu':
+    case 'evs2mcu':
       return MeterCommType.evs2mcu;
     case 'mcu05':
       return MeterCommType.mcu05;
