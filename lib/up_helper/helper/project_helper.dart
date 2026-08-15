@@ -573,6 +573,16 @@ String? getSiteDisplayString(SiteScope? site) {
       return 'UTown';
     case SiteScope.NUS_VH:
       return 'VH';
+    case SiteScope.NUS_EH:
+      return 'EH';
+    case SiteScope.NUS_TH:
+      return 'TH';
+    case SiteScope.NUS_SH:
+      return 'SH';
+    case SiteScope.NUS_KRH:
+      return 'KRH';
+    case SiteScope.NUS_KE7H:
+      return 'KE7H';
     case SiteScope.SUTD_CAMPUS:
       return 'SUTD';
     case SiteScope.NTU_MR:
@@ -620,6 +630,16 @@ SiteScope? getSiteScopeFromStr(String? scopeStr) {
       return SiteScope.NUS_UTOWN;
     case 'NUS_VH':
       return SiteScope.NUS_VH;
+    case 'NUS_EH':
+      return SiteScope.NUS_EH;
+    case 'NUS_TH':
+      return SiteScope.NUS_TH;
+    case 'NUS_SH':
+      return SiteScope.NUS_SH;
+    case 'NUS_KE7H':
+      return SiteScope.NUS_KE7H;
+    case 'NUS_KRH':
+      return SiteScope.NUS_KRH;
     case 'SUTD_CAMPUS':
       return SiteScope.SUTD_CAMPUS;
     case 'NTU_MR':
@@ -844,7 +864,7 @@ bool is2402EVS1(String displayname) {
 }
 
 bool isNusFiveHallsBySiteTag(String? siteTag) {
-  if(siteTag == null){
+  if (siteTag == null) {
     return false;
   }
   if (siteTag == 'nus_eh' ||

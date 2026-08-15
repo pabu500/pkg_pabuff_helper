@@ -57,6 +57,14 @@ enum ItemIsMain {
   no,
 }
 
+enum CpcStatus {
+  on,
+  off,
+  want_on,
+  want_off,
+  unknown,
+}
+
 ItemOpLifecycleStatus getItemOpLifecycleStatus(String? statusStr) {
   if (statusStr == null || statusStr.isEmpty) {
     return ItemOpLifecycleStatus.normal;
@@ -471,6 +479,129 @@ final Map<MeterCommType, dynamic> meterCommTypeInfo = {
 
 Widget getCommTypeTagWidget(MeterCommType commType) {
   Map<String, dynamic> tagInfo = meterCommTypeInfo[commType] ?? {};
+
+  if (tagInfo.isEmpty) {
+    return Container();
+  }
+  return Container(
+    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+    decoration: BoxDecoration(
+      color: tagInfo['color'],
+      borderRadius: BorderRadius.circular(4),
+    ),
+    child: Text(
+      tagInfo['tag'],
+      style: const TextStyle(
+        color: Colors.white,
+        fontSize: 10,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+  );
+}
+
+Map<String, dynamic> getCpcStatusTag(row, fieldKey) {
+  if ((row['cpc_status'] ?? '').isEmpty) {
+    return {};
+  }
+  if (row['cpc_status'] == '-') {
+    return {};
+  }
+  String valueStr = row['cpc_status'].toString().toLowerCase();
+  // if (valueStr.length == 18 && valueStr.startsWith('89')) {
+  //   valueStr = 'mms';
+  // }
+  CpcStatus? status = getCpcStatus(valueStr);
+  if (status == CpcStatus.unknown) {
+    return {};
+  }
+
+  return {
+    'tag': getCpcStatusTagStr(valueStr),
+    'color': getCpcStatusColor(status.name),
+    'tooltip': getCpcStatusMessage(status.name),
+  };
+}
+
+String? getCpcStatusTagStr(String? statusStr) {
+  // if ((statusStr ?? '').isEmpty) {
+  //   return null;
+  // }
+  CpcStatus? status = getCpcStatus(statusStr);
+
+  return cpcStatusInfo[status]!['tag'];
+}
+
+String getCpcStatusMessage(String? statusStr) {
+  if (statusStr == null) {
+    return 'N/A';
+  }
+  CpcStatus? status = CpcStatus.values.byName(statusStr);
+
+  return cpcStatusInfo[status]!['tooltip'];
+}
+
+Color getCpcStatusColor(String? statusStr) {
+  if (statusStr == null || statusStr.isEmpty) {
+    return Colors.transparent;
+  }
+  CpcStatus? status = CpcStatus.values.byName(statusStr);
+
+  return cpcStatusInfo[status]!['color'];
+}
+
+CpcStatus getCpcStatus(String? typeStr) {
+  if (typeStr == null || typeStr.isEmpty) {
+    return CpcStatus.unknown;
+  }
+  if (typeStr == '-') {
+    return CpcStatus.unknown;
+  }
+
+  switch (typeStr) {
+    case 'on':
+      return CpcStatus.on;
+    case 'off':
+      return CpcStatus.off;
+    case 'want_on':
+      return CpcStatus.want_on;
+    case 'want_off':
+      return CpcStatus.want_off;
+    default:
+      return CpcStatus.unknown;
+  }
+}
+
+final Map<CpcStatus, dynamic> cpcStatusInfo = {
+  CpcStatus.on: {
+    'tag': 'on',
+    'color': Colors.green,
+    'tooltip': 'CPC On',
+  },
+  CpcStatus.off: {
+    'tag': 'off',
+    'color': Colors.red,
+    'tooltip': 'CPC Off',
+  },
+  CpcStatus.want_on: {
+    'tag': 'w_on',
+    'color': Colors.teal.shade900,
+    'tooltip': 'CPC Want On',
+  },
+  CpcStatus.want_off: {
+    'tag': 'w_off',
+    'color': Colors.red.shade900,
+    'tooltip': 'CPC Want Off',
+  },
+  CpcStatus.unknown: {
+    'tag': '',
+    'color': Colors.transparent,
+    'tooltip': '',
+  },
+};
+
+Widget getCpcStatusTagWidget(CpcStatus cpcStatus) {
+  Map<String, dynamic> tagInfo = cpcStatusInfo[cpcStatus] ?? {};
 
   if (tagInfo.isEmpty) {
     return Container();

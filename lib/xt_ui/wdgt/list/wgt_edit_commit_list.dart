@@ -103,7 +103,7 @@ class WgtEditCommitList extends StatefulWidget {
 }
 
 class _WgtEditCommitListState extends State<WgtEditCommitList> {
-  final double _indexWidth = 34;
+  final double _indexWidth = 55;
 
   bool _modified = false;
   // late double _lastColWidth;
@@ -601,8 +601,8 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
             configItem['getDisplayString'](row[configItem['fieldKey']]) ?? '';
       }
       if (configItem['useThousandSeparator'] == true) {
-        originalFullText =
-            getCommaNumberStr(double.tryParse(originalFullText), decimal: _decimal);
+        originalFullText = getCommaNumberStr(double.tryParse(originalFullText),
+            decimal: _decimal);
       }
 
       bool showTag = false;
