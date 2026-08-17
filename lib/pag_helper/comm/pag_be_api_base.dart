@@ -320,6 +320,9 @@ class PagUrlBase {
   static const String eptGetResTypeInfoList = '/acl/get_res_type_info_list';
   static const String eptCreateResourceType = '/acl/create_resource_type';
   static const String eptCreateAclItem = '/acl/create_acl_item';
+  static const String eptDeleteAclRes = '/acl/delete_res';
+  static const String eptDeleteAclPerm = '/acl/delete_perm';
+  static const String eptDeleteAclPolicy = '/acl/delete_policy';
   static const String eptGetRoleScopePolicyList =
       '/acl/role/get_role_scope_policy_list';
   static const String eptUpdateRolePolicyList =

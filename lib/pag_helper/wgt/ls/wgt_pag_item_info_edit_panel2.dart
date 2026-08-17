@@ -244,6 +244,104 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
     }
   }
 
+  Future<Map<String, dynamic>> _doDeleteAclItem(PagAclType aclType) async {
+    if (_isDeleting) {
+      return {};
+    }
+
+    setState(() {
+      _isDeleting = true;
+      _deleteResultText = '';
+    });
+
+    try {
+      final endpoint = switch (aclType) {
+        PagAclType.resource => PagUrlBase.eptDeleteAclRes,
+        PagAclType.permission => PagUrlBase.eptDeleteAclPerm,
+        PagAclType.policy => PagUrlBase.eptDeleteAclPolicy,
+      };
+      final itemIdKey = switch (aclType) {
+        PagAclType.resource => 'res_id',
+        PagAclType.permission => 'perm_id',
+        PagAclType.policy => 'policy_id',
+      };
+
+      final result = await ex(
+        endpoint: endpoint,
+        crudType: 'delete',
+        opStr: 'delete ACL ${aclType.label.toLowerCase()}',
+        appConfig: widget.appConfig,
+        queryMap: {
+          'scope': _loggedInUser!.selectedScope.toScopeMap(),
+          itemIdKey: widget.strItemIndex,
+        },
+        svcClaim: MdlPagSvcClaim(
+          userId: _loggedInUser!.id,
+          username: _loggedInUser!.username,
+          scope: '',
+          target: '',
+          operation: 'delete',
+        ),
+      );
+
+      return result is Map<String, dynamic> ? result : {};
+    } catch (e) {
+      dev.log(e.toString());
+      return {
+        'error': getErrorText(e,
+            defaultErrorText: 'Error deleting ACL ${aclType.label}')
+      };
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isDeleting = false;
+        });
+      }
+    }
+  }
+
+  void _showDeleteAclItemConfirmation(String itemName, PagAclType aclType) {
+    final itemLabel = aclType.label.toLowerCase();
+    final usageDescription = switch (aclType) {
+      PagAclType.resource => 'a permission',
+      PagAclType.permission => 'a policy',
+      PagAclType.policy => 'a role or permission assignment',
+    };
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return WgtConfirmBox(
+          title: 'Delete ${aclType.label}',
+          message1: 'This operation will delete the selected ACL $itemLabel',
+          message2: 'A $itemLabel used by $usageDescription cannot be deleted',
+          opName: 'delete_acl_${aclType.value}',
+          keyInConfirmStrList: ['delete', itemName],
+          itemCount: 1,
+          onConfirm: () async {
+            final result = await _doDeleteAclItem(aclType);
+            if (!mounted) {
+              return;
+            }
+
+            if (result['error'] != null) {
+              setState(() {
+                _deleteResultText = result['error'].toString();
+              });
+              return;
+            }
+
+            setState(() {
+              _deleteResultText = 'Item deleted';
+            });
+            widget.onUpdate?.call();
+            Navigator.of(this.context).pop();
+          },
+        );
+      },
+    );
+  }
+
   void _updateIsTenantUser(List<Map<String, dynamic>> userRoleList) {
     bool isTenantUser = false;
     for (Map<String, dynamic> roleInfo in userRoleList) {
@@ -334,6 +432,9 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
       case PagItemKind.bill:
         isDeleteableItem = true;
         break;
+      case PagItemKind.acl:
+        isDeleteableItem = widget.itemTypeEnum is PagAclType;
+        break;
       default:
         break;
     }
@@ -343,6 +444,8 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isAclItem =
+        widget.itemKind == PagItemKind.acl && widget.itemTypeEnum is PagAclType;
     bool isItemMFD = false;
     for (Map<String, dynamic> field in widget.fieldList) {
       if (field['col_key'] != 'lc_status') {
@@ -439,6 +542,23 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
                     child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
+                          if (isAclItem &&
+                              isDeleteableItem &&
+                              isDeleteableByAcl)
+                            _isDeleting
+                                ? const WgtPagWait(size: 21)
+                                : IconButton(
+                                    tooltip:
+                                        'Delete ${(widget.itemTypeEnum as PagAclType).label.toLowerCase()}',
+                                    icon: Icon(Icons.delete,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .error),
+                                    onPressed: () =>
+                                        _showDeleteAclItemConfirmation(itemName,
+                                            widget.itemTypeEnum as PagAclType),
+                                  ),
+                          horizontalSpaceTiny,
                           Text(_itemDisplayName ?? '',
                               style: TextStyle(
                                   fontSize: 21,
@@ -472,6 +592,15 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
               ]),
               // verticalSpaceSmall,
               const Divider(height: 1),
+              if (isAclItem && _deleteResultText.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: _deleteResultText.contains('deleted')
+                      ? Text(_deleteResultText,
+                          style: TextStyle(color: commitColor))
+                      : getErrorTextPrompt(
+                          errorText: _deleteResultText, context: context),
+                ),
               verticalSpaceSmall,
               _deleteResultText == 'Item deleted'
                   ? Container()
