@@ -256,12 +256,17 @@ class _WgtEmsMeterGroupAssignmentState
     }
   }
 
-  bool _checkModified({String assignmentErrorMessage = ''}) {
+  bool _checkModified({
+    String assignmentErrorMessage = '',
+  }) {
     bool modified = false;
     if (assignmentErrorMessage.isNotEmpty) {
-      return false; // if there is an assignment error, do not consider it modified
+      // return false; // if there is an assignment error, do not consider it modified
     }
     if ((_scopeMismatchItemList ?? []).isNotEmpty) {
+      if (assignmentErrorMessage.isNotEmpty) {
+        return false; // if there is an assignment error, do not consider it modified
+      }
       for (Map<String, dynamic> item in _scopeMismatchItemList!) {
         if (item['updated_meter_assignment_to_this_meter_group'] != null) {
           String percentageNew =
@@ -276,12 +281,37 @@ class _WgtEmsMeterGroupAssignmentState
       }
     } else {
       for (Map<String, dynamic> item in _itemGroupScopeMatchingItemList ?? []) {
+        final assignmentInfo = item['assignment'];
+        double existingPercentageAssignedToThisMeterToThisMg = 0.0;
+        double existingTotalPercentageAssignedToThisMeter = 0.0;
+        for (var assignment in assignmentInfo ?? []) {
+          if (assignment['meter_group_id'] == widget.strItemGroupIndex) {
+            existingPercentageAssignedToThisMeterToThisMg =
+                double.tryParse(assignment['percentage']?.toString() ?? '0') ??
+                    0.0;
+          }
+          existingTotalPercentageAssignedToThisMeter +=
+              double.tryParse(assignment['percentage']?.toString() ?? '0') ??
+                  0.0;
+        }
+
         if (item['updated_meter_assignment_to_this_meter_group'] != null) {
           String percentageNew =
               item['updated_meter_assignment_to_this_meter_group']
                       ?['percentage'] ??
                   '';
           if (percentageNew.isNotEmpty) {
+            if (assignmentErrorMessage.isNotEmpty) {
+              if (existingTotalPercentageAssignedToThisMeter > 100.0) {
+                double dblPercentageNew = double.tryParse(percentageNew) ?? 0.0;
+                if (dblPercentageNew >
+                    existingPercentageAssignedToThisMeterToThisMg - 0.00001) {
+                  dev.log(
+                      'Item ${item['meter_sn']} has assignment error and new percentage $dblPercentageNew is greater than existing percentage assigned to this meter group $existingPercentageAssignedToThisMeterToThisMg, not considering it modified');
+                  return false;
+                }
+              }
+            }
             modified = true;
             break;
           }
