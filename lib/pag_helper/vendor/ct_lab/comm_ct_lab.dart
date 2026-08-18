@@ -25,8 +25,7 @@ Future<dynamic> doLoadVendorCredential(
         userId: loggedInUser.id,
         username: loggedInUser.username,
         scope: '',
-        operation: '',
-        target: '',
+        operation: 'read',
       ),
     );
 

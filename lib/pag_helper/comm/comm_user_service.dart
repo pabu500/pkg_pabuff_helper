@@ -8,6 +8,7 @@ import 'package:buff_helper/pag_helper/model/mdl_svc_query.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
 import 'package:buff_helper/pagrid_helper/comm_helper/local_storage.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -37,21 +38,12 @@ Future<MdlPagUser> doLoginPag(
   if (response.statusCode == 200) {
     dev.log('usersvc comm: getting token from response body');
 
-    String token = jsonDecode(response.body)['token'];
-
-    // try {
-    //   await storage.write(key: 'pag_user_token', value: token);
-    // } catch (err) {
-    //   if (kDebugMode) {
-    //     print('usersvc comm: error writing token to secure storage: $err');
-    //   }
-    // }
-
     MdlPagUser user = MdlPagUser.fromJson2(jsonDecode(response.body));
 
     // Do not write token to secure storage if resetPasswordToken is 'flag_reset'
     if (user.resetPasswordToken != 'flag_reset') {
       try {
+        String token = jsonDecode(response.body)['token'];
         await secStorage.write(key: 'pag_user_token', value: token);
       } catch (err) {
         dev.log('usersvc comm: error writing token to secure storage: $err');

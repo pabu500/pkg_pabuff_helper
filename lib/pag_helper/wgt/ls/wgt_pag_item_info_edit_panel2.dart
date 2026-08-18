@@ -164,8 +164,6 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
           roleId: _loggedInUser!.selectedRole?.id,
           roleName: _loggedInUser!.selectedRole?.name,
           roleLabel: _loggedInUser!.selectedRole?.label,
-          scope: '',
-          target: '',
           operation: 'update',
         ),
       );
@@ -229,8 +227,7 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
           username: _loggedInUser!.username,
           userId: _loggedInUser!.id,
           scope: '',
-          target: '',
-          operation: '',
+          operation: 'delete',
         ),
       );
 
@@ -269,7 +266,7 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
         PagAclType.policy => 'policy_id',
       };
 
-      final result = await ex(
+      final result = await ex2(
         endpoint: endpoint,
         crudType: 'delete',
         opStr: 'delete ACL ${aclType.label.toLowerCase()}',
@@ -278,14 +275,14 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
           'scope': _loggedInUser!.selectedScope.toScopeMap(),
           itemIdKey: widget.strItemIndex,
         },
-        svcClaim: MdlPagSvcClaim(
+        svcClaim: MdlPagSvcClaim2(
           userId: _loggedInUser!.id,
           username: _loggedInUser!.username,
           roleId: _loggedInUser!.selectedRole?.id,
           roleName: _loggedInUser!.selectedRole?.name,
           roleLabel: _loggedInUser!.selectedRole?.label,
-          scope: '',
-          target: '',
+          userScope: _loggedInUser!.selectedScope.toScopeMap(),
+          resId: int.tryParse(widget.strItemIndex) ?? -1,
           operation: 'delete',
         ),
       );
@@ -384,8 +381,7 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
           username: _loggedInUser!.username,
           userId: _loggedInUser!.id,
           scope: '',
-          target: '',
-          operation: '',
+          operation: 'delete',
         ),
       );
 

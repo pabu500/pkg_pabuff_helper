@@ -10,7 +10,6 @@ import 'package:buff_helper/pag_helper/model/scope/mdl_pag_location.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_location_group_profile.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_site_group_profile.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_site_profile.dart';
-import 'package:buff_helper/up_helper/model/mdl_svc_claim.dart';
 import 'package:flutter/foundation.dart';
 import 'package:buff_helper/pag_helper/def_helper/def_page_route.dart';
 

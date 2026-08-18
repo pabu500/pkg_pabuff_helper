@@ -19,3 +19,23 @@ class MdlPagSvcQuery {
     };
   }
 }
+
+class MdlPagSvcQuery2 {
+  MdlPagSvcClaim2 svcClaimDto;
+  dynamic request;
+
+  MdlPagSvcQuery2(this.svcClaimDto, this.request);
+
+  Map<String, dynamic> toJson() {
+    return {
+      'svcClaimDto': svcClaimDto.toJson(),
+      'request': request is Map<String, dynamic>
+          ? request
+          : request is List<Map<String, dynamic>>
+              ? request
+              : request is List<String>
+                  ? request
+                  : request
+    };
+  }
+}

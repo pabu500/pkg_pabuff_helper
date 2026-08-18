@@ -1,3 +1,5 @@
+import '../scope/mdl_pag_scope_profile.dart';
+
 class MdlPagSvcClaim {
   int? userId = 0;
   String? username = '';
@@ -37,7 +39,7 @@ class MdlPagSvcClaim {
       svcName: json['svc_name'],
       endpoint: json['endpoint'],
       scope: json['scope'],
-      target: json['target'],
+      target: json['res'],
       operation: json['operation'],
     );
   }
@@ -53,7 +55,75 @@ class MdlPagSvcClaim {
       'svc_name': svcName,
       'endpoint': endpoint,
       'scope': scope,
-      'target': target,
+      'res': target,
+      'operation': operation,
+    };
+  }
+}
+
+class MdlPagSvcClaim2 {
+  int? userId = 0;
+  String? username = '';
+
+  int? roleId = 0;
+  String? roleName = '';
+  String? roleLabel = '';
+
+  Map<String, dynamic>? userScope;
+
+  int? resId = 0;
+  String? resName = '';
+  String? resLabel = '';
+
+  String? operation = '';
+
+  String? svcName = '';
+  String? endpoint = '';
+
+  MdlPagSvcClaim2(
+      {this.userId,
+      this.username,
+      this.roleId,
+      this.roleName,
+      this.roleLabel,
+      this.resName,
+      this.resLabel,
+      this.svcName,
+      this.endpoint,
+      this.userScope,
+      this.resId,
+      this.operation});
+
+  factory MdlPagSvcClaim2.fromJson(Map<String, dynamic> json) {
+    return MdlPagSvcClaim2(
+      userId: json['user_id'],
+      username: json['username'],
+      roleId: json['role_id'],
+      roleName: json['role_name'],
+      roleLabel: json['role_label'],
+      resName: json['res_name'],
+      resLabel: json['res_label'],
+      svcName: json['svc_name'],
+      endpoint: json['endpoint'],
+      userScope: json['scope'],
+      resId: json['res_id'],
+      operation: json['operation'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'user_id': userId,
+      'username': username,
+      'role_id': roleId,
+      'role_name': roleName,
+      'role_label': roleLabel,
+      'res_name': resName,
+      'res_label': resLabel,
+      'svc_name': svcName,
+      'endpoint': endpoint,
+      'scope': userScope,
+      'res_id': resId,
       'operation': operation,
     };
   }

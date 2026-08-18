@@ -203,7 +203,7 @@ class _WgtPagItemHistoryGetterState extends State<WgtPagItemHistoryGetter> {
     String itemTypeStr = "";
     if (widget.itemType is PagDeviceCat) {
       itemTypeStr = (widget.itemType as PagDeviceCat).value;
-    }else if(widget.itemType is DeviceCat){
+    } else if (widget.itemType is DeviceCat) {
       itemTypeStr = (widget.itemType as DeviceCat).name;
     }
 
@@ -238,7 +238,7 @@ class _WgtPagItemHistoryGetterState extends State<WgtPagItemHistoryGetter> {
             userId: widget.loggedInUser.id,
             username: widget.loggedInUser.username,
             scope: '',
-            target: widget.historyType.name,
+            target: '',
             operation: '',
           ),
         );

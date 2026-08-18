@@ -1,4 +1,5 @@
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
+import 'package:buff_helper/pag_helper/model/scope/mdl_pag_scope_profile.dart';
 
 class MdlPagScope {
   String projectName;
@@ -146,6 +147,32 @@ class MdlPagScope {
     }
 
     return PagScopeType.project;
+  }
+
+  factory MdlPagScope.fromScopeProfile(MdlPagScopeProfile scopeProfile) {
+    int projectId = scopeProfile.projectProfile?.id ?? -1;
+    int siteGroupId = scopeProfile.siteGroupProfile?.id ?? -1;
+    int siteId = scopeProfile.siteProfile?.id ?? -1;
+    int buildingId = scopeProfile.buildingProfile?.id ?? -1;
+    int locationGroupId = scopeProfile.locationGroupProfile?.id ?? -1;
+
+    return MdlPagScope(
+      projectId: projectId.toString(),
+      projectName: scopeProfile.projectProfile?.name ?? '',
+      projectLabel: scopeProfile.projectProfile?.label ?? '',
+      siteGroupId: siteGroupId.toString(),
+      siteGroupName: scopeProfile.siteGroupProfile?.name ?? '',
+      siteGroupLabel: scopeProfile.siteGroupProfile?.label ?? '',
+      siteId: siteId.toString(),
+      siteName: scopeProfile.siteProfile?.name ?? '',
+      siteLabel: scopeProfile.siteProfile?.label ?? '',
+      buildingId: buildingId.toString(),
+      buildingName: scopeProfile.buildingProfile?.name ?? '',
+      buildingLabel: scopeProfile.buildingProfile?.label ?? '',
+      locationGroupId: locationGroupId.toString(),
+      locationGroupName: scopeProfile.locationGroupProfile?.name ?? '',
+      locationGroupLabel: scopeProfile.locationGroupProfile?.label ?? '',
+    );
   }
 
   factory MdlPagScope.fromJson(Map<String, dynamic> json) {

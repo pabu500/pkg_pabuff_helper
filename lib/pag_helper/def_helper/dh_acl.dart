@@ -131,3 +131,14 @@ String? validateResLabel(String? value) {
 
   return null;
 }
+
+String getAclResLabel(PagAclType aclType) {
+  switch (aclType) {
+    case PagAclType.resource:
+    case PagAclType.permission:
+    case PagAclType.policy:
+      return aclType.label;
+    default:
+      return '';
+  }
+}
