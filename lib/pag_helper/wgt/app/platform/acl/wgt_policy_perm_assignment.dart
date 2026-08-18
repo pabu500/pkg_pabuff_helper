@@ -552,7 +552,6 @@ class _WgtPolicyPermAssignmentState extends State<WgtPolicyPermAssignment> {
   Widget getItemRow(Map<String, dynamic> itemInfo, int index) {
     String itemName = itemInfo['item_name'] ?? '-';
     String itemLabel = itemInfo['item_label'] ?? '-';
-    String operation = itemInfo['operation'] ?? '-';
     // String meterSn = itemInfo['meter_sn'] ?? '-';
     // bool assigned = itemInfo['assigned'] ?? false;
 
@@ -610,16 +609,6 @@ class _WgtPolicyPermAssignmentState extends State<WgtPolicyPermAssignment> {
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
               child: SelectableText(
                 itemLabel,
-                style: disabled ? disabledTextStyle : null,
-              ),
-            ),
-            horizontalSpaceSmall,
-            Container(
-              width: 85,
-              decoration: boxDecoration,
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-              child: SelectableText(
-                operation,
                 style: disabled ? disabledTextStyle : null,
               ),
             ),

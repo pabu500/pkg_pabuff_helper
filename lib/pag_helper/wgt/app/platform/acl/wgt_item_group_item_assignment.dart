@@ -649,6 +649,7 @@ class _WgtItemGroupItemAssignmentState
   Widget getItemRow(Map<String, dynamic> itemInfo, int index) {
     String itemName = itemInfo['item_name'] ?? '-';
     String itemLabel = itemInfo['item_label'] ?? '-';
+    String? operation = itemInfo['operation']?.toString();
     // String meterSn = itemInfo['meter_sn'] ?? '-';
     // bool assigned = itemInfo['assigned'] ?? false;
 
@@ -776,6 +777,18 @@ class _WgtItemGroupItemAssignmentState
                 style: disabled ? disabledTextStyle : null,
               ),
             ),
+            if (operation != null) ...[
+              horizontalSpaceSmall,
+              Container(
+                width: 85,
+                decoration: boxDecoration,
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                child: SelectableText(
+                  operation,
+                  style: disabled ? disabledTextStyle : null,
+                ),
+              ),
+            ],
             horizontalSpaceTiny,
             getAssignmentBox(itemInfo),
           ],
