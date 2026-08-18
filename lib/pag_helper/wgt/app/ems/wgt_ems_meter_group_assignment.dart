@@ -101,6 +101,9 @@ class _WgtEmsMeterGroupAssignmentState
         queryMap: queryMap,
         svcClaim: MdlPagSvcClaim(
           username: loggedInUser!.username,
+          roleId: loggedInUser!.selectedRole?.id,
+          roleName: loggedInUser!.selectedRole?.name,
+          roleLabel: loggedInUser!.selectedRole?.label,
           userId: loggedInUser!.id,
           scope: '',
           target: '',
@@ -169,6 +172,9 @@ class _WgtEmsMeterGroupAssignmentState
         queryMap: queryMap,
         svcClaim: MdlPagSvcClaim(
           username: loggedInUser!.username,
+          roleId: loggedInUser!.selectedRole?.id,
+          roleName: loggedInUser!.selectedRole?.name,
+          roleLabel: loggedInUser!.selectedRole?.label,
           userId: loggedInUser!.id,
           scope: '',
           target: '',
@@ -224,6 +230,9 @@ class _WgtEmsMeterGroupAssignmentState
         queryMap: queryMap,
         svcClaim: MdlPagSvcClaim(
           username: loggedInUser!.username,
+          roleId: loggedInUser!.selectedRole?.id,
+          roleName: loggedInUser!.selectedRole?.name,
+          roleLabel: loggedInUser!.selectedRole?.label,
           userId: loggedInUser!.id,
           scope: '',
           target: '',

@@ -71,6 +71,9 @@ class _WgtMeterResetState extends State<WgtMeterReset> {
         queryMap: queryMap,
         svcClaim: MdlPagSvcClaim(
           username: widget.loggedInUser.username,
+          roleId: widget.loggedInUser.selectedRole?.id,
+          roleName: widget.loggedInUser.selectedRole?.name,
+          roleLabel: widget.loggedInUser.selectedRole?.label,
           userId: widget.loggedInUser.id,
           scope: '',
           target: '',
@@ -121,6 +124,9 @@ class _WgtMeterResetState extends State<WgtMeterReset> {
         queryMap: queryMap,
         svcClaim: MdlPagSvcClaim(
           username: widget.loggedInUser.username,
+          roleId: widget.loggedInUser.selectedRole?.id,
+          roleName: widget.loggedInUser.selectedRole?.name,
+          roleLabel: widget.loggedInUser.selectedRole?.label,
           userId: widget.loggedInUser.id,
           scope: '',
           target: '',
@@ -171,6 +177,9 @@ class _WgtMeterResetState extends State<WgtMeterReset> {
         queryMap: queryMap,
         svcClaim: MdlPagSvcClaim(
           username: widget.loggedInUser.username,
+          roleId: widget.loggedInUser.selectedRole?.id,
+          roleName: widget.loggedInUser.selectedRole?.name,
+          roleLabel: widget.loggedInUser.selectedRole?.label,
           userId: widget.loggedInUser.id,
           scope: '',
           target: '',

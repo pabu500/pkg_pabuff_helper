@@ -161,6 +161,9 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
         svcClaim: MdlPagSvcClaim(
           userId: _loggedInUser!.id,
           username: _loggedInUser!.username,
+          roleId: _loggedInUser!.selectedRole?.id,
+          roleName: _loggedInUser!.selectedRole?.name,
+          roleLabel: _loggedInUser!.selectedRole?.label,
           scope: '',
           target: '',
           operation: 'update',
@@ -196,7 +199,7 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
     setState(() {
       _isDeleting = true;
     });
-    await Future.delayed(const Duration(milliseconds: 1000));
+    // await Future.delayed(const Duration(milliseconds: 1000));
     try {
       String itemTypeStr = '';
       if (widget.itemTypeEnum is PagScopeType) {
@@ -278,6 +281,9 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
         svcClaim: MdlPagSvcClaim(
           userId: _loggedInUser!.id,
           username: _loggedInUser!.username,
+          roleId: _loggedInUser!.selectedRole?.id,
+          roleName: _loggedInUser!.selectedRole?.name,
+          roleLabel: _loggedInUser!.selectedRole?.label,
           scope: '',
           target: '',
           operation: 'delete',

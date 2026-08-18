@@ -169,6 +169,9 @@ class _WgtJobTypeOpPanel3State extends State<WgtJobTypeOpPanel3> {
         svcClaim: MdlPagSvcClaim(
           userId: widget.loggedInUser.id,
           username: widget.loggedInUser.username,
+          roleId: widget.loggedInUser.selectedRole?.id,
+          roleName: widget.loggedInUser.selectedRole?.name,
+          roleLabel: widget.loggedInUser.selectedRole?.label,
           scope: '',
           target: '',
           operation: 'create',

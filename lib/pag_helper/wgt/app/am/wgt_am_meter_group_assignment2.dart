@@ -94,6 +94,9 @@ class _WgtAmMeterGroupAssignment2State
         svcClaim: MdlPagSvcClaim(
           userId: loggedInUser!.id,
           username: loggedInUser!.username,
+          roleId: loggedInUser!.selectedRole?.id,
+          roleName: loggedInUser!.selectedRole?.name,
+          roleLabel: loggedInUser!.selectedRole?.label,
           scope: '',
           target: '',
           operation: '',
@@ -173,6 +176,9 @@ class _WgtAmMeterGroupAssignment2State
         svcClaim: MdlPagSvcClaim(
           userId: loggedInUser!.id,
           username: loggedInUser!.username,
+          roleId: loggedInUser!.selectedRole?.id,
+          roleName: loggedInUser!.selectedRole?.name,
+          roleLabel: loggedInUser!.selectedRole?.label,
           scope: '',
           target: '',
           operation: '',
