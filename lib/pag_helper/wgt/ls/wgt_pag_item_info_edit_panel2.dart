@@ -244,7 +244,7 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
     }
   }
 
-  Future<Map<String, dynamic>> _doDeleteAclItem(PagAclType aclType) async {
+  Future<dynamic> _doDeleteAclItem(PagAclType aclType) async {
     if (_isDeleting) {
       return {};
     }
@@ -282,7 +282,7 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
           roleName: _loggedInUser!.selectedRole?.name,
           roleLabel: _loggedInUser!.selectedRole?.label,
           userScope: _loggedInUser!.selectedScope.toScopeMap(),
-          resId: int.tryParse(widget.strItemIndex) ?? -1,
+          resName: getResNameByItemType(widget.itemTypeEnum),
           operation: 'delete',
         ),
       );

@@ -754,12 +754,12 @@ class _WgtRolePolicyAssignmentState extends State<WgtRolePolicyAssignment> {
   }
 
   Widget getAssignmentBox(Map<String, dynamic> itemInfo) {
-    String? meterGroupName = itemInfo['assigned_item_group_name'];
-    String? meterGroupLabel = itemInfo['assigned_item_group_label'];
-    bool hasAssignmentInfo = meterGroupName != null;
+    String? itemGroupName = itemInfo['assigned_item_group_name'];
+    String? itemGroupLabel = itemInfo['assigned_item_group_label'];
+    bool hasAssignmentInfo = itemGroupName != null;
 
     double barWidth = 180;
-    String tooltipMessage = 'assigned to: ${meterGroupName ?? 'None'}';
+    String tooltipMessage = 'assigned to: ${itemGroupName ?? 'None'}';
 
     double margin = 45;
     bool checked = itemInfo['assigned_new'] ?? hasAssignmentInfo;

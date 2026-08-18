@@ -76,11 +76,11 @@ Future<dynamic> ex2({
   svcClaim.endpoint = endpoint;
 
   String svcToken = '';
-  try {
-    svcToken = await aclGate(appConfig, svcClaim, queryMap);
-  } catch (err) {
-    throw Exception(err);
-  }
+  // try {
+  //   svcToken = await aclGate(appConfig, svcClaim, queryMap);
+  // } catch (err) {
+  //   throw Exception(err);
+  // }
 
   final portalType = appConfig.portalType;
   queryMap['query_check_portal_type'] = portalType.name;

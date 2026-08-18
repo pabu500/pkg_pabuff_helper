@@ -100,3 +100,12 @@ String? Function(String) getRoleValidator(String key,
       };
   }
 }
+
+String? getResNameByItemType(dynamic itemType) {
+  if (itemType is Enum) {
+    dev.log('getResNameByItemType: itemType is an Enum: $itemType');
+    return itemType.name;
+  }
+  dev.log('getResNameByItemType: itemType is not an Enum: $itemType');
+  return null;
+}

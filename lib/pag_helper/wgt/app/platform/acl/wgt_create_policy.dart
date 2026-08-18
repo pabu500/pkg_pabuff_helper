@@ -53,6 +53,7 @@ class _WgtCreatePolicyState extends State<WgtCreatePolicy> {
 
   final Map<String, dynamic> _itemScopeMap = {};
   UniqueKey? _scopeSetterKey;
+  bool _isProjectScope = false;
 
   Future<dynamic> _createItem() async {
     setState(() {
@@ -74,6 +75,7 @@ class _WgtCreatePolicyState extends State<WgtCreatePolicy> {
         'acl_type': PagAclType.policy.value,
         'label': _newItemLabel,
         'item_scope_info': _itemScopeMap,
+        'is_project_scope': _isProjectScope.toString(),
       };
 
       final result = await ex(
@@ -131,7 +133,8 @@ class _WgtCreatePolicyState extends State<WgtCreatePolicy> {
       return false;
     }
 
-    return _newItemLabel != null && _itemScopeMap.isNotEmpty;
+    return _newItemLabel != null &&
+        (_itemScopeMap.isNotEmpty || _isProjectScope);
   }
 
   @override
@@ -187,6 +190,7 @@ class _WgtCreatePolicyState extends State<WgtCreatePolicy> {
                                     _newItemLabelResetKey = UniqueKey();
 
                                     _itemScopeMap.clear();
+                                    _isProjectScope = false;
                                     _scopeSetterKey = UniqueKey();
                                   });
 
@@ -291,12 +295,17 @@ class _WgtCreatePolicyState extends State<WgtCreatePolicy> {
         appConfig: widget.appConfig,
         width: width,
         labelWidth: 130,
+        allowProjectScope: true,
         // itemScopeMap: widget.itemScopeMap!,
         forItemKind: PagItemKind.acl,
         // forScopeType: widget.itemType is PagScopeType ? widget.itemType : null,
         onScopeSet: (dynamic profile) {
           if (profile == null) {
-            dev.log('Profile is null');
+            setState(() {
+              _itemScopeMap.clear();
+              _isProjectScope = true;
+              _checkEnableButton();
+            });
             return {};
           }
           String scopeIdColName = '';
@@ -322,8 +331,11 @@ class _WgtCreatePolicyState extends State<WgtCreatePolicy> {
             return {};
           }
           setState(() {
+            _itemScopeMap.clear();
+            _isProjectScope = false;
             _itemScopeMap[scopeIdColName] = profile.id.toString();
             _itemScopeMap[scopeNameColName] = profile.name;
+            _checkEnableButton();
           });
         },
       ),

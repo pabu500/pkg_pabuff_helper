@@ -1,5 +1,3 @@
-import '../scope/mdl_pag_scope_profile.dart';
-
 class MdlPagSvcClaim {
   int? userId = 0;
   String? username = '';
@@ -62,16 +60,16 @@ class MdlPagSvcClaim {
 }
 
 class MdlPagSvcClaim2 {
-  int? userId = 0;
+  int? userId;
   String? username = '';
 
-  int? roleId = 0;
+  int? roleId;
   String? roleName = '';
   String? roleLabel = '';
 
   Map<String, dynamic>? userScope;
 
-  int? resId = 0;
+  int? resId;
   String? resName = '';
   String? resLabel = '';
 
@@ -80,19 +78,20 @@ class MdlPagSvcClaim2 {
   String? svcName = '';
   String? endpoint = '';
 
-  MdlPagSvcClaim2(
-      {this.userId,
-      this.username,
-      this.roleId,
-      this.roleName,
-      this.roleLabel,
-      this.resName,
-      this.resLabel,
-      this.svcName,
-      this.endpoint,
-      this.userScope,
-      this.resId,
-      this.operation});
+  MdlPagSvcClaim2({
+    this.userId,
+    this.username,
+    this.roleId,
+    this.roleName,
+    this.roleLabel,
+    this.resName,
+    this.resLabel,
+    this.svcName,
+    this.endpoint,
+    this.userScope,
+    this.resId,
+    this.operation,
+  });
 
   factory MdlPagSvcClaim2.fromJson(Map<String, dynamic> json) {
     return MdlPagSvcClaim2(
@@ -105,7 +104,7 @@ class MdlPagSvcClaim2 {
       resLabel: json['res_label'],
       svcName: json['svc_name'],
       endpoint: json['endpoint'],
-      userScope: json['scope'],
+      userScope: json['user_scope'],
       resId: json['res_id'],
       operation: json['operation'],
     );
@@ -122,7 +121,7 @@ class MdlPagSvcClaim2 {
       'res_label': resLabel,
       'svc_name': svcName,
       'endpoint': endpoint,
-      'scope': userScope,
+      'user_scope': userScope,
       'res_id': resId,
       'operation': operation,
     };

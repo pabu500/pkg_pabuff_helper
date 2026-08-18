@@ -1,7 +1,6 @@
 import 'dart:developer' as dev;
 
 import 'package:buff_helper/pag_helper/comm/comm_pag_item.dart';
-import 'package:buff_helper/pag_helper/def_helper/dh_pag_org.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_scope_profile.dart';
@@ -65,6 +64,7 @@ class _CreatePermissionState extends State<WgtCreatePermission> {
 
   final Map<String, dynamic> _itemScopeMap = {};
   UniqueKey? _scopeSetterKey;
+  bool _isProjectScope = false;
 
   Future<dynamic> _createItem() async {
     setState(() {
@@ -80,6 +80,7 @@ class _CreatePermissionState extends State<WgtCreatePermission> {
         'label': _label,
         'operation': _selectedOperationType?.value,
         'item_scope_info': _itemScopeMap,
+        'is_project_scope': _isProjectScope.toString(),
       };
 
       final result = await ex(
@@ -147,7 +148,7 @@ class _CreatePermissionState extends State<WgtCreatePermission> {
       return false;
     }
 
-    if (_itemScopeMap.isEmpty) {
+    if (_itemScopeMap.isEmpty && !_isProjectScope) {
       return false;
     }
 
@@ -403,12 +404,17 @@ class _CreatePermissionState extends State<WgtCreatePermission> {
         appConfig: widget.appConfig,
         width: width,
         labelWidth: 130,
+        allowProjectScope: true,
         // itemScopeMap: widget.itemScopeMap!,
         forItemKind: PagItemKind.acl,
         // forScopeType: widget.itemType is PagScopeType ? widget.itemType : null,
         onScopeSet: (dynamic profile) {
           if (profile == null) {
-            dev.log('Profile is null');
+            setState(() {
+              _itemScopeMap.clear();
+              _isProjectScope = true;
+              _checkEnableButton();
+            });
             return {};
           }
           String scopeIdColName = '';
@@ -434,8 +440,11 @@ class _CreatePermissionState extends State<WgtCreatePermission> {
             return {};
           }
           setState(() {
+            _itemScopeMap.clear();
+            _isProjectScope = false;
             _itemScopeMap[scopeIdColName] = profile.id.toString();
             _itemScopeMap[scopeNameColName] = profile.name;
+            _checkEnableButton();
           });
         },
       ),
