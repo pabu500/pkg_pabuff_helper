@@ -126,12 +126,7 @@ class _WgtEmsMeterGroupAssignmentState
       _scopeMismatchItemList =
           List<Map<String, dynamic>>.from(scopeMismatchItemList);
 
-      // sort by label
-      _itemGroupScopeMatchingItemList!.sort((a, b) {
-        String labelA = a['label'] ?? '';
-        String labelB = b['label'] ?? '';
-        return labelA.compareTo(labelB);
-      });
+      _sortItemGroupScopeMatchingItemList();
       for (Map<String, dynamic> itemInfo in _itemGroupScopeMatchingItemList!) {
         // itemInfo['assigned'] = false;
         String meterType = itemInfo['meter_type'] ?? '';
@@ -386,33 +381,53 @@ class _WgtEmsMeterGroupAssignmentState
   }
 
   void _sortItemGroupScopeMatchingItemList() {
-    for (var item in _itemGroupScopeMatchingItemList ?? []) {
-      final assignmentInfo = item['assignment'];
-      if (assignmentInfo == null) {
-        dev.log('No assignment info for item: ${item['id']}, skipping.');
-        continue;
+    _itemGroupScopeMatchingItemList?.sort((a, b) {
+      final rankComparison = _getMeterAssignmentSortRank(a)
+          .compareTo(_getMeterAssignmentSortRank(b));
+      if (rankComparison != 0) {
+        return rankComparison;
       }
-      final meterMeterGroupAssignment =
-          assignmentInfo['meter_meter_group_assignment'];
-      if (meterMeterGroupAssignment == null) {
-        dev.log(
-            'No meter meter group assignment for item: ${item['id']}, skipping.');
-        continue;
+
+      final nameA = (a['item_name']?.toString() ?? '').toLowerCase();
+      final nameB = (b['item_name']?.toString() ?? '').toLowerCase();
+      final nameComparison = nameA.compareTo(nameB);
+      if (nameComparison != 0) {
+        return nameComparison;
       }
-      for (var tenantAssignment in meterMeterGroupAssignment) {
-        // Process each tenant assignment
-        final tenantInfo = tenantAssignment['tenant_info'];
-        if (tenantInfo == null) {
-          continue;
-        }
-        String tenantName = tenantInfo['name'] ?? '';
-        if (tenantName == widget.itemInfo?['tenant_name']) {
-          // move it to the top
-          _itemGroupScopeMatchingItemList?.remove(item);
-          _itemGroupScopeMatchingItemList?.insert(0, item);
-        }
-      }
+
+      final meterSnA = a['meter_sn']?.toString() ?? '';
+      final meterSnB = b['meter_sn']?.toString() ?? '';
+      return meterSnA.compareTo(meterSnB);
+    });
+  }
+
+  int _getMeterAssignmentSortRank(Map<String, dynamic> item) {
+    final assignmentList = item['assignment'];
+    final assignedMeterGroupId =
+        item['meter_group_id'] ?? item['assigned_item_group_id'];
+    final assignedToThisMeterGroup =
+        _isTrue(item['is_assigned_to_this_meter_group']) ||
+            assignedMeterGroupId?.toString() == widget.strItemGroupIndex ||
+            (assignmentList is List &&
+                assignmentList.any((assignment) =>
+                    assignment is Map &&
+                    assignment['meter_group_id']?.toString() ==
+                        widget.strItemGroupIndex));
+
+    if (assignedToThisMeterGroup) {
+      return 0;
     }
+
+    final assignedToAnyMeterGroup =
+        _isTrue(item['is_assigned_to_meter_group']) ||
+            (assignedMeterGroupId?.toString() ?? '').isNotEmpty ||
+            (assignmentList is List && assignmentList.isNotEmpty);
+    return assignedToAnyMeterGroup ? 2 : 1;
+  }
+
+  bool _isTrue(dynamic value) {
+    final normalizedValue = value?.toString().toLowerCase();
+    return value == true || normalizedValue == 'true' || normalizedValue == '1';
   }
 
   @override

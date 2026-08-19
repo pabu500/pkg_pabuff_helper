@@ -140,6 +140,8 @@ class _WgtMeterGroupAssignmentItemState
     );
 
     bool disabled = false; //_hasTptMismatchAssignmentError;
+    final meterIconColor = _getMeterIconColor();
+    final meterIconMessage = _getMeterIconMessage();
 
     return Column(
       children: [
@@ -173,8 +175,15 @@ class _WgtMeterGroupAssignmentItemState
               ),
             ),
             horizontalSpaceTiny,
-            Icon(PagDeviceCat.meter.iconData,
-                color: Theme.of(context).hintColor, size: 18),
+            Tooltip(
+              message: meterIconMessage,
+              waitDuration: const Duration(milliseconds: 500),
+              child: Icon(
+                PagDeviceCat.meter.iconData,
+                color: meterIconColor,
+                size: 21,
+              ),
+            ),
             horizontalSpaceTiny,
             Container(
               width: 150,
@@ -221,6 +230,75 @@ class _WgtMeterGroupAssignmentItemState
         if (true) getAssignmentMap(),
       ],
     );
+  }
+
+  bool _isTrue(dynamic value) {
+    final normalizedValue = value?.toString().toLowerCase();
+    return value == true || normalizedValue == 'true' || normalizedValue == '1';
+  }
+
+  ({bool assignedToAnyMeterGroup, bool assignedToThisMeterGroup})
+      _getMeterGroupAssignmentState() {
+    final assignedMeterGroupId =
+        _itemInfo['meter_group_id'] ?? _itemInfo['assigned_item_group_id'];
+    final hasAssignedMeterGroupId =
+        (assignedMeterGroupId?.toString() ?? '').isNotEmpty;
+    final assignedToThisMeterGroup =
+        _isTrue(_itemInfo['is_assigned_to_this_meter_group']) ||
+            assignedMeterGroupId?.toString() == widget.strItemGroupIndex;
+    final assignedToAnyMeterGroup = assignedToThisMeterGroup ||
+        _isTrue(_itemInfo['is_assigned_to_meter_group']) ||
+        hasAssignedMeterGroupId;
+
+    if (_itemInfo.containsKey('is_assigned_to_meter_group') ||
+        _itemInfo.containsKey('is_assigned_to_this_meter_group') ||
+        hasAssignedMeterGroupId) {
+      return (
+        assignedToAnyMeterGroup: assignedToAnyMeterGroup,
+        assignedToThisMeterGroup: assignedToThisMeterGroup,
+      );
+    }
+
+    final assignmentList = _itemInfo['assignment'];
+    if (assignmentList is List) {
+      final assignedToThisMeterGroup = assignmentList.any(
+        (assignment) =>
+            assignment is Map &&
+            assignment['meter_group_id']?.toString() ==
+                widget.strItemGroupIndex,
+      );
+      return (
+        assignedToAnyMeterGroup: assignmentList.isNotEmpty,
+        assignedToThisMeterGroup: assignedToThisMeterGroup,
+      );
+    }
+
+    return (
+      assignedToAnyMeterGroup: false,
+      assignedToThisMeterGroup: false,
+    );
+  }
+
+  Color _getMeterIconColor() {
+    final assignmentState = _getMeterGroupAssignmentState();
+    if (assignmentState.assignedToThisMeterGroup) {
+      return Theme.of(context).colorScheme.primary;
+    }
+    if (assignmentState.assignedToAnyMeterGroup) {
+      return Theme.of(context).hintColor.withAlpha(80);
+    }
+    return Theme.of(context).colorScheme.onSurface;
+  }
+
+  String _getMeterIconMessage() {
+    final assignmentState = _getMeterGroupAssignmentState();
+    if (assignmentState.assignedToThisMeterGroup) {
+      return 'Assigned to this meter group';
+    }
+    if (assignmentState.assignedToAnyMeterGroup) {
+      return 'Assigned to another meter group';
+    }
+    return 'Not assigned to a meter group';
   }
 
   Widget getAssignmentBox() {
