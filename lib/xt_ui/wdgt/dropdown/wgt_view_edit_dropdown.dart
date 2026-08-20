@@ -305,6 +305,7 @@ class _WgtViewEditDropdownState extends State<WgtViewEditDropdown> {
                     setState(() {
                       _isEditing = false;
                       _currentValueMap = widget.originalValueMap;
+                      _errorText = '';
                     });
                   },
                 ),

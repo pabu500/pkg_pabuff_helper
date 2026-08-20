@@ -171,6 +171,7 @@ class _WgtViewEditFieldState extends State<WgtViewEditField> {
                                 ),
                                 errorText:
                                     _errorText.isNotEmpty ? _errorText : null,
+                                errorMaxLines: 2,
                                 errorStyle: const TextStyle(
                                   fontSize: 13,
                                 )),
