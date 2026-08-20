@@ -30,7 +30,7 @@ class PagPdfBillCwP2 {
   PagPdfBillCwP2({
     required this.customerName,
     required this.tenantAccountNumber,
-    required this.customerLabel,
+    required this.customerCompanyTradingName,
     required this.tenantBillingAddressLine1,
     required this.tenantBillingAddressLine2,
     required this.tenantBillingAddressLine3,
@@ -108,7 +108,7 @@ class PagPdfBillCwP2 {
     required this.strCollectionEndDate,
   });
 
-  final String customerLabel;
+  final String customerCompanyTradingName;
   final String customerName;
   final String tenantAccountNumber;
   final String tenantBillingAddressLine1;
@@ -503,7 +503,7 @@ class PagPdfBillCwP2 {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        pw.Text(customerLabel,
+        pw.Text(customerCompanyTradingName,
             style: styleLarge.copyWith(fontWeight: pw.FontWeight.bold)),
         // pw.SizedBox(height: 2),
         pw.Row(children: [

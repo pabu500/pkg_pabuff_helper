@@ -248,6 +248,8 @@ Map<String, dynamic> prepCalcedBillInfoRl(Map<String, dynamic> billInfo) {
     'billLabel': billInfo['bill_label'] ?? '',
     'customerName': billInfo['tenant_name'] ?? '',
     'customerLabel': billInfo['tenant_label'] ?? '',
+    'customerCompanyTradingName':
+        billInfo['customer_company_trading_name'] ?? '',
     'tenantAccountNumber': billInfo['tenant_account_number'] ?? '',
     'strDepositAmount': billInfo['deposit_amount'] ?? '',
     'paymentMethod': billInfo['payment_method'] ?? '',
