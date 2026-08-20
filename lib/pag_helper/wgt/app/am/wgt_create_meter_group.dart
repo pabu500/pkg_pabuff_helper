@@ -461,7 +461,7 @@ class _CreateItemState extends State<WgtCreateMeterGroup> {
   }
 
   Widget getPollingLawSelector() {
-    if (selectedServiceType != 'comm') {
+    if (selectedServiceType != MeterGroupServiceType.comm) {
       return Container();
     }
 
