@@ -1077,8 +1077,8 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
       popupHeight: 150,
       direction: 'left',
       popupChild: getBypassInfo(
-          row['meter_sn'],
-          row['meter_displayname'],
+          row['meter_sn'] ?? '',
+          row['meter_displayname'] ?? '',
           row['username'] ?? '',
           configItem['fetchBypassInfo'],
           widget.scopeProfile.timezone),
