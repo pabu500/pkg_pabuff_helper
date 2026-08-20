@@ -21,11 +21,13 @@ import '../../../comm/comm_ex.dart';
 import '../../../comm/pag_be_api_base.dart';
 import '../../../def_helper/dh_meter_group.dart';
 import '../../../model/mdl_pag_app_config.dart';
+import '../../../model/mdl_pag_app_context.dart';
 import '../../wgt_comm_button.dart';
 
 class WgtEmsMeterGroupAssignment extends StatefulWidget {
   const WgtEmsMeterGroupAssignment({
     super.key,
+    required this.appContext,
     required this.appConfig,
     required this.strItemGroupIndex,
     required this.itemName,
@@ -37,6 +39,7 @@ class WgtEmsMeterGroupAssignment extends StatefulWidget {
     this.onUpdate,
   });
 
+  final MdlPagAppContext appContext;
   final MdlPagAppConfig appConfig;
   final String strItemGroupIndex;
   final String itemName;
@@ -88,7 +91,11 @@ class _WgtEmsMeterGroupAssignmentState
     Map<String, dynamic> queryMap = {
       'scope': loggedInUser!.selectedScope.toScopeMap(),
       'item_group_id': widget.strItemGroupIndex,
-      'service_type': MeterGroupServiceType.ems.value,
+      'service_type': widget.appContext.appContextType == PagAppContextType.ems
+          ? MeterGroupServiceType.ems.value
+          : widget.appContext.appContextType == PagAppContextType.evs
+              ? MeterGroupServiceType.evs.value
+              : MeterGroupServiceType.unknown.value,
     };
 
     _isScopeMatchingListFetching = true;
@@ -210,7 +217,11 @@ class _WgtEmsMeterGroupAssignmentState
     }
     Map<String, dynamic> queryMap = {
       'scope': loggedInUser!.selectedScope.toScopeMap(),
-      'service_type': MeterGroupServiceType.ems.value,
+      'service_type': widget.appContext.appContextType == PagAppContextType.ems
+          ? MeterGroupServiceType.ems.value
+          : widget.appContext.appContextType == PagAppContextType.evs
+              ? MeterGroupServiceType.evs.value
+              : MeterGroupServiceType.unknown.value,
       'item_group_id': widget.strItemGroupIndex,
       'item_assignment_list': assignmentList,
     };

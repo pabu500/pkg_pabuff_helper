@@ -43,6 +43,7 @@ enum PagEmsMeterGroupOpType {
 enum MeterGroupServiceType {
   comm('comm', 'comm', 'comm'),
   ems('ems', 'ems', 'ems'),
+  evs('evs', 'evs', 'evs'),
   unknown('unknown', 'unknown', 'unknown');
 
   const MeterGroupServiceType(

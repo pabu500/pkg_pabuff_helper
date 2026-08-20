@@ -1080,6 +1080,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                         break;
                       case PagItemKind.meterGroup:
                         opWidget = WgtEmsMeterGroupAssignment(
+                          appContext: widget.pagAppContext!,
                           appConfig: widget.appConfig,
                           meterType: item['meter_type'] ?? '',
                           strItemGroupIndex: item['id'],
