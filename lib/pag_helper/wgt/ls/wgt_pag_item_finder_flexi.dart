@@ -86,6 +86,7 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
     this.onScopeChanged,
     this.prevailingScopeProfile,
     this.enableSearch = true,
+    this.autoCascadeScopeFilter = true,
   });
 
   final MdlPagUser loggedInUser;
@@ -130,6 +131,7 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
   final String? sortOrder;
   final bool isScopeProvider;
   final bool enableSearch;
+  final bool autoCascadeScopeFilter;
   final MdlPagScopeProfile? prevailingScopeProfile;
   final void Function(MdlPagSiteGroupProfile?, MdlPagSiteProfile?,
       MdlPagBuildingProfile?, MdlPagLocationGroupProfile?)? onScopeChanged;
@@ -373,9 +375,15 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
       for (var item in result['filter_value_list']) {
         listColController.valueList?.add(item);
       }
-      if (listColController.valueList!.length == 1) {
+      if (listColController.valueList!.length == 1 &&
+          (widget.autoCascadeScopeFilter ||
+              listColController.filterGroupType !=
+                  PagFilterGroupType.location)) {
         Map<String, dynamic> value = listColController.valueList![0];
         listColController.filterValue = value;
+      } else if (!widget.autoCascadeScopeFilter &&
+          listColController.filterGroupType == PagFilterGroupType.location) {
+        _clearAutoSelectedScopeFilter(listColController);
       }
     } catch (e) {
       dev.log('Error getting filter value list: $e');
@@ -571,6 +579,20 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
         _selectedLocationGroupColController,
         defaultLocationGroupProfile: scopeProfile.locationGroupProfile,
         limitToDefault: true);
+    if (!widget.autoCascadeScopeFilter) {
+      if (_selectedSiteGroupProfile == null) {
+        _clearAutoSelectedScopeFilter(_selectedSiteGroupColController);
+      }
+      if (_selectedSiteProfile == null) {
+        _clearAutoSelectedScopeFilter(_selectedSiteColController);
+      }
+      if (_selectedBuildingProfile == null) {
+        _clearAutoSelectedScopeFilter(_selectedBuildingColController);
+      }
+      if (_selectedLocationGroupProfile == null) {
+        _clearAutoSelectedScopeFilter(_selectedLocationGroupColController);
+      }
+    }
   }
 
   void _updateBind(MdlPagScopeProfile scopeProfile) {
@@ -604,6 +626,15 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     _selectedSiteGroupProfile
         ?.bindFilterColController(_selectedSiteColController);
     _selectedSiteColController?.resetFilter();
+    if (!widget.autoCascadeScopeFilter) {
+      _clearAutoSelectedScopeFilter(_selectedSiteColController);
+      _selectedSiteProfile = null;
+      _selectedBuildingProfile = null;
+      _selectedLocationGroupProfile = null;
+      _selectedBuildingColController?.clearFilter();
+      _selectedLocationGroupColController?.clearFilter();
+      return;
+    }
     _selectedSiteProfile = _selectedSiteGroupProfile?.getDefaultSiteProfile();
     _onUpdateSite(_selectedSiteProfile);
   }
@@ -614,6 +645,13 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     _selectedSiteProfile
         ?.bindFilterColController(_selectedBuildingColController);
     _selectedBuildingColController?.resetFilter();
+    if (!widget.autoCascadeScopeFilter) {
+      _clearAutoSelectedScopeFilter(_selectedBuildingColController);
+      _selectedBuildingProfile = null;
+      _selectedLocationGroupProfile = null;
+      _selectedLocationGroupColController?.clearFilter();
+      return;
+    }
     _selectedBuildingProfile =
         _selectedSiteProfile?.getDefaultBuildingProfile();
     _onUpdateBuilding(_selectedBuildingProfile);
@@ -625,6 +663,11 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     _selectedBuildingProfile
         ?.bindFilterColController(_selectedLocationGroupColController);
     _selectedLocationGroupColController?.resetFilter();
+    if (!widget.autoCascadeScopeFilter) {
+      _clearAutoSelectedScopeFilter(_selectedLocationGroupColController);
+      _selectedLocationGroupProfile = null;
+      return;
+    }
     _selectedLocationGroupProfile =
         _selectedBuildingProfile?.getDefaultLocationGroupProfile();
     _onUpdateLocationGroup(_selectedLocationGroupProfile);
@@ -638,6 +681,13 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
         selectedLocationGroup?.toJson();
     _selectedLocationGroupProfile?.filterColController?.filterWidgetController
         ?.text = selectedLocationGroup?.label ?? '';
+  }
+
+  void _clearAutoSelectedScopeFilter(
+      MdlListColController? scopeColController) {
+    scopeColController?.filterValue = null;
+    scopeColController?.filterWidgetController?.clear();
+    scopeColController?.filterResetKey = UniqueKey();
   }
 
   // void _onUpdateSiteGroup(MdlPagSiteGroupProfile? selectedSiteGroup) {

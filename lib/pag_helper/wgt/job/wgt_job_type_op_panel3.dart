@@ -278,6 +278,8 @@ class _WgtJobTypeOpPanel3State extends State<WgtJobTypeOpPanel3> {
       case 'gen-initial-bill':
         // return _selectedFromDate != null && _selectedToDate != null;
         return true;
+      case 'user-login-log':
+        return _selectedFromDate != null && _selectedToDate != null;
       default:
         return false;
     }
@@ -384,6 +386,7 @@ class _WgtJobTypeOpPanel3State extends State<WgtJobTypeOpPanel3> {
       loggedInUser: widget.loggedInUser,
       appConfig: widget.appConfig,
       isScopeProvider: true,
+      autoCascadeScopeFilter: false,
       prevailingScopeProfile: _selectedScopeProfile,
       itemKind: PagItemKind.scope,
       itemType: null,
@@ -451,9 +454,39 @@ class _WgtJobTypeOpPanel3State extends State<WgtJobTypeOpPanel3> {
         return getGenBillingReminderListOptions();
       case 'gen-initial-bill':
         return getGenInitialBillOptions();
+      case 'user-login-log':
+        return getUserLoginLogOptions();
       default:
         return const SizedBox();
     }
+  }
+
+  Widget getUserLoginLogOptions() {
+    return Column(
+      children: [
+        // const Padding(
+        //   padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        //   child: Text(
+        //     'Generate tenant portal login activity for all users in the selected project.',
+        //     textAlign: TextAlign.center,
+        //   ),
+        // ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Time Range',
+              style: TextStyle(
+                color: Theme.of(context).hintColor,
+                fontSize: 16,
+              ),
+            ),
+            horizontalSpaceSmall,
+            getTimeRangePicker(),
+          ],
+        ),
+      ],
+    );
   }
 
   Widget getBillingTaskOptions() {
