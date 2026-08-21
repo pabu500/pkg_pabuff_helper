@@ -137,6 +137,9 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
   bool _isReset = false;
   bool _isModified = false;
   bool _childrenListFetched = false;
+  // Reuse the same fetch across parent widget rebuilds to avoid showing the
+  // loading state again. This is cleared when the scope selection changes.
+  Future<dynamic>? _parentScopeChildrenFuture;
 
   UniqueKey? _siteGroupInputSelectKey;
   UniqueKey? _siteInputSelectKey;
@@ -522,6 +525,8 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
   void _restoreInitialScope() {
     setState(() {
       _isReset = true;
+      _childrenListFetched = false;
+      _parentScopeChildrenFuture = null;
       _selectedSiteGroupProfile = null;
       _selectedSiteProfile = null;
       _selectedBuildingProfile = null;
@@ -575,6 +580,7 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
     _isCommitted = false;
     _committedMessage = '';
     _childrenListFetched = false;
+    _parentScopeChildrenFuture = null;
 
     _siteGroupInputSelectKey = UniqueKey();
     _siteInputSelectKey = UniqueKey();
@@ -665,7 +671,6 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
     if (_isModified && widget.isFlexiScope && _selectedLocation == null) {
       pullChildrenList = false;
     }
-
     String initialScopeLabel = widget.initialScope?.getLeafScopeLabel() ?? '';
     Widget? scopeIcon;
     PagScopeType? itemScopeType = widget.initialScope?.getScopeType();
@@ -716,7 +721,8 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
                     ? SizedBox(
                         height: height,
                         child: FutureBuilder<void>(
-                          future: _getParentScopeChildrenList(),
+                          future: _parentScopeChildrenFuture ??=
+                              _getParentScopeChildrenList(),
                           builder: (context, AsyncSnapshot<void> snapshot) {
                             switch (snapshot.connectionState) {
                               case ConnectionState.waiting:

@@ -8,6 +8,7 @@ import 'package:buff_helper/pag_helper/wgt/app/am/wgt_create_amgr.dart';
 
 import '../../../model/mdl_pag_app_config.dart';
 import 'wgt_create_bank.dart';
+import 'wgt_create_landlord.dart';
 
 class WgtCreateOrg extends StatefulWidget {
   const WgtCreateOrg({
@@ -91,8 +92,11 @@ class _CreateOrgState extends State<WgtCreateOrg> {
         onCreated: widget.onCreated,
       );
     } else if (itemType == PagOrgType.landlord) {
-      // return const WgtCreateLandlord();
-      return const SizedBox.shrink();
+      return WgtCreateLandlord(
+        appConfig: widget.appConfig,
+        loggedInUser: widget.loggedInUser,
+        onCreated: widget.onCreated,
+      );
     } else if (itemType == PagOrgType.bank) {
       return WgtCreateBank(
         appConfig: widget.appConfig,
