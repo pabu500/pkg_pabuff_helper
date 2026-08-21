@@ -234,7 +234,9 @@ class _WgtJobTypeOpPanel3State extends State<WgtJobTypeOpPanel3> {
         }
         return ok;
       case 'giro-file':
-        return _selectedFromDate != null && _selectedToDate != null;
+        // return _selectedFromDate != null && _selectedToDate != null;
+        // site group must be selected
+        return _selectedScopeProfile?.siteGroupProfile != null;
       case 'billing-report':
         return _selectedFromDate != null && _selectedToDate != null;
       case 'bill-lc-status-update':
@@ -402,12 +404,14 @@ class _WgtJobTypeOpPanel3State extends State<WgtJobTypeOpPanel3> {
       ) {
         dev.log(
             'Scope changed: siteGroup=${siteGroupProfile?.name}, site=${userSiteProfile?.name}, building=${buildingProfile?.name}, locationGroup=${locationGroupProfile?.name}');
-        _selectedScopeProfile = MdlPagScopeProfile(
-          siteGroupProfile: siteGroupProfile,
-          siteProfile: userSiteProfile,
-          buildingProfile: buildingProfile,
-          locationGroupProfile: locationGroupProfile,
-        );
+        setState(() {
+          _selectedScopeProfile = MdlPagScopeProfile(
+            siteGroupProfile: siteGroupProfile,
+            siteProfile: userSiteProfile,
+            buildingProfile: buildingProfile,
+            locationGroupProfile: locationGroupProfile,
+          );
+        });
       },
       onResult: (Map<String, dynamic> itemFindResult) {},
     );
@@ -696,20 +700,20 @@ class _WgtJobTypeOpPanel3State extends State<WgtJobTypeOpPanel3> {
     if ((_selectedFromDate == null || _selectedToDate == null)) {}
     return Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Duration',
-              style: TextStyle(
-                color: Theme.of(context).hintColor,
-                fontSize: 16,
-              ),
-            ),
-            horizontalSpaceSmall,
-            getTimeRangePicker(),
-          ],
-        ),
+        // Row(
+        //   mainAxisAlignment: MainAxisAlignment.center,
+        //   children: [
+        //     Text(
+        //       'Duration',
+        //       style: TextStyle(
+        //         color: Theme.of(context).hintColor,
+        //         fontSize: 16,
+        //       ),
+        //     ),
+        //     horizontalSpaceSmall,
+        //     getTimeRangePicker(),
+        //   ],
+        // ),
       ],
     );
   }

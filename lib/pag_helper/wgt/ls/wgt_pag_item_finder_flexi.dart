@@ -1862,16 +1862,9 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
           )
         : Row(
             children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: getClearButton(),
-              ),
+              getClearButton(),
               horizontalSpaceRegular,
-              if (showPanelModeButton)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: getPanelModeButton(),
-                ),
+              if (showPanelModeButton) getPanelModeButton(),
             ],
           );
   }
@@ -1918,10 +1911,11 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   }
 
   Widget getPanelModeButton() {
-    return InkWell(
-      child: Icon(_isFullPanel ? Icons.unfold_less : Icons.unfold_more,
-          size: 25, color: Theme.of(context).colorScheme.primary),
-      onTap: () {
+    return IconButton(
+      iconSize: 21,
+      icon: Icon(_isFullPanel ? Icons.unfold_less : Icons.unfold_more,
+          color: Theme.of(context).colorScheme.primary),
+      onPressed: () {
         setState(() {
           _isFullPanel = !_isFullPanel;
           dev.log('Toggle panel mode to: $_isFullPanel');
@@ -1931,13 +1925,11 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   }
 
   Widget getClearButton() {
-    return InkWell(
-      // iconSize: 25,
-      // tooltip: 'Clear search',
-      // icon: Icon(Icons.restart_alt, color: Theme.of(context).colorScheme.error),
-      child: Icon(Icons.restart_alt,
-          size: 21, color: Theme.of(context).colorScheme.error),
-      onTap: () {
+    return IconButton(
+      iconSize: 21,
+      tooltip: 'Clear search',
+      icon: Icon(Icons.restart_alt, color: Theme.of(context).colorScheme.error),
+      onPressed: () {
         _clearSearch();
         _iniScopesPreload();
         // final result = iniScopesPreload(
