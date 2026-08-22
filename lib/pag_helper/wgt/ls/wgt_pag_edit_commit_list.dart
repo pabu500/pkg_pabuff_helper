@@ -19,22 +19,24 @@ import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:flutter/services.dart';
 
 import '../../def_helper/dh_device.dart';
+import '../../def_helper/dh_meter_group.dart';
 import '../../def_helper/dh_pag_tariff.dart';
 import '../../def_helper/dh_pag_tenant.dart';
-import '../../def_helper/list_helper.dart';
+import '../../def_helper/dh_list.dart';
 import '../wgt_list_column_customize.dart';
 
 class WgtPagEditCommitList extends StatefulWidget {
   const WgtPagEditCommitList({
     super.key,
+    required this.listController,
+    required this.listItems,
+    required this.listPrefix,
+    required this.itemKind,
     this.width,
     this.height,
     this.sectionName = '',
     this.appConfig,
     this.loggedInUser,
-    required this.listController,
-    required this.listItems,
-    required this.listPrefix,
     this.listContextType,
     this.selectShowColumn = false,
     this.showCommit = true,
@@ -70,6 +72,7 @@ class WgtPagEditCommitList extends StatefulWidget {
   final MdlPagAppConfig? appConfig;
   final MdlPagUser? loggedInUser;
   final String listPrefix;
+  final PagItemKind itemKind;
   final double? width;
   final double? height;
   final String sectionName;
@@ -113,7 +116,27 @@ class WgtPagEditCommitList extends StatefulWidget {
 }
 
 class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
-  final double indexWidth = 34;
+  static const double _minIndexWidth = 21;
+  static const double _indexHorizontalPadding = 8;
+
+  TextStyle get _indexTextStyle =>
+      TextStyle(fontSize: 13.5, color: Theme.of(context).hintColor);
+
+  double get _indexWidth {
+    int maxIndex = _rows.length;
+    if (widget.maxRowsPerPage != null &&
+        widget.currentPage != null &&
+        widget.currentPage! > 1) {
+      maxIndex =
+          (widget.currentPage! - 1) * widget.maxRowsPerPage! + _rows.length;
+    }
+
+    final textWidth =
+        getStringDisplaySize2(context, maxIndex.toString(), _indexTextStyle)
+            .width;
+    final requiredWidth = textWidth + _indexHorizontalPadding;
+    return requiredWidth < _minIndexWidth ? _minIndexWidth : requiredWidth;
+  }
 
   bool _modified = false;
   // late double _lastColWidth;
@@ -125,10 +148,8 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
   late double _listHeight;
   UniqueKey? _listKey;
 
-  late TextStyle _listItemStyle = TextStyle(
-    fontSize: 13.5,
-    color: Theme.of(context).hintColor,
-  );
+  late final TextStyle _listItemStyle =
+      TextStyle(fontSize: 13.5, color: Theme.of(context).hintColor);
 
   UniqueKey? _headerRefreshKey;
 
@@ -370,10 +391,9 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
     dev.log('build list header');
 
     TextStyle listHeaderStyle = TextStyle(
-      fontWeight: FontWeight.bold,
-      fontSize: 15,
-      color: Theme.of(context).hintColor,
-    );
+        fontWeight: FontWeight.bold,
+        fontSize: 15,
+        color: Theme.of(context).hintColor);
 
     //build list header from widget.listConfig
     List<Widget> listHeader = [];
@@ -381,7 +401,7 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
     // if (widget.showCommit || _modified) {
     listHeader.add(
       SizedBox(
-        width: indexWidth,
+        width: _indexWidth,
         child:
             // widget.showCommit && _modified
             //     ? CommitModifiedTable(
@@ -504,11 +524,8 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
             Evs2ListText(
               // originalFullText: index.toString(),
               originalFullText: indexLabel,
-              width: indexWidth,
-              style: TextStyle(
-                fontSize: 13.5,
-                color: Theme.of(context).hintColor,
-              ),
+              width: _indexWidth,
+              style: _indexTextStyle,
             ),
           )
         : Container();
@@ -1097,6 +1114,14 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
       PagPortalType portalType = PagPortalType.byValue(tagText);
       tagLabel = portalType.tag;
       tagColor = portalType.color;
+    } else if (configItem['col_key'] == 'service_type') {
+      if (widget.itemKind == PagItemKind.meterGroup ||
+          widget.itemType == PagDeviceCat.meterGroup) {
+        MeterGroupServiceType meterGroupServiceType =
+            MeterGroupServiceType.byTag(tagText);
+        tagLabel = meterGroupServiceType.tag;
+        tagColor = meterGroupServiceType.color.withAlpha(130);
+      }
     } else if (configItem['col_key'] == 'soa_type') {
       PaymentSoaType soaType = PaymentSoaType.byValue(tagText);
       tagLabel = soaType.tag;

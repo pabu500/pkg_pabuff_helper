@@ -11,7 +11,7 @@ import 'package:buff_helper/xt_ui/wdgt/datetime/wgt_date_picker.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 import 'package:flutter/material.dart';
 
-import '../../def_helper/list_helper.dart';
+import '../../def_helper/dh_list.dart';
 import '../../def_helper/dh_pag_item.dart';
 import '../../model/list/mdl_list_col_controller.dart';
 import '../../model/mdl_pag_app_config.dart';

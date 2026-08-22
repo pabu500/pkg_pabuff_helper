@@ -214,7 +214,7 @@ class _WgtAmMeterGroupAssignment2State
 
     for (Map<String, dynamic> item in _itemGroupScopeMatchingItemList ?? []) {
       if (item['assigned_new'] != null) {
-        if (item['assigned'] != item['assigned_new']) {
+        if (_wasAssignedToThisMeterGroup(item) != item['assigned_new']) {
           modified = true;
           break;
         }
@@ -224,7 +224,7 @@ class _WgtAmMeterGroupAssignment2State
     if ((_scopeMismatchItemList ?? []).isNotEmpty) {
       for (Map<String, dynamic> item in _scopeMismatchItemList!) {
         if (item['assigned_new'] != null) {
-          if (item['assigned'] != item['assigned_new']) {
+          if (_wasAssignedToThisMeterGroup(item) != item['assigned_new']) {
             modified = true;
             break;
           }
@@ -233,7 +233,7 @@ class _WgtAmMeterGroupAssignment2State
     } else {
       for (Map<String, dynamic> item in _itemGroupScopeMatchingItemList ?? []) {
         if (item['assigned_new'] != null) {
-          if (item['assigned'] != item['assigned_new']) {
+          if (_wasAssignedToThisMeterGroup(item) != item['assigned_new']) {
             modified = true;
             break;
           }
@@ -244,6 +244,11 @@ class _WgtAmMeterGroupAssignment2State
       _modified = modified;
     });
     return modified;
+  }
+
+  bool _wasAssignedToThisMeterGroup(Map<String, dynamic> item) {
+    return item['assigned_item_group_id']?.toString() ==
+        widget.strItemGroupIndex;
   }
 
   bool _showItem(Map<String, dynamic> item) {
@@ -641,13 +646,13 @@ class _WgtAmMeterGroupAssignment2State
   Widget getAssignmentBox(Map<String, dynamic> itemInfo) {
     String? meterGroupName = itemInfo['assigned_item_group_name'];
     String? meterGroupLabel = itemInfo['assigned_item_group_label'];
-    bool hasAssignmentInfo = meterGroupName != null;
 
     double barWidth = 180;
     String tooltipMessage = 'assigned to: ${meterGroupName ?? 'None'}';
 
     double margin = 45;
-    bool checked = itemInfo['assigned_new'] ?? hasAssignmentInfo;
+    bool checked =
+        itemInfo['assigned_new'] ?? _wasAssignedToThisMeterGroup(itemInfo);
     bool disabled = false;
     return SizedBox(
       width: barWidth + margin,
@@ -678,10 +683,6 @@ class _WgtAmMeterGroupAssignment2State
                       setState(() {
                         if (value == null) return;
                         itemInfo['assigned_new'] = value;
-                        if (itemInfo['assigned_new'] == true) {
-                          itemInfo['percentage'] =
-                              100.0; // Set to 100% if assigned
-                        }
                         // if (itemInfo['assigned_new'] == false) {
                         //   itemInfo['assignment_info'] = null;
                         // }

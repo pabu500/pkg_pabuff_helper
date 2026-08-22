@@ -61,6 +61,12 @@ List<Map<String, dynamic>> getOpListConfig(
     if (opInfo == null) {
       continue;
     }
+
+    final constantValue = opInfo['const_value'];
+    if (constantValue != null) {
+      continue; // skip constant value columns
+    }
+
     bool isIdentityColumn = false;
     bool isMappingRequired = true;
     bool isValueRequired = true;

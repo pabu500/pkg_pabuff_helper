@@ -3,6 +3,7 @@ import 'dart:developer' as dev;
 import 'package:buff_helper/pag_helper/def_helper/dh_device.dart';
 import 'package:buff_helper/pag_helper/def_helper/enum_helper.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_item.dart';
+import 'package:flutter/material.dart';
 
 enum PagEmsMeterGroupOpType {
   onboarding1on1('EMS Onboarding 1-on-1', 'ems_onb_1on1', 'ems_onb_1on1'),
@@ -41,19 +42,21 @@ enum PagEmsMeterGroupOpType {
 }
 
 enum MeterGroupServiceType {
-  comm('comm', 'comm', 'comm'),
-  ems('ems', 'ems', 'ems'),
-  evs('evs', 'evs', 'evs'),
-  unknown('unknown', 'unknown', 'unknown');
+  comm('comm', 'comm', 'comm', Colors.blue),
+  ems('ems', 'ems', 'ems', Colors.orange),
+  evs('evs', 'evs', 'evs', Colors.purple),
+  unknown('unknown', 'unknown', 'unknown', Colors.grey);
 
   const MeterGroupServiceType(
     this.label,
     this.value,
     this.tag,
+    this.color,
   );
   final String label;
   final String value;
   final String tag;
+  final Color color;
 
   static MeterGroupServiceType byValue(String? value) =>
       enumByValue(

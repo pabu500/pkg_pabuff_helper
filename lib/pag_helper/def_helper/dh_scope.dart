@@ -149,7 +149,8 @@ String? validateLabelScope(String val, {PagScopeType? selectedScopeType}) {
   return null;
 }
 
-Widget getScopeLabel(BuildContext context, MdlPagScope scope) {
+Widget getScopeLabel(BuildContext context, MdlPagScope scope,
+    {bool showProjectLabel = false}) {
   BoxDecoration boxDecoration = BoxDecoration(
     border: Border.all(color: Theme.of(context).hintColor.withAlpha(50)),
     borderRadius: BorderRadius.circular(5),
@@ -165,6 +166,10 @@ Widget getScopeLabel(BuildContext context, MdlPagScope scope) {
   PagScopeType leafScopeType = scopeChain.last['type'];
 
   for (var item in scopeChain) {
+    if (showProjectLabel == false && item['type'] == PagScopeType.project) {
+      continue;
+    }
+
     PagScopeType chainScopeType = item['type'];
     bool isLeaf = chainScopeType == leafScopeType;
 

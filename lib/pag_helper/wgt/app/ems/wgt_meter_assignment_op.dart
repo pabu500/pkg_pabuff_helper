@@ -83,22 +83,29 @@ class _WgtMeterAssignmentOpState extends State<WgtMeterAssignmentOp> {
     }
 
     for (var meterGroupAssignment in meterGroupAssignmentList) {
+      final assignmentPercentage = _parsePercentage(
+        meterGroupAssignment['percentage'],
+      );
+      // Communication meter-group assignments intentionally have no
+      // percentage and do not participate in EMS/EVS allocation.
+      if (assignmentPercentage == null) {
+        continue;
+      }
+
       Map<String, dynamic> barInfo = {};
 
       bool isCurrentMeterGroup =
           meterGroupAssignment['meter_group_id'] == widget.strMeterGroupId;
 
       if (isCurrentMeterGroup) {
-        _percentAssignedToThisGroup ??=
-            double.tryParse(meterGroupAssignment['percentage']) ?? 0.0;
+        _percentAssignedToThisGroup ??= assignmentPercentage;
         // barInfo['mg_self_percentage'] = _percentAssignedToThisGroup;
       }
 
       String meterGroupName = meterGroupAssignment['meter_group_name'] ?? '';
       String meterGroupLabel = meterGroupAssignment['meter_group_label'] ?? '';
 
-      double? meterPercentage =
-          double.tryParse(meterGroupAssignment['percentage']);
+      double? meterPercentage = assignmentPercentage;
       if (isCurrentMeterGroup && _percentAssignedToThisGroupNew != null) {
         meterPercentage = _percentAssignedToThisGroupNew;
       }
@@ -208,6 +215,16 @@ class _WgtMeterAssignmentOpState extends State<WgtMeterAssignmentOp> {
             'please remove this meter from this meter group to fix the assignment error';
       }
     }
+  }
+
+  double? _parsePercentage(dynamic value) {
+    if (value == null) {
+      return null;
+    }
+    if (value is num) {
+      return value.toDouble();
+    }
+    return double.tryParse(value.toString());
   }
 
   @override

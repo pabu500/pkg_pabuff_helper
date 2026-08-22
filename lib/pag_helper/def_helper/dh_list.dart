@@ -1,19 +1,55 @@
 import 'package:buff_helper/pkg_buff_helper.dart';
 
+import 'enum_helper.dart';
+
 enum PagListContextType {
-  info,
-  infoTp,
-  usage,
-  scada,
-  soa,
-  none,
-  fh,
-  paymentMatching,
-  paymentApply,
-  billCompilation,
-  jobOption,
-  rolePermAssignment,
-  linkAssetOp,
+  info('Info', 'info', 'info'),
+  infoTp('Info TP', 'info_tp', 'info_tp'),
+  usage('Usage', 'usage', 'usage'),
+  scada('SCADA', 'scada', 'scada'),
+  soa('SOA', 'soa', 'soa'),
+  fh('FH', 'fh', 'fh'),
+  paymentMatching('Payment Matching', 'payment_matching', 'payment_matching'),
+  paymentApply('Payment Apply', 'payment_apply', 'payment_apply'),
+  billCompilation('Bill Compilation', 'bill_compilation', 'bill_compilation'),
+  jobOption('Job Option', 'job_option', 'job_option'),
+  rolePermAssignment(
+      'Role Perm Assignment', 'role_perm_assignment', 'role_perm_assignment'),
+  linkAssetOp('Link Asset Op', 'link_asset_op', 'link_asset_op'),
+  evsMeterGroup('EVS Meter Group', 'evs_meter_group', 'evs_meter_group'),
+  emsMeterGroup('EMS Meter Group', 'ems_meter_group', 'ems_meter_group'),
+  amMeterGroup('AM Meter Group', 'am_meter_group', 'am_meter_group'),
+  none('None', 'none', 'none');
+
+  const PagListContextType(
+    this.label,
+    this.value,
+    this.tag,
+  );
+
+  final String label;
+  final String value;
+  final String tag;
+
+  static PagListContextType byValue(String? value) =>
+      enumByValue(
+        value,
+        values,
+        (e) => (e).value,
+      ) ??
+      none;
+
+  static PagListContextType? byLabel(String? label) => enumByLabel(
+        label,
+        values,
+        (e) => (e).label,
+      );
+
+  static PagListContextType? byTag(String? tag) => enumByTag(
+        tag,
+        values,
+        (e) => (e).tag,
+      );
 }
 
 enum PagListTypeName {

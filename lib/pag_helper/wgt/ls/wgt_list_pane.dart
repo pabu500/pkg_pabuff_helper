@@ -10,7 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
-import '../../def_helper/list_helper.dart';
+import '../../def_helper/dh_pag_item.dart';
+import '../../def_helper/dh_list.dart';
 import '../../model/mdl_pag_app_config.dart';
 import 'wgt_pag_edit_commit_list.dart';
 import 'dart:developer' as dev;
@@ -21,6 +22,7 @@ class WgtListPane extends StatefulWidget {
   const WgtListPane({
     super.key,
     required this.appConfig,
+    required this.itemKind,
     required this.initialItemList,
     required this.totalItemCount,
     required this.queryMap,
@@ -39,6 +41,7 @@ class WgtListPane extends StatefulWidget {
   });
 
   final MdlPagAppConfig appConfig;
+  final PagItemKind itemKind;
   final List<Map<String, dynamic>> initialItemList;
   final Map<String, dynamic> queryMap;
   final MdlPagListController listController;
@@ -57,6 +60,7 @@ class WgtListPane extends StatefulWidget {
   final String listPrefix;
   final double? paneHeight;
   final dynamic itemType;
+
   final String displayMode;
   final Function(Map<String, dynamic>)? onResult;
 
@@ -283,6 +287,7 @@ class _WgtListPaneState extends State<WgtListPane> {
           : WgtPagEditCommitList(
               key: _refreshKey,
               appConfig: widget.appConfig,
+              itemKind: widget.itemKind,
               isFetching: _isFetchingItemList,
               loggedInUser: loggedInUser,
               listController: widget.listController,

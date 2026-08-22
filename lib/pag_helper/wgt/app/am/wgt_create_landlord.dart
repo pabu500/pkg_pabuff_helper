@@ -6,7 +6,7 @@ import 'package:buff_helper/pag_helper/def_helper/dh_pag_item.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_org.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_tenant.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
-import 'package:buff_helper/pag_helper/def_helper/list_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_list.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_site_group_profile.dart';

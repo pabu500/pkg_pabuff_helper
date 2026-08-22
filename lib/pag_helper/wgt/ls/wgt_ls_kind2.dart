@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:buff_helper/pag_helper/pag_app_context_list.dart';
-import 'package:buff_helper/pag_helper/def_helper/list_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_list.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_item.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_controller.dart';
@@ -15,6 +15,7 @@ import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:provider/provider.dart';
 import '../../def_helper/dh_acl.dart';
 import '../../def_helper/dh_device.dart';
+import '../../def_helper/dh_meter_group.dart';
 import '../../def_helper/dh_pag_finance.dart';
 import '../../def_helper/dh_pag_org.dart';
 import '../../def_helper/dh_pag_tariff.dart';
@@ -75,6 +76,10 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
   final double paneWidth = 850;
   final double paneHeight = 830;
 
+  final initialFilterMap = <String, dynamic>{};
+  PagFilterGroupType? _initialFilterGroupType;
+  bool _isInitialValueMutable = false;
+
   late final MdlPagUser? loggedInUser;
   late final prefKey = widget.pagAppContext.route;
   late final String itemTypeListStr;
@@ -118,6 +123,16 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
       }
       if (_selectedListController == null) {
         throw Exception('ListConfig not found for item type: $itemType');
+      }
+
+      final selectedItemTypeEnum = _selectedListController?.itemTypeEnum;
+
+      initialFilterMap.clear();
+      _initialFilterGroupType = null;
+      if (selectedItemTypeEnum == PagDeviceCat.meterGroup) {
+        initialFilterMap['service_type'] = MeterGroupServiceType.comm.value;
+        _isInitialValueMutable = false;
+        _initialFilterGroupType = PagFilterGroupType.spec;
       }
 
       _displayNameKey = _selectedListController?.getDisplayNameKey() ?? '';
@@ -360,6 +375,9 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
               isCompactFinder: widget.isCompactFinder,
               isSingleItemMode: widget.isSingleItemMode,
               showList: widget.showList,
+              initialFilterMap: initialFilterMap,
+              initialFilterGroupType: _initialFilterGroupType,
+              isInitialValueMutable: _isInitialValueMutable,
               finderRefreshKey: _itemTypeRefreshKey,
               pagAppContext: widget.pagAppContext,
               itemKind: widget.itemKind,

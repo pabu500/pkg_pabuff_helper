@@ -1,5 +1,5 @@
 import 'dart:developer' as dev;
-import 'package:buff_helper/pag_helper/def_helper/list_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_list.dart';
 import 'package:flutter/material.dart';
 
 import '../../def_helper/dh_scope.dart';
@@ -403,11 +403,11 @@ class MdlListColController {
     }
 
     if (listContextType != null) {
-      if (contextExcludeList.contains(listContextType.name)) {
+      if (contextExcludeList.contains(listContextType.value)) {
         showColumn = false;
       }
       if (contextIncludeList.isNotEmpty &&
-          !contextIncludeList.contains(listContextType.name)) {
+          !contextIncludeList.contains(listContextType.value)) {
         showColumn = false;
       }
     }

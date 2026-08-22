@@ -794,7 +794,7 @@ class _WgtEmsMeterGroupAssignmentState
     for (Map<String, dynamic> itemInfo in _itemGroupScopeMatchingItemList!) {
       bool showItem = _showItem(itemInfo);
       if (showItem) {
-        dev.log('Item ${itemInfo['meter_sn']} is included in the list');
+        // dev.log('Item ${itemInfo['meter_sn']} is included in the list');
       }
       itemInfo['index'] = ++index;
       if (!showItem) {

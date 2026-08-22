@@ -8,7 +8,7 @@ import 'dart:developer' as dev;
 import 'package:buff_helper/pag_helper/comm/comm_pag_item.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_finance.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_org.dart';
-import 'package:buff_helper/pag_helper/def_helper/list_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_list.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_item.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
@@ -683,8 +683,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
         ?.text = selectedLocationGroup?.label ?? '';
   }
 
-  void _clearAutoSelectedScopeFilter(
-      MdlListColController? scopeColController) {
+  void _clearAutoSelectedScopeFilter(MdlListColController? scopeColController) {
     scopeColController?.filterValue = null;
     scopeColController?.filterWidgetController?.clear();
     scopeColController?.filterResetKey = UniqueKey();
@@ -1641,8 +1640,9 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
             ),
           );
         } else {
-          wdiget = (colController.valueList!.isEmpty && !_filterListPulled)
-              ? FutureBuilder(
+          wdiget = (colController.valueList!.isNotEmpty || _filterListPulled)
+              ? getDropDownButton(colController, _isFullPanel)
+              : FutureBuilder(
                   future: _getFilterValueList(colController),
                   builder: (context, AsyncSnapshot<void> snapshot) {
                     switch (snapshot.connectionState) {
@@ -1661,8 +1661,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
                         }
                     }
                   },
-                )
-              : getDropDownButton(colController, _isFullPanel);
+                );
         }
         if (_isFullPanel || colController.pinned) {
           list.add(wdiget);
@@ -1841,6 +1840,12 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   }
 
   Widget getDropDownButton(MdlListColController colController, bool isFull) {
+    bool enableEdit = true;
+    if (!widget.isInitialValueMutable) {
+      if (colController.filterValue != null) {
+        enableEdit = false;
+      }
+    }
     List<Map<String, dynamic>> list = colController.valueList ?? [];
     return Padding(
       padding: const EdgeInsets.only(left: 8, right: 8, bottom: 5),
@@ -1852,14 +1857,14 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
           children: [
             if (isFull) getPin(listColController: colController),
             if (isFull) horizontalSpaceSmall,
-            DropdownButton<Map<String, dynamic>>(
+            DropdownButton<String>(
               key:
                   UniqueKey(), // prevent reuse of the same widget (and its state)
               hint: Padding(
                   padding: const EdgeInsets.only(bottom: 3.0),
                   child: Text(colController.filterLabel,
                       style: _dropDownListHintStyle)),
-              value: colController.filterValue,
+              value: colController.filterValue?['value'],
               // isDense: true,
               // itemHeight: 55,
               focusColor: Theme.of(context).hoverColor,
@@ -1867,23 +1872,25 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
               icon: const Icon(Icons.arrow_drop_down),
               iconSize: 21,
               style: TextStyle(color: Theme.of(context).colorScheme.primary),
-              onChanged: (Map<String, dynamic>? value) async {
-                if (value != null) {
-                  if (value == colController.filterValue) {
-                    return;
-                  }
-                }
-                setState(() {
-                  colController.filterValue = value!;
-                  _enableSearch = _enableSearchButton();
-                });
+              onChanged: !enableEdit
+                  ? null
+                  : (String? value) async {
+                      if (value != null) {
+                        if (value == colController.filterValue?['value']) {
+                          return;
+                        }
+                      }
+                      setState(() {
+                        colController.filterValue = {'value': value};
+                        _enableSearch = _enableSearchButton();
+                      });
 
-                widget.onModified?.call();
-              },
-              items: list.map<DropdownMenuItem<Map<String, dynamic>>>(
-                  (Map<String, dynamic> value) {
-                return DropdownMenuItem<Map<String, dynamic>>(
-                  value: value,
+                      widget.onModified?.call();
+                    },
+              items: list
+                  .map<DropdownMenuItem<String>>((Map<String, dynamic> value) {
+                return DropdownMenuItem<String>(
+                  value: value['value'],
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: 3.0),
                     child: Text(

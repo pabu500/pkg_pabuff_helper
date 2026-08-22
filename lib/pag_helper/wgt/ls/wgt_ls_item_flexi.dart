@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:buff_helper/pag_helper/comm/comm_pag_item.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_device.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_tariff.dart';
-import 'package:buff_helper/pag_helper/def_helper/list_helper.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_list.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_item.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_tariff_package.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
@@ -94,6 +94,7 @@ class WgtListSearchItemFlexi extends StatefulWidget {
     this.showTimeRangePicker = false,
     this.timeRangePickerWidget,
     this.initialFilterMap = const {},
+    this.isInitialValueMutable = true,
     this.initialFilterGroupType,
     this.allowFlexiLabel = false,
     this.hint,
@@ -135,6 +136,7 @@ class WgtListSearchItemFlexi extends StatefulWidget {
   final Widget? timeRangePickerWidget;
   final Map<String, dynamic> initialFilterMap;
   final PagFilterGroupType? initialFilterGroupType;
+  final bool isInitialValueMutable;
   final bool allowFlexiLabel;
   final String? hint;
   final double widthOffset;
@@ -151,6 +153,10 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
   late final MdlPagUser? loggedInUser;
 
   late final listPrefix = widget.itemKind.name.toLowerCase();
+
+  final initialFilterMap = <String, dynamic>{};
+  PagFilterGroupType? _initialFilterGroupType;
+  bool _isInitialValueMutable = false;
 
   bool _isFetchingListInfo = false;
   bool _isFetchingItemList = false;
@@ -1907,6 +1913,21 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
 
     _sortBy = widget.sortBy;
     _sortOrder = widget.sortOrder;
+
+    initialFilterMap.clear();
+    initialFilterMap.addAll(widget.initialFilterMap);
+    _isInitialValueMutable = widget.isInitialValueMutable;
+    _initialFilterGroupType = widget.initialFilterGroupType;
+
+    if (widget.itemKind == PagItemKind.meterGroup) {
+      initialFilterMap['service_type'] = MeterGroupServiceType.ems.value;
+      if (widget.pagAppContext == appCtxEvs) {
+        initialFilterMap['service_type'] = MeterGroupServiceType.evs.value;
+      }
+
+      _isInitialValueMutable = false;
+      _initialFilterGroupType = PagFilterGroupType.spec;
+    }
   }
 
   @override
@@ -2002,9 +2023,8 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       return Container();
     }
 
-    bool isInitialValueMutable = true;
     if (widget.listContextType == PagListContextType.infoTp) {
-      isInitialValueMutable = false;
+      _isInitialValueMutable = false;
     }
 
     return Column(children: [
@@ -2036,9 +2056,9 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
             maxDurationDays: widget.listContextType == PagListContextType.usage
                 ? 1100
                 : null,
-            initialFilterMap: widget.initialFilterMap,
-            initialFilterGroupType: widget.initialFilterGroupType,
-            isInitialValueMutable: isInitialValueMutable,
+            initialFilterMap: initialFilterMap,
+            initialFilterGroupType: _initialFilterGroupType,
+            isInitialValueMutable: _isInitialValueMutable,
             allowFlexiLabel: widget.allowFlexiLabel,
             hint: widget.hint,
             additionalQuery: widget.additionalQuery,
@@ -2449,6 +2469,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         padding: const EdgeInsets.only(left: 0, right: 60),
         child: WgtListPane(
           appConfig: widget.appConfig,
+          itemKind: widget.itemKind,
           enablePaneModeSwitcher: widget.enablePaneModeSwitcher,
           initialItemList: _entityItems,
           listContextType: widget.listContextType,
