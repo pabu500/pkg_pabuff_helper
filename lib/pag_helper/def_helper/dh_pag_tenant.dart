@@ -718,6 +718,11 @@ String? validateInitialBalance(String value) {
 enum PagTenantOpType {
   onboarding('Onboarding', 'onb', 'onb'),
   mgAssignment1on1('MG Assignment 1on1', 'mg_assignment_1on1', 'mg1'),
+  mgAssignmentIndLoc1on1(
+    'MG Assignment Ind. Loc. 1on1',
+    'mg_assignment_ind_loc_1on1',
+    'mgil1',
+  ),
   update('Update', 'update', 'upd'),
   sendBillingReminder('Send Billing Reminder', 'sbr', 'sbr'),
   none('None', 'none', 'none');
@@ -1092,6 +1097,26 @@ final List<Map<String, dynamic>> listConfigMgAssign1on1 = [
   },
 ];
 
+final List<Map<String, dynamic>> listConfigMgAssignIndLoc1on1 = [
+  {
+    'col_key': 'label',
+    'title': 'Tenant Label',
+    'col_type': 'string',
+    'width': 200,
+    'is_mapping_required': true,
+    'validator': validateTenantLabel,
+  },
+  {
+    'col_key': 'meter_sn',
+    'title': 'Meter S/N',
+    'col_type': 'string',
+    'width': 200,
+    'is_mapping_required': true,
+    'validator': (String value) =>
+        value.trim().isEmpty ? 'Meter S/N is required' : null,
+  },
+];
+
 List<Map<String, dynamic>> getListConfigBaseByTenantOpType(
     PagTenantOpType opType) {
   final List<Map<String, dynamic>> list = [];
@@ -1107,6 +1132,9 @@ List<Map<String, dynamic>> getListConfigBaseByTenantOpType(
           .firstWhere((element) => element['col_key'] == 'account_number');
       accountNumberConfig['validator'] = validateTenantAccountNumber2;
       list.addAll(listConfigBaseTenant + listConfigMgAssign1on1);
+      break;
+    case PagTenantOpType.mgAssignmentIndLoc1on1:
+      list.addAll(listConfigMgAssignIndLoc1on1);
       break;
     default:
       list.addAll(listConfigBaseTenant + []);

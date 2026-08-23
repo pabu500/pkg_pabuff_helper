@@ -6,11 +6,11 @@ import 'package:buff_helper/pag_helper/def_helper/dh_pag_item.dart';
 import 'package:flutter/material.dart';
 
 enum PagEmsMeterGroupOpType {
-  onb1on1('EMS Onboarding 1-on-1', 'ems_onb_1on1', 'ems_onb_1on1'),
+  onb1on1('EMS Onboarding 1-on-1', 'ems_onb_1on1', '1on1'),
   onbIndLoc1on1(
     'EMS Independent Location Onboarding 1-on-1',
     'ems_onb_ind_loc_1on1',
-    'ems_onb_ind_loc_1on1',
+    'iloc1on1',
   ),
   update('Update', 'update', 'update'),
   none('None', 'none', 'none'),
@@ -44,6 +44,50 @@ enum PagEmsMeterGroupOpType {
         values,
         (e) => (e).tag,
       );
+}
+
+enum EmsMeterGroupAssignmentType {
+  ems1on1('1-on-1', 'ems_onb_1on1', '1on1', Colors.purple),
+  emsIndLoc1on1(
+      'Ind. Loc. 1-on-1', 'ems_onb_ind_loc_1on1', 'iloc1on1', Colors.blue),
+  manual('manual', 'manual', 'man', Colors.teal),
+  unknown('unknown', 'unknown', 'unknown', Colors.grey);
+
+  const EmsMeterGroupAssignmentType(
+    this.label,
+    this.value,
+    this.tag,
+    this.color,
+  );
+  final String label;
+  final String value;
+  final String tag;
+  final Color color;
+
+  static EmsMeterGroupAssignmentType byValue(String? value) {
+    return enumByValue(
+          value,
+          values,
+          (e) => (e).value,
+        ) ??
+        unknown;
+  }
+
+  static EmsMeterGroupAssignmentType byLabel(String? label) =>
+      enumByLabel(
+        label,
+        values,
+        (e) => (e).label,
+      ) ??
+      unknown;
+
+  static EmsMeterGroupAssignmentType byTag(String? tag) =>
+      enumByTag(
+        tag,
+        values,
+        (e) => (e).tag,
+      ) ??
+      unknown;
 }
 
 enum MeterGroupServiceType {

@@ -11,6 +11,7 @@ class WgtMeterAssignmentOp extends StatefulWidget {
   final String strMeterGroupId;
   final Map<String, dynamic> meterInfo;
   final void Function(double, String) onPercentageChanged;
+  final bool readOnly;
 
   const WgtMeterAssignmentOp({
     super.key,
@@ -18,6 +19,7 @@ class WgtMeterAssignmentOp extends StatefulWidget {
     required this.strMeterGroupId,
     required this.meterInfo,
     required this.onPercentageChanged,
+    this.readOnly = false,
   });
 
   @override
@@ -214,6 +216,11 @@ class _WgtMeterAssignmentOpState extends State<WgtMeterAssignmentOp> {
         _disabledMessage =
             'please remove this meter from this meter group to fix the assignment error';
       }
+    }
+
+    if (widget.readOnly) {
+      _disableOp = true;
+      _disabledMessage = '1-on-1 meter group assignments are immutable';
     }
   }
 

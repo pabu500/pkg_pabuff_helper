@@ -1093,6 +1093,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                           strItemGroupIndex: item['id'],
                           itemName: item['name'],
                           itemLabel: item['label'] ?? '',
+                          itemInfo: item,
                           itemScope: itemScope,
                           onUpdate: () {
                             setState(() {

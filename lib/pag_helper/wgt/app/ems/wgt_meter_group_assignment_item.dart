@@ -23,6 +23,7 @@ class WgtMeterGroupAssignmentItem extends StatefulWidget {
     required this.itemInfo,
     required this.getMeterAssignment,
     required this.strItemGroupIndex,
+    this.assignmentReadOnly = false,
     this.regFresh,
     this.onModified,
   });
@@ -31,6 +32,7 @@ class WgtMeterGroupAssignmentItem extends StatefulWidget {
   final MdlPagUser loggedInUser;
   final Map<String, dynamic> itemInfo;
   final String strItemGroupIndex;
+  final bool assignmentReadOnly;
   final void Function(void Function(bool isComm, bool isEnabled))? regFresh;
   final Future<void> Function(Map<String, dynamic> itemInfo) getMeterAssignment;
   final void Function(String)? onModified;
@@ -338,6 +340,7 @@ class _WgtMeterGroupAssignmentItemState
       appConfig: widget.appConfig,
       strMeterGroupId: widget.strItemGroupIndex,
       meterInfo: itemInfo,
+      readOnly: widget.assignmentReadOnly,
       onPercentageChanged: (newPercentage, assignmentErrorMessage) {
         final assignment = itemInfo['assignment'] ?? [];
 

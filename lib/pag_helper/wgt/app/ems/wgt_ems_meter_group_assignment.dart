@@ -77,6 +77,13 @@ class _WgtEmsMeterGroupAssignmentState
   // String? _selectedMeterIndexStr;
   bool _isFetchingAllAssignmentInfo = false;
   bool _isAllAssignmentInfoFetched = false;
+  String _assignmentType = '';
+
+  bool get _isAssignmentImmutable {
+    final normalizedType = _assignmentType.toLowerCase();
+    return normalizedType.endsWith('_onb_1on1') ||
+        normalizedType.endsWith('_onb_ind_loc_1on1');
+  }
 
   final TextEditingController _itemSnFilterController = TextEditingController();
   String _itemSnFilterStr = '';
@@ -127,6 +134,8 @@ class _WgtEmsMeterGroupAssignmentState
       if (scopeMismatchItemList == null) {
         throw Exception('scope_mismatch_item_list is null');
       }
+      _assignmentType =
+          result['item_group_assignment_type']?.toString() ?? _assignmentType;
       _itemGroupScopeMatchingItemList = List<Map<String, dynamic>>.from(
         itemGroupScopeMatchingItemList,
       );
@@ -449,6 +458,7 @@ class _WgtEmsMeterGroupAssignmentState
       context,
       listen: false,
     ).currentUser;
+    _assignmentType = widget.itemInfo?['assignment_type']?.toString() ?? '';
   }
 
   @override
@@ -557,6 +567,7 @@ class _WgtEmsMeterGroupAssignmentState
             loggedInUser: loggedInUser!,
             itemInfo: itemInfo,
             strItemGroupIndex: widget.strItemGroupIndex,
+            assignmentReadOnly: _isAssignmentImmutable,
             getMeterAssignment: _getMeterAssignment,
             onModified: (assignmentErrorMessage) {
               _checkModified(assignmentErrorMessage: assignmentErrorMessage);
@@ -706,6 +717,7 @@ class _WgtEmsMeterGroupAssignmentState
     );
     PagTenantLcStatus? lcStatus =
         PagTenantLcStatus.byValue(widget.itemInfo?['tenant_lc_status'] ?? '');
+    final assignmentType = EmsMeterGroupAssignmentType.byValue(_assignmentType);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -749,6 +761,26 @@ class _WgtEmsMeterGroupAssignmentState
               child: Text(widget.meterType,
                   style: const TextStyle(fontWeight: FontWeight.bold)),
             ),
+            if (_assignmentType.isNotEmpty) ...[
+              horizontalSpaceSmall,
+              Tooltip(
+                message: assignmentType.label,
+                child: Container(
+                  decoration: boxDecoration.copyWith(
+                    border: Border.all(color: assignmentType.color),
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                  child: Text(
+                    assignmentType.tag,
+                    style: TextStyle(
+                      color: assignmentType.color,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ],
             horizontalSpaceSmall,
           ],
         ),
@@ -809,6 +841,7 @@ class _WgtEmsMeterGroupAssignmentState
             loggedInUser: loggedInUser!,
             itemInfo: itemInfo,
             strItemGroupIndex: widget.strItemGroupIndex,
+            assignmentReadOnly: _isAssignmentImmutable,
             getMeterAssignment: _getMeterAssignment,
             onModified: (assignmentErrorMessage) {
               _checkModified(assignmentErrorMessage: assignmentErrorMessage);

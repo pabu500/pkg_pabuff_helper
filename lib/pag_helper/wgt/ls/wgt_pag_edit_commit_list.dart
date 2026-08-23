@@ -1118,9 +1118,17 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
       if (widget.itemKind == PagItemKind.meterGroup ||
           widget.itemType == PagDeviceCat.meterGroup) {
         MeterGroupServiceType meterGroupServiceType =
-            MeterGroupServiceType.byTag(tagText);
+            MeterGroupServiceType.byValue(tagText);
         tagLabel = meterGroupServiceType.tag;
         tagColor = meterGroupServiceType.color.withAlpha(130);
+      }
+    } else if (configItem['col_key'] == 'assignment_type') {
+      if (widget.itemKind == PagItemKind.meterGroup ||
+          widget.itemType == PagDeviceCat.meterGroup) {
+        EmsMeterGroupAssignmentType assignmentType =
+            EmsMeterGroupAssignmentType.byValue(tagText);
+        tagLabel = assignmentType.tag;
+        tagColor = assignmentType.color.withAlpha(130);
       }
     } else if (configItem['col_key'] == 'soa_type') {
       PaymentSoaType soaType = PaymentSoaType.byValue(tagText);
