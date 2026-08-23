@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../../../xt_ui/style/evs2_colors.dart';
 import '../../../../xt_ui/xt_helpers.dart';
 import '../../../model/mdl_pag_app_config.dart';
+import '../../../model/mdl_pag_app_context.dart';
 import '../../../model/mdl_pag_user.dart';
 import '../../../model/scope/mdl_pag_scope.dart';
 
@@ -12,6 +13,7 @@ class WgtTenantItemAssignment extends StatefulWidget {
   const WgtTenantItemAssignment({
     super.key,
     required this.appConfig,
+    required this.appContext,
     required this.loggedInUser,
     required this.strItemGroupIndex,
     required this.itemName,
@@ -22,6 +24,7 @@ class WgtTenantItemAssignment extends StatefulWidget {
   });
 
   final MdlPagAppConfig appConfig;
+  final MdlPagAppContext appContext;
   final MdlPagUser loggedInUser;
   final String strItemGroupIndex;
   final String itemName;
@@ -98,6 +101,7 @@ class _WgtTenantItemAssignmentState extends State<WgtTenantItemAssignment> {
       case 'Meter Group':
         return WgtTenantMeterGroupAssignment(
           appConfig: widget.appConfig,
+          appContext: widget.appContext,
           strItemGroupIndex: widget.strItemGroupIndex,
           itemName: widget.itemName,
           itemLabel: widget.itemLabel,

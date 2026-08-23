@@ -1055,6 +1055,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                       case PagItemKind.tenant:
                         opWidget = WgtTenantItemAssignment(
                           appConfig: widget.appConfig,
+                          appContext: widget.pagAppContext!,
                           loggedInUser: loggedInUser!,
                           strItemGroupIndex: item['id'],
                           itemName: item['name'],

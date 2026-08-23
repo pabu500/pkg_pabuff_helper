@@ -18,13 +18,16 @@ import '../../../comm/comm_ex.dart';
 
 import '../../../comm/comm_tenant_ops.dart';
 import '../../../comm/pag_be_api_base.dart';
+import '../../../def_helper/dh_meter_group.dart';
 import '../../../def_helper/dh_pag_tenant.dart';
 import '../../../model/mdl_pag_app_config.dart';
+import '../../../model/mdl_pag_app_context.dart';
 
 class WgtTenantMeterGroupAssignment extends StatefulWidget {
   const WgtTenantMeterGroupAssignment({
     super.key,
     required this.appConfig,
+    required this.appContext,
     required this.strItemGroupIndex,
     required this.itemName,
     required this.itemLabel,
@@ -34,6 +37,7 @@ class WgtTenantMeterGroupAssignment extends StatefulWidget {
   });
 
   final MdlPagAppConfig appConfig;
+  final MdlPagAppContext appContext;
   final String strItemGroupIndex;
   final String itemName;
   final String itemLabel;
@@ -74,6 +78,13 @@ class _WgtTenantMeterGroupAssignmentState
 
   String? _selectedMeterGroupIndexStr;
 
+  String get _serviceType =>
+      widget.appContext.appContextType == PagAppContextType.ems
+          ? MeterGroupServiceType.ems.value
+          : widget.appContext.appContextType == PagAppContextType.evs
+              ? MeterGroupServiceType.evs.value
+              : MeterGroupServiceType.unknown.value;
+
   Future<void> _doAutoPopulate() async {
     if (_isFetching) {
       return;
@@ -86,6 +97,7 @@ class _WgtTenantMeterGroupAssignmentState
       'scope': loggedInUser!.selectedScope.toScopeMap(),
       'item_group_id': widget.strItemGroupIndex,
       'item_scope': widget.itemScope.toScopeMap(),
+      'service_type': _serviceType,
     };
 
     _isFetching = true;
@@ -230,6 +242,7 @@ class _WgtTenantMeterGroupAssignmentState
     Map<String, dynamic> queryMap = {
       'scope': loggedInUser!.selectedScope.toScopeMap(),
       'item_group_id': widget.strItemGroupIndex,
+      'service_type': _serviceType,
       'item_assignment_list': assignmentList,
     };
     try {
@@ -814,7 +827,7 @@ class _WgtTenantMeterGroupAssignmentState
               ),
             ),
             Container(
-              width: 150,
+              width: 160,
               decoration: boxDecoration,
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
               child: SelectableText(
@@ -824,7 +837,7 @@ class _WgtTenantMeterGroupAssignmentState
             ),
             horizontalSpaceSmall,
             Container(
-              width: 160,
+              width: 250,
               decoration: boxDecoration,
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
               child: SelectableText(

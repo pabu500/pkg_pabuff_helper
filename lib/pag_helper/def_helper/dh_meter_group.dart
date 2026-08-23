@@ -6,7 +6,12 @@ import 'package:buff_helper/pag_helper/def_helper/dh_pag_item.dart';
 import 'package:flutter/material.dart';
 
 enum PagEmsMeterGroupOpType {
-  onboarding1on1('EMS Onboarding 1-on-1', 'ems_onb_1on1', 'ems_onb_1on1'),
+  onb1on1('EMS Onboarding 1-on-1', 'ems_onb_1on1', 'ems_onb_1on1'),
+  onbIndLoc1on1(
+    'EMS Independent Location Onboarding 1-on-1',
+    'ems_onb_ind_loc_1on1',
+    'ems_onb_ind_loc_1on1',
+  ),
   update('Update', 'update', 'update'),
   none('None', 'none', 'none'),
   ;
@@ -130,12 +135,41 @@ final List<Map<String, dynamic>> listConfigOnb1on1 = [
   },
 ];
 
+final List<Map<String, dynamic>> listConfigOnbIndLoc1on1 = [
+  {
+    'col_key': 'meter_sn',
+    'title': 'Meter Serial Number',
+    'col_type': 'string',
+    'width': 200,
+    'join_key': 'meter_id',
+    'is_id_col': true,
+    'is_column_mapping_required': true,
+    'is_value_required': true,
+    'validator': validateSerialNumber,
+  },
+  {
+    'col_key': 'building_label',
+    'title': 'Building Label',
+    'col_type': 'string',
+    'width': 200,
+    'join_key': 'scope_id',
+    'is_id_col': false,
+    'is_column_mapping_required': true,
+    'is_value_required': true,
+    'validator': (String value) =>
+        value.trim().isEmpty ? 'Building Label is required' : null,
+  },
+];
+
 List<Map<String, dynamic>> getListConfigBaseByOpType(
     PagEmsMeterGroupOpType opType) {
   final List<Map<String, dynamic>> list = [];
   switch (opType) {
-    case PagEmsMeterGroupOpType.onboarding1on1:
+    case PagEmsMeterGroupOpType.onb1on1:
       list.addAll(listConfigBaseMeterGroup + listConfigOnb1on1);
+      break;
+    case PagEmsMeterGroupOpType.onbIndLoc1on1:
+      list.addAll(listConfigBaseMeterGroup + listConfigOnbIndLoc1on1);
       break;
     case PagEmsMeterGroupOpType.update:
       list.addAll(listConfigBaseMeterGroup + []);
