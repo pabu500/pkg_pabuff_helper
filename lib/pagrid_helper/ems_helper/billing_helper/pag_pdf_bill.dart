@@ -40,6 +40,7 @@ class PagPdfBillCwP2 {
     required this.gst,
     required this.billingRecName,
     required this.billLabel,
+    required this.invoiceNumber,
     required this.strFrom,
     required this.strTo,
     required this.strEffectiveTo,
@@ -120,6 +121,7 @@ class PagPdfBillCwP2 {
   final double? gst;
   final String billingRecName;
   final String billLabel;
+  final String invoiceNumber;
   final String strFrom;
   final String strTo;
   final String strEffectiveTo;
@@ -456,7 +458,7 @@ class PagPdfBillCwP2 {
                 pw.Text(' Invoice No',
                     style:
                         styleNormal.copyWith(fontWeight: pw.FontWeight.bold)),
-                pw.Text(' $billLabel',
+                pw.Text(' $invoiceNumber',
                     style:
                         styleNormal.copyWith(fontWeight: pw.FontWeight.bold)),
               ]),
@@ -556,7 +558,7 @@ class PagPdfBillCwP2 {
                       ]),
                       pw.TableRow(children: [
                         pw.Text(' Invoice Number:', style: styleNormal),
-                        pw.Text(' $billLabel', style: styleNormal),
+                        pw.Text(' $invoiceNumber', style: styleNormal),
                       ]),
                       pw.TableRow(children: [
                         pw.Text(' Date of Invoice:', style: styleNormal),

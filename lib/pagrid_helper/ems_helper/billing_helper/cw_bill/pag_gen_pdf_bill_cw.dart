@@ -17,6 +17,7 @@ Future<Uint8List> generatePagInvoice(
   final invoiceCwP2 = PagPdfBillCwP2(
     billingRecName: calcedBillInfoRl['billingRecName'] ?? '',
     billLabel: calcedBillInfoRl['billLabel'] ?? '',
+    invoiceNumber: calcedBillInfoRl['invoiceNumber'] ?? '',
     customerName: calcedBillInfoRl['customerName'] ?? '',
     customerCompanyTradingName:
         calcedBillInfoRl['customerCompanyTradingName'] ?? '',

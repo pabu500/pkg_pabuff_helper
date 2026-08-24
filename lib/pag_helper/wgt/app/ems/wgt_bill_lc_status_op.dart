@@ -60,6 +60,7 @@ class _WgtPagBillLcStatusOpState extends State<WgtPagBillLcStatusOp> {
         'gen_type': widget.billInfo['gen_type'],
         'billing_rec_id': widget.billInfo['billing_rec_id'],
         'bill_date_timestamp': widget.billInfo['bill_date_timestamp'],
+        'from_timestamp': widget.billInfo['from_timestamp'],
         // 'billed_total_amount': widget.billInfo['billed_total_amount'],
         'billed_cycle_total_amount':
             widget.billInfo['billed_cycle_total_amount'],
@@ -85,6 +86,9 @@ class _WgtPagBillLcStatusOpState extends State<WgtPagBillLcStatusOp> {
       PagBillingLcStatus updatedStatus = PagBillingLcStatus.byValue(newStatus);
       setState(() {
         _selectedLcStatus = updatedStatus;
+        if (result['audit_label'] != null) {
+          widget.billInfo['audit_label'] = result['audit_label'];
+        }
       });
       widget.onCommitted?.call(updatedStatus);
     } catch (e) {

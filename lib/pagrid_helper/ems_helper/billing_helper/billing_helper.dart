@@ -1,6 +1,13 @@
 import '../../../util/date_time_util.dart';
 import '../tenant/pag_ems_type_usage_calc_rl.dart';
 
+String getBillInvoiceNumber(Map<String, dynamic> billInfo) {
+  if (billInfo['lc_status']?.toString().toLowerCase() != 'released') {
+    return '';
+  }
+  return billInfo['audit_label']?.toString() ?? '';
+}
+
 Map<String, dynamic> prepCalcedBillInfoRl(Map<String, dynamic> billInfo) {
   String strFromTimestamp = billInfo['from_timestamp'];
   DateTime? fromDatetime = getTargetDatetimeFromTargetStr(strFromTimestamp);
@@ -246,6 +253,7 @@ Map<String, dynamic> prepCalcedBillInfoRl(Map<String, dynamic> billInfo) {
   final Map<String, dynamic> calcedBillInfo = {
     'billingRecName': billInfo['name'] ?? '',
     'billLabel': billInfo['bill_label'] ?? '',
+    'invoiceNumber': getBillInvoiceNumber(billInfo),
     'customerName': billInfo['tenant_name'] ?? '',
     'customerLabel': billInfo['tenant_label'] ?? '',
     'customerCompanyTradingName':
