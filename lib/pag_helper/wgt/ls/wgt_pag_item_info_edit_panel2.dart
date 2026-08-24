@@ -303,6 +303,54 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
     }
   }
 
+  Future<dynamic> _doDeleteResourceType() async {
+    if (_isDeleting) {
+      return {};
+    }
+
+    setState(() {
+      _isDeleting = true;
+      _deleteResultText = '';
+    });
+
+    try {
+      final result = await ex(
+        endpoint: PagUrlBase.eptDeleteResourceType,
+        crudType: 'delete',
+        opStr: 'delete resource type',
+        appConfig: widget.appConfig,
+        queryMap: {
+          'scope': _loggedInUser!.selectedScope.toScopeMap(),
+          'res_type_id': widget.strItemIndex,
+        },
+        svcClaim: MdlPagSvcClaim(
+          userId: _loggedInUser!.id,
+          username: _loggedInUser!.username,
+          roleId: _loggedInUser!.selectedRole?.id,
+          roleName: _loggedInUser!.selectedRole?.name,
+          roleLabel: _loggedInUser!.selectedRole?.label,
+          scope: '',
+          target: '',
+          operation: 'delete',
+        ),
+      );
+
+      return result is Map<String, dynamic> ? result : {};
+    } catch (e) {
+      dev.log(e.toString());
+      return {
+        'error':
+            getErrorText(e, defaultErrorText: 'Error deleting resource type')
+      };
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isDeleting = false;
+        });
+      }
+    }
+  }
+
   void _showDeleteAclItemConfirmation(String itemName, PagAclType aclType) {
     final itemLabel = aclType.label.toLowerCase();
     final usageDescription = switch (aclType) {
@@ -323,6 +371,41 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
           itemCount: 1,
           onConfirm: () async {
             final result = await _doDeleteAclItem(aclType);
+            if (!mounted) {
+              return;
+            }
+
+            if (result['error'] != null) {
+              setState(() {
+                _deleteResultText = result['error'].toString();
+              });
+              return;
+            }
+
+            setState(() {
+              _deleteResultText = 'Item deleted';
+            });
+            widget.onUpdate?.call();
+            Navigator.of(this.context).pop();
+          },
+        );
+      },
+    );
+  }
+
+  void _showDeleteResourceTypeConfirmation(String itemName) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return WgtConfirmBox(
+          title: 'Delete Resource Type',
+          message1: 'This operation will delete the selected resource type',
+          message2: 'A resource type used by a resource cannot be deleted',
+          opName: 'delete_resource_type',
+          keyInConfirmStrList: ['delete', itemName],
+          itemCount: 1,
+          onConfirm: () async {
+            final result = await _doDeleteResourceType();
             if (!mounted) {
               return;
             }
@@ -434,6 +517,9 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
       case PagItemKind.bill:
         isDeleteableItem = true;
         break;
+      case PagItemKind.resourceType:
+        isDeleteableItem = true;
+        break;
       case PagItemKind.acl:
         isDeleteableItem = widget.itemTypeEnum is PagAclType;
         break;
@@ -448,6 +534,7 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
   Widget build(BuildContext context) {
     final bool isAclItem =
         widget.itemKind == PagItemKind.acl && widget.itemTypeEnum is PagAclType;
+    final bool isResourceTypeItem = widget.itemKind == PagItemKind.resourceType;
     bool isItemMFD = false;
     for (Map<String, dynamic> field in widget.fieldList) {
       if (field['col_key'] != 'lc_status') {
@@ -560,6 +647,21 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
                                         _showDeleteAclItemConfirmation(itemName,
                                             widget.itemTypeEnum as PagAclType),
                                   ),
+                          if (isResourceTypeItem &&
+                              isDeleteableItem &&
+                              isDeleteableByAcl)
+                            _isDeleting
+                                ? const WgtPagWait(size: 21)
+                                : IconButton(
+                                    tooltip: 'Delete resource type',
+                                    icon: Icon(Icons.delete,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .error),
+                                    onPressed: () =>
+                                        _showDeleteResourceTypeConfirmation(
+                                            itemName),
+                                  ),
                           horizontalSpaceTiny,
                           Text(_itemDisplayName ?? '',
                               style: TextStyle(
@@ -594,7 +696,8 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
               ]),
               // verticalSpaceSmall,
               const Divider(height: 1),
-              if (isAclItem && _deleteResultText.isNotEmpty)
+              if ((isAclItem || isResourceTypeItem) &&
+                  _deleteResultText.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
                   child: _deleteResultText.contains('deleted')

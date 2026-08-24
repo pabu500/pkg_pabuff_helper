@@ -280,6 +280,10 @@ class _WgtJobTypeOpPanel3State extends State<WgtJobTypeOpPanel3> {
         return true;
       case 'user-login-log':
         return _selectedFromDate != null && _selectedToDate != null;
+      case 'monthly-3in1-audit-report':
+        return _selectedScopeProfile?.siteGroupProfile != null &&
+            _selectedFromDate != null &&
+            _selectedToDate != null;
       default:
         return false;
     }
@@ -432,6 +436,8 @@ class _WgtJobTypeOpPanel3State extends State<WgtJobTypeOpPanel3> {
         return getGiroFileOptions();
       case 'billing-report':
         return getBillingReportOptions();
+      case 'monthly-3in1-audit-report':
+        return getAuditReportOptions();
       case 'bill-lc-status-update':
         return getBillLcStatusUpdateOptions();
       case 'payment-lc-status-update':
@@ -759,6 +765,27 @@ class _WgtJobTypeOpPanel3State extends State<WgtJobTypeOpPanel3> {
           children: [
             Text(
               'Billing Month',
+              style: TextStyle(
+                color: Theme.of(context).hintColor,
+                fontSize: 16,
+              ),
+            ),
+            horizontalSpaceSmall,
+            getTimeRangePicker(forceMonthly: true),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget getAuditReportOptions() {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Month / Cycle',
               style: TextStyle(
                 color: Theme.of(context).hintColor,
                 fontSize: 16,

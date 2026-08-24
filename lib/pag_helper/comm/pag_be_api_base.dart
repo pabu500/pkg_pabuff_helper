@@ -320,6 +320,7 @@ class PagUrlBase {
   static const String eptAclGate = '/acl/acl_gate';
   static const String eptGetResTypeInfoList = '/acl/get_res_type_info_list';
   static const String eptCreateResourceType = '/acl/create_resource_type';
+  static const String eptDeleteResourceType = '/acl/delete_resource_type';
   static const String eptCreateAclItem = '/acl/create_acl_item';
   static const String eptDeleteAclRes = '/acl/delete_res';
   static const String eptDeleteAclPerm = '/acl/delete_perm';
