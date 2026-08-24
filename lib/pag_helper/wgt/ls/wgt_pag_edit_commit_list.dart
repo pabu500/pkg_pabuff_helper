@@ -277,7 +277,7 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
     //   }
     // }
     for (var item in widget.listController.listColControllerList) {
-      if (item.showColumn) {
+      if (item.showColumn && !item.hidden) {
         width += item.colWidth;
       }
     }

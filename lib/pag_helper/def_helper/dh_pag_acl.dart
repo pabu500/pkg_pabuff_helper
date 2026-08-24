@@ -35,7 +35,8 @@ enum PagPortalType {
 }
 
 enum PagRoleType {
-  admin('admin', 'Admin', 'admin', Colors.red),
+  sysAdmin('sys_admin', 'System Admin', 'sysadmin', Colors.red),
+  admin('admin', 'Admin', 'admin', Colors.redAccent),
   subAdmin('sub_admin', 'Sub Admin', 'subadmin', Colors.yellow),
   ops('ops', 'Ops', 'ops', Colors.teal),
   siteOps('site_ops', 'Site Ops', 'siteops', Colors.orange),

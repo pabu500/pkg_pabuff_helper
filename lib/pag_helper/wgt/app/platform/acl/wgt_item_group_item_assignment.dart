@@ -87,6 +87,7 @@ class _WgtItemGroupItemAssignmentState
     Map<String, dynamic> queryMap = {
       'scope': widget.loggedInUser!.selectedScope.toScopeMap(),
       'item_group_id': widget.strItemGroupIndex,
+      'item_scope': widget.itemScope.toScopeMap(),
     };
 
     _isScopeMatchingListFetching = true;
@@ -216,6 +217,7 @@ class _WgtItemGroupItemAssignmentState
     Map<String, dynamic> queryMap = {
       'scope': widget.loggedInUser!.selectedScope.toScopeMap(),
       'item_group_id': widget.strItemGroupIndex,
+      'item_scope': widget.itemScope.toScopeMap(),
       'item_assignment_list': assignmentList,
     };
     try {
