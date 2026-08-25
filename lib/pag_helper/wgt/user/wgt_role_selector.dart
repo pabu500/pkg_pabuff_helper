@@ -76,7 +76,8 @@ class _WgtRoleSelectorState extends State<WgtRoleSelector> {
                 .map(
                   (MdlPagRole role) => DropdownMenuItem<MdlPagRole>(
                     value: role,
-                    child: Text(role.label ?? role.name),
+                    child: Text(role.label ?? role.name,
+                        style: const TextStyle(fontSize: 13.5)),
                   ),
                 )
                 .toList(),

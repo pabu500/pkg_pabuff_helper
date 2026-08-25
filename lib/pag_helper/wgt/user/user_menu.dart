@@ -99,7 +99,7 @@ class _UserMenuState extends State<UserMenu> {
                 Symbols.group,
                 color: Theme.of(context).hintColor,
               ),
-              const SizedBox(width: 8),
+              horizontalSpaceTiny,
               WgtRoleSelector(
                 appConfig: widget.appConfig,
                 loggedInUser: _loggedInUser!,
