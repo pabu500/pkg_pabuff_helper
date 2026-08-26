@@ -303,7 +303,7 @@ class PagPdfBillCwP2 {
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
             pw.SizedBox(
-              width: 270,
+              width: 265,
               child: pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 mainAxisSize: pw.MainAxisSize.min,
@@ -317,10 +317,13 @@ class PagPdfBillCwP2 {
         pw.Row(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            pw.SizedBox(width: 230, child: _getPayerInfo()),
+            pw.SizedBox(width: 235, child: _getPayerInfo()),
             pw.Expanded(child: pw.Container()),
             if (paymentMethod == 'giro')
-              pw.SizedBox(width: 210, child: _getGrioNote()),
+              pw.Padding(
+                padding: const pw.EdgeInsets.only(right: 6),
+                child: pw.SizedBox(width: 210, child: _getGrioNote()),
+              ),
           ],
         ),
         // if (context.pageNumber > 1) pw.SizedBox(height: 20)
@@ -441,31 +444,28 @@ class PagPdfBillCwP2 {
           pw.SizedBox(width: 5),
           pw.Table(
             columnWidths: {
-              0: const pw.FixedColumnWidth(70),
-              1: const pw.FixedColumnWidth(105),
+              0: const pw.FixedColumnWidth(55),
+              1: const pw.FixedColumnWidth(130),
             },
             border: pw.TableBorder.all(color: PdfColors.grey600, width: 0.5),
             children: [
               pw.TableRow(children: [
                 pw.Text(' Account No',
-                    style:
-                        styleNormal.copyWith(fontWeight: pw.FontWeight.bold)),
+                    style: styleSmall.copyWith(fontWeight: pw.FontWeight.bold)),
                 pw.Text(' $tenantAccountNumber',
                     style:
                         styleNormal.copyWith(fontWeight: pw.FontWeight.bold)),
               ]),
               pw.TableRow(children: [
                 pw.Text(' Invoice No',
-                    style:
-                        styleNormal.copyWith(fontWeight: pw.FontWeight.bold)),
+                    style: styleSmall.copyWith(fontWeight: pw.FontWeight.bold)),
                 pw.Text(' $invoiceNumber',
                     style:
                         styleNormal.copyWith(fontWeight: pw.FontWeight.bold)),
               ]),
               pw.TableRow(children: [
-                pw.Text(' Total Amount',
-                    style:
-                        styleNormal.copyWith(fontWeight: pw.FontWeight.bold)),
+                pw.Text(' Total Amt.',
+                    style: styleSmall.copyWith(fontWeight: pw.FontWeight.bold)),
                 pw.Text(
                     payableAmount != null
                         // ? ' \$${payableAmount.toString()}'
@@ -547,31 +547,31 @@ class PagPdfBillCwP2 {
                         color: PdfColors.grey600, width: 0.5),
                     columnWidths: {
                       0: const pw.FixedColumnWidth(30),
-                      1: const pw.FixedColumnWidth(30),
+                      1: const pw.FixedColumnWidth(55),
                     },
                     defaultVerticalAlignment:
                         pw.TableCellVerticalAlignment.middle,
                     children: [
                       pw.TableRow(children: [
-                        pw.Text(' Account Number:', style: styleNormal),
+                        pw.Text(' Account No.:', style: styleNormal),
                         pw.Text(' $tenantAccountNumber', style: styleNormal)
                       ]),
                       pw.TableRow(children: [
-                        pw.Text(' Invoice Number:', style: styleNormal),
+                        pw.Text(' Invoice No.:', style: styleNormal),
                         pw.Text(' $invoiceNumber', style: styleNormal),
                       ]),
                       pw.TableRow(children: [
-                        pw.Text(' Date of Invoice:', style: styleNormal),
+                        pw.Text(' Invoice Date:', style: styleNormal),
                         pw.Text(' ${_getDateStr(strBillDate)}',
                             style: styleNormal),
                       ]),
                       pw.TableRow(children: [
-                        pw.Text(' Deposit Amount:', style: styleNormal),
+                        pw.Text(' Deposit Amt.:', style: styleNormal),
                         pw.Text(' \$${getCommaNumberStr(depositAmount)}',
                             style: styleNormal),
                       ]),
                       pw.TableRow(children: [
-                        pw.Text(' Mode of Payment:', style: styleNormal),
+                        pw.Text(' Payment Mode:', style: styleNormal),
                         pw.Text(' ${paymentMethodEnum.label}',
                             style: styleNormal),
                       ]),

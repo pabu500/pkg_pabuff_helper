@@ -120,11 +120,11 @@ String? validateScopeTag(String? value) {
   }
 
   // validate alphanumeric, _, -,
-  // and minimum 3 characters, maximum 21
-  String pattern = r"^[a-zA-Z0-9_-]{3,21}$";
+  // and minimum 3 characters, maximum 8
+  String pattern = r"^[a-zA-Z0-9_-]{3,8}$";
   RegExp regExp = RegExp(pattern);
   if (!regExp.hasMatch(value)) {
-    return 'alphanumeric, _, - only and length 3-21';
+    return 'alphanumeric, _, - only and length 3-8';
   }
   return null;
 }

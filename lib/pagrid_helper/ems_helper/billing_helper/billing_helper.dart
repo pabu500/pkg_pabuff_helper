@@ -5,7 +5,9 @@ String getBillInvoiceNumber(Map<String, dynamic> billInfo) {
   if (billInfo['lc_status']?.toString().toLowerCase() != 'released') {
     return '';
   }
-  return billInfo['audit_label']?.toString() ?? '';
+  return billInfo['audit_label']?.toString() ??
+      billInfo['bill_label']?.toString() ??
+      '';
 }
 
 Map<String, dynamic> prepCalcedBillInfoRl(Map<String, dynamic> billInfo) {
