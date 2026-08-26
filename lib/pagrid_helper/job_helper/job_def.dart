@@ -4,6 +4,7 @@ enum JobTaskType {
   billCwNus,
   usageReport,
   balReport,
+  lrtReport,
 }
 
 String? getJobTaskTypeName(JobTaskType jobType) {
@@ -18,6 +19,8 @@ String? getJobTaskTypeName(JobTaskType jobType) {
       return 'usage-report';
     case JobTaskType.balReport:
       return 'bal-report';
+    case JobTaskType.lrtReport:
+      return 'lrt-report';
   }
   return null;
 }
@@ -34,6 +37,8 @@ JobTaskType? getJobTaskType(String jobType) {
       return JobTaskType.usageReport;
     case 'bal-report':
       return JobTaskType.balReport;
+    case 'lrt-report':
+      return JobTaskType.lrtReport;
   }
   return null;
 }
