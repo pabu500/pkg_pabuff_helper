@@ -7,24 +7,22 @@ import 'package:buff_helper/pag_helper/wgt/wgt_comm_button.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-import '../../../../pagrid_helper/ems_helper/billing_helper/cw_bill/pag_gen_pdf_bill_compilation_cw.dart';
+import '../../../../pagrid_helper/ems_helper/billing_helper/cw_bill/pag_gen_pdf_bill_compilation_cw2.dart';
 import '../../../../pagrid_helper/ems_helper/billing_helper/wgt_pag_render_pdf.dart';
 import '../../../../up_helper/exceptions.dart';
 import '../../../../util/date_time_util.dart';
 import '../../../../xt_ui/xt_helpers.dart';
-import '../../../comm/comm_pag_billing.dart';
+import '../../../comm/comm_pag_billing2.dart';
 import '../../../comm/comm_pag_item.dart';
-import '../../../def_helper/billing_gen.dart';
 import '../../../model/acl/mdl_pag_svc_claim.dart';
 import '../../../model/mdl_pag_app_context.dart';
 import '../../../model/mdl_pag_user.dart';
 import '../../../model/mdl_pag_app_config.dart';
 import '../../../model/scope/mdl_pag_scope.dart';
 import '../../datetime/wgt_date_range_picker_monthly.dart';
-import 'wgt_bill_compilation2.dart';
 
-class WgtBillCompilation extends StatefulWidget {
-  const WgtBillCompilation({
+class WgtBillCompilation2 extends StatefulWidget {
+  const WgtBillCompilation2({
     super.key,
     required this.appConfig,
     required this.pagAppContext,
@@ -40,10 +38,10 @@ class WgtBillCompilation extends StatefulWidget {
   final Map<String, dynamic> scopeInfo;
 
   @override
-  State<WgtBillCompilation> createState() => _WgtBillCompilationState();
+  State<WgtBillCompilation2> createState() => _WgtBillCompilation2State();
 }
 
-class _WgtBillCompilationState extends State<WgtBillCompilation> {
+class _WgtBillCompilation2State extends State<WgtBillCompilation2> {
   String _errorText = '';
   bool _gettingBillList = false;
   bool _fetchedBillList = false;
@@ -160,7 +158,7 @@ class _WgtBillCompilationState extends State<WgtBillCompilation> {
           'is_released_mode': 'true',
         };
         try {
-          final billResult = await getPagCompositeBill(
+          final billResult = await getPagCompositeBill2(
             widget.appConfig,
             queryMap,
             MdlPagSvcClaim(
@@ -223,16 +221,6 @@ class _WgtBillCompilationState extends State<WgtBillCompilation> {
 
   @override
   Widget build(BuildContext context) {
-    if (useBillingGen3) {
-      return WgtBillCompilation2(
-        appConfig: widget.appConfig,
-        pagAppContext: widget.pagAppContext,
-        loggedInUser: widget.loggedInUser,
-        scopeType: widget.scopeType,
-        scopeInfo: widget.scopeInfo,
-      );
-    }
-
     return Container(
       // height: 500,
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
@@ -260,7 +248,7 @@ class _WgtBillCompilationState extends State<WgtBillCompilation> {
             WgtPagRenderPdf(
               loggedInUser: widget.loggedInUser,
               itemInfo: {'bill_info_list': _billList},
-              builder: generatePagInvoiceCompilation,
+              builder: generatePagInvoiceCompilation2,
             ),
           verticalSpaceSmall,
         ],

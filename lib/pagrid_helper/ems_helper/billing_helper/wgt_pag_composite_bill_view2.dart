@@ -7,22 +7,21 @@ import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
 
 import '../../../pag_helper/def_helper/dh_device.dart';
-import '../../../pag_helper/def_helper/billing_gen.dart';
 import '../../../pag_helper/def_helper/dh_list.dart';
 import '../../../pag_helper/def_helper/dh_pag_item.dart';
 import '../../../pag_helper/model/mdl_pag_project_profile.dart';
 import '../tenant/pag_ems_type_usage_calc.dart';
-import '../../../pag_helper/wgt/app/ems/wgt_bill_lc_status_op.dart';
+import '../../../pag_helper/wgt/app/ems/wgt_bill_lc_status_op2.dart';
 import '../tenant/wgt_pag_tenant_composite_usage_summary.dart';
-import '../../../pag_helper/comm/comm_pag_billing.dart';
+import '../../../pag_helper/comm/comm_pag_billing2.dart';
 import '../tenant/wgt_pag_tenant_composite_usage_summary_rl.dart';
 import '../../../pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import '../../../pag_helper/def_helper/dh_pag_bill.dart';
+import 'billing_helper2.dart';
 import 'wgt_pag_render_pdf.dart';
-import 'wgt_pag_composite_bill_view2.dart';
 
-class WgtPagCompositeBillView extends StatefulWidget {
-  const WgtPagCompositeBillView({
+class WgtPagCompositeBillView2 extends StatefulWidget {
+  const WgtPagCompositeBillView2({
     super.key,
     required this.appConfig,
     required this.loggedInUser,
@@ -50,11 +49,11 @@ class WgtPagCompositeBillView extends StatefulWidget {
   final Function? onUpdate;
 
   @override
-  State<WgtPagCompositeBillView> createState() =>
-      _WgtPagCompositeBillViewState();
+  State<WgtPagCompositeBillView2> createState() =>
+      _WgtPagCompositeBillView2State();
 }
 
-class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
+class _WgtPagCompositeBillView2State extends State<WgtPagCompositeBillView2> {
   final List<String> usageTypeTags = ['E', 'W', 'B', 'N', 'G'];
   final defaultErrorText = 'Error getting bill';
 
@@ -97,7 +96,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     };
 
     try {
-      final billResult = await getPagCompositeBill(
+      final billResult = await getPagCompositeBill2(
         widget.appConfig,
         queryMap,
         MdlPagSvcClaim(
@@ -163,22 +162,6 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
 
   @override
   Widget build(BuildContext context) {
-    if (useBillingGen3) {
-      return WgtPagCompositeBillView2(
-        appConfig: widget.appConfig,
-        loggedInUser: widget.loggedInUser,
-        billingRecIndexStr: widget.billingRecIndexStr,
-        defaultBillLcStatusStr: widget.defaultBillLcStatusStr,
-        listContextType: widget.listContextType,
-        displayContextStr: widget.displayContextStr,
-        isBillMode: widget.isBillMode,
-        costDecimals: widget.costDecimals,
-        modes: widget.modes,
-        genTypes: widget.genTypes,
-        onUpdate: widget.onUpdate,
-      );
-    }
-
     bool pullData = _bill.isEmpty && !_gettingBill;
 
     if (_pullFails > 0) {
@@ -267,7 +250,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
                             ),
                           ),
                         if (widget.listContextType != PagListContextType.infoTp)
-                          WgtPagBillLcStatusOp(
+                          WgtPagBillLcStatusOp2(
                             key: _lcStatusOpsKey,
                             appConfig: widget.appConfig,
                             loggedInUser: widget.loggedInUser,
@@ -844,7 +827,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
   }
 
   Widget getReleaseRender2(Map<String, dynamic> billInfo) {
-    final calcedBillInfoRl = prepCalcedBillInfoRl(billInfo);
+    final calcedBillInfoRl = prepCalcedBillInfoRl2(billInfo);
 
     return _renderMode == 'pdf'
         ? WgtPagRenderPdf(

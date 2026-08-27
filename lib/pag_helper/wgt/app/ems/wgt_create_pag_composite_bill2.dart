@@ -10,15 +10,13 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'dart:developer' as dev;
 
-import '../../../comm/comm_billing.dart';
-import '../../../def_helper/billing_gen.dart';
+import '../../../comm/comm_billing2.dart';
 import '../../../model/mdl_pag_app_config.dart';
 import 'bill_helper.dart';
-import 'wgt_create_pag_composite_bill2.dart';
 import 'wgt_create_pag_singular_bill.dart';
 
-class WgtCreatePagCompositeBill extends StatefulWidget {
-  const WgtCreatePagCompositeBill({
+class WgtCreatePagCompositeBill2 extends StatefulWidget {
+  const WgtCreatePagCompositeBill2({
     super.key,
     required this.appConfig,
     required this.pagAppContext,
@@ -36,11 +34,12 @@ class WgtCreatePagCompositeBill extends StatefulWidget {
   final Function? onCreated;
 
   @override
-  State<WgtCreatePagCompositeBill> createState() =>
-      _WgtCreatePagCompositeBillState();
+  State<WgtCreatePagCompositeBill2> createState() =>
+      _WgtCreatePagCompositeBill2State();
 }
 
-class _WgtCreatePagCompositeBillState extends State<WgtCreatePagCompositeBill> {
+class _WgtCreatePagCompositeBill2State
+    extends State<WgtCreatePagCompositeBill2> {
   // late MdlPagUser? _loggedInUser;
 
   final defaultErrorText = 'Error generating bill';
@@ -166,7 +165,7 @@ class _WgtCreatePagCompositeBillState extends State<WgtCreatePagCompositeBill> {
         queryMap['line_item_amount_3'] = _lineItemAmount3.toString();
       }
 
-      final result = await genPagBill(
+      final result = await genPagBill2(
         widget.appConfig,
         queryMap,
         MdlPagSvcClaim(
@@ -403,17 +402,6 @@ class _WgtCreatePagCompositeBillState extends State<WgtCreatePagCompositeBill> {
 
   @override
   Widget build(BuildContext context) {
-    if (useBillingGen3) {
-      return WgtCreatePagCompositeBill2(
-        appConfig: widget.appConfig,
-        pagAppContext: widget.pagAppContext,
-        loggedInUser: widget.loggedInUser,
-        width: widget.width,
-        height: widget.height,
-        onCreated: widget.onCreated,
-      );
-    }
-
     _width ??= MediaQuery.of(context).size.width - 130;
 
     bool showBillComponent =
