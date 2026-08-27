@@ -24,6 +24,11 @@ class WgtPagLs extends StatefulWidget {
     this.hint,
     this.enabledItemTypeList = const [],
     this.initialFilterMap = const {},
+    this.initialNoR,
+    this.showFinder = true,
+    this.loadOnInit = false,
+    this.sortBy,
+    this.sortOrder,
   });
 
   final MdlPagAppConfig appConfig;
@@ -42,6 +47,11 @@ class WgtPagLs extends StatefulWidget {
   final String? hint;
   final List<dynamic> enabledItemTypeList;
   final Map<String, dynamic> initialFilterMap;
+  final int? initialNoR;
+  final bool showFinder;
+  final bool loadOnInit;
+  final String? sortBy;
+  final String? sortOrder;
 
   @override
   State<WgtPagLs> createState() => _WgtPagLsState();
@@ -128,6 +138,11 @@ class _WgtPagLsState extends State<WgtPagLs> {
           isSingleItemMode: widget.isSingleItemMode,
           hint: widget.hint,
           initialFilterMap: widget.initialFilterMap,
+          initialNoR: widget.initialNoR,
+          showFinder: widget.showFinder,
+          loadOnInit: widget.loadOnInit,
+          sortBy: widget.sortBy,
+          sortOrder: widget.sortOrder,
         );
       default:
         return Container();

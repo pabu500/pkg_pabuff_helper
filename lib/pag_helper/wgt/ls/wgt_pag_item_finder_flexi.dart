@@ -87,6 +87,7 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
     this.prevailingScopeProfile,
     this.enableSearch = true,
     this.autoCascadeScopeFilter = true,
+    this.loadOnInit = false,
   });
 
   final MdlPagUser loggedInUser;
@@ -132,6 +133,7 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
   final bool isScopeProvider;
   final bool enableSearch;
   final bool autoCascadeScopeFilter;
+  final bool loadOnInit;
   final MdlPagScopeProfile? prevailingScopeProfile;
   final void Function(MdlPagSiteGroupProfile?, MdlPagSiteProfile?,
       MdlPagBuildingProfile?, MdlPagLocationGroupProfile?)? onScopeChanged;
@@ -913,6 +915,17 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
       if (colController.includeColKeyAsFilter) {
         _filterCount++;
       }
+    }
+
+    if (widget.loadOnInit) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (!mounted) return;
+
+        final itemFindResult = await _getItemList();
+        if (!mounted || itemFindResult == null) return;
+
+        widget.onResult(itemFindResult);
+      });
     }
   }
 

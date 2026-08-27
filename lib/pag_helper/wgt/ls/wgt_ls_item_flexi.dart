@@ -103,6 +103,9 @@ class WgtListSearchItemFlexi extends StatefulWidget {
     this.sortBy,
     this.sortOrder,
     this.enableSearch = true,
+    this.initialNoR,
+    this.showFinder = true,
+    this.loadOnInit = false,
   });
 
   final MdlPagAppConfig appConfig;
@@ -144,6 +147,9 @@ class WgtListSearchItemFlexi extends StatefulWidget {
   final String? sortBy;
   final String? sortOrder;
   final bool enableSearch;
+  final int? initialNoR;
+  final bool showFinder;
+  final bool loadOnInit;
 
   @override
   State<WgtListSearchItemFlexi> createState() => _WgtListSearchItemFlexiState();
@@ -2036,102 +2042,108 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           getAddItemButton(),
-          WgtPagItemFinderFlexi(
-            key: _finderRefreshKey, //_listContentRefreshKey,
-            enableSearch: widget.enableSearch,
-            width: widget.width,
-            widthOffset: widget.widthOffset,
-            loggedInUser: loggedInUser!,
-            appConfig: widget.appConfig,
-            itemKind: widget.itemKind,
-            itemType: _selectedListController!.itemTypeEnum,
-            listContextType: widget.listContextType,
-            listController: _selectedListController!,
-            selectedItemInfoList: widget.selectedItemInfoList,
-            isCompactMode: widget.isCompactFinder,
-            isSingleItemMode: widget.isSingleItemMode,
-            meterTypeList: meterTypeList,
-            // right padding as clerance for context menu
-            sidePadding: const EdgeInsets.only(left: 0, right: 60),
-            showTimeRangePicker: widget.showTimeRangePicker,
-            timeRangePickerWidget: widget.timeRangePickerWidget,
-            maxDurationDays: widget.listContextType == PagListContextType.usage
-                ? 1100
-                : null,
-            initialFilterMap: initialFilterMap,
-            initialFilterGroupType: _initialFilterGroupType,
-            isInitialValueMutable: _isInitialValueMutable,
-            allowFlexiLabel: widget.allowFlexiLabel,
-            hint: widget.hint,
-            additionalQuery: widget.additionalQuery,
-            sortBy: _sortBy,
-            sortOrder: _sortOrder,
-            onSearching: () {
-              setState(() {
-                _isFetchingItemList = true;
-              });
-              widget.onSearching?.call();
-            },
-            onClearSearch: () {
-              _resetFinder();
-            },
-            onModified: () {
-              _resetFinder();
-            },
-            onResult: (Map<String, dynamic> itemFindResult) {
-              if (itemFindResult['error'] != null) {
+          Offstage(
+            offstage: !widget.showFinder,
+            child: WgtPagItemFinderFlexi(
+              key: _finderRefreshKey, //_listContentRefreshKey,
+              enableSearch: widget.enableSearch,
+              initialNoR: widget.initialNoR,
+              loadOnInit: widget.loadOnInit,
+              width: widget.width,
+              widthOffset: widget.widthOffset,
+              loggedInUser: loggedInUser!,
+              appConfig: widget.appConfig,
+              itemKind: widget.itemKind,
+              itemType: _selectedListController!.itemTypeEnum,
+              listContextType: widget.listContextType,
+              listController: _selectedListController!,
+              selectedItemInfoList: widget.selectedItemInfoList,
+              isCompactMode: widget.isCompactFinder,
+              isSingleItemMode: widget.isSingleItemMode,
+              meterTypeList: meterTypeList,
+              // right padding as clerance for context menu
+              sidePadding: const EdgeInsets.only(left: 0, right: 60),
+              showTimeRangePicker: widget.showTimeRangePicker,
+              timeRangePickerWidget: widget.timeRangePickerWidget,
+              maxDurationDays:
+                  widget.listContextType == PagListContextType.usage
+                      ? 1100
+                      : null,
+              initialFilterMap: initialFilterMap,
+              initialFilterGroupType: _initialFilterGroupType,
+              isInitialValueMutable: _isInitialValueMutable,
+              allowFlexiLabel: widget.allowFlexiLabel,
+              hint: widget.hint,
+              additionalQuery: widget.additionalQuery,
+              sortBy: _sortBy,
+              sortOrder: _sortOrder,
+              onSearching: () {
                 setState(() {
-                  _isFetchingItemList = false;
-                  _errorText = itemFindResult['error'];
+                  _isFetchingItemList = true;
                 });
-                return;
-              }
-              _errorText = '';
-
-              if (_listControllerList.isEmpty) {
-                if (itemFindResult['list_config'] == null) {
+                widget.onSearching?.call();
+              },
+              onClearSearch: () {
+                _resetFinder();
+              },
+              onModified: () {
+                _resetFinder();
+              },
+              onResult: (Map<String, dynamic> itemFindResult) {
+                if (itemFindResult['error'] != null) {
                   setState(() {
                     _isFetchingItemList = false;
-                    _errorText = 'Failed to get list config';
+                    _errorText = itemFindResult['error'];
                   });
                   return;
                 }
+                _errorText = '';
 
-                for (var config in itemFindResult['list_config']) {
-                  _listControllerList
-                      .add(MdlPagListController.fromJson(config));
+                if (_listControllerList.isEmpty) {
+                  if (itemFindResult['list_config'] == null) {
+                    setState(() {
+                      _isFetchingItemList = false;
+                      _errorText = 'Failed to get list config';
+                    });
+                    return;
+                  }
+
+                  for (var config in itemFindResult['list_config']) {
+                    _listControllerList
+                        .add(MdlPagListController.fromJson(config));
+                  }
                 }
-              }
 
-              if (_currentPage == 1) {
-                _totalItemCount = itemFindResult['count'];
-              }
-              _entityItems.clear();
-              _entityItems.addAll(itemFindResult['item_list']);
-
-              setState(() {
-                _totalItemCount = itemFindResult['count'];
-
-                // copy the query map from the item finder
-                _queryMap = itemFindResult['query_map'];
-
-                _maxRowsPerPage =
-                    int.parse(_queryMap['max_rows_per_page'] ?? '20');
-
-                if (_totalItemCount == 0) {
-                  _showEmptyResult = true;
-                } else {
-                  _showEmptyResult = false;
+                if (_currentPage == 1) {
+                  _totalItemCount = itemFindResult['count'];
                 }
-                _isFetchingItemList = false;
-              });
+                _entityItems.clear();
+                _entityItems.addAll(itemFindResult['item_list']);
 
-              setState(() {
-                _isFetchingItemList = false;
-              });
+                setState(() {
+                  _totalItemCount = itemFindResult['count'];
 
-              widget.onResult?.call(itemFindResult);
-            },
+                  // copy the query map from the item finder
+                  _queryMap = itemFindResult['query_map'];
+
+                  _maxRowsPerPage =
+                      int.parse(_queryMap['max_rows_per_page'] ?? '20');
+
+                  if (_totalItemCount == 0) {
+                    _showEmptyResult = true;
+                  } else {
+                    _showEmptyResult = false;
+                  }
+                  _isFetchingItemList = false;
+                });
+
+                setState(() {
+                  _isFetchingItemList = false;
+                });
+
+                widget.onResult?.call(itemFindResult);
+              },
+            ),
           ),
         ],
       ),

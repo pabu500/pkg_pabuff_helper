@@ -94,28 +94,34 @@ class _WgtUserTenantSelectorState extends State<WgtUserTenantSelector> {
     // assigning a different class instance, even if it has the same values,
     // will be considered a different value, causing assertation error.
     // instead, use simple string labels as values.
-    return SizedBox(
+    return Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Theme.of(context).colorScheme.primary),
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
         child: DropdownButton<TenantItem>(
-      itemHeight: 55,
-      value: _selectedTenantItem,
-      onChanged: (TenantItem? newValue) {
-        if (newValue == null) {
-          _selectedTenantItem = null;
-        } else {
-          _selectedTenantItem = newValue;
-          for (var tenant in tenantList) {
-            if (tenant.name == _selectedTenantItem!.name) {
-              _selectedTenant = tenant;
-              break;
+          itemHeight: 55,
+          hint: const Text('Select tenant to view bills'),
+          value: _selectedTenantItem,
+          onChanged: (TenantItem? newValue) {
+            if (newValue == null) {
+              _selectedTenantItem = null;
+            } else {
+              _selectedTenantItem = newValue;
+              for (var tenant in tenantList) {
+                if (tenant.name == _selectedTenantItem!.name) {
+                  _selectedTenant = tenant;
+                  break;
+                }
+              }
             }
-          }
-        }
-        widget.onTenantSelected(_selectedTenant);
-        setState(() {});
-        _saveScopePref();
-      },
-      items: tenantDropdownItemList,
-    ));
+            widget.onTenantSelected(_selectedTenant);
+            setState(() {});
+            _saveScopePref();
+          },
+          items: tenantDropdownItemList,
+        ));
   }
 }
 
