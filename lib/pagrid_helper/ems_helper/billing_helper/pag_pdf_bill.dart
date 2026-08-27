@@ -844,7 +844,7 @@ class PagPdfBillCwP2 {
         width: 500,
         decoration: pw.BoxDecoration(
           border: pw.Border.all(color: PdfColors.grey600, width: 1),
-          borderRadius: pw.BorderRadius.circular(5.0),
+          borderRadius: pw.BorderRadius.circular(3.0),
         ),
         margin: const pw.EdgeInsets.only(top: 5),
         padding: const pw.EdgeInsets.symmetric(horizontal: 5, vertical: 2),
@@ -1628,7 +1628,7 @@ class PagPdfBillCwP2 {
         width: 550,
         decoration: pw.BoxDecoration(
           border: pw.Border.all(color: _darkColor, width: 1),
-          borderRadius: pw.BorderRadius.circular(5.0),
+          borderRadius: pw.BorderRadius.circular(3.0),
         ),
         margin: const pw.EdgeInsets.only(top: 8),
         padding: const pw.EdgeInsets.symmetric(horizontal: 5, vertical: 3),
