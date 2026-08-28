@@ -98,10 +98,26 @@ Future<Uint8List> generatePagInvoice(
     amgrBankPayNow: calcedBillInfoRl['amgrBankPayNow'] ?? '',
     strCollectionStartDate: calcedBillInfoRl['strCollectionStartDate'] ?? '',
     strCollectionEndDate: calcedBillInfoRl['strCollectionEndDate'] ?? '',
+    showBillingGen2Hint: calcedBillInfoRl['showBillingGen2Hint'] == true,
     tax: .15,
     baseColor: PdfColors.teal,
     accentColor: PdfColors.blueGrey900,
   );
 
   return await invoiceCwP2.buildPdf(pageFormat);
+}
+
+Future<Uint8List> generatePagInvoiceV2(
+  MdlPagUser loggedInUser,
+  PdfPageFormat pageFormat,
+  Map<String, dynamic> calcedBillInfoRl,
+) {
+  return generatePagInvoice(
+    loggedInUser,
+    pageFormat,
+    {
+      ...calcedBillInfoRl,
+      'showBillingGen2Hint': true,
+    },
+  );
 }

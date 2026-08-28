@@ -63,6 +63,7 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
     this.onUpdate,
     this.interestInfo = const {},
     this.bciInfoList = const [],
+    this.showInvoiceColon = false,
   });
 
   final MdlPagAppConfig appConfig;
@@ -102,6 +103,7 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
   // final Map<String, dynamic> usageFactor;
   // final Map<String, dynamic>? typeRates;
   final Map<String, dynamic> interestInfo;
+  final bool showInvoiceColon;
   final Function? onUpdate;
 
   @override
@@ -351,7 +353,7 @@ class _WgtPagTenantCompositeUsageSummaryState
         children: [
           getBillLcStatusTagWidget(context, billLcStatus),
           horizontalSpaceSmall,
-          Text('Invoice: ',
+          Text(widget.showInvoiceColon ? 'Invoice: ' : 'Invoice ',
               style: TextStyle(
                 fontSize: 18,
                 color: Theme.of(context).hintColor.withAlpha(180),

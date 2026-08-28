@@ -13,7 +13,7 @@ import 'dart:developer' as dev;
 import '../../../comm/comm_billing2.dart';
 import '../../../model/mdl_pag_app_config.dart';
 import 'bill_helper.dart';
-import 'wgt_create_pag_singular_bill.dart';
+import 'wgt_create_pag_singular_bill2.dart';
 
 class WgtCreatePagCompositeBill2 extends StatefulWidget {
   const WgtCreatePagCompositeBill2({
@@ -89,7 +89,7 @@ class _WgtCreatePagCompositeBill2State
   bool _tenantOK = false;
   bool _singularBillListOK = false;
 
-  final List<WgtCreatePagSingularBill> _singularBillWgtList = [];
+  final List<WgtCreatePagSingularBill2> _singularBillWgtList = [];
   final List<Map<String, dynamic>> _singularBillInfoList = [];
 
   bool _createIniBalBill = false;
@@ -767,7 +767,7 @@ class _WgtCreatePagCompositeBill2State
                 _singularBillInfoList.add(singularBillInfo);
 
                 setState(() {
-                  _singularBillWgtList.add(WgtCreatePagSingularBill(
+                  _singularBillWgtList.add(WgtCreatePagSingularBill2(
                     appConfig: widget.appConfig,
                     appContext: widget.pagAppContext,
                     loggedInUser: widget.loggedInUser,

@@ -49,6 +49,7 @@ class WgtPagTenantCompositeUsageSummaryRl extends StatefulWidget {
     required this.collectionEndDateTimestampStr,
     this.onUpdate,
     this.interestInfo = const {},
+    this.showInvoiceColon = false,
   });
 
   final MdlPagAppConfig appConfig;
@@ -87,6 +88,7 @@ class WgtPagTenantCompositeUsageSummaryRl extends StatefulWidget {
   final String collectionStartDateTimestampStr;
   final String collectionEndDateTimestampStr;
   final Map<String, dynamic> interestInfo;
+  final bool showInvoiceColon;
   final Function? onUpdate;
 
   @override
@@ -248,7 +250,7 @@ class _WgtPagTenantCompositeUsageSummaryRlState
         children: [
           getBillLcStatusTagWidget(context, billLcStatus),
           horizontalSpaceSmall,
-          Text('Invoice: ',
+          Text(widget.showInvoiceColon ? 'Invoice: ' : 'Invoice ',
               style: TextStyle(
                 fontSize: 18,
                 color: Theme.of(context).hintColor.withAlpha(180),

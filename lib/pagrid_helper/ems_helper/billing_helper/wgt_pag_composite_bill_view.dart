@@ -805,6 +805,7 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     return _renderMode == 'pdf'
         ? Container()
         : WgtPagTenantCompositeUsageSummary(
+            showInvoiceColon: true,
             isDisabled: _isDisabledGn,
             costDecimals: widget.costDecimals,
             appConfig: widget.appConfig,
@@ -849,10 +850,11 @@ class _WgtPagCompositeBillViewState extends State<WgtPagCompositeBillView> {
     return _renderMode == 'pdf'
         ? WgtPagRenderPdf(
             loggedInUser: widget.loggedInUser,
-            builder: generatePagInvoice,
+            builder: generatePagInvoiceV2,
             itemInfo: calcedBillInfoRl,
           )
         : WgtPagTenantCompositeUsageSummaryRl(
+            showInvoiceColon: true,
             isDisabled: _isDisabledPvRl,
             costDecimals: widget.costDecimals,
             appConfig: widget.appConfig,

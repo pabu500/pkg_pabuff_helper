@@ -111,6 +111,7 @@ Future<Uint8List> generatePagInvoiceCompilation(
       amgrBankPayNow: calcedBillInfoRl['amgrBankPayNow'] ?? '',
       strCollectionStartDate: calcedBillInfoRl['strCollectionStartDate'] ?? '',
       strCollectionEndDate: calcedBillInfoRl['strCollectionEndDate'] ?? '',
+      showBillingGen2Hint: true,
       tax: .15,
       baseColor: PdfColors.teal,
       accentColor: PdfColors.blueGrey900,

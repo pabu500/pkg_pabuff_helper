@@ -107,6 +107,7 @@ class PagPdfBillCwP2 {
     required this.amgrBankPayNow,
     required this.strCollectionStartDate,
     required this.strCollectionEndDate,
+    this.showBillingGen2Hint = false,
   });
 
   final String customerCompanyTradingName;
@@ -176,6 +177,7 @@ class PagPdfBillCwP2 {
   final String? billedAmgrCompanyTradingName;
   final String? billedAmgrCompanyRegNumber;
   final String? billedAmgrGstRegNumber;
+  final bool showBillingGen2Hint;
   final String? amgrAddressLine1;
   final String? amgrAddressLine2;
   final String? amgrAddressLine3;
@@ -553,25 +555,25 @@ class PagPdfBillCwP2 {
                         pw.TableCellVerticalAlignment.middle,
                     children: [
                       pw.TableRow(children: [
-                        pw.Text(' Account No.:', style: styleNormal),
+                        pw.Text(' Account No.', style: styleNormal),
                         pw.Text(' $tenantAccountNumber', style: styleNormal)
                       ]),
                       pw.TableRow(children: [
-                        pw.Text(' Invoice No.:', style: styleNormal),
+                        pw.Text(' Invoice No.', style: styleNormal),
                         pw.Text(' $invoiceNumber', style: styleNormal),
                       ]),
                       pw.TableRow(children: [
-                        pw.Text(' Invoice Date:', style: styleNormal),
+                        pw.Text(' Invoice Date', style: styleNormal),
                         pw.Text(' ${_getDateStr(strBillDate)}',
                             style: styleNormal),
                       ]),
                       pw.TableRow(children: [
-                        pw.Text(' Deposit Amt.:', style: styleNormal),
+                        pw.Text(' Deposit Amt.', style: styleNormal),
                         pw.Text(' \$${getCommaNumberStr(depositAmount)}',
                             style: styleNormal),
                       ]),
                       pw.TableRow(children: [
-                        pw.Text(' Payment Mode:', style: styleNormal),
+                        pw.Text(' Payment Mode', style: styleNormal),
                         pw.Text(' ${paymentMethodEnum.label}',
                             style: styleNormal),
                       ]),
@@ -690,7 +692,11 @@ class PagPdfBillCwP2 {
         child: pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            pw.Text('Issued on behalf of', style: styleSmall),
+            pw.Text(
+                showBillingGen2Hint
+                    ? 'Issued on behalf of:'
+                    : 'Issued on behalf of',
+                style: styleSmall),
             pw.Text(billedAmgrCompanyTradingName ?? '',
                 maxLines: 2,
                 style: styleNormal.copyWith(fontWeight: pw.FontWeight.bold)),
