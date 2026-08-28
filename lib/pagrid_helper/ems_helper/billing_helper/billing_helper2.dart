@@ -1,6 +1,13 @@
 import '../../../util/date_time_util.dart';
 import '../tenant/pag_ems_type_usage_calc_rl.dart';
 
+double? _billValueToDouble(dynamic value) {
+  if (value is num) {
+    return value.toDouble();
+  }
+  return value == null ? null : double.tryParse(value.toString());
+}
+
 String getBillInvoiceNumber2(Map<String, dynamic> billInfo) {
   if (billInfo['lc_status']?.toString().toLowerCase() != 'released') {
     return '';
@@ -113,16 +120,15 @@ Map<String, dynamic> prepCalcedBillInfoRl2(Map<String, dynamic> billInfo) {
   String amgrBankSwiftCode = billInfo['amgr_bank_swift_code'] ?? '';
   String amgrBankPayNow = billInfo['amgr_bank_paynow'] ?? '';
 
-  List<String> usageTypeTags = ['E', 'W', 'B', 'N', 'G'];
-
-  Map<String, dynamic> billedUsageFactorInfo = {};
+  Map<String, dynamic> fallbackBilledUsageFactorInfo = {};
   if (billInfo['usage_factor_list'] != null) {
     for (var item in billInfo['usage_factor_list']) {
-      String meterType = item['meter_type'];
-      meterType = meterType.toLowerCase();
-      String valueStr = item['usage_factor'];
-      double? value = double.tryParse(valueStr);
-      billedUsageFactorInfo['billed_usage_factor_$meterType'] = value;
+      final meterType = item['meter_type']?.toString().trim().toLowerCase();
+      if (meterType == null || meterType.isEmpty) {
+        continue;
+      }
+      fallbackBilledUsageFactorInfo['billed_usage_factor_$meterType'] =
+          _billValueToDouble(item['usage_factor']);
     }
   }
 
@@ -135,45 +141,48 @@ Map<String, dynamic> prepCalcedBillInfoRl2(Map<String, dynamic> billInfo) {
   }
 
   for (Map<String, dynamic> singularUsage in singularUsageList) {
+    final meterType =
+        singularUsage['meter_type']?.toString().trim().toLowerCase() ?? '';
+    if (meterType.isEmpty) {
+      continue;
+    }
+
     Map<String, dynamic> billedAutoUsageInfo = {};
-    for (String typeTag in usageTypeTags) {
-      typeTag = typeTag.toLowerCase();
-      String typebilledAutoUsageStr =
-          singularUsage['billed_auto_usage_$typeTag'] ?? '';
-      double? usage = double.tryParse(typebilledAutoUsageStr);
-      if (usage != null) {
-        billedAutoUsageInfo['billed_auto_usage_$typeTag'] = usage;
-      }
+    final billedAutoUsage =
+        _billValueToDouble(singularUsage['billed_auto_usage']);
+    if (billedAutoUsage != null) {
+      billedAutoUsageInfo['billed_auto_usage_$meterType'] = billedAutoUsage;
     }
 
     Map<String, dynamic> billedRateInfo = {};
-    for (String typeTag in usageTypeTags) {
-      typeTag = typeTag.toLowerCase();
-      String typebilledRateStr = singularUsage['billed_rate_$typeTag'] ?? '';
-      double? rate = double.tryParse(typebilledRateStr);
-      if (rate != null) {
-        billedRateInfo['billed_rate_$typeTag'] = rate;
-      }
+    final billedRate = _billValueToDouble(singularUsage['billed_rate']);
+    if (billedRate != null) {
+      billedRateInfo['billed_rate_$meterType'] = billedRate;
     }
 
     Map<String, dynamic> billedSubTenantUsages = {};
 
     Map<String, dynamic> billedManualUsages = {};
-    for (String typeTag in usageTypeTags) {
-      typeTag = typeTag.toLowerCase();
-      String typebilledManualUsageStr =
-          singularUsage['manual_usage_$typeTag'] ?? '';
-      double? usage = double.tryParse(typebilledManualUsageStr);
-      if (usage != null) {
-        billedManualUsages['manual_usage_$typeTag'] = usage;
-      }
+    final billedManualUsage = _billValueToDouble(singularUsage['manual_usage']);
+    if (billedManualUsage != null) {
+      billedManualUsages['manual_usage_$meterType'] = billedManualUsage;
+    }
+
+    Map<String, dynamic> billedUsageFactorInfo = {
+      ...fallbackBilledUsageFactorInfo,
+    };
+    final billedUsageFactor =
+        _billValueToDouble(singularUsage['billed_usage_factor']);
+    if (billedUsageFactor != null) {
+      billedUsageFactorInfo['billed_usage_factor_$meterType'] =
+          billedUsageFactor;
     }
 
     List<Map<String, dynamic>> billedTrendingSnapShot = [];
 
     double? billedGstRate;
     if (singularUsage['billed_gst'] != null) {
-      billedGstRate = double.tryParse(singularUsage['billed_gst']);
+      billedGstRate = _billValueToDouble(singularUsage['billed_gst']);
     }
 
     PagEmsTypeUsageCalcRl emsTypeUsageCalcRl = PagEmsTypeUsageCalcRl(

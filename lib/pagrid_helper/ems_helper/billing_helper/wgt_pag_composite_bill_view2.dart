@@ -20,6 +20,13 @@ import '../../../pag_helper/def_helper/dh_pag_bill.dart';
 import 'billing_helper2.dart';
 import 'wgt_pag_render_pdf.dart';
 
+double? _billFieldToDouble(dynamic value) {
+  if (value is num) {
+    return value.toDouble();
+  }
+  return value == null ? null : double.tryParse(value.toString());
+}
+
 class WgtPagCompositeBillView2 extends StatefulWidget {
   const WgtPagCompositeBillView2({
     super.key,
@@ -54,7 +61,6 @@ class WgtPagCompositeBillView2 extends StatefulWidget {
 }
 
 class _WgtPagCompositeBillView2State extends State<WgtPagCompositeBillView2> {
-  final List<String> usageTypeTags = ['E', 'W', 'B', 'N', 'G'];
   final defaultErrorText = 'Error getting bill';
 
   bool _gettingBill = false;
@@ -600,10 +606,12 @@ class _WgtPagCompositeBillView2State extends State<WgtPagCompositeBillView2> {
     Map<String, dynamic> usageFactor = {};
     if (_bill['usage_factor_list'] != null) {
       for (var item in _bill['usage_factor_list']) {
-        String meterType = item['meter_type'];
-        String valueStr = item['usage_factor'];
-        double? value = double.tryParse(valueStr);
-        usageFactor[meterType] = value;
+        final meterType =
+            item['meter_type']?.toString().trim().toUpperCase() ?? '';
+        if (meterType.isEmpty) {
+          continue;
+        }
+        usageFactor[meterType] = _billFieldToDouble(item['usage_factor']);
       }
     }
 
@@ -613,12 +621,27 @@ class _WgtPagCompositeBillView2State extends State<WgtPagCompositeBillView2> {
         singularUsageList.add(singularUsage);
       }
     }
+    for (final singularUsage in singularUsageList) {
+      final meterType =
+          singularUsage['meter_type']?.toString().trim().toUpperCase() ?? '';
+      final billedUsageFactor =
+          _billFieldToDouble(singularUsage['billed_usage_factor']);
+      if (meterType.isNotEmpty && billedUsageFactor != null) {
+        usageFactor[meterType] = billedUsageFactor;
+      }
+    }
 
     String billedGstStr = _bill['billed_gst'] ?? '';
     double? billedGst = double.tryParse(billedGstStr);
 
     List<PagEmsTypeUsageCalc> singularUsageCalcList = [];
     for (Map<String, dynamic> singularUsage in singularUsageList) {
+      final meterType =
+          singularUsage['meter_type']?.toString().trim().toUpperCase() ?? '';
+      if (meterType.isEmpty) {
+        continue;
+      }
+
       //sort auto usage
       List<Map<String, dynamic>> meterGroupUsageList = [];
       final autoUsageSummary = singularUsage['tenant_usage_summary'];
@@ -634,62 +657,21 @@ class _WgtPagCompositeBillView2State extends State<WgtPagCompositeBillView2> {
       final meterTypeRateInfo = singularUsage['meter_type_rate_info'];
       Map<String, dynamic> typeRates = {};
       double? gst;
-      for (String typeTag in usageTypeTags) {
-        if (meterTypeRateInfo[typeTag] != null) {
-          String typeRateStr = meterTypeRateInfo[typeTag]['result']['rate'];
-          double? typeRate = double.tryParse(typeRateStr);
-          typeRates[typeTag] = typeRate;
-
-          if (gst == null) {
-            String gstStr = meterTypeRateInfo[typeTag]['result']['gst'];
-            gst = double.tryParse(gstStr);
-          }
-          if (gst == null) {
-            throw Exception('gst is null');
-          }
-        }
+      final rateResult = meterTypeRateInfo?[meterType]?['result'];
+      if (rateResult != null) {
+        typeRates[meterType] = _billFieldToDouble(rateResult['rate']);
+        gst = _billFieldToDouble(rateResult['gst']);
+      }
+      if (gst == null) {
+        throw Exception('gst is null for meter type $meterType');
       }
 
       List<Map<String, dynamic>> manualUsageList = [];
-      final manualUsageInfo = singularUsage['manual_usage_info'] ?? {};
-      final manualUsageE = manualUsageInfo['manual_usage_e'];
-      final manualUsageW = manualUsageInfo['manual_usage_w'];
-      final manualUsageB = manualUsageInfo['manual_usage_b'];
-      final manualUsageN = manualUsageInfo['manual_usage_n'];
-      final manualUsageG = manualUsageInfo['manual_usage_g'];
-      if (manualUsageE != null) {
-        double? usage = double.tryParse(manualUsageE);
+      final manualUsage = _billFieldToDouble(singularUsage['manual_usage']);
+      if (manualUsage != null) {
         manualUsageList.add({
-          'meter_type': 'E',
-          'usage': usage,
-        });
-      }
-      if (manualUsageW != null) {
-        double? usage = double.tryParse(manualUsageW);
-        manualUsageList.add({
-          'meter_type': 'W',
-          'usage': usage,
-        });
-      }
-      if (manualUsageB != null) {
-        double? usage = double.tryParse(manualUsageB);
-        manualUsageList.add({
-          'meter_type': 'B',
-          'usage': usage,
-        });
-      }
-      if (manualUsageN != null) {
-        double? usage = double.tryParse(manualUsageN);
-        manualUsageList.add({
-          'meter_type': 'N',
-          'usage': usage,
-        });
-      }
-      if (manualUsageG != null) {
-        double? usage = double.tryParse(manualUsageG);
-        manualUsageList.add({
-          'meter_type': 'G',
-          'usage': usage,
+          'meter_type': meterType,
+          'usage': manualUsage,
         });
       }
 
