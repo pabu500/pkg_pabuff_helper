@@ -2,7 +2,7 @@ import 'dart:developer' as dev;
 
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pag_helper/wgt/ls/wgt_item_delete_op.dart';
-import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/cw_bill/pag_gen_pdf_bill_cw.dart';
+import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/cw_bill/pag_gen_pdf_bill_cw2.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
 
@@ -814,7 +814,7 @@ class _WgtPagCompositeBillView2State extends State<WgtPagCompositeBillView2> {
     return _renderMode == 'pdf'
         ? WgtPagRenderPdf(
             loggedInUser: widget.loggedInUser,
-            builder: generatePagInvoice,
+            builder: generatePagInvoice2,
             itemInfo: calcedBillInfoRl,
           )
         : WgtPagTenantCompositeUsageSummaryRl(

@@ -614,7 +614,7 @@ class _WgtCreatePagSingularBill2State extends State<WgtCreatePagSingularBill2> {
       // key: _timePickerKey,
       iniStartDateTime: _selectedFromDateTime,
       iniEndDateTime: _selectedToDateTime,
-      maxDurationDays: 500,
+      maxDurationDays: 550,
       maxSelectionDurationDays: 31,
       customRangeSelected: _customDateRangeSelected,
       monthPicked: _monthPicked,

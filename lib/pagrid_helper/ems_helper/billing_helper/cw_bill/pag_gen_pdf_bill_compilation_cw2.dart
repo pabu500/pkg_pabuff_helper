@@ -1,5 +1,5 @@
 import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
-import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/pag_pdf_bill.dart';
+import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/pag_pdf_bill2.dart';
 import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -18,7 +18,7 @@ Future<Uint8List> generatePagInvoiceCompilation2(
 
   final billInfoList = billInfo['bill_info_list'] as List<Map<String, dynamic>>;
 
-  List<PagPdfBillCwP2> invoiceList = [];
+  List<PagPdfBillCwP2Gen3> invoiceList = [];
   for (var billInfo in billInfoList) {
     String genType = billInfo['gen_type'] ?? '';
     if (genType == 'initial_balance') {
@@ -27,7 +27,7 @@ Future<Uint8List> generatePagInvoiceCompilation2(
 
     final calcedBillInfoRl = prepCalcedBillInfoRl2(billInfo);
 
-    final invoice = PagPdfBillCwP2(
+    final invoice = PagPdfBillCwP2Gen3(
       billingRecName: calcedBillInfoRl['billingRecName'] ?? '',
       billLabel: calcedBillInfoRl['billLabel'] ?? '',
       invoiceNumber: calcedBillInfoRl['invoiceNumber'] ?? '',
@@ -123,7 +123,7 @@ Future<Uint8List> generatePagInvoiceCompilation2(
 }
 
 Future<Uint8List> buildPdf(PdfPageFormat pageFormat, String assetFolder,
-    List<PagPdfBillCwP2> invoiceList) async {
+    List<PagPdfBillCwP2Gen3> invoiceList) async {
   final pdf = pw.Document();
 
   final logo = pw.MemoryImage(
