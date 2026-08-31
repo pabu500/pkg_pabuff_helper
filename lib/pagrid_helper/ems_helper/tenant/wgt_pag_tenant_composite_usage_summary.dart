@@ -64,6 +64,7 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
     this.interestInfo = const {},
     this.bciInfoList = const [],
     this.showInvoiceColon = false,
+    this.useMeterMultiplierFactor = false,
   });
 
   final MdlPagAppConfig appConfig;
@@ -104,6 +105,7 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
   // final Map<String, dynamic>? typeRates;
   final Map<String, dynamic> interestInfo;
   final bool showInvoiceColon;
+  final bool useMeterMultiplierFactor;
   final Function? onUpdate;
 
   @override
@@ -535,10 +537,17 @@ class _WgtPagTenantCompositeUsageSummaryState
       if (usageVal == null) {
         dev.log('usageVal is null');
       }
-      if (usageVal != null && usageFactor != null) {
-        usageVal = usageVal * usageFactor;
+      double? meterUsageFactor = usageFactor;
+      if (widget.useMeterMultiplierFactor) {
+        final multiplierFactorValue = meterUsageSummary['multiplier_factor'];
+        meterUsageFactor = multiplierFactorValue is num
+            ? multiplierFactorValue.toDouble()
+            : double.tryParse(multiplierFactorValue?.toString() ?? '') ?? 1;
+      }
+      if (usageVal != null && meterUsageFactor != null) {
+        usageVal = usageVal * meterUsageFactor;
         meterUsageSummary['usage_factored'] = usageVal;
-        meterUsageSummary['factor'] = usageFactor;
+        meterUsageSummary['factor'] = meterUsageFactor;
       }
 
       meterStatList.add(meterUsageSummary);
@@ -626,6 +635,7 @@ class _WgtPagTenantCompositeUsageSummaryState
         loggedInUser: widget.loggedInUser,
         displayContextStr: widget.displayContextStr,
         showFactoredUsage: widget.showFactoredUsage,
+        showMultiplierFactor: widget.useMeterMultiplierFactor,
         calcUsageFromReadings: calcUsageFromReadings,
         appConfig: widget.appConfig,
         isBillMode: widget.isBillMode,

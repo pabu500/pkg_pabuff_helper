@@ -120,18 +120,6 @@ Map<String, dynamic> prepCalcedBillInfoRl2(Map<String, dynamic> billInfo) {
   String amgrBankSwiftCode = billInfo['amgr_bank_swift_code'] ?? '';
   String amgrBankPayNow = billInfo['amgr_bank_paynow'] ?? '';
 
-  Map<String, dynamic> fallbackBilledUsageFactorInfo = {};
-  if (billInfo['usage_factor_list'] != null) {
-    for (var item in billInfo['usage_factor_list']) {
-      final meterType = item['meter_type']?.toString().trim().toLowerCase();
-      if (meterType == null || meterType.isEmpty) {
-        continue;
-      }
-      fallbackBilledUsageFactorInfo['billed_usage_factor_$meterType'] =
-          _billValueToDouble(item['usage_factor']);
-    }
-  }
-
   List<Map<String, dynamic>> singularUsageList = [];
 
   if (billInfo['singular_billing_rec_list'] != null) {
@@ -168,15 +156,11 @@ Map<String, dynamic> prepCalcedBillInfoRl2(Map<String, dynamic> billInfo) {
       billedManualUsages['manual_usage_$meterType'] = billedManualUsage;
     }
 
+    // Gen3 billed_auto_usage is already multiplier-adjusted. The released
+    // calculator still accepts a factor, so keep it neutral.
     Map<String, dynamic> billedUsageFactorInfo = {
-      ...fallbackBilledUsageFactorInfo,
+      'billed_usage_factor_$meterType': 1.0,
     };
-    final billedUsageFactor =
-        _billValueToDouble(singularUsage['billed_usage_factor']);
-    if (billedUsageFactor != null) {
-      billedUsageFactorInfo['billed_usage_factor_$meterType'] =
-          billedUsageFactor;
-    }
 
     List<Map<String, dynamic>> billedTrendingSnapShot = [];
 

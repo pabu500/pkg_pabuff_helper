@@ -39,6 +39,7 @@ class WgtPagUsageStatCore extends StatefulWidget {
     this.rateDecimals = 5,
     this.costDecimals = 3,
     this.showFactoredUsage = true,
+    this.showMultiplierFactor = false,
   });
 
   final MdlPagUser loggedInUser;
@@ -68,6 +69,7 @@ class WgtPagUsageStatCore extends StatefulWidget {
   final bool showRate;
   final bool calcUsageFromReadings;
   final bool showFactoredUsage;
+  final bool showMultiplierFactor;
 
   @override
   State<WgtPagUsageStatCore> createState() => _WgtPagUsageStatCoreState();
@@ -75,6 +77,31 @@ class WgtPagUsageStatCore extends StatefulWidget {
 
 class _WgtPagUsageStatCoreState extends State<WgtPagUsageStatCore> {
   final totalWidth = 210.0;
+
+  double? get _factor {
+    final value = widget.meterUsageSummary['factor'];
+    if (value is num) {
+      return value.toDouble();
+    }
+    return double.tryParse(value?.toString() ?? '');
+  }
+
+  bool get _showFactor {
+    if (!widget.showFactoredUsage || _factor == null) {
+      return false;
+    }
+    return widget.showMultiplierFactor || _factor! < 0.999999;
+  }
+
+  String get _factorText {
+    final factor = _factor!;
+    if (widget.showMultiplierFactor) {
+      final value =
+          factor.toStringAsFixed(5).replaceFirst(RegExp(r'\.?0+$'), '');
+      return 'Multiplier Factor: $value';
+    }
+    return 'Factor: ${(1 / factor).toStringAsFixed(5)}';
+  }
 
   @override
   void initState() {
@@ -231,10 +258,9 @@ class _WgtPagUsageStatCoreState extends State<WgtPagUsageStatCore> {
                   unitStyle: defStatStyleSmall.copyWith(
                     color: widget.statColor ?? Colors.grey.shade800,
                   )),
-              if (widget.showFactoredUsage &&
-                  (widget.meterUsageSummary['factor'] ?? 1) < 0.999999)
+              if (_showFactor)
                 Text(
-                  'Factor: ${(1 / widget.meterUsageSummary['factor']).toStringAsFixed(5)}',
+                  _factorText,
                   style: defStatStyleSmall,
                 ),
             ],
@@ -265,10 +291,9 @@ class _WgtPagUsageStatCoreState extends State<WgtPagUsageStatCore> {
                       ),
                       showUnit: false,
                     ),
-                    if (widget.showFactoredUsage &&
-                        (widget.meterUsageSummary['factor'] ?? 1) < 0.999999)
+                    if (_showFactor)
                       Text(
-                        'Factor: ${(1 / widget.meterUsageSummary['factor']).toStringAsFixed(5)}',
+                        _factorText,
                         style: defStatStyleSmall,
                       ),
                   ],
@@ -480,10 +505,9 @@ class _WgtPagUsageStatCoreState extends State<WgtPagUsageStatCore> {
                       ),
                       showUnit: false,
                     ),
-                    if (widget.showFactoredUsage &&
-                        (widget.meterUsageSummary['factor'] ?? 1) < 0.999999)
+                    if (_showFactor)
                       Text(
-                        'Factor: ${(1 / widget.meterUsageSummary['factor']).toStringAsFixed(5)}',
+                        _factorText,
                         style: defStatStyleSmall,
                       ),
                   ],

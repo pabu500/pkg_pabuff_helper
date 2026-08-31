@@ -486,7 +486,10 @@ class _WgtCreatePagCompositeBill2State
                 verticalSpaceTiny,
                 getCheckers(),
                 verticalSpaceTiny,
-                getActions(),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: getActions(),
+                ),
               ],
             ),
           );

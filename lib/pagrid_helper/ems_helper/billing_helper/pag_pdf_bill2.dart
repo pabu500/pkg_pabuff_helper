@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:buff_helper/pagrid_helper/ems_helper/tenant/mdl_ems_type_usage_r2.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_ems_type_usage_calc_rl.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
@@ -25,6 +24,17 @@ const int usageDecimals = 3;
 const int rateDecimals = 4;
 
 const tableHeaders = ['Category', 'Budget', 'Expense', 'Result'];
+
+double? _pdfValueToDouble(dynamic value) {
+  if (value is num) {
+    return value.toDouble();
+  }
+  return double.tryParse(value?.toString() ?? '');
+}
+
+// String _formatMultiplierFactor(double value) {
+//   return value.toStringAsFixed(5).replaceFirst(RegExp(r'\.?0+$'), '');
+// }
 
 class PagPdfBillCwP2Gen3 {
   PagPdfBillCwP2Gen3({
@@ -1704,11 +1714,6 @@ class PagPdfBillCwP2Gen3 {
         Map<String, dynamic>? meterTypeRateInfo =
             singularUsageInfo['meter_type_rate_info'];
         assert(meterTypeRateInfo != null, 'meterTypeRateInfo cannot be null');
-        PagEmsTypeUsageCalcRl? usageCalc = singularUsageInfo['usage_calc_rl'];
-        assert(usageCalc != null, 'usageCalc cannot be null');
-
-        double? typeUsageFactor = usageCalc!.getTypeUsageFactor(meterTypeTag);
-
         final meterGroupUsageSummary =
             groupInfo['meter_group_usage_summary'] ?? [];
         final meterUsageList = meterGroupUsageSummary['meter_usage_list'] ?? [];
@@ -1725,7 +1730,17 @@ class PagPdfBillCwP2Gen3 {
           String strLastReadingTime =
               meterUsageSummary['last_reading_timestamp'] ?? '';
           String strLastReading = meterUsageSummary['last_reading_value'] ?? '';
-          String strUsage = meterUsageSummary['usage'] ?? '';
+          final rawUsage = _pdfValueToDouble(meterUsageSummary['usage']);
+          final percentage =
+              _pdfValueToDouble(meterUsageSummary['percentage']) ?? 100;
+          final multiplierFactor =
+              _pdfValueToDouble(meterUsageSummary['multiplier_factor']) ?? 1;
+          final adjustedUsage = rawUsage == null
+              ? null
+              : rawUsage * percentage / 100 * multiplierFactor;
+          final strUsage = adjustedUsage == null
+              ? ''
+              : getCommaNumberStr(adjustedUsage, decimal: usageDecimals);
           if (strFirstReadingTime.length > 10) {
             strFirstReadingTime = strFirstReadingTime.substring(0, 10);
           }
@@ -1738,13 +1753,13 @@ class PagPdfBillCwP2Gen3 {
               pw.Text('  $buildingLabel', style: styleTiny),
               pw.Text('  $meterSn', style: styleTiny),
               pw.Text('  $locatinLabel', style: styleTiny),
-              pw.Text('  $strFirstReading', style: styleSmall),
+              pw.Text('  $strFirstReading', style: styleTiny),
               pw.Text('  $strFirstReadingTime', style: styleTiny),
-              pw.Text('  $strLastReading', style: styleSmall),
+              pw.Text('  $strLastReading', style: styleTiny),
               pw.Text('  $strLastReadingTime', style: styleTiny),
-              pw.Text('  x${typeUsageFactor?.toStringAsFixed(0) ?? ''}',
+              pw.Text('  ${multiplierFactor.toStringAsFixed(1)}',
                   style: styleTiny),
-              pw.Text('  $strUsage', style: styleSmall),
+              pw.Text('  $strUsage', style: styleTiny),
               pw.Text('  ${meterType.unit}', style: styleTiny),
             ],
           ));
@@ -1777,8 +1792,8 @@ class PagPdfBillCwP2Gen3 {
           4: const pw.FixedColumnWidth(85),
           5: const pw.FixedColumnWidth(85),
           6: const pw.FixedColumnWidth(85),
-          7: const pw.FixedColumnWidth(20),
-          8: const pw.FixedColumnWidth(60),
+          7: const pw.FixedColumnWidth(30),
+          8: const pw.FixedColumnWidth(65),
           9: const pw.FixedColumnWidth(30),
         },
         defaultVerticalAlignment: pw.TableCellVerticalAlignment.middle,
