@@ -346,24 +346,14 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
 
     //build list header from widget.listConfig
     List<Widget> listHeader = [];
-    // if (widget.showIndex != null && widget.showIndex!) {
-    // if (widget.showCommit || _modified) {
-    listHeader.add(
-      SizedBox(
-        width: _indexWidth,
-        child:
-            // widget.showCommit && _modified
-            //     ? CommitModifiedTable(
-            //         getList: getModifiedList,
-            //         doCommit: (list, byUser) async =>
-            //             await widget.doCommit(list, byUser),
-            //         updateItemModified: widget.fieldUpdateModified,
-            //         clearListModifiedFlag: clearModifiedFlag,
-            //       )
-            // :
-            widget.selectShowColumn ? getCustomize() : Container(),
-      ),
-    );
+    if (widget.showIndex) {
+      listHeader.add(
+        SizedBox(
+          width: _indexWidth,
+          child: widget.selectShowColumn ? getCustomize() : Container(),
+        ),
+      );
+    }
 
     for (Map<String, dynamic> configItem in _listConfig) {
       // if (item != widget.listConfig.last) {

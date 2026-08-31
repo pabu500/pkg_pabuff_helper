@@ -33,6 +33,8 @@ AclTarget getAclTargetFromItemType(ItemType itemType) {
       return AclTarget.job_type_p_info;
     case ItemType.job:
       return AclTarget.job_p_info;
+    case ItemType.op_log:
+      return AclTarget.meter_p_info;
     default:
       return AclTarget.meter_p_info;
   }
