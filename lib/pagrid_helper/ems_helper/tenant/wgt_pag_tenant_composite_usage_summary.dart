@@ -2,6 +2,7 @@ import 'package:buff_helper/pag_helper/def_helper/dh_pag_item.dart';
 import 'package:buff_helper/pag_helper/model/mdl_history.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_bill.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_ems_type_usage_calc.dart';
+import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_ems_type_usage_calc2.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/usage/pag_usage_stat_helper.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'dart:developer' as dev;
@@ -17,6 +18,7 @@ import '../usage/usage_stat_helper.dart';
 import '../../../pag_helper/wgt/app/ems/wgt_pag_group_stat_core.dart';
 import '../usage/wgt_pag_meter_stat_core.dart';
 import 'mdl_ems_type_usage.dart';
+import 'mdl_ems_type_usage_r2.dart';
 
 class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
   const WgtPagTenantCompositeUsageSummary({
@@ -47,6 +49,7 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
     // for rendering, not calculation
     this.tenantSingularUsageInfoList = const [],
     this.compositeUsageCalc,
+    this.compositeUsageCalc2,
     this.strCollectionStartDateTimestamp = '',
     this.strCollectionEndDateTimestamp = '',
     this.subTenantListUsageSummary = const [],
@@ -88,6 +91,7 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
   // final bool excludeAutoUsage;
   final List<Map<String, dynamic>> tenantSingularUsageInfoList;
   final PagEmsTypeUsageCalc? compositeUsageCalc;
+  final PagEmsTypeUsageCalc2? compositeUsageCalc2;
   final String strCollectionStartDateTimestamp;
   final String strCollectionEndDateTimestamp;
   final List<Map<String, dynamic>> subTenantListUsageSummary;
@@ -115,6 +119,29 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
 
 class _WgtPagTenantCompositeUsageSummaryState
     extends State<WgtPagTenantCompositeUsageSummary> {
+  dynamic get _compositeUsageCalc =>
+      widget.compositeUsageCalc2 ?? widget.compositeUsageCalc;
+
+  EmsTypeUsageR2? _getCompositeTypeUsage(String meterType) {
+    if (widget.compositeUsageCalc2 != null) {
+      return widget.compositeUsageCalc2!.getTypeUsage(meterType);
+    }
+    switch (meterType) {
+      case 'E':
+        return widget.compositeUsageCalc?.typeUsageE;
+      case 'W':
+        return widget.compositeUsageCalc?.typeUsageW;
+      case 'B':
+        return widget.compositeUsageCalc?.typeUsageB;
+      case 'N':
+        return widget.compositeUsageCalc?.typeUsageN;
+      case 'G':
+        return widget.compositeUsageCalc?.typeUsageG;
+      default:
+        return null;
+    }
+  }
+
   final double statWidth = 850;
   late final String strBillingRecId;
 
@@ -265,16 +292,16 @@ class _WgtPagTenantCompositeUsageSummaryState
                     costDecimals: widget.costDecimals,
                     context,
                     widget.isBillMode,
-                    widget.compositeUsageCalc!.typeUsageE!.usage,
-                    widget.compositeUsageCalc!.typeUsageE!.cost,
-                    widget.compositeUsageCalc!.typeUsageW!.usage,
-                    widget.compositeUsageCalc!.typeUsageW!.cost,
-                    widget.compositeUsageCalc!.typeUsageB!.usage,
-                    widget.compositeUsageCalc!.typeUsageB!.cost,
-                    widget.compositeUsageCalc!.typeUsageN!.usage,
-                    widget.compositeUsageCalc!.typeUsageN!.cost,
-                    widget.compositeUsageCalc!.typeUsageG!.usage,
-                    widget.compositeUsageCalc!.typeUsageG!.cost,
+                    _getCompositeTypeUsage('E')?.usage,
+                    _getCompositeTypeUsage('E')?.cost,
+                    _getCompositeTypeUsage('W')?.usage,
+                    _getCompositeTypeUsage('W')?.cost,
+                    _getCompositeTypeUsage('B')?.usage,
+                    _getCompositeTypeUsage('B')?.cost,
+                    _getCompositeTypeUsage('N')?.usage,
+                    _getCompositeTypeUsage('N')?.cost,
+                    _getCompositeTypeUsage('G')?.usage,
+                    _getCompositeTypeUsage('G')?.cost,
                     displayContextStr: widget.displayContextStr,
                   ),
                 ],
@@ -300,18 +327,18 @@ class _WgtPagTenantCompositeUsageSummaryState
                   strBillingRecId,
                   'generated',
                   currentBillLcStatus,
-                  widget.compositeUsageCalc!.totalUsageCost,
-                  widget.compositeUsageCalc!.gst!,
-                  widget.compositeUsageCalc!.subTotalCost,
-                  widget.compositeUsageCalc!.gstAmount,
+                  _compositeUsageCalc.totalUsageCost,
+                  _compositeUsageCalc.gst!,
+                  _compositeUsageCalc.subTotalCost,
+                  _compositeUsageCalc.gstAmount,
                   // widget.compositeUsageCalc!.totalCost,
-                  widget.compositeUsageCalc!.principalAmount,
-                  widget.compositeUsageCalc!.cycleTotalAmount,
-                  widget.compositeUsageCalc!.payableAmount,
+                  _compositeUsageCalc.principalAmount,
+                  _compositeUsageCalc.cycleTotalAmount,
+                  _compositeUsageCalc.payableAmount,
                   widget.tenantType,
                   widget.lineItems,
                   widget.bciInfoList,
-                  widget.compositeUsageCalc!.miniSoaInfo,
+                  _compositeUsageCalc.miniSoaInfo,
                   widget.strCollectionStartDateTimestamp,
                   widget.strCollectionEndDateTimestamp,
                   widget.interestInfo,
@@ -489,7 +516,8 @@ class _WgtPagTenantCompositeUsageSummaryState
         Map<String, dynamic>? meterTypeRateInfo =
             singularUsageInfo['meter_type_rate_info'];
         assert(meterTypeRateInfo != null, 'meterTypeRateInfo cannot be null');
-        PagEmsTypeUsageCalc? usageCalc = singularUsageInfo['usage_calc'];
+        dynamic usageCalc = singularUsageInfo[
+            widget.useMeterMultiplierFactor ? 'usage_calc2' : 'usage_calc'];
         assert(usageCalc != null, 'usageCalc cannot be null');
 
         typeGroupList.add(Column(
@@ -515,7 +543,7 @@ class _WgtPagTenantCompositeUsageSummaryState
   }
 
   Widget getGroupMeterStat(Map<String, dynamic> groupInfo, MeterType? meterType,
-      Map<String, dynamic> meterTypeRateInfo, PagEmsTypeUsageCalc usageCalc) {
+      Map<String, dynamic> meterTypeRateInfo, dynamic usageCalc) {
     String groupType = groupInfo['meter_type'] ?? '';
     MeterType? meterType = getMeterType(groupType);
     if (meterType == null) {
@@ -662,7 +690,8 @@ class _WgtPagTenantCompositeUsageSummaryState
   Widget getManualUsage2(
       Map<String, dynamic> singularUsageInfo, String targetMeterTypeTag) {
     List<Widget> manualUsageWidgetList = [];
-    PagEmsTypeUsageCalc? usageCalc = singularUsageInfo['usage_calc'];
+    dynamic usageCalc = singularUsageInfo[
+        widget.useMeterMultiplierFactor ? 'usage_calc2' : 'usage_calc'];
     if (usageCalc == null) {
       return Container();
     }
@@ -723,7 +752,8 @@ class _WgtPagTenantCompositeUsageSummaryState
     List<Widget> manualUsageWidgetList = [];
     for (Map<String, dynamic> singularUsageInfo
         in widget.tenantSingularUsageInfoList) {
-      PagEmsTypeUsageCalc? usageCalc = singularUsageInfo['usage_calc'];
+      dynamic usageCalc = singularUsageInfo[
+          widget.useMeterMultiplierFactor ? 'usage_calc2' : 'usage_calc'];
       if (usageCalc == null) {
         continue;
       }

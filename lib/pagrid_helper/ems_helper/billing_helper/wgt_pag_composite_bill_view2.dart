@@ -10,7 +10,7 @@ import '../../../pag_helper/def_helper/dh_device.dart';
 import '../../../pag_helper/def_helper/dh_list.dart';
 import '../../../pag_helper/def_helper/dh_pag_item.dart';
 import '../../../pag_helper/model/mdl_pag_project_profile.dart';
-import '../tenant/pag_ems_type_usage_calc.dart';
+import '../tenant/pag_ems_type_usage_calc2.dart';
 import '../../../pag_helper/wgt/app/ems/wgt_bill_lc_status_op2.dart';
 import '../tenant/wgt_pag_tenant_composite_usage_summary.dart';
 import '../../../pag_helper/comm/comm_pag_billing2.dart';
@@ -25,42 +25,6 @@ double? _billFieldToDouble(dynamic value) {
     return value.toDouble();
   }
   return value == null ? null : double.tryParse(value.toString());
-}
-
-double _getEffectiveMultiplierFactor(Map<String, dynamic> singularUsage) {
-  double rawUsageTotal = 0;
-  double adjustedUsageTotal = 0;
-  bool hasUsage = false;
-
-  final meterGroupUsageList = singularUsage['tenant_usage_summary']
-          ?['meter_group_usage_list'] as List? ??
-      const [];
-  for (final meterGroupUsage in meterGroupUsageList) {
-    final meterUsageList = meterGroupUsage['meter_group_usage_summary']
-            ?['meter_usage_list'] as List? ??
-        const [];
-    for (final meterUsage in meterUsageList) {
-      final summary = meterUsage['meter_usage_summary'];
-      if (summary is! Map) {
-        continue;
-      }
-      final usage = _billFieldToDouble(summary['usage']);
-      if (usage == null) {
-        continue;
-      }
-      final percentage = _billFieldToDouble(summary['percentage']) ?? 100;
-      final multiplierFactor =
-          _billFieldToDouble(summary['multiplier_factor']) ?? 1;
-      final usageShare = usage * percentage / 100;
-      rawUsageTotal += usageShare;
-      adjustedUsageTotal += usageShare * multiplierFactor;
-      hasUsage = true;
-    }
-  }
-
-  return hasUsage && rawUsageTotal != 0
-      ? adjustedUsageTotal / rawUsageTotal
-      : 1;
 }
 
 class WgtPagCompositeBillView2 extends StatefulWidget {
@@ -638,28 +602,16 @@ class _WgtPagCompositeBillView2State extends State<WgtPagCompositeBillView2> {
     //   useMiddle: isMonthly ? true : false,
     // );
 
-    // Gen3 uses meter multiplier factors in the existing usage-factor slot so
-    // generated totals match the per-meter adjusted usage.
-    Map<String, dynamic> usageFactor = {};
-
     List<Map<String, dynamic>> singularUsageList = [];
     if (_bill['singular_billing_rec_list'] != null) {
       for (var singularUsage in _bill['singular_billing_rec_list']) {
         singularUsageList.add(singularUsage);
       }
     }
-    for (final singularUsage in singularUsageList) {
-      final meterType =
-          singularUsage['meter_type']?.toString().trim().toUpperCase() ?? '';
-      if (meterType.isNotEmpty) {
-        usageFactor[meterType] = _getEffectiveMultiplierFactor(singularUsage);
-      }
-    }
-
     String billedGstStr = _bill['billed_gst'] ?? '';
     double? billedGst = double.tryParse(billedGstStr);
 
-    List<PagEmsTypeUsageCalc> singularUsageCalcList = [];
+    List<PagEmsTypeUsageCalc2> singularUsageCalcList = [];
     for (Map<String, dynamic> singularUsage in singularUsageList) {
       final meterType =
           singularUsage['meter_type']?.toString().trim().toUpperCase() ?? '';
@@ -678,13 +630,13 @@ class _WgtPagCompositeBillView2State extends State<WgtPagCompositeBillView2> {
           }
         }
       }
-      //sort type rates
+      // Sort the one rate carried by this Gen3 singular billing record.
       final meterTypeRateInfo = singularUsage['meter_type_rate_info'];
-      Map<String, dynamic> typeRates = {};
+      double? rate;
       double? gst;
       final rateResult = meterTypeRateInfo?[meterType]?['result'];
       if (rateResult != null) {
-        typeRates[meterType] = _billFieldToDouble(rateResult['rate']);
+        rate = _billFieldToDouble(rateResult['rate']);
         gst = _billFieldToDouble(rateResult['gst']);
       }
       if (gst == null) {
@@ -700,38 +652,28 @@ class _WgtPagCompositeBillView2State extends State<WgtPagCompositeBillView2> {
         });
       }
 
-      PagEmsTypeUsageCalc emsTypeUsageCalc = PagEmsTypeUsageCalc(
+      PagEmsTypeUsageCalc2 emsTypeUsageCalc = PagEmsTypeUsageCalc2(
         costDecimals: widget.costDecimals,
+        meterType: meterType,
+        rate: rate,
         gst: gst,
-        typeRates: typeRates,
-        usageFactor: usageFactor,
         autoUsageSummary: autoUsageSummary ?? {},
-        subTenantUsageSummary: [],
         manualUsageList: manualUsageList,
         lineItemList: lineItemList,
         billBarFromMonth: billBarFromMonth,
-        //use billed trending snapshot
-        billedTrendingSnapShot: [],
       );
       emsTypeUsageCalc.doSingularCalc();
 
       singularUsageCalcList.add(emsTypeUsageCalc);
 
-      singularUsage['usage_calc'] = emsTypeUsageCalc;
+      singularUsage['usage_calc2'] = emsTypeUsageCalc;
     }
 
-    PagEmsTypeUsageCalc compositeUsageCalc = PagEmsTypeUsageCalc(
+    PagEmsTypeUsageCalc2 compositeUsageCalc = PagEmsTypeUsageCalc2(
       costDecimals: widget.costDecimals,
       gst: billedGst,
-      typeRates: {},
-      usageFactor: usageFactor,
-      autoUsageSummary: {},
-      subTenantUsageSummary: [],
-      manualUsageList: [],
       lineItemList: lineItemList,
       billBarFromMonth: billBarFromMonth,
-      //use billed trending snapshot
-      billedTrendingSnapShot: [],
       singularUsageCalcList: singularUsageCalcList,
       miniSoaInfo: miniSoaInfo,
       interestInfo: interestInfo,
@@ -801,7 +743,7 @@ class _WgtPagCompositeBillView2State extends State<WgtPagCompositeBillView2> {
             loggedInUser: widget.loggedInUser,
             displayContextStr: widget.displayContextStr,
             tenantSingularUsageInfoList: singularUsageList,
-            compositeUsageCalc: compositeUsageCalc,
+            compositeUsageCalc2: compositeUsageCalc,
             strCollectionStartDateTimestamp: strCollectionStartDateTimestamp,
             strCollectionEndDateTimestamp: strCollectionEndDateTimestamp,
             isBillMode: widget.isBillMode,
@@ -867,7 +809,7 @@ class _WgtPagCompositeBillView2State extends State<WgtPagCompositeBillView2> {
             billedBciInfoList: calcedBillInfoRl['billedBciInfoList'] ?? [],
             tenantSingularUsageInfoList:
                 calcedBillInfoRl['singularUsageList'] ?? [],
-            compositeUsageCalc: calcedBillInfoRl['compositeUsageCalc'],
+            compositeUsageCalcRl2: calcedBillInfoRl['compositeUsageCalc'],
             collectionStartDateTimestampStr:
                 calcedBillInfoRl['strCollectionStartDate'],
             collectionEndDateTimestampStr:

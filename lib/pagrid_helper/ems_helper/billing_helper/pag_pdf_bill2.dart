@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:buff_helper/pagrid_helper/ems_helper/tenant/mdl_ems_type_usage_r2.dart';
-import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_ems_type_usage_calc_rl.dart';
+import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_ems_type_usage_calc_rl2.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
@@ -779,23 +779,23 @@ class PagPdfBillCwP2Gen3 {
 
     for (Map<String, dynamic> singularUsageInfo
         in tenantSingularUsageInfoList) {
-      PagEmsTypeUsageCalcRl? usageCalc = singularUsageInfo['usage_calc_rl'];
-      if (usageCalc?.getTypeUsage('E').usage != null) {
+      PagEmsTypeUsageCalcRl2? usageCalc = singularUsageInfo['usage_calc_rl2'];
+      if (usageCalc?.getTypeUsage('E')?.usage != null) {
         typeSingularUsageInfoListE.add(singularUsageInfo);
       }
-      if (usageCalc?.getTypeUsage('W').usage != null) {
+      if (usageCalc?.getTypeUsage('W')?.usage != null) {
         typeSingularUsageInfoListW.add(singularUsageInfo);
       }
-      if (usageCalc?.getTypeUsage('B').usage != null) {
+      if (usageCalc?.getTypeUsage('B')?.usage != null) {
         typeSingularUsageInfoListB.add(singularUsageInfo);
       }
-      if (usageCalc?.getTypeUsage('N').usage != null) {
+      if (usageCalc?.getTypeUsage('N')?.usage != null) {
         typeSingularUsageInfoListN.add(singularUsageInfo);
       }
-      if (usageCalc?.getTypeUsage('G').usage != null) {
+      if (usageCalc?.getTypeUsage('G')?.usage != null) {
         typeSingularUsageInfoListG.add(singularUsageInfo);
       }
-      if (usageCalc?.getTypeUsage('SE1').usage != null) {
+      if (usageCalc?.getTypeUsage('SE1')?.usage != null) {
         typeSingularUsageInfoListSE1.add(singularUsageInfo);
       }
     }
@@ -881,8 +881,8 @@ class PagPdfBillCwP2Gen3 {
         ),
       );
 
-      PagEmsTypeUsageCalcRl? usageCalc = singularUsageInfo['usage_calc_rl'];
-      if (usageCalc?.getTypeUsage(typeKey).usage != null) {
+      PagEmsTypeUsageCalcRl2? usageCalc = singularUsageInfo['usage_calc_rl2'];
+      if (usageCalc?.getTypeUsage(typeKey)?.usage != null) {
         typeSingularStatList.add(singularStat);
       }
     }
@@ -1032,7 +1032,7 @@ class PagPdfBillCwP2Gen3 {
       Map<String, dynamic> singularUsageInfo,
       Map<String, dynamic> singleNote,
       String typeKeyPrefix) {
-    PagEmsTypeUsageCalcRl usageCalc = singularUsageInfo['usage_calc_rl'];
+    PagEmsTypeUsageCalcRl2 usageCalc = singularUsageInfo['usage_calc_rl2'];
 
     EmsTypeUsageR2? typeUsage;
     String billedTpNote = '';

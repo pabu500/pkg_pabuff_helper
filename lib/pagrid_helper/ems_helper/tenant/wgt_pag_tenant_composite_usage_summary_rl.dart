@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 
 import '../../../pag_helper/def_helper/dh_pag_bill.dart';
 import '../usage/pag_usage_stat_helper.dart';
+import 'mdl_ems_type_usage_r2.dart';
 import 'pag_ems_type_usage_calc_rl.dart';
+import 'pag_ems_type_usage_calc_rl2.dart';
 
 class WgtPagTenantCompositeUsageSummaryRl extends StatefulWidget {
   const WgtPagTenantCompositeUsageSummaryRl({
@@ -44,7 +46,8 @@ class WgtPagTenantCompositeUsageSummaryRl extends StatefulWidget {
     this.rateDecimals = 4,
     this.costDecimals = 3,
     this.tenantSingularUsageInfoList = const [],
-    required this.compositeUsageCalc,
+    this.compositeUsageCalc,
+    this.compositeUsageCalcRl2,
     required this.collectionStartDateTimestampStr,
     required this.collectionEndDateTimestampStr,
     this.onUpdate,
@@ -85,6 +88,7 @@ class WgtPagTenantCompositeUsageSummaryRl extends StatefulWidget {
   final int costDecimals;
   final List<Map<String, dynamic>> tenantSingularUsageInfoList;
   final PagEmsTypeUsageCalcRl? compositeUsageCalc;
+  final PagEmsTypeUsageCalcRl2? compositeUsageCalcRl2;
   final String collectionStartDateTimestampStr;
   final String collectionEndDateTimestampStr;
   final Map<String, dynamic> interestInfo;
@@ -98,6 +102,16 @@ class WgtPagTenantCompositeUsageSummaryRl extends StatefulWidget {
 
 class _WgtPagTenantCompositeUsageSummaryRlState
     extends State<WgtPagTenantCompositeUsageSummaryRl> {
+  dynamic get _compositeUsageCalc =>
+      widget.compositeUsageCalcRl2 ?? widget.compositeUsageCalc;
+
+  EmsTypeUsageR2? _getCompositeTypeUsage(String meterType) {
+    if (widget.compositeUsageCalcRl2 != null) {
+      return widget.compositeUsageCalcRl2!.getTypeUsage(meterType);
+    }
+    return widget.compositeUsageCalc?.getTypeUsage(meterType);
+  }
+
   final List<String> usageTypeList = ['E', 'B', 'W', 'N', 'G'];
 
   final widgetWidth = 750.0;
@@ -161,16 +175,16 @@ class _WgtPagTenantCompositeUsageSummaryRlState
                     costDecimals: widget.costDecimals,
                     context,
                     widget.isBillMode,
-                    widget.compositeUsageCalc!.typeUsageE!.usageFactored,
-                    widget.compositeUsageCalc!.typeUsageE!.cost,
-                    widget.compositeUsageCalc!.typeUsageW!.usageFactored,
-                    widget.compositeUsageCalc!.typeUsageW!.cost,
-                    widget.compositeUsageCalc!.typeUsageB!.usageFactored,
-                    widget.compositeUsageCalc!.typeUsageB!.cost,
-                    widget.compositeUsageCalc!.typeUsageN!.usageFactored,
-                    widget.compositeUsageCalc!.typeUsageN!.cost,
-                    widget.compositeUsageCalc!.typeUsageG!.usageFactored,
-                    widget.compositeUsageCalc!.typeUsageG!.cost,
+                    _getCompositeTypeUsage('E')?.usageFactored,
+                    _getCompositeTypeUsage('E')?.cost,
+                    _getCompositeTypeUsage('W')?.usageFactored,
+                    _getCompositeTypeUsage('W')?.cost,
+                    _getCompositeTypeUsage('B')?.usageFactored,
+                    _getCompositeTypeUsage('B')?.cost,
+                    _getCompositeTypeUsage('N')?.usageFactored,
+                    _getCompositeTypeUsage('N')?.cost,
+                    _getCompositeTypeUsage('G')?.usageFactored,
+                    _getCompositeTypeUsage('G')?.cost,
                   ),
                 ],
               ),
@@ -196,18 +210,18 @@ class _WgtPagTenantCompositeUsageSummaryRlState
                   widget.billInfo['billing_rec_id'] ?? '',
                   'released',
                   currentBillLcStatus,
-                  widget.compositeUsageCalc!.totalUsageCost,
+                  _compositeUsageCalc.totalUsageCost,
                   widget.gst!,
-                  widget.compositeUsageCalc!.subTotalCost,
-                  widget.compositeUsageCalc!.billedGstAmount,
+                  _compositeUsageCalc.subTotalCost,
+                  _compositeUsageCalc.billedGstAmount,
                   // widget.compositeUsageCalc!.totalCost,
-                  widget.compositeUsageCalc!.principalAmount,
-                  widget.compositeUsageCalc!.cycleTotalAmount,
-                  widget.compositeUsageCalc!.payableAmount,
+                  _compositeUsageCalc.principalAmount,
+                  _compositeUsageCalc.cycleTotalAmount,
+                  _compositeUsageCalc.payableAmount,
                   widget.tenantType,
                   widget.lineItems,
                   widget.billedBciInfoList,
-                  widget.compositeUsageCalc!.miniSoaInfo,
+                  _compositeUsageCalc.miniSoaInfo,
                   widget.collectionStartDateTimestampStr,
                   widget.collectionEndDateTimestampStr,
                   widget.interestInfo,
@@ -300,22 +314,23 @@ class _WgtPagTenantCompositeUsageSummaryRlState
     List<Widget> slotList = [];
     for (Map<String, dynamic> singularUsageInfo
         in widget.tenantSingularUsageInfoList) {
-      PagEmsTypeUsageCalcRl? usageCalc = singularUsageInfo['usage_calc_rl'];
+      dynamic usageCalc = singularUsageInfo['usage_calc_rl2'] ??
+          singularUsageInfo['usage_calc_rl'];
 
       slotList.add(getPagTypeUsageNet(
         context,
         widget.loggedInUser,
         widget.appConfig,
-        usageCalc!.typeUsageE!.usageFactored,
-        usageCalc.typeUsageE!.rate,
-        usageCalc.typeUsageW!.usageFactored,
-        usageCalc.typeUsageW!.rate,
-        usageCalc.typeUsageB!.usageFactored,
-        usageCalc.typeUsageB!.rate,
-        usageCalc.typeUsageN!.usageFactored,
-        usageCalc.typeUsageN!.rate,
-        usageCalc.typeUsageG!.usageFactored,
-        usageCalc.typeUsageG!.rate,
+        usageCalc!.getTypeUsage('E')?.usageFactored,
+        usageCalc.getTypeUsage('E')?.rate,
+        usageCalc.getTypeUsage('W')?.usageFactored,
+        usageCalc.getTypeUsage('W')?.rate,
+        usageCalc.getTypeUsage('B')?.usageFactored,
+        usageCalc.getTypeUsage('B')?.rate,
+        usageCalc.getTypeUsage('N')?.usageFactored,
+        usageCalc.getTypeUsage('N')?.rate,
+        usageCalc.getTypeUsage('G')?.usageFactored,
+        usageCalc.getTypeUsage('G')?.rate,
         usageDecimals: widget.usageDecimals,
         rateDecimals: widget.rateDecimals,
         costDecimals: widget.costDecimals,

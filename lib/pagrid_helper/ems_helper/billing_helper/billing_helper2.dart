@@ -1,5 +1,5 @@
 import '../../../util/date_time_util.dart';
-import '../tenant/pag_ems_type_usage_calc_rl.dart';
+import '../tenant/pag_ems_type_usage_calc_rl2.dart';
 
 double? _billValueToDouble(dynamic value) {
   if (value is num) {
@@ -34,10 +34,6 @@ Map<String, dynamic> prepCalcedBillInfoRl2(Map<String, dynamic> billInfo) {
   final strBilledUsageCostAmount = billInfo['billed_usage_cost_amount'] ?? '';
   double? billedUsageCostAmount =
       double.tryParse(strBilledUsageCostAmount) ?? 0.0;
-
-  final strBilledInterestAmount = billInfo['billed_interest_amount'] ?? '';
-  double? billedInterestAmount =
-      double.tryParse(strBilledInterestAmount) ?? 0.0;
 
   final strBilledPrincipalAmount = billInfo['billed_principal_amount'] ?? '';
   double? billedPrincipalAmount =
@@ -101,7 +97,7 @@ Map<String, dynamic> prepCalcedBillInfoRl2(Map<String, dynamic> billInfo) {
       miniSoaInfo['collection_end_date_timestamp'] ?? '';
 
   String billBarFromMonth = billInfo['bill_bar_from_timestamp'] ?? '';
-  List<PagEmsTypeUsageCalcRl> singularUsageCalcList = [];
+  List<PagEmsTypeUsageCalcRl2> singularUsageCalcList = [];
 
   String billedAmgrCompanyTradingName =
       billInfo['billed_amgr_company_trading_name'] ?? '';
@@ -135,92 +131,38 @@ Map<String, dynamic> prepCalcedBillInfoRl2(Map<String, dynamic> billInfo) {
       continue;
     }
 
-    Map<String, dynamic> billedAutoUsageInfo = {};
     final billedAutoUsage =
         _billValueToDouble(singularUsage['billed_auto_usage']);
-    if (billedAutoUsage != null) {
-      billedAutoUsageInfo['billed_auto_usage_$meterType'] = billedAutoUsage;
-    }
-
-    Map<String, dynamic> billedRateInfo = {};
     final billedRate = _billValueToDouble(singularUsage['billed_rate']);
-    if (billedRate != null) {
-      billedRateInfo['billed_rate_$meterType'] = billedRate;
-    }
-
-    Map<String, dynamic> billedSubTenantUsages = {};
-
-    Map<String, dynamic> billedManualUsages = {};
     final billedManualUsage = _billValueToDouble(singularUsage['manual_usage']);
-    if (billedManualUsage != null) {
-      billedManualUsages['manual_usage_$meterType'] = billedManualUsage;
-    }
-
-    // Gen3 billed_auto_usage is already multiplier-adjusted. The released
-    // calculator still accepts a factor, so keep it neutral.
-    Map<String, dynamic> billedUsageFactorInfo = {
-      'billed_usage_factor_$meterType': 1.0,
-    };
-
-    List<Map<String, dynamic>> billedTrendingSnapShot = [];
 
     double? billedGstRate;
     if (singularUsage['billed_gst'] != null) {
       billedGstRate = _billValueToDouble(singularUsage['billed_gst']);
     }
 
-    PagEmsTypeUsageCalcRl emsTypeUsageCalcRl = PagEmsTypeUsageCalcRl(
+    PagEmsTypeUsageCalcRl2 emsTypeUsageCalcRl = PagEmsTypeUsageCalcRl2(
       costDecimals: 2,
-      billedAutoUsageE: billedAutoUsageInfo['billed_auto_usage_e'],
-      billedAutoUsageW: billedAutoUsageInfo['billed_auto_usage_w'],
-      billedAutoUsageB: billedAutoUsageInfo['billed_auto_usage_b'],
-      billedAutoUsageN: billedAutoUsageInfo['billed_auto_usage_n'],
-      billedAutoUsageG: billedAutoUsageInfo['billed_auto_usage_g'],
-      billedAutoUsageSE1: billedAutoUsageInfo['billed_auto_usage_se1'],
-      billedManualUsageE: billedManualUsages['manual_usage_e'],
-      billedManualUsageW: billedManualUsages['manual_usage_w'],
-      billedManualUsageB: billedManualUsages['manual_usage_b'],
-      billedManualUsageN: billedManualUsages['manual_usage_n'],
-      billedManualUsageG: billedManualUsages['manual_usage_g'],
-      billedManualUsageSE1: billedManualUsages['manual_usage_se1'],
-      billedRateE: billedRateInfo['billed_rate_e'],
-      billedRateW: billedRateInfo['billed_rate_w'],
-      billedRateB: billedRateInfo['billed_rate_b'],
-      billedRateN: billedRateInfo['billed_rate_n'],
-      billedRateG: billedRateInfo['billed_rate_g'],
-      billedRateSE1: billedRateInfo['billed_rate_se1'],
-      billedUsageFactorE: billedUsageFactorInfo['billed_usage_factor_e'],
-      billedUsageFactorW: billedUsageFactorInfo['billed_usage_factor_w'],
-      billedUsageFactorB: billedUsageFactorInfo['billed_usage_factor_b'],
-      billedUsageFactorN: billedUsageFactorInfo['billed_usage_factor_n'],
-      billedUsageFactorG: billedUsageFactorInfo['billed_usage_factor_g'],
-      billedUsageFactorSE1: billedUsageFactorInfo['billed_usage_factor_se1'],
-      billedSubTenantUsageE: billedSubTenantUsages['billed_sub_tenant_usage_e'],
-      billedSubTenantUsageW: billedSubTenantUsages['billed_sub_tenant_usage_w'],
-      billedSubTenantUsageB: billedSubTenantUsages['billed_sub_tenant_usage_b'],
-      billedSubTenantUsageN: billedSubTenantUsages['billed_sub_tenant_usage_n'],
-      billedSubTenantUsageG: billedSubTenantUsages['billed_sub_tenant_usage_g'],
-      billedSubTenantUsageSE1:
-          billedSubTenantUsages['billed_sub_tenant_usage_se1'],
+      meterType: meterType,
+      billedAutoUsage: billedAutoUsage,
+      billedManualUsage: billedManualUsage,
+      billedRate: billedRate,
       billedGst: billedGstRate,
       billedGstAmount: billedGstAmount,
       billedUsageCostAmount: billedUsageCostAmount,
       billedPrincipalAmount: billedPrincipalAmount,
-      billedInterestAmount: billedInterestAmount,
       billedCycleTotalAmount: billedCycleTotalAmount,
       lineItemList: lineItemList,
-      billedTrendingSnapShot: billedTrendingSnapShot,
       billBarFromMonth: billBarFromMonth,
     );
     emsTypeUsageCalcRl.doSingularCalc();
     singularUsageCalcList.add(emsTypeUsageCalcRl);
 
-    singularUsage['usage_calc_rl'] = emsTypeUsageCalcRl;
+    singularUsage['usage_calc_rl2'] = emsTypeUsageCalcRl;
   }
 
-  PagEmsTypeUsageCalcRl compositeUsageCalcRl = PagEmsTypeUsageCalcRl(
+  PagEmsTypeUsageCalcRl2 compositeUsageCalcRl = PagEmsTypeUsageCalcRl2(
     costDecimals: 2,
-    billedTrendingSnapShot: billInfo['billed_trending_snapshot'] ?? [],
     lineItemList: lineItemList,
     billBarFromMonth: billBarFromMonth,
     singularUsageCalcList: singularUsageCalcList,
@@ -230,7 +172,6 @@ Map<String, dynamic> prepCalcedBillInfoRl2(Map<String, dynamic> billInfo) {
     billedGstAmount: billedGstAmount,
     billedUsageCostAmount: billedUsageCostAmount,
     billedPrincipalAmount: billedPrincipalAmount,
-    billedInterestAmount: billedInterestAmount,
     billedCycleTotalAmount: billedCycleTotalAmount,
     billedPayableAmount: billedPayableAmount,
     billedBciInfo: billedBciInfo,
@@ -278,30 +219,31 @@ Map<String, dynamic> prepCalcedBillInfoRl2(Map<String, dynamic> billInfo) {
     'interestInfo': interestInfo,
     'cycleTotalAmount': compositeUsageCalcRl.cycleTotalAmount,
     'payableAmount': compositeUsageCalcRl.payableAmount,
-    'typeRateE': compositeUsageCalcRl.typeUsageE?.rate,
-    'typeRateW': compositeUsageCalcRl.typeUsageW?.rate,
-    'typeRateB': compositeUsageCalcRl.typeUsageB?.rate,
-    'typeRateN': compositeUsageCalcRl.typeUsageN?.rate,
-    'typeRateG': compositeUsageCalcRl.typeUsageG?.rate,
-    'typeRateSE1': compositeUsageCalcRl.typeUsageSE1?.rate,
-    'typeUsageE': compositeUsageCalcRl.typeUsageE?.usage,
-    'typeUsageW': compositeUsageCalcRl.typeUsageW?.usage,
-    'typeUsageB': compositeUsageCalcRl.typeUsageB?.usage,
-    'typeUsageN': compositeUsageCalcRl.typeUsageN?.usage,
-    'typeUsageG': compositeUsageCalcRl.typeUsageG?.usage,
-    'typeUsageSE1': compositeUsageCalcRl.typeUsageSE1?.usage,
-    'typeCostE': compositeUsageCalcRl.typeUsageE?.cost,
-    'typeCostW': compositeUsageCalcRl.typeUsageW?.cost,
-    'typeCostB': compositeUsageCalcRl.typeUsageB?.cost,
-    'typeCostN': compositeUsageCalcRl.typeUsageN?.cost,
-    'typeCostG': compositeUsageCalcRl.typeUsageG?.cost,
-    'typeCostSE1': compositeUsageCalcRl.typeUsageSE1?.cost,
-    'trendingE': compositeUsageCalcRl.trendingE,
-    'trendingW': compositeUsageCalcRl.trendingW,
-    'trendingB': compositeUsageCalcRl.trendingB,
-    'trendingN': compositeUsageCalcRl.trendingN,
-    'trendingG': compositeUsageCalcRl.trendingG,
-    'trendingSE1': compositeUsageCalcRl.trendingSE1,
+    'typeRateE': compositeUsageCalcRl.getTypeUsage('E')?.rate,
+    'typeRateW': compositeUsageCalcRl.getTypeUsage('W')?.rate,
+    'typeRateB': compositeUsageCalcRl.getTypeUsage('B')?.rate,
+    'typeRateN': compositeUsageCalcRl.getTypeUsage('N')?.rate,
+    'typeRateG': compositeUsageCalcRl.getTypeUsage('G')?.rate,
+    'typeRateSE1': compositeUsageCalcRl.getTypeUsage('SE1')?.rate,
+    'typeUsageE': compositeUsageCalcRl.getTypeUsage('E')?.usage,
+    'typeUsageW': compositeUsageCalcRl.getTypeUsage('W')?.usage,
+    'typeUsageB': compositeUsageCalcRl.getTypeUsage('B')?.usage,
+    'typeUsageN': compositeUsageCalcRl.getTypeUsage('N')?.usage,
+    'typeUsageG': compositeUsageCalcRl.getTypeUsage('G')?.usage,
+    'typeUsageSE1': compositeUsageCalcRl.getTypeUsage('SE1')?.usage,
+    'typeCostE': compositeUsageCalcRl.getTypeUsage('E')?.cost,
+    'typeCostW': compositeUsageCalcRl.getTypeUsage('W')?.cost,
+    'typeCostB': compositeUsageCalcRl.getTypeUsage('B')?.cost,
+    'typeCostN': compositeUsageCalcRl.getTypeUsage('N')?.cost,
+    'typeCostG': compositeUsageCalcRl.getTypeUsage('G')?.cost,
+    'typeCostSE1': compositeUsageCalcRl.getTypeUsage('SE1')?.cost,
+    // Trending snapshots are not part of the Gen3 singular billing record.
+    'trendingE': const <Map<String, dynamic>>[],
+    'trendingW': const <Map<String, dynamic>>[],
+    'trendingB': const <Map<String, dynamic>>[],
+    'trendingN': const <Map<String, dynamic>>[],
+    'trendingG': const <Map<String, dynamic>>[],
+    'trendingSE1': const <Map<String, dynamic>>[],
     'lineItemList': compositeUsageCalcRl.lineItemList,
     'lineItemLabel1': lineItemLabel1,
     'lineItemValue1': lineItemAmount1,
