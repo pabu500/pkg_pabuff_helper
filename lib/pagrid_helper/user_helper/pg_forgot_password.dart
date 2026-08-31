@@ -52,7 +52,8 @@ class _PgForgotPasswordState extends State<PgForgotPassword> {
       _errorText = '';
     });
     try {
-      final String resetUrl = Uri.base.resolve('/reset_password').toString();
+      final String resetUrl =
+          Uri.base.resolve('/').replace(fragment: '/reset_password').toString();
       await doRequestPasswordReset(widget.appConfig!, email, resetUrl);
       if (!mounted) return;
       setState(() {
