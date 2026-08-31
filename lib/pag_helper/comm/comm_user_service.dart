@@ -59,6 +59,7 @@ Future<MdlPagUser> doLoginPag(
 
 Future<void> doRequestPasswordReset(
   MdlPagAppConfig appConfig,
+  String username,
   String email,
   String resetUrl,
 ) async {
@@ -69,6 +70,7 @@ Future<void> doRequestPasswordReset(
       'Content-Type': 'application/json; charset=UTF-8',
     },
     body: jsonEncode(<String, String>{
+      'username': username.trim(),
       'email': email.trim(),
       'reset_url': resetUrl,
     }),
