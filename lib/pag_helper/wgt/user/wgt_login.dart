@@ -440,7 +440,7 @@ class _WgtLoginState extends State<WgtLogin> {
                   child: Padding(
                     padding: const EdgeInsets.only(right: 5.0),
                     child: Text(
-                      'Forget Password?',
+                      'Forgot Password?',
                       style: TextStyle(
                           color: Theme.of(context).hintColor, fontSize: 13.5),
                     ),

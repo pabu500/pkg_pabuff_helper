@@ -87,6 +87,12 @@ class _CreateItemState extends State<WgtCreateMeter> {
   MeterDataType? _selectedMeterDataType;
   bool _isMeterDataTypeRequired = false;
 
+  bool _isMainSubMeterRequired = false;
+
+  bool _isMeterLcStatusRequired = false;
+
+  bool _isPhaseTypeRequired = false;
+
   String? _multiplierFactor;
   bool _isMultiplierFactorValidated = false;
   UniqueKey? _multiplierFactorResetKey;
@@ -187,11 +193,11 @@ class _CreateItemState extends State<WgtCreateMeter> {
         } else if (colKey == 'meter_type') {
           _isMeterTypeRequired = colController.requiredForOp('form_create');
         } else if (colKey == 'main_sub_meter') {
-          // no action needed
+          _isMainSubMeterRequired = colController.requiredForOp('form_create');
         } else if (colKey == 'lc_status') {
-          // no action needed
+          _isMeterLcStatusRequired = colController.requiredForOp('form_create');
         } else if (colKey == 'phase_type') {
-          // no action needed
+          _isPhaseTypeRequired = colController.requiredForOp('form_create');
         } else if (colKey == 'data_type') {
           _isMeterDataTypeRequired = colController.requiredForOp('form_create');
         } else if (colKey == 'multiplier_factor') {
@@ -291,7 +297,11 @@ class _CreateItemState extends State<WgtCreateMeter> {
       return false;
     }
 
-    if (_label == null || !_isLabelValidated) {
+    if (_label == null) {
+      if (_isLabelRequired) {
+        return false;
+      }
+    } else if (!_isLabelValidated) {
       return false;
     }
     if (_sn == null) {
@@ -327,6 +337,17 @@ class _CreateItemState extends State<WgtCreateMeter> {
         return false;
       }
     }
+    if (_mainSubMeter == null && _isMainSubMeterRequired) {
+      return false;
+    }
+    if (_meterLcStatus == null && _isMeterLcStatusRequired) {
+      return false;
+    }
+    if (_selectedMeterType == MeterTypeTag.E &&
+        _selectedPhaseType == null &&
+        _isPhaseTypeRequired) {
+      return false;
+    }
     if (_multiplierFactor == null) {
       if (_isMultiplierFactorRequired) {
         return false;
@@ -336,6 +357,12 @@ class _CreateItemState extends State<WgtCreateMeter> {
     }
 
     return _itemScopeMap.isNotEmpty;
+  }
+
+  bool _showInputOnFormCreate(String colKey) {
+    return listColControllerList.any(
+      (col) => col.colKey == colKey && col.showInputOnFormCreate,
+    );
   }
 
   @override
@@ -581,13 +608,17 @@ class _CreateItemState extends State<WgtCreateMeter> {
                 labelText: 'Serial Number ${_isSnRequired ? '(Required)' : ''}',
                 maxLength: maxFullNameLength,
                 validator: getValidator(validateSerialNumber, _isSnRequired),
+                requireUnique: true,
                 // _isSnRequired
                 //     ? validateSerialNumber
                 //     : (val) => val != null && val.trim().isNotEmpty
                 //         ? validateSerialNumber
                 //         : null,
                 checkUnique: doPagCheckUnique,
-                uniqueKey: 'sn',
+                uniqueKey: listColControllerList
+                    .firstWhere(
+                        (col) => col.colKey == 'sn' || col.colKey == 'meter_sn')
+                    .colKey,
                 itemTableName: '$projectName.meter_$projectName',
                 validateOnChange: false,
                 onChanged: (val) {
@@ -767,6 +798,10 @@ class _CreateItemState extends State<WgtCreateMeter> {
   }
 
   Widget getMeterTypeSelector() {
+    if (!_showInputOnFormCreate('meter_type')) {
+      return const SizedBox.shrink();
+    }
+
     // hard code for now
     List<MeterTypeTag> meterTypeList = [
       MeterTypeTag.E,
@@ -788,7 +823,7 @@ class _CreateItemState extends State<WgtCreateMeter> {
           width: 95,
           child: Align(
             alignment: AlignmentDirectional.centerEnd,
-            child: Text('Meter Type:',
+            child: Text('Meter Type${_isMeterTypeRequired ? ' *' : ''}:',
                 style: TextStyle(color: Theme.of(context).hintColor)),
           ),
         ),
@@ -837,6 +872,10 @@ class _CreateItemState extends State<WgtCreateMeter> {
   }
 
   Widget getMeterDataTypeSelector() {
+    if (!_showInputOnFormCreate('data_type')) {
+      return const SizedBox.shrink();
+    }
+
     // hard code for now
     List<MeterDataType> meterDataTypeList = [
       MeterDataType.amr,
@@ -858,7 +897,7 @@ class _CreateItemState extends State<WgtCreateMeter> {
           width: 95,
           child: Align(
             alignment: AlignmentDirectional.centerEnd,
-            child: Text('Data Type:',
+            child: Text('Data Type${_isMeterDataTypeRequired ? ' *' : ''}:',
                 style: TextStyle(color: Theme.of(context).hintColor)),
           ),
         ),
@@ -907,7 +946,8 @@ class _CreateItemState extends State<WgtCreateMeter> {
   }
 
   Widget getMeterPhaseSelector() {
-    if (_selectedMeterType != MeterTypeTag.E) {
+    if (!_showInputOnFormCreate('phase_type') ||
+        _selectedMeterType != MeterTypeTag.E) {
       return const SizedBox.shrink();
     }
 
@@ -916,7 +956,7 @@ class _CreateItemState extends State<WgtCreateMeter> {
         SizedBox(
           width: 80,
           child: Text(
-            'Phase Type:',
+            'Phase Type${_isPhaseTypeRequired ? ' *' : ''}:',
             style: TextStyle(color: Theme.of(context).hintColor),
           ),
         ),
@@ -955,6 +995,10 @@ class _CreateItemState extends State<WgtCreateMeter> {
   }
 
   Widget getMeterLcStatusSelector() {
+    if (!_showInputOnFormCreate('lc_status')) {
+      return const SizedBox.shrink();
+    }
+
     // hard code for now
     List<PagDeviceLsStatus> lcStatusList = PagDeviceLsStatus.values;
     TextStyle dropDownListHintStyle =
@@ -968,7 +1012,7 @@ class _CreateItemState extends State<WgtCreateMeter> {
           width: 95,
           child: Align(
             alignment: AlignmentDirectional.centerEnd,
-            child: Text('Status:',
+            child: Text('Status${_isMeterLcStatusRequired ? ' *' : ''}:',
                 style: TextStyle(color: Theme.of(context).hintColor)),
           ),
         ),
@@ -1013,6 +1057,10 @@ class _CreateItemState extends State<WgtCreateMeter> {
   }
 
   Widget getMainSubSelector() {
+    if (!_showInputOnFormCreate('main_sub_meter')) {
+      return const SizedBox.shrink();
+    }
+
     // hard code for now
     List<String> mainSubList = [
       'Main Meter',
@@ -1033,7 +1081,7 @@ class _CreateItemState extends State<WgtCreateMeter> {
           width: 95,
           child: Align(
             alignment: AlignmentDirectional.centerEnd,
-            child: Text('Main/Sub:',
+            child: Text('Main/Sub${_isMainSubMeterRequired ? ' *' : ''}:',
                 style: TextStyle(color: Theme.of(context).hintColor)),
           ),
         ),
