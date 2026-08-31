@@ -57,6 +57,62 @@ Future<MdlPagUser> doLoginPag(
   }
 }
 
+Future<void> doRequestPasswordReset(
+  MdlPagAppConfig appConfig,
+  String email,
+  String resetUrl,
+) async {
+  final response = await http.post(
+    Uri.parse(PagUrlController(null, appConfig)
+        .getUrl(PagSvcType.usersvc2, PagUrlBase.eptUsersvcForgotPassword)),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    body: jsonEncode(<String, String>{
+      'email': email.trim(),
+      'reset_url': resetUrl,
+    }),
+  );
+
+  if (response.statusCode != 200) {
+    throw Exception(_passwordResetError(response.body));
+  }
+}
+
+Future<void> doResetForgottenPassword(
+  MdlPagAppConfig appConfig,
+  String token,
+  String password,
+) async {
+  final response = await http.post(
+    Uri.parse(PagUrlController(null, appConfig)
+        .getUrl(PagSvcType.usersvc2, PagUrlBase.eptUsersvcResetPassword)),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    body: jsonEncode(<String, String>{
+      'token': token,
+      'password': password,
+    }),
+  );
+
+  if (response.statusCode != 200) {
+    throw Exception(_passwordResetError(response.body));
+  }
+}
+
+String _passwordResetError(String responseBody) {
+  try {
+    final dynamic body = jsonDecode(responseBody);
+    if (body is Map && body['error'] != null) {
+      return body['error'].toString();
+    }
+  } catch (_) {
+    // Use the generic message below for non-JSON service responses.
+  }
+  return 'Password reset service is unavailable';
+}
+
 Future<dynamic> doCreateUser(
   MdlPagUser loggedInUser,
   MdlPagAppConfig appConfig,
