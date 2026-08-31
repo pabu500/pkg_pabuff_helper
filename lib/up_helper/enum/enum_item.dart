@@ -20,6 +20,7 @@ enum ItemType {
   job,
   job_type_sub,
   fleet_health,
+  op_log,
 }
 
 enum ItemFinderType {

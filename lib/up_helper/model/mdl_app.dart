@@ -17,6 +17,7 @@ enum PortalPage {
   transactionService,
   creditService,
   creditTransactions,
+  opLog,
   projectService,
   buildingService,
   levelService,
@@ -49,6 +50,7 @@ const sensorService = 'Sensor Service';
 const meterManager = 'Meter Manager';
 const siteManager = 'Site Manager';
 const creditTransactions = 'Credit & Transactions';
+const opLog = 'Op Log';
 const transactionService = 'Transaction Service';
 const transactionHistory = 'Transaction History';
 const topupHistory = 'Topup History';
