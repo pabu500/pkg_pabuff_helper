@@ -4,7 +4,12 @@ import 'package:buff_helper/pag_helper/def_helper/dh_pag_item.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_context.dart';
 import 'package:buff_helper/pag_helper/wgt/ls/wgt_ls_kind2.dart';
 import 'package:flutter/material.dart';
+import '../../../up_helper/enum/enum_acl.dart';
+import '../../../xt_ui/wdgt/info/get_error_text_prompt.dart';
+import '../../def_helper/def_page_route.dart';
+import '../../def_helper/dh_pag_acl.dart';
 import '../../model/mdl_pag_app_config.dart';
+import '../../model/mdl_pag_user.dart';
 import 'wgt_ls_item_flexi.dart';
 
 class WgtPagLs extends StatefulWidget {
@@ -12,8 +17,11 @@ class WgtPagLs extends StatefulWidget {
     super.key,
     required this.appConfig,
     required this.pagAppContext,
+    required this.pageRoute,
+    required this.loggedInUser,
     required this.itemKind,
     required this.listContextType,
+    required this.pageSection,
     this.additionalColumnConfig,
     this.onScopeTreeUpdate,
     this.getPaneWidget,
@@ -33,6 +41,9 @@ class WgtPagLs extends StatefulWidget {
 
   final MdlPagAppConfig appConfig;
   final MdlPagAppContext pagAppContext;
+  final PagPageRoute pageRoute;
+  final String pageSection;
+  final MdlPagUser? loggedInUser;
   final PagItemKind itemKind;
   final PagListContextType listContextType;
   final List<Map<String, dynamic>>? additionalColumnConfig;
@@ -60,13 +71,46 @@ class WgtPagLs extends StatefulWidget {
 class _WgtPagLsState extends State<WgtPagLs> {
   late final prefKey = widget.pagAppContext.route;
 
+  String _pageAclMessage = '';
+
   @override
   void initState() {
     super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+
+      final aclResult = await checkAcl(
+        widget.appConfig,
+        widget.pagAppContext,
+        widget.loggedInUser!,
+        widget.pageRoute,
+        widget.pageSection,
+        AclOperation.read,
+      );
+      // if (!mounted || aclResult == null) return;
+      if ('error' == aclResult['result']) {
+        setState(() {
+          _pageAclMessage = 'Error checking Page Access';
+        });
+        return;
+      }
+
+      setState(() {
+        _pageAclMessage = aclResult['result'];
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    // if (_pageAclMessage != 'granted') {
+    //   return Container(
+    //       alignment: Alignment.topCenter,
+    //       child:
+    //           getErrorTextPrompt(context: context, errorText: _pageAclMessage));
+    // }
+
     switch (widget.itemKind) {
       case PagItemKind.device ||
             PagItemKind.scope ||

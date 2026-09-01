@@ -1,8 +1,19 @@
+import 'package:buff_helper/pag_helper/def_helper/def_page_route.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as dev;
 
 import 'package:buff_helper/pag_helper/def_helper/enum_helper.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_item.dart';
+
+import '../model/mdl_pag_app_context.dart';
+
+import '../../up_helper/enum/enum_acl.dart';
+import '../comm/comm_ex.dart';
+import '../comm/pag_be_api_base.dart';
+import '../model/acl/mdl_pag_svc_claim.dart';
+import '../model/mdl_pag_app_config.dart';
+import '../model/mdl_pag_app_context.dart';
+import '../model/mdl_pag_user.dart';
 
 enum PagPortalType {
   pagConsole('pag-console', 'Ops Console', 'op', Colors.teal),
@@ -109,4 +120,46 @@ String? getResNameByItemType(dynamic itemType) {
   }
   dev.log('getResNameByItemType: itemType is not an Enum: $itemType');
   return null;
+}
+
+String? getResNameByPageRouteSection(
+    MdlPagAppContext appContext, PagPageRoute pageRoute, String pageSection) {
+  return '${appContext.name}.${pageRoute.name}.$pageSection';
+}
+
+Future<dynamic> checkAcl(
+  MdlPagAppConfig appConfig,
+  MdlPagAppContext appContext,
+  MdlPagUser loggedInUser,
+  PagPageRoute pageRoute,
+  String pageSection,
+  AclOperation operation,
+) async {
+  try {
+    final aclResult = await ex2(
+      endpoint: PagUrlBase.eptCheckAcl,
+      crudType: 'read',
+      opStr: 'check acl',
+      appConfig: appConfig,
+      queryMap: {},
+      svcClaim: MdlPagSvcClaim2(
+        userId: loggedInUser.id,
+        username: loggedInUser.username,
+        roleId: loggedInUser.selectedRole?.id,
+        roleName: loggedInUser.selectedRole?.name,
+        roleLabel: loggedInUser.selectedRole?.label,
+        userScope: loggedInUser.selectedScope.toScopeMap(),
+        resName:
+            getResNameByPageRouteSection(appContext, pageRoute, pageSection),
+        operation: operation.name,
+      ),
+    );
+    return aclResult;
+  } catch (e) {
+    dev.log('checkAcl error: $e');
+    return {
+      'result': 'error',
+      'message': e.toString(),
+    };
+  }
 }

@@ -288,6 +288,8 @@ class PagUrlBase {
   // static const String eptSetPortalTargetStatus = '/set_portal_target_status';
 
   //oresvc2 endpoints
+  static const String eptCheckAcl = '/acl/check_acl';
+
   //scope
   static const String eptCreateScope = '/scope/create_scope';
   static const String eptGetUserRoleScopeList =
