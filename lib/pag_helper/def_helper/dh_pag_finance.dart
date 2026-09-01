@@ -370,138 +370,138 @@ List<Map<String, dynamic>> listConfigPostPayment = [
   },
 ];
 
-List<Map<String, dynamic>> listConfigMatchPayment = [
-  {
-    'col_key': 'tenant_id',
-    'title': 'Tenant ID',
-    'col_type': 'string',
-    'width': 150,
-    'is_mapping_required': true,
-    'validator': validateItemId,
-  },
-  {
-    'col_key': 'tenant_name',
-    'title': 'Tenant Name',
-    'col_type': 'string',
-    'width': 150,
-    'is_mapping_required': true,
-    'validator': validateTenantName,
-  },
-  {
-    'col_key': 'tenant_label',
-    'title': 'Tenant Label',
-    'col_type': 'string',
-    'width': 180,
-    'is_mapping_required': true,
-    'validator': validateTenantLabel,
-  },
-  {
-    'col_key': 'payment_id',
-    'title': 'Payment ID',
-    'col_type': 'string',
-    'width': 180,
-    'is_mapping_required': false,
-    'validator': validateItemId,
-  },
-  {
-    'col_key': 'soa_type',
-    'title': 'SoA Type',
-    'col_type': 'string',
-    'width': 120,
-    'is_mapping_required': true,
-    'validator': soaTypeValidator,
-  },
-  {
-    'col_key': 'payment_lc_status',
-    'title': 'Payment LC Status',
-    'col_type': 'string',
-    'width': 120,
-    'is_mapping_required': true,
-    'validator': validatePaymentLcStatus,
-  },
-  {
-    'col_key': 'value_date',
-    'title': 'Value Date',
-    'col_type': 'date',
-    'width': 120,
-    'is_mapping_required': true,
-    'validator': validateDateIgnoreTime,
-  },
-  {
-    'col_key': 'amount',
-    'title': 'Amount',
-    'col_type': 'double',
-    'width': 120,
-    'is_mapping_required': true,
-    'validator': validatePaymentAmount,
-  },
-  {
-    'col_key': 'bill_id_1',
-    'title': 'Bill ID 1',
-    'col_type': 'string',
-    'width': 120,
-    'is_mapping_required': true,
-    // 'validator': validateItemIdNotRequired,
-  },
-  {
-    'col_key': 'gen_type_1',
-    'title': 'Gen Type 1',
-    'col_type': 'string',
-    'width': 120,
-    'is_mapping_required': true,
-    'validator': validateBillGenTypeNotRequired,
-  },
-  {
-    'col_key': 'cycle_total_1',
-    'title': 'Cycle Total 1',
-    'col_type': 'string',
-    'width': 120,
-    'is_mapping_required': true,
-    'validator': validatePaymentAmountNotRequired,
-  },
-  {
-    'col_key': 'remaining_1',
-    'title': 'Remaining 1',
-    'col_type': 'string',
-    'width': 120,
-    'is_mapping_required': true,
-    'validator': validatePaymentAmountNotRequired,
-  },
-  {
-    'col_key': 'principal_1',
-    'title': 'Principal 1',
-    'col_type': 'string',
-    'width': 120,
-    'is_mapping_required': true,
-    'validator': validatePaymentAmountNotRequired,
-  },
-  {
-    'col_key': 'interest_1',
-    'title': 'Interest 1',
-    'col_type': 'string',
-    'width': 120,
-    'is_mapping_required': true,
-    'validator': validatePaymentAmountNotRequired,
-  },
-];
+// List<Map<String, dynamic>> listConfigMatchPayment = [
+//   {
+//     'col_key': 'tenant_id',
+//     'title': 'Tenant ID',
+//     'col_type': 'string',
+//     'width': 150,
+//     'is_mapping_required': true,
+//     'validator': validateItemId,
+//   },
+//   {
+//     'col_key': 'tenant_name',
+//     'title': 'Tenant Name',
+//     'col_type': 'string',
+//     'width': 150,
+//     'is_mapping_required': true,
+//     'validator': validateTenantName,
+//   },
+//   {
+//     'col_key': 'tenant_label',
+//     'title': 'Tenant Label',
+//     'col_type': 'string',
+//     'width': 180,
+//     'is_mapping_required': true,
+//     'validator': validateTenantLabel,
+//   },
+//   {
+//     'col_key': 'payment_id',
+//     'title': 'Payment ID',
+//     'col_type': 'string',
+//     'width': 180,
+//     'is_mapping_required': false,
+//     'validator': validateItemId,
+//   },
+//   {
+//     'col_key': 'soa_type',
+//     'title': 'SoA Type',
+//     'col_type': 'string',
+//     'width': 120,
+//     'is_mapping_required': true,
+//     'validator': soaTypeValidator,
+//   },
+//   {
+//     'col_key': 'payment_lc_status',
+//     'title': 'Payment LC Status',
+//     'col_type': 'string',
+//     'width': 120,
+//     'is_mapping_required': true,
+//     'validator': validatePaymentLcStatus,
+//   },
+//   {
+//     'col_key': 'value_date',
+//     'title': 'Value Date',
+//     'col_type': 'date',
+//     'width': 120,
+//     'is_mapping_required': true,
+//     'validator': validateDateIgnoreTime,
+//   },
+//   {
+//     'col_key': 'amount',
+//     'title': 'Amount',
+//     'col_type': 'double',
+//     'width': 120,
+//     'is_mapping_required': true,
+//     'validator': validatePaymentAmount,
+//   },
+//   {
+//     'col_key': 'bill_id_1',
+//     'title': 'Bill ID 1',
+//     'col_type': 'string',
+//     'width': 120,
+//     'is_mapping_required': true,
+//     // 'validator': validateItemIdNotRequired,
+//   },
+//   {
+//     'col_key': 'gen_type_1',
+//     'title': 'Gen Type 1',
+//     'col_type': 'string',
+//     'width': 120,
+//     'is_mapping_required': true,
+//     'validator': validateBillGenTypeNotRequired,
+//   },
+//   {
+//     'col_key': 'cycle_total_1',
+//     'title': 'Cycle Total 1',
+//     'col_type': 'string',
+//     'width': 120,
+//     'is_mapping_required': true,
+//     'validator': validatePaymentAmountNotRequired,
+//   },
+//   {
+//     'col_key': 'remaining_1',
+//     'title': 'Remaining 1',
+//     'col_type': 'string',
+//     'width': 120,
+//     'is_mapping_required': true,
+//     'validator': validatePaymentAmountNotRequired,
+//   },
+//   {
+//     'col_key': 'principal_1',
+//     'title': 'Principal 1',
+//     'col_type': 'string',
+//     'width': 120,
+//     'is_mapping_required': true,
+//     'validator': validatePaymentAmountNotRequired,
+//   },
+//   {
+//     'col_key': 'interest_1',
+//     'title': 'Interest 1',
+//     'col_type': 'string',
+//     'width': 120,
+//     'is_mapping_required': true,
+//     'validator': validatePaymentAmountNotRequired,
+//   },
+// ];
 
-List<Map<String, dynamic>> getListConfigBaseByPaymentOpType(
-    PagPaymentOpType opType) {
-  final List<Map<String, dynamic>> list = [];
-  switch (opType) {
-    case PagPaymentOpType.postPayment:
-      list.addAll(listConfigPostPayment);
-      break;
-    case PagPaymentOpType.matchPayment:
-      list.addAll(listConfigMatchPayment);
-      break;
-    default:
-      list.addAll(listConfigPostPayment);
-  }
-  //remove empty maps
-  list.removeWhere((map) => map.isEmpty);
-  return list;
-}
+// List<Map<String, dynamic>> getListConfigBaseByPaymentOpType(
+//     PagPaymentOpType opType) {
+//   final List<Map<String, dynamic>> list = [];
+//   switch (opType) {
+//     case PagPaymentOpType.postPayment:
+//       list.addAll(listConfigPostPayment);
+//       break;
+//     case PagPaymentOpType.matchPayment:
+//       list.addAll(listConfigMatchPayment);
+//       break;
+//     default:
+//       list.addAll(listConfigPostPayment);
+//   }
+//   //remove empty maps
+//   list.removeWhere((map) => map.isEmpty);
+//   return list;
+// }
 
 String? Function(String) getFinanceValidator(String key, dynamic itemType,
     {bool isValueRequired = true}) {
@@ -531,6 +531,8 @@ String? Function(String) getPaymentValidator(String key,
       return getValidator(dateValidator, isValueRequired);
     case 'amount':
       return getValidator(validatePaymentAmount, isValueRequired);
+    case 'remark':
+      return getValidator(validatePaymentRemark, isValueRequired);
     default:
       dev.log('No validator found for payment key: $key');
       return (String? value) {

@@ -365,18 +365,31 @@ String? validatePaymentAmount(String value) {
   return null;
 }
 
-String? validatePaymentAmountNotRequired(String value) {
+String? validatePaymentRemark(String value) {
   if (value.isEmpty) {
-    return null;
+    return 'Payment remark is required';
   }
   // Add more validation logic if needed
-  // numeric, - 1 million, 0 to 1 billion, up to 2 decimal places
-  final RegExp numeric = RegExp(r'^-?\d{1,9}(\.\d{0,2})?$');
-  if (!numeric.hasMatch(value)) {
-    return 'Invalid payment amount format';
+  // alphanumeric, space, - _ / # . + & ( ) ' : @ and 1-255 characters
+  final RegExp alphanumeric = RegExp(r"^[a-zA-Z0-9\-\/#_\. +&()/':@]{1,255}$");
+  if (!alphanumeric.hasMatch(value)) {
+    return 'Invalid payment remark format';
   }
   return null;
 }
+
+// String? validatePaymentAmountNotRequired(String value) {
+//   if (value.isEmpty) {
+//     return null;
+//   }
+//   // Add more validation logic if needed
+//   // numeric, - 1 million, 0 to 1 billion, up to 2 decimal places
+//   final RegExp numeric = RegExp(r'^-?\d{1,9}(\.\d{0,2})?$');
+//   if (!numeric.hasMatch(value)) {
+//     return 'Invalid payment amount format';
+//   }
+//   return null;
+// }
 
 String? validateTenantRef(String value) {
   if (value.isEmpty) {
