@@ -201,7 +201,6 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
   bool _billCompilationColumnExists = false;
   bool _rolePolicyColumnExists = false;
   bool _policyPermColumnExists = false;
-  bool _permResColumnExists = false;
 
   Future<dynamic> _getListInfo() async {
     if (loggedInUser == null) {
@@ -457,10 +456,6 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     bool isPolicyManager = widget.pagAppContext == appCtxPlatform &&
         widget.itemKind == PagItemKind.acl &&
         widget.itemTypeEnum == PagAclType.policy;
-    bool isPermManager = widget.pagAppContext == appCtxPlatform &&
-        widget.itemKind == PagItemKind.acl &&
-        widget.itemTypeEnum == PagAclType.permission;
-
     if (isEmsDeviceLs ||
         isEmsMeterUsage ||
         isEmsTenantUsage ||
@@ -567,11 +562,6 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       addPolicyPermColumn = true;
     }
 
-    bool addPermResColumn = false;
-    if (isPermManager) {
-      addPermResColumn = true;
-    }
-
     if (hasOpColumn) {
       addOpColumn = false;
     }
@@ -595,13 +585,6 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         _addPolicyPermColumn(listController);
       }
       _policyPermColumnExists = true;
-    }
-
-    if (addPermResColumn) {
-      if (!_permResColumnExists) {
-        _addPermResColumn(listController);
-      }
-      _permResColumnExists = true;
     }
 
     if (addMeterUsageColumn) {
@@ -1244,67 +1227,6 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                   eptUpdateItemGroupItemAssignment:
                       PagUrlBase.eptUpdatePolicyPermList,
                   maxAssignmentCount: 1000,
-                  onUpdate: () {
-                    setState(() {
-                      _itemUpdated = true;
-                    });
-                  },
-                ),
-                onClosed: () {
-                  if (_itemUpdated) {
-                    setState(() {
-                      _listContentRefreshKey = UniqueKey();
-                      _itemUpdated = false;
-                    });
-                  }
-                },
-              );
-            },
-          ),
-        );
-      },
-    );
-    // _selectedListController?.listColControllerList.add(appCtxCol);
-    listController.listColControllerList.insert(0, appCtxCol);
-  }
-
-  void _addPermResColumn(MdlPagListController listController) {
-    //add property edit column
-    MdlListColController appCtxCol = MdlListColController(
-      colKey: 'res',
-      colTitle: 'Res',
-      includeColKeyAsFilter: false,
-      showColumn: true,
-      colWidth: 50,
-      colWidgetType: PagColWidgetType.CUSTOM,
-      getCustomWidget: (item, fullList) {
-        item['project_id'] =
-            loggedInUser!.selectedScope.projectProfile!.id.toString();
-        item['project_name'] = loggedInUser!.selectedScope.projectProfile!.name;
-        MdlPagScope itemScope = MdlPagScope.fromJson(item);
-
-        return Padding(
-          padding: const EdgeInsets.only(left: 0),
-          child: IconButton(
-            icon: Icon(
-              Symbols.assignment,
-              color: Theme.of(context).colorScheme.primary.withAlpha(200),
-            ),
-            onPressed: () {
-              xtShowModelBottomSheet(
-                context,
-                WgtItemGroupItemAssignment(
-                  appConfig: widget.appConfig,
-                  loggedInUser: loggedInUser!,
-                  strItemGroupIndex: item['id'],
-                  itemName: item['name'],
-                  itemLabel: item['label'] ?? '',
-                  itemScope: itemScope,
-                  eptGetItemGroupScopeMatchingItemList:
-                      PagUrlBase.eptGetPermScopeResList,
-                  eptUpdateItemGroupItemAssignment:
-                      PagUrlBase.eptUpdatePermResList,
-                  maxAssignmentCount: 1,
                   onUpdate: () {
                     setState(() {
                       _itemUpdated = true;
