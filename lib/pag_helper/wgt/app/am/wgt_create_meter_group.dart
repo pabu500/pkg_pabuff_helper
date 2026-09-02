@@ -399,6 +399,7 @@ class _CreateItemState extends State<WgtCreateMeterGroup> {
     List<MeterTypeTag> meterTypeList = [
       MeterTypeTag.E,
       MeterTypeTag.W,
+      MeterTypeTag.SE1
     ];
     TextStyle dropDownListTextStyle = TextStyle(
         fontSize: 15,
