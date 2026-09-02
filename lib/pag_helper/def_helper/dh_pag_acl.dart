@@ -154,6 +154,9 @@ Future<dynamic> checkAcl(
         operation: operation.name,
       ),
     );
+    if('denied' == aclResult['result']) {
+      aclResult['result'] = 'access denied';
+    }
     return aclResult;
   } catch (e) {
     dev.log('checkAcl error: $e');

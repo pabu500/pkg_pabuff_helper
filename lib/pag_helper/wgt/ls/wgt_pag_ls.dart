@@ -104,12 +104,12 @@ class _WgtPagLsState extends State<WgtPagLs> {
 
   @override
   Widget build(BuildContext context) {
-    // if (_pageAclMessage != 'granted') {
-    //   return Container(
-    //       alignment: Alignment.topCenter,
-    //       child:
-    //           getErrorTextPrompt(context: context, errorText: _pageAclMessage));
-    // }
+    if (_pageAclMessage != 'granted') {
+      return Container(
+          alignment: Alignment.topCenter,
+          child:
+              getErrorTextPrompt(context: context, errorText: _pageAclMessage));
+    }
 
     switch (widget.itemKind) {
       case PagItemKind.device ||

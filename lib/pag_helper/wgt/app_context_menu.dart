@@ -10,9 +10,12 @@ import 'package:go_router/go_router.dart';
 import 'package:buff_helper/pag_helper/def_helper/def_page_route.dart';
 import 'package:provider/provider.dart';
 
+import '../model/mdl_pag_app_config.dart';
+
 class WgtAppContextMenu extends StatefulWidget {
   const WgtAppContextMenu({
     super.key,
+    required this.appConfig,
     required this.width,
     required this.title,
     // required this.routeList,
@@ -22,6 +25,7 @@ class WgtAppContextMenu extends StatefulWidget {
     this.tileColor,
   });
 
+  final MdlPagAppConfig appConfig;
   final double width;
   final String title;
   final MdlPagAppContext appContext;
@@ -43,13 +47,16 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
 
   RenderBox? _renderBox;
 
+  String _pageAclMessage = '';
+
   @override
   void initState() {
     super.initState();
 
     routeList = widget.appContext.routeList!;
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
       _renderBox = context.findRenderObject() as RenderBox;
     });
   }
