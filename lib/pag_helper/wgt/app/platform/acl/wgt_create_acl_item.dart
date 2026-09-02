@@ -6,7 +6,7 @@ import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../model/mdl_pag_app_config.dart';
-import 'wgt_create_permission.dart';
+import 'wgt_create_permission2.dart';
 import 'wgt_create_policy.dart';
 import 'wgt_create_resource.dart';
 
@@ -88,7 +88,7 @@ class _CreateAclItemState extends State<WgtCreateAclItem> {
         onCreated: widget.onCreated,
       );
     } else if (itemType == PagAclType.permission) {
-      return WgtCreatePermission(
+      return WgtCreatePermission2(
         appConfig: widget.appConfig,
         loggedInUser: widget.loggedInUser,
         onCreated: widget.onCreated,

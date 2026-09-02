@@ -1259,22 +1259,12 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
   }
 
   Widget getControl({String errorText = ''}) {
-    bool isChanged = false;
-    if (_selectedSiteGroupProfile == originalSiteGroupProfile) {
-      isChanged = true;
-    }
-    if (_selectedSiteProfile == originalSiteProfile) {
-      isChanged = true;
-    }
-    if (_selectedBuildingProfile == originalBuildingProfile) {
-      isChanged = true;
-    }
-    if (!(_selectedLocationGroupProfile == originalLocationGroupProfile)) {
-      isChanged = true;
-    }
-    if (_selectedLocation == originalLocation) {
-      isChanged = true;
-    }
+    final bool isChanged =
+        _selectedSiteGroupProfile != originalSiteGroupProfile ||
+            _selectedSiteProfile != originalSiteProfile ||
+            _selectedBuildingProfile != originalBuildingProfile ||
+            _selectedLocationGroupProfile != originalLocationGroupProfile ||
+            _selectedLocation != originalLocation;
 
     // check enable commit
     bool enableCommit = errorText.isEmpty && _committedMessage.isEmpty;
@@ -1332,6 +1322,9 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
       showClear = false;
     }
     if (!isChanged) {
+      showClear = false;
+    }
+    if (!_isEditing) {
       showClear = false;
     }
 
