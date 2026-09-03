@@ -67,6 +67,7 @@ enum AclTarget {
   meter_p_rls,
   meter_p_credit_balance,
   meter_p_month_to_date_kwh_usage,
+  meter_p_past_days_kwh_usage,
   meter_p_bypass_policy,
   meter_p_conc,
   meter_p_sn,
