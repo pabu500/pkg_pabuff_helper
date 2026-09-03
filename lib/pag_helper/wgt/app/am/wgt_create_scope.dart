@@ -5,7 +5,6 @@ import 'package:buff_helper/pag_helper/def_helper/dh_geo.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_item.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
-import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_building_profile.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_location.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_location_group_profile.dart';
@@ -17,7 +16,6 @@ import 'package:buff_helper/pag_helper/wgt/wgt_comm_button.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:buff_helper/pag_helper/comm/comm_scope.dart';
-import 'package:provider/provider.dart';
 
 import '../../../model/mdl_pag_app_config.dart';
 import '../../../pag_app_context_list.dart';
@@ -152,8 +150,29 @@ class _CreateScopeState extends State<WgtCreateScope> {
       return false;
     }
 
-    return _label != null &&
-        _selectedScopeType != null &&
+    if (_label == null || !_isNewItemLabelValidated) {
+      return false;
+    }
+
+    if (_selectedScopeType == PagScopeType.siteGroup ||
+        _selectedScopeType == PagScopeType.site ||
+        _selectedScopeType == PagScopeType.building) {
+      if (_lat == null || !_isLatValidated) {
+        return false;
+      }
+      if (_lng == null || !_isLngValidated) {
+        return false;
+      }
+    } else {
+      if (_lat != null && !_isLatValidated) {
+        return false;
+      }
+      if (_lng != null && !_isLngValidated) {
+        return false;
+      }
+    }
+
+    return _selectedScopeType != null &&
         (_selectedScopeType == PagScopeType.siteGroup ||
             _itemScopeMap.isNotEmpty);
   }
@@ -168,6 +187,8 @@ class _CreateScopeState extends State<WgtCreateScope> {
 
   @override
   Widget build(BuildContext context) {
+    final bool showForm = _selectedScopeType != null;
+
     return SingleChildScrollView(
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -205,60 +226,64 @@ class _CreateScopeState extends State<WgtCreateScope> {
                       });
                     },
                   ),
-                  verticalSpaceSmall,
+                  if (showForm) verticalSpaceSmall,
                   // getScopeTypeSelector(),
                   // verticalSpaceTiny,
-                  getItemPropBlock(),
-                  verticalSpaceTiny,
-                  getItemScopeSetter(),
-                  verticalSpaceRegular,
-                  WgtCommButton(
-                    enabled: _checkEnableButton(),
-                    label: _createWait
-                        ? 'Creating scope...'
-                        : _createSuccess
-                            ? '✓ Scope created'
-                            : 'Create Scope',
-                    onPressed:
-                        !_checkEnableButton() //_selectedProjectScope == null
-                            ? null
-                            : () async {
-                                await _createItem();
+                  if (showForm) getItemPropBlock(),
+                  if (showForm) verticalSpaceTiny,
+                  if (showForm) getItemScopeSetter(),
+                  if (showForm) verticalSpaceRegular,
+                  if (showForm)
+                    WgtCommButton(
+                      enabled: _checkEnableButton(),
+                      label: _createWait
+                          ? 'Creating scope...'
+                          : _createSuccess
+                              ? '✓ Scope created'
+                              : 'Create Scope',
+                      onPressed:
+                          !_checkEnableButton() //_selectedProjectScope == null
+                              ? null
+                              : () async {
+                                  await _createItem();
+                                  if (!mounted || !_createSuccess) return;
 
-                                // reset the form
-                                setState(() {
-                                  // _newItem = true;
-                                  _label = null;
-                                  _isNewItemLabelValidated = false;
-                                  _newItemLabelResetKey = UniqueKey();
+                                  // reset the form
+                                  setState(() {
+                                    // _newItem = true;
+                                    _label = null;
+                                    _isNewItemLabelValidated = false;
+                                    _newItemLabelResetKey = UniqueKey();
 
-                                  _selectedScopeType = null;
+                                    _lat = null;
+                                    _isLatValidated = false;
+                                    _latResetKey = UniqueKey();
+                                    _lng = null;
+                                    _isLngValidated = false;
+                                    _lngResetKey = UniqueKey();
 
-                                  _lat = null;
-                                  _isLatValidated = false;
-                                  _latResetKey = UniqueKey();
-                                  _lng = null;
-                                  _isLngValidated = false;
-                                  _lngResetKey = UniqueKey();
+                                    _itemScopeMap.clear();
+                                    _scopeSetterKey = UniqueKey();
+                                  });
 
-                                  _itemScopeMap.clear();
-                                  _scopeSetterKey = UniqueKey();
-                                });
-
-                                // pause for 1 second to show the error message before reset
-                                await Future.delayed(
-                                    const Duration(seconds: 1));
-                                widget.onScopeTreeUpdate?.call();
-                              },
-                  ),
-                  if (_newItem && !_createSuccess && _errorText.isNotEmpty)
+                                  widget.onCreated?.call();
+                                  widget.onScopeTreeUpdate?.call();
+                                },
+                    ),
+                  if (showForm &&
+                      _newItem &&
+                      !_createSuccess &&
+                      _errorText.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.all(5.0),
                       child: Text(_errorText,
                           style: TextStyle(
                               color: Theme.of(context).colorScheme.error)),
                     ),
-                  if (!_newItem && _createSuccess && _errorText.isEmpty)
+                  if (showForm &&
+                      !_newItem &&
+                      _createSuccess &&
+                      _errorText.isEmpty)
                     Padding(
                       padding: const EdgeInsets.all(5.0),
                       child: Text(
@@ -267,7 +292,7 @@ class _CreateScopeState extends State<WgtCreateScope> {
                             color: Theme.of(context).colorScheme.primary),
                       ),
                     ),
-                  verticalSpaceRegular,
+                  if (showForm) verticalSpaceRegular,
                 ],
               ),
             ),
@@ -335,6 +360,8 @@ class _CreateScopeState extends State<WgtCreateScope> {
               onEditingComplete: () {
                 setState(() {
                   _isEditing = false;
+
+                  _checkEnableButton();
                 });
               },
               onValidate: (String? result) {
@@ -374,6 +401,8 @@ class _CreateScopeState extends State<WgtCreateScope> {
               onEditingComplete: () {
                 setState(() {
                   _isEditing = false;
+
+                  _checkEnableButton();
                 });
               },
               onValidate: (String? result) {
@@ -412,6 +441,7 @@ class _CreateScopeState extends State<WgtCreateScope> {
               onEditingComplete: () {
                 setState(() {
                   _isEditing = false;
+                  _checkEnableButton();
                 });
               },
               onValidate: (String? result) {
@@ -461,6 +491,7 @@ class _CreateScopeState extends State<WgtCreateScope> {
                               _selectedTimezoneOffset = value!;
                               _newItem = true;
                               _createSuccess = false;
+                              _checkEnableButton();
                             });
                           },
                           items: timezoneOffsetList
@@ -588,6 +619,7 @@ class _CreateScopeState extends State<WgtCreateScope> {
           }
           setState(() {
             _itemScopeMap[scopeIdColName] = profile.id.toString();
+            _checkEnableButton();
           });
         },
       ),

@@ -77,17 +77,19 @@ class _WgtCommButtonState extends State<WgtCommButton> {
 
                     widget.onResult?.call(e.toString());
                   } finally {
-                    setState(() {
-                      _isWaiting = false;
-                    });
+                    if (mounted) {
+                      setState(() {
+                        _isWaiting = false;
+                      });
+                    }
                   }
+
+                  if (!mounted) return;
 
                   if (widget.cooldownMillis != null) {
                     await Future.delayed(
                         Duration(milliseconds: widget.cooldownMillis!));
-                    setState(() {
-                      _isCoolingDown = false;
-                    });
+                    if (!mounted) return;
                   }
                   setState(() {
                     _isCoolingDown = false;

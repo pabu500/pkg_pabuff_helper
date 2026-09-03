@@ -1853,12 +1853,8 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   }
 
   Widget getDropDownButton(MdlListColController colController, bool isFull) {
-    bool enableEdit = true;
-    if (!widget.isInitialValueMutable) {
-      if (colController.filterValue != null) {
-        enableEdit = false;
-      }
-    }
+    final bool enableEdit = widget.isInitialValueMutable ||
+        !widget.initialFilterMap.containsKey(colController.colKey);
     List<Map<String, dynamic>> list = colController.valueList ?? [];
     return Padding(
       padding: const EdgeInsets.only(left: 8, right: 8, bottom: 5),
