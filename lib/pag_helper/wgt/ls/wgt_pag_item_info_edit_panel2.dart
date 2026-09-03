@@ -303,6 +303,56 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
     }
   }
 
+  Future<dynamic> _doDeleteScope(
+      PagScopeType scopeType, String itemName) async {
+    if (_isDeleting) {
+      return {};
+    }
+
+    setState(() {
+      _isDeleting = true;
+      _deleteResultText = '';
+    });
+
+    try {
+      final result = await ex(
+        endpoint: PagUrlBase.eptDeleteScope,
+        crudType: 'delete',
+        opStr: 'delete ${scopeType.label.toLowerCase()} scope',
+        appConfig: widget.appConfig,
+        queryMap: {
+          'scope': _loggedInUser!.selectedScope.toScopeMap(),
+          'item_type': scopeType.name,
+          'item_id_value': widget.strItemIndex,
+          'item_name': itemName,
+        },
+        svcClaim: MdlPagSvcClaim(
+          userId: _loggedInUser!.id,
+          username: _loggedInUser!.username,
+          roleId: _loggedInUser!.selectedRole?.id,
+          roleName: _loggedInUser!.selectedRole?.name,
+          roleLabel: _loggedInUser!.selectedRole?.label,
+          scope: '',
+          target: '',
+          operation: 'delete',
+        ),
+      );
+
+      return result is Map<String, dynamic> ? result : {};
+    } catch (e) {
+      dev.log(e.toString());
+      return {
+        'error': getErrorText(e, defaultErrorText: 'Error deleting scope item')
+      };
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isDeleting = false;
+        });
+      }
+    }
+  }
+
   Future<dynamic> _doDeleteResourceType() async {
     if (_isDeleting) {
       return {};
@@ -386,6 +436,42 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
               _deleteResultText = 'Item deleted';
             });
             widget.onUpdate?.call();
+            Navigator.of(this.context).pop();
+          },
+        );
+      },
+    );
+  }
+
+  void _showDeleteScopeConfirmation(String itemName, PagScopeType scopeType) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return WgtConfirmBox(
+          title: 'Delete ${scopeType.label}',
+          message1: 'This operation will delete the selected scope item',
+          message2: 'A scope item with child scope items cannot be deleted',
+          opName: 'delete_${scopeType.name}_scope',
+          keyInConfirmStrList: ['delete', itemName],
+          itemCount: 1,
+          onConfirm: () async {
+            final result = await _doDeleteScope(scopeType, itemName);
+            if (!mounted) {
+              return;
+            }
+
+            if (result['error'] != null) {
+              setState(() {
+                _deleteResultText = result['error'].toString();
+              });
+              return;
+            }
+
+            setState(() {
+              _deleteResultText = 'Item deleted';
+            });
+            widget.onUpdate?.call();
+            widget.onScopeTreeUpdate?.call();
             Navigator.of(this.context).pop();
           },
         );
@@ -517,6 +603,10 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
       case PagItemKind.bill:
         isDeleteableItem = true;
         break;
+      case PagItemKind.scope:
+        isDeleteableItem = widget.itemTypeEnum is PagScopeType &&
+            widget.itemTypeEnum != PagScopeType.project;
+        break;
       case PagItemKind.resourceType:
         isDeleteableItem = true;
         break;
@@ -535,6 +625,9 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
     final bool isAclItem =
         widget.itemKind == PagItemKind.acl && widget.itemTypeEnum is PagAclType;
     final bool isResourceTypeItem = widget.itemKind == PagItemKind.resourceType;
+    final bool isScopeItem = widget.itemKind == PagItemKind.scope &&
+        widget.itemTypeEnum is PagScopeType;
+    final bool deleteSucceeded = _deleteResultText == 'Item deleted';
     bool isItemMFD = false;
     for (Map<String, dynamic> field in widget.fieldList) {
       if (field['col_key'] != 'lc_status') {
@@ -567,20 +660,26 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
               Stack(children: [
-                if (isDeleteableItem && isDeleteableByAcl && isItemMFD)
+                if (!isScopeItem &&
+                    isDeleteableItem &&
+                    isDeleteableByAcl &&
+                    isItemMFD)
                   _isDeleting
                       ? const WgtPagWait(size: 35)
                       : (_deleteResultText.isNotEmpty)
-                          ? Text(
-                              _deleteResultText,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: _deleteResultText.contains('deleted')
-                                    ? commitColor
-                                    : Theme.of(context).colorScheme.error,
-                              ),
-                            )
+                          ? deleteSucceeded
+                              ? Text(
+                                  _deleteResultText,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: commitColor,
+                                  ),
+                                )
+                              : getErrorTextPrompt(
+                                  errorText: _deleteResultText,
+                                  context: context,
+                                )
                           : Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
@@ -662,6 +761,24 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
                                         _showDeleteResourceTypeConfirmation(
                                             itemName),
                                   ),
+                          if (isScopeItem &&
+                              isDeleteableItem &&
+                              isDeleteableByAcl)
+                            _isDeleting
+                                ? const WgtPagWait(size: 21)
+                                : IconButton(
+                                    tooltip:
+                                        'Delete ${(widget.itemTypeEnum as PagScopeType).label.toLowerCase()}',
+                                    icon: Icon(Icons.delete,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .error),
+                                    onPressed: () =>
+                                        _showDeleteScopeConfirmation(
+                                            itemName,
+                                            widget.itemTypeEnum
+                                                as PagScopeType),
+                                  ),
                           horizontalSpaceTiny,
                           Text(_itemDisplayName ?? '',
                               style: TextStyle(
@@ -696,18 +813,18 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
               ]),
               // verticalSpaceSmall,
               const Divider(height: 1),
-              if ((isAclItem || isResourceTypeItem) &&
+              if ((isAclItem || isResourceTypeItem || isScopeItem) &&
                   _deleteResultText.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
-                  child: _deleteResultText.contains('deleted')
+                  child: deleteSucceeded
                       ? Text(_deleteResultText,
                           style: TextStyle(color: commitColor))
                       : getErrorTextPrompt(
                           errorText: _deleteResultText, context: context),
                 ),
               verticalSpaceSmall,
-              _deleteResultText == 'Item deleted'
+              deleteSucceeded
                   ? Container()
                   : Column(
                       // alignment: WrapAlignment.center,

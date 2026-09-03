@@ -292,6 +292,7 @@ class PagUrlBase {
 
   //scope
   static const String eptCreateScope = '/scope/create_scope';
+  static const String eptDeleteScope = '/scope/delete_scope';
   static const String eptGetUserRoleScopeList =
       '/scope/get_user_role_scope_list';
   static const String eptGetLocationGroupLocationList =
