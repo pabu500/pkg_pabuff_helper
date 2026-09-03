@@ -1476,7 +1476,10 @@ class PagPdfBillCwP2Gen3 {
                     if (paymentList != null)
                       ...paymentList.map<pw.Widget>((payment) {
                         final paymentAmountObj = payment['credit_amount'];
-                        final paymentDateStr = payment['entry_timestamp'] ?? '';
+                        final paymentDateStr =
+                            payment['effective_value_timestamp'] ??
+                                payment['value_timestamp'] ??
+                                '';
                         double paymentAmount = 0;
                         if (paymentAmountObj != null) {
                           if (paymentAmountObj is double) {
