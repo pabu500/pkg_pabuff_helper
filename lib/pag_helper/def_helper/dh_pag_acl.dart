@@ -154,7 +154,7 @@ Future<dynamic> checkAcl(
         operation: operation.name,
       ),
     );
-    if('denied' == aclResult['result']) {
+    if ('denied' == aclResult['result']) {
       aclResult['result'] = 'access denied';
     }
     return aclResult;
