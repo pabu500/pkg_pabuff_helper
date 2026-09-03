@@ -2201,6 +2201,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                 appConfig: widget.appConfig,
                 loggedInUser: loggedInUser!,
                 itemTypeEnum: _selectedListController?.itemTypeEnum,
+                onScopeTreeUpdate: widget.onScopeTreeUpdate,
                 onCreated: () {
                   setState(() {
                     _itemUpdated = true;

@@ -805,6 +805,9 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
                         _fieldUpdated = true;
                         widget.onUpdate?.call();
                       });
+                      if (widget.itemKind == PagItemKind.scope) {
+                        widget.onScopeTreeUpdate?.call();
+                      }
                     } else {
                       Map<String, dynamic> errorMap =
                           resultMap['error'] is String
@@ -815,13 +818,6 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
                       setState(() {
                         _errorText = 'Error updating field';
                       });
-                    }
-
-                    // if it's scope update, need to update scope tree
-                    if (_errorText.isEmpty) {
-                      if (widget.itemKind == PagItemKind.scope) {
-                        widget.onScopeTreeUpdate?.call();
-                      }
                     }
 
                     return resultMap;
@@ -878,6 +874,9 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
                         _fieldUpdated = true;
                         widget.onUpdate?.call();
                       });
+                      if (widget.itemKind == PagItemKind.scope) {
+                        widget.onScopeTreeUpdate?.call();
+                      }
                     } else {
                       Map<String, dynamic> errorMap = resultMap['error'];
                       String? status = errorMap['status'];
