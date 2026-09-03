@@ -56,9 +56,6 @@ class _WgtCreatePermission2State extends State<WgtCreatePermission2> {
   bool _createSuccess = false;
 
   String? _selectedResourceTypeId;
-  String? _permissionLabel;
-  UniqueKey? _labelResetKey;
-  bool _isLabelValid = true;
   String _errorText = '';
   String _resourceErrorText = '';
   int _createdCount = 0;
@@ -224,7 +221,6 @@ class _WgtCreatePermission2State extends State<WgtCreatePermission2> {
           'item_scope_info': Map<String, dynamic>.from(_itemScopeMap),
           'is_project_scope': _isProjectScope.toString(),
           'res_type_id': _selectedResourceTypeId,
-          'label': _permissionLabel?.trim(),
           'permission_change_list': changeList,
         },
         svcClaim: _svcClaim(),
@@ -236,9 +232,6 @@ class _WgtCreatePermission2State extends State<WgtCreatePermission2> {
           in _selectedOperations.entries) {
         _originalOperations[entry.key] = Set<String>.from(entry.value);
       }
-      _permissionLabel = null;
-      _labelResetKey = UniqueKey();
-      _isLabelValid = true;
       _createSuccess = true;
       widget.onCreated?.call();
     } catch (error) {
@@ -261,7 +254,6 @@ class _WgtCreatePermission2State extends State<WgtCreatePermission2> {
         _selectedResourceTypeId != null &&
         !_loadingResources &&
         !_creating &&
-        _isLabelValid &&
         _errorText.isEmpty &&
         _hasChanges();
   }
@@ -399,33 +391,6 @@ class _WgtCreatePermission2State extends State<WgtCreatePermission2> {
                 _buildResourceTypeSelector(),
                 verticalSpaceSmall,
                 _buildResourceOperationList(),
-                verticalSpaceSmall,
-                WgtTextField(
-                  key: _labelResetKey,
-                  appConfig: widget.appConfig,
-                  hintText: 'Leave blank if no label is needed',
-                  labelText: 'Permission label (Optional)',
-                  maxLength: maxFullNameLength,
-                  maxLines: 1,
-                  validator: (String? value) {
-                    if (value == null || value.trim().isEmpty) return null;
-                    return validateItemLabel(value);
-                  },
-                  onChanged: (String value) {
-                    _permissionLabel = value;
-                    if (_errorText.isNotEmpty) {
-                      setState(() {
-                        _errorText = '';
-                      });
-                    }
-                    return null;
-                  },
-                  onValidate: (String? error) {
-                    setState(() {
-                      _isLabelValid = error == null;
-                    });
-                  },
-                ),
                 verticalSpaceRegular,
                 Align(
                   alignment: Alignment.center,

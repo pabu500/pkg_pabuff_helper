@@ -119,14 +119,20 @@ enum PagAclOperationType {
 }
 
 String? validateResLabel(String? value) {
-  if (value == null || value.isEmpty) {
+  if (value == null || value.trim().isEmpty) {
     return 'required';
   }
 
-  // alphanumeric, ., *, _, -, 1-255 characters
-  final regex = RegExp(r'^[a-zA-Z0-9.\*\_\-]{1,255}$');
-  if (!regex.hasMatch(value)) {
-    return 'alphanumeric, ., *, _, -, and 1-255 length';
+  if (value.length > 255) {
+    return 'must be at most 255 characters';
+  }
+
+  // One or more dot-separated lowerCamelCase segments.
+  final lowerCamelCasePath = RegExp(
+    r'^[a-z][a-zA-Z0-9]*(\.[a-z][a-zA-Z0-9]*)*$',
+  );
+  if (!lowerCamelCasePath.hasMatch(value)) {
+    return 'must use lowerCamelCase separated by dots, e.g. com.myRes.yourScope';
   }
 
   return null;
