@@ -171,7 +171,7 @@ class _WgtScopeEventIssuePanelState extends State<WgtScopeEventIssuePanel> {
                 {
                   'title': '#',
                   'col_key': 'index',
-                  'width': 21.0,
+                  'width': 35.0,
                 },
                 {
                   'title': 'Type',
