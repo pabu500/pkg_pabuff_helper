@@ -1204,6 +1204,17 @@ String? validateSendReminderType(String value) {
   return null;
 }
 
+String? validateReminderRemark(String value) {
+  if (value.trim().isEmpty) {
+    return 'required';
+  }
+  // up to 255
+  if (value.length > 255) {
+    return 'must be at most 255 characters';
+  }
+  return null;
+}
+
 String? Function(String) getTenantValidator(String key,
     {bool isValueRequired = true}) {
   switch (key) {
@@ -1273,6 +1284,8 @@ String? Function(String) getTenantValidator(String key,
       return getValidator(validateSendReminder, isValueRequired);
     case 'send_reminder_type':
       return getValidator(validateSendReminderType, isValueRequired);
+    case 'reminder_remark':
+      return getValidator(validateReminderRemark, isValueRequired);
     case 'mg_assignment_type':
       return getValidator(validateMgAssignmentType, isValueRequired);
     default:
