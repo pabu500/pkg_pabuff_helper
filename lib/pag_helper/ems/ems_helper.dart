@@ -73,13 +73,15 @@ void populateListItemTenantUsage(Map<String, dynamic> item, var meterTypeList) {
 
     for (Map<String, dynamic> meter in meterUsageList) {
       var meterUsageSummary = meter['meter_usage_summary'];
-      String firstReadingTimestamp =
-          meterUsageSummary['first_reading_timestamp'];
-      String lastReadingTimestamp = meterUsageSummary['last_reading_timestamp'];
-      String firstReadingValue = meterUsageSummary['first_reading_value'];
-      String lastReadingValue = meterUsageSummary['last_reading_value'];
-      String meterUsageStr = meterUsageSummary['usage'];
-      double? meterUsage = double.tryParse(meterUsageStr);
+      final multiplierFactor =
+          meter['multiplier_factor'] ?? meterUsageSummary['multiplier_factor'];
+      final factoredUsage = _applyMeterMultiplier(
+        meterUsageSummary['usage'],
+        multiplierFactor,
+      );
+      final meterUsage = factoredUsage is num
+          ? factoredUsage.toDouble()
+          : double.tryParse(factoredUsage?.toString() ?? '');
 
       if (meterUsage == null) {
         continue;

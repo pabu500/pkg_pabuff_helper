@@ -1533,6 +1533,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                         tenantAccountId: item['account_number'],
                         tenantType: '',
                         tenantUsageSummary: tenantUsageSummary,
+                        useMeterMultiplierFactor: true,
                         // subTenantListUsageSummary: subTenantListUsageSummary,
                         // manualUsages: manualUsage,
                         // lineItems: lineItems,

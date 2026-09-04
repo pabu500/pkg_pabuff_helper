@@ -14,6 +14,7 @@ import '../usage/usage_stat_helper.dart';
 import '../../../pag_helper/wgt/app/ems/wgt_pag_group_stat_core.dart';
 import '../usage/wgt_pag_meter_stat_core.dart';
 import 'mdl_ems_type_usage.dart';
+import 'tenant_usage_helper.dart';
 
 class WgtPagTenantUsageSummary extends StatefulWidget {
   const WgtPagTenantUsageSummary({
@@ -52,6 +53,7 @@ class WgtPagTenantUsageSummary extends StatefulWidget {
     this.usageDecimals = 3,
     this.rateDecimals = 4,
     this.costDecimals = 3,
+    this.useMeterMultiplierFactor = false,
   });
 
   final MdlPagAppConfig appConfig;
@@ -85,6 +87,7 @@ class WgtPagTenantUsageSummary extends StatefulWidget {
   final int usageDecimals;
   final int rateDecimals;
   final int costDecimals;
+  final bool useMeterMultiplierFactor;
   // final Map<String, dynamic> usageFactor;
   final Map<String, dynamic>? typeRates;
 
@@ -170,15 +173,20 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
                     costDecimals: widget.costDecimals,
                     context,
                     widget.isBillMode,
-                    widget.usageCalc!.typeUsageE!.usage,
+                    _getDisplayedTypeUsage(
+                        'E', widget.usageCalc!.typeUsageE!.usage),
                     widget.usageCalc!.typeUsageE!.cost,
-                    widget.usageCalc!.typeUsageW!.usage,
+                    _getDisplayedTypeUsage(
+                        'W', widget.usageCalc!.typeUsageW!.usage),
                     widget.usageCalc!.typeUsageW!.cost,
-                    widget.usageCalc!.typeUsageB!.usage,
+                    _getDisplayedTypeUsage(
+                        'B', widget.usageCalc!.typeUsageB!.usage),
                     widget.usageCalc!.typeUsageB!.cost,
-                    widget.usageCalc!.typeUsageN!.usage,
+                    _getDisplayedTypeUsage(
+                        'N', widget.usageCalc!.typeUsageN!.usage),
                     widget.usageCalc!.typeUsageN!.cost,
-                    widget.usageCalc!.typeUsageG!.usage,
+                    _getDisplayedTypeUsage(
+                        'G', widget.usageCalc!.typeUsageG!.usage),
                     widget.usageCalc!.typeUsageG!.cost,
                     displayContextStr: widget.displayContextStr,
                   ),
@@ -225,6 +233,17 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
         ),
       ),
     );
+  }
+
+  double? _getDisplayedTypeUsage(String meterType, double? fallbackUsage) {
+    if (!widget.useMeterMultiplierFactor || !widget.showFactoredUsage) {
+      return fallbackUsage;
+    }
+    return getMultiplierFactoredTenantUsage(
+          widget.tenantUsageSummary,
+          meterType,
+        ) ??
+        fallbackUsage;
   }
 
   Widget getBillTitleRow() {
@@ -302,15 +321,25 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
     double? usageFactor = widget.usageCalc!.getTypeUsageFactor(groupType);
     for (var meterStat in meterUsageList) {
       final meterUsageSummary = meterStat['meter_usage_summary'];
-      String usageStr = meterUsageSummary['usage'] ?? '';
-      double? usageVal = double.tryParse(usageStr);
+      final usageValue = meterUsageSummary['usage'];
+      double? usageVal = usageValue is num
+          ? usageValue.toDouble()
+          : double.tryParse(usageValue?.toString() ?? '');
       if (usageVal == null) {
         dev.log('usageVal is null');
       }
-      if (usageVal != null && usageFactor != null) {
-        usageVal = usageVal * usageFactor;
+      double? meterUsageFactor = usageFactor;
+      if (widget.useMeterMultiplierFactor) {
+        final multiplierFactorValue = meterStat['multiplier_factor'] ??
+            meterUsageSummary['multiplier_factor'];
+        meterUsageFactor = multiplierFactorValue is num
+            ? multiplierFactorValue.toDouble()
+            : double.tryParse(multiplierFactorValue?.toString() ?? '') ?? 1;
+      }
+      if (usageVal != null && meterUsageFactor != null) {
+        usageVal = usageVal * meterUsageFactor;
         meterUsageSummary['usage_factored'] = usageVal;
-        meterUsageSummary['factor'] = usageFactor;
+        meterUsageSummary['factor'] = meterUsageFactor;
       }
 
       meterStatList.add(meterUsageSummary);
@@ -388,6 +417,7 @@ class _WgtPagTenantUsageSummaryState extends State<WgtPagTenantUsageSummary> {
         loggedInUser: widget.loggedInUser,
         displayContextStr: widget.displayContextStr,
         showFactoredUsage: widget.showFactoredUsage,
+        showMultiplierFactor: widget.useMeterMultiplierFactor,
         calcUsageFromReadings: calcUsageFromReadings,
         appConfig: widget.appConfig,
         isBillMode: widget.isBillMode,

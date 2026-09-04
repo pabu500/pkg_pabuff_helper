@@ -36,4 +36,59 @@ void main() {
       expect(item['usage_export'], 'invalid');
     });
   });
+
+  group('populateListItemTenantUsage', () {
+    test('applies each meter multiplier before summing usage by type', () {
+      final item = <String, dynamic>{
+        'tenant_usage_summary': {
+          'meter_group_usage_list': [
+            {
+              'meter_type': 'E',
+              'meter_group_usage_summary': {
+                'meter_usage_list': [
+                  {
+                    'multiplier_factor': '10',
+                    'meter_usage_summary': {'usage': '5'},
+                  },
+                  {
+                    'meter_usage_summary': {
+                      'usage': 3,
+                      'multiplier_factor': '2',
+                    },
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      };
+
+      populateListItemTenantUsage(item, ['E']);
+
+      expect(item['usage_e'], '56.0');
+    });
+
+    test('defaults missing meter multipliers to one', () {
+      final item = <String, dynamic>{
+        'tenant_usage_summary': {
+          'meter_group_usage_list': [
+            {
+              'meter_type': 'W',
+              'meter_group_usage_summary': {
+                'meter_usage_list': [
+                  {
+                    'meter_usage_summary': {'usage': '4.5'},
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      };
+
+      populateListItemTenantUsage(item, ['W']);
+
+      expect(item['usage_w'], '4.5');
+    });
+  });
 }
