@@ -172,7 +172,7 @@ String? Function(String) getItemKindValidator(PagItemKind itemKind, String key,
     case PagItemKind.acl:
       return getAclValidator(key, itemType, isValueRequired: isValueRequired);
     case PagItemKind.org:
-      return getOrgValidator(key, isValueRequired: isValueRequired);
+      return getOrgValidator(key, itemType, isValueRequired: isValueRequired);
     default:
       dev.log('No validator found for item kind: $itemKind, key: $key');
       return (String value) {
