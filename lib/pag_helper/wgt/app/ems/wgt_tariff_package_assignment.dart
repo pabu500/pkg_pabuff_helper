@@ -71,6 +71,9 @@ class _WgtTariffPackageAssignmentState
   final TextEditingController _itemLabelFilterController =
       TextEditingController();
   String _itemLabelFilterStr = '';
+  final TextEditingController _accountNumberFilterController =
+      TextEditingController();
+  String _accountNumberFilterStr = '';
 
   Future<void> _doAutoPopulate() async {
     if (_isFetching) {
@@ -108,12 +111,6 @@ class _WgtTariffPackageAssignmentState
       }
       _itemGroupScopeMatchingItemList =
           List<Map<String, dynamic>>.from(tpScopeMatchingTenantList);
-      // sort by label
-      _itemGroupScopeMatchingItemList!.sort((a, b) {
-        String labelA = a['label'] ?? '';
-        String labelB = b['label'] ?? '';
-        return labelA.compareTo(labelB);
-      });
 
       for (Map<String, dynamic> tenant in _itemGroupScopeMatchingItemList!) {
         String tenantMeterTypeTpKey =
@@ -135,6 +132,8 @@ class _WgtTariffPackageAssignmentState
         if (!isUnassigned && !isAsignedToOtherTps) {
           tenant['assigned'] = true;
         }
+        tenant['assigned_to_current_tp'] =
+            !isUnassigned && !isAsignedToOtherTps;
         if (isAsignedToOtherTps) {
           tenant['assigned_to_another_tp_name'] = tpName;
           tenant['assigned'] = true;
@@ -148,6 +147,30 @@ class _WgtTariffPackageAssignmentState
           _hasTptMismatchAssignmentError = true;
         }
       }
+
+      // Keep assignments to this package at the top and assignments to other
+      // packages at the bottom. Pending checkbox changes deliberately do not
+      // re-sort the list so the row being edited stays in view.
+      _itemGroupScopeMatchingItemList!.sort((a, b) {
+        int assignmentRank(Map<String, dynamic> tenant) {
+          if (tenant['assigned_to_current_tp'] == true) {
+            return 0;
+          }
+          if (tenant['assigned_to_another_tp_name'] != null) {
+            return 2;
+          }
+          return 1;
+        }
+
+        final rankComparison = assignmentRank(a).compareTo(assignmentRank(b));
+        if (rankComparison != 0) {
+          return rankComparison;
+        }
+
+        final labelA = (a['label'] ?? '').toString().toLowerCase();
+        final labelB = (b['label'] ?? '').toString().toLowerCase();
+        return labelA.compareTo(labelB);
+      });
     } catch (e) {
       dev.log(e.toString());
 
@@ -208,24 +231,28 @@ class _WgtTariffPackageAssignmentState
   }
 
   bool _showItem(Map<String, dynamic> item) {
-    if (_itemNameFilterStr.isNotEmpty) {
-      String? name = item['name'];
-      bool nameMatches = (name ?? '').isNotEmpty &&
-          (name ?? '').toLowerCase().contains(_itemNameFilterStr);
-      return nameMatches;
-    }
-    if (_itemLabelFilterStr.isNotEmpty) {
-      String? label = item['label'];
-      bool labelMatches = (label ?? '').isNotEmpty &&
-          (label ?? '').toLowerCase().contains(_itemLabelFilterStr);
-      return labelMatches;
-    }
-    return true; // Include item if no filter is applied
+    final name = (item['name'] ?? '').toString().toLowerCase();
+    final label = (item['label'] ?? '').toString().toLowerCase();
+    final accountNumber =
+        (item['account_number'] ?? '').toString().toLowerCase();
+
+    return (_itemNameFilterStr.isEmpty || name.contains(_itemNameFilterStr)) &&
+        (_itemLabelFilterStr.isEmpty || label.contains(_itemLabelFilterStr)) &&
+        (_accountNumberFilterStr.isEmpty ||
+            accountNumber.contains(_accountNumberFilterStr));
   }
 
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _itemNamefilterController.dispose();
+    _itemLabelFilterController.dispose();
+    _accountNumberFilterController.dispose();
+    super.dispose();
   }
 
   @override
@@ -362,6 +389,29 @@ class _WgtTariffPackageAssignmentState
           ),
         ),
         horizontalSpaceSmall,
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 5),
+          child: SizedBox(
+            width: 150,
+            height: 39,
+            child: TextField(
+              controller: _accountNumberFilterController,
+              readOnly: _isCommitting ||
+                  _isCommitted ||
+                  {_itemGroupScopeMatchingItemList ?? []}.isEmpty,
+              decoration: InputDecoration(
+                hintText: 'Tenant Account No.',
+                hintStyle: TextStyle(color: Theme.of(context).hintColor),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  _accountNumberFilterStr = value.trim().toLowerCase();
+                });
+              },
+            ),
+          ),
+        ),
+        horizontalSpaceSmall,
         InkWell(
           onTap: (_itemGroupScopeMatchingItemList ?? []).isEmpty ||
                   _hasTptMismatchAssignmentError
@@ -438,9 +488,6 @@ class _WgtTariffPackageAssignmentState
   }
 
   Widget getTpInfo() {
-    String tariffPackageScopeLabel = widget.itemScope.getLeafScopeLabel();
-    PagScopeType itemScopeType = widget.itemScope.getScopeType();
-    Widget scopeIcon = getScopeIcon(context, itemScopeType, size: 21);
     BoxDecoration boxDecoration = BoxDecoration(
       border: Border.all(color: Theme.of(context).hintColor, width: 1.5),
       borderRadius: BorderRadius.circular(5),
@@ -528,7 +575,6 @@ class _WgtTariffPackageAssignmentState
     }
 
     return ListView.builder(
-      key: UniqueKey(), // Add a key to force rebuild when the list changes
       itemExtent: 35,
       itemCount: itemWidgetList.length,
       itemBuilder: (context, index) {
@@ -540,7 +586,7 @@ class _WgtTariffPackageAssignmentState
   Widget getItemRow(Map<String, dynamic> itemInfo, int index) {
     String tenantName = itemInfo['name'] ?? 'Unknown Tenant';
     String tenantLabel = itemInfo['label'] ?? '';
-    bool assigned = itemInfo['assigned'] ?? false;
+    String tenantAccountNumber = (itemInfo['account_number'] ?? '').toString();
 
     String? meterTypeTptLabel =
         itemInfo['tpt_label_${widget.meterType.toLowerCase()}'];
@@ -594,11 +640,29 @@ class _WgtTariffPackageAssignmentState
         ),
         horizontalSpaceSmall,
         Container(
-          width: 350,
+          width: 180,
           decoration: boxDecoration,
           padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-          child: SelectableText(tenantLabel.isNotEmpty ? tenantLabel : '-',
-              style: disabled ? disabledTextStyle : null),
+          child: Tooltip(
+            message: tenantLabel,
+            child: Text(
+              tenantLabel.isNotEmpty ? tenantLabel : '-',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: disabled ? disabledTextStyle : null,
+            ),
+          ),
+        ),
+        horizontalSpaceSmall,
+        Container(
+          width: 150,
+          decoration: boxDecoration,
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+          child: SelectableText(
+            tenantAccountNumber.isNotEmpty ? tenantAccountNumber : '-',
+            maxLines: 1,
+            style: disabled ? disabledTextStyle : null,
+          ),
         ),
         horizontalSpaceSmall,
         Tooltip(
