@@ -80,36 +80,45 @@ class _WgtPagLsState extends State<WgtPagLs> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
 
-      final aclResult = await checkAcl(
+      final resLabel = getResNameByPageRouteSection(
+          widget.pagAppContext, widget.pageRoute, widget.pageSection);
+
+      final aclResultList = await checkAcl2(
         widget.appConfig,
         widget.pagAppContext,
         widget.loggedInUser!,
-        widget.pageRoute,
-        widget.pageSection,
-        AclOperation.read,
+        [
+          {
+            'res_label': resLabel,
+            'operation': AclOperation.read.name,
+          }
+        ],
       );
-      // if (!mounted || aclResult == null) return;
-      if ('error' == aclResult['result']) {
+      if (!mounted) return;
+      if (aclResultList is! List || aclResultList.isEmpty) {
         setState(() {
           _pageAclMessage = 'Error checking Page Access';
         });
         return;
       }
 
+      final aclResult = Map<String, dynamic>.from(aclResultList.first as Map);
       setState(() {
-        _pageAclMessage = aclResult['result'];
+        _pageAclMessage = aclResult['result'] == 'denied'
+            ? 'access denied'
+            : aclResult['result'] as String;
       });
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // if (_pageAclMessage != 'granted') {
-    //   return Container(
-    //       alignment: Alignment.topCenter,
-    //       child:
-    //           getErrorTextPrompt(context: context, errorText: _pageAclMessage));
-    // }
+    if (_pageAclMessage != 'granted') {
+      return Container(
+          alignment: Alignment.topCenter,
+          child:
+              getErrorTextPrompt(context: context, errorText: _pageAclMessage));
+    }
 
     switch (widget.itemKind) {
       case PagItemKind.device ||

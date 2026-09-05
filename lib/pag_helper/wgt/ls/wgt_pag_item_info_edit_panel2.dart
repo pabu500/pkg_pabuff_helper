@@ -276,15 +276,20 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
           itemIdKey: widget.strItemIndex,
         },
         svcClaim: MdlPagSvcClaim2(
-          userId: _loggedInUser!.id,
-          username: _loggedInUser!.username,
-          roleId: _loggedInUser!.selectedRole?.id,
-          roleName: _loggedInUser!.selectedRole?.name,
-          roleLabel: _loggedInUser!.selectedRole?.label,
-          userScope: _loggedInUser!.selectedScope.toScopeMap(),
-          resName: getResNameByItemType(widget.itemTypeEnum),
-          operation: 'delete',
-        ),
+            userId: _loggedInUser!.id,
+            username: _loggedInUser!.username,
+            roleId: _loggedInUser!.selectedRole?.id,
+            roleName: _loggedInUser!.selectedRole?.name,
+            roleLabel: _loggedInUser!.selectedRole?.label,
+            userScope: _loggedInUser!.selectedScope.toScopeMap(),
+            // resName: getResNameByItemType(widget.itemTypeEnum),
+            // operation: 'delete',
+            permRequestList: [
+              {
+                'res_label': getResNameByItemType(widget.itemTypeEnum),
+                'operation': 'delete',
+              }
+            ]),
       );
 
       return result is Map<String, dynamic> ? result : {};

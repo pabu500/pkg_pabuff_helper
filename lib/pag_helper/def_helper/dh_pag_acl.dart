@@ -12,7 +12,6 @@ import '../comm/comm_ex.dart';
 import '../comm/pag_be_api_base.dart';
 import '../model/acl/mdl_pag_svc_claim.dart';
 import '../model/mdl_pag_app_config.dart';
-import '../model/mdl_pag_app_context.dart';
 import '../model/mdl_pag_user.dart';
 
 enum PagPortalType {
@@ -127,17 +126,68 @@ String? getResNameByPageRouteSection(
   return '${appContext.name}.${pageRoute.name}.$pageSection';
 }
 
-Future<dynamic> checkAcl(
+// Future<dynamic> checkAcl(
+//   MdlPagAppConfig appConfig,
+//   MdlPagAppContext appContext,
+//   MdlPagUser loggedInUser,
+//   PagPageRoute pageRoute,
+//   String pageSection,
+//   AclOperation operation,
+// ) async {
+//   try {
+//     final aclResult = await ex2(
+//       endpoint: PagUrlBase.eptCheckAcl,
+//       crudType: 'read',
+//       opStr: 'check acl',
+//       appConfig: appConfig,
+//       queryMap: {},
+//       svcClaim: MdlPagSvcClaim2(
+//         userId: loggedInUser.id,
+//         username: loggedInUser.username,
+//         roleId: loggedInUser.selectedRole?.id,
+//         roleName: loggedInUser.selectedRole?.name,
+//         roleLabel: loggedInUser.selectedRole?.label,
+//         userScope: loggedInUser.selectedScope.toScopeMap(),
+//         resName:
+//             getResNameByPageRouteSection(appContext, pageRoute, pageSection),
+//         operation: operation.name,
+//       ),
+//     );
+//     if ('denied' == aclResult['result']) {
+//       aclResult['result'] = 'access denied';
+//     }
+//     return aclResult;
+//   } catch (e) {
+//     dev.log('checkAcl error: $e');
+//     return {
+//       'result': 'error',
+//       'message': e.toString(),
+//     };
+//   }
+// }
+
+Future<dynamic> checkAcl2(
   MdlPagAppConfig appConfig,
   MdlPagAppContext appContext,
   MdlPagUser loggedInUser,
-  PagPageRoute pageRoute,
-  String pageSection,
-  AclOperation operation,
+  List<Map<String, dynamic>> permSrcList,
 ) async {
   try {
+    final List<Map<String, dynamic>> permRequestList = [];
+    for (var permSrc in permSrcList) {
+      final resLabel = permSrc['res_label'] as String;
+      final operationValue = permSrc['operation'];
+      final operation = operationValue is AclOperation
+          ? operationValue.name
+          : operationValue as String;
+      permRequestList.add({
+        'res_label': resLabel,
+        'operation': operation,
+      });
+    }
+
     final aclResult = await ex2(
-      endpoint: PagUrlBase.eptCheckAcl,
+      endpoint: PagUrlBase.eptCheckAcl2,
       crudType: 'read',
       opStr: 'check acl',
       appConfig: appConfig,
@@ -149,14 +199,9 @@ Future<dynamic> checkAcl(
         roleName: loggedInUser.selectedRole?.name,
         roleLabel: loggedInUser.selectedRole?.label,
         userScope: loggedInUser.selectedScope.toScopeMap(),
-        resName:
-            getResNameByPageRouteSection(appContext, pageRoute, pageSection),
-        operation: operation.name,
+        permRequestList: permRequestList,
       ),
     );
-    if ('denied' == aclResult['result']) {
-      aclResult['result'] = 'access denied';
-    }
     return aclResult;
   } catch (e) {
     dev.log('checkAcl error: $e');
