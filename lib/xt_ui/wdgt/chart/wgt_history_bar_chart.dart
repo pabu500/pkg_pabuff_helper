@@ -1,3 +1,4 @@
+import 'dart:developer' as dev;
 import 'dart:math';
 
 import 'package:fl_chart/fl_chart.dart';
@@ -375,7 +376,7 @@ class _WgtHistoryBarChartState extends State<WgtHistoryBarChart> {
   Color? setBarColor(int i, int touchedValue) {
     if (widget.altBarColorIf != null) {
       if (widget.altBarColorIf!(i, widget.historyData[i])) {
-        return widget.barColor.withAlpha(128);
+        return widget.barColor.withAlpha(80);
       }
     }
 
@@ -676,6 +677,8 @@ class _WgtHistoryBarChartState extends State<WgtHistoryBarChart> {
                                     format: widget.tooltipTimeFormat ??
                                         'MM-dd HH:mm');
 
+                            // dev.log('xText: $xText');
+
                             // if (kDebugMode) {print(group.x);}
 
                             double theVal = rod.toY;
@@ -725,6 +728,7 @@ class _WgtHistoryBarChartState extends State<WgtHistoryBarChart> {
                               }
                             }
 
+                            dev.log('xText: $xText');
                             return BarTooltipItem(
                               errorDataText.isNotEmpty
                                   ? 'Error Data: $errorDataText'
@@ -748,7 +752,7 @@ class _WgtHistoryBarChartState extends State<WgtHistoryBarChart> {
                                 TextSpan(
                                   text: widget.timestampOnSecondLine
                                       ? '\n$xText'
-                                      : xText,
+                                      : ' $xText',
                                   style: TextStyle(
                                     color: widget.tooltipTextColor,
                                     fontWeight: FontWeight.normal,
