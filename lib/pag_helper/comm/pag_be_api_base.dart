@@ -289,6 +289,7 @@ class PagUrlBase {
 
   //oresvc2 endpoints
   static const String eptCheckAcl = '/acl/check_acl';
+  static const String eptCheckAcl2 = '/acl/check_acl2';
 
   //scope
   static const String eptCreateScope = '/scope/create_scope';
