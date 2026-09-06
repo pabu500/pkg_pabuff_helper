@@ -88,6 +88,7 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
     this.enableSearch = true,
     this.autoCascadeScopeFilter = true,
     this.loadOnInit = false,
+    this.aclResLabel,
   });
 
   final MdlPagUser loggedInUser;
@@ -134,6 +135,7 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
   final bool enableSearch;
   final bool autoCascadeScopeFilter;
   final bool loadOnInit;
+  final String? aclResLabel;
   final MdlPagScopeProfile? prevailingScopeProfile;
   final void Function(MdlPagSiteGroupProfile?, MdlPagSiteProfile?,
       MdlPagBuildingProfile?, MdlPagLocationGroupProfile?)? onScopeChanged;
@@ -279,6 +281,15 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
             colController.filterGroupType == PagFilterGroupType.status) {
           return "value";
         }
+
+        // Exclude location filter for jobType items
+        // scope visibility is controlled by acl and job panel
+        if (widget.itemKind == PagItemKind.jobType) {
+          if (colController.filterGroupType == PagFilterGroupType.location) {
+            return "mark_to_exclude";
+          }
+        }
+
         return "label";
       },
     );
@@ -290,19 +301,29 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
 
     queryMap.addAll(widget.additionalQuery);
 
+    if (widget.itemKind == PagItemKind.jobType) {
+      queryMap['acl_filter_operation'] = 'create';
+    }
+
     // AclTarget aclTarget = getAclTargetFromItemType(widget.itemType);
 
     try {
-      result = await fetchItemList(
-        widget.loggedInUser,
+      result = await fetchItemList2(
         widget.appConfig,
         queryMap,
-        MdlPagSvcClaim(
+        MdlPagSvcClaim2(
           username: widget.loggedInUser.username,
           userId: widget.loggedInUser.id,
-          scope: '',
-          target: '',
-          operation: '',
+          roleId: widget.loggedInUser.selectedRole?.id,
+          roleName: widget.loggedInUser.selectedRole?.name,
+          roleLabel: widget.loggedInUser.selectedRole?.label,
+          userScope: widget.loggedInUser.selectedScope.toScopeMap(),
+          permRequestList: [
+            {
+              'res_label': widget.aclResLabel ?? itemTypeStr,
+              'operation': 'read',
+            }
+          ],
         ),
       );
 

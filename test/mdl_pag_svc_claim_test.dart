@@ -5,12 +5,12 @@ import 'package:buff_helper/up_helper/enum/enum_acl.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('MdlPagSvcClaim2 encodes permission operations as strings', () {
+  test('MdlPagSvcClaim2 serializes a caller-built permission request', () {
     final claim = MdlPagSvcClaim2(
       permRequestList: [
         {
           'res_label': 'ems.meter.list',
-          'operation': AclOperation.read,
+          'operation': AclOperation.read.name,
         },
       ],
     );

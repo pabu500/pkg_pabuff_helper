@@ -46,6 +46,7 @@ class WgtListSearchKind2 extends StatefulWidget {
     this.allowFlexiLabel = false,
     this.additionalQuery = const {},
     this.enabledItemTypeList = const [],
+    this.aclResLabel,
   });
 
   final MdlPagAppConfig appConfig;
@@ -67,6 +68,7 @@ class WgtListSearchKind2 extends StatefulWidget {
   final bool allowFlexiLabel;
   final Map<String, dynamic> additionalQuery;
   final List<dynamic> enabledItemTypeList;
+  final String? aclResLabel;
 
   @override
   State<WgtListSearchKind2> createState() => _WgtListSearchKind2State();
@@ -394,6 +396,7 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
               allowFlexiLabel: widget.isCompactFinder
                   ? (widget.allowFlexiLabel ? true : false)
                   : false,
+              aclResLabel: widget.aclResLabel,
               getPaneWidget: getPaneWidget,
               // getSwitcher: getPaneModeSwitcher,
               onScopeTreeUpdate: widget.onScopeTreeUpdate,

@@ -72,6 +72,9 @@ class WgtPagLs extends StatefulWidget {
 class _WgtPagLsState extends State<WgtPagLs> {
   late final prefKey = widget.pagAppContext.route;
 
+  String get _aclResLabel => getResNameByPageRouteSection(
+      widget.pagAppContext, widget.pageRoute, widget.pageSection)!;
+
   String? _pageAclMessage;
 
   @override
@@ -81,16 +84,13 @@ class _WgtPagLsState extends State<WgtPagLs> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
 
-      final resLabel = getResNameByPageRouteSection(
-          widget.pagAppContext, widget.pageRoute, widget.pageSection);
-
       final aclResultList = await checkAcl2(
         widget.appConfig,
         widget.pagAppContext,
         widget.loggedInUser!,
         [
           {
-            'res_label': resLabel,
+            'res_label': _aclResLabel,
             'operation': AclOperation.read.name,
           }
         ],
@@ -145,6 +145,7 @@ class _WgtPagLsState extends State<WgtPagLs> {
             validateTreeChildren: widget.validateTreeChildren,
             selectedItemInfoList: widget.selectedItemInfoList,
             hint: widget.hint,
+            aclResLabel: _aclResLabel,
           );
         }
         return WgtListSearchKind2(
@@ -158,6 +159,7 @@ class _WgtPagLsState extends State<WgtPagLs> {
           listContextType: widget.listContextType,
           onScopeTreeUpdate: widget.onScopeTreeUpdate,
           enabledItemTypeList: widget.enabledItemTypeList,
+          aclResLabel: _aclResLabel,
         );
       case PagItemKind.user ||
             PagItemKind.tenant ||
@@ -200,6 +202,7 @@ class _WgtPagLsState extends State<WgtPagLs> {
           loadOnInit: widget.loadOnInit,
           sortBy: widget.sortBy,
           sortOrder: widget.sortOrder,
+          aclResLabel: _aclResLabel,
         );
       default:
         return Container();

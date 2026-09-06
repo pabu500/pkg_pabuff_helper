@@ -106,6 +106,7 @@ class WgtListSearchItemFlexi extends StatefulWidget {
     this.initialNoR,
     this.showFinder = true,
     this.loadOnInit = false,
+    this.aclResLabel,
   });
 
   final MdlPagAppConfig appConfig;
@@ -150,6 +151,7 @@ class WgtListSearchItemFlexi extends StatefulWidget {
   final int? initialNoR;
   final bool showFinder;
   final bool loadOnInit;
+  final String? aclResLabel;
 
   @override
   State<WgtListSearchItemFlexi> createState() => _WgtListSearchItemFlexiState();
@@ -342,16 +344,23 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     if (widget.listContextType == PagListContextType.soa) {}
 
     try {
-      itemFindResult = await fetchItemList(
-        loggedInUser,
+      itemFindResult = await fetchItemList2(
         widget.appConfig,
         _queryMap,
-        MdlPagSvcClaim(
+        MdlPagSvcClaim2(
           userId: loggedInUser!.id,
           username: loggedInUser!.username,
-          scope: '',
-          target: '',
-          operation: '',
+          roleId: loggedInUser!.selectedRole?.id,
+          roleName: loggedInUser!.selectedRole?.name,
+          roleLabel: loggedInUser!.selectedRole?.label,
+          userScope: loggedInUser!.selectedScope.toScopeMap(),
+          permRequestList: [
+            {
+              'res_label': widget.aclResLabel ??
+                  getItemTypeValue(_selectedListController!.itemTypeEnum),
+              'operation': 'read',
+            }
+          ],
         ),
       );
 
@@ -2000,6 +2009,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
               additionalQuery: widget.additionalQuery,
               sortBy: _sortBy,
               sortOrder: _sortOrder,
+              aclResLabel: widget.aclResLabel,
               onSearching: () {
                 setState(() {
                   _isFetchingItemList = true;

@@ -314,6 +314,7 @@ class PagUrlBase {
 
   //item
   static const String eptGetItemList = '/item/get_item_list';
+  static const String eptGetItemList2 = '/item/get_item_list2';
   static const String eptGetItemInfo = '/item/get_item_info';
   static const String eptCheckItemExists = '/item/check_item_exists';
   static const String eptGetItemKeyValList = '/item/get_item_key_val_list';

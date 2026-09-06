@@ -329,6 +329,10 @@ class MdlPagListController /*extends ChangeNotifier*/ {
       if (colController.filterValue != null) {
         // if (false) {
         // use join key (in e.g. s.label, b.name etc., format for filter map)
+        if ('mark_to_exclude' == getFilterValueKey?.call(colController)) {
+          continue;
+        }
+
         if (colController.joinKey != null) {
           filterMap[colController.joinKey!] = colController
               .filterValue?[getFilterValueKey?.call(colController)];

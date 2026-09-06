@@ -2,6 +2,7 @@ import 'dart:developer' as dev;
 
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:buff_helper/pag_helper/comm/comm_ex.dart';
 import 'package:buff_helper/pag_helper/comm/pag_be_api_base.dart';
 import 'package:buff_helper/pag_helper/ems/ems_helper.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
@@ -114,6 +115,54 @@ Future<dynamic> fetchItemList(
   } else {
     throw Exception(jsonDecode(response.body)['error']);
   }
+}
+
+Future<dynamic> fetchItemList2(
+  MdlPagAppConfig pagAppConfig,
+  Map<String, dynamic> queryMap,
+  MdlPagSvcClaim2 svcClaim,
+) async {
+  dev.log('fetching item list from get_item_list2');
+
+  final result = await ex2(
+    endpoint: PagUrlBase.eptGetItemList2,
+    crudType: 'read',
+    opStr: 'get item list',
+    appConfig: pagAppConfig,
+    queryMap: queryMap,
+    svcClaim: svcClaim,
+  );
+
+  if (result is! Map || result['item_list'] == null) {
+    throw Exception('Failed to get item list');
+  }
+
+  final itemListJson = result['item_list'];
+  final totalCount = result['count'];
+  final listConfig = result['list_config'];
+  final idSelectQuery = result['item_select_query'];
+  final List<Map<String, dynamic>> itemList = [];
+
+  for (final itemJson in itemListJson) {
+    final item = Map<String, dynamic>.from(itemJson as Map);
+    populateListItemMeterUsage(item);
+    populateListItemTenantUsage(item, queryMap['meter_type_list'] ?? []);
+    itemList.add(item);
+  }
+
+  final int? count = totalCount is String
+      ? int.tryParse(totalCount)
+      : totalCount is int
+          ? totalCount
+          : null;
+
+  return {
+    'item_list': itemList,
+    'count': count,
+    'list_config': listConfig,
+    'item_select_query': idSelectQuery,
+    'query_map': queryMap,
+  };
 }
 
 Future<dynamic> pullPagItemHistory(
