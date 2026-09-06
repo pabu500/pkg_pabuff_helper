@@ -2,7 +2,7 @@ import 'package:buff_helper/pag_helper/def_helper/dh_pag_acl.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'dart:developer' as dev;
 
-import '../../def_helper/def_page_route.dart';
+import '../../def_helper/dh_page_route.dart';
 
 class MdlPagRole {
   int id;

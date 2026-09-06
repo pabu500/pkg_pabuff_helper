@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:buff_helper/pag_helper/def_helper/dh_pag_acl.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:buff_helper/pag_helper/model/app/mdl_project_config.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_context.dart';
@@ -7,7 +10,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
-import 'package:buff_helper/pag_helper/def_helper/def_page_route.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_page_route.dart';
 import 'package:provider/provider.dart';
 
 import '../model/mdl_pag_app_config.dart';
@@ -41,23 +44,121 @@ class WgtAppContextMenu extends StatefulWidget {
 class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
   bool _isPhone = false;
   String _dragStatus = '';
-  late final List<PagPageRoute> routeList;
+  final Map<PagPageRoute, bool> _aclGrantedByRoute = {};
+  bool _aclCheckCompleted = false;
+  int _aclRequestGeneration = 0;
+  String? _aclRequestSignature;
+
+  List<PagPageRoute> get routeList => widget.appContext.routeList ?? [];
 
   Offset _position = const Offset(0, 0);
 
   RenderBox? _renderBox;
 
-  String _pageAclMessage = '';
-
   @override
   void initState() {
     super.initState();
 
-    routeList = widget.appContext.routeList!;
-
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
       _renderBox = context.findRenderObject() as RenderBox;
+      await _checkMenuAcl();
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant WgtAppContextMenu oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (_aclRequestSignature != _getAclRequestSignature()) {
+      _checkMenuAcl();
+    }
+  }
+
+  List<String> _getMenuResLabels(PagPageRoute pageRoute) {
+    return <String>[
+      '${widget.appContext.name}.${pageRoute.name}',
+      ...pageRoute.pageSectionList.map((pageSection) =>
+          getResNameByPageRouteSection(
+              widget.appContext, pageRoute, pageSection)!),
+    ];
+  }
+
+  String _getAclRequestSignature() {
+    final routeNames = routeList.map((route) => route.name).join(',');
+    final scope = jsonEncode(widget.loggedInUser.selectedScope.toScopeMap());
+    return '${widget.loggedInUser.id}|'
+        '${widget.loggedInUser.selectedRole?.id}|'
+        '${widget.appContext.name}|$routeNames|$scope';
+  }
+
+  Future<void> _checkMenuAcl() async {
+    final routes = List<PagPageRoute>.from(routeList);
+    final requestSignature = _getAclRequestSignature();
+    final requestGeneration = ++_aclRequestGeneration;
+    _aclRequestSignature = requestSignature;
+
+    if (mounted) {
+      setState(() {
+        _aclCheckCompleted = false;
+        _aclGrantedByRoute.clear();
+      });
+    }
+
+    if (routes.isEmpty) {
+      if (!mounted || requestGeneration != _aclRequestGeneration) return;
+      setState(() {
+        _aclCheckCompleted = true;
+      });
+      return;
+    }
+
+    final operation = AclOperation.read.name;
+    final resourceLabelsByRoute = <PagPageRoute, List<String>>{
+      for (final route in routes) route: _getMenuResLabels(route),
+    };
+    final permissionRequests = <Map<String, dynamic>>[
+      for (final resourceLabels in resourceLabelsByRoute.values)
+        for (final resourceLabel in resourceLabels)
+          {
+            'res_label': resourceLabel,
+            'operation': operation,
+          },
+    ];
+
+    final aclResultList = await checkAcl2(
+      widget.appConfig,
+      widget.appContext,
+      widget.loggedInUser,
+      permissionRequests,
+    );
+
+    if (!mounted ||
+        requestGeneration != _aclRequestGeneration ||
+        requestSignature != _getAclRequestSignature()) {
+      return;
+    }
+
+    final grantedByResource = <String, bool>{};
+    if (aclResultList is List) {
+      for (final resultValue in aclResultList) {
+        if (resultValue is! Map) continue;
+
+        final result = Map<String, dynamic>.from(resultValue);
+        final resLabel = result['res_label']?.toString();
+        final resultOperation = result['operation']?.toString();
+        if (resLabel == null || resultOperation != operation) continue;
+
+        grantedByResource[resLabel] = result['result'] == 'granted';
+      }
+    }
+
+    setState(() {
+      for (final route in routes) {
+        _aclGrantedByRoute[route] = resourceLabelsByRoute[route]!
+            .any((resLabel) => grantedByResource[resLabel] ?? false);
+      }
+      _aclCheckCompleted = true;
     });
   }
 
@@ -193,7 +294,8 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
 
     if (routeList.isNotEmpty) {
       for (PagPageRoute pr in routeList) {
-        bool isDisabled = false;
+        bool isDisabled =
+            !_aclCheckCompleted || !(_aclGrantedByRoute[pr] ?? false);
         bool show = true;
 
         if (appModel.appName == 'pag_ems_tp') {

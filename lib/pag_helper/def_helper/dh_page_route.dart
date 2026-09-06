@@ -1,6 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+enum PageSection {
+  aclList,
+  billCompilation,
+  billList,
+  cmList,
+  cmUsage,
+  esInsights,
+  financeList,
+  meterGroupList,
+  meterList,
+  meterUsage,
+  orgList,
+  resourceTypeList,
+  roleList,
+  scopeList,
+  tariffList,
+  taskTypeList,
+  tenantList,
+  tenantSoA,
+  tenantUsage,
+  userList,
+}
+
 enum PagPageRoute {
   projectPublicFront('Project Public Front', 'project_public_front',
       Symbols.flag_filled_rounded),
@@ -10,26 +33,36 @@ enum PagPageRoute {
   register('Register', 'register', Symbols.person_add),
   myProfile('Profile', 'profile', Symbols.person),
   consoleHomeDashboard('Home', 'console_home_dashboard', Symbols.home),
-  platformUserService('User Service', 'user_service', Symbols.person),
-  platformAcl('Role & Access', 'platform_acl', Symbols.admin_panel_settings),
+  platformUserService(
+      'User Service', 'user_service', Symbols.person, [PageSection.userList]),
+  platformAcl('Role & Access', 'platform_acl', Symbols.admin_panel_settings, [
+    PageSection.roleList,
+    PageSection.resourceTypeList,
+    PageSection.aclList
+  ]),
   platformSettings('Settings', 'platform_settings', Symbols.settings),
-  platformTaskManager(
-      'Task Manager', 'platform_task_manager', Symbols.overview),
+  platformTaskManager('Task Manager', 'platform_task_manager', Symbols.overview,
+      [PageSection.taskTypeList]),
   platformDashboard('Platform', 'platform_dashboard', Symbols.grid_view),
-  meterManager('Meter Manager', 'meter_manager', Symbols.speed),
+  meterManager('Meter Manager', 'meter_manager', Symbols.speed,
+      [PageSection.meterList, PageSection.meterUsage]),
   evsMeterManager('Meter Manager', 'evs_meter_manager', Symbols.speed),
   evsMeterGroupManager(
       'Meter Group Manager', 'evs_meter_group_manager', Symbols.atr),
-  emsMeterGroupManager(
-      'Meter Group Manager', 'ems_meter_group_manager', Symbols.atr),
+  emsMeterGroupManager('Meter Group Manager', 'ems_meter_group_manager',
+      Symbols.atr, [PageSection.meterGroupList]),
   creditTransaction(
       'Credit Transaction', 'credit_transaction', Symbols.credit_card),
-  tenantManager('Tenant Manager', 'tenant_manager', Symbols.location_away),
+  tenantManager('Tenant Manager', 'tenant_manager', Symbols.location_away,
+      [PageSection.tenantList, PageSection.tenantUsage, PageSection.tenantSoA]),
   evsTenantManager(
       'Tenant Manager', 'evs_tenant_manager', Symbols.location_away),
-  tariffManager('Tariff Manager', 'tariff_manager', Symbols.price_change),
-  billingManager('Billing Manager', 'billing_manager', Symbols.request_quote),
-  paymentManager('Payment Manager', 'payment_manager', Symbols.attach_money),
+  tariffManager('Tariff Manager', 'tariff_manager', Symbols.price_change,
+      [PageSection.tariffList]),
+  billingManager('Billing Manager', 'billing_manager', Symbols.request_quote,
+      [PageSection.billList, PageSection.billCompilation]),
+  paymentManager('Payment Manager', 'payment_manager', Symbols.attach_money,
+      [PageSection.financeList]),
   evsDashboard('EVS', 'evs_dashboard', Symbols.grid_view),
   evsTaskReportManager('Task/Report Manager', 'evs_task_report_manager',
       Symbols.energy_program_time_used),
@@ -59,18 +92,21 @@ enum PagPageRoute {
   bmsDashboard('BMS', 'bms_dashboard', Symbols.grid_view),
   amDashboard('Asset Management', 'am_dashboard', Symbols.grid_view),
   cmDashboard('Condition Monitoring', 'cm_dashboard', Symbols.grid_view),
-  cmDeviceManager(
-      'Device Manager', 'cm_device_manager', Symbols.home_iot_device),
-  amScopeManager('Scope Manager', 'am_scope_manager', Symbols.file_map_stack),
+  cmDeviceManager('Device Manager', 'cm_device_manager',
+      Symbols.home_iot_device, [PageSection.cmList, PageSection.cmUsage]),
+  amScopeManager('Scope Manager', 'am_scope_manager', Symbols.file_map_stack,
+      [PageSection.scopeList]),
   amCommsManager('Comms Manager', 'am_comms_manager', Symbols.join),
   amDeviceManager(
       'Device Manager', 'am_device_manager', Symbols.home_iot_device),
-  amOrgManager('Org Manager', 'am_org_manager', Symbols.corporate_fare),
+  amOrgManager('Org Manager', 'am_org_manager', Symbols.corporate_fare,
+      [PageSection.orgList]),
   pqDashboard('PQ', 'pq_dashboard', Symbols.grid_view),
   pqInsights('PQ Insights', 'pq_insights', Symbols.airwave),
   ctLab('CT Lab', 'ctlab', Symbols.airwave),
   esDashboard('ES', 'es_dashboard', Symbols.grid_view),
-  esInsights('ES Insights', 'es_insights', Symbols.developer_board),
+  esInsights('ES Insights', 'es_insights', Symbols.developer_board,
+      [PageSection.esInsights]),
   about('About', 'about', Symbols.info),
   contact('Contact', 'contact', Symbols.contact_support),
   terms('Terms', 'terms', Symbols.contract),
@@ -83,11 +119,13 @@ enum PagPageRoute {
   forgotPassword('Forgot Password', 'forgot_password', Symbols.lock),
   resetPassword('Reset Password', 'reset_password', Symbols.restart_alt);
 
-  const PagPageRoute(this.label, this.route, this.iconData);
+  const PagPageRoute(this.label, this.route, this.iconData,
+      [this.pageSectionList = const []]);
 
   final String label;
   final String route;
   final IconData iconData;
+  final List<PageSection> pageSectionList;
 
   static PagPageRoute byLabel(String? label) =>
       enumByLabel(label, values) ?? none;

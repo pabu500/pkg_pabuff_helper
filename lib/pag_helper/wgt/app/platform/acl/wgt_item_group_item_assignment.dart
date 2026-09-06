@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'dart:developer' as dev;
+import 'dart:math' as math;
 
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
@@ -11,6 +12,7 @@ import 'package:buff_helper/xt_ui/wdgt/info/get_error_text_prompt.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 import 'package:buff_helper/xt_ui/xt_helpers.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
+import 'package:buff_helper/util/string_util.dart';
 
 import '../../../../../up_helper/exceptions.dart';
 import '../../../../comm/comm_ex.dart';
@@ -50,6 +52,10 @@ class WgtItemGroupItemAssignment extends StatefulWidget {
 
 class _WgtItemGroupItemAssignmentState
     extends State<WgtItemGroupItemAssignment> {
+  static const double _itemNameMaxWidth = 380;
+  static const double _itemLabelMaxWidth = 500;
+  static const double _itemTextHorizontalPadding = 10;
+
   // late final MdlPagUser? loggedInUser;
 
   final double width = 395.0;
@@ -450,9 +456,22 @@ class _WgtItemGroupItemAssignmentState
   Widget getScopeMismatchItemList(double listHeight) {
     List<Widget> itemWidgetList = [];
     int index = 0;
+    final itemNameWidth = _getItemColumnWidth(
+      'item_name',
+      _itemNameMaxWidth,
+    );
+    final itemLabelWidth = _getItemColumnWidth(
+      'item_label',
+      _itemLabelMaxWidth,
+    );
 
     for (Map<String, dynamic> itemInfo in (_scopeMismatchItemList ?? [])) {
-      Widget tile = getItemRow(itemInfo, ++index);
+      Widget tile = getItemRow(
+        itemInfo,
+        ++index,
+        itemNameWidth,
+        itemLabelWidth,
+      );
       itemWidgetList.add(
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 13),
@@ -622,13 +641,26 @@ class _WgtItemGroupItemAssignmentState
     }
     List<Widget> itemWidgetList = [];
     int index = 0;
+    final itemNameWidth = _getItemColumnWidth(
+      'item_name',
+      _itemNameMaxWidth,
+    );
+    final itemLabelWidth = _getItemColumnWidth(
+      'item_label',
+      _itemLabelMaxWidth,
+    );
     for (Map<String, dynamic> itemInfo in _itemGroupScopeMatchingItemList!) {
       bool showItem = _showItem(itemInfo);
       index++;
       if (!showItem) {
         continue; // Skip this item if it doesn't match the filter
       }
-      Widget tile = getItemRow(itemInfo, index);
+      Widget tile = getItemRow(
+        itemInfo,
+        index,
+        itemNameWidth,
+        itemLabelWidth,
+      );
       itemWidgetList.add(
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 3),
@@ -648,7 +680,32 @@ class _WgtItemGroupItemAssignmentState
     );
   }
 
-  Widget getItemRow(Map<String, dynamic> itemInfo, int index) {
+  double _getItemColumnWidth(String key, double maxWidth) {
+    final itemList = [
+      ...?_itemGroupScopeMatchingItemList,
+      ...?_scopeMismatchItemList,
+    ];
+    final textStyle = DefaultTextStyle.of(context).style;
+    double displayWidth = 0;
+
+    for (final itemInfo in itemList) {
+      final value = (itemInfo[key] ?? '-').toString();
+      displayWidth = math.max(
+        displayWidth,
+        1.05 * getStringDisplaySize(value, textStyle).width +
+            _itemTextHorizontalPadding,
+      );
+    }
+
+    return math.min(displayWidth, maxWidth);
+  }
+
+  Widget getItemRow(
+    Map<String, dynamic> itemInfo,
+    int index,
+    double itemNameWidth,
+    double itemLabelWidth,
+  ) {
     String itemName = itemInfo['item_name'] ?? '-';
     String itemLabel = itemInfo['item_label'] ?? '-';
     String? operation = itemInfo['operation']?.toString();
@@ -751,7 +808,7 @@ class _WgtItemGroupItemAssignmentState
             ),
             horizontalSpaceSmall,
             Container(
-              width: 175,
+              width: itemNameWidth,
               decoration: boxDecoration,
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
               child: SelectableText(
@@ -771,7 +828,7 @@ class _WgtItemGroupItemAssignmentState
             // ),
             horizontalSpaceSmall,
             Container(
-              width: 250,
+              width: itemLabelWidth,
               decoration: boxDecoration,
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
               child: SelectableText(

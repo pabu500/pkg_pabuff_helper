@@ -1,4 +1,4 @@
-import 'package:buff_helper/pag_helper/def_helper/def_page_route.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_page_route.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as dev;
 
@@ -121,9 +121,9 @@ String? getResNameByItemType(dynamic itemType) {
   return null;
 }
 
-String? getResNameByPageRouteSection(
-    MdlPagAppContext appContext, PagPageRoute pageRoute, String pageSection) {
-  return '${appContext.name}.${pageRoute.name}.$pageSection';
+String? getResNameByPageRouteSection(MdlPagAppContext appContext,
+    PagPageRoute pageRoute, PageSection pageSection) {
+  return '${appContext.name}.${pageRoute.name}.${pageSection.name}';
 }
 
 // Future<dynamic> checkAcl(
@@ -131,7 +131,7 @@ String? getResNameByPageRouteSection(
 //   MdlPagAppContext appContext,
 //   MdlPagUser loggedInUser,
 //   PagPageRoute pageRoute,
-//   String pageSection,
+//   PageSection pageSection,
 //   AclOperation operation,
 // ) async {
 //   try {

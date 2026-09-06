@@ -6,7 +6,8 @@ import 'package:buff_helper/pag_helper/wgt/ls/wgt_ls_kind2.dart';
 import 'package:flutter/material.dart';
 import '../../../up_helper/enum/enum_acl.dart';
 import '../../../xt_ui/wdgt/info/get_error_text_prompt.dart';
-import '../../def_helper/def_page_route.dart';
+import '../../../xt_ui/wdgt/wgt_pag_wait.dart';
+import '../../def_helper/dh_page_route.dart';
 import '../../def_helper/dh_pag_acl.dart';
 import '../../model/mdl_pag_app_config.dart';
 import '../../model/mdl_pag_user.dart';
@@ -42,7 +43,7 @@ class WgtPagLs extends StatefulWidget {
   final MdlPagAppConfig appConfig;
   final MdlPagAppContext pagAppContext;
   final PagPageRoute pageRoute;
-  final String pageSection;
+  final PageSection pageSection;
   final MdlPagUser? loggedInUser;
   final PagItemKind itemKind;
   final PagListContextType listContextType;
@@ -71,7 +72,7 @@ class WgtPagLs extends StatefulWidget {
 class _WgtPagLsState extends State<WgtPagLs> {
   late final prefKey = widget.pagAppContext.route;
 
-  String _pageAclMessage = '';
+  String? _pageAclMessage;
 
   @override
   void initState() {
@@ -114,10 +115,13 @@ class _WgtPagLsState extends State<WgtPagLs> {
   @override
   Widget build(BuildContext context) {
     if (_pageAclMessage != 'granted') {
+      if (_pageAclMessage == null) {
+        return const Center(child: WgtPagWait());
+      }
       return Container(
           alignment: Alignment.topCenter,
-          child:
-              getErrorTextPrompt(context: context, errorText: _pageAclMessage));
+          child: getErrorTextPrompt(
+              context: context, errorText: _pageAclMessage!));
     }
 
     switch (widget.itemKind) {
