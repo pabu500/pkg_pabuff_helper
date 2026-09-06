@@ -294,8 +294,10 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
 
     if (routeList.isNotEmpty) {
       for (PagPageRoute pr in routeList) {
-        bool isDisabled =
-            !_aclCheckCompleted || !(_aclGrantedByRoute[pr] ?? false);
+        // uncomment the following line to enable ACL check
+        // bool isDisabled = !_aclCheckCompleted || !(_aclGrantedByRoute[pr] ?? false);
+        bool isDisabled = false;
+
         bool show = true;
 
         if (appModel.appName == 'pag_ems_tp') {

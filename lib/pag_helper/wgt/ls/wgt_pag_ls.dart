@@ -114,15 +114,16 @@ class _WgtPagLsState extends State<WgtPagLs> {
 
   @override
   Widget build(BuildContext context) {
-    if (_pageAclMessage != 'granted') {
-      if (_pageAclMessage == null) {
-        return const Center(child: WgtPagWait());
-      }
-      return Container(
-          alignment: Alignment.topCenter,
-          child: getErrorTextPrompt(
-              context: context, errorText: _pageAclMessage!));
-    }
+    // uncomment the following line to enable ACL check for the page
+    // if (_pageAclMessage != 'granted') {
+    //   if (_pageAclMessage == null) {
+    //     return const Center(child: WgtPagWait());
+    //   }
+    //   return Container(
+    //       alignment: Alignment.topCenter,
+    //       child: getErrorTextPrompt(
+    //           context: context, errorText: _pageAclMessage!));
+    // }
 
     switch (widget.itemKind) {
       case PagItemKind.device ||
