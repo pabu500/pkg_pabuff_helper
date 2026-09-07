@@ -108,7 +108,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
     Map<String, dynamic> queryMap = {
       'scope': widget.loggedInUser.selectedScope.toScopeMap(),
       'item_kind': PagItemKind.bill.value,
-      't.name': tenantName,
+      'filter_value_info': {'t.name': tenantName},
       'payment_id': _paymentInfo['id'] ?? '',
     };
 

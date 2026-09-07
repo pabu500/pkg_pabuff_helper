@@ -161,11 +161,14 @@ class _WgtCreatePermission2State extends State<WgtCreatePermission2> {
           .toList();
       for (final Map<String, dynamic> resource in _resources) {
         final String resourceId = resource['id'].toString();
-        final Set<String> existingOperations =
+        final Set<String> persistedOperations =
             ((resource['existing_operations'] as List<dynamic>?) ?? <dynamic>[])
                 .map((dynamic value) => value.toString())
-                .where(_operations.contains)
                 .toSet();
+        final Set<String> existingOperations =
+            persistedOperations.contains('full')
+                ? Set<String>.from(_operations)
+                : persistedOperations.where(_operations.contains).toSet();
         _originalOperations[resourceId] = Set<String>.from(existingOperations);
         _selectedOperations[resourceId] = Set<String>.from(existingOperations);
       }

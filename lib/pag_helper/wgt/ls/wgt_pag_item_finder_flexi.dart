@@ -275,7 +275,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
           (_pickedMonth == null || _isMTD) ? 'false' : 'true';
     }
 
-    Map<String, dynamic> fliterMap = widget.listController.getFilterMap(
+    Map<String, dynamic> filterValueInfo = widget.listController.getFilterMap(
       getFilterValueKey: (MdlListColController colController) {
         if (colController.filterGroupType == PagFilterGroupType.spec ||
             colController.filterGroupType == PagFilterGroupType.status) {
@@ -293,7 +293,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
         return "label";
       },
     );
-    queryMap.addAll(fliterMap);
+    queryMap['filter_value_info'] = filterValueInfo;
 
     if (widget.listController.isNotEmpty) {
       queryMap['list_info'] = widget.listController.toJson();

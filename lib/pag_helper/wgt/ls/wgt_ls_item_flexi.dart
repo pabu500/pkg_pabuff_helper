@@ -2393,7 +2393,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     if (widget.itemKind == PagItemKind.device &&
         widget.itemTypeListStr == 'meter' &&
         widget.listContextType == PagListContextType.usage) {
-      if (_queryMap['meter_type'] == 'SE1') {
+      if (_queryMap['filter_value_info']?['meter_type'] == 'SE1') {
         // remove from list col controller in list controller, the usage_first_reading_timestamp, usage_last_reading_timestamp, usage_first_reading_value, usage_last_reading_value, usage
         _selectedListController?.listColControllerList.removeWhere(
             (colController) =>
