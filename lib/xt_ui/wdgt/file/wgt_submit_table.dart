@@ -18,6 +18,7 @@ class WgtSubmitTable extends StatefulWidget {
     this.getHeader,
     this.onGetFileInfo,
     this.onListLoaded,
+    this.onImportError,
   });
 
   final String? tooltip;
@@ -27,6 +28,7 @@ class WgtSubmitTable extends StatefulWidget {
   final Function(List<String>)? getHeader;
   final Function? onGetFileInfo;
   final Function? onListLoaded;
+  final Function? onImportError;
 
   @override
   State<WgtSubmitTable> createState() => _WgtSubmitTableState();
@@ -80,7 +82,8 @@ class _WgtSubmitTableState extends State<WgtSubmitTable> {
           widget.onGetFileInfo!(filename);
         }
       } catch (e) {
-        dev.log(e.toString());
+        dev.log('error in _getCsv: ${e.toString()}');
+        widget.onImportError?.call(e);
       }
     }
 
