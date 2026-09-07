@@ -101,8 +101,8 @@ class _LineItemsNotSubjectToTaxState extends State<WgtBillLineItemLabel> {
     if (value == null || value.isEmpty) {
       return 'Label cannot be empty';
     }
-    if (value.length > 50) {
-      return 'Label cannot exceed 50 characters';
+    if (value.length > 89) {
+      return 'Label cannot exceed 89 characters';
     }
     return null;
   }
