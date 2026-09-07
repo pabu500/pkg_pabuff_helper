@@ -692,7 +692,7 @@ class _WgtItemGroupItemAssignmentState
       final value = (itemInfo[key] ?? '-').toString();
       displayWidth = math.max(
         displayWidth,
-        1.05 * getStringDisplaySize(value, textStyle).width +
+        1.10 * getStringDisplaySize(value, textStyle).width +
             _itemTextHorizontalPadding,
       );
     }
@@ -858,7 +858,9 @@ class _WgtItemGroupItemAssignmentState
             child: Row(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [getScopeLabel(context, itemScope)],
+              children: [
+                getScopeLabel(context, itemScope, showProjectLabel: true),
+              ],
             ),
           ),
       ],

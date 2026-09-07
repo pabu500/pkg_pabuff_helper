@@ -363,6 +363,18 @@ class _WgtCreatePermission2State extends State<WgtCreatePermission2> {
     });
   }
 
+  void _toggleNone(String resourceId, bool selected) {
+    if (!selected) return;
+
+    setState(() {
+      _selectedOperations
+          .putIfAbsent(resourceId, () => <String>{})
+          .clear();
+      _createSuccess = false;
+      _errorText = '';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -531,6 +543,7 @@ class _WgtCreatePermission2State extends State<WgtCreatePermission2> {
                 _operationHeader('L', 'List'),
                 _operationHeader('RO', 'Read only: Read + List', width: 48),
                 _operationHeader('Full', 'All operations', width: 54),
+                _operationHeader('None', 'Remove all operations', width: 54),
               ],
             ),
           ),
@@ -556,6 +569,8 @@ class _WgtCreatePermission2State extends State<WgtCreatePermission2> {
       (String operation) =>
           selected.contains(operation) != original.contains(operation),
     );
+    final bool noneSelected = selected.isEmpty;
+    final bool noneChanged = noneSelected != original.isEmpty;
     final String label = (resource['label'] ?? '').toString();
     final String name = (resource['name'] ?? '').toString();
 
@@ -594,6 +609,12 @@ class _WgtCreatePermission2State extends State<WgtCreatePermission2> {
             fullSelected,
             (bool value) => _toggleFull(resourceId, value),
             changed: fullChanged,
+            width: 54,
+          ),
+          _operationCheckbox(
+            noneSelected,
+            (bool value) => _toggleNone(resourceId, value),
+            changed: noneChanged,
             width: 54,
           ),
         ],
