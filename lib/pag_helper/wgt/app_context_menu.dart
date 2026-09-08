@@ -77,7 +77,7 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
 
   List<String> _getMenuResLabels(PagPageRoute pageRoute) {
     return <String>[
-      '${widget.appContext.name}.${pageRoute.name}',
+      getResNameByPageRoute(widget.appContext, pageRoute),
       ...pageRoute.pageSectionList.map((pageSection) =>
           getResNameByPageRouteSection(
               widget.appContext, pageRoute, pageSection)!),

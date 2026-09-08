@@ -84,6 +84,15 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
     return normalizedLabel == 'pagesection';
   }
 
+  bool get _isPageRouteResourceType {
+    final normalizedLabel =
+        _resTypeLabel?.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '').toLowerCase();
+    return normalizedLabel == 'pagpageroute';
+  }
+
+  bool get _isPageResourceType =>
+      _isPageRouteResourceType || _isPageSectionResourceType;
+
   void _clearGeneratedLabel() {
     _generatedLabelCheckGeneration++;
     _newItemLabel = null;
@@ -92,7 +101,7 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
     _newItemLabelResetKey = UniqueKey();
   }
 
-  void _resetPageSectionSelection({bool clearLabel = true}) {
+  void _resetPageResourceSelection({bool clearLabel = true}) {
     _selectedAppContext = null;
     _selectedPageRoute = null;
     _selectedPageSection = null;
@@ -104,17 +113,20 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
     }
   }
 
-  Future<void> _updateGeneratedPageSectionLabel() async {
+  Future<void> _updateGeneratedPageResourceLabel() async {
     final appContext = _selectedAppContext;
     final pageRoute = _selectedPageRoute;
     final pageSection = _selectedPageSection;
-    if (appContext == null || pageRoute == null || pageSection == null) {
+    if (appContext == null ||
+        pageRoute == null ||
+        (_isPageSectionResourceType && pageSection == null)) {
       setState(_clearGeneratedLabel);
       return;
     }
 
-    final generatedLabel =
-        getResNameByPageRouteSection(appContext, pageRoute, pageSection)!;
+    final generatedLabel = _isPageRouteResourceType
+        ? getResNameByPageRoute(appContext, pageRoute)
+        : getResNameByPageRouteSection(appContext, pageRoute, pageSection!)!;
     final validationResult = validateResLabel(generatedLabel);
     final requestGeneration = ++_generatedLabelCheckGeneration;
 
@@ -364,9 +376,9 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
                   getBasicInfoBlock(),
                   verticalSpaceTiny,
                   getResourceType(),
-                  if (_isPageSectionResourceType) ...[
+                  if (_isPageResourceType) ...[
                     verticalSpaceTiny,
-                    getPageSectionResourceSelectors(),
+                    getPageResourceSelectors(),
                   ],
                   verticalSpaceTiny,
                   getItemScopeSetter(),
@@ -391,8 +403,8 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
                                   // reset the form
                                   setState(() {
                                     // _newItem = true;
-                                    if (_isPageSectionResourceType) {
-                                      _resetPageSectionSelection();
+                                    if (_isPageResourceType) {
+                                      _resetPageResourceSelection();
                                     } else {
                                       _newItemLabel = null;
                                       _isNewItemLabelValidated = false;
@@ -456,16 +468,15 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
               hintText: 'Label',
               labelText: 'Label',
               maxLength: maxFullNameLength,
-              enabled: !_isPageSectionResourceType,
-              showClearButton: !_isPageSectionResourceType,
-              requireUnique: !_isPageSectionResourceType,
+              enabled: !_isPageResourceType,
+              showClearButton: !_isPageResourceType,
+              requireUnique: !_isPageResourceType,
               validator: validateResLabel,
               checkUnique: doPagCheckUnique,
               uniqueKey: 'label',
               itemTableName: '$projectName.acl_res_$projectName',
-              suffix: _isPageSectionResourceType
-                  ? _getGeneratedLabelStatusWidget()
-                  : null,
+              suffix:
+                  _isPageResourceType ? _getGeneratedLabelStatusWidget() : null,
               onChanged: (val) {
                 setState(() {
                   if (val != _newItemLabel) {
@@ -557,16 +568,15 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
               // isInitialValueMutable: widget.fixedItemLabel == null,
               height: 50,
               width: 420,
-              onSelected: (String? value) async {
+              onSelected: (String? value) {
                 if (value == _resTypeLabel) {
                   return;
                 }
-                final wasPageSectionResourceType = _isPageSectionResourceType;
+                final wasPageResourceType = _isPageResourceType;
                 setState(() {
                   _resTypeLabel = value;
-                  if (wasPageSectionResourceType ||
-                      _isPageSectionResourceType) {
-                    _resetPageSectionSelection();
+                  if (wasPageResourceType || _isPageResourceType) {
+                    _resetPageResourceSelection();
                   }
                   // _enableSearch = _enableSearchButton();
                   _errorText = '';
@@ -585,7 +595,7 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
     );
   }
 
-  Widget getPageSectionResourceSelectors() {
+  Widget getPageResourceSelectors() {
     final pageRoutes = _selectedAppContext?.routeList ?? const [];
     final pageSections = _selectedPageRoute?.pageSectionList ?? const [];
 
@@ -634,7 +644,7 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
               initialValue: _selectedPageRoute?.name,
               height: 50,
               width: 420,
-              onSelected: (String? value) {
+              onSelected: (String? value) async {
                 setState(() {
                   _selectedPageRoute = value == null
                       ? null
@@ -648,10 +658,11 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
                   _newItem = true;
                   _createSuccess = false;
                 });
+                await _updateGeneratedPageResourceLabel();
               },
             ),
           ],
-          if (_selectedPageRoute != null) ...[
+          if (_isPageSectionResourceType && _selectedPageRoute != null) ...[
             verticalSpaceTiny,
             WgtDropdownSelector(
               key: ValueKey('page-section-${_selectedPageRoute!.name}'),
@@ -670,7 +681,7 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
                           .where((pageSection) => pageSection.name == value)
                           .firstOrNull;
                 });
-                await _updateGeneratedPageSectionLabel();
+                await _updateGeneratedPageResourceLabel();
               },
             ),
           ],

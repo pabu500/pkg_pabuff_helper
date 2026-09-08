@@ -127,6 +127,11 @@ String? getResNameByPageRouteSection(MdlPagAppContext appContext,
   return '${appContext.name}.${pageRoute.name}.${pageSection.name}';
 }
 
+String getResNameByPageRoute(
+    MdlPagAppContext appContext, PagPageRoute pageRoute) {
+  return '${appContext.name}.${pageRoute.name}';
+}
+
 // Future<dynamic> checkAcl(
 //   MdlPagAppConfig appConfig,
 //   MdlPagAppContext appContext,
