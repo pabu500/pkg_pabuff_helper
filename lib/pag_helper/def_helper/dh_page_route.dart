@@ -7,6 +7,7 @@ enum PageSection {
   billList,
   cmList,
   cmUsage,
+  deviceList,
   esInsights,
   financeList,
   linkAssetList,
@@ -86,7 +87,8 @@ enum PagPageRoute {
   vmTaskReportManager(
       'Task/Report Manager', 'vm_task_report_manager', Symbols.overview),
   fhDashboard('FH', 'fh_dashboard', Symbols.grid_view),
-  fhDeviceManager('FH', 'fh_device_manager', Symbols.home_iot_device),
+  fhDeviceManager('FH', 'fh_device_manager', Symbols.home_iot_device,
+      [PageSection.deviceList]),
   fhEventManager('Event Manager', 'fh_event_manager', Symbols.event_list),
   fhTaskReportManager(
       'Task/Report Manager', 'fh_task_report_manager', Symbols.overview),
@@ -99,8 +101,8 @@ enum PagPageRoute {
       [PageSection.scopeList]),
   amCommsManager('Comms Manager', 'am_comms_manager', Symbols.join,
       [PageSection.linkAssetList]),
-  amDeviceManager(
-      'Device Manager', 'am_device_manager', Symbols.home_iot_device),
+  amDeviceManager('Device Manager', 'am_device_manager',
+      Symbols.home_iot_device, [PageSection.deviceList]),
   amOrgManager('Org Manager', 'am_org_manager', Symbols.corporate_fare,
       [PageSection.orgList]),
   pqDashboard('PQ', 'pq_dashboard', Symbols.grid_view),

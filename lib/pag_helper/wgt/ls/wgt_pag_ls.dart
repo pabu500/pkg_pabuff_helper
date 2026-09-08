@@ -97,8 +97,13 @@ class _WgtPagLsState extends State<WgtPagLs> {
       );
       if (!mounted) return;
       if (aclResultList is! List || aclResultList.isEmpty) {
+        final rawMessage = aclResultList is Map
+            ? (aclResultList['error'] ?? aclResultList['message'])?.toString()
+            : null;
         setState(() {
-          _pageAclMessage = 'Error checking Page Access';
+          _pageAclMessage = rawMessage == null || rawMessage.isEmpty
+              ? 'Error checking Page Access ($_aclResLabel)'
+              : 'Error checking Page Access ($_aclResLabel): $rawMessage';
         });
         return;
       }
@@ -106,7 +111,7 @@ class _WgtPagLsState extends State<WgtPagLs> {
       final aclResult = Map<String, dynamic>.from(aclResultList.first as Map);
       setState(() {
         _pageAclMessage = aclResult['result'] == 'denied'
-            ? 'access denied'
+            ? 'access denied: $_aclResLabel'
             : aclResult['result'] as String;
       });
     });

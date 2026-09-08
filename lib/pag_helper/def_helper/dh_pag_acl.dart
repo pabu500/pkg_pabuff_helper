@@ -210,10 +210,14 @@ Future<dynamic> checkAcl2(
     );
     return aclResult;
   } catch (e) {
-    dev.log('checkAcl error: $e');
+    // NOTE: callers detect the failure by the result NOT being a List.
+    // Keep 'error'/'message' populated so they can show why.
+    final message = e.toString();
+    dev.log('checkAcl2 error: $message');
     return {
       'result': 'error',
-      'message': e.toString(),
+      'error': message,
+      'message': message,
     };
   }
 }

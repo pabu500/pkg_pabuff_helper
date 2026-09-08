@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as dev;
 
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_acl.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
@@ -46,6 +47,7 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
   String _dragStatus = '';
   final Map<PagPageRoute, bool> _aclGrantedByRoute = {};
   bool _aclCheckCompleted = false;
+  String? _aclErrorMessage;
   int _aclRequestGeneration = 0;
   String? _aclRequestSignature;
 
@@ -101,6 +103,7 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
     if (mounted) {
       setState(() {
         _aclCheckCompleted = false;
+        _aclErrorMessage = null;
         _aclGrantedByRoute.clear();
       });
     }
@@ -140,7 +143,18 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
     }
 
     final grantedByResource = <String, bool>{};
-    if (aclResultList is List) {
+    if (aclResultList is! List) {
+      // The ACL call failed (transport, or a BE error such as
+      // 'role_id must be positive' / a bad scope id). Without this the menu
+      // looks exactly like a legitimate 'access denied'.
+      final rawMessage = aclResultList is Map
+          ? (aclResultList['error'] ?? aclResultList['message'])?.toString()
+          : null;
+      _aclErrorMessage = rawMessage == null || rawMessage.isEmpty
+          ? 'ACL check failed'
+          : 'ACL check failed: $rawMessage';
+      dev.log('checkMenuAcl: $_aclErrorMessage');
+    } else {
       for (final resultValue in aclResultList) {
         if (resultValue is! Map) continue;
 
@@ -160,6 +174,15 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
       }
       _aclCheckCompleted = true;
     });
+
+    if (kDebugMode) {
+      for (final route in routes) {
+        if (_aclGrantedByRoute[route] ?? false) continue;
+        dev.log('menu acl denied: ${route.name} '
+            '(checked: ${resourceLabelsByRoute[route]!.join(', ')} '
+            'op: $operation)');
+      }
+    }
   }
 
   @override
@@ -291,6 +314,7 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
 
   List<Widget> _buildMenuItemList(PagAppProvider appModel) {
     List<Widget> tiles = [];
+    final String operationLabel = AclOperation.read.name;
 
     if (routeList.isNotEmpty) {
       for (PagPageRoute pr in routeList) {
@@ -404,8 +428,24 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
         if (!show) {
           continue;
         }
+        // Say WHY the tile is dead: ACL error, still checking, ACL deny
+        // (with the res_labels that were asked for), or a scope/app-config
+        // visibility rule.
+        final String tooltipMessage;
+        if (!isDisabled) {
+          tooltipMessage = pr.label;
+        } else if (_aclErrorMessage != null) {
+          tooltipMessage = '${pr.label} - $_aclErrorMessage';
+        } else if (!_aclCheckCompleted) {
+          tooltipMessage = '${pr.label} - checking access...';
+        } else if (!(_aclGrantedByRoute[pr] ?? false)) {
+          tooltipMessage = '${pr.label} - no "$operationLabel" access to '
+              '${_getMenuResLabels(pr).join(' / ')}';
+        } else {
+          tooltipMessage = '${pr.label} - not available at this scope';
+        }
         tiles.add(Tooltip(
-          message: pr.label,
+          message: tooltipMessage,
           waitDuration: const Duration(milliseconds: 500),
           child: InkWell(
             onTap: isDisabled
