@@ -260,9 +260,7 @@ class _WgtItemTypeSelectorState extends State<WgtItemTypeSelector> {
     if (!_listInfoFetched) {
       return Container();
     }
-    // final selectedItemTypeStr = getItemTypeStr(_selectedItemType);
-    final selectedItemTypeStr =
-        getItemTypeValue(_selectedListController?.itemTypeEnum);
+    final selectedItemTypeStr = getItemTypeValue(_selectedItemType);
 
     List<Widget> itemTypeList = [];
     if (_itemTypeInfoList.isNotEmpty) {

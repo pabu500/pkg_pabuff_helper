@@ -5,6 +5,8 @@ import 'package:buff_helper/pag_helper/model/mdl_pag_app_context.dart';
 import 'package:buff_helper/pag_helper/wgt/ls/wgt_ls_kind2.dart';
 import 'package:flutter/material.dart';
 import '../../../up_helper/enum/enum_acl.dart';
+import '../../../xt_ui/wdgt/info/get_error_text_prompt.dart';
+import '../../../xt_ui/wdgt/wgt_pag_wait.dart';
 import '../../def_helper/dh_page_route.dart';
 import '../../def_helper/dh_pag_acl.dart';
 import '../../model/mdl_pag_app_config.dart';
@@ -113,15 +115,15 @@ class _WgtPagLsState extends State<WgtPagLs> {
   @override
   Widget build(BuildContext context) {
     // uncomment the following line to enable ACL check for the page
-    // if (_pageAclMessage != 'granted') {
-    //   if (_pageAclMessage == null) {
-    //     return const Center(child: WgtPagWait());
-    //   }
-    //   return Container(
-    //       alignment: Alignment.topCenter,
-    //       child: getErrorTextPrompt(
-    //           context: context, errorText: _pageAclMessage!));
-    // }
+    if (_pageAclMessage != 'granted') {
+      if (_pageAclMessage == null) {
+        return const Center(child: WgtPagWait());
+      }
+      return Container(
+          alignment: Alignment.topCenter,
+          child: getErrorTextPrompt(
+              context: context, errorText: _pageAclMessage!));
+    }
 
     switch (widget.itemKind) {
       case PagItemKind.device ||

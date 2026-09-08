@@ -295,9 +295,9 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
     if (routeList.isNotEmpty) {
       for (PagPageRoute pr in routeList) {
         // uncomment the following line to enable ACL check
-        // bool isDisabled =
-        //     !_aclCheckCompleted || !(_aclGrantedByRoute[pr] ?? false);
-        bool isDisabled = false;
+        bool isDisabled =
+            !_aclCheckCompleted || !(_aclGrantedByRoute[pr] ?? false);
+        // bool isDisabled = false;
 
         bool show = true;
 
@@ -335,36 +335,36 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
           }
         }
 
-        if (widget.loggedInUser.selectedRole?.name
-                .contains('project-billing-') ??
-            false) {
-          if (pr != PagPageRoute.platformTaskManager &&
-              pr != PagPageRoute.emsMeterGroupManager &&
-              pr != PagPageRoute.billingManager &&
-              pr != PagPageRoute.paymentManager &&
-              pr != PagPageRoute.tenantManager &&
-              pr != PagPageRoute.tariffManager &&
-              // pr != PagPageRoute.amgrManager &&
-              // pr != PagPageRoute.landlordManager &&
-              // pr != PagPageRoute.amOrgManager &&
-              pr != PagPageRoute.meterManager) {
-            isDisabled = true;
-          }
-        }
+        // if (widget.loggedInUser.selectedRole?.name
+        //         .contains('project-billing-') ??
+        //     false) {
+        //   if (pr != PagPageRoute.platformTaskManager &&
+        //       pr != PagPageRoute.emsMeterGroupManager &&
+        //       pr != PagPageRoute.billingManager &&
+        //       pr != PagPageRoute.paymentManager &&
+        //       pr != PagPageRoute.tenantManager &&
+        //       pr != PagPageRoute.tariffManager &&
+        //       // pr != PagPageRoute.amgrManager &&
+        //       // pr != PagPageRoute.landlordManager &&
+        //       // pr != PagPageRoute.amOrgManager &&
+        //       pr != PagPageRoute.meterManager) {
+        //     isDisabled = true;
+        //   }
+        // }
 
-        if (widget.loggedInUser.selectedRole?.name.contains('project-ops-') ??
-            false) {
-          if (pr != PagPageRoute.platformTaskManager &&
-              // pr != PagPageRoute.meterGroupManager &&
-              pr != PagPageRoute.billingManager &&
-              // pr != PagPageRoute.paymentManager &&
-              pr != PagPageRoute.tenantManager &&
-              pr != PagPageRoute.tariffManager &&
-              // pr != PagPageRoute.amOrgManager &&
-              pr != PagPageRoute.meterManager) {
-            isDisabled = true;
-          }
-        }
+        // if (widget.loggedInUser.selectedRole?.name.contains('project-ops-') ??
+        //     false) {
+        //   if (pr != PagPageRoute.platformTaskManager &&
+        //       // pr != PagPageRoute.meterGroupManager &&
+        //       pr != PagPageRoute.billingManager &&
+        //       // pr != PagPageRoute.paymentManager &&
+        //       pr != PagPageRoute.tenantManager &&
+        //       pr != PagPageRoute.tariffManager &&
+        //       // pr != PagPageRoute.amOrgManager &&
+        //       pr != PagPageRoute.meterManager) {
+        //     isDisabled = true;
+        //   }
+        // }
 
         for (MdlPagProjectConfig appConfig in widget
             .loggedInUser.selectedScope.projectProfile!.appContextConfigList) {

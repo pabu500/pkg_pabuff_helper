@@ -9,6 +9,7 @@ enum PageSection {
   cmUsage,
   esInsights,
   financeList,
+  linkAssetList,
   meterGroupList,
   meterList,
   meterUsage,
@@ -96,7 +97,8 @@ enum PagPageRoute {
       Symbols.home_iot_device, [PageSection.cmList, PageSection.cmUsage]),
   amScopeManager('Scope Manager', 'am_scope_manager', Symbols.file_map_stack,
       [PageSection.scopeList]),
-  amCommsManager('Comms Manager', 'am_comms_manager', Symbols.join),
+  amCommsManager('Comms Manager', 'am_comms_manager', Symbols.join,
+      [PageSection.linkAssetList]),
   amDeviceManager(
       'Device Manager', 'am_device_manager', Symbols.home_iot_device),
   amOrgManager('Org Manager', 'am_org_manager', Symbols.corporate_fare,
