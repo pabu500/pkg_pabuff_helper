@@ -38,6 +38,7 @@ class WgtListPane extends StatefulWidget {
     this.itemType,
     this.displayMode = 'table',
     this.onResult,
+    this.aclResLabel,
   });
 
   final MdlPagAppConfig appConfig;
@@ -63,6 +64,7 @@ class WgtListPane extends StatefulWidget {
 
   final String displayMode;
   final Function(Map<String, dynamic>)? onResult;
+  final String? aclResLabel;
 
   @override
   State<WgtListPane> createState() => _WgtListPaneState();
@@ -111,16 +113,29 @@ class _WgtListPaneState extends State<WgtListPane> {
     _queryMap['scope'] = loggedInUser!.selectedScope.toScopeMap();
 
     try {
-      itemFindResult = await fetchItemList(
-        loggedInUser,
+      // NOTE: use get_item_list2 (same endpoint as the initial/first page
+      // fetch in wgt_ls_item_flexi) so that every page carries the full
+      // svc claim (user_id / role_id / user_scope / perm_request_list).
+      // The legacy get_item_list endpoint does not inject the claim into the
+      // request map, which breaks server side ACL filtering (e.g. jobType)
+      // and returns an empty list from page 2 onwards.
+      itemFindResult = await fetchItemList2(
         widget.appConfig,
         _queryMap,
-        MdlPagSvcClaim(
+        MdlPagSvcClaim2(
           userId: loggedInUser!.id,
           username: loggedInUser!.username,
-          scope: '',
-          target: '',
-          operation: '',
+          roleId: loggedInUser!.selectedRole?.id,
+          roleName: loggedInUser!.selectedRole?.name,
+          roleLabel: loggedInUser!.selectedRole?.label,
+          userScope: loggedInUser!.selectedScope.toScopeMap(),
+          permRequestList: [
+            {
+              'res_label': widget.aclResLabel ??
+                  getItemTypeValue(widget.listController.itemTypeEnum),
+              'operation': 'read',
+            }
+          ],
         ),
       );
 

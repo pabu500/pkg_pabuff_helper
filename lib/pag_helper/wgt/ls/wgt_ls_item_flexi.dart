@@ -2431,6 +2431,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           paneHeight: widget.paneHeight,
           itemType: widget.itemTypeEnum ?? widget.listController?.itemTypeEnum,
           listPrefix: _getListPrefix(),
+          aclResLabel: widget.aclResLabel,
           onResult: (Map<String, dynamic> result) {
             widget.onResult?.call(result);
           },
