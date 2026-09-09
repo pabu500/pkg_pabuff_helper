@@ -48,6 +48,7 @@ class WgtPagItemInfoEditPanel2 extends StatefulWidget {
     required this.itemKind,
     required this.itemDisplayName,
     required this.fieldList,
+    required this.isEditableByAcl,
     this.itemTypeEnum,
     this.listController,
     this.itemScopeMap,
@@ -67,6 +68,7 @@ class WgtPagItemInfoEditPanel2 extends StatefulWidget {
   final Map<String, dynamic>? itemScopeMap;
   final Map<String, dynamic>? itemInfoMap;
   final List<Map<String, dynamic>> fieldList;
+  final bool isEditableByAcl;
   final dynamic itemTypeEnum;
   final Function? onClose;
   final Function? onUpdate;
@@ -93,7 +95,7 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
 
   bool _isTenantUser = false;
 
-  late final bool isEditableByAcl;
+  bool get isEditableByAcl => widget.isEditableByAcl;
 
   late bool isDeleteableItem;
   late final bool isDeleteableByAcl;
@@ -594,8 +596,6 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
     bool isProjectBilling =
         _loggedInUser!.selectedRole?.name.contains('project-billing-') ?? false;
 
-    isEditableByAcl = isAdmin || isAtProjectLevel;
-
     isDeleteableItem = false;
     switch (widget.itemKind) {
       case PagItemKind.device:
@@ -622,7 +622,7 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
         break;
     }
 
-    isDeleteableByAcl = isAtProjectLevel && isAdmin;
+    isDeleteableByAcl = isEditableByAcl && isAtProjectLevel && isAdmin;
   }
 
   @override
@@ -1029,7 +1029,9 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
   }
 
   Widget getUserPasswordReset() {
-    if ((widget.itemKind != PagItemKind.user) || (_loggedInUser == null)) {
+    if (!isEditableByAcl ||
+        (widget.itemKind != PagItemKind.user) ||
+        (_loggedInUser == null)) {
       return Container();
     }
 
@@ -1051,7 +1053,9 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
   }
 
   Widget getUserRoleSetter() {
-    if ((widget.itemKind != PagItemKind.user) || (_loggedInUser == null)) {
+    if (!isEditableByAcl ||
+        (widget.itemKind != PagItemKind.user) ||
+        (_loggedInUser == null)) {
       return Container();
     }
 
@@ -1319,7 +1323,9 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
   }
 
   Widget getLcStatusOp(Map<String, dynamic> field) {
-    if (widget.itemInfoMap == null || widget.itemInfoMap!.isEmpty) {
+    if (!isEditableByAcl ||
+        widget.itemInfoMap == null ||
+        widget.itemInfoMap!.isEmpty) {
       return Container();
     }
 
@@ -1650,7 +1656,8 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
   }
 
   Widget getMeterReset() {
-    if (widget.itemKind != PagItemKind.device ||
+    if (!isEditableByAcl ||
+        widget.itemKind != PagItemKind.device ||
         widget.itemTypeEnum != PagDeviceCat.meter) {
       return Container();
     }

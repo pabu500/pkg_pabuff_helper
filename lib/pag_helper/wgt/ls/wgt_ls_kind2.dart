@@ -47,6 +47,8 @@ class WgtListSearchKind2 extends StatefulWidget {
     this.additionalQuery = const {},
     this.enabledItemTypeList = const [],
     this.aclResLabel,
+    this.isEditableByAcl,
+    this.isCreatableByAcl,
   });
 
   final MdlPagAppConfig appConfig;
@@ -69,6 +71,8 @@ class WgtListSearchKind2 extends StatefulWidget {
   final Map<String, dynamic> additionalQuery;
   final List<dynamic> enabledItemTypeList;
   final String? aclResLabel;
+  final bool? isEditableByAcl;
+  final bool? isCreatableByAcl;
 
   @override
   State<WgtListSearchKind2> createState() => _WgtListSearchKind2State();
@@ -397,6 +401,8 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
                   ? (widget.allowFlexiLabel ? true : false)
                   : false,
               aclResLabel: widget.aclResLabel,
+              isEditableByAcl: widget.isEditableByAcl,
+              isCreatableByAcl: widget.isCreatableByAcl,
               getPaneWidget: getPaneWidget,
               // getSwitcher: getPaneModeSwitcher,
               onScopeTreeUpdate: widget.onScopeTreeUpdate,

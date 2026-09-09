@@ -107,6 +107,8 @@ class WgtListSearchItemFlexi extends StatefulWidget {
     this.showFinder = true,
     this.loadOnInit = false,
     this.aclResLabel,
+    this.isEditableByAcl,
+    this.isCreatableByAcl,
   });
 
   final MdlPagAppConfig appConfig;
@@ -152,6 +154,8 @@ class WgtListSearchItemFlexi extends StatefulWidget {
   final bool showFinder;
   final bool loadOnInit;
   final String? aclResLabel;
+  final bool? isEditableByAcl;
+  final bool? isCreatableByAcl;
 
   @override
   State<WgtListSearchItemFlexi> createState() => _WgtListSearchItemFlexiState();
@@ -187,7 +191,11 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
 
   bool _itemUpdated = false;
 
-  late final bool isEditableByAcl;
+  late final bool _legacyIsEditableByAcl;
+
+  bool get isEditableByAcl => widget.isEditableByAcl ?? _legacyIsEditableByAcl;
+  bool get isCreatableByAcl =>
+      widget.isCreatableByAcl ?? _legacyIsEditableByAcl;
 
   final List<String> meterTypeList = [];
 
@@ -674,9 +682,10 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                   ))
               : IconButton(
                   icon: Icon(
-                    isEditableByAcl ? Icons.edit : Symbols.manage_search,
+                    isEditableByAcl ? Icons.edit : Symbols.search,
                     color: Theme.of(context).colorScheme.primary.withAlpha(210),
                   ),
+                  tooltip: isEditableByAcl ? 'Edit' : 'View',
                   onPressed: () {
                     List<Map<String, dynamic>> fieldList = [];
                     String displayNameKey = '';
@@ -809,6 +818,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                         onScopeTreeUpdate: widget.onScopeTreeUpdate,
                         validateTreeChildren: widget.validateTreeChildren,
                         customProperties: customProperties,
+                        isEditableByAcl: isEditableByAcl,
                         onClose: () {
                           setState(() {
                             _listContentRefreshKey = UniqueKey();
@@ -1845,7 +1855,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     bool isAtProjectLevel =
         loggedInUser!.selectedScope.isAtScopeType(PagScopeType.project);
     bool isAdmin = loggedInUser!.selectedRole?.isAdmin() ?? false;
-    isEditableByAcl = isAdmin || isAtProjectLevel;
+    _legacyIsEditableByAcl = isAdmin || isAtProjectLevel;
 
     if (widget.listController != null) {
       _selectedListController = widget.listController;
@@ -2118,6 +2128,17 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     }
     if (widget.pagAppContext == appCtxFh) {
       return Container();
+    }
+
+    if (!isCreatableByAcl) {
+      return IconButton(
+        tooltip: 'No create access',
+        onPressed: null,
+        icon: Icon(
+          Icons.add,
+          color: Theme.of(context).hintColor.withAlpha(130),
+        ),
+      );
     }
 
     Color buttonColor = Theme.of(context).colorScheme.primary;

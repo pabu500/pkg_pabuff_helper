@@ -76,6 +76,8 @@ class _WgtPagLsState extends State<WgtPagLs> {
       widget.pagAppContext, widget.pageRoute, widget.pageSection)!;
 
   String? _pageAclMessage;
+  bool _isEditableByAcl = false;
+  bool _isCreatableByAcl = false;
 
   @override
   void initState() {
@@ -92,7 +94,15 @@ class _WgtPagLsState extends State<WgtPagLs> {
           {
             'res_label': _aclResLabel,
             'operation': AclOperation.read.name,
-          }
+          },
+          {
+            'res_label': _aclResLabel,
+            'operation': AclOperation.update.name,
+          },
+          {
+            'res_label': _aclResLabel,
+            'operation': AclOperation.create.name,
+          },
         ],
       );
       if (!mounted) return;
@@ -108,11 +118,21 @@ class _WgtPagLsState extends State<WgtPagLs> {
         return;
       }
 
-      final aclResult = Map<String, dynamic>.from(aclResultList.first as Map);
+      final grantedByOperation = <String, bool>{};
+      for (final resultValue in aclResultList) {
+        if (resultValue is! Map) continue;
+        final result = Map<String, dynamic>.from(resultValue);
+        final operation = result['operation']?.toString();
+        if (operation == null) continue;
+        grantedByOperation[operation] = result['result'] == 'granted';
+      }
+      final canRead = grantedByOperation[AclOperation.read.name] ?? false;
       setState(() {
-        _pageAclMessage = aclResult['result'] == 'denied'
-            ? 'access denied: $_aclResLabel'
-            : aclResult['result'] as String;
+        _pageAclMessage = !canRead ? 'access denied: $_aclResLabel' : 'granted';
+        _isEditableByAcl =
+            grantedByOperation[AclOperation.update.name] ?? false;
+        _isCreatableByAcl =
+            grantedByOperation[AclOperation.create.name] ?? false;
       });
     });
   }
@@ -152,6 +172,8 @@ class _WgtPagLsState extends State<WgtPagLs> {
             selectedItemInfoList: widget.selectedItemInfoList,
             hint: widget.hint,
             aclResLabel: _aclResLabel,
+            isEditableByAcl: _isEditableByAcl,
+            isCreatableByAcl: _isCreatableByAcl,
           );
         }
         return WgtListSearchKind2(
@@ -166,6 +188,8 @@ class _WgtPagLsState extends State<WgtPagLs> {
           onScopeTreeUpdate: widget.onScopeTreeUpdate,
           enabledItemTypeList: widget.enabledItemTypeList,
           aclResLabel: _aclResLabel,
+          isEditableByAcl: _isEditableByAcl,
+          isCreatableByAcl: _isCreatableByAcl,
         );
       case PagItemKind.user ||
             PagItemKind.tenant ||
@@ -209,6 +233,8 @@ class _WgtPagLsState extends State<WgtPagLs> {
           sortBy: widget.sortBy,
           sortOrder: widget.sortOrder,
           aclResLabel: _aclResLabel,
+          isEditableByAcl: _isEditableByAcl,
+          isCreatableByAcl: _isCreatableByAcl,
         );
       default:
         return Container();
