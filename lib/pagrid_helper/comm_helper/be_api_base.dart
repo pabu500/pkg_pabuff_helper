@@ -133,7 +133,8 @@ class UrlBase {
       'https://oresvc-cw-nus.web-ems.com';
   static const String _rDevOresvcUrlCwNus = _rOresvc;
 
-  static const String _dUsersvcUrl = 'http://13.228.16.206:8081';
+  static const String _dUsersvcUrl =
+      'https://evs2u.evs.com.sg'; //'http://13.228.16.206:8081';
   static const String _rDevUsersvcUrl = 'https://evs2u.evs.com.sg';
   static const String _rProdUsersvcUrl = 'https://evs2u.evs.com.sg';
 
