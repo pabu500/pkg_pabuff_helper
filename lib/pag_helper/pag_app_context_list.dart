@@ -286,35 +286,35 @@ void routeGuard(BuildContext context, MdlPagUser? loggedInUser,
   dev.log('homeRouteStr: $homeRouteStr');
 
   bool noAccess = false;
-  // if (loggedInUser.selectedRole?.name.contains('project-billing-') ?? false) {
-  //   if (pr != PagPageRoute.consoleHomeDashboard &&
-  //       pr != PagPageRoute.platformTaskManager &&
-  //       pr != PagPageRoute.emsMeterGroupManager &&
-  //       pr != PagPageRoute.billingManager &&
-  //       pr != PagPageRoute.paymentManager &&
-  //       pr != PagPageRoute.tenantManager &&
-  //       pr != PagPageRoute.tariffManager &&
-  //       // pr != PagPageRoute.amgrManager &&
-  //       // pr != PagPageRoute.landlordManager &&
-  //       // pr != PagPageRoute.amOrgManager &&
-  //       pr != PagPageRoute.meterManager) {
-  //     noAccess = true;
-  //   }
-  // }
+  if (loggedInUser.selectedRole?.name.contains('project-billing-') ?? false) {
+    if (pr != PagPageRoute.consoleHomeDashboard &&
+        pr != PagPageRoute.platformTaskManager &&
+        pr != PagPageRoute.emsMeterGroupManager &&
+        pr != PagPageRoute.billingManager &&
+        pr != PagPageRoute.paymentManager &&
+        pr != PagPageRoute.tenantManager &&
+        pr != PagPageRoute.tariffManager &&
+        // pr != PagPageRoute.amgrManager &&
+        // pr != PagPageRoute.landlordManager &&
+        // pr != PagPageRoute.amOrgManager &&
+        pr != PagPageRoute.meterManager) {
+      noAccess = true;
+    }
+  }
 
-  // if (loggedInUser.selectedRole?.name.contains('project-ops-') ?? false) {
-  //   if (pr != PagPageRoute.consoleHomeDashboard &&
-  //       pr != PagPageRoute.platformTaskManager &&
-  //       // pr != PagPageRoute.emsMeterGroupManager &&
-  //       pr != PagPageRoute.billingManager &&
-  //       // pr != PagPageRoute.paymentManager &&
-  //       pr != PagPageRoute.tenantManager &&
-  //       pr != PagPageRoute.tariffManager &&
-  //       // pr != PagPageRoute.amOrgManager &&
-  //       pr != PagPageRoute.meterManager) {
-  //     noAccess = true;
-  //   }
-  // }
+  if (loggedInUser.selectedRole?.name.contains('project-ops-') ?? false) {
+    if (pr != PagPageRoute.consoleHomeDashboard &&
+        pr != PagPageRoute.platformTaskManager &&
+        // pr != PagPageRoute.emsMeterGroupManager &&
+        pr != PagPageRoute.billingManager &&
+        // pr != PagPageRoute.paymentManager &&
+        pr != PagPageRoute.tenantManager &&
+        pr != PagPageRoute.tariffManager &&
+        // pr != PagPageRoute.amOrgManager &&
+        pr != PagPageRoute.meterManager) {
+      noAccess = true;
+    }
+  }
 
   WidgetsBinding.instance.addPostFrameCallback((_) {
     if (appContext != null) {
