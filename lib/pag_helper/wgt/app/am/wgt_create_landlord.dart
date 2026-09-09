@@ -40,8 +40,24 @@ class WgtCreateLandlord extends StatefulWidget {
 
 class _WgtCreateLandlordState extends State<WgtCreateLandlord> {
   static const double _width = 395;
+  static const List<Map<String, String>> _feeFieldDefinitions = [
+    {'key': 'audit_fee', 'label': 'Audit'},
+    {'key': 'audit_fee_ftf', 'label': 'Audit (FTF)'},
+    {'key': 'metering_billing_fee', 'label': 'M&B'},
+    {
+      'key': 'metering_billing_fee_coc_mss_only',
+      'label': 'M&B (CoC-MSS)',
+    },
+    {'key': 'metering_billing_fee_vacant', 'label': 'M&B (Vacant)'},
+    {'key': 'metering_billing_fee_non_coc', 'label': 'M&B (non-CoC)'},
+    {'key': 'consultancy_fee', 'label': 'Consult. Fee'},
+    {'key': 'management_fee', 'label': 'Mgmt. Fee'},
+  ];
 
   final TextEditingController _bankNameController = TextEditingController();
+  final Map<String, String> _feeValues = {};
+  final Map<String, bool> _feeValidation = {};
+  final Map<String, UniqueKey> _feeResetKeys = {};
 
   String? _label;
   String? _bankAccountUtil;
@@ -155,7 +171,12 @@ class _WgtCreateLandlordState extends State<WgtCreateLandlord> {
         _itemScopeMap['site_group_id'] != null &&
         _isLabelValidated &&
         _isBankAccountUtilValidated &&
-        _isGiroAccountNumberValidated;
+        _isGiroAccountNumberValidated &&
+        _feeValues.entries.every(
+          (entry) =>
+              entry.value.trim().isEmpty ||
+              (_feeValidation[entry.key] ?? false),
+        );
   }
 
   Future<bool> _createItem() async {
@@ -175,6 +196,13 @@ class _WgtCreateLandlordState extends State<WgtCreateLandlord> {
         'giro_account_number': _giroAccountNumber?.trim(),
         'item_scope_info': _itemScopeMap,
       };
+
+      for (final entry in _feeValues.entries) {
+        final value = entry.value.trim();
+        if (value.isNotEmpty) {
+          queryMap[entry.key] = value;
+        }
+      }
 
       final result = await doPagCreateOrg(
         widget.loggedInUser,
@@ -245,9 +273,14 @@ class _WgtCreateLandlordState extends State<WgtCreateLandlord> {
                               _isLabelValidated = false;
                               _isBankAccountUtilValidated = false;
                               _isGiroAccountNumberValidated = false;
+                              _feeValues.clear();
+                              _feeValidation.clear();
                               _labelResetKey = UniqueKey();
                               _bankAccountUtilResetKey = UniqueKey();
                               _giroAccountNumberResetKey = UniqueKey();
+                              for (final field in _feeFieldDefinitions) {
+                                _feeResetKeys[field['key']!] = UniqueKey();
+                              }
                               _itemScopeMap.clear();
                               _scopeSetterKey = UniqueKey();
                               _bankNameController.clear();
@@ -380,10 +413,45 @@ class _WgtCreateLandlordState extends State<WgtCreateLandlord> {
                 },
               ),
               _getBankSelector(),
+              ..._feeFieldDefinitions.map(_getFeeField),
             ],
           ),
         ),
       ],
+    );
+  }
+
+  Widget _getFeeField(Map<String, String> field) {
+    final fieldKey = field['key']!;
+    final fieldLabel = field['label']!;
+    final validator = getLandlordValidator(
+      fieldKey,
+      isValueRequired: false,
+    );
+
+    return WgtTextField(
+      key: _feeResetKeys[fieldKey],
+      appConfig: widget.appConfig,
+      hintText: fieldLabel,
+      labelText: fieldLabel,
+      maxLength: maxFullNameLength,
+      maxLines: 1,
+      validator: validator,
+      onChanged: (val) {
+        final value = val.toString();
+        setState(() {
+          _feeValues[fieldKey] = value;
+          _feeValidation[fieldKey] = validator(value) == null;
+          _errorText = '';
+          _createSuccess = false;
+        });
+        return null;
+      },
+      onValidate: (String? result) {
+        setState(() {
+          _feeValidation[fieldKey] = result == null;
+        });
+      },
     );
   }
 
