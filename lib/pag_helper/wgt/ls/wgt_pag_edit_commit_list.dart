@@ -1136,7 +1136,7 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
       tagColor = soaType.color.withAlpha(130);
     } else if (configItem['col_key'] == 'lc_status') {
       if (widget.itemType is PagDeviceCat) {
-        PagDeviceLsStatus deviceLsStatus = PagDeviceLsStatus.byTag(tagText);
+        PagDeviceLsStatus deviceLsStatus = PagDeviceLsStatus.byValue(tagText);
         tagLabel = deviceLsStatus.tag;
         tagColor = deviceLsStatus.color.withAlpha(130);
       } else if (widget.itemType is PagFinanceType) {
