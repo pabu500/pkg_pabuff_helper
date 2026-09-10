@@ -332,7 +332,7 @@ class _WgtListSearchBillingRecState extends State<WgtListSearchBillingRec> {
           'showSort': true,
           'getTag': getBillingLcStatusTag,
           'useWidget':
-              widget.allowLcStatusUpdate ? 'billingLcSatusUpdate' : null,
+              widget.allowLcStatusUpdate ? 'billingLcStatusUpdate' : null,
         },
       ]);
 

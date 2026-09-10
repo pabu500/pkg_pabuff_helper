@@ -72,7 +72,7 @@ Map<String, dynamic> getBillingLcStatusTag(row, fieldKey) {
 
   return {
     'tag': getBillingLcStatusTagStr(valueStr),
-    'color': getBillingLcSatusColor(status.name),
+    'color': getBillingLcStatusColor(status.name),
     'tooltip': getBillingLcStatusMessage(status.name),
   };
 }
@@ -94,7 +94,7 @@ String getBillingLcStatusMessage(String? statusStr) {
   return billingLcStatusInfo[status]!['tooltip'];
 }
 
-Color getBillingLcSatusColor(String? statusStr) {
+Color getBillingLcStatusColor(String? statusStr) {
   if (statusStr == null || statusStr.isEmpty) {
     return Colors.transparent;
   }

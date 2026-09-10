@@ -636,7 +636,7 @@ class _WgtEditCommitListState extends State<WgtEditCommitList> {
                   clickCopy: configItem['clickCopy'] ?? false,
                 ),
               )
-            : configItem['useWidget'] == 'billingLcSatusUpdate'
+            : configItem['useWidget'] == 'billingLcStatusUpdate'
                 ? getBillingLcStatusControl(
                     row: row,
                     configItem: configItem,
