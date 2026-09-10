@@ -85,6 +85,7 @@ class WgtListSearchItemFlexi extends StatefulWidget {
     this.getSwitcher,
     this.paneHeight = 820,
     this.finderRefreshKey,
+    this.refreshCurrentSearchKey,
     this.onScopeTreeUpdate,
     this.validateTreeChildren,
     this.isCompactFinder = false,
@@ -131,6 +132,10 @@ class WgtListSearchItemFlexi extends StatefulWidget {
           Map<String, dynamic>, List<Map<String, dynamic>>, Function onPressed)?
       getSwitcher;
   final UniqueKey? finderRefreshKey;
+
+  /// Reruns the most recent search when this changes to a non-null value.
+  /// The finder inputs and saved query are preserved.
+  final Key? refreshCurrentSearchKey;
   final Function? onScopeTreeUpdate;
   final Function? validateTreeChildren;
   final Function? onSearching;
@@ -332,7 +337,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     }
   }
 
-  Future<dynamic> _getItemList() async {
+  Future<dynamic> _getItemList({bool isRefresh = false}) async {
     if (_queryMap.isEmpty) {
       dev.log('queryMap is empty');
       return null;
@@ -388,6 +393,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         'item_list': _entityItems,
         'count': _totalItemCount,
         'current_page': _currentPage,
+        'is_refresh': isRefresh,
       });
     } catch (e) {
       dev.log(e.toString());
@@ -1878,6 +1884,32 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       _isInitialValueMutable = false;
       _initialFilterGroupType = PagFilterGroupType.spec;
     }
+  }
+
+  @override
+  void didUpdateWidget(covariant WgtListSearchItemFlexi oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.refreshCurrentSearchKey == null ||
+        widget.refreshCurrentSearchKey == oldWidget.refreshCurrentSearchKey) {
+      return;
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted || _queryMap.isEmpty) return;
+
+      try {
+        await _getItemList(isRefresh: true);
+      } catch (e) {
+        dev.log('Error refreshing current item search: $e');
+        if (mounted) {
+          widget.onResult?.call({
+            'error': 'Error refreshing item information',
+            'is_refresh': true,
+          });
+        }
+      }
+    });
   }
 
   @override

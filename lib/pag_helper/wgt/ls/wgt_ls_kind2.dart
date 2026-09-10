@@ -49,6 +49,7 @@ class WgtListSearchKind2 extends StatefulWidget {
     this.aclResLabel,
     this.isEditableByAcl,
     this.isCreatableByAcl,
+    this.refreshCurrentSearchKey,
   });
 
   final MdlPagAppConfig appConfig;
@@ -73,6 +74,10 @@ class WgtListSearchKind2 extends StatefulWidget {
   final String? aclResLabel;
   final bool? isEditableByAcl;
   final bool? isCreatableByAcl;
+
+  /// Reruns the most recent search when this changes to a non-null value.
+  /// The finder inputs and saved query are preserved.
+  final Key? refreshCurrentSearchKey;
 
   @override
   State<WgtListSearchKind2> createState() => _WgtListSearchKind2State();
@@ -403,6 +408,7 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
               aclResLabel: widget.aclResLabel,
               isEditableByAcl: widget.isEditableByAcl,
               isCreatableByAcl: widget.isCreatableByAcl,
+              refreshCurrentSearchKey: widget.refreshCurrentSearchKey,
               getPaneWidget: getPaneWidget,
               // getSwitcher: getPaneModeSwitcher,
               onScopeTreeUpdate: widget.onScopeTreeUpdate,
