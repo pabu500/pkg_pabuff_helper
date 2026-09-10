@@ -825,7 +825,7 @@ enum PagMeterCommType {
 enum PagDeviceLsStatus {
   cip('Commission in Progress', 'cip', 'cip', Colors.lime),
   normal('Noraml', 'normal', 'norm', Colors.lightGreen),
-  maintenance('Maintenance', 'maint', 'maint.', Colors.orangeAccent),
+  maintenance('Maintenance', 'maint', 'maint', Colors.orangeAccent),
   dc('Decommissioned', 'dc', 'dc', Colors.brown),
   mfd('Marked for Delete', 'mfd', 'mfd', Colors.redAccent),
   ;
