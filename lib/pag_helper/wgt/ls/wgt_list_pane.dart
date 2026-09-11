@@ -1,10 +1,12 @@
 import 'package:buff_helper/pag_helper/comm/comm_pag_item.dart';
+import 'package:buff_helper/pag_helper/comm/comm_pref.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_controller.dart';
 import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
 import 'package:buff_helper/pag_helper/wgt/ls/wgt_card_list.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
+import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -39,6 +41,7 @@ class WgtListPane extends StatefulWidget {
     this.displayMode = 'table',
     this.onResult,
     this.aclResLabel,
+    this.projectId,
   });
 
   final MdlPagAppConfig appConfig;
@@ -65,6 +68,7 @@ class WgtListPane extends StatefulWidget {
   final String displayMode;
   final Function(Map<String, dynamic>)? onResult;
   final String? aclResLabel;
+  final int? projectId;
 
   @override
   State<WgtListPane> createState() => _WgtListPaneState();
@@ -90,6 +94,65 @@ class _WgtListPaneState extends State<WgtListPane> {
   String? _sortOrder;
   UniqueKey? _refreshKey;
   UniqueKey? _listKey;
+
+  bool _isLoadingColumnPref = true;
+  int _columnPrefRevision = 0;
+  Map<String, bool> _defaultColumnVisibility = {};
+  int? _columnPrefUserId;
+  int? _columnPrefProjectId;
+
+  Future<void> _loadColumnPref() async {
+    final controller = widget.listController;
+    final prefKey = widget.sectionName;
+    final prefUser = loggedInUser;
+    final userId = prefUser?.id;
+    final projectId =
+        widget.projectId ?? prefUser?.selectedScope.projectProfile?.id;
+    _columnPrefUserId = userId;
+    _columnPrefProjectId = projectId;
+    _defaultColumnVisibility = getListColumnDefaults(controller);
+    for (final column in controller.listColControllerList) {
+      if (_defaultColumnVisibility.containsKey(column.colKey)) {
+        column.showColumn = _defaultColumnVisibility[column.colKey]!;
+      }
+    }
+    if (prefKey.isEmpty || prefUser == null || projectId == null) {
+      if (mounted) setState(() => _isLoadingColumnPref = false);
+      return;
+    }
+    try {
+      final pref = await getListColumnPreference(
+        appConfig: widget.appConfig,
+        user: prefUser,
+        projectId: projectId,
+        prefKey: prefKey,
+      );
+      if (!mounted ||
+          !identical(controller, widget.listController) ||
+          prefKey != widget.sectionName ||
+          userId != _columnPrefUserId ||
+          projectId != _columnPrefProjectId) {
+        return;
+      }
+      for (final column in controller.listColControllerList) {
+        if (!column.hidden &&
+            pref.columnVisibility.containsKey(column.colKey)) {
+          column.showColumn = pref.columnVisibility[column.colKey]!;
+        }
+      }
+      _columnPrefRevision = pref.revision;
+    } catch (error) {
+      dev.log('Failed to load list column preference: $error');
+    } finally {
+      if (mounted &&
+          identical(controller, widget.listController) &&
+          prefKey == widget.sectionName &&
+          userId == _columnPrefUserId &&
+          projectId == _columnPrefProjectId) {
+        setState(() => _isLoadingColumnPref = false);
+      }
+    }
+  }
 
   Future<dynamic> _getItemList() async {
     if (_queryMap.isEmpty) {
@@ -285,10 +348,46 @@ class _WgtListPaneState extends State<WgtListPane> {
           });
       widget.listController.listColControllerList.insert(0, switcherCol);
     }
+
+    _loadColumnPref();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final currentUser = Provider.of<PagUserProvider>(context).currentUser;
+    final currentProjectId =
+        widget.projectId ?? currentUser?.selectedScope.projectProfile?.id;
+    if (currentUser?.id != _columnPrefUserId ||
+        currentProjectId != _columnPrefProjectId) {
+      loggedInUser = currentUser;
+      _isLoadingColumnPref = true;
+      _columnPrefRevision = 0;
+      _loadColumnPref();
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant WgtListPane oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!identical(oldWidget.listController, widget.listController) ||
+        oldWidget.sectionName != widget.sectionName ||
+        oldWidget.projectId != widget.projectId ||
+        oldWidget.appConfig.portalType != widget.appConfig.portalType) {
+      _isLoadingColumnPref = true;
+      _columnPrefRevision = 0;
+      _loadColumnPref();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoadingColumnPref) {
+      return const SizedBox(
+        height: 130,
+        child: Center(child: WgtPagWait()),
+      );
+    }
     return _listPaneMode == ListPaneMode.list
         ? getList(ListPaneMode.list)
         : getListPane();
@@ -311,6 +410,9 @@ class _WgtListPaneState extends State<WgtListPane> {
               itemType: widget.itemType,
               selectShowColumn: true,
               sectionName: widget.sectionName,
+              defaultColumnVisibility: _defaultColumnVisibility,
+              columnPrefRevision: _columnPrefRevision,
+              columnPrefProjectId: _columnPrefProjectId,
               listPrefix: widget.listPrefix,
               showIndex: true,
               queryMap: _queryMap,
@@ -324,6 +426,9 @@ class _WgtListPaneState extends State<WgtListPane> {
                       _setPaneMode();
                     }
                   : null,
+              onColumnPrefRevisionChanged: (revision) {
+                setState(() => _columnPrefRevision = revision);
+              },
               onPreviousPage: () async {
                 setState(() {
                   _currentPage--;

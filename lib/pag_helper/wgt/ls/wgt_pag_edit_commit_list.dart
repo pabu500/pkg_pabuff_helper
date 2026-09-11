@@ -23,6 +23,7 @@ import '../../def_helper/dh_meter_group.dart';
 import '../../def_helper/dh_pag_tariff.dart';
 import '../../def_helper/dh_pag_tenant.dart';
 import '../../def_helper/dh_list.dart';
+import '../wgt_list_column_customize2.dart';
 import '../wgt_list_column_customize.dart';
 
 class WgtPagEditCommitList extends StatefulWidget {
@@ -35,6 +36,10 @@ class WgtPagEditCommitList extends StatefulWidget {
     this.width,
     this.height,
     this.sectionName = '',
+    this.defaultColumnVisibility = const {},
+    this.columnPrefRevision = 0,
+    this.columnPrefProjectId,
+    this.onColumnPrefRevisionChanged,
     this.appConfig,
     this.loggedInUser,
     this.listContextType,
@@ -76,6 +81,10 @@ class WgtPagEditCommitList extends StatefulWidget {
   final double? width;
   final double? height;
   final String sectionName;
+  final Map<String, bool> defaultColumnVisibility;
+  final int columnPrefRevision;
+  final int? columnPrefProjectId;
+  final ValueChanged<int>? onColumnPrefRevisionChanged;
   // final List<Map<String, dynamic>> listConfig;
   final MdlPagListController listController;
   final PagListContextType? listContextType;
@@ -991,6 +1000,42 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
     //   onChanged: () {},
     //   onReset: () {},
     // );
+    final useServerPreference = widget.sectionName.isNotEmpty &&
+        widget.appConfig != null &&
+        widget.loggedInUser != null &&
+        widget.columnPrefProjectId != null;
+    final customizeWidget = useServerPreference
+        ? WgtPagListColumnCustomize2(
+            appConfig: widget.appConfig!,
+            loggedInUser: widget.loggedInUser!,
+            projectId: widget.columnPrefProjectId!,
+            prefKey: widget.sectionName,
+            listController: widget.listController,
+            listHeight: 220,
+            defaultColumnVisibility: widget.defaultColumnVisibility,
+            revision: widget.columnPrefRevision,
+            onSet: (revision) {
+              setState(() {
+                _headerRefreshKey = UniqueKey();
+                _listKey = UniqueKey();
+                widget.onColCustomizeSet?.call();
+              });
+              widget.onColumnPrefRevisionChanged?.call(revision);
+            },
+          )
+        : WgtPagListColumnCustomize(
+            sectionName: widget.sectionName,
+            listController: widget.listController,
+            listHeight: 220,
+            onChanged: (_) {},
+            onSet: () {
+              setState(() {
+                _headerRefreshKey = UniqueKey();
+                _listKey = UniqueKey();
+                widget.onColCustomizeSet?.call();
+              });
+            },
+          );
     return Align(
       alignment: Alignment.centerLeft,
       child: Tooltip(
@@ -999,27 +1044,10 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
         child: WgtPopupButton(
             width: 15,
             height: 15,
-            popupWidth: 130,
-            popupHeight: 255,
+            popupWidth: 180,
+            popupHeight: 285,
             direction: 'right',
-            popupChild: WgtPagListColumnCustomize(
-              sectionName: widget.sectionName,
-              listController: widget.listController,
-              listHeight: 220,
-              onChanged: (bool selected) {
-                // setState(() {
-                // _headerRefreshKey = UniqueKey();
-                // _listKey = UniqueKey();
-                // });
-              },
-              onSet: () {
-                setState(() {
-                  _headerRefreshKey = UniqueKey();
-                  _listKey = UniqueKey();
-                  widget.onColCustomizeSet?.call();
-                });
-              },
-            ),
+            popupChild: customizeWidget,
             // getColumnSelection(),
             child: Icon(
               Icons.settings,

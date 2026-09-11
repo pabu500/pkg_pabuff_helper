@@ -33,6 +33,7 @@ import 'package:buff_helper/pag_helper/pag_app_context_list.dart';
 import 'package:provider/provider.dart';
 
 import '../../comm/comm_list.dart';
+import '../../comm/comm_pref.dart';
 import '../../comm/pag_be_api_base.dart';
 import '../../def_helper/dh_acl.dart';
 import '../../def_helper/dh_meter_group.dart';
@@ -318,7 +319,9 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           }
         }
 
-        _updateCustomize();
+        if (widget.aclResLabel == null || widget.aclResLabel!.isEmpty) {
+          _updateCustomize();
+        }
 
         widget.onGetListInfoListResult?.call(_listControllerList);
       }
@@ -2464,12 +2467,23 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       }
     }
 
+    final columnPrefKey =
+        widget.aclResLabel == null || widget.aclResLabel!.trim().isEmpty
+            ? ''
+            : getListColumnPrefKey(
+                aclResLabel: widget.aclResLabel!,
+                itemKind: widget.itemKind,
+                itemType: _selectedListController!.itemTypeEnum,
+                listContextType: widget.listContextType,
+              );
+
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Padding(
         padding: const EdgeInsets.only(left: 0, right: 60),
         child: WgtListPane(
           appConfig: widget.appConfig,
+          projectId: loggedInUser!.selectedScope.projectProfile!.id,
           itemKind: widget.itemKind,
           enablePaneModeSwitcher: widget.enablePaneModeSwitcher,
           initialItemList: _entityItems,
@@ -2480,7 +2494,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           listController: _selectedListController!,
           getPaneWidget: widget.getPaneWidget,
           getSwitcher: widget.getSwitcher ?? getPaneModeSwitcher,
-          sectionName: widget.prefKey,
+          sectionName: columnPrefKey,
           paneHeight: widget.paneHeight,
           itemType: widget.itemTypeEnum ?? widget.listController?.itemTypeEnum,
           listPrefix: _getListPrefix(),

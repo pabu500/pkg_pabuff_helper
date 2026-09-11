@@ -153,8 +153,12 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
       }
       assert(_displayNameKey.isNotEmpty);
 
-      // update col pref
-      _loadColPref();
+      // Legacy callers without an ACL resource label continue to use the
+      // browser preference. Server-backed lists load their preference in
+      // WgtListPane after the selected list controller is ready.
+      if (widget.aclResLabel == null || widget.aclResLabel!.isEmpty) {
+        _loadColPref();
+      }
 
       widget.onItemTypeSelected?.call(_selectedListController?.itemTypeEnum);
 
