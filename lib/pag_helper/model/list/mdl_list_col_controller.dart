@@ -139,7 +139,7 @@ class MdlListColController {
     this.errorColor,
     this.valueList,
     this.getTag,
-    bool? pinned,
+    this.pinned = false,
     this.noSel = false,
     this.getCustomWidget,
     this.scopeType,
@@ -158,9 +158,7 @@ class MdlListColController {
     this.opInfo,
     this.isCompactFilter = false,
     this.showScanner = false,
-  }) {
-    pinned = pinned ?? false;
-  }
+  });
 
   //getter isJoinKey
   bool get isJoinKey => joinKey != null;
@@ -577,6 +575,16 @@ class MdlListColController {
       }
     }
 
+    bool pinned = false;
+    if (json['pinned'] != null) {
+      final pinnedValue = json['pinned'];
+      if (pinnedValue is bool) {
+        pinned = pinnedValue;
+      } else if (pinnedValue is String) {
+        pinned = pinnedValue.toLowerCase() == 'true';
+      }
+    }
+
     bool showScanner = false;
     if (json['show_scanner'] != null) {
       dynamic showScannerValue = json['show_scanner'];
@@ -642,6 +650,7 @@ class MdlListColController {
       showTimestampAsDate: showTimestampAsDate,
       rowOrder: rowOrder,
       isCompactFilter: isCompactFilter,
+      pinned: pinned,
       showScanner: showScanner,
       // opInfoList: opInfoList,
       opInfo: opInfo,
@@ -690,6 +699,7 @@ class MdlListColController {
     // data['op_info_list'] = opInfoList;
     data['op_info'] = opInfo;
     data['is_compact_filter'] = isCompactFilter.toString();
+    data['pinned'] = pinned.toString();
     data['show_scanner'] = showScanner.toString();
     data['no_sel'] = noSel.toString();
 

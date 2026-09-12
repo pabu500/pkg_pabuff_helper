@@ -59,7 +59,7 @@ import '../app/platform/acl/wgt_item_group_item_assignment.dart';
 import '../app/platform/user_manager/wgt_create_user2.dart';
 import '../job/wgt_job_type_op_panel3.dart';
 import 'wgt_list_pane.dart';
-import 'wgt_pag_item_finder_flexi.dart';
+import 'wgt_pag_item_finder_flexi2.dart';
 import '../app/ems/wgt_tariff_package_assignment.dart';
 import 'dart:developer' as dev;
 
@@ -2021,7 +2021,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           getAddItemButton(),
           Offstage(
             offstage: !widget.showFinder,
-            child: WgtPagItemFinderFlexi(
+            child: WgtPagItemFinderFlexi2(
               key: _finderRefreshKey, //_listContentRefreshKey,
               enableSearch: widget.enableSearch,
               initialNoR: widget.initialNoR,
@@ -2030,6 +2030,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
               widthOffset: widget.widthOffset,
               loggedInUser: loggedInUser!,
               appConfig: widget.appConfig,
+              projectId: loggedInUser!.selectedScope.projectProfile!.id,
               itemKind: widget.itemKind,
               itemType: _selectedListController!.itemTypeEnum,
               listContextType: widget.listContextType,

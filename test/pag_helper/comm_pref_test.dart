@@ -2,6 +2,7 @@ import 'package:buff_helper/pag_helper/comm/comm_pref.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_device.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_list.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_item.dart';
+import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -40,6 +41,35 @@ void main() {
         ),
         'ems.billingManager.billList.bill.info',
       );
+    });
+  });
+
+  test('finder preference key has a distinct suffix', () {
+    expect(
+      getFinderPinPrefKey(
+        aclResLabel: 'ems.meterManager.meterList',
+        itemKind: PagItemKind.device,
+        itemType: PagDeviceCat.meter,
+        listContextType: PagListContextType.info,
+      ),
+      'ems.meterManager.meterList.device.meter.info.finder',
+    );
+  });
+
+  group('list info pinned default', () {
+    test('accepts string true', () {
+      final column = MdlListColController.fromJson({
+        'col_key': 'name',
+        'pinned': 'true',
+      });
+
+      expect(column.pinned, isTrue);
+    });
+
+    test('is false when omitted', () {
+      final column = MdlListColController.fromJson({'col_key': 'name'});
+
+      expect(column.pinned, isFalse);
     });
   });
 }

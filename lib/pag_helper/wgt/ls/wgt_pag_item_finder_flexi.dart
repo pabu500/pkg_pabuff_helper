@@ -30,6 +30,7 @@ import '../../../xt_ui/wdgt/get_collapsed_bar.dart';
 import '../../../xt_ui/wdgt/info/get_error_text_prompt.dart';
 import '../../../xt_ui/xt_helpers.dart';
 import '../../comm/comm_list.dart';
+import '../../comm/comm_pref.dart';
 import '../../def_helper/dh_acl.dart';
 import '../../def_helper/dh_device.dart';
 import '../../def_helper/dh_pag_tariff.dart';
@@ -89,6 +90,8 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
     this.autoCascadeScopeFilter = true,
     this.loadOnInit = false,
     this.aclResLabel,
+    this.useServerPinPreference = false,
+    this.projectId,
   });
 
   final MdlPagUser loggedInUser;
@@ -136,6 +139,8 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
   final bool autoCascadeScopeFilter;
   final bool loadOnInit;
   final String? aclResLabel;
+  final bool useServerPinPreference;
+  final int? projectId;
   final MdlPagScopeProfile? prevailingScopeProfile;
   final void Function(MdlPagSiteGroupProfile?, MdlPagSiteProfile?,
       MdlPagBuildingProfile?, MdlPagLocationGroupProfile?)? onScopeChanged;
@@ -174,6 +179,13 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   final _norCap = 300;
 
   bool _isCustSet = false;
+
+  bool _isLoadingPinPreference = false;
+  int _pinPreferenceRevision = 0;
+  int _pinPreferenceLoadSequence = 0;
+  Timer? _pinPreferenceSaveTimer;
+  bool _isSavingPinPreference = false;
+  bool _pinPreferenceSavePending = false;
 
   late TextStyle _dropDownListTextStyle;
   late TextStyle _dropDownListHintStyle;
@@ -508,6 +520,14 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   }
 
   void _saveCustomize() {
+    if (_usesServerPinPreference) {
+      _pinPreferenceSaveTimer?.cancel();
+      _pinPreferenceSaveTimer =
+          Timer(const Duration(milliseconds: 350), _saveServerPinPreference);
+      widget.onCustomizeSet?.call();
+      return;
+    }
+
     Map<String, dynamic> colCustomize = {};
 
     for (MdlListColController item
@@ -516,6 +536,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
     }
 
     saveToSharedPref(listName, colCustomize);
+    widget.onCustomizeSet?.call();
   }
 
   void _loadCustomize() {
@@ -527,6 +548,105 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
       if (colCustomize['${key}_pinned'] != null) {
         item.pinned = colCustomize['${key}_pinned'] ?? false;
       }
+    }
+  }
+
+  bool get _usesServerPinPreference =>
+      widget.useServerPinPreference &&
+      widget.projectId != null &&
+      widget.aclResLabel != null &&
+      widget.aclResLabel!.trim().isNotEmpty;
+
+  String get _finderPinPrefKey => getFinderPinPrefKey(
+        aclResLabel: widget.aclResLabel!,
+        itemKind: widget.itemKind,
+        itemType: widget.itemType,
+        listContextType: widget.listContextType,
+      );
+
+  Map<String, bool> _currentPinValues() {
+    return {
+      for (final column in widget.listController.listColControllerList)
+        column.colKey: column.pinned,
+    };
+  }
+
+  Future<void> _loadServerPinPreference() async {
+    final loadSequence = ++_pinPreferenceLoadSequence;
+    final controller = widget.listController;
+    final defaults = getFinderPinDefaults(controller);
+    for (final column in controller.listColControllerList) {
+      column.pinned = defaults[column.colKey] ?? false;
+    }
+    _isLoadingPinPreference = true;
+    try {
+      final preference = await getFinderPinPreference(
+        appConfig: widget.appConfig,
+        user: widget.loggedInUser,
+        projectId: widget.projectId!,
+        prefKey: _finderPinPrefKey,
+      );
+      if (!mounted ||
+          loadSequence != _pinPreferenceLoadSequence ||
+          !identical(controller, widget.listController)) {
+        return;
+      }
+      for (final column in controller.listColControllerList) {
+        if (preference.filterPinned.containsKey(column.colKey)) {
+          column.pinned = preference.filterPinned[column.colKey]!;
+        }
+      }
+      _pinPreferenceRevision = preference.revision;
+    } catch (error) {
+      dev.log('Failed to load finder pin preference: $error');
+    } finally {
+      if (mounted &&
+          loadSequence == _pinPreferenceLoadSequence &&
+          identical(controller, widget.listController)) {
+        setState(() => _isLoadingPinPreference = false);
+      }
+    }
+  }
+
+  Future<void> _saveServerPinPreference() async {
+    if (!_usesServerPinPreference) return;
+    if (_isSavingPinPreference) {
+      _pinPreferenceSavePending = true;
+      return;
+    }
+    _isSavingPinPreference = true;
+    try {
+      do {
+        _pinPreferenceSavePending = false;
+        final filterPinned = _currentPinValues();
+        try {
+          final saved = await setFinderPinPreference(
+            appConfig: widget.appConfig,
+            user: widget.loggedInUser,
+            projectId: widget.projectId!,
+            prefKey: _finderPinPrefKey,
+            filterPinned: filterPinned,
+            expectedRevision: _pinPreferenceRevision,
+          );
+          _pinPreferenceRevision = saved.revision;
+        } catch (error) {
+          if (!error.toString().contains('Preference revision conflict')) {
+            rethrow;
+          }
+          final latest = await getFinderPinPreference(
+            appConfig: widget.appConfig,
+            user: widget.loggedInUser,
+            projectId: widget.projectId!,
+            prefKey: _finderPinPrefKey,
+          );
+          _pinPreferenceRevision = latest.revision;
+          _pinPreferenceSavePending = true;
+        }
+      } while (_pinPreferenceSavePending && mounted);
+    } catch (error) {
+      dev.log('Failed to save finder pin preference: $error');
+    } finally {
+      _isSavingPinPreference = false;
     }
   }
 
@@ -911,7 +1031,11 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
       }
     }
 
-    _loadCustomize();
+    if (_usesServerPinPreference) {
+      _loadServerPinPreference();
+    } else {
+      _loadCustomize();
+    }
 
     _lastLoadingTime = DateTime.now();
 
@@ -951,13 +1075,37 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   }
 
   @override
+  void didUpdateWidget(covariant WgtPagItemFinderFlexi oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final preferenceIdentityChanged = oldWidget.projectId != widget.projectId ||
+        oldWidget.aclResLabel != widget.aclResLabel ||
+        oldWidget.itemKind != widget.itemKind ||
+        oldWidget.itemType != widget.itemType ||
+        oldWidget.listContextType != widget.listContextType ||
+        !identical(oldWidget.listController, widget.listController);
+    if (_usesServerPinPreference && preferenceIdentityChanged) {
+      _pinPreferenceSaveTimer?.cancel();
+      _pinPreferenceRevision = 0;
+      _loadServerPinPreference();
+    }
+  }
+
+  @override
   void dispose() {
+    _pinPreferenceSaveTimer?.cancel();
     _numberOfRecordsController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoadingPinPreference) {
+      return const SizedBox(
+        height: 130,
+        child: Center(child: WgtPagWait()),
+      );
+    }
+
     _enableSearch = _enableSearchButton();
 
     _isPhone = context.isPhone;
@@ -1272,9 +1420,6 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   }
 
   Widget getItemLocationFilterGroup({double dropdownWidth = 250}) {
-    if (!_isFullPanel) {
-      return Container();
-    }
     List<Widget> list = getItemLocationGroupList(dropdownWidth: dropdownWidth);
     if (list.isEmpty) {
       return Container();

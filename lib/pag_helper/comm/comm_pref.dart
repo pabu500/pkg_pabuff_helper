@@ -22,8 +22,22 @@ class PagListColumnPreference {
   final int revision;
 }
 
+class PagFinderPinPreference {
+  const PagFinderPinPreference({
+    required this.found,
+    required this.filterPinned,
+    required this.revision,
+  });
+
+  final bool found;
+  final Map<String, bool> filterPinned;
+  final int revision;
+}
+
 final Expando<Map<String, bool>> _listColumnDefaults =
     Expando<Map<String, bool>>('listColumnDefaults');
+final Expando<Map<String, bool>> _finderPinDefaults =
+    Expando<Map<String, bool>>('finderPinDefaults');
 
 Map<String, bool> getListColumnDefaults(MdlPagListController listController) {
   final existing = _listColumnDefaults[listController];
@@ -33,6 +47,17 @@ Map<String, bool> getListColumnDefaults(MdlPagListController listController) {
     defaults[column.colKey] = column.showColumn;
   }
   _listColumnDefaults[listController] = Map<String, bool>.from(defaults);
+  return defaults;
+}
+
+Map<String, bool> getFinderPinDefaults(MdlPagListController listController) {
+  final existing = _finderPinDefaults[listController];
+  if (existing != null) return Map<String, bool>.from(existing);
+  final defaults = <String, bool>{};
+  for (final column in listController.listColControllerList) {
+    defaults[column.colKey] = column.pinned;
+  }
+  _finderPinDefaults[listController] = Map<String, bool>.from(defaults);
   return defaults;
 }
 
@@ -54,6 +79,20 @@ String getListColumnPrefKey({
   }
   parts.add(listContextType.value);
   return parts.join('.');
+}
+
+String getFinderPinPrefKey({
+  required String aclResLabel,
+  required PagItemKind itemKind,
+  required dynamic itemType,
+  required PagListContextType listContextType,
+}) {
+  return '${getListColumnPrefKey(
+    aclResLabel: aclResLabel,
+    itemKind: itemKind,
+    itemType: itemType,
+    listContextType: listContextType,
+  )}.finder';
 }
 
 Future<PagListColumnPreference> getListColumnPreference({
@@ -127,6 +166,65 @@ Future<void> resetListColumnPreference({
   );
 }
 
+Future<PagFinderPinPreference> getFinderPinPreference({
+  required MdlPagAppConfig appConfig,
+  required MdlPagUser user,
+  required int projectId,
+  required String prefKey,
+}) async {
+  final result = await ex2(
+    endpoint: _getPrefEndpoint,
+    crudType: 'read',
+    opStr: 'get finder pin preference',
+    appConfig: appConfig,
+    queryMap: {
+      'project_id': projectId,
+      'portal_type': appConfig.portalType.value,
+      'pref_key': prefKey,
+    },
+    svcClaim: _claimFor(user),
+  );
+  final parsed = _preferenceMapFromResult(result, 'filter_pinned');
+  return PagFinderPinPreference(
+    found: parsed.found,
+    filterPinned: parsed.values,
+    revision: parsed.revision,
+  );
+}
+
+Future<PagFinderPinPreference> setFinderPinPreference({
+  required MdlPagAppConfig appConfig,
+  required MdlPagUser user,
+  required int projectId,
+  required String prefKey,
+  required Map<String, bool> filterPinned,
+  required int expectedRevision,
+}) async {
+  final result = await ex2(
+    endpoint: _setPrefEndpoint,
+    crudType: 'update',
+    opStr: 'save finder pin preference',
+    appConfig: appConfig,
+    queryMap: {
+      'project_id': projectId,
+      'portal_type': appConfig.portalType.value,
+      'pref_key': prefKey,
+      'expected_revision': expectedRevision,
+      'pref_value': {
+        'schema_version': 1,
+        'filter_pinned': filterPinned,
+      },
+    },
+    svcClaim: _claimFor(user),
+  );
+  final parsed = _preferenceMapFromResult(result, 'filter_pinned');
+  return PagFinderPinPreference(
+    found: parsed.found,
+    filterPinned: parsed.values,
+    revision: parsed.revision,
+  );
+}
+
 MdlPagSvcClaim2 _claimFor(MdlPagUser user) {
   return MdlPagSvcClaim2(
     userId: user.id,
@@ -139,6 +237,16 @@ MdlPagSvcClaim2 _claimFor(MdlPagUser user) {
 }
 
 PagListColumnPreference _preferenceFromResult(dynamic result) {
+  final parsed = _preferenceMapFromResult(result, 'column_visibility');
+  return PagListColumnPreference(
+    found: parsed.found,
+    columnVisibility: parsed.values,
+    revision: parsed.revision,
+  );
+}
+
+({bool found, Map<String, bool> values, int revision}) _preferenceMapFromResult(
+    dynamic result, String valueKey) {
   if (result is! Map) {
     throw Exception('Invalid preference response');
   }
@@ -148,21 +256,21 @@ PagListColumnPreference _preferenceFromResult(dynamic result) {
   final revision = revisionValue is num
       ? revisionValue.toInt()
       : int.tryParse(revisionValue?.toString() ?? '') ?? 0;
-  final visibility = <String, bool>{};
+  final values = <String, bool>{};
   final prefValue = resultMap['pref_value'];
   if (prefValue is Map) {
-    final rawVisibility = prefValue['column_visibility'];
-    if (rawVisibility is Map) {
-      for (final entry in rawVisibility.entries) {
+    final rawValues = prefValue[valueKey];
+    if (rawValues is Map) {
+      for (final entry in rawValues.entries) {
         if (entry.value is bool) {
-          visibility[entry.key.toString()] = entry.value as bool;
+          values[entry.key.toString()] = entry.value as bool;
         }
       }
     }
   }
-  return PagListColumnPreference(
+  return (
     found: found,
-    columnVisibility: visibility,
+    values: values,
     revision: revision,
   );
 }
