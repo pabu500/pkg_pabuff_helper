@@ -7,6 +7,8 @@ import 'package:material_symbols_icons/symbols.dart';
 import '../../app_helper/pagrid_app_config.dart';
 import '../usage/usage_stat_helper.dart';
 import 'mdl_ems_type_usage.dart';
+import 'tenant_meter_readings_csv.dart';
+import 'wgt_meter_readings_download.dart';
 
 class WgtTenantUsageSummary2 extends StatefulWidget {
   const WgtTenantUsageSummary2({
@@ -23,6 +25,9 @@ class WgtTenantUsageSummary2 extends StatefulWidget {
     required this.excludeAutoUsage,
     required this.displayContextStr,
     this.usageCalc,
+    this.showMeterReadingsDownload = false,
+    this.meterReadingsExport,
+    this.meterReadingsExportError,
     this.showFactoredUsage = true,
     // required this.usageFactor,
     this.typeRates,
@@ -44,6 +49,9 @@ class WgtTenantUsageSummary2 extends StatefulWidget {
     this.costDecimals = 3,
   });
 
+  final bool showMeterReadingsDownload;
+  final List<dynamic>? meterReadingsExport;
+  final String? meterReadingsExportError;
   final PaGridAppConfig appConfig;
   final ScopeProfile scopeProfile;
   final Evs2User loggedInUser;
@@ -133,6 +141,21 @@ class _WgtTenantUsageSummary2State extends State<WgtTenantUsageSummary2> {
                   widget.tenantLabel,
                   widget.tenantName,
                   widget.tenantAccountId,
+                  action: widget.showMeterReadingsDownload
+                      ? WgtMeterReadingsDownload(
+                          rows: widget.meterReadingsExport,
+                          fallbackRows: tenantMeterReadingsFromUsageSummary(
+                            widget.tenantLabel?.isNotEmpty == true
+                                ? widget.tenantLabel!
+                                : widget.tenantName,
+                            widget.tenantUsageSummary,
+                          ),
+                          error: widget.meterReadingsExportError,
+                          tenantName: widget.tenantName,
+                          fromDatetime: widget.fromDatetime,
+                          toDatetime: widget.toDatetime,
+                        )
+                      : null,
                 ),
                 getUsageTypeStat(
                   context,

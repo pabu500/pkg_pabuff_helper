@@ -141,7 +141,7 @@ class _WgtUsageStatCoreState extends State<WgtUsageStatCore> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       SizedBox(
-                        width: 70,
+                        width: 75,
                         child: Padding(
                           padding: const EdgeInsets.only(top: 25),
                           child: Row(

@@ -14,12 +14,14 @@ class WgtTenantUsage extends StatefulWidget {
     super.key,
     required this.appConfig,
     this.itemListPaneMode = false,
+    this.showMeterReadingsDownload = false,
     this.tenantName,
     this.tenantLabel,
   });
 
   final PaGridAppConfig appConfig;
   final bool itemListPaneMode;
+  final bool showMeterReadingsDownload;
   final String? tenantName;
   final String? tenantLabel;
 
@@ -90,6 +92,7 @@ class _WgtTenantUsageState extends State<WgtTenantUsage> {
 
       Duration duration = _selectedEndDate!.difference(_selectedStartDate!);
       Map<String, String> queryMap = {
+        'include_meter_readings_export': widget.showMeterReadingsDownload.toString(),
         'item_type': _itemType.name,
         'meter_type': _itemType.name,
         'project_scope': _scopeProfile.selectedProjectScope!.name,
@@ -562,6 +565,9 @@ class _WgtTenantUsageState extends State<WgtTenantUsage> {
           tenantType: item['tenant_type'],
           excludeAutoUsage: false,
           tenantUsageSummary: tenantUsageSummaryList,
+          showMeterReadingsDownload: widget.showMeterReadingsDownload,
+          meterReadingsExport: item['meter_readings_export'],
+          meterReadingsExportError: item['meter_readings_export_error'],
           subTenantListUsageSummary: [], //subTenantListUsageSummary,
         ),
       );

@@ -99,7 +99,8 @@ Widget getUsageTitle(
     bool isMonthly,
     String? tenantLabel,
     String tenantName,
-    String? tenantAccountId) {
+    String? tenantAccountId,
+    {Widget? action}) {
   String rangeStr = getTimeRangeStr(
     fromDatetime,
     toDatetime,
@@ -118,47 +119,55 @@ Widget getUsageTitle(
           ),
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            tenantLabel ?? '',
-            style: TextStyle(
-              fontSize: 21,
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).hintColor,
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  tenantLabel ?? '',
+                  style: TextStyle(
+                    fontSize: 21,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).hintColor,
+                  ),
+                ),
+                Row(
+                  children: [
+                    Text(
+                      tenantName,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).hintColor.withAlpha(210),
+                      ),
+                    ),
+                    horizontalSpaceRegular,
+                    Text(
+                      tenantAccountId ?? '',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).hintColor.withAlpha(210),
+                      ),
+                    ),
+                  ],
+                ),
+                verticalSpaceSmall,
+                Text(
+                  rangeStr,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).hintColor,
+                  ),
+                ),
+              ],
             ),
           ),
-          Row(
-            children: [
-              Text(
-                tenantName,
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).hintColor.withAlpha(210),
-                ),
-              ),
-              horizontalSpaceRegular,
-              Text(
-                tenantAccountId ?? '',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).hintColor.withAlpha(210),
-                ),
-              ),
-            ],
-          ),
-          verticalSpaceSmall,
-          Text(
-            rangeStr,
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).hintColor,
-            ),
-          ),
+          if (action != null) action,
         ],
       ),
     ),
