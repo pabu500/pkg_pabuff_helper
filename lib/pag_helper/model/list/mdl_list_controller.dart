@@ -53,12 +53,14 @@ class MdlPagListController /*extends ChangeNotifier*/ {
   // }
 
   factory MdlPagListController.fromJson(Map<String, dynamic> json,
-      {PagListContextType? listContextType}) {
+      {PagListContextType? listContextType,
+      PagScopeType? currentScopeType}) {
     List<MdlListColController> listConfigItemList = [];
     if (json['list_config'] != null) {
       for (var listConfigItem in json['list_config']) {
         listConfigItem = MdlListColController.fromJson(listConfigItem,
-            listContextType: listContextType);
+            listContextType: listContextType,
+            currentScopeType: currentScopeType);
         listConfigItemList.add(listConfigItem);
       }
     }

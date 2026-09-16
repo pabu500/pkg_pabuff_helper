@@ -124,7 +124,9 @@ class _WgtItemTypeSelectorState extends State<WgtItemTypeSelector> {
         for (var listInfoMap in _itemTypeInfoList) {
           listInfoMap['item_kind'] = widget.itemKind.name;
           MdlPagListController listController =
-              MdlPagListController.fromJson(listInfoMap);
+              MdlPagListController.fromJson(listInfoMap,
+                  currentScopeType:
+                      loggedInUser!.selectedScope.getScopeType());
           _listControllerList.add(listController);
         }
       }

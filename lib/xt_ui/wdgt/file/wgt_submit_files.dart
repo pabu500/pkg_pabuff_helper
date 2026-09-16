@@ -41,38 +41,31 @@ class _WgtSubmitFilesState extends State<WgtSubmitFiles> {
       return;
     }
     try {
-      await FilePicker /*.platform*/
-              .pickFiles(
-                  withData: true,
-                  type: FileType.custom,
-                  allowMultiple: true,
-                  allowedExtensions: widget.fileExtensions!)
-          .then((result) {
-        if (result == null || result.files.isEmpty) {
-          if (mounted) {
-            showSnackBar(context, 'Please select a file');
-          }
-          return;
-        }
-        if (result.files.length > widget.maxFiles) {
+      await FilePicker.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: widget.fileExtensions!,
+      ).then((result) {
+        if (result.length > widget.maxFiles) {
           if (mounted) {
             showSnackBar(
-                context, 'Please select up to ${widget.maxFiles} files');
+              context,
+              'Please select up to ${widget.maxFiles} files',
+            );
           }
           return;
         }
 
         //check if the file is txt or csv
         bool getTextContent = true;
-        for (var file in result.files) {
+        for (var file in result) {
           if (file.extension != 'txt' && file.extension != 'csv') {
             getTextContent = false;
           }
         }
         if (getTextContent) {
-          _getTextFileContent(result.files);
+          _getTextFileContent(result);
         } else {
-          _getFileContent(result.files);
+          _getFileContent(result);
         }
       });
     } catch (e) {
@@ -80,12 +73,12 @@ class _WgtSubmitFilesState extends State<WgtSubmitFiles> {
     }
   }
 
-  void _getTextFileContent(List<PlatformFile> textFiles) {
+  Future<void> _getTextFileContent(List<PlatformFile> textFiles) async {
     try {
       _fileContentList.clear();
       try {
         for (var file in textFiles) {
-          Uint8List? uploadfile = file.bytes;
+          Uint8List? uploadfile = await file.readAsBytes();
           if (uploadfile == null) {
             if (uploadfile == null) {
               showSnackBar(context, 'Please select a file');

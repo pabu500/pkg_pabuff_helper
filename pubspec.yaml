@@ -4,8 +4,8 @@ version: 2.24.11
 homepage:
 
 environment:
-  sdk: '>=3.4.1 <4.0.0'
-  # flutter: ">=1.17.0"
+  sdk: '>=3.10.0 <4.0.0'
+  flutter: ">=3.38.0"
 
 dependencies:
   flutter:
@@ -18,7 +18,7 @@ dependencies:
   loading_animation_widget: ^1.2.1
   flutter_svg: ^2.0.10+1
   toggle_switch: ^2.3.0
-  file_picker: ^11.0.2
+  file_picker: ^13.1.0
   fl_chart: ^1.0.0
   material_symbols_icons: ^4.2928.1
   # firebase_auth: ^5.1.0

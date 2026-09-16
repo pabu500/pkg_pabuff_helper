@@ -2,6 +2,7 @@ import 'package:buff_helper/pag_helper/comm/comm_pref.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_device.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_list.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_item.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -70,6 +71,57 @@ void main() {
       final column = MdlListColController.fromJson({'col_key': 'name'});
 
       expect(column.pinned, isFalse);
+    });
+  });
+
+  group('list column scope visibility', () {
+    const config = {
+      'col_key': 'label',
+      'visible_at_scope_list': ['project'],
+    };
+
+    test('shows the column at an allowed scope', () {
+      final column = MdlListColController.fromJson(
+        config,
+        currentScopeType: PagScopeType.project,
+      );
+
+      expect(column.showColumn, isTrue);
+    });
+
+    test('hides the column at a different scope', () {
+      final column = MdlListColController.fromJson(
+        config,
+        currentScopeType: PagScopeType.site,
+      );
+
+      expect(column.showColumn, isFalse);
+    });
+
+    test('scope restriction cannot be overridden by a saved preference', () {
+      final column = MdlListColController.fromJson(
+        config,
+        currentScopeType: PagScopeType.site,
+      );
+
+      column.showColumn = true;
+
+      expect(column.showColumn, isFalse);
+    });
+
+    test('hides a restricted column when the current scope is unavailable', () {
+      final column = MdlListColController.fromJson(config);
+
+      expect(column.showColumn, isFalse);
+    });
+
+    test('leaves an unrestricted column visible', () {
+      final column = MdlListColController.fromJson(
+        {'col_key': 'name'},
+        currentScopeType: PagScopeType.site,
+      );
+
+      expect(column.showColumn, isTrue);
     });
   });
 }

@@ -51,7 +51,7 @@ class MdlListColController {
   String colTitle;
   String filterLabel;
   double colWidth;
-  bool showColumn;
+  bool _showColumn;
   bool showEditPanel;
   bool showOnCard;
   bool showTimestampAsDate;
@@ -91,6 +91,8 @@ class MdlListColController {
   List<String>? contextExcludeList;
   List<String>? contextIncludeList;
   List<String>? contextRequiredOnLsList;
+  List<PagScopeType> visibleAtScopeList;
+  PagScopeType? currentScopeType;
   // bool requiredOnOnb;
   // bool requiredOnFormCreate;
   bool showInputOnFormCreate;
@@ -113,7 +115,7 @@ class MdlListColController {
     this.colTitle = '',
     this.filterLabel = '',
     this.colWidth = 0.0,
-    this.showColumn = true,
+    bool showColumn = true,
     this.showEditPanel = true,
     this.showOnCard = false,
     this.rowOnCard = 1,
@@ -150,6 +152,8 @@ class MdlListColController {
     this.contextExcludeList,
     this.contextIncludeList,
     this.contextRequiredOnLsList,
+    this.visibleAtScopeList = const [],
+    this.currentScopeType,
     // this.requiredOnOnb = false,
     // this.requiredOnFormCreate = false,
     this.showInputOnFormCreate = false,
@@ -158,10 +162,21 @@ class MdlListColController {
     this.opInfo,
     this.isCompactFilter = false,
     this.showScanner = false,
-  });
+  }) : _showColumn = showColumn;
 
   //getter isJoinKey
   bool get isJoinKey => joinKey != null;
+
+  bool get showColumn =>
+      _showColumn && isVisibleAtScope(currentScopeType);
+
+  set showColumn(bool value) => _showColumn = value;
+
+  bool isVisibleAtScope(PagScopeType? currentScopeType) {
+    return visibleAtScopeList.isEmpty ||
+        (currentScopeType != null &&
+            visibleAtScopeList.contains(currentScopeType));
+  }
 
   void prePopulateFilterValue() {
     if (valueList?.length == 1) {
@@ -195,7 +210,8 @@ class MdlListColController {
   }
 
   factory MdlListColController.fromJson(Map<String, dynamic> json,
-      {PagListContextType? listContextType}) {
+      {PagListContextType? listContextType,
+      PagScopeType? currentScopeType}) {
     String? colKey = json['colKey'] ?? json['col_key'] ?? json['fieldKey'];
     if (colKey == null) {
       throw Exception('col_key is missing');
@@ -410,6 +426,13 @@ class MdlListColController {
       }
     }
 
+    List<PagScopeType> visibleAtScopeList = [];
+    final dynamic visibleAtScopeListValue = json['visible_at_scope_list'];
+    if (visibleAtScopeListValue is List) {
+      visibleAtScopeList = visibleAtScopeListValue
+          .map((value) => PagScopeType.byValue(value.toString()))
+          .toList();
+    }
     List<String> contextRequiredOnLsList = [];
     if (json['context_required_on_ls'] != null) {
       dynamic contextRequiredOnLsListValue = json['context_required_on_ls'];
@@ -643,6 +666,8 @@ class MdlListColController {
       contextExcludeList: contextExcludeList,
       contextIncludeList: contextIncludeList,
       contextRequiredOnLsList: contextRequiredOnLsList,
+      visibleAtScopeList: visibleAtScopeList,
+      currentScopeType: currentScopeType,
       // requiredOnOnb: requiredOnOnb,
       // requiredOnFormCreate: requiredOnFormCreate,
       showInputOnFormCreate: showInputOnFormCreate,
@@ -689,6 +714,8 @@ class MdlListColController {
     data['context_exclude'] = contextExcludeList;
     data['context_include'] = contextIncludeList;
     data['context_required_on_ls'] = contextRequiredOnLsList;
+    data['visible_at_scope_list'] =
+        visibleAtScopeList.map((scopeType) => scopeType.value).toList();
     data['filter_data_type'] = filterDataType.name;
     // data['required_on_onb'] = requiredOnOnb.toString();
     // data['required_on_form_create'] = requiredOnFormCreate.toString();

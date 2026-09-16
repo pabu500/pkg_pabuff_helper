@@ -38,20 +38,18 @@ class _WgtSubmitTableState extends State<WgtSubmitTable> {
   List<List> _table = [];
 
   Future<dynamic> _getCsv() async {
-    FilePickerResult? result;
-    File file;
+    PlatformFile? result;
     try {
-      result = await FilePicker /*.platform*/ .pickFiles(
-          withData: true,
-          type: FileType.custom,
-          allowMultiple: false,
-          allowedExtensions: widget.fileExtensions ?? ['csv']);
+      result = await FilePicker.pickFile(
+        type: FileType.custom,
+        allowedExtensions: widget.fileExtensions ?? ['csv'],
+      );
     } catch (e) {
       dev.log('picker error: $e');
     }
-    if (result != null && result.files.isNotEmpty) {
+    if (result != null) {
       try {
-        Uint8List? uploadfile = result.files.single.bytes;
+        Uint8List? uploadfile = await result.readAsBytes();
         if (uploadfile == null) {
           if (mounted) {
             showSnackBar(context, 'Please select a csv file');
@@ -61,8 +59,10 @@ class _WgtSubmitTableState extends State<WgtSubmitTable> {
 
         final bytes = utf8.decode(uploadfile.toList());
         final csv = const CsvToListConverter(
-                shouldParseNumbers: false, eol: "\r\n", fieldDelimiter: ",")
-            .convert(bytes);
+          shouldParseNumbers: false,
+          eol: "\r\n",
+          fieldDelimiter: ",",
+        ).convert(bytes);
 
         List<String> header = csv[0].map((e) => e.toString()).toList();
 
@@ -78,7 +78,8 @@ class _WgtSubmitTableState extends State<WgtSubmitTable> {
         // String filename = result.files.first.name;
         // widget.onGetFileInfo?.call(filename);
         if (widget.onGetFileInfo != null) {
-          String filename = result.files.single.name;
+          // String filename = result.files.single.name;
+          String filename = result.name;
           widget.onGetFileInfo!(filename);
         }
       } catch (e) {
