@@ -74,6 +74,32 @@ List<Map<String, dynamic>> tenantMeterReadingsFromUsageSummary(
   return rows;
 }
 
+/// Combines every loaded tenant into a single page-level export.
+List<dynamic> tenantMeterReadingsFromTenants(
+  List<Map<String, dynamic>> tenants,
+) {
+  final rows = <dynamic>[];
+  for (final tenant in tenants) {
+    final exportRows = tenant['meter_readings_export'];
+    if (exportRows is List) {
+      rows.addAll(exportRows);
+      continue;
+    }
+    final groups = <Map<String, dynamic>>[];
+    final usageSummary = tenant['tenant_usage_summary'];
+    if (usageSummary is List) {
+      for (final group in usageSummary) {
+        if (group is Map<String, dynamic>) groups.add(group);
+      }
+    }
+    final tenantName = (tenant['tenant_label']?.toString().isNotEmpty ?? false)
+        ? tenant['tenant_label'].toString()
+        : tenant['tenant_name']?.toString() ?? '';
+    rows.addAll(tenantMeterReadingsFromUsageSummary(tenantName, groups));
+  }
+  return rows;
+}
+
 Object _cell(dynamic value) {
   if (value == null || value == '-') return '';
   if (value is num) return value;
