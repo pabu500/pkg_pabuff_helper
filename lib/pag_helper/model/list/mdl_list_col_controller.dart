@@ -4,21 +4,9 @@ import 'package:flutter/material.dart';
 
 import '../../def_helper/dh_scope.dart';
 
-enum PagFilterWidgetType {
-  INPUT,
-  SELECT,
-  DATE,
-  DATETIME,
-  INPUT_SELECT,
-}
+enum PagFilterWidgetType { INPUT, SELECT, DATE, DATETIME, INPUT_SELECT }
 
-enum PagColWidgetType {
-  TEXT,
-  CHECKBOX,
-  TAG,
-  CUSTOM,
-  TAG_LIST,
-}
+enum PagColWidgetType { TEXT, CHECKBOX, TAG, CUSTOM, TAG_LIST }
 
 enum PagFilterGroupType {
   identity,
@@ -31,13 +19,7 @@ enum PagFilterGroupType {
   join,
 }
 
-enum PagFilterDataType {
-  string,
-  number,
-  boolean,
-  date,
-  datetime,
-}
+enum PagFilterDataType { string, number, boolean, date, datetime }
 
 class MdlListColController {
   late final String colKey;
@@ -51,7 +33,7 @@ class MdlListColController {
   String colTitle;
   String filterLabel;
   double colWidth;
-  bool _showColumn;
+  bool showColumn;
   bool showEditPanel;
   bool showOnCard;
   bool showTimestampAsDate;
@@ -80,8 +62,10 @@ class MdlListColController {
   Function(Map<String, dynamic> row, String colKey)? getTag;
   bool pinned = false;
   Widget? Function(
-          Map<String, dynamic> row, List<Map<String, dynamic>> fullList)?
-      getCustomWidget;
+    Map<String, dynamic> row,
+    List<Map<String, dynamic>> fullList,
+  )?
+  getCustomWidget;
   TextEditingController? filterWidgetController;
   PagScopeType? scopeType;
   String? align;
@@ -115,7 +99,6 @@ class MdlListColController {
     this.colTitle = '',
     this.filterLabel = '',
     this.colWidth = 0.0,
-    bool showColumn = true,
     this.showEditPanel = true,
     this.showOnCard = false,
     this.rowOnCard = 1,
@@ -162,21 +145,21 @@ class MdlListColController {
     this.opInfo,
     this.isCompactFilter = false,
     this.showScanner = false,
-  }) : _showColumn = showColumn;
+    this.showColumn = true,
+  });
 
   //getter isJoinKey
   bool get isJoinKey => joinKey != null;
 
-  bool get showColumn =>
-      _showColumn && isVisibleAtScope(currentScopeType);
+  // bool get showColumn => _showColumn && isVisibleAtScope(currentScopeType);
 
-  set showColumn(bool value) => _showColumn = value;
+  // set showColumn(bool value) => _showColumn = value;
 
-  bool isVisibleAtScope(PagScopeType? currentScopeType) {
-    return visibleAtScopeList.isEmpty ||
-        (currentScopeType != null &&
-            visibleAtScopeList.contains(currentScopeType));
-  }
+  // bool isVisibleAtScope(PagScopeType? currentScopeType) {
+  //   return visibleAtScopeList.isEmpty ||
+  //       (currentScopeType != null &&
+  //           visibleAtScopeList.contains(currentScopeType));
+  // }
 
   void prePopulateFilterValue() {
     if (valueList?.length == 1) {
@@ -209,9 +192,11 @@ class MdlListColController {
     return opType == op && isValueRequired;
   }
 
-  factory MdlListColController.fromJson(Map<String, dynamic> json,
-      {PagListContextType? listContextType,
-      PagScopeType? currentScopeType}) {
+  factory MdlListColController.fromJson(
+    Map<String, dynamic> json, {
+    PagListContextType? listContextType,
+    PagScopeType? currentScopeType,
+  }) {
     String? colKey = json['colKey'] ?? json['col_key'] ?? json['fieldKey'];
     if (colKey == null) {
       throw Exception('col_key is missing');
@@ -241,7 +226,8 @@ class MdlListColController {
     String colTitle =
         json['colTitle'] ?? json['col_title'] ?? json['title'] ?? colKey;
 
-    String filterLabel = json['filterLabel'] ??
+    String filterLabel =
+        json['filterLabel'] ??
         json['filter_label_flexi'] ??
         json['filter_label'] ??
         json['label'] ??
@@ -265,14 +251,27 @@ class MdlListColController {
       colType = json['col_type'] ?? json['colType'];
     }
 
-    bool showColumn = true;
+    List<PagScopeType> visibleAtScopeList = [];
+    final dynamic visibleAtScopeListValue = json['visible_at_scope_list'];
+    if (visibleAtScopeListValue is List) {
+      visibleAtScopeList = visibleAtScopeListValue
+          .map((value) => PagScopeType.byValue(value.toString()))
+          .toList();
+    }
+    bool isVisibleAtScope = true;
+    if (visibleAtScopeList.isNotEmpty &&
+        !visibleAtScopeList.contains(currentScopeType)) {
+      isVisibleAtScope = false;
+    }
+
+    bool showColumn = isVisibleAtScope;
     bool showEditPanel = true;
     if (json['show'] != null) {
       dynamic showValue = json['show'];
       if (showValue is bool) {
-        showColumn = showValue;
+        showColumn = showColumn && showValue;
       } else if (showValue is String) {
-        showColumn = showValue.toLowerCase() == 'true';
+        showColumn = showColumn && showValue.toLowerCase() == 'true';
       }
     }
 
@@ -317,8 +316,9 @@ class MdlListColController {
     try {
       String? filterWidgetTypeStr = json['filter_widget_type'];
       if (filterWidgetTypeStr != null) {
-        filterWidgetType = PagFilterWidgetType.values
-            .byName(filterWidgetTypeStr.toUpperCase());
+        filterWidgetType = PagFilterWidgetType.values.byName(
+          filterWidgetTypeStr.toUpperCase(),
+        );
       }
     } catch (e) {
       dev.log('Error in parsing filter_widget_type: $e');
@@ -356,8 +356,9 @@ class MdlListColController {
     PagFilterDataType filterDataType = PagFilterDataType.string;
     if (json['filter_data_type'] != null) {
       String filterDataTypeStr = json['filter_data_type'];
-      filterDataType =
-          PagFilterDataType.values.byName(filterDataTypeStr.toLowerCase());
+      filterDataType = PagFilterDataType.values.byName(
+        filterDataTypeStr.toLowerCase(),
+      );
     }
 
     bool isUnique = false;
@@ -402,8 +403,9 @@ class MdlListColController {
     if (json['context_exclude'] != null) {
       dynamic contextExcludeListValue = json['context_exclude'];
       if (contextExcludeListValue is List) {
-        contextExcludeList =
-            List<String>.from(contextExcludeListValue.map((e) => e.toString()));
+        contextExcludeList = List<String>.from(
+          contextExcludeListValue.map((e) => e.toString()),
+        );
       }
     }
 
@@ -411,8 +413,9 @@ class MdlListColController {
     if (json['context_include'] != null) {
       dynamic contextIncludeListValue = json['context_include'];
       if (contextIncludeListValue is List) {
-        contextIncludeList =
-            List<String>.from(contextIncludeListValue.map((e) => e.toString()));
+        contextIncludeList = List<String>.from(
+          contextIncludeListValue.map((e) => e.toString()),
+        );
       }
     }
 
@@ -420,36 +423,37 @@ class MdlListColController {
       if (contextExcludeList.contains(listContextType.value)) {
         showColumn = false;
       }
-      if (contextIncludeList.isNotEmpty &&
-          !contextIncludeList.contains(listContextType.value)) {
-        showColumn = false;
+      if (contextIncludeList.isNotEmpty) {
+        if (!contextIncludeList.contains(listContextType.value)) {
+          showColumn = false;
+        }
       }
     }
 
-    List<PagScopeType> visibleAtScopeList = [];
-    final dynamic visibleAtScopeListValue = json['visible_at_scope_list'];
-    if (visibleAtScopeListValue is List) {
-      visibleAtScopeList = visibleAtScopeListValue
-          .map((value) => PagScopeType.byValue(value.toString()))
-          .toList();
-    }
     List<String> contextRequiredOnLsList = [];
     if (json['context_required_on_ls'] != null) {
       dynamic contextRequiredOnLsListValue = json['context_required_on_ls'];
       if (contextRequiredOnLsListValue is List) {
         contextRequiredOnLsList = List<String>.from(
-            contextRequiredOnLsListValue.map((e) => e.toString()));
+          contextRequiredOnLsListValue.map((e) => e.toString()),
+        );
       }
     }
 
     Widget Function(
-            Map<String, dynamic> row, List<Map<String, dynamic>> fullList)?
-        getCustomWidget;
+      Map<String, dynamic> row,
+      List<Map<String, dynamic>> fullList,
+    )?
+    getCustomWidget;
     if (json['get_custom_widget'] != null) {
       dynamic customWidgetValue = json['get_custom_widget'];
       if (customWidgetValue is Function) {
-        getCustomWidget = customWidgetValue as Widget Function(
-            Map<String, dynamic> row, List<Map<String, dynamic>> fullList);
+        getCustomWidget =
+            customWidgetValue
+                as Widget Function(
+                  Map<String, dynamic> row,
+                  List<Map<String, dynamic>> fullList,
+                );
       }
     }
 
@@ -714,8 +718,9 @@ class MdlListColController {
     data['context_exclude'] = contextExcludeList;
     data['context_include'] = contextIncludeList;
     data['context_required_on_ls'] = contextRequiredOnLsList;
-    data['visible_at_scope_list'] =
-        visibleAtScopeList.map((scopeType) => scopeType.value).toList();
+    data['visible_at_scope_list'] = visibleAtScopeList
+        .map((scopeType) => scopeType.value)
+        .toList();
     data['filter_data_type'] = filterDataType.name;
     // data['required_on_onb'] = requiredOnOnb.toString();
     // data['required_on_form_create'] = requiredOnFormCreate.toString();

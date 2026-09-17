@@ -74,6 +74,45 @@ void main() {
     });
   });
 
+  group('list column preference eligibility', () {
+    test('allows a column visible in the list configuration', () {
+      final column = MdlListColController(
+        colKey: 'name',
+        colTitle: 'Name',
+      );
+
+      expect(
+        canUserOverrideListColumnVisibility(column, {'name': true}),
+        isTrue,
+      );
+    });
+
+    test('rejects a column hidden by the list configuration', () {
+      final column = MdlListColController(
+        colKey: 'name',
+        colTitle: 'Name',
+      );
+
+      expect(
+        canUserOverrideListColumnVisibility(column, {'name': false}),
+        isFalse,
+      );
+    });
+
+    test('rejects a permanently hidden column', () {
+      final column = MdlListColController(
+        colKey: 'name',
+        colTitle: 'Name',
+        hidden: true,
+      );
+
+      expect(
+        canUserOverrideListColumnVisibility(column, {'name': true}),
+        isFalse,
+      );
+    });
+  });
+
   group('list column scope visibility', () {
     const config = {
       'col_key': 'label',
@@ -104,9 +143,13 @@ void main() {
         currentScopeType: PagScopeType.site,
       );
 
-      column.showColumn = true;
-
-      expect(column.showColumn, isFalse);
+      expect(
+        canUserOverrideListColumnVisibility(
+          column,
+          {'label': column.showColumn},
+        ),
+        isFalse,
+      );
     });
 
     test('hides a restricted column when the current scope is unavailable', () {

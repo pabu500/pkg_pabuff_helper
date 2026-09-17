@@ -46,8 +46,18 @@ class _WgtPagListColumnCustomize2State
     super.initState();
     _revision = widget.revision;
     for (final column in widget.listController.listColControllerList) {
-      _draft[column.colKey] = column.showColumn;
+      if (_canCustomize(column)) {
+        _draft[column.colKey] = column.showColumn;
+      }
     }
+  }
+
+  bool _canCustomize(MdlListColController column) {
+    return canUserOverrideListColumnVisibility(
+          column,
+          widget.defaultColumnVisibility,
+        ) &&
+        column.colTitle.isNotEmpty;
   }
 
   Future<void> _save() async {
@@ -59,7 +69,7 @@ class _WgtPagListColumnCustomize2State
     try {
       final visibility = <String, bool>{};
       for (final column in widget.listController.listColControllerList) {
-        if (!column.hidden && column.colTitle.isNotEmpty) {
+        if (_canCustomize(column)) {
           visibility[column.colKey] =
               _draft[column.colKey] ?? column.showColumn;
         }
@@ -129,7 +139,11 @@ class _WgtPagListColumnCustomize2State
 
   void _applyVisibility(Map<String, bool> visibility) {
     for (final column in widget.listController.listColControllerList) {
-      if (!column.hidden && visibility.containsKey(column.colKey)) {
+      final defaultVisibility = widget.defaultColumnVisibility[column.colKey];
+      if (defaultVisibility != null) {
+        column.showColumn = defaultVisibility;
+      }
+      if (_canCustomize(column) && visibility.containsKey(column.colKey)) {
         column.showColumn = visibility[column.colKey]!;
       }
     }
@@ -138,7 +152,7 @@ class _WgtPagListColumnCustomize2State
   @override
   Widget build(BuildContext context) {
     final columns = widget.listController.listColControllerList
-        .where((column) => !column.hidden && column.colTitle.isNotEmpty)
+        .where(_canCustomize)
         .toList();
     return SizedBox(
       height: widget.listHeight + 55,

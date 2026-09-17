@@ -2,6 +2,7 @@ import 'package:buff_helper/pag_helper/comm/comm_ex.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_list.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_item.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
+import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_controller.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
@@ -48,6 +49,24 @@ Map<String, bool> getListColumnDefaults(MdlPagListController listController) {
   }
   _listColumnDefaults[listController] = Map<String, bool>.from(defaults);
   return defaults;
+}
+
+/// Column visibility precedence:
+/// 1. `list_info` supplies the default visibility for the current context and
+///    scope.
+/// 2. A user preference may override only a column that is visible by default
+///    and is not permanently hidden.
+/// 3. Missing preference entries keep the `list_info` default, so new columns
+///    inherit their configured visibility.
+/// 4. Reset removes the user override and restores all `list_info` defaults.
+///
+/// A user may hide and later re-enable an eligible column. A preference cannot
+/// expose a column hidden by `show`, context, scope, or `hidden` configuration.
+bool canUserOverrideListColumnVisibility(
+  MdlListColController column,
+  Map<String, bool> defaultColumnVisibility,
+) {
+  return !column.hidden && defaultColumnVisibility[column.colKey] == true;
 }
 
 Map<String, bool> getFinderPinDefaults(MdlPagListController listController) {

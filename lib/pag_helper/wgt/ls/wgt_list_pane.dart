@@ -135,7 +135,10 @@ class _WgtListPaneState extends State<WgtListPane> {
         return;
       }
       for (final column in controller.listColControllerList) {
-        if (!column.hidden &&
+        if (canUserOverrideListColumnVisibility(
+              column,
+              _defaultColumnVisibility,
+            ) &&
             pref.columnVisibility.containsKey(column.colKey)) {
           column.showColumn = pref.columnVisibility[column.colKey]!;
         }
