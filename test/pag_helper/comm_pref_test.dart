@@ -4,6 +4,7 @@ import 'package:buff_helper/pag_helper/def_helper/dh_list.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_item.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -74,12 +75,47 @@ void main() {
     });
   });
 
+  group('list column padding', () {
+    test('parses left, top, right, bottom string values', () {
+      final column = MdlListColController.fromJson({
+        'col_key': 'balance',
+        'padding': ['0', '0', '8', '0'],
+      });
+
+      expect(column.padding, const EdgeInsets.fromLTRB(0, 0, 8, 0));
+    });
+
+    test('also accepts numeric values', () {
+      final column = MdlListColController.fromJson({
+        'col_key': 'balance',
+        'padding': [1, 2.5, 3, 4],
+      });
+
+      expect(column.padding, const EdgeInsets.fromLTRB(1, 2.5, 3, 4));
+    });
+
+    test('accepts margin as a configuration alias', () {
+      final column = MdlListColController.fromJson({
+        'col_key': 'balance',
+        'margin': ['0', '0', '8', '0'],
+      });
+
+      expect(column.padding, const EdgeInsets.fromLTRB(0, 0, 8, 0));
+    });
+
+    test('serializes values as strings', () {
+      final column = MdlListColController(
+        colKey: 'balance',
+        padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
+      );
+
+      expect(column.toJson()['padding'], ['0.0', '0.0', '8.0', '0.0']);
+    });
+  });
+
   group('list column preference eligibility', () {
     test('allows a column visible in the list configuration', () {
-      final column = MdlListColController(
-        colKey: 'name',
-        colTitle: 'Name',
-      );
+      final column = MdlListColController(colKey: 'name', colTitle: 'Name');
 
       expect(
         canUserOverrideListColumnVisibility(column, {'name': true}),
@@ -88,10 +124,7 @@ void main() {
     });
 
     test('rejects a column hidden by the list configuration', () {
-      final column = MdlListColController(
-        colKey: 'name',
-        colTitle: 'Name',
-      );
+      final column = MdlListColController(colKey: 'name', colTitle: 'Name');
 
       expect(
         canUserOverrideListColumnVisibility(column, {'name': false}),
@@ -144,10 +177,9 @@ void main() {
       );
 
       expect(
-        canUserOverrideListColumnVisibility(
-          column,
-          {'label': column.showColumn},
-        ),
+        canUserOverrideListColumnVisibility(column, {
+          'label': column.showColumn,
+        }),
         isFalse,
       );
     });
@@ -159,10 +191,9 @@ void main() {
     });
 
     test('leaves an unrestricted column visible', () {
-      final column = MdlListColController.fromJson(
-        {'col_key': 'name'},
-        currentScopeType: PagScopeType.site,
-      );
+      final column = MdlListColController.fromJson({
+        'col_key': 'name',
+      }, currentScopeType: PagScopeType.site);
 
       expect(column.showColumn, isTrue);
     });

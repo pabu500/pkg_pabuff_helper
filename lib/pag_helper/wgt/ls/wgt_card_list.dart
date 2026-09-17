@@ -103,10 +103,11 @@ class _WgtCardListState extends State<WgtCardList> {
                 ? Column(
                     children: [
                       Divider(
-                          color: Theme.of(context).hintColor.withAlpha(130),
-                          height: 8,
-                          indent: 5,
-                          endIndent: 8),
+                        color: Theme.of(context).hintColor.withAlpha(130),
+                        height: 8,
+                        indent: 5,
+                        endIndent: 8,
+                      ),
                       getPagenationBar(
                         context,
                         widget.itemList.length,
@@ -142,8 +143,12 @@ class _WgtCardListState extends State<WgtCardList> {
     );
   }
 
-  Widget _buildListItem(int index, Map<String, dynamic> row,
-      Map<String, dynamic> modifiedRow, List<Map<String, dynamic>>? fullList) {
+  Widget _buildListItem(
+    int index,
+    Map<String, dynamic> row,
+    Map<String, dynamic> modifiedRow,
+    List<Map<String, dynamic>>? fullList,
+  ) {
     List<MdlListColController> colontrollersRow1 = [];
     List<MdlListColController> colontrollersRow2 = [];
     List<MdlListColController> colontrollersRow3 = [];
@@ -203,8 +208,9 @@ class _WgtCardListState extends State<WgtCardList> {
 
         if (ctrlItem.useComma || ctrlItem.decimal != null) {
           originalFullText = getCommaNumberStr(
-              double.tryParse(originalFullText),
-              decimal: ctrlItem.decimal ?? 2);
+            double.tryParse(originalFullText),
+            decimal: ctrlItem.decimal ?? 2,
+          );
           originalFullText += ' ';
         }
 
@@ -247,9 +253,10 @@ class _WgtCardListState extends State<WgtCardList> {
         TextStyle listItemStyle = _listItemStyle;
         if (onRowNumber == 1) {
           listItemStyle = _listItemStyle.copyWith(
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-              color: Theme.of(context).colorScheme.onSurface);
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            color: Theme.of(context).colorScheme.onSurface,
+          );
         }
 
         listItem.add(
@@ -257,72 +264,68 @@ class _WgtCardListState extends State<WgtCardList> {
               ? Tooltip(
                   message: originalFullText,
                   waitDuration: const Duration(milliseconds: 500),
-                  child: Padding(
-                    padding: ctrlItem.align == 'right'
-                        ? const EdgeInsets.only(right: 0.0)
-                        : const EdgeInsets.only(left: 0.0),
-                    child: getCellText(
-                      colTitle: ctrlItem.colTitle,
-                      originalFullText: originalFullText,
-                      width: width,
-                      style: listItemStyle,
-                      clickCopy: true,
-                      alignment: ctrlItem.align == 'right'
-                          ? Alignment.centerRight
-                          : Alignment.centerLeft,
-                    ),
+                  child: getCellText(
+                    colTitle: ctrlItem.colTitle,
+                    originalFullText: originalFullText,
+                    width: width,
+                    style: listItemStyle,
+                    padding: ctrlItem.padding,
+                    clickCopy: true,
+                    alignment: ctrlItem.align == 'right'
+                        ? Alignment.centerRight
+                        : Alignment.centerLeft,
                   ),
                 )
               : ctrlItem.colWidgetType == PagColWidgetType.TAG && showTag
-                  ? SizedBox(
-                      width: width,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          getTag2(
-                            row: row,
-                            configItem: ctrlItem.toJson(),
-                            width: width,
-                            tagColor: tagColor,
-                            tagText: tagText.isNotEmpty
-                                ? tagText
-                                : row[ctrlItem.colKey] ?? '',
-                            tagTooltip: tagTooltip,
-                          ),
-                        ],
+              ? SizedBox(
+                  width: width,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      getTag2(
+                        row: row,
+                        configItem: ctrlItem.toJson(),
+                        width: width,
+                        tagColor: tagColor,
+                        tagText: tagText.isNotEmpty
+                            ? tagText
+                            : row[ctrlItem.colKey] ?? '',
+                        tagTooltip: tagTooltip,
                       ),
-                    )
-                  : ctrlItem.colWidgetType == PagColWidgetType.TAG_LIST
-                      ? getTagList(
-                          row: row,
-                          configItem: ctrlItem.toJson(),
-                          width: width,
-                          tagColor: tagColor,
-                          tagText: row[ctrlItem.colKey] ?? '',
-                          tagTooltip: tagTooltip,
+                    ],
+                  ),
+                )
+              : ctrlItem.colWidgetType == PagColWidgetType.TAG_LIST
+              ? getTagList(
+                  row: row,
+                  configItem: ctrlItem.toJson(),
+                  width: width,
+                  tagColor: tagColor,
+                  tagText: row[ctrlItem.colKey] ?? '',
+                  tagTooltip: tagTooltip,
+                )
+              : Container(
+                  width: width /*+ 10*/,
+                  alignment: Alignment.centerLeft,
+                  child: ctrlItem.colWidgetType == PagColWidgetType.CUSTOM
+                      ? Container(
+                          decoration: (row['is_selected'] ?? false)
+                              ? BoxDecoration(
+                                  border: Border.all(
+                                    color: Theme.of(context).highlightColor,
+                                    // Theme.of(context).colorScheme.primary,
+                                    width: 1.5,
+                                  ),
+                                  borderRadius: BorderRadius.circular(3),
+                                )
+                              : null,
+                          child: ctrlItem.getCustomWidget?.call(
+                            row,
+                            widget.itemList,
+                          ),
                         )
-                      : Container(
-                          width: width /*+ 10*/,
-                          alignment: Alignment.centerLeft,
-                          child:
-                              ctrlItem.colWidgetType == PagColWidgetType.CUSTOM
-                                  ? Container(
-                                      decoration: (row['is_selected'] ?? false)
-                                          ? BoxDecoration(
-                                              border: Border.all(
-                                                color: Theme.of(context)
-                                                    .highlightColor,
-                                                // Theme.of(context).colorScheme.primary,
-                                                width: 1.5,
-                                              ),
-                                              borderRadius:
-                                                  BorderRadius.circular(3),
-                                            )
-                                          : null,
-                                      child: ctrlItem.getCustomWidget
-                                          ?.call(row, widget.itemList))
-                                  : Container(),
-                        ),
+                      : Container(),
+                ),
         );
       }
     }
@@ -345,8 +348,9 @@ class _WgtCardListState extends State<WgtCardList> {
             Column(
               children: [
                 Divider(
-                    color: Theme.of(context).hintColor.withAlpha(130),
-                    height: 13),
+                  color: Theme.of(context).hintColor.withAlpha(130),
+                  height: 13,
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: listItemRow2,
@@ -357,8 +361,9 @@ class _WgtCardListState extends State<WgtCardList> {
             Column(
               children: [
                 Divider(
-                    color: Theme.of(context).hintColor.withAlpha(130),
-                    height: 13),
+                  color: Theme.of(context).hintColor.withAlpha(130),
+                  height: 13,
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: listItemRow3,
@@ -376,6 +381,7 @@ class _WgtCardListState extends State<WgtCardList> {
     required String originalFullText,
     required double width,
     required TextStyle style,
+    EdgeInsets padding = EdgeInsets.zero,
     Alignment alignment = Alignment.centerLeft,
     bool clickCopy = false,
   }) {
@@ -388,25 +394,32 @@ class _WgtCardListState extends State<WgtCardList> {
               ? CrossAxisAlignment.end
               : CrossAxisAlignment.start,
           children: [
-            Text(colTitle,
-                style: style.copyWith(
-                    fontSize: 13.5, color: style.color!.withAlpha(150))),
-            InkWell(
-              onTap: !clickCopy
-                  ? null
-                  : () {
-                      Clipboard.setData(
-                        ClipboardData(text: originalFullText),
-                      );
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Copied to clipboard')),
-                      );
-                    },
-              child: Text(
-                originalFullText,
-                style: style,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+            Text(
+              colTitle,
+              style: style.copyWith(
+                fontSize: 13.5,
+                color: style.color!.withAlpha(150),
+              ),
+            ),
+            Padding(
+              padding: padding,
+              child: InkWell(
+                onTap: !clickCopy
+                    ? null
+                    : () {
+                        Clipboard.setData(
+                          ClipboardData(text: originalFullText),
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Copied to clipboard')),
+                        );
+                      },
+                child: Text(
+                  originalFullText,
+                  style: style,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ),
           ],
@@ -439,10 +452,7 @@ class _WgtCardListState extends State<WgtCardList> {
     }
     return SizedBox(
       width: width,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: tagWidgets,
-      ),
+      child: Row(mainAxisSize: MainAxisSize.min, children: tagWidgets),
     );
   }
 
@@ -470,16 +480,19 @@ class _WgtCardListState extends State<WgtCardList> {
         tagLabel = deviceLsStatus.tag;
         tagColor = deviceLsStatus.color.withAlpha(130);
       } else if (widget.itemType is PagFinanceType) {
-        PagPaymentLcStatus financeLcStatus =
-            PagPaymentLcStatus.byValue(tagText);
+        PagPaymentLcStatus financeLcStatus = PagPaymentLcStatus.byValue(
+          tagText,
+        );
         tagLabel = financeLcStatus.tag;
         tagColor = financeLcStatus.color.withAlpha(130);
       } else if (widget.itemType is PagItemKind) {
         if (widget.itemType == PagItemKind.bill) {
-          PagBillingLcStatus billingLcStatus =
-              PagBillingLcStatus.byValue(tagText);
+          PagBillingLcStatus billingLcStatus = PagBillingLcStatus.byValue(
+            tagText,
+          );
           tagLabel = billingLcStatus.tag ?? '';
-          tagColor = billingLcStatus.color?.withAlpha(130) ??
+          tagColor =
+              billingLcStatus.color?.withAlpha(130) ??
               Colors.grey.withAlpha(130);
         }
         if (widget.itemType == PagItemKind.tenant) {
@@ -490,10 +503,12 @@ class _WgtCardListState extends State<WgtCardList> {
       }
     } else if (widget.itemType == PagItemKind.bill) {
       if (configItem['col_key'] == 'payment_status') {
-        PagBillPaymentStatus billPaymentStatus =
-            PagBillPaymentStatus.byValue(tagText);
+        PagBillPaymentStatus billPaymentStatus = PagBillPaymentStatus.byValue(
+          tagText,
+        );
         tagLabel = billPaymentStatus.tag ?? '';
-        tagColor = billPaymentStatus.color?.withAlpha(130) ??
+        tagColor =
+            billPaymentStatus.color?.withAlpha(130) ??
             Colors.grey.withAlpha(130);
       } else if (configItem['col_key'] == 'due_status') {
         PagBillDueStatus billDueStatus = PagBillDueStatus.byValue(tagText);
@@ -504,7 +519,8 @@ class _WgtCardListState extends State<WgtCardList> {
         if (widget.itemType == PagItemKind.bill) {
           PagBillGenType billingGenType = PagBillGenType.byValue(tagText);
           tagLabel = billingGenType.tag ?? '';
-          tagColor = billingGenType.color?.withAlpha(130) ??
+          tagColor =
+              billingGenType.color?.withAlpha(130) ??
               Colors.grey.withAlpha(130);
         }
       }
@@ -524,7 +540,8 @@ class _WgtCardListState extends State<WgtCardList> {
       tagLabel = tagText;
     }
     return Tooltip(
-      message: tagTooltip ??
+      message:
+          tagTooltip ??
           configItem['getTooltip']?.call(row[configItem['fieldKey']]) ??
           '',
       waitDuration: const Duration(milliseconds: 300),
@@ -536,10 +553,13 @@ class _WgtCardListState extends State<WgtCardList> {
           color: tagColor,
           borderRadius: BorderRadius.circular(3),
         ),
-        child: Text(tagLabel,
-            style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface,
-                fontSize: 13.5)),
+        child: Text(
+          tagLabel,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
+            fontSize: 13.5,
+          ),
+        ),
       ),
     );
   }
@@ -553,7 +573,8 @@ class _WgtCardListState extends State<WgtCardList> {
     required double width,
   }) {
     return Tooltip(
-      message: tagTooltip ??
+      message:
+          tagTooltip ??
           configItem['getTooltip']?.call(row[configItem['fieldKey']]) ??
           '',
       waitDuration: const Duration(milliseconds: 300),
@@ -565,14 +586,18 @@ class _WgtCardListState extends State<WgtCardList> {
               // width: width,
               padding: const EdgeInsets.symmetric(horizontal: 5),
               decoration: BoxDecoration(
-                color: tagColor ??
+                color:
+                    tagColor ??
                     configItem['getColor']?.call(row[configItem['fieldKey']]),
                 borderRadius: BorderRadius.circular(5),
               ),
-              child: Text(tagText,
-                  style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface,
-                      fontSize: 13.5)),
+              child: Text(
+                tagText,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: 13.5,
+                ),
+              ),
             ),
           ],
         ),

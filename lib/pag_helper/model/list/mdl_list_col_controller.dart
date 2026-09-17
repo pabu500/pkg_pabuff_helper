@@ -69,6 +69,7 @@ class MdlListColController {
   TextEditingController? filterWidgetController;
   PagScopeType? scopeType;
   String? align;
+  EdgeInsets padding;
   bool useComma;
   int? decimal;
   String? Function(String)? validator;
@@ -129,6 +130,7 @@ class MdlListColController {
     this.getCustomWidget,
     this.scopeType,
     this.align,
+    this.padding = EdgeInsets.zero,
     this.decimal,
     this.useComma = false,
     this.validator,
@@ -481,6 +483,26 @@ class MdlListColController {
       }
     }
 
+    EdgeInsets padding = EdgeInsets.zero;
+    dynamic paddingValue = json['padding'] ?? json['margin'];
+    if (paddingValue is List && paddingValue.length == 4) {
+      List<double?> values = paddingValue.map((value) {
+        if (value is num) {
+          return value.toDouble();
+        }
+        return double.tryParse(value.toString());
+      }).toList();
+
+      if (values.every((value) => value != null)) {
+        padding = EdgeInsets.fromLTRB(
+          values[0]!,
+          values[1]!,
+          values[2]!,
+          values[3]!,
+        );
+      }
+    }
+
     int? decimal;
     if (json['decimal'] != null) {
       dynamic decimalValue = json['decimal'];
@@ -666,6 +688,7 @@ class MdlListColController {
       isPaneKey: isPaneKey,
       scopeType: scopeType,
       align: align,
+      padding: padding,
       decimal: decimal,
       contextExcludeList: contextExcludeList,
       contextIncludeList: contextIncludeList,
@@ -714,6 +737,12 @@ class MdlListColController {
     // data['editorWidgetType'] = editorWidgetType.name;
     data['filter_group_type'] = filterGroupType.name;
     data['align'] = align;
+    data['padding'] = [
+      padding.left.toString(),
+      padding.top.toString(),
+      padding.right.toString(),
+      padding.bottom.toString(),
+    ];
     data['decimal'] = decimal;
     data['context_exclude'] = contextExcludeList;
     data['context_include'] = contextIncludeList;

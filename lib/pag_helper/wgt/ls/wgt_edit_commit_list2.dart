@@ -116,10 +116,7 @@ class _WgtPagEditCommitList2State extends State<WgtPagEditCommitList2> {
 
   late final BoxDecoration listTileDecor = BoxDecoration(
     border: Border(
-      bottom: BorderSide(
-        color: Theme.of(context).hintColor,
-        width: 0.5,
-      ),
+      bottom: BorderSide(color: Theme.of(context).hintColor, width: 0.5),
     ),
   );
 
@@ -147,8 +144,10 @@ class _WgtPagEditCommitList2State extends State<WgtPagEditCommitList2> {
     _refreshTiles[index] = refresh;
   }
 
-  void _refresh(List<Map<String, dynamic>> refreshIndexes,
-      {Function? getColor}) {}
+  void _refresh(
+    List<Map<String, dynamic>> refreshIndexes, {
+    Function? getColor,
+  }) {}
 
   void regFieldUpdateModified(Function(bool) updateFieldModified) {
     widget.fieldUpdateModified?.add(updateFieldModified);
@@ -291,7 +290,8 @@ class _WgtPagEditCommitList2State extends State<WgtPagEditCommitList2> {
       print('list width: $_width list height: $_listHeight');
     }
 
-    bool showPagination = widget.totalCount != null &&
+    bool showPagination =
+        widget.totalCount != null &&
         widget.currentPage != null &&
         widget.totalCount! > 0;
 
@@ -301,16 +301,14 @@ class _WgtPagEditCommitList2State extends State<WgtPagEditCommitList2> {
     double height = _listHeight > (widget.height ?? 830)
         ? (widget.height ?? 900)
         : _listHeight < 120
-            ? 120
-            : _listHeight;
+        ? 120
+        : _listHeight;
     return Container(
       height: height,
       width: _width,
       decoration: panelBoxDecor(Theme.of(context).hintColor),
       child: widget.isFetching
-          ? const Center(
-              child: WgtPagWait(),
-            )
+          ? const Center(child: WgtPagWait())
           : ListView.builder(
               key: _listKey,
               shrinkWrap: false,
@@ -324,25 +322,26 @@ class _WgtPagEditCommitList2State extends State<WgtPagEditCommitList2> {
                 } else if (index == _rows.length + 1) {
                   //footer
                   return ListTile(
-                      title: showPagination
-                          ? Padding(
-                              padding: const EdgeInsets.only(top: 8),
-                              child: getPagenationBar(
-                                context,
-                                _rows.length,
-                                widget.maxRowsPerPage, //_rows.length,
-                                widget.totalCount,
-                                widget.currentPage,
-                                widget.onPreviousPage,
-                                widget.onNextPage,
-                                widget.onClickPage,
-                                narrow: widget.narrowPaginationBar,
-                                rows: _rows,
-                                getCsv: _getCsvList,
-                                listPrefix: widget.listPrefix,
-                              ),
-                            )
-                          : Container());
+                    title: showPagination
+                        ? Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: getPagenationBar(
+                              context,
+                              _rows.length,
+                              widget.maxRowsPerPage, //_rows.length,
+                              widget.totalCount,
+                              widget.currentPage,
+                              widget.onPreviousPage,
+                              widget.onNextPage,
+                              widget.onClickPage,
+                              narrow: widget.narrowPaginationBar,
+                              rows: _rows,
+                              getCsv: _getCsvList,
+                              listPrefix: widget.listPrefix,
+                            ),
+                          )
+                        : Container(),
+                  );
                 } else if (index == _rows.length + 2) {
                   //footer padding
                   return Container(height: 10);
@@ -367,14 +366,24 @@ class _WgtPagEditCommitList2State extends State<WgtPagEditCommitList2> {
                   }
 
                   return Transform.translate(
-                      offset: Offset(0, itemExt - 30),
-                      child: _buildListItem(
-                          index, row, modifiedRow, _postCommitRows));
+                    offset: Offset(0, itemExt - 30),
+                    child: _buildListItem(
+                      index,
+                      row,
+                      modifiedRow,
+                      _postCommitRows,
+                    ),
+                  );
 
                   return _buildListItem(
-                      index, row, modifiedRow, _postCommitRows);
+                    index,
+                    row,
+                    modifiedRow,
+                    _postCommitRows,
+                  );
                 }
-              }),
+              },
+            ),
     );
   }
 
@@ -446,23 +455,25 @@ class _WgtPagEditCommitList2State extends State<WgtPagEditCommitList2> {
         if (_currentMode == 'pane') {
           suffix.add(Expanded(child: Container()));
         }
-        suffix.add(WgtListPaneIcon(
+        suffix.add(
+          WgtListPaneIcon(
             mode: _currentMode,
             onToggleMode: (mode) {
               if (widget.onToggleListPaneMode != null) {
                 widget.onToggleListPaneMode!(mode, item.colKey);
               }
-            }));
+            },
+          ),
+        );
       }
-      listHeader.add(Evs2ListText(
-        originalFullText: item.colTitle,
-        width: item.colWidth,
-        style: listHeaderStyle,
-        suffix: suffix,
-        mainAixsAlignment: item.align == 'right'
-            ? MainAxisAlignment.end
-            : MainAxisAlignment.start,
-      ));
+      listHeader.add(
+        Evs2ListText(
+          originalFullText: item.colTitle,
+          width: item.colWidth,
+          style: listHeaderStyle,
+          suffix: suffix,
+        ),
+      );
     }
 
     if (kDebugMode) {
@@ -475,25 +486,24 @@ class _WgtPagEditCommitList2State extends State<WgtPagEditCommitList2> {
       title: Container(
         decoration: BoxDecoration(
           border: Border(
-            bottom: BorderSide(
-              color: Theme.of(context).hintColor,
-              width: 0.5,
-            ),
+            bottom: BorderSide(color: Theme.of(context).hintColor, width: 0.5),
           ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            ...listHeader,
-          ],
+          children: [...listHeader],
         ),
       ),
     );
   }
 
-  Widget _buildListItem(int index, Map<String, dynamic> row,
-      Map<String, dynamic> modifiedRow, List<Map<String, dynamic>>? fullList) {
+  Widget _buildListItem(
+    int index,
+    Map<String, dynamic> row,
+    Map<String, dynamic> modifiedRow,
+    List<Map<String, dynamic>>? fullList,
+  ) {
     List<Widget> listItem = [];
     String indexLabel = index.toString();
     if (widget.maxRowsPerPage != null &&
@@ -608,20 +618,28 @@ class _WgtPagEditCommitList2State extends State<WgtPagEditCommitList2> {
         // 5. col editable color
         if (ctrlItem.errorColor != null &&
             (row[ctrlItem.colKey] as String).contains(
-                'error') /*&& row['error'].keys.first == item['fieldKey']*/) {
+              'error',
+            ) /*&& row['error'].keys.first == item['fieldKey']*/ ) {
           _listItemStyle = _listItemStyle.copyWith(
-              color: ctrlItem.errorColor, fontWeight: FontWeight.w500);
+            color: ctrlItem.errorColor,
+            fontWeight: FontWeight.w500,
+          );
         } else if (row['${ctrlItem.colKey}_color'] != null) {
           _listItemStyle = _listItemStyle.copyWith(
-              color: row['${ctrlItem.colKey}_color'],
-              fontWeight: FontWeight.w500);
+            color: row['${ctrlItem.colKey}_color'],
+            fontWeight: FontWeight.w500,
+          );
         } else if (row['${ctrlItem.colKey}_modified'] != null) {
           _listItemStyle = _listItemStyle.copyWith(
-              color: _modifiedColor, fontWeight: FontWeight.w500);
+            color: _modifiedColor,
+            fontWeight: FontWeight.w500,
+          );
         } else if (ctrlItem.successColor != null &&
             (row[ctrlItem.colKey] as String).contains('success')) {
           _listItemStyle = _listItemStyle.copyWith(
-              color: ctrlItem.successColor, fontWeight: FontWeight.w500);
+            color: ctrlItem.successColor,
+            fontWeight: FontWeight.w500,
+          );
         }
         // else if (colEditable) {
         //   _listItemStyle = _listItemStyle.copyWith(
@@ -642,8 +660,10 @@ class _WgtPagEditCommitList2State extends State<WgtPagEditCommitList2> {
       //       ctrlItem['getDisplayString'](row[ctrlItem.colKey]) ?? '';
       // }
       if (ctrlItem.useComma) {
-        originalFullText =
-            getCommaNumberStr(double.tryParse(originalFullText), decimal: 2);
+        originalFullText = getCommaNumberStr(
+          double.tryParse(originalFullText),
+          decimal: 2,
+        );
       }
 
       bool showTag = false;
@@ -670,6 +690,7 @@ class _WgtPagEditCommitList2State extends State<WgtPagEditCommitList2> {
                   originalFullText: originalFullText,
                   width: width,
                   style: _listItemStyle,
+                  padding: ctrlItem.padding,
                   alignment: ctrlItem.align == 'right'
                       ? Alignment.centerRight
                       : Alignment.centerLeft,
@@ -699,180 +720,179 @@ class _WgtPagEditCommitList2State extends State<WgtPagEditCommitList2> {
                 // ),
               )
             : ctrlItem.colWidgetType == PagColWidgetType.TAG && showTag
-                ? getTag(
-                    row: row,
-                    configItem: ctrlItem.toJson(),
-                    width: width,
-                    tagColor: tagColor,
-                    tagText: tagText,
-                    tagTooltip: tagTooltip,
-                  )
-                : ctrlItem.colWidgetType == PagColWidgetType.TAG_LIST
-                    ? getTagList(
-                        row: row,
-                        configItem: ctrlItem.toJson(),
-                        width: width,
-                        tagColor: tagColor,
-                        tagText: row[ctrlItem.colKey] ?? '',
-                        tagTooltip: tagTooltip,
+            ? getTag(
+                row: row,
+                configItem: ctrlItem.toJson(),
+                width: width,
+                tagColor: tagColor,
+                tagText: tagText,
+                tagTooltip: tagTooltip,
+              )
+            : ctrlItem.colWidgetType == PagColWidgetType.TAG_LIST
+            ? getTagList(
+                row: row,
+                configItem: ctrlItem.toJson(),
+                width: width,
+                tagColor: tagColor,
+                tagText: row[ctrlItem.colKey] ?? '',
+                tagTooltip: tagTooltip,
+              )
+            // :
+            // ctrlItem.colWidgetType == PagColWidgetType.CHECKBOX
+            //     ? Tooltip(
+            //         message: '',
+            //         // disabled ? ctrlItem['disabledTooltip'] ?? '' : '',
+            //         waitDuration: const Duration(milliseconds: 500),
+            //         child: SizedBox(
+            //           width: width,
+            //           child: Checkbox(
+            //             // checkColor: Theme.of(context).hintColor,
+            //             // activeColor: Theme.of(context).colorScheme.secondary,
+            //             value: ctrlItem['getVal']?.call(row) ??
+            //                 row[ctrlItem.colKey] ??
+            //                 false,
+            //             onChanged: disabled
+            //                 ? null
+            //                 : (value) {
+            //                     ctrlItem['onChanged'](value, row);
+            //                   },
+            //           ),
+            //         ),
+            //       )
+            // :
+            // ctrlItem['useWidget'] == 'iconButton'
+            //     ? Padding(
+            //         padding: const EdgeInsets.only(bottom: 8.0),
+            //         child: SizedBox(
+            //           width: width,
+            //           height: 18,
+            //           child: Align(
+            //             alignment: Alignment.centerLeft,
+            //             child: showAltIcon
+            //                 ? Tooltip(
+            //                     message: ctrlItem['altIconTooltip'],
+            //                     child: Icon(
+            //                       ctrlItem['altIcon'],
+            //                       color: Theme.of(context).hintColor,
+            //                     ),
+            //                   )
+            //                 : InkWell(
+            //                     onTap: ctrlItem['onTap'] == null
+            //                         ? ctrlItem['onTap']
+            //                         : () => ctrlItem['onTap'](
+            //                             context,
+            //                             row,
+            //                             fullList!,
+            //                             widget.queryMap),
+            //                     onHover: (val) {
+            //                       setState(() {
+            //                         if (val) {
+            //                           _widgetIndex = index;
+            //                         } else {
+            //                           _widgetIndex = -1;
+            //                         }
+            //                       });
+            //                     },
+            //                     child: showIcon
+            //                         ? Tooltip(
+            //                             waitDuration: const Duration(
+            //                                 milliseconds: 500),
+            //                             message:
+            //                                 ctrlItem['iconTooltip'] ??
+            //                                     iconTooltip ??
+            //                                     '',
+            //                             child: Icon(
+            //                               ctrlItem['iconData'] ??
+            //                                   Icons.edit,
+            //                               color:
+            //                                   ctrlItem['iconColor'] ??
+            //                                       Theme.of(context)
+            //                                           .colorScheme
+            //                                           .primary
+            //                                           .withOpacity(0.5),
+            //                               size: ctrlItem['iconSize'],
+            //                             ),
+            //                           )
+            //                         : Container(),
+            //                   ),
+            //           ),
+            //         ),
+            //       )
+            // :
+            // ctrlItem['useWidget'] == 'dropdown'
+            //     ? DropdownButton(
+            //         isExpanded: true,
+            //         value: row[ctrlItem.colKey],
+            //         items: ctrlItem['dropdownItems']
+            //             .map<DropdownMenuItem<dynamic>>((item) {
+            //           return DropdownMenuItem(
+            //             value: item['value'],
+            //             child: Text(item['label']),
+            //           );
+            //         }).toList(),
+            //         onChanged: disabled
+            //             ? null
+            //             : (value) {
+            //                 ctrlItem['onChanged'](value, row);
+            //               },
+            //       )
+            // :
+            // ctrlItem['useWidget'] == 'singleKey'
+            //     ? ctrlItem['onTap'] == null
+            //         ? Container()
+            //         : InkWell(
+            //             onTap: () {
+            //               ctrlItem['onTap'](row);
+            //             },
+            //             child: Tooltip(
+            //               message:
+            //                   ctrlItem['detailTooltip'] ?? '',
+            //               waitDuration:
+            //                   const Duration(milliseconds: 500),
+            //               child: Evs2ListText(
+            //                 nonSelectable: true,
+            //                 // parentListWgt: widget,
+            //                 originalFullText: originalFullText,
+            //                 width: width,
+            //                 style: row[ctrlItem.colKey] ==
+            //                         widget.currentItemId
+            //                     ? TextStyle(
+            //                         backgroundColor:
+            //                             Theme.of(context)
+            //                                 .colorScheme
+            //                                 .primary,
+            //                         fontSize: 15,
+            //                         color: Colors.white,
+            //                         fontWeight: FontWeight.w500,
+            //                       )
+            //                     : _listItemStyle.copyWith(
+            //                         color: Theme.of(context)
+            //                             .colorScheme
+            //                             .primary,
+            //                         fontWeight: FontWeight.w500,
+            //                       ),
+            //               ),
+            //             ),
+            //           )
+            : Container(
+                width: width,
+                alignment: Alignment.centerLeft,
+                child: ctrlItem.colWidgetType == PagColWidgetType.CUSTOM
+                    ? Container(
+                        decoration: (row['is_selected'] ?? false)
+                            ? BoxDecoration(
+                                border: Border.all(
+                                  color: Theme.of(context).highlightColor,
+                                  // Theme.of(context).colorScheme.primary,
+                                  width: 1.5,
+                                ),
+                                borderRadius: BorderRadius.circular(3),
+                              )
+                            : null,
+                        child: ctrlItem.getCustomWidget?.call(row, _rows),
                       )
-                    // :
-                    // ctrlItem.colWidgetType == PagColWidgetType.CHECKBOX
-                    //     ? Tooltip(
-                    //         message: '',
-                    //         // disabled ? ctrlItem['disabledTooltip'] ?? '' : '',
-                    //         waitDuration: const Duration(milliseconds: 500),
-                    //         child: SizedBox(
-                    //           width: width,
-                    //           child: Checkbox(
-                    //             // checkColor: Theme.of(context).hintColor,
-                    //             // activeColor: Theme.of(context).colorScheme.secondary,
-                    //             value: ctrlItem['getVal']?.call(row) ??
-                    //                 row[ctrlItem.colKey] ??
-                    //                 false,
-                    //             onChanged: disabled
-                    //                 ? null
-                    //                 : (value) {
-                    //                     ctrlItem['onChanged'](value, row);
-                    //                   },
-                    //           ),
-                    //         ),
-                    //       )
-                    // :
-                    // ctrlItem['useWidget'] == 'iconButton'
-                    //     ? Padding(
-                    //         padding: const EdgeInsets.only(bottom: 8.0),
-                    //         child: SizedBox(
-                    //           width: width,
-                    //           height: 18,
-                    //           child: Align(
-                    //             alignment: Alignment.centerLeft,
-                    //             child: showAltIcon
-                    //                 ? Tooltip(
-                    //                     message: ctrlItem['altIconTooltip'],
-                    //                     child: Icon(
-                    //                       ctrlItem['altIcon'],
-                    //                       color: Theme.of(context).hintColor,
-                    //                     ),
-                    //                   )
-                    //                 : InkWell(
-                    //                     onTap: ctrlItem['onTap'] == null
-                    //                         ? ctrlItem['onTap']
-                    //                         : () => ctrlItem['onTap'](
-                    //                             context,
-                    //                             row,
-                    //                             fullList!,
-                    //                             widget.queryMap),
-                    //                     onHover: (val) {
-                    //                       setState(() {
-                    //                         if (val) {
-                    //                           _widgetIndex = index;
-                    //                         } else {
-                    //                           _widgetIndex = -1;
-                    //                         }
-                    //                       });
-                    //                     },
-                    //                     child: showIcon
-                    //                         ? Tooltip(
-                    //                             waitDuration: const Duration(
-                    //                                 milliseconds: 500),
-                    //                             message:
-                    //                                 ctrlItem['iconTooltip'] ??
-                    //                                     iconTooltip ??
-                    //                                     '',
-                    //                             child: Icon(
-                    //                               ctrlItem['iconData'] ??
-                    //                                   Icons.edit,
-                    //                               color:
-                    //                                   ctrlItem['iconColor'] ??
-                    //                                       Theme.of(context)
-                    //                                           .colorScheme
-                    //                                           .primary
-                    //                                           .withOpacity(0.5),
-                    //                               size: ctrlItem['iconSize'],
-                    //                             ),
-                    //                           )
-                    //                         : Container(),
-                    //                   ),
-                    //           ),
-                    //         ),
-                    //       )
-                    // :
-                    // ctrlItem['useWidget'] == 'dropdown'
-                    //     ? DropdownButton(
-                    //         isExpanded: true,
-                    //         value: row[ctrlItem.colKey],
-                    //         items: ctrlItem['dropdownItems']
-                    //             .map<DropdownMenuItem<dynamic>>((item) {
-                    //           return DropdownMenuItem(
-                    //             value: item['value'],
-                    //             child: Text(item['label']),
-                    //           );
-                    //         }).toList(),
-                    //         onChanged: disabled
-                    //             ? null
-                    //             : (value) {
-                    //                 ctrlItem['onChanged'](value, row);
-                    //               },
-                    //       )
-                    // :
-                    // ctrlItem['useWidget'] == 'singleKey'
-                    //     ? ctrlItem['onTap'] == null
-                    //         ? Container()
-                    //         : InkWell(
-                    //             onTap: () {
-                    //               ctrlItem['onTap'](row);
-                    //             },
-                    //             child: Tooltip(
-                    //               message:
-                    //                   ctrlItem['detailTooltip'] ?? '',
-                    //               waitDuration:
-                    //                   const Duration(milliseconds: 500),
-                    //               child: Evs2ListText(
-                    //                 nonSelectable: true,
-                    //                 // parentListWgt: widget,
-                    //                 originalFullText: originalFullText,
-                    //                 width: width,
-                    //                 style: row[ctrlItem.colKey] ==
-                    //                         widget.currentItemId
-                    //                     ? TextStyle(
-                    //                         backgroundColor:
-                    //                             Theme.of(context)
-                    //                                 .colorScheme
-                    //                                 .primary,
-                    //                         fontSize: 15,
-                    //                         color: Colors.white,
-                    //                         fontWeight: FontWeight.w500,
-                    //                       )
-                    //                     : _listItemStyle.copyWith(
-                    //                         color: Theme.of(context)
-                    //                             .colorScheme
-                    //                             .primary,
-                    //                         fontWeight: FontWeight.w500,
-                    //                       ),
-                    //               ),
-                    //             ),
-                    //           )
-                    : Container(
-                        width: width,
-                        alignment: Alignment.centerLeft,
-                        child: ctrlItem.colWidgetType == PagColWidgetType.CUSTOM
-                            ? Container(
-                                decoration: (row['is_selected'] ?? false)
-                                    ? BoxDecoration(
-                                        border: Border.all(
-                                          color:
-                                              Theme.of(context).highlightColor,
-                                          // Theme.of(context).colorScheme.primary,
-                                          width: 1.5,
-                                        ),
-                                        borderRadius: BorderRadius.circular(3),
-                                      )
-                                    : null,
-                                child:
-                                    ctrlItem.getCustomWidget?.call(row, _rows))
-                            : Container(),
-                      ),
+                    : Container(),
+              ),
       );
     }
 
@@ -888,6 +908,7 @@ class _WgtPagEditCommitList2State extends State<WgtPagEditCommitList2> {
     required String originalFullText,
     required double width,
     required TextStyle style,
+    EdgeInsets padding = EdgeInsets.zero,
     Alignment alignment = Alignment.centerLeft,
     // required String fieldKey,
     // required Map<String, dynamic> modifiedRow,
@@ -897,17 +918,22 @@ class _WgtPagEditCommitList2State extends State<WgtPagEditCommitList2> {
     // required bool nonSelectable,
     // required bool clickCopy,
   }) {
-    String displayText = convertToDisplayString(originalFullText, width, style);
+    double contentWidth = (width - padding.horizontal)
+        .clamp(0.0, width)
+        .toDouble();
+    String displayText = convertToDisplayString(
+      originalFullText,
+      contentWidth,
+      style,
+    );
 
     return SizedBox(
       width: width,
-      child: Align(
-        alignment: alignment,
-        child: SelectableText.rich(
-          TextSpan(
-            text: displayText,
-            style: style,
-          ),
+      child: Padding(
+        padding: padding,
+        child: Align(
+          alignment: alignment,
+          child: SelectableText.rich(TextSpan(text: displayText, style: style)),
         ),
       ),
     );
@@ -926,35 +952,36 @@ class _WgtPagEditCommitList2State extends State<WgtPagEditCommitList2> {
         message: 'Customize columns',
         waitDuration: const Duration(milliseconds: 500),
         child: WgtPopupButton(
-            width: 15,
-            height: 15,
-            popupWidth: 130,
-            popupHeight: 255,
-            direction: 'right',
-            popupChild: WgtPagListColumnCustomize(
-              sectionName: widget.sectionName,
-              listController: widget.listController,
-              listHeight: 220,
-              onChanged: (bool selected) {
-                // setState(() {
-                // _headerRefreshKey = UniqueKey();
-                // _listKey = UniqueKey();
-                // });
-              },
-              onSet: () {
-                setState(() {
-                  _headerRefreshKey = UniqueKey();
-                  _listKey = UniqueKey();
-                  widget.onColCustomizeSet?.call();
-                });
-              },
-            ),
-            // getColumnSelection(),
-            child: Icon(
-              Icons.settings,
-              size: 13,
-              color: Theme.of(context).hintColor,
-            )),
+          width: 15,
+          height: 15,
+          popupWidth: 130,
+          popupHeight: 255,
+          direction: 'right',
+          popupChild: WgtPagListColumnCustomize(
+            sectionName: widget.sectionName,
+            listController: widget.listController,
+            listHeight: 220,
+            onChanged: (bool selected) {
+              // setState(() {
+              // _headerRefreshKey = UniqueKey();
+              // _listKey = UniqueKey();
+              // });
+            },
+            onSet: () {
+              setState(() {
+                _headerRefreshKey = UniqueKey();
+                _listKey = UniqueKey();
+                widget.onColCustomizeSet?.call();
+              });
+            },
+          ),
+          // getColumnSelection(),
+          child: Icon(
+            Icons.settings,
+            size: 13,
+            color: Theme.of(context).hintColor,
+          ),
+        ),
       ),
     );
   }
@@ -983,18 +1010,16 @@ class _WgtPagEditCommitList2State extends State<WgtPagEditCommitList2> {
             ),
             Text(
               configItem.colTitle,
-              style:
-                  TextStyle(fontSize: 13.5, color: Theme.of(context).hintColor),
+              style: TextStyle(
+                fontSize: 13.5,
+                color: Theme.of(context).hintColor,
+              ),
             ),
           ],
         ),
       );
     }
-    return SingleChildScrollView(
-      child: Column(
-        children: columnSelection,
-      ),
-    );
+    return SingleChildScrollView(child: Column(children: columnSelection));
   }
 
   Widget getTagList({
@@ -1021,10 +1046,7 @@ class _WgtPagEditCommitList2State extends State<WgtPagEditCommitList2> {
     }
     return SizedBox(
       width: width,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: tagWidgets,
-      ),
+      child: Row(mainAxisSize: MainAxisSize.min, children: tagWidgets),
     );
   }
 
@@ -1048,16 +1070,19 @@ class _WgtPagEditCommitList2State extends State<WgtPagEditCommitList2> {
         tagLabel = deviceLsStatus.tag;
         tagColor = deviceLsStatus.color.withAlpha(130);
       } else if (widget.itemType is PagFinanceType) {
-        PagPaymentLcStatus financeLcStatus =
-            PagPaymentLcStatus.byValue(tagText);
+        PagPaymentLcStatus financeLcStatus = PagPaymentLcStatus.byValue(
+          tagText,
+        );
         tagLabel = financeLcStatus.tag;
         tagColor = financeLcStatus.color.withAlpha(130);
       } else if (widget.itemType is PagItemKind) {
         if (widget.itemType == PagItemKind.bill) {
-          PagBillingLcStatus billingLcStatus =
-              PagBillingLcStatus.byValue(tagText);
+          PagBillingLcStatus billingLcStatus = PagBillingLcStatus.byValue(
+            tagText,
+          );
           tagLabel = billingLcStatus.tag ?? '';
-          tagColor = billingLcStatus.color?.withAlpha(130) ??
+          tagColor =
+              billingLcStatus.color?.withAlpha(130) ??
               Colors.grey.withAlpha(130);
         }
         if (widget.itemType == PagItemKind.tenant) {
@@ -1084,7 +1109,8 @@ class _WgtPagEditCommitList2State extends State<WgtPagEditCommitList2> {
       tagLabel = tagText;
     }
     return Tooltip(
-      message: tagTooltip ??
+      message:
+          tagTooltip ??
           configItem['getTooltip']?.call(row[configItem['fieldKey']]) ??
           '',
       waitDuration: const Duration(milliseconds: 300),
@@ -1096,10 +1122,13 @@ class _WgtPagEditCommitList2State extends State<WgtPagEditCommitList2> {
           color: tagColor,
           borderRadius: BorderRadius.circular(3),
         ),
-        child: Text(tagLabel,
-            style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface,
-                fontSize: 13.5)),
+        child: Text(
+          tagLabel,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
+            fontSize: 13.5,
+          ),
+        ),
       ),
     );
   }
@@ -1113,7 +1142,8 @@ class _WgtPagEditCommitList2State extends State<WgtPagEditCommitList2> {
     required double width,
   }) {
     return Tooltip(
-      message: tagTooltip ??
+      message:
+          tagTooltip ??
           configItem['getTooltip']?.call(row[configItem['fieldKey']]) ??
           '',
       waitDuration: const Duration(milliseconds: 300),
@@ -1125,14 +1155,18 @@ class _WgtPagEditCommitList2State extends State<WgtPagEditCommitList2> {
               // width: width,
               padding: const EdgeInsets.symmetric(horizontal: 5),
               decoration: BoxDecoration(
-                color: tagColor ??
+                color:
+                    tagColor ??
                     configItem['getColor']?.call(row[configItem['fieldKey']]),
                 borderRadius: BorderRadius.circular(5),
               ),
-              child: Text(tagText,
-                  style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface,
-                      fontSize: 13.5)),
+              child: Text(
+                tagText,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: 13.5,
+                ),
+              ),
             ),
           ],
         ),
