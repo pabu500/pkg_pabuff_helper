@@ -7,7 +7,9 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
 import 'comm_tenant_usage.dart';
+import 'tenant_meter_readings_csv.dart';
 import 'wgt_tenant_finder2.dart';
+import 'wgt_meter_readings_download.dart';
 
 class WgtTenantUsage extends StatefulWidget {
   const WgtTenantUsage({
@@ -71,6 +73,14 @@ class _WgtTenantUsageState extends State<WgtTenantUsage> {
   // final List<Map<String, dynamic>> _subTenantListUsageSummary = [];
 
   EmsTypeUsageCalc? _emsTypeUsageCalc;
+
+  String? _getMeterReadingsExportError() {
+    for (final tenant in _tenantUsageSummary) {
+      final error = tenant['meter_readings_export_error'];
+      if (error is String && error.isNotEmpty) return error;
+    }
+    return null;
+  }
 
   Future<void> _getTenantUsageSummary() async {
     if (_selectedEndDate == null || _selectedStartDate == null) return;
@@ -376,12 +386,33 @@ class _WgtTenantUsageState extends State<WgtTenantUsage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          xtInfoBox(
-            text: 'Tenant Usage Summary',
-            textStyle:
-                opsWidgetTitle.copyWith(color: Theme.of(context).hintColor),
-            iconTextSpace: 3,
-            icon: const Icon(Symbols.cases),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              xtInfoBox(
+                text: 'Tenant Usage Summary',
+                textStyle:
+                    opsWidgetTitle.copyWith(color: Theme.of(context).hintColor),
+                iconTextSpace: 3,
+                icon: const Icon(Symbols.cases),
+              ),
+              if (widget.showMeterReadingsDownload &&
+                  _tenantUsageSummary.isNotEmpty &&
+                  _selectedStartDate != null &&
+                  _selectedEndDate != null)
+                WgtMeterReadingsDownload(
+                  rows: tenantMeterReadingsFromTenants(_tenantUsageSummary),
+                  fallbackRows: const [],
+                  error: _getMeterReadingsExportError(),
+                  tenantName: _tenantUsageSummary.length == 1
+                      ? _tenantUsageSummary.first['tenant_name'] ??
+                          'tenant_usage'
+                      : 'tenant_usage',
+                  fromDatetime: _selectedStartDate!,
+                  toDatetime: _selectedEndDate!,
+                ),
+            ],
           ),
           verticalSpaceSmall,
           WgtTenantFinder2(

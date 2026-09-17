@@ -40,10 +40,7 @@ class WgtDateRangePicker2 extends StatefulWidget {
   final bool useEdgeTime;
   final bool showHHmm;
   final bool enabled;
-  final void Function(
-    DateTime? startDate,
-    DateTime? endDate,
-  ) onSet;
+  final void Function(DateTime? startDate, DateTime? endDate) onSet;
   final bool singleDate;
   final double width;
   final bool updateRangeByParent;
@@ -71,8 +68,9 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
     CalendarDatePicker2Type datePickerType,
     List<DateTime?> values,
   ) {
-    values =
-        values.map((e) => e != null ? DateUtils.dateOnly(e) : null).toList();
+    values = values
+        .map((e) => e != null ? DateUtils.dateOnly(e) : null)
+        .toList();
     var valueText = (values.isNotEmpty ? values[0] : null)
         .toString()
         .replaceAll('00:00:00.000', '');
@@ -80,8 +78,8 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
     if (datePickerType == CalendarDatePicker2Type.multi) {
       valueText = values.isNotEmpty
           ? values
-              .map((v) => v.toString().replaceAll('00:00:00.000', ''))
-              .join(', ')
+                .map((v) => v.toString().replaceAll('00:00:00.000', ''))
+                .join(', ')
           : 'null';
     } else if (datePickerType == CalendarDatePicker2Type.range) {
       if (values.isNotEmpty) {
@@ -115,13 +113,13 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
     if (widget.populateDefaultRange) {
       _defaultEndDate = (widget.history
           ? getTargetLocalDatetimeNow(activeProjectTimezone)
-          : getTargetLocalDatetimeNow(activeProjectTimezone)
-              .add(const Duration(hours: 48)));
+          : getTargetLocalDatetimeNow(
+              activeProjectTimezone,
+            ).add(const Duration(hours: 48)));
 
-      _defaultStartDate = /*widget.startDateTime ??*/
-          (widget.history
-              ? _defaultEndDate!.subtract(const Duration(hours: 48))
-              : getTargetLocalDatetimeNow(activeProjectTimezone));
+      _defaultStartDate = /*widget.startDateTime ??*/ (widget.history
+          ? _defaultEndDate!.subtract(const Duration(hours: 48))
+          : getTargetLocalDatetimeNow(activeProjectTimezone));
 
       // if (widget.useEdgeTime) {
       //   _defaultEndDate = getTargetLocalDatetime(
@@ -134,17 +132,37 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
       // }
       if (widget.useEdgeTime) {
         _defaultEndDate = getTargetLocalDatetime(
-            activeProjectTimezone, 23, 59, 59, 999,
-            refLocalDatetime: _defaultEndDate); //get the end of the day
+          activeProjectTimezone,
+          23,
+          59,
+          59,
+          999,
+          refLocalDatetime: _defaultEndDate,
+        ); //get the end of the day
         _defaultStartDate = getTargetLocalDatetime(
-            activeProjectTimezone, 0, 0, 0, 0,
-            refLocalDatetime: _defaultStartDate); //get the start of the day
+          activeProjectTimezone,
+          0,
+          0,
+          0,
+          0,
+          refLocalDatetime: _defaultStartDate,
+        ); //get the start of the day
         _selectedStartDate = getTargetLocalDatetime(
-            activeProjectTimezone, 0, 0, 0, 0,
-            refLocalDatetime: _defaultStartDate); //get the start of the day
+          activeProjectTimezone,
+          0,
+          0,
+          0,
+          0,
+          refLocalDatetime: _defaultStartDate,
+        ); //get the start of the day
         _selectedEndDate = getTargetLocalDatetime(
-            activeProjectTimezone, 23, 59, 59, 999,
-            refLocalDatetime: _defaultEndDate); //get the end of the day
+          activeProjectTimezone,
+          23,
+          59,
+          59,
+          999,
+          refLocalDatetime: _defaultEndDate,
+        ); //get the end of the day
       }
     }
     // if (kDebugMode) {
@@ -168,12 +186,15 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
   @override
   Widget build(BuildContext context) {
     if (widget.updateRangeByParent) {
-      DateTime selectedEndDate = widget.endDateTime ??
+      DateTime selectedEndDate =
+          widget.endDateTime ??
           (widget.history
               ? getTargetLocalDatetimeNow(widget.timezone)
-              : getTargetLocalDatetimeNow(widget.timezone)
-                  .add(const Duration(hours: 48)));
-      DateTime selectedStartDate = widget.startDateTime ??
+              : getTargetLocalDatetimeNow(
+                  widget.timezone,
+                ).add(const Duration(hours: 48)));
+      DateTime selectedStartDate =
+          widget.startDateTime ??
           (widget.history && _defaultEndDate != null
               ? _defaultEndDate!.subtract(const Duration(hours: 48))
               : getTargetLocalDatetimeNow(widget.timezone));
@@ -202,13 +223,14 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
     String toText = 'Select';
     if (_selectedEndDate != _selectedStartDate) {
       if (_selectedStartDate != null) {
-        fromText =
-            DateFormat(widget.showHHmm ? 'yyyy-MM-dd HH:mm' : 'yyyy-MM-dd')
-                .format(_selectedStartDate!);
+        fromText = DateFormat(
+          widget.showHHmm ? 'yyyy-MM-dd HH:mm' : 'yyyy-MM-dd',
+        ).format(_selectedStartDate!);
       }
       if (_selectedEndDate != null) {
-        toText = DateFormat(widget.showHHmm ? 'yyyy-MM-dd HH:mm' : 'yyyy-MM-dd')
-            .format(_selectedEndDate!);
+        toText = DateFormat(
+          widget.showHHmm ? 'yyyy-MM-dd HH:mm' : 'yyyy-MM-dd',
+        ).format(_selectedEndDate!);
       }
     }
 
@@ -222,20 +244,22 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
             keyText: 'From',
             valueText: fromText,
             valueStyle: TextStyle(
-                fontSize: 15,
-                color: fromText == 'Select'
-                    ? Theme.of(context).hintColor.withAlpha(89)
-                    : Theme.of(context).colorScheme.primary),
+              fontSize: 15,
+              color: fromText == 'Select'
+                  ? Theme.of(context).hintColor.withAlpha(89)
+                  : Theme.of(context).colorScheme.primary,
+            ),
           ),
           horizontalSpaceTiny,
           xtKeyValueText(
             keyText: 'To',
             valueText: toText,
             valueStyle: TextStyle(
-                fontSize: 15,
-                color: toText == 'Select'
-                    ? Theme.of(context).hintColor.withAlpha(89)
-                    : Theme.of(context).colorScheme.primary),
+              fontSize: 15,
+              color: toText == 'Select'
+                  ? Theme.of(context).hintColor.withAlpha(89)
+                  : Theme.of(context).colorScheme.primary,
+            ),
           ),
           horizontalSpaceSmall,
           getDateRangePickerPopupButton(),
@@ -251,7 +275,8 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
     final config = CalendarDatePicker2Config(
       // controlsHeight: 45,
       calendarType: CalendarDatePicker2Type.range,
-      lastDate: widget.lastDate ??
+      lastDate:
+          widget.lastDate ??
           (widget.history
               ? endDate.add(const Duration(days: 1))
               : endDate.add(widget.maxDuration)),
@@ -272,9 +297,11 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
     );
 
     dev.log(
-        '_rangeDatePickerValueWithDefaultValue[0]:${_rangeDatePickerValueWithDefaultValue[0]}');
+      '_rangeDatePickerValueWithDefaultValue[0]:${_rangeDatePickerValueWithDefaultValue[0]}',
+    );
     dev.log(
-        '_rangeDatePickerValueWithDefaultValue[1]:${_rangeDatePickerValueWithDefaultValue[1]}');
+      '_rangeDatePickerValueWithDefaultValue[1]:${_rangeDatePickerValueWithDefaultValue[1]}',
+    );
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -294,16 +321,18 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
               }
               if (dates.length == 2) {
                 // _maxDurationExceeded = false;
-                Duration? duration = dates[1].difference(dates[0]);
-                if (duration > widget.maxSelectionDuration) {
-                  // setState(() {
-                  //   _maxDurationExceeded = true;
-                  // });
+                Duration? duration = dates[1]?.difference(dates[0]!);
+                if (duration != null) {
+                  if (duration > widget.maxSelectionDuration) {
+                    // setState(() {
+                    //   _maxDurationExceeded = true;
+                    // });
 
-                  if (widget.onMaxDurationExceeded != null) {
-                    widget.onMaxDurationExceeded!();
+                    if (widget.onMaxDurationExceeded != null) {
+                      widget.onMaxDurationExceeded!();
+                    }
+                    return;
                   }
-                  return;
                 }
               }
               // setState(() {
@@ -311,14 +340,24 @@ class _WgtDateRangePicker2State extends State<WgtDateRangePicker2> {
               _selectedStartDate = dates[0];
               if (widget.useEdgeTime) {
                 _selectedStartDate = getTargetLocalDatetime(
-                    widget.timezone, 0, 0, 0, 0,
-                    refLocalDatetime: _selectedStartDate!);
+                  widget.timezone,
+                  0,
+                  0,
+                  0,
+                  0,
+                  refLocalDatetime: _selectedStartDate!,
+                );
               }
               _selectedEndDate = dates.length > 1 ? dates[1] : null;
               if (_selectedEndDate != null && widget.useEdgeTime) {
                 _selectedEndDate = getTargetLocalDatetime(
-                    widget.timezone, 23, 59, 59, 999,
-                    refLocalDatetime: _selectedEndDate!);
+                  widget.timezone,
+                  23,
+                  59,
+                  59,
+                  999,
+                  refLocalDatetime: _selectedEndDate!,
+                );
               }
               // });
               if (!widget.updateRangeByParent) {
