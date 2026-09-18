@@ -90,6 +90,7 @@ class _WgtJobTypeOpPanel3State extends State<WgtJobTypeOpPanel3> {
   String? _selectedLcStatusStr;
 
   bool _isOption1 = false;
+  bool _isOption2 = false;
 
   String? _selectedItemTypeStr;
 
@@ -143,6 +144,7 @@ class _WgtJobTypeOpPanel3State extends State<WgtJobTypeOpPanel3> {
         'to_timestamp': _selectedToDate?.toIso8601String(),
         'target_lc_status': _selectedLcStatusStr,
         'is_option_1': _isOption1.toString(),
+        'is_option_2': _isOption2.toString(),
         'selected_item_type': _selectedItemTypeStr,
         'selected_item_id_type': _selectedItemIdTypeStr,
         'selected_item_id': _selectedItemIdStr,
@@ -609,6 +611,7 @@ class _WgtJobTypeOpPanel3State extends State<WgtJobTypeOpPanel3> {
   }
 
   Widget getUsageReportOptions() {
+    bool isOption2Enabled = widget.jobTaskType == 'usage-report';
     return Column(
       children: [
         Row(
@@ -639,10 +642,29 @@ class _WgtJobTypeOpPanel3State extends State<WgtJobTypeOpPanel3> {
                 onChanged: (bool? value) {
                   setState(() {
                     _isOption1 = value ?? false;
+                    if (!_isOption1) {
+                      _isOption2 = false;
+                    }
                   });
                 },
               ),
               const Text('Full Report'),
+            ],
+          ),
+        if (isOption2Enabled && _isOption1)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Checkbox(
+                value: _isOption2,
+                onChanged: (bool? value) {
+                  setState(() {
+                    _isOption2 = value ?? false;
+                  });
+                },
+              ),
+              const Text('Include Peak/Off-Peak'),
             ],
           ),
       ],
