@@ -239,6 +239,7 @@ class _WgtJobTypeOpPanel3State extends State<WgtJobTypeOpPanel3> {
         return _selectedScopeProfile?.siteGroupProfile != null &&
             _selectedDate1 != null;
       case 'billing-report':
+      case 'giro-collection-report':
         return _selectedFromDate != null && _selectedToDate != null;
       case 'bill-lc-status-update':
         if (_isOption1) {
@@ -437,6 +438,8 @@ class _WgtJobTypeOpPanel3State extends State<WgtJobTypeOpPanel3> {
         return getGiroFileOptions();
       case 'billing-report':
         return getBillingReportOptions();
+      case 'giro-collection-report':
+        return getGiroCollectionReportOptions();
       case 'monthly-3in1-audit-report':
         return getAuditReportOptions();
       case 'bill-lc-status-update':
@@ -801,6 +804,27 @@ class _WgtJobTypeOpPanel3State extends State<WgtJobTypeOpPanel3> {
           children: [
             Text(
               'Billing Month',
+              style: TextStyle(
+                color: Theme.of(context).hintColor,
+                fontSize: 16,
+              ),
+            ),
+            horizontalSpaceSmall,
+            getTimeRangePicker(forceMonthly: true),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget getGiroCollectionReportOptions() {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'GIRO Report Month',
               style: TextStyle(
                 color: Theme.of(context).hintColor,
                 fontSize: 16,
