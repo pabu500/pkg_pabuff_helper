@@ -1,5 +1,6 @@
 import 'dart:developer' as dev show log;
 
+import 'package:buff_helper/pag_helper/def_helper/dh_pag_bill.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_item.dart';
 import 'package:buff_helper/xt_ui/util/xt_util_InputFieldValidator.dart';
@@ -1215,6 +1216,27 @@ String? validateReminderRemark(String value) {
   return null;
 }
 
+String? validateReminderType(String value) {
+  if (value.trim().isEmpty) {
+    return 'required';
+  }
+
+  List<String> validValues = BillingReminderType.values.map((e) => e.value).toList();
+  String errorMessage = 'must be ${validValues.join(' or ')}';
+  BillingReminderType? reminderType;
+  for (var e in BillingReminderType.values) {
+    if (e.value == value) {
+      reminderType = e;
+      break;
+    }
+  }
+  if (reminderType == null) {
+    return errorMessage;
+  }
+  
+  return null;
+}
+
 String? Function(String) getTenantValidator(String key,
     {bool isValueRequired = true}) {
   switch (key) {
@@ -1286,6 +1308,8 @@ String? Function(String) getTenantValidator(String key,
       return getValidator(validateSendReminderType, isValueRequired);
     case 'reminder_remark':
       return getValidator(validateReminderRemark, isValueRequired);
+    case 'reminder_type':
+        return getValidator(validateReminderType, isValueRequired);
     case 'mg_assignment_type':
       return getValidator(validateMgAssignmentType, isValueRequired);
     default:
