@@ -473,7 +473,7 @@ String? nusSnValidator(String displayname) {
     bool isVh = isVH(displayname) == null;
     bool isUTown = isUtown(displayname) == null;
     bool isPgpr = isPGPR(displayname) == null;
-    bool isNusFiveHalls = isNUSFiveHalls(displayname) == null;
+    bool isNusFiveHalls = isNus5Halls(displayname) == null;
     if (isVh || isRvrc || isUTown || isPgpr || isNusFiveHalls) {
       return null;
     }
@@ -558,7 +558,7 @@ String? isPGPR(String displayname) {
   return null;
 }
 
-String? isNUSFiveHalls(String displayname) {
+String? isNus5Halls(String displayname) {
   int displaynameInt = int.parse(displayname);
   if ((displaynameInt < 10014100 || displaynameInt > 10014434)) {
     return 'Invalid displayname';
