@@ -116,9 +116,7 @@ ScopeProfile? getActiveScopeProfile(ProjectScope activePortalProjectScope) {
 final scopeProfiles = [
   {
     'project_scope': ProjectScope.EVS2_PA,
-    'project_sites': [
-      SiteScope.PA_ATP,
-    ],
+    'project_sites': [SiteScope.PA_ATP],
     'timezone': 8,
     'currency': 'SGD',
     'validate_entity_sn': mmsSnValidator,
@@ -139,9 +137,7 @@ final scopeProfiles = [
   },
   {
     'project_scope': ProjectScope.MMC_GI_DE,
-    'project_sites': [
-      SiteScope.GI_DE_DEMO,
-    ],
+    'project_sites': [SiteScope.GI_DE_DEMO],
     'timezone': 8,
     'currency': 'SGD',
     'validate_entity_sn': mmsSnValidator,
@@ -221,11 +217,7 @@ final scopeProfiles = [
     },
     'allow_custom_amount': true,
     'payment_mode_setting': {
-      {
-        'payment_mode': PaymentMode.stripe,
-        'active': false,
-        'show': false,
-      },
+      {'payment_mode': PaymentMode.stripe, 'active': false, 'show': false},
       {
         'payment_mode': PaymentMode.netsQR,
         'active': false,
@@ -255,21 +247,9 @@ final scopeProfiles = [
       }
     },
     'payment_mode_setting': [
-      {
-        'payment_mode': PaymentMode.stripe,
-        'active': false,
-        'show': true,
-      },
-      {
-        'payment_mode': PaymentMode.netsQR,
-        'active': false,
-        'show': true,
-      },
-      {
-        'payment_mode': PaymentMode.enets,
-        'active': true,
-        'show': true,
-      },
+      {'payment_mode': PaymentMode.stripe, 'active': false, 'show': true},
+      {'payment_mode': PaymentMode.netsQR, 'active': false, 'show': true},
+      {'payment_mode': PaymentMode.enets, 'active': true, 'show': true},
     ],
   },
   {
@@ -295,18 +275,10 @@ final scopeProfiles = [
         'pub_key':
             'pk_live_51MokvvAzcY0NKTCHoedkapOh9Tl9VEwT3Nz2bRn0vcGugAmFJBoOrH0GprHSj99GLhaDByJyciLVOmsoSiuHuY7F00N9f88BqB',
         'merchant_identifier': 'merchant.com.evs2.ntu',
-        'pay_svc_host_url': 'https://p3.evs.com.sg'
+        'pay_svc_host_url': 'https://p3.evs.com.sg',
       },
-      {
-        'payment_mode': PaymentMode.netsQR,
-        'active': false,
-        'show': true,
-      },
-      {
-        'payment_mode': PaymentMode.enets,
-        'active': false,
-        'show': true,
-      },
+      {'payment_mode': PaymentMode.netsQR, 'active': false, 'show': true},
+      {'payment_mode': PaymentMode.enets, 'active': false, 'show': true},
     ],
   },
   {
@@ -400,8 +372,8 @@ final scopeProfiles = [
 ];
 
 String? mmsSnValidator(value) {
-  //12 digits, start with '202', all digits
-  RegExp exp = RegExp(r'^202\d{9}$');
+  //12 digits, start with '20', all digits
+  RegExp exp = RegExp(r'^20\d{10}$');
   if (exp.hasMatch(value)) {
     return null;
   } else {
@@ -409,8 +381,10 @@ String? mmsSnValidator(value) {
   }
 }
 
-ScopeProfile? getActivePortalScopeProfile(ProjectScope activePortalProjectScope,
-    List<Map<String, dynamic>> scopeProfiles) {
+ScopeProfile? getActivePortalScopeProfile(
+  ProjectScope activePortalProjectScope,
+  List<Map<String, dynamic>> scopeProfiles,
+) {
   for (var scopeProfile in scopeProfiles) {
     if (scopeProfile['project_scope'] == activePortalProjectScope) {
       return ScopeProfile.fromJson(scopeProfile);
@@ -424,10 +398,7 @@ ScopeProfile? getActivePortalScopeProfile(ProjectScope activePortalProjectScope,
 // "project_nus" or "site_nus_pgpr"
 Map<String, dynamic> getSortedScope(List<String>? scopes) {
   if (scopes == null || scopes.isEmpty) {
-    return {
-      'project_scopes': [],
-      'site_scopes': [],
-    };
+    return {'project_scopes': [], 'site_scopes': []};
   }
 
   List<ProjectScope> projectScopes = [];
@@ -456,28 +427,35 @@ Map<String, dynamic> getSortedScope(List<String>? scopes) {
   if (projectScopes.contains(ProjectScope.GLOBAL) ||
       projectScopes.contains(ProjectScope.SG_ALL)) {
     projectScopes = [];
-    projectScopes.addAll(evs2Projects.where((e) =>
-        e != ProjectScope.NONE &&
-        e != ProjectScope.GLOBAL &&
-        e != ProjectScope.SG_ALL));
+    projectScopes.addAll(
+      evs2Projects.where(
+        (e) =>
+            e != ProjectScope.NONE &&
+            e != ProjectScope.GLOBAL &&
+            e != ProjectScope.SG_ALL,
+      ),
+    );
     //sort alphabetically
     projectScopes.sort((a, b) => a.toString().compareTo(b.toString()));
     //add sg_all to the firt position
     projectScopes.insert(0, ProjectScope.SG_ALL);
 
     siteScopes = [];
-    siteScopes.addAll(evs2Sites.where((e) =>
-        e != SiteScope.NONE && e != SiteScope.GLOBAL && e != SiteScope.SG_ALL));
+    siteScopes.addAll(
+      evs2Sites.where(
+        (e) =>
+            e != SiteScope.NONE &&
+            e != SiteScope.GLOBAL &&
+            e != SiteScope.SG_ALL,
+      ),
+    );
     //sort alphabetically
     siteScopes.sort((a, b) => a.toString().compareTo(b.toString()));
     //add sg_all to the firt position
     // siteScopes.insert(0, SiteScope.SG_ALL);
   }
 
-  return {
-    'project_scopes': projectScopes,
-    'site_scopes': siteScopes,
-  };
+  return {'project_scopes': projectScopes, 'site_scopes': siteScopes};
 }
 
 ProjectScope getProjectScopeFromStr2(String scopeStr) {
@@ -503,7 +481,9 @@ SiteScope getSiteScopeFromStr2(String scopeStr) {
 }
 
 List<SiteScope> getProjectSites(
-    ProjectScope? projectScope, List<Map<String, dynamic>> scopeProfiles) {
+  ProjectScope? projectScope,
+  List<Map<String, dynamic>> scopeProfiles,
+) {
   if (projectScope == null) return [];
   for (var scopeProfile in scopeProfiles) {
     if (scopeProfile['project_scope'] == projectScope) {
@@ -523,8 +503,11 @@ List<SiteScope> getProjectSites(
   return [];
 }
 
-double getProjectMeterUsageFactor(ProjectScope? projectScope,
-    List<Map<String, dynamic>> scopeProfiles, MeterType? meterType) {
+double getProjectMeterUsageFactor(
+  ProjectScope? projectScope,
+  List<Map<String, dynamic>> scopeProfiles,
+  MeterType? meterType,
+) {
   if (projectScope == null) return 1.0;
   if (meterType == null) return 1.0;
   for (var scopeProfile in scopeProfiles) {

@@ -45,9 +45,7 @@ enum PagSiteScope {
 final projectProfileRepo = [
   {
     'project_scope': PagProjectScope.PAG_GI_DE,
-    'project_sites': [
-      SiteScope.GI_DE_DEMO,
-    ],
+    'project_sites': [SiteScope.GI_DE_DEMO],
     'timezone': 8,
     'currency': 'SGD',
     'validate_entity_sn': mmsSnValidator,
@@ -68,9 +66,7 @@ final projectProfileRepo = [
   },
   {
     'project_scope': PagProjectScope.EVS2_PA,
-    'project_sites': [
-      SiteScope.PA_ATP,
-    ],
+    'project_sites': [SiteScope.PA_ATP],
     'timezone': 8,
     'currency': 'SGD',
     'validate_entity_sn': mmsSnValidator,
@@ -98,11 +94,7 @@ final projectProfileRepo = [
       'measurementId': 'G-KWBCXHSFM5',
     },
     'payment_mode_setting': {
-      {
-        'payment_mode': PaymentMode.stripe,
-        'active': false,
-        'show': true,
-      },
+      {'payment_mode': PaymentMode.stripe, 'active': false, 'show': true},
       {
         'payment_mode': PaymentMode.netsQR,
         'active': false,
@@ -173,11 +165,7 @@ final projectProfileRepo = [
     },
     'allow_custom_amount': true,
     'payment_mode_setting': {
-      {
-        'payment_mode': PaymentMode.stripe,
-        'active': false,
-        'show': false,
-      },
+      {'payment_mode': PaymentMode.stripe, 'active': false, 'show': false},
       {
         'payment_mode': PaymentMode.netsQR,
         'active': false,
@@ -207,21 +195,9 @@ final projectProfileRepo = [
       }
     },
     'payment_mode_setting': [
-      {
-        'payment_mode': PaymentMode.stripe,
-        'active': false,
-        'show': true,
-      },
-      {
-        'payment_mode': PaymentMode.netsQR,
-        'active': false,
-        'show': true,
-      },
-      {
-        'payment_mode': PaymentMode.enets,
-        'active': true,
-        'show': true,
-      },
+      {'payment_mode': PaymentMode.stripe, 'active': false, 'show': true},
+      {'payment_mode': PaymentMode.netsQR, 'active': false, 'show': true},
+      {'payment_mode': PaymentMode.enets, 'active': true, 'show': true},
     ],
   },
   {
@@ -247,18 +223,10 @@ final projectProfileRepo = [
         'pub_key':
             'pk_live_51MokvvAzcY0NKTCHoedkapOh9Tl9VEwT3Nz2bRn0vcGugAmFJBoOrH0GprHSj99GLhaDByJyciLVOmsoSiuHuY7F00N9f88BqB',
         'merchant_identifier': 'merchant.com.evs2.ntu',
-        'pay_svc_host_url': 'https://p3.evs.com.sg'
+        'pay_svc_host_url': 'https://p3.evs.com.sg',
       },
-      {
-        'payment_mode': PaymentMode.netsQR,
-        'active': false,
-        'show': true,
-      },
-      {
-        'payment_mode': PaymentMode.enets,
-        'active': false,
-        'show': true,
-      },
+      {'payment_mode': PaymentMode.netsQR, 'active': false, 'show': true},
+      {'payment_mode': PaymentMode.enets, 'active': false, 'show': true},
     ],
   },
   {
@@ -335,7 +303,7 @@ final projectProfileRepo = [
       'messagingSenderId': '949621989494',
       'appId': '1:949621989494:web:2e67a89ce429494f043f57',
     },
-  }
+  },
 ];
 
 ScopeProfile? getScopeProfile(PagProjectScope activePortalPagProjectScope) {
@@ -427,7 +395,7 @@ Map<String, dynamic> getProjctPaymentModes(String scopeStr) {
   for (var key in paymentProfile.keys) {
     paymentModes[key] = {
       'active': paymentProfile[key]['active'],
-      'show': paymentProfile[key]['show']
+      'show': paymentProfile[key]['show'],
     };
   }
 
@@ -456,8 +424,8 @@ Function getDisplaynameValidator(String scopeStr) {
 }
 
 String? mmsSnValidator(value) {
-  //12 digits, start with '202', all digits
-  RegExp exp = RegExp(r'^202\d{9}$');
+  //12 digits, start with '20', all digits
+  RegExp exp = RegExp(r'^20\d{10}$');
   if (exp.hasMatch(value)) {
     return null;
   } else {
@@ -513,7 +481,7 @@ List<int> rvrc24List = [
   10010021,
   10010022,
   10010023,
-  10010024
+  10010024,
 ];
 String? isRVRC(String displayname) {
   int displaynameInt = int.parse(displayname);
@@ -539,9 +507,9 @@ String? isUtown(String displayname) {
 
   bool isValidUtownRange =
       (displaynameInt >= 10000000 && displaynameInt <= 10003985) ||
-          (displaynameInt == 10009999) ||
-          (displaynameInt >= 10010161 && displaynameInt <= 10010184) ||
-          (displaynameInt >= 10100034 && displaynameInt <= 10101302);
+      (displaynameInt == 10009999) ||
+      (displaynameInt >= 10010161 && displaynameInt <= 10010184) ||
+      (displaynameInt >= 10100034 && displaynameInt <= 10101302);
 
   if (!isValidUtownRange) {
     return 'Invalid displayname';
