@@ -862,7 +862,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
   Widget getBillItem(int index) {
     Map<String, dynamic> billInfo = _billList[index];
     final billingRecId = billInfo['id'] ?? '';
-    final billLabel = billInfo['label'] ?? '';
+    final invoiceNumber = getFinanceInvoiceNumber(billInfo);
     final cycleStr = billInfo['cycle_str'] ?? '';
     final billingLcStatusStr = billInfo['lc_status'] ?? '';
 
@@ -958,7 +958,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('$billLabel', style: billLabelStyle),
+                        Text(invoiceNumber, style: billLabelStyle),
                         Text('$cycleStr', style: billLabelStyle),
                       ],
                     ),
@@ -1302,7 +1302,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
         break;
       }
       String tenantLabel = applyInfo['tenant_label'] ?? '-';
-      String billLabel = applyInfo['bill_label'] ?? '-';
+      String invoiceNumber = getFinanceInvoiceNumber(applyInfo);
       String billedTotalCost = applyInfo['billed_total_amount'] ?? '-';
       String appliedTimestamp = applyInfo['applied_timestamp'] ?? '-';
       String appliedByOpName = applyInfo['applied_by_op_username'] ?? '-';
@@ -1334,7 +1334,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
                   children: [
                     Text('Bill: ', style: keyStyle),
                     Text(
-                      billLabel,
+                      invoiceNumber,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ],
@@ -1405,7 +1405,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
       return Container();
     }
 
-    String billLabel = billInfo['label'] ?? '-';
+    String invoiceNumber = getFinanceInvoiceNumber(billInfo);
     String billedTotalCost = billInfo['billed_total_amount'] ?? '-';
 
     List<Widget> appliesWidgets = [];
@@ -1420,7 +1420,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
             });
           },
           child: Text(
-            'Payment Applies (${existingPaymentApplyInfoListTyped.length}) for This Bill - $billLabel',
+            'Payment Applies (${existingPaymentApplyInfoListTyped.length}) for This Bill - $invoiceNumber',
             style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
@@ -1464,7 +1464,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
                 //   children: [
                 //     Text('Bill: ', style: keyStyle),
                 //     Text(
-                //       billLabel,
+                //       invoiceNumber,
                 //       style: const TextStyle(fontWeight: FontWeight.bold),
                 //     ),
                 //   ],

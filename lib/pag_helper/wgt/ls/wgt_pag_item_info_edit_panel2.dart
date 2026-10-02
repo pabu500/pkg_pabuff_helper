@@ -1519,7 +1519,8 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
                       for (Map<String, dynamic> applyInfo
                           in _paymentApplyList) {
                         String tenantLabel = applyInfo['tenant_label'] ?? '-';
-                        String billLabel = applyInfo['bill_label'] ?? '-';
+                        String invoiceNumber =
+                            getFinanceInvoiceNumber(applyInfo);
                         String billedTotalCost =
                             applyInfo['billed_total_cost'] ?? '-';
                         String appliedTimestamp =
@@ -1568,7 +1569,7 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
                                                         fontSize: 13.5))),
                                           ),
                                           Text(
-                                            billLabel,
+                                            invoiceNumber,
                                             style: const TextStyle(
                                                 fontSize: 15,
                                                 fontWeight: FontWeight.bold),

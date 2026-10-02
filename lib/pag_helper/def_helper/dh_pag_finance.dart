@@ -8,6 +8,10 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'dh_pag_tenant.dart';
 import 'enum_helper.dart';
 
+/// The invoice identifier used by SOA and payment matching, without a label fallback.
+String getFinanceInvoiceNumber(Map<String, dynamic> billInfo) =>
+    billInfo['audit_label']?.toString() ?? '';
+
 enum PagFinanceType {
   tenantSoa('Statement of Account', 'tenant_soa', 'soa', Symbols.contract),
   payment('Payment', 'payment', 'pyt', Symbols.attach_money),
