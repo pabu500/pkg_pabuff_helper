@@ -363,6 +363,12 @@ class _WgtPagDateRangePicker2State extends State<WgtPagDateRangePicker2> {
         (widget.history
             ? startDate.subtract(widget.maxDuration)
             : startDate.subtract(const Duration(days: 1)));
+    final earliestDateAge = getTargetLocalDatetimeNow(
+      widget.timezone,
+    ).difference(earliestDate);
+    final earliestDateText = earliestDateAge.isNegative
+        ? 'in ${getReadableDuration(earliestDateAge.abs())}'
+        : '${getReadableDuration(earliestDateAge)} ago';
 
     final config = CalendarDatePicker2Config(
       // controlsHeight: 45,
@@ -468,7 +474,7 @@ class _WgtPagDateRangePicker2State extends State<WgtPagDateRangePicker2> {
           offset: const Offset(0, -10),
           child: Text(
             '* max selection: ${getReadableDuration(widget.maxDuration)}\n'
-            '* earliest date: ${DateFormat('yyyy-MM-dd').format(earliestDate)}',
+            '* earliest date: $earliestDateText',
             style: TextStyle(
               color: Theme.of(context).colorScheme.error,
               fontSize: 16,
