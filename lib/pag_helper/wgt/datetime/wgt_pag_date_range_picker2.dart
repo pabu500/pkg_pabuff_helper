@@ -419,7 +419,7 @@ class _WgtPagDateRangePicker2State extends State<WgtPagDateRangePicker2> {
               }
               if (dates.length == 2) {
                 // _maxDurationExceeded = false;
-                Duration duration = dates[1]!.difference(dates[0]!);
+                Duration duration = dates[1].difference(dates[0]);
                 if (duration > widget.maxDuration) {
                   // setState(() {
                   //   _maxDurationExceeded = true;

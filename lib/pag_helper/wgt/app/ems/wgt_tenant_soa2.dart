@@ -138,7 +138,8 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
           context: context, errorText: 'Error: Misising tenant name or label');
     }
 
-    // bool pullData = _soaData.isEmpty && !_fetching && !_fetched;
+    final accountNumber =
+        widget.tenantInfo['account_number']?.toString().trim() ?? '';
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -152,14 +153,17 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
           ),
         ),
         verticalSpaceSmall,
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
+        Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 8,
+          runSpacing: 8,
           children: [
             getPopulateMissingSoaEntryButton(),
-            horizontalSpaceSmall,
             Text(
-              'Tenant: $tenantName ($tenantLabel)',
+              accountNumber.isEmpty
+                  ? 'Tenant: $tenantName ($tenantLabel)'
+                  : 'Tenant: $accountNumber ($tenantName, $tenantLabel)',
               style: TextStyle(
                 fontSize: 16,
                 color: Theme.of(context).colorScheme.onSurface,
@@ -170,7 +174,7 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
         if (_updateSoaErrorText.isNotEmpty)
           getErrorTextPrompt(context: context, errorText: _updateSoaErrorText),
         verticalSpaceSmall,
-        getSoAContainer(),
+        Flexible(child: getSoAContainer()),
         verticalSpaceSmall,
       ],
     );
