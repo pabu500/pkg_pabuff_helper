@@ -5,6 +5,7 @@ import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_target.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_scope.dart';
+import 'package:buff_helper/pag_helper/wgt/datetime/wgt_pag_date_range_picker2.dart';
 import 'package:buff_helper/up_helper/enum/enum_item.dart';
 import 'package:buff_helper/up_helper/helper/device_def.dart';
 import 'package:buff_helper/up_helper/model/mdl_meter_kwh_history.dart';
@@ -19,13 +20,10 @@ import 'package:flutter/material.dart';
 import '../../comm/comm_pag_item.dart';
 import '../../model/mdl_history.dart';
 import '../../model/mdl_pag_app_config.dart';
-import '../datetime/wgt_pag_date_range_picker.dart';
 
-enum NormalisationType {
-  NONE,
-  DEVICE_READING,
-  DEVICE_READING_INSERT_ZERO,
-}
+// import '../datetime/wgt_pag_date_range_picker.dart';
+
+enum NormalisationType { NONE, DEVICE_READING, DEVICE_READING_INSERT_ZERO }
 
 class WgtPagItemHistoryGetter extends StatefulWidget {
   const WgtPagItemHistoryGetter({
@@ -172,11 +170,14 @@ class _WgtPagItemHistoryGetterState extends State<WgtPagItemHistoryGetter> {
     }
 
     if (!_isCustomRange) {
-      DateTime endDate = _endDate ??
+      DateTime endDate =
+          _endDate ??
           widget.endDate ??
           getTargetLocalDatetimeNow(
-              widget.loggedInUser.selectedScope.getProjectTimezone());
-      DateTime startDate = widget.startDate ??
+            widget.loggedInUser.selectedScope.getProjectTimezone(),
+          );
+      DateTime startDate =
+          widget.startDate ??
           endDate.subtract(Duration(minutes: _selectedTimeRangeMinutes + 1));
 
       _startDate = startDate;
@@ -192,13 +193,15 @@ class _WgtPagItemHistoryGetterState extends State<WgtPagItemHistoryGetter> {
     _legend = [];
 
     // Map<String, dynamic> historyResult = {};
-    List<String> fields =
-        widget.dataFields.map((e) => e['field'] as String).toList();
+    List<String> fields = widget.dataFields
+        .map((e) => e['field'] as String)
+        .toList();
 
     _lastRequestTime = DateTime.now();
 
-    String meterTypeTag =
-        widget.meterType == null ? '' : getMeterTypeTag(widget.meterType!);
+    String meterTypeTag = widget.meterType == null
+        ? ''
+        : getMeterTypeTag(widget.meterType!);
 
     String itemTypeStr = "";
     if (widget.itemType is PagDeviceCat) {
@@ -249,9 +252,7 @@ class _WgtPagItemHistoryGetterState extends State<WgtPagItemHistoryGetter> {
           if (data['total_count'] == null) {
             throw Exception('Failed to get total count');
           }
-          itemHistoryInfo = {
-            'total_count': data['total_count'],
-          };
+          itemHistoryInfo = {'total_count': data['total_count']};
         }
 
         if (itemHistoryInfo == null) {
@@ -301,13 +302,14 @@ class _WgtPagItemHistoryGetterState extends State<WgtPagItemHistoryGetter> {
         'max_number_of_records': _maxNumberOfRecords.toString(),
         'get_earliest_date': _earliestDate == null ? 'true' : 'false',
         'allow_consolidation': widget.allowConsolidation ? 'true' : 'false',
-        'clear_repeated_readings_only':
-            widget.clearRepeatedReadingsOnly ? 'true' : 'false',
+        'clear_repeated_readings_only': widget.clearRepeatedReadingsOnly
+            ? 'true'
+            : 'false',
         'raw_data_check': widget.rawDataCheck ? 'true' : 'false',
         'detect_restart_event':
             false //widget.appConfig.activePortalProjectScope == ProjectScope.EMS_SMRT && widget.itemType == ItemType.meter_3p
-                ? 'true'
-                : 'false',
+            ? 'true'
+            : 'false',
         'force_align_time_range': widget.forceAlignTimeRange ? 'true' : 'false',
         'gen_meta': widget.genMeta ? 'true' : 'false',
       };
@@ -360,9 +362,7 @@ class _WgtPagItemHistoryGetterState extends State<WgtPagItemHistoryGetter> {
           _earliestDate = null;
           _emptyResultText = 'No history data for this period';
           // throw Exception('empty');
-          widget.onResult({
-            'emptyResultText': _emptyResultText,
-          });
+          widget.onResult({'emptyResultText': _emptyResultText});
           return;
         }
       }
@@ -374,9 +374,7 @@ class _WgtPagItemHistoryGetterState extends State<WgtPagItemHistoryGetter> {
       if (historyList.isEmpty) {
         // throw Exception('empty');
         _emptyResultText = 'No history data for this period';
-        widget.onResult({
-          'emptyResultText': _emptyResultText,
-        });
+        widget.onResult({'emptyResultText': _emptyResultText});
         return;
       }
 
@@ -390,8 +388,9 @@ class _WgtPagItemHistoryGetterState extends State<WgtPagItemHistoryGetter> {
         if (meterInfo.isNotEmpty) {
           for (var element in (meterInfo as Map<String, dynamic>).entries) {
             if (element.value != null) {
-              historyMeta[element.key] =
-                  MeterHistoryMeta.fromJson(element.value);
+              historyMeta[element.key] = MeterHistoryMeta.fromJson(
+                element.value,
+              );
 
               _allDataKeys.add(element.key);
               if (!element.key.contains('_diff')) {
@@ -410,8 +409,8 @@ class _WgtPagItemHistoryGetterState extends State<WgtPagItemHistoryGetter> {
         if (_historyMeta.isNotEmpty) {
           _dominantIntervalMinutes =
               _historyMeta[_historyMeta.keys.first]!.dominantInterval ~/
-                  1000 ~/
-                  60;
+              1000 ~/
+              60;
           if (kDebugMode) {
             print('dominantIntervalMinutes: $_dominantIntervalMinutes');
           }
@@ -455,7 +454,7 @@ class _WgtPagItemHistoryGetterState extends State<WgtPagItemHistoryGetter> {
           'avgY': _avgY,
           'medianY': _medianY,
           'dominantIntervalMinutes': _dominantIntervalMinutes,
-        }
+        },
       });
     } catch (e) {
       if (kDebugMode) {
@@ -483,8 +482,11 @@ class _WgtPagItemHistoryGetterState extends State<WgtPagItemHistoryGetter> {
     }
   }
 
-  List<Map<String, dynamic>> _alignTimeRange(List<Map<String, dynamic>> history,
-      DateTime targetStartDate, DateTime targetEndDate) {
+  List<Map<String, dynamic>> _alignTimeRange(
+    List<Map<String, dynamic>> history,
+    DateTime targetStartDate,
+    DateTime targetEndDate,
+  ) {
     List<Map<String, dynamic>> alignedHistory = [];
     DateTime alignedStartDate = targetStartDate;
     DateTime alignedEndDate = targetEndDate;
@@ -496,35 +498,41 @@ class _WgtPagItemHistoryGetterState extends State<WgtPagItemHistoryGetter> {
 
       // insert zero if data starts after target start date or ends before target end date
       if (targetEndDate.isAfter(
-          dataLastDate.add(Duration(minutes: _dominantIntervalMinutes)))) {
-        DateTime insertDate =
-            dataLastDate.add(Duration(minutes: _dominantIntervalMinutes));
+        dataLastDate.add(Duration(minutes: _dominantIntervalMinutes)),
+      )) {
+        DateTime insertDate = dataLastDate.add(
+          Duration(minutes: _dominantIntervalMinutes),
+        );
         while (insertDate.isBefore(targetEndDate)) {
           alignedHistory.add({
             'dt': insertDate.toString(),
             'readings': {},
             'is_empty': 1,
           });
-          insertDate =
-              insertDate.add(Duration(minutes: _dominantIntervalMinutes));
+          insertDate = insertDate.add(
+            Duration(minutes: _dominantIntervalMinutes),
+          );
         }
       }
       //reverse the alignedHistory
       alignedHistory = alignedHistory.reversed.toList();
 
       alignedHistory.addAll(history);
-      if (targetStartDate.isBefore(dataFirstDate
-          .subtract(Duration(minutes: _dominantIntervalMinutes)))) {
-        DateTime insertDate =
-            dataFirstDate.subtract(Duration(minutes: _dominantIntervalMinutes));
+      if (targetStartDate.isBefore(
+        dataFirstDate.subtract(Duration(minutes: _dominantIntervalMinutes)),
+      )) {
+        DateTime insertDate = dataFirstDate.subtract(
+          Duration(minutes: _dominantIntervalMinutes),
+        );
         while (insertDate.isAfter(targetStartDate)) {
           alignedHistory.add({
             'dt': insertDate.toString(),
             'readings': {},
             'is_empty': 1,
           });
-          insertDate =
-              insertDate.subtract(Duration(minutes: _dominantIntervalMinutes));
+          insertDate = insertDate.subtract(
+            Duration(minutes: _dominantIntervalMinutes),
+          );
         }
       }
     }
@@ -536,37 +544,37 @@ class _WgtPagItemHistoryGetterState extends State<WgtPagItemHistoryGetter> {
     // for (String fieldKeys in _allDataKeys) {
     _selectedHistoryDataSets.clear();
     for (String fieldKeys in _readingTotalKeys) {
-      Map<String, List<Map<String, dynamic>>> readingDataSet = {
-        fieldKeys: [],
-      };
+      Map<String, List<Map<String, dynamic>>> readingDataSet = {fieldKeys: []};
 
       _selectedHistoryDataSets.add(readingDataSet);
     }
-    _selectedHistoryDataSets
-        .sort((a, b) => a.keys.first.compareTo(b.keys.first));
+    _selectedHistoryDataSets.sort(
+      (a, b) => a.keys.first.compareTo(b.keys.first),
+    );
     for (var readingRow in _historyData) {
       String readingTimestamp = readingRow['dt'];
       int isEstimated = readingRow['is_est'] ?? 0;
       int dtRepeated = readingRow['dt_repeated'] ?? 0;
       int dtMissing = readingRow['dt_missing'] ?? 0;
       // String isEmpty = readingRow['is_empty'];
-      Map<String, dynamic> readingParts =
-          readingRow['readings'].isEmpty ? {} : readingRow['readings'];
+      Map<String, dynamic> readingParts = readingRow['readings'].isEmpty
+          ? {}
+          : readingRow['readings'];
       for (String key in _readingTotalKeys) {
         if (readingParts.isEmpty) {
           _selectedHistoryDataSets
               .firstWhere((element) => element.containsKey(key))[key]!
               .add({
-            'time': readingTimestamp,
-            'value': 0.0,
-            'is_estimated': 'false',
-            'is_ot': 'false',
-            'is_neg': 'false',
-            'dt_repeated': 0,
-            'dt_missing': 0,
-            'is_restart': 'false',
-            'is_empty': readingRow['is_empty'] == 1 ? 'true' : 'false',
-          });
+                'time': readingTimestamp,
+                'value': 0.0,
+                'is_estimated': 'false',
+                'is_ot': 'false',
+                'is_neg': 'false',
+                'dt_repeated': 0,
+                'dt_missing': 0,
+                'is_restart': 'false',
+                'is_empty': readingRow['is_empty'] == 1 ? 'true' : 'false',
+              });
         } else {
           Map<String, dynamic> readingPair = readingParts[key] ?? {};
           double readingTotal = readingPair['rt'];
@@ -590,16 +598,16 @@ class _WgtPagItemHistoryGetterState extends State<WgtPagItemHistoryGetter> {
           _selectedHistoryDataSets
               .firstWhere((element) => element.containsKey(key))[key]!
               .add({
-            'time': readingTimestamp,
-            'value': displayValue,
-            'is_estimated': isEstimated == 1 ? 'true' : 'false',
-            'is_ot': isReadingDiffOt == 1 ? 'true' : 'false',
-            'is_neg': isReadingDiffNeg == 1 ? 'true' : 'false',
-            'dt_repeated': dtRepeated,
-            'dt_missing': dtMissing,
-            'is_restart': isRestart == 1 ? 'true' : 'false',
-            'is_empty': readingRow['is_empty'] == 1 ? 'true' : 'false',
-          });
+                'time': readingTimestamp,
+                'value': displayValue,
+                'is_estimated': isEstimated == 1 ? 'true' : 'false',
+                'is_ot': isReadingDiffOt == 1 ? 'true' : 'false',
+                'is_neg': isReadingDiffNeg == 1 ? 'true' : 'false',
+                'dt_repeated': dtRepeated,
+                'dt_missing': dtMissing,
+                'is_restart': isRestart == 1 ? 'true' : 'false',
+                'is_empty': readingRow['is_empty'] == 1 ? 'true' : 'false',
+              });
         }
       }
     }
@@ -611,7 +619,8 @@ class _WgtPagItemHistoryGetterState extends State<WgtPagItemHistoryGetter> {
     List<String> selectedKeys = [];
     for (var element in _selectedHistoryDataSets) {
       selectedKeys.add(
-          '${element.keys.first}${widget.dataType == DataType.total ? '' : '_diff'}');
+        '${element.keys.first}${widget.dataType == DataType.total ? '' : '_diff'}',
+      );
     }
     for (var keyName in selectedKeys) {
       _legend.add({
@@ -766,29 +775,36 @@ class _WgtPagItemHistoryGetterState extends State<WgtPagItemHistoryGetter> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   SizedBox(
-                      height: 35,
-                      child: IconButton(
-                        tooltip:
-                            'previous ${getReadableDuration(Duration(minutes: _selectedTimeRangeMinutes))}',
-                        onPressed: _isFetchingData ||
-                                _isCustomRange ||
-                                _startDate == null ||
-                                _earliestDate == null ||
-                                _startDate!.isBefore(_earliestDate!)
-                            ? null
-                            : () async {
-                                _endDate = _endDate!.subtract(Duration(
-                                    minutes: _selectedTimeRangeMinutes));
-                                _startDate = _startDate!.subtract(Duration(
-                                    minutes: _selectedTimeRangeMinutes));
-                                _isCustomRange = false;
+                    height: 35,
+                    child: IconButton(
+                      tooltip:
+                          'previous ${getReadableDuration(Duration(minutes: _selectedTimeRangeMinutes))}',
+                      onPressed:
+                          _isFetchingData ||
+                              _isCustomRange ||
+                              _startDate == null ||
+                              _earliestDate == null ||
+                              _startDate!.isBefore(_earliestDate!)
+                          ? null
+                          : () async {
+                              _endDate = _endDate!.subtract(
+                                Duration(minutes: _selectedTimeRangeMinutes),
+                              );
+                              _startDate = _startDate!.subtract(
+                                Duration(minutes: _selectedTimeRangeMinutes),
+                              );
+                              _isCustomRange = false;
 
-                                widget.onTimeRangeChanged(
-                                    _startDate!, _endDate!, _isCustomRange);
-                                await _getHistory();
-                              },
-                        icon: const Icon(Icons.arrow_left),
-                      )),
+                              widget.onTimeRangeChanged(
+                                _startDate!,
+                                _endDate!,
+                                _isCustomRange,
+                              );
+                              await _getHistory();
+                            },
+                      icon: const Icon(Icons.arrow_left),
+                    ),
+                  ),
                   for (var item in widget.lookBackMinutes)
                     InkWell(
                       onTap: _isFetchingData
@@ -798,11 +814,13 @@ class _WgtPagItemHistoryGetterState extends State<WgtPagItemHistoryGetter> {
                                 setState(() {
                                   _selectedTimeRangeMinutes = item;
                                 });
-                                _endDate = getTargetLocalDatetimeNow(widget
-                                    .loggedInUser.selectedScope
-                                    .getProjectTimezone());
-                                _startDate = _endDate!.subtract(Duration(
-                                    minutes: _selectedTimeRangeMinutes));
+                                _endDate = getTargetLocalDatetimeNow(
+                                  widget.loggedInUser.selectedScope
+                                      .getProjectTimezone(),
+                                );
+                                _startDate = _endDate!.subtract(
+                                  Duration(minutes: _selectedTimeRangeMinutes),
+                                );
                                 _isCustomRange = false;
                                 widget.onTimeRangeChanged(
                                   _startDate!,
@@ -818,47 +836,60 @@ class _WgtPagItemHistoryGetterState extends State<WgtPagItemHistoryGetter> {
                           borderRadius: BorderRadius.circular(3),
                         ),
                         color: _selectedTimeRangeMinutes == item
-                            ? Theme.of(context)
-                                .colorScheme
-                                .primary
-                                .withAlpha(130)
+                            ? Theme.of(
+                                context,
+                              ).colorScheme.primary.withAlpha(130)
                             : Theme.of(context).hintColor.withAlpha(30),
                         child: Padding(
-                          padding:
-                              const EdgeInsets.fromLTRB(5.0, 6.0, 5.0, 5.0),
+                          padding: const EdgeInsets.fromLTRB(
+                            5.0,
+                            6.0,
+                            5.0,
+                            5.0,
+                          ),
                           child: Text(
-                              getReadableDuration(Duration(minutes: item)),
-                              // '${item ~/ 60} hours',
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  color: Theme.of(context).hintColor,
-                                  fontWeight: FontWeight.w500)),
+                            getReadableDuration(Duration(minutes: item)),
+                            // '${item ~/ 60} hours',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Theme.of(context).hintColor,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
                         ),
                       ),
                     ),
                   IconButton(
                     tooltip:
                         'next ${getReadableDuration(Duration(minutes: _selectedTimeRangeMinutes))}',
-                    onPressed: _isFetchingData ||
+                    onPressed:
+                        _isFetchingData ||
                             _isCustomRange ||
                             _endDate == null ||
-                            _endDate!.isAfter(getTargetLocalDatetimeNow(widget
-                                    .loggedInUser.selectedScope
-                                    .getProjectTimezone())
-                                .subtract(const Duration(hours: 1)))
+                            _endDate!.isAfter(
+                              getTargetLocalDatetimeNow(
+                                widget.loggedInUser.selectedScope
+                                    .getProjectTimezone(),
+                              ).subtract(const Duration(hours: 1)),
+                            )
                         ? null
                         : () async {
                             _endDate = _endDate!.add(
-                                Duration(minutes: _selectedTimeRangeMinutes));
+                              Duration(minutes: _selectedTimeRangeMinutes),
+                            );
                             _startDate = _startDate!.add(
-                                Duration(minutes: _selectedTimeRangeMinutes));
+                              Duration(minutes: _selectedTimeRangeMinutes),
+                            );
                             widget.onTimeRangeChanged(
-                                _startDate!, _endDate!, _isCustomRange);
+                              _startDate!,
+                              _endDate!,
+                              _isCustomRange,
+                            );
 
                             await _getHistory();
                           },
                     icon: const Icon(Icons.arrow_right),
-                  )
+                  ),
                 ],
               ),
             ),
@@ -877,9 +908,46 @@ class _WgtPagItemHistoryGetterState extends State<WgtPagItemHistoryGetter> {
                       ),
                 borderRadius: BorderRadius.circular(5),
               ),
-              child: WgtPagDateRangePicker(
-                timezone:
-                    widget.loggedInUser.selectedScope.getProjectTimezone(),
+              // child: WgtPagDateRangePicker(
+              //   timezone: widget.loggedInUser.selectedScope
+              //       .getProjectTimezone(),
+              //   populateDefaultRange: false,
+              //   width: 290,
+              //   updateRangeByParent: true,
+              //   startDateTime: _startDate,
+              //   endDateTime: _endDate,
+              //   onSet: (startDate, endDate) async {
+              //     if (startDate == null || endDate == null) return;
+              //     setState(() {
+              //       _startDate = startDate;
+              //       _endDate = endDate;
+              //       _isCustomRange = true;
+              //       _selectedTimeRangeMinutes = endDate
+              //           .difference(startDate)
+              //           .inMinutes;
+              //     });
+
+              //     widget.onTimeRangeChanged(
+              //       _startDate!,
+              //       _endDate!,
+              //       _isCustomRange,
+              //     );
+
+              //     await _getHistory();
+              //   },
+              //   maxDuration: widget.maxDuration, // const Duration(days: 7),
+              //   onMaxDurationExceeded: () {
+              //     // Timer(const Duration(milliseconds: 500), () {
+              //     //   showSnackBar(
+              //     //     context,
+              //     //     'Maximum duration is ${getReadableDuration(const Duration(days: 3))}',
+              //     //   );
+              //     // });
+              //   },
+              // ),
+              child: WgtPagDateRangePicker2(
+                timezone: widget.loggedInUser.selectedScope
+                    .getProjectTimezone(),
                 populateDefaultRange: false,
                 width: 290,
                 updateRangeByParent: true,
@@ -891,16 +959,23 @@ class _WgtPagItemHistoryGetterState extends State<WgtPagItemHistoryGetter> {
                     _startDate = startDate;
                     _endDate = endDate;
                     _isCustomRange = true;
-                    _selectedTimeRangeMinutes =
-                        endDate.difference(startDate).inMinutes;
+                    _selectedTimeRangeMinutes = endDate
+                        .difference(startDate)
+                        .inMinutes;
                   });
 
                   widget.onTimeRangeChanged(
-                      _startDate!, _endDate!, _isCustomRange);
+                    _startDate!,
+                    _endDate!,
+                    _isCustomRange,
+                  );
 
                   await _getHistory();
                 },
                 maxDuration: widget.maxDuration, // const Duration(days: 7),
+                earliestDate: DateTime.now().subtract(
+                  const Duration(days: 800),
+                ),
                 onMaxDurationExceeded: () {
                   // Timer(const Duration(milliseconds: 500), () {
                   //   showSnackBar(
@@ -918,7 +993,10 @@ class _WgtPagItemHistoryGetterState extends State<WgtPagItemHistoryGetter> {
                 widget.loggedInUser.hasPermission(
                   MdlPagScope(
                     projectId: widget
-                        .loggedInUser.selectedScope.projectProfile!.id
+                        .loggedInUser
+                        .selectedScope
+                        .projectProfile!
+                        .id
                         .toString(),
                     projectName:
                         widget.loggedInUser.selectedScope.projectProfile!.name,
@@ -956,10 +1034,12 @@ class _WgtPagItemHistoryGetterState extends State<WgtPagItemHistoryGetter> {
                   await _getHistory();
                 },
         ),
-        Text('apply Trending Discovery',
-            style: disabled
-                ? TextStyle(color: Theme.of(context).hintColor)
-                : null),
+        Text(
+          'apply Trending Discovery',
+          style: disabled
+              ? TextStyle(color: Theme.of(context).hintColor)
+              : null,
+        ),
       ],
     );
   }
