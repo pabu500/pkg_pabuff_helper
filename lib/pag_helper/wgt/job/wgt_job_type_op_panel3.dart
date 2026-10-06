@@ -9,6 +9,7 @@ import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/xt_ui/wdgt/datetime/wgt_date_picker.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 import 'package:flutter/material.dart';
+import 'package:multi_dropdown/multiselect_dropdown.dart';
 
 import '../../comm/comm_ex.dart';
 import '../../comm/pag_be_api_base.dart';
@@ -67,6 +68,7 @@ class _WgtJobTypeOpPanel3State extends State<WgtJobTypeOpPanel3> {
   // UniqueKey? _timePickerKey;
   DateTime? _selectedFromDate;
   DateTime? _selectedToDate;
+  final List<String> _selectedMeterTypeList = [];
   bool _customDateRangeSelected = false;
   bool _isMTD = false;
   DateTime? _monthPicked;
@@ -113,11 +115,11 @@ class _WgtJobTypeOpPanel3State extends State<WgtJobTypeOpPanel3> {
       _postResultErrorText = '';
     });
 
-    // align to the midnight of the next day
-    if (_selectedToDate != null) {
-      _selectedToDate = DateTime(_selectedToDate!.year, _selectedToDate!.month,
-          _selectedToDate!.day + 1, 0, 0, 0);
-    }
+    // Keep picker state unchanged so a retry uses the same inclusive end date.
+    final toTimestamp = _selectedToDate == null
+        ? null
+        : DateTime(_selectedToDate!.year, _selectedToDate!.month,
+            _selectedToDate!.day + 1);
 
     try {
       assert(_selectedScopeProfile != null, 'Selected scope profile is null');
@@ -141,7 +143,9 @@ class _WgtJobTypeOpPanel3State extends State<WgtJobTypeOpPanel3> {
         'selected_timestamp_2': _selectedDate2?.toIso8601String(),
         'selected_timestamp_3': _selectedDate3?.toIso8601String(),
         'from_timestamp': _selectedFromDate?.toIso8601String(),
-        'to_timestamp': _selectedToDate?.toIso8601String(),
+        'to_timestamp': toTimestamp?.toIso8601String(),
+        if (widget.jobTaskType == 'reading-report')
+          'meter_type_list': List<String>.of(_selectedMeterTypeList),
         'target_lc_status': _selectedLcStatusStr,
         'is_option_1': _isOption1.toString(),
         'is_option_2': _isOption2.toString(),
@@ -221,6 +225,11 @@ class _WgtJobTypeOpPanel3State extends State<WgtJobTypeOpPanel3> {
 
   bool _checkEnableSubmit() {
     switch (widget.jobTaskType) {
+      case 'reading-report':
+        return _selectedFromDate != null &&
+            _selectedToDate != null &&
+            !_selectedToDate!.isBefore(_selectedFromDate!) &&
+            _selectedMeterTypeList.isNotEmpty;
       case 'usage-report' || 'meter-reading-report-consolidated':
       case 'tenant-usage-report':
         return _selectedFromDate != null && _selectedToDate != null;
@@ -428,6 +437,8 @@ class _WgtJobTypeOpPanel3State extends State<WgtJobTypeOpPanel3> {
 
   Widget getOptions() {
     switch (widget.jobTaskType) {
+      case 'reading-report':
+        return getReadingReportOptions();
       case 'usage-report' || 'meter-reading-report-consolidated':
         return getUsageReportOptions();
       case 'tenant-usage-report':
@@ -609,6 +620,110 @@ class _WgtJobTypeOpPanel3State extends State<WgtJobTypeOpPanel3> {
                   ),
                 ],
               ),
+      ],
+    );
+  }
+
+  Widget getReadingReportOptions() {
+    final colors = Theme.of(context).colorScheme;
+    final chipLabelStyle = TextStyle(fontSize: 14, color: colors.onPrimary);
+    double selectedWidth = 30;
+    for (final type in _selectedMeterTypeList) {
+      final painter = TextPainter(
+        text: TextSpan(text: type, style: chipLabelStyle),
+        textDirection: Directionality.of(context),
+        textScaler: MediaQuery.textScalerOf(context),
+      )..layout();
+      // Include chip padding, its remove icon, and spacing between chips.
+      selectedWidth += painter.width + 44;
+      painter.dispose();
+    }
+    // Reserve space for the clear and dropdown icons; overflow stays scrollable.
+    final dropdownWidth = _selectedMeterTypeList.isEmpty
+        ? 100.0
+        : (selectedWidth + 64).clamp(100.0, 300.0).toDouble();
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text('Time Range'),
+            horizontalSpaceSmall,
+            getTimeRangePicker(),
+          ],
+        ),
+        verticalSpaceSmall,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text('Meter Type'),
+            horizontalSpaceSmall,
+            SizedBox(
+              width: dropdownWidth,
+              height: 45,
+              child: MultiSelectDropDown<String>(
+                hint: 'Select',
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                options: const [
+                  ValueItem(label: 'E', value: 'E'),
+                  ValueItem(label: 'W', value: 'W'),
+                  ValueItem(label: 'G', value: 'G'),
+                ],
+                selectedOptions: _selectedMeterTypeList
+                    .map((type) => ValueItem<String>(label: type, value: type))
+                    .toList(),
+                selectionType: SelectionType.multi,
+                searchEnabled: false,
+                dropdownHeight: 144,
+                borderRadius: 5,
+                hintColor: Theme.of(context).hintColor.withAlpha(89),
+                hintStyle: TextStyle(
+                    fontSize: 15,
+                    color: Theme.of(context).hintColor.withAlpha(89)),
+                hintPadding: EdgeInsets.zero,
+                fieldBackgroundColor: colors.surface,
+                dropdownBackgroundColor: colors.surface,
+                optionsBackgroundColor: colors.surface,
+                selectedOptionBackgroundColor: colors.surfaceContainerHighest,
+                selectedOptionTextColor: colors.onSurface,
+                borderColor: _selectedMeterTypeList.isEmpty
+                    ? Theme.of(context).hintColor.withAlpha(50)
+                    : colors.primary,
+                borderWidth: _selectedMeterTypeList.isEmpty ? 1 : 2,
+                focusedBorderWidth: 2,
+                focusedBorderColor: colors.primary,
+                dropdownBorderRadius: 5,
+                suffixIcon: Icon(Icons.arrow_drop_down, color: colors.onSurface),
+                clearIcon: Icon(Icons.close_outlined,
+                    size: 20, color: colors.onSurfaceVariant),
+                optionTextStyle:
+                    TextStyle(color: colors.onSurface),
+                selectedOptionIcon: Icon(
+                  Icons.check_box,
+                  color: colors.primary,
+                ),
+                chipConfig: ChipConfig(
+                  wrapType: WrapType.scroll,
+                  radius: 5,
+                  labelStyle: chipLabelStyle,
+                  deleteIcon: const Icon(Icons.cancel, size: 18),
+                  backgroundColor: colors.primary,
+                  labelColor: colors.onPrimary,
+                  deleteIconColor: colors.onPrimary,
+                ),
+                onOptionSelected: (options) {
+                  setState(() {
+                    _selectedMeterTypeList
+                      ..clear()
+                      ..addAll(options
+                          .map((option) => option.value)
+                          .whereType<String>());
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
       ],
     );
   }
