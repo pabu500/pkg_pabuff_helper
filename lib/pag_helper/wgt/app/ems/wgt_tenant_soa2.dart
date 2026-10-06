@@ -1,4 +1,5 @@
 import 'dart:developer' as dev;
+import 'wgt_soa_correction.dart';
 
 import 'package:buff_helper/pag_helper/def_helper/dh_list.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
@@ -44,7 +45,8 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
   bool _isMTD = false;
   DateTime? _pickedMonth;
   bool _isFetchingSoa = false;
-  // UniqueKey? _finderFreshKey;
+  int _correctionRefresh = 0;
+  bool _correctionHeld = false;
 
   bool _isUpdatingSoa = false;
   bool _updated = false;
@@ -85,8 +87,10 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
       );
     } catch (e) {
       dev.log(e.toString());
-      _updateSoaErrorText = getErrorText(e,
-          defaultErrorText: 'Error populating missing SoA entry');
+      _updateSoaErrorText = getErrorText(
+        e,
+        defaultErrorText: 'Error populating missing SoA entry',
+      );
       rethrow;
     } finally {
       setState(() {
@@ -135,7 +139,9 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
   Widget build(BuildContext context) {
     if (tenantName.isEmpty || tenantLabel.isEmpty) {
       return getErrorTextPrompt(
-          context: context, errorText: 'Error: Misising tenant name or label');
+        context: context,
+        errorText: 'Error: Misising tenant name or label',
+      );
     }
 
     final accountNumber =
@@ -160,6 +166,18 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
           runSpacing: 8,
           children: [
             getPopulateMissingSoaEntryButton(),
+            WgtSoaCorrection(
+              key: ValueKey(widget.tenantInfo['id']),
+              appConfig: widget.appConfig,
+              user: widget.loggedInUser,
+              tenantId: widget.tenantInfo['id'].toString(),
+              onChanged: () {
+                if (mounted) setState(() => _correctionRefresh++);
+              },
+              onHoldChanged: (held) {
+                if (mounted) setState(() => _correctionHeld = held);
+              },
+            ),
             Text(
               accountNumber.isEmpty
                   ? 'Tenant: $tenantName ($tenantLabel)'
@@ -183,8 +201,12 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
   Widget getPopulateMissingSoaEntryButton() {
     return WgtCommButton(
       label: 'Check SoA Entry',
-      enabled: !_isFetchingSoa ||
-          !_isUpdatingSoa && !_updated && _updateSoaErrorText.isEmpty,
+      enabled:
+          !_correctionHeld &&
+          !_isFetchingSoa &&
+          !_isUpdatingSoa &&
+          !_updated &&
+          _updateSoaErrorText.isEmpty,
       labelStyle: TextStyle(
         color: Theme.of(context).colorScheme.onSecondary,
         fontSize: 13.5,
@@ -206,7 +228,7 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
 
   Widget getSoA2() {
     return WgtListSearchItemFlexi(
-      // key: _finderFreshKey,
+      key: ValueKey(_correctionRefresh),
       appConfig: widget.appConfig,
       pagAppContext: widget.pagAppContext,
       itemKind: PagItemKind.finance,
@@ -271,7 +293,8 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
           _toDate = DateTime(selected.year, selected.month + 1, 1);
           // _customRange = false;
           DateTime localNow = getTargetLocalDatetimeNow(
-              widget.loggedInUser.selectedScope.getProjectTimezone());
+            widget.loggedInUser.selectedScope.getProjectTimezone(),
+          );
           _isMTD = false;
           if (localNow.year == selected.year &&
               localNow.month == selected.month) {

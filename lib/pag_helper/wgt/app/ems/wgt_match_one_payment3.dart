@@ -10,6 +10,7 @@ import 'dart:developer' as dev;
 import '../../../../pagrid_helper/ems_helper/billing_helper/wgt_pag_composite_bill_view.dart';
 import '../../../../xt_ui/wdgt/wgt_pag_wait.dart';
 import '../../../comm/comm_fin_ops.dart';
+import '../../../comm/comm_ex.dart';
 import '../../../def_helper/dh_pag_finance.dart';
 import '../../../def_helper/dh_list.dart';
 import 'wgt_payment_lc_status_op.dart';
@@ -91,6 +92,8 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
 
   bool _inManualOverride = false;
 
+  String? _activeCorrectionId;
+  bool _useCorrection = false;
   bool _isCommitting = false;
   bool _isCommitted = false;
   String _commitErrorText = '';
@@ -128,6 +131,33 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
         throw Exception("No payment info found in the response");
       }
 
+      // A held payment is applied only after an explicit correction confirmation.
+      try {
+        final preview = await ex(
+          endpoint: '/ems/fin/soa_correction/preview',
+          crudType: 'read',
+          opStr: 'check account correction',
+          authenticated: true,
+          appConfig: widget.appConfig,
+          queryMap: {
+            'scope': widget.loggedInUser.selectedScope.toScopeMap(),
+            'tenant_id': widget.tenantInfo['tenant_id'],
+          },
+          svcClaim: MdlPagSvcClaim(
+            userId: widget.loggedInUser.id,
+            username: widget.loggedInUser.username,
+            roleId: widget.loggedInUser.selectedRole?.id,
+            roleName: widget.loggedInUser.selectedRole?.name,
+            roleLabel: widget.loggedInUser.selectedRole?.label,
+            scope: '',
+            target: 'ems.finance.soaCorrection',
+            operation: 'read',
+          ),
+        );
+        _activeCorrectionId = preview['correction_op_id']?.toString();
+      } catch (_) {
+        // Ordinary matching remains available; the writer guard refuses any held account.
+      }
       final billList = result['bill_list'] ?? [];
       final paymentApplyInfoList = result['payment_apply_info_list'] ?? [];
       _initialBalancePaymentInfo.clear();
@@ -189,6 +219,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
       'tenant_id': widget.tenantInfo['tenant_id'] ?? '',
       'payment_id': _paymentInfo['id'] ?? '',
       'apply_list': _paymentApplyInfoListNew,
+      if (_useCorrection) 'correction_op_id': _activeCorrectionId,
     };
     setState(() {
       _isCommitting = true;
@@ -197,7 +228,30 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
       _isPopulated = false;
     });
     try {
-      final result = await commitPaymentApply(
+      if (_activeCorrectionId != null && !_useCorrection)
+        throw Exception(
+          'Confirm that this application is part of the current account correction.',
+        );
+      final result = _useCorrection
+          ? await ex(
+              endpoint: '/ems/fin/soa_correction/apply',
+              crudType: 'update',
+              opStr: 'apply payment during correction',
+              authenticated: true,
+              appConfig: widget.appConfig,
+              queryMap: queryMap,
+              svcClaim: MdlPagSvcClaim(
+                userId: widget.loggedInUser.id,
+                username: widget.loggedInUser.username,
+                roleId: widget.loggedInUser.selectedRole?.id,
+                roleName: widget.loggedInUser.selectedRole?.name,
+                roleLabel: widget.loggedInUser.selectedRole?.label,
+                scope: '',
+                target: 'ems.finance.soaCorrection',
+                operation: 'update',
+              ),
+            )
+          : await commitPaymentApply(
           widget.appConfig,
           queryMap,
           MdlPagSvcClaim(
@@ -601,6 +655,19 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+        if (_activeCorrectionId != null)
+          CheckboxListTile(
+            title: const Text(
+              'Apply this payment as part of the current account correction',
+            ),
+            subtitle: const Text(
+              'Review the allocations, then return to Account correction to check balances and close.',
+            ),
+            value: _useCorrection,
+            onChanged: _isCommitting
+                ? null
+                : (value) => setState(() => _useCorrection = value ?? false),
+          ),
         Stack(
           alignment: Alignment.center,
           children: [

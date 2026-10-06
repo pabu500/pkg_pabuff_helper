@@ -11,6 +11,13 @@ import 'package:http/http.dart' as http;
 
 import '../../util/util.dart';
 
+class PagRequestRejected implements Exception {
+  PagRequestRejected(this.message);
+  final String message;
+  @override
+  String toString() => message;
+}
+
 const int successCode = 200;
 const int successCodeCreate = 201;
 
@@ -21,11 +28,17 @@ Future<dynamic> ex({
   required MdlPagAppConfig appConfig,
   required Map<String, dynamic> queryMap,
   required MdlPagSvcClaim svcClaim,
+  bool authenticated = false,
 }) async {
   svcClaim.svcName = PagSvcType.oresvc2.name;
   svcClaim.endpoint = endpoint;
 
   String svcToken = '';
+  if (authenticated) {
+    const storage = FlutterSecureStorage();
+    svcToken = await storage.read(key: 'pag_user_token') ?? '';
+    if (svcToken.isEmpty) throw Exception('Please sign in again');
+  }
   // try {
   //   svcToken = await aclGate(appConfig, svcClaim, queryMap);
   // } catch (err) {
@@ -37,8 +50,12 @@ Future<dynamic> ex({
 
   try {
     final response = await http.post(
-      Uri.parse(PagUrlController(null, appConfig)
-          .getUrl(PagSvcType.oresvc2, svcClaim.endpoint!)),
+      Uri.parse(
+        PagUrlController(
+          null,
+          appConfig,
+        ).getUrl(PagSvcType.oresvc2, svcClaim.endpoint!),
+      ),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $svcToken',
@@ -57,9 +74,18 @@ Future<dynamic> ex({
       // throw Exception('Failed to $opStr');
     }
 
-    return getResultFromResp(response.body,
-        defualtErrorMsg: 'Failed to get response data for $opStr');
+    if (authenticated) {
+      final body = jsonDecode(response.body);
+      if (body is Map && body['error'] != null) {
+        throw PagRequestRejected(body['error']['message'].toString());
+      }
+    }
+    return getResultFromResp(
+      response.body,
+      defualtErrorMsg: 'Failed to get response data for $opStr',
+    );
   } catch (e) {
+    if (e is PagRequestRejected) rethrow;
     throw Exception('q:Failed to $opStr: $e');
   }
 }
@@ -87,8 +113,12 @@ Future<dynamic> ex2({
 
   try {
     final response = await http.post(
-      Uri.parse(PagUrlController(null, appConfig)
-          .getUrl(PagSvcType.oresvc2, svcClaim.endpoint!)),
+      Uri.parse(
+        PagUrlController(
+          null,
+          appConfig,
+        ).getUrl(PagSvcType.oresvc2, svcClaim.endpoint!),
+      ),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $svcToken',
@@ -107,15 +137,20 @@ Future<dynamic> ex2({
       // throw Exception('Failed to $opStr');
     }
 
-    return getResultFromResp(response.body,
-        defualtErrorMsg: 'Failed to get response data for $opStr');
+    return getResultFromResp(
+      response.body,
+      defualtErrorMsg: 'Failed to get response data for $opStr',
+    );
   } catch (e) {
     throw Exception('q:Failed to $opStr: $e');
   }
 }
 
-Future<dynamic> aclGate(MdlPagAppConfig appConfig, MdlPagSvcClaim2 svcClaim,
-    Map<String, dynamic> queryMap) async {
+Future<dynamic> aclGate(
+  MdlPagAppConfig appConfig,
+  MdlPagSvcClaim2 svcClaim,
+  Map<String, dynamic> queryMap,
+) async {
   const storage = FlutterSecureStorage();
   String? userToken = await storage.read(key: 'pag_user_token');
   if (userToken == null) {
@@ -124,8 +159,12 @@ Future<dynamic> aclGate(MdlPagAppConfig appConfig, MdlPagSvcClaim2 svcClaim,
 
   try {
     final response = await http.post(
-      Uri.parse(PagUrlController(null, appConfig)
-          .getUrl(PagSvcType.oresvc2, PagUrlBase.eptAclGate)),
+      Uri.parse(
+        PagUrlController(
+          null,
+          appConfig,
+        ).getUrl(PagSvcType.oresvc2, PagUrlBase.eptAclGate),
+      ),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $userToken',
@@ -148,7 +187,9 @@ Future<dynamic> aclGate(MdlPagAppConfig appConfig, MdlPagSvcClaim2 svcClaim,
 }
 
 Future<dynamic> svcGate(
-    MdlPagAppConfig appConfig, MdlPagSvcClaim svcClaim) async {
+  MdlPagAppConfig appConfig,
+  MdlPagSvcClaim svcClaim,
+) async {
   const storage = FlutterSecureStorage();
   String? userToken = await storage.read(key: 'evs2_user_token');
   if (userToken == null) {
@@ -168,7 +209,9 @@ Future<dynamic> svcGate(
 }
 
 Future<dynamic> applySvcToken(
-    MdlPagAppConfig appConfig, MdlPagSvcClaim svcClaim) async {
+  MdlPagAppConfig appConfig,
+  MdlPagSvcClaim svcClaim,
+) async {
   const storage = FlutterSecureStorage();
   String? userToken = await storage.read(key: 'evs2_user_token');
 
@@ -177,8 +220,12 @@ Future<dynamic> applySvcToken(
   }
 
   final response = await http.post(
-    Uri.parse(PagUrlController(null, appConfig)
-        .getUrl(PagSvcType.usersvc2, PagUrlBase.eptUsersvcApplySvcToken)),
+    Uri.parse(
+      PagUrlController(
+        null,
+        appConfig,
+      ).getUrl(PagSvcType.usersvc2, PagUrlBase.eptUsersvcApplySvcToken),
+    ),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
       'Authorization': 'Bearer $userToken',
