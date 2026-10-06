@@ -11,6 +11,12 @@ import 'package:http/http.dart' as http;
 
 import '../../util/util.dart';
 
+class PagServiceUnavailable implements Exception {
+  @override
+  String toString() =>
+      'Cannot connect to the account service. Please try again once it is available.';
+}
+
 class PagRequestRejected implements Exception {
   PagRequestRejected(this.message);
   final String message;
@@ -86,6 +92,9 @@ Future<dynamic> ex({
     );
   } catch (e) {
     if (e is PagRequestRejected) rethrow;
+    if (authenticated && e is http.ClientException) {
+      throw PagServiceUnavailable();
+    }
     throw Exception('q:Failed to $opStr: $e');
   }
 }

@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import '../../../comm/comm_ex.dart';
+import '../../wgt_comm_button.dart';
 import '../../../model/acl/mdl_pag_svc_claim.dart';
 import '../../../model/mdl_pag_app_config.dart';
 
@@ -140,8 +141,9 @@ class _WgtSoaCorrectionState extends State<WgtSoaCorrection> {
             });
             try {
               if (pending == null) {
-                if (reason.text.trim().isEmpty)
+                if (reason.text.trim().isEmpty) {
                   throw Exception('Enter a reason for this operation.');
+                }
                 final op = action?['op_type']?.toString() ?? 'close_correction';
                 final confirm = await showDialog<bool>(
                   context: context,
@@ -182,10 +184,12 @@ class _WgtSoaCorrectionState extends State<WgtSoaCorrection> {
               final result = Map<String, dynamic>.from(
                 await _call('commit', pending!) as Map,
               );
-              if (result['rejected'] == true)
+              if (result['rejected'] == true) {
                 throw PagRequestRejected(result['message'].toString());
-              if (result['uncertain'] == true)
+              }
+              if (result['uncertain'] == true) {
                 throw Exception(result['message']);
+              }
               pending = null;
               _pending = null;
               _correctionId = result['outcome'] != null
@@ -318,8 +322,9 @@ class _WgtSoaCorrectionState extends State<WgtSoaCorrection> {
                                   } catch (e) {
                                     message = e.toString();
                                   }
-                                  if (context.mounted)
+                                  if (context.mounted) {
                                     change(() => working = false);
+                                  }
                                 },
                           child: const Text('Refresh'),
                         ),
@@ -335,8 +340,9 @@ class _WgtSoaCorrectionState extends State<WgtSoaCorrection> {
                                   } catch (e) {
                                     message = e.toString();
                                   }
-                                  if (context.mounted)
+                                  if (context.mounted) {
                                     change(() => working = false);
+                                  }
                                 },
                           child: const Text('Check balances'),
                         ),
@@ -400,18 +406,28 @@ class _WgtSoaCorrectionState extends State<WgtSoaCorrection> {
   Widget build(BuildContext context) => Column(
     mainAxisSize: MainAxisSize.min,
     children: [
-      OutlinedButton(
-        onPressed: _busy ? null : _manage,
-        child: const Text('Account correction'),
+      WgtCommButton(
+        label: 'Account correction',
+        enabled: !_busy,
+        inComm: _busy,
+        labelStyle: TextStyle(
+          color: Theme.of(context).colorScheme.onSecondary,
+          fontSize: 13.5,
+        ),
+        onPressed: _manage,
       ),
       if (_correctionId != null)
         const Text(
           'Correction in progress — billing, matching and GIRO paused.',
         ),
       if (_error.isNotEmpty)
-        Text(
-          _error,
-          style: TextStyle(color: Theme.of(context).colorScheme.error),
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 420),
+          child: Text(
+            _error,
+            softWrap: true,
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
+          ),
         ),
     ],
   );
