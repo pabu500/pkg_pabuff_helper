@@ -72,6 +72,7 @@ class WgtPagEditCommitList extends StatefulWidget {
     this.onColCustomizeSet,
     this.isFetching = false,
     this.itemType,
+    this.rowLeadingBuilder,
   });
 
   final MdlPagAppConfig? appConfig;
@@ -118,6 +119,7 @@ class WgtPagEditCommitList extends StatefulWidget {
   final List<String> colKeyShowList;
   final Function? onColCustomizeSet;
   final bool isFetching;
+  final Widget Function(Map<String, dynamic>)? rowLeadingBuilder;
   final dynamic itemType;
 
   @override
@@ -226,7 +228,7 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
   }
 
   void _sortList(String key, bool ascending) {
-    bool inlineSort = true;
+    bool inlineSort = widget.rowLeadingBuilder == null;
     if (widget.maxRowsPerPage != null &&
         widget.totalCount != null &&
         widget.currentPage != null &&
@@ -283,7 +285,7 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
     if (widget.width != null) {
       return widget.width!;
     }
-    double width = 120;
+    double width = 120 + (widget.rowLeadingBuilder == null ? 0 : 44);
     // for (Map<String, dynamic> item in _listConfig) {
     //   if (item['show'] ?? true) {
     //     width += item['width'];
@@ -421,6 +423,9 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
 
     //build list header from widget.listConfig
     List<Widget> listHeader = [];
+    if (widget.rowLeadingBuilder != null) {
+      listHeader.add(const SizedBox(width: 44));
+    }
     // if (widget.showIndex != null && widget.showIndex!) {
     // if (widget.showCommit || _modified) {
     listHeader.add(
@@ -536,6 +541,9 @@ class _WgtPagEditCommitListState extends State<WgtPagEditCommitList> {
     List<Map<String, dynamic>>? fullList,
   ) {
     List<Widget> listItem = [];
+    if (widget.rowLeadingBuilder != null) {
+      listItem.add(SizedBox(width: 44, child: widget.rowLeadingBuilder!(row)));
+    }
     String indexLabel = index.toString();
     if (widget.maxRowsPerPage != null &&
         widget.totalCount != null &&

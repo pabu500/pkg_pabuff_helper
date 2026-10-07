@@ -137,7 +137,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
           endpoint: '/ems/fin/soa_correction/preview',
           crudType: 'read',
           opStr: 'check account correction',
-          authenticated: true,
+          structuredErrors: true,
           appConfig: widget.appConfig,
           queryMap: {
             'scope': widget.loggedInUser.selectedScope.toScopeMap(),
@@ -237,7 +237,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
               endpoint: '/ems/fin/soa_correction/apply',
               crudType: 'update',
               opStr: 'apply payment during correction',
-              authenticated: true,
+              structuredErrors: true,
               appConfig: widget.appConfig,
               queryMap: queryMap,
               svcClaim: MdlPagSvcClaim(

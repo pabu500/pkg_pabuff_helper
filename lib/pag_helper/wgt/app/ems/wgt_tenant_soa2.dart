@@ -47,6 +47,8 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
   bool _isFetchingSoa = false;
   int _correctionRefresh = 0;
   bool _correctionHeld = false;
+  final _correctionKey = GlobalKey<WgtSoaCorrectionState>();
+  Map<String, Map<String, dynamic>> _reverseActions = {};
 
   bool _isUpdatingSoa = false;
   bool _updated = false;
@@ -167,10 +169,13 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
           children: [
             getPopulateMissingSoaEntryButton(),
             WgtSoaCorrection(
-              key: ValueKey(widget.tenantInfo['id']),
+              key: _correctionKey,
               appConfig: widget.appConfig,
               user: widget.loggedInUser,
               tenantId: widget.tenantInfo['id'].toString(),
+              onActionsChanged: (actions) {
+                if (mounted) setState(() => _reverseActions = actions);
+              },
               onChanged: () {
                 if (mounted) setState(() => _correctionRefresh++);
               },
@@ -228,7 +233,18 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
 
   Widget getSoA2() {
     return WgtListSearchItemFlexi(
-      key: ValueKey(_correctionRefresh),
+      refreshCurrentSearchKey: ValueKey(_correctionRefresh),
+      rowLeadingBuilder: (row) {
+        final action = _reverseActions[row['id']?.toString()];
+        if (action == null) return const SizedBox.shrink();
+        return IconButton(
+          key: ValueKey('reverse-soa-${row['id']}'),
+          tooltip: 'Reverse this entry',
+          icon: const Icon(Icons.undo),
+          color: Theme.of(context).colorScheme.primary,
+          onPressed: () => _correctionKey.currentState?.openEntry(action, row),
+        );
+      },
       appConfig: widget.appConfig,
       pagAppContext: widget.pagAppContext,
       itemKind: PagItemKind.finance,
@@ -245,15 +261,17 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
       },
       enableSearch: _enableSearch,
       onSearching: () {
+        _correctionKey.currentState?.invalidateList();
         setState(() {
           _isFetchingSoa = true;
           _enableSearch = _enableSearchButton();
         });
       },
-      onResult: (itemList) {
+      onResult: (result) {
         setState(() {
           _isFetchingSoa = false;
         });
+        _correctionKey.currentState?.updateList(result);
       },
       sortBy: 'entry_timestamp',
       sortOrder: 'desc',
@@ -270,6 +288,7 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
       populateDefaultRange: false,
       onRangeSet: (startDate, endDate) async {
         if (startDate == null || endDate == null) return;
+        _correctionKey.currentState?.invalidateList();
         _resetTimeRangPicker(resetDateRange: true);
         setState(() {
           _fromDate = startDate;
@@ -285,6 +304,7 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
         // widget.onModified?.call();
       },
       onMonthPicked: (selected) {
+        _correctionKey.currentState?.invalidateList();
         _resetTimeRangPicker(resetDateRange: true);
         setState(() {
           // _timePickerKey = UniqueKey();

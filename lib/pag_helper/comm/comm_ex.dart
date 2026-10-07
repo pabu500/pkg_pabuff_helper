@@ -35,6 +35,7 @@ Future<dynamic> ex({
   required Map<String, dynamic> queryMap,
   required MdlPagSvcClaim svcClaim,
   bool authenticated = false,
+  bool structuredErrors = false,
 }) async {
   svcClaim.svcName = PagSvcType.oresvc2.name;
   svcClaim.endpoint = endpoint;
@@ -80,7 +81,7 @@ Future<dynamic> ex({
       // throw Exception('Failed to $opStr');
     }
 
-    if (authenticated) {
+    if (authenticated || structuredErrors) {
       final body = jsonDecode(response.body);
       if (body is Map && body['error'] != null) {
         throw PagRequestRejected(body['error']['message'].toString());
@@ -92,7 +93,7 @@ Future<dynamic> ex({
     );
   } catch (e) {
     if (e is PagRequestRejected) rethrow;
-    if (authenticated && e is http.ClientException) {
+    if ((authenticated || structuredErrors) && e is http.ClientException) {
       throw PagServiceUnavailable();
     }
     throw Exception('q:Failed to $opStr: $e');

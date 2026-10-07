@@ -111,6 +111,7 @@ class WgtListSearchItemFlexi extends StatefulWidget {
     this.aclResLabel,
     this.isEditableByAcl,
     this.isCreatableByAcl,
+    this.rowLeadingBuilder,
   });
 
   final MdlPagAppConfig appConfig;
@@ -162,6 +163,7 @@ class WgtListSearchItemFlexi extends StatefulWidget {
   final String? aclResLabel;
   final bool? isEditableByAcl;
   final bool? isCreatableByAcl;
+  final Widget Function(Map<String, dynamic>)? rowLeadingBuilder;
 
   @override
   State<WgtListSearchItemFlexi> createState() => _WgtListSearchItemFlexiState();
@@ -192,6 +194,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
   String? _sortOrder;
   UniqueKey? _finderRefreshKey;
   UniqueKey? _listContentRefreshKey;
+  UniqueKey? _paneResultKey;
   UniqueKey? _listKey;
   Map<String, dynamic> _queryMap = {};
 
@@ -349,6 +352,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       return null;
     }
 
+    widget.onSearching?.call();
     setState(() {
       _isFetchingItemList = true;
       _errorText = '';
@@ -383,6 +387,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         ),
       );
 
+      _paneResultKey = UniqueKey();
       List<Map<String, dynamic>> itemList = itemFindResult['item_list'];
       _entityItems.clear();
       for (var item in itemList) {
@@ -399,6 +404,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
         'item_list': _entityItems,
         'count': _totalItemCount,
         'current_page': _currentPage,
+        'query_map': Map<String, dynamic>.from(_queryMap),
         'is_refresh': isRefresh,
       });
     } catch (e) {
@@ -2015,88 +2021,94 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       _isInitialValueMutable = false;
     }
 
-    return Column(children: [
-      // verticalSpaceTiny,
-      // if (_selectedListController != null)
-      Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          getAddItemButton(),
-          Offstage(
-            offstage: !widget.showFinder,
-            child: WgtPagItemFinderFlexi2(
-              key: _finderRefreshKey, //_listContentRefreshKey,
-              enableSearch: widget.enableSearch,
-              initialNoR: widget.initialNoR,
-              loadOnInit: widget.loadOnInit,
-              width: widget.width,
-              widthOffset: widget.widthOffset,
-              loggedInUser: loggedInUser!,
-              appConfig: widget.appConfig,
-              projectId: loggedInUser!.selectedScope.projectProfile!.id,
-              itemKind: widget.itemKind,
-              itemType: _selectedListController!.itemTypeEnum,
-              listContextType: widget.listContextType,
-              listController: _selectedListController!,
-              selectedItemInfoList: widget.selectedItemInfoList,
-              isCompactMode: widget.isCompactFinder,
-              isSingleItemMode: widget.isSingleItemMode,
-              meterTypeList: meterTypeList,
-              // right padding as clerance for context menu
-              sidePadding: const EdgeInsets.only(left: 0, right: 60),
-              showTimeRangePicker: widget.showTimeRangePicker,
-              timeRangePickerWidget: widget.timeRangePickerWidget,
-              maxDurationDays:
-                  widget.listContextType == PagListContextType.usage
-                      ? 1100
-                      : null,
-              initialFilterMap: initialFilterMap,
-              initialFilterGroupType: _initialFilterGroupType,
-              isInitialValueMutable: _isInitialValueMutable,
-              allowFlexiLabel: widget.allowFlexiLabel,
-              hint: widget.hint,
-              additionalQuery: widget.additionalQuery,
-              sortBy: _sortBy,
-              sortOrder: _sortOrder,
-              aclResLabel: widget.aclResLabel,
-              onSearching: () {
-                setState(() {
-                  _isFetchingItemList = true;
-                });
-                widget.onSearching?.call();
-              },
-              onClearSearch: () {
-                _resetFinder();
-              },
-              onModified: () {
-                _resetFinder();
-              },
-              onResult: (Map<String, dynamic> itemFindResult) {
-                if (itemFindResult['error'] != null) {
+    return Column(
+      children: [
+        // verticalSpaceTiny,
+        // if (_selectedListController != null)
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            getAddItemButton(),
+            Offstage(
+              offstage: !widget.showFinder,
+              child: WgtPagItemFinderFlexi2(
+                key: _finderRefreshKey, //_listContentRefreshKey,
+                enableSearch: widget.enableSearch,
+                initialNoR: widget.initialNoR,
+                loadOnInit: widget.loadOnInit,
+                width: widget.width,
+                widthOffset: widget.widthOffset,
+                loggedInUser: loggedInUser!,
+                appConfig: widget.appConfig,
+                projectId: loggedInUser!.selectedScope.projectProfile!.id,
+                itemKind: widget.itemKind,
+                itemType: _selectedListController!.itemTypeEnum,
+                listContextType: widget.listContextType,
+                listController: _selectedListController!,
+                selectedItemInfoList: widget.selectedItemInfoList,
+                isCompactMode: widget.isCompactFinder,
+                isSingleItemMode: widget.isSingleItemMode,
+                meterTypeList: meterTypeList,
+                // right padding as clerance for context menu
+                sidePadding: const EdgeInsets.only(left: 0, right: 60),
+                showTimeRangePicker: widget.showTimeRangePicker,
+                timeRangePickerWidget: widget.timeRangePickerWidget,
+                maxDurationDays:
+                    widget.listContextType == PagListContextType.usage
+                    ? 1100
+                    : null,
+                initialFilterMap: initialFilterMap,
+                initialFilterGroupType: _initialFilterGroupType,
+                isInitialValueMutable: _isInitialValueMutable,
+                allowFlexiLabel: widget.allowFlexiLabel,
+                hint: widget.hint,
+                additionalQuery: widget.additionalQuery,
+                sortBy: _sortBy,
+                sortOrder: _sortOrder,
+                aclResLabel: widget.aclResLabel,
+                onSearching: () {
                   setState(() {
-                    _isFetchingItemList = false;
-                    _errorText = itemFindResult['error'];
+                    _isFetchingItemList = true;
                   });
-                  return;
-                }
-                _errorText = '';
-
-                if (_listControllerList.isEmpty) {
-                  if (itemFindResult['list_config'] == null) {
+                  widget.onSearching?.call();
+                },
+                onClearSearch: () {
+                  widget.onSearching?.call();
+                  _resetFinder();
+                },
+                onModified: () {
+                  widget.onSearching?.call();
+                  _resetFinder();
+                },
+                onResult: (Map<String, dynamic> itemFindResult) {
+                  if (itemFindResult['error'] != null) {
                     setState(() {
                       _isFetchingItemList = false;
-                      _errorText = 'Failed to get list config';
+                      _errorText = itemFindResult['error'];
                     });
                     return;
                   }
+                  _errorText = '';
 
-                  for (var config in itemFindResult['list_config']) {
-                    _listControllerList.add(MdlPagListController.fromJson(
-                        config,
-                        currentScopeType:
-                            loggedInUser!.selectedScope.getScopeType()));
+                  if (_listControllerList.isEmpty) {
+                    if (itemFindResult['list_config'] == null) {
+                      setState(() {
+                        _isFetchingItemList = false;
+                        _errorText = 'Failed to get list config';
+                      });
+                      return;
+                    }
+
+                    for (var config in itemFindResult['list_config']) {
+                      _listControllerList.add(
+                        MdlPagListController.fromJson(
+                          config,
+                          currentScopeType: loggedInUser!.selectedScope
+                              .getScopeType(),
+                        ),
+                      );
+                    }
                   }
-                }
 
                 if (_currentPage == 1) {
                   _totalItemCount = itemFindResult['count'];
@@ -2107,8 +2119,18 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                 setState(() {
                   _totalItemCount = itemFindResult['count'];
 
-                  // copy the query map from the item finder
-                  _queryMap = itemFindResult['query_map'];
+                    // copy the query map from the item finder
+                    _queryMap = Map<String, dynamic>.from(
+                      itemFindResult['query_map'],
+                    );
+                    _paneResultKey = UniqueKey();
+                    _currentPage =
+                        int.tryParse(
+                          _queryMap['current_page']?.toString() ?? '',
+                        ) ??
+                        1;
+                    _sortBy = _queryMap['sort_by']?.toString();
+                    _sortOrder = _queryMap['sort_order']?.toString();
 
                   _maxRowsPerPage =
                       int.parse(_queryMap['max_rows_per_page'] ?? '20');
@@ -2125,24 +2147,30 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                   _isFetchingItemList = false;
                 });
 
-                widget.onResult?.call(itemFindResult);
-              },
+                  widget.onResult?.call({
+                    ...itemFindResult,
+                    'query_map': Map<String, dynamic>.from(_queryMap),
+                  });
+                },
+              ),
             ),
-          ),
-        ],
-      ),
-      verticalSpaceTiny,
-      _isFetchingItemList
-          ? const WgtPagWait()
-          : _errorText.isNotEmpty
-              ? getErrorTextPrompt(context: context, errorText: _errorText)
-              : _entityItems.isEmpty
-                  ? _queryMap.isEmpty
-                      ? Container()
-                      : getEmptyResultPrompt(
-                          context: context, emptyResultText: 'No result found')
-                  : getResultList()
-    ]);
+          ],
+        ),
+        verticalSpaceTiny,
+        _isFetchingItemList
+            ? const WgtPagWait()
+            : _errorText.isNotEmpty
+            ? getErrorTextPrompt(context: context, errorText: _errorText)
+            : _entityItems.isEmpty
+            ? _queryMap.isEmpty
+                  ? Container()
+                  : getEmptyResultPrompt(
+                      context: context,
+                      emptyResultText: 'No result found',
+                    )
+            : getResultList(),
+      ],
+    );
   }
 
   Widget getAddItemButton() {
@@ -2488,11 +2516,14 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       child: Padding(
         padding: const EdgeInsets.only(left: 0, right: 60),
         child: WgtListPane(
+          key: _paneResultKey,
           appConfig: widget.appConfig,
           projectId: loggedInUser!.selectedScope.projectProfile!.id,
           itemKind: widget.itemKind,
           enablePaneModeSwitcher: widget.enablePaneModeSwitcher,
           initialItemList: _entityItems,
+          rowLeadingBuilder: widget.rowLeadingBuilder,
+          onSearching: () => widget.onSearching?.call(),
           listContextType: widget.listContextType,
           queryMap: _queryMap,
           displayMode: widget.isCompactFinder ? 'card' : 'table',
@@ -2506,6 +2537,14 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           listPrefix: _getListPrefix(),
           aclResLabel: widget.aclResLabel,
           onResult: (Map<String, dynamic> result) {
+            if (result['query_map'] is Map) {
+              _queryMap = Map<String, dynamic>.from(result['query_map']);
+              _currentPage =
+                  int.tryParse(_queryMap['current_page']?.toString() ?? '') ??
+                  1;
+              _sortBy = _queryMap['sort_by']?.toString();
+              _sortOrder = _queryMap['sort_order']?.toString();
+            }
             widget.onResult?.call(result);
           },
         ),

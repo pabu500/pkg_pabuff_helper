@@ -42,6 +42,8 @@ class WgtListPane extends StatefulWidget {
     this.onResult,
     this.aclResLabel,
     this.projectId,
+    this.rowLeadingBuilder,
+    this.onSearching,
   });
 
   final MdlPagAppConfig appConfig;
@@ -69,6 +71,8 @@ class WgtListPane extends StatefulWidget {
   final Function(Map<String, dynamic>)? onResult;
   final String? aclResLabel;
   final int? projectId;
+  final Widget Function(Map<String, dynamic>)? rowLeadingBuilder;
+  final VoidCallback? onSearching;
 
   @override
   State<WgtListPane> createState() => _WgtListPaneState();
@@ -164,6 +168,7 @@ class _WgtListPaneState extends State<WgtListPane> {
       return null;
     }
 
+    widget.onSearching?.call();
     setState(() {
       _isFetchingItemList = true;
       _errorText = '';
@@ -220,6 +225,7 @@ class _WgtListPaneState extends State<WgtListPane> {
         'item_list': _entityItems,
         'count': _totalItemCount,
         'current_page': _currentPage,
+        'query_map': Map<String, dynamic>.from(_queryMap),
       });
     } catch (e) {
       dev.log(e.toString());
@@ -326,6 +332,10 @@ class _WgtListPaneState extends State<WgtListPane> {
     _totalItemCount = widget.totalItemCount;
 
     _queryMap = widget.queryMap;
+    _currentPage =
+        int.tryParse(_queryMap['current_page']?.toString() ?? '') ?? 1;
+    _sortBy = _queryMap['sort_by']?.toString();
+    _sortOrder = _queryMap['sort_order']?.toString();
 
     if (_entityItems.isNotEmpty) {
       assert(_totalItemCount != 0);
@@ -410,6 +420,7 @@ class _WgtListPaneState extends State<WgtListPane> {
               listController: widget.listController,
               listContextType: widget.listContextType,
               listItems: _entityItems,
+              rowLeadingBuilder: widget.rowLeadingBuilder,
               itemType: widget.itemType,
               selectShowColumn: true,
               sectionName: widget.sectionName,
