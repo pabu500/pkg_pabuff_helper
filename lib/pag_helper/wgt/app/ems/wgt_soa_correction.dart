@@ -1,8 +1,13 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
+import 'package:buff_helper/pagrid_helper/batch_op_helper/wgt_confirm_box.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import '../../../comm/comm_ex.dart';
+import '../../../def_helper/dh_pag_finance.dart';
 import '../../wgt_comm_button.dart';
 import '../../../model/acl/mdl_pag_svc_claim.dart';
 import '../../../model/mdl_pag_app_config.dart';
@@ -14,7 +19,6 @@ class WgtSoaCorrection extends StatefulWidget {
     required this.user,
     required this.tenantId,
     required this.onChanged,
-    required this.onHoldChanged,
     required this.onActionsChanged,
     this.request,
   });
@@ -22,7 +26,6 @@ class WgtSoaCorrection extends StatefulWidget {
   final MdlPagUser user;
   final String tenantId;
   final VoidCallback onChanged;
-  final ValueChanged<bool> onHoldChanged;
   final ValueChanged<Map<String, Map<String, dynamic>>> onActionsChanged;
   final Future<dynamic> Function(String, Map<String, dynamic>)? request;
   @override
@@ -31,7 +34,6 @@ class WgtSoaCorrection extends StatefulWidget {
 
 class WgtSoaCorrectionState extends State<WgtSoaCorrection> {
   Map<String, dynamic> _preview = {};
-  String? _correctionId;
   String _error = '';
   bool _busy = false;
   bool _sheetOpen = false;
@@ -45,14 +47,12 @@ class WgtSoaCorrectionState extends State<WgtSoaCorrection> {
     return ex(
       endpoint: '/ems/fin/soa_correction/$action',
       crudType: action == 'commit' ? 'update' : 'read',
-      opStr: 'manage account correction',
+      opStr: 'review SOA reversal',
       structuredErrors: true,
       appConfig: widget.appConfig,
       queryMap: {
         'scope': widget.user.selectedScope.toScopeMap(),
         'tenant_id': widget.tenantId,
-        if (_correctionId != null && action != 'commit')
-          'correction_op_id': _correctionId,
         ...body,
       },
       svcClaim: MdlPagSvcClaim(
@@ -97,7 +97,6 @@ class WgtSoaCorrectionState extends State<WgtSoaCorrection> {
       if (!mounted || revision != _viewRevision) return;
       setState(() {
         _preview = preview;
-        _correctionId = preview['correction_op_id']?.toString();
         _latestShown = soaListShowsLatest(
           _visibleRows,
           _listQuery,
@@ -105,7 +104,6 @@ class WgtSoaCorrectionState extends State<WgtSoaCorrection> {
         );
         _error = '';
       });
-      widget.onHoldChanged(_correctionId != null);
     } catch (e) {
       if (mounted && revision == _viewRevision) {
         setState(() => _error = e.toString());
@@ -116,6 +114,7 @@ class WgtSoaCorrectionState extends State<WgtSoaCorrection> {
   Future<void> _checkEntries() async {
     if (!_latestShown || _busy) return;
     final revision = _viewRevision;
+    String checkError = '';
     widget.onActionsChanged({});
     setState(() {
       _busy = true;
@@ -132,27 +131,39 @@ class WgtSoaCorrectionState extends State<WgtSoaCorrection> {
       final actions = latest
           ? soaActionsByRow(preview, _visibleRows)
           : <String, Map<String, dynamic>>{};
+      final reasons = (preview['reasons'] as List?) ?? [];
+      checkError = !latest
+          ? 'The latest entries changed. Refresh the list and check again.'
+          : actions.isNotEmpty
+          ? ''
+          : (preview['actions'] as List?)?.isNotEmpty == true
+          ? 'The reversible entry is outside this page. Show more entries and check again.'
+          : reasons.isEmpty
+          ? 'No reversible entry found.'
+          : reasons.join('\n');
       setState(() {
         _preview = preview;
-        _correctionId = preview['correction_op_id']?.toString();
         _latestShown = latest;
-        _error = !latest
-            ? 'The latest entries changed. Refresh the list and check again.'
-            : actions.isNotEmpty
-            ? ''
-            : (preview['actions'] as List?)?.isNotEmpty == true
-            ? 'The reversible entry is outside this page. Show more entries and check again.'
-            : ((preview['reasons'] as List?) ?? ['No reversible entry found.'])
-                  .join('\n');
       });
       widget.onActionsChanged(actions);
-      widget.onHoldChanged(_correctionId != null);
     } catch (e) {
       if (mounted && revision == _viewRevision) {
-        setState(() => _error = e.toString());
+        checkError = _soaCorrectionError(e);
       }
     } finally {
-      if (mounted) setState(() => _busy = false);
+      if (mounted) {
+        setState(() => _busy = false);
+        if (revision == _viewRevision && checkError.isNotEmpty) {
+          showInfoDialog(
+            context,
+            'Cannot reverse entry',
+            checkError.replaceAll(
+              'Regenerate or remove the later draft bill first',
+              'Delete the un-released or draft bill before reversing further.',
+            ),
+          );
+        }
+      }
     }
   }
 
@@ -171,10 +182,8 @@ class WgtSoaCorrectionState extends State<WgtSoaCorrection> {
       if (!mounted || revision != _viewRevision) return;
       setState(() {
         _preview = preview;
-        _correctionId = preview['correction_op_id']?.toString();
         _error = '';
       });
-      widget.onHoldChanged(_correctionId != null);
     } catch (e) {
       if (mounted && revision == _viewRevision) {
         setState(() => _error = e.toString());
@@ -200,7 +209,8 @@ class WgtSoaCorrectionState extends State<WgtSoaCorrection> {
     'unrelease_bill' => 'Un-release bill',
     'unrelease_payment' => 'Un-release payment',
     'remove_payment_apply' => 'Remove application',
-    _ => 'Close correction',
+    'close_correction' => 'Legacy workflow completed',
+    _ => 'Reverse entry',
   };
   Future<void> _manage({
     Map<String, dynamic>? action,
@@ -244,13 +254,18 @@ class WgtSoaCorrectionState extends State<WgtSoaCorrection> {
         return;
       }
     }
+    // Retain the selected entry when an account refresh moves to the next SOA row.
+    Map<String, dynamic> entryPreview = Map<String, dynamic>.from(preview);
     List<dynamic> history = [];
     Map<String, dynamic>? reconciliation;
+    bool reconciliationFromRejectedOperation = false;
     Map<String, dynamic>? pending = _pending;
     String message = _error;
     bool working = false;
+    bool awaitingConfirmation = false;
+    bool operationCompleted = false;
+    String completionMessage = '';
     final reason = TextEditingController();
-    String outcome = 'completed';
     try {
       history = List<dynamic>.from(await _call('history') as List);
     } catch (e) {
@@ -262,408 +277,651 @@ class WgtSoaCorrectionState extends State<WgtSoaCorrection> {
       return;
     }
     setState(() => _sheetOpen = true);
+    ModalRoute<void>? sheetRoute;
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       isDismissible: false,
       enableDrag: false,
-      showDragHandle: true,
-      constraints: const BoxConstraints(maxWidth: 1000),
-      builder: (dialogContext) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.viewInsetsOf(dialogContext).bottom,
-        ),
-        child: SizedBox(
-          height: MediaQuery.sizeOf(dialogContext).height * .85,
-          child: StatefulBuilder(
-            builder: (context, change) {
-              Future<void> refresh() async {
-                final data = Map<String, dynamic>.from(
-                  await _call('preview', {
-                        if (action != null)
-                          'target_soa_id': action['target_soa_id'],
-                      })
-                      as Map,
-                );
-                _correctionId = data['correction_op_id']?.toString();
-                preview = data;
-                history = List<dynamic>.from(await _call('history') as List);
-              }
-
-              Future<void> perform(
-                Map<String, dynamic>? operationAction,
-              ) async {
-                change(() {
-                  working = true;
-                  message = '';
-                });
-                try {
-                  if (pending == null) {
-                    if (reason.text.trim().isEmpty) {
-                      throw Exception('Enter a reason for this operation.');
+      showDragHandle: false,
+      useSafeArea: true,
+      clipBehavior: Clip.antiAlias,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(5)),
+      ),
+      constraints: const BoxConstraints(maxWidth: 760),
+      builder: (dialogContext) {
+        sheetRoute = ModalRoute.of<void>(dialogContext);
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.viewInsetsOf(dialogContext).bottom,
+          ),
+          child: LayoutBuilder(
+            builder: (context, constraints) => ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: min(860, constraints.maxHeight * .94),
+              ),
+              child: Theme(
+                data: _soaSheetTheme(context),
+                child: StatefulBuilder(
+                  builder: (context, change) {
+                    Future<void> refresh() async {
+                      final data = Map<String, dynamic>.from(
+                        await _call('preview', {
+                              if (action != null && !operationCompleted)
+                                'target_soa_id': action['target_soa_id'],
+                            })
+                            as Map,
+                      );
+                      preview = data;
+                      if (action != null && !operationCompleted) {
+                        entryPreview = data;
+                      }
+                      history = List<dynamic>.from(
+                        await _call('history') as List,
+                      );
                     }
-                    final op =
-                        operationAction?['op_type']?.toString() ??
-                        'close_correction';
-                    final confirm = await showDialog<bool>(
-                      context: context,
-                      builder: (ctx) => AlertDialog(
-                        title: Text(_label(op)),
-                        content: Text(
-                          op == 'close_correction'
-                              ? 'Close this correction after checking source statuses and balances? Reason: ${reason.text.trim()}'
-                              : '${_label(op)} for SOA entry ${operationAction?['target_soa_id']}? The original entry will be archived. Reason: ${reason.text.trim()}',
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(ctx, false),
-                            child: const Text('Cancel'),
-                          ),
-                          FilledButton(
-                            onPressed: () => Navigator.pop(ctx, true),
-                            child: const Text('Confirm'),
-                          ),
-                        ],
-                      ),
-                    );
-                    if (confirm != true) return;
-                    pending = {
-                      'op_id': _uuid(),
-                      'op_type': op,
-                      'reason': reason.text.trim(),
-                      if (_correctionId != null)
-                        'correction_op_id': _correctionId,
-                      if (op == 'close_correction') 'outcome': outcome,
-                      if (op != 'close_correction') ...{
-                        'target_soa_id': operationAction?['target_soa_id'],
-                        'expected_top_soa_id': preview['top_soa_id'],
-                        'expected_max_soa_id': preview['max_soa_id'],
-                      },
-                    };
-                  }
-                  _pending = pending;
-                  final result = Map<String, dynamic>.from(
-                    await _call('commit', pending!) as Map,
-                  );
-                  if (result['rejected'] == true) {
-                    throw PagRequestRejected(result['message'].toString());
-                  }
-                  if (result['uncertain'] == true) {
-                    throw Exception(result['message']);
-                  }
-                  pending = null;
-                  _pending = null;
-                  _correctionId = result['outcome'] != null
-                      ? null
-                      : result['correction_op_id']?.toString();
-                  reason.clear();
-                  reconciliation = Map<String, dynamic>.from(
-                    result['reconciliation'] as Map,
-                  );
-                  preview = {
-                    ...preview,
-                    'allowed': false,
-                    'actions': <dynamic>[],
-                  };
-                  widget.onActionsChanged({});
-                  widget.onHoldChanged(_correctionId != null);
-                  widget.onChanged();
-                  message = 'Operation completed.';
-                  try {
-                    await refresh();
-                  } catch (e) {
-                    message =
-                        'Operation completed. Could not refresh details: $e';
-                  }
-                } catch (e) {
-                  message = e.toString();
-                  if (e is PagRequestRejected) {
-                    pending = null;
-                    _pending = null;
-                    widget.onActionsChanged({});
-                    try {
-                      await refresh();
-                    } catch (refreshError) {
-                      message =
-                          '$message\nCould not refresh details: $refreshError';
-                      preview = {...preview, 'allowed': false};
-                    }
-                  }
-                } finally {
-                  if (context.mounted) change(() => working = false);
-                }
-              }
 
-              final actions = action == null ? <dynamic>[] : <dynamic>[action];
-              final target = preview['target'] as Map?;
-              final selectedEntry = <String, dynamic>{
-                ...?row,
-                if (target != null) ...Map<String, dynamic>.from(target),
-              };
-              return PopScope(
-                canPop: !working,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        action == null
-                            ? 'Manage correction'
-                            : 'Reverse SOA entry',
-                        style: Theme.of(context).textTheme.headlineSmall,
-                      ),
-                      const SizedBox(height: 16),
-                      Expanded(
-                        child: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Text(
-                                'Eligibility is checked again on the server when you confirm the reversal.',
-                              ),
-                              if (_correctionId != null)
-                                const Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 12),
-                                  child: Text(
-                                    'Correction in progress. Automatic billing, matching and GIRO are paused. Delete or re-release the affected bill, and re-release affected payments in date order, before closing. To reapply a payment now, open its matching form and confirm that it is part of this correction. Unapplied funds may remain when closing.',
-                                  ),
-                                ),
-                              if (target != null)
-                                Text(
-                                  'Entry: ${target['entry_type']} · ${target['entry_timestamp']} · ${target['id']}',
-                                ),
-                              for (final block
-                                  in (preview['reasons'] as List?) ?? [])
-                                Text(
-                                  block.toString(),
-                                  style: TextStyle(
-                                    color: Theme.of(context).colorScheme.error,
-                                  ),
-                                ),
-                              for (final application
-                                  in (preview['applications'] as List?) ?? [])
-                                Text(
-                                  'Application ${application['payment_apply_id']}: principal ${application['principal']}, interest ${application['interest']}',
-                                ),
-                              if (action != null && row != null) ...[
-                                const Divider(),
-                                Text(
-                                  'Selected entry: ${selectedEntry['entry_type']} · ${selectedEntry['entry_timestamp']} · ${selectedEntry['id']}',
-                                ),
-                                Text(
-                                  'Action: ${_label(action['op_type']?.toString())}',
-                                ),
-                                for (final field in [
-                                  'billing_rec_id',
-                                  'payment_id',
-                                  'payment_apply_id',
-                                  'credit_amount',
-                                  'debit_amount',
-                                  'change_usage',
-                                  'change_interest',
-                                  'balance',
-                                  'balance_usage',
-                                  'balance_interest',
-                                ])
-                                  if (selectedEntry[field] != null)
-                                    Text(
-                                      '${_fieldLabel(field)}: ${selectedEntry[field]}',
-                                    ),
-                              ],
-                              if (action != null)
-                                ExpansionTile(
-                                  title: const Text('Entry details'),
-                                  children: [
-                                    SelectableText(
-                                      const JsonEncoder.withIndent(
-                                        '  ',
-                                      ).convert(selectedEntry),
-                                    ),
-                                  ],
-                                ),
-                              if (action != null && preview['source'] != null)
-                                ExpansionTile(
-                                  title: const Text('Source details'),
-                                  children: [
-                                    SelectableText(
-                                      const JsonEncoder.withIndent(
-                                        '  ',
-                                      ).convert(preview['source']),
-                                    ),
-                                  ],
-                                ),
-                              TextField(
-                                controller: reason,
-                                enabled: !working && pending == null,
-                                minLines: 1,
-                                maxLines: 3,
-                                decoration: const InputDecoration(
-                                  labelText: 'Reason (required)',
-                                ),
-                              ),
-                              if (_correctionId != null)
-                                DropdownButton<String>(
-                                  value: outcome,
-                                  items: const [
-                                    DropdownMenuItem(
-                                      value: 'completed',
-                                      child: Text('Completed'),
-                                    ),
-                                    DropdownMenuItem(
-                                      value: 'abandoned',
-                                      child: Text('Abandoned'),
-                                    ),
-                                  ],
-                                  onChanged: working || pending != null
-                                      ? null
-                                      : (value) =>
-                                            change(() => outcome = value!),
-                                ),
-                              if (message.isNotEmpty)
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 8,
-                                  ),
-                                  child: SelectableText(message),
-                                ),
-                              if (pending != null)
-                                const Text(
-                                  'The operation has not been confirmed. Retry uses the same operation ID. Retry to confirm the result before starting another operation.',
-                                ),
-                              Wrap(
-                                spacing: 8,
+                    Future<void> perform(
+                      Map<String, dynamic>? operationAction,
+                    ) async {
+                      change(() {
+                        working = true;
+                        message = '';
+                        reconciliation = null;
+                        reconciliationFromRejectedOperation = false;
+                      });
+                      try {
+                        if (pending == null) {
+                          if (reason.text.trim().isEmpty) {
+                            throw Exception(
+                              'Enter a reason for this operation.',
+                            );
+                          }
+                          if (operationAction == null) {
+                            throw Exception('Select an entry to reverse.');
+                          }
+                          final op = operationAction['op_type'].toString();
+                          awaitingConfirmation = true;
+                          var confirmed = false;
+                          await showDialog<void>(
+                            context: context,
+                            builder: (ctx) => WgtConfirmBox(
+                              title: _label(op),
+                              titleWidget: Row(
                                 children: [
-                                  if (pending != null)
-                                    FilledButton(
-                                      onPressed: working
-                                          ? null
-                                          : () => perform(null),
-                                      child: const Text('Retry operation'),
-                                    ),
-                                  if (pending == null &&
-                                      preview['allowed'] == true)
-                                    for (final action in actions)
-                                      FilledButton(
-                                        onPressed: working
-                                            ? null
-                                            : () => perform(
-                                                Map<String, dynamic>.from(
-                                                  action as Map,
-                                                ),
-                                              ),
-                                        child: Text(
-                                          _label(action['op_type']?.toString()),
-                                        ),
-                                      ),
-                                  if (action == null &&
-                                      _correctionId != null &&
-                                      pending == null)
-                                    FilledButton(
-                                      onPressed: working
-                                          ? null
-                                          : () => perform(null),
-                                      child: const Text('Close correction'),
-                                    ),
-                                  TextButton(
-                                    onPressed: working
-                                        ? null
-                                        : () async {
-                                            change(() => working = true);
-                                            try {
-                                              await refresh();
-                                              message = '';
-                                            } catch (e) {
-                                              message = e.toString();
-                                            }
-                                            if (context.mounted) {
-                                              change(() => working = false);
-                                            }
-                                          },
-                                    child: const Text('Refresh'),
+                                  Icon(
+                                    Symbols.undo,
+                                    color: Theme.of(ctx).colorScheme.error,
                                   ),
-                                  TextButton(
-                                    onPressed: working
-                                        ? null
-                                        : () async {
-                                            change(() => working = true);
-                                            try {
-                                              reconciliation =
-                                                  Map<String, dynamic>.from(
-                                                    await _call('reconcile')
-                                                        as Map,
-                                                  );
-                                            } catch (e) {
-                                              message = e.toString();
-                                            }
-                                            if (context.mounted) {
-                                              change(() => working = false);
-                                            }
-                                          },
-                                    child: const Text('Check balances'),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      _label(op),
+                                      style: TextStyle(
+                                        color: Theme.of(ctx).colorScheme.error,
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
-                              if (reconciliation != null)
-                                SelectableText(
-                                  'Balance check: ${reconciliation!['passed'] == true ? 'Passed' : 'Needs attention'}\nBalance owed: ${_money(reconciliation!['total'], debt: true)} · Principal: ${_money(reconciliation!['principal'], debt: true)} · Interest: ${_money(reconciliation!['interest'], debt: true)} · Unapplied funds: ${_money(reconciliation!['unapplied'])}\n${(reconciliation!['issues'] as List?)?.isEmpty == true ? '' : reconciliation!['issues']}',
-                                ),
-                              const Divider(),
-                              const Text('Correction history'),
-                              for (final row in history)
-                                ExpansionTile(
-                                  title: Text(
-                                    '${_label(row['op_type']?.toString())} · ${row['op_timestamp']}',
+                              opName: op,
+                              itemCount: 1,
+                              contentWidget: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '${_label(op)} for SOA entry ${operationAction['target_soa_id']}? The original entry will be archived.',
                                   ),
-                                  subtitle: Text(
-                                    '${row['op_username']} · ${row['reason']}',
+                                  const SizedBox(height: 12),
+                                  Text('Reason: ${reason.text.trim()}'),
+                                ],
+                              ),
+                              onConfirm: () => confirmed = true,
+                            ),
+                          );
+                          awaitingConfirmation = false;
+                          if (!confirmed) return;
+                          pending = {
+                            'op_id': _uuid(),
+                            'op_type': op,
+                            'reason': reason.text.trim(),
+                            'target_soa_id': operationAction['target_soa_id'],
+                            'expected_top_soa_id': preview['top_soa_id'],
+                            'expected_max_soa_id': preview['max_soa_id'],
+                          };
+                        }
+                        _pending = pending;
+                        final result = Map<String, dynamic>.from(
+                          await _call('commit', pending!) as Map,
+                        );
+                        if (result['rejected'] == true) {
+                          throw PagRequestRejected(
+                            result['message'].toString(),
+                          );
+                        }
+                        if (result['uncertain'] == true) {
+                          throw Exception(result['message']);
+                        }
+                        pending = null;
+                        _pending = null;
+                        operationCompleted = true;
+                        reason.clear();
+                        reconciliation = Map<String, dynamic>.from(
+                          result['reconciliation'] as Map,
+                        );
+                        preview = {
+                          ...preview,
+                          'allowed': false,
+                          'actions': <dynamic>[],
+                          'reasons': <dynamic>[],
+                        };
+                        widget.onActionsChanged({});
+                        widget.onChanged();
+                        final completedAction = switch (result['op_type']) {
+                          'unrelease_payment' => 'Payment un-released',
+                          'unrelease_bill' => 'Bill un-released',
+                          'remove_payment_apply' => 'Payment Apply removed',
+                          _ => null,
+                        };
+                        message =
+                            result['outcome'] == 'completed' &&
+                                completedAction != null
+                            ? 'Operation completed. $completedAction.'
+                            : 'Operation completed.';
+                        completionMessage = message;
+                        try {
+                          await refresh();
+                        } catch (e) {
+                          message =
+                              'Operation completed. Could not refresh details: $e';
+                        }
+                      } catch (e) {
+                        message = _soaCorrectionError(e);
+                        reconciliation = _soaReconciliationFailure(e);
+                        reconciliationFromRejectedOperation =
+                            e is PagRequestRejected && reconciliation != null;
+                        if (e is PagRequestRejected) {
+                          pending = null;
+                          _pending = null;
+                          widget.onActionsChanged({});
+                          try {
+                            await refresh();
+                          } catch (refreshError) {
+                            message =
+                                '$message\nCould not refresh details: $refreshError';
+                            preview = {...preview, 'allowed': false};
+                          }
+                        }
+                      } finally {
+                        awaitingConfirmation = false;
+                        if (context.mounted) change(() => working = false);
+                      }
+                    }
+
+                    final actions = action == null
+                        ? <dynamic>[]
+                        : <dynamic>[action];
+                    final target = entryPreview['target'] as Map?;
+                    final selectedEntry = <String, dynamic>{
+                      ...?row,
+                      if (target != null) ...Map<String, dynamic>.from(target),
+                    };
+                    final theme = Theme.of(context);
+                    final colors = theme.colorScheme;
+                    final showCompletedNotice =
+                        operationCompleted &&
+                        message.startsWith('Operation completed');
+                    final primaryActions = <Widget>[
+                      if (pending != null)
+                        _SoaActionButton(
+                          onPressed: working ? null : () => perform(null),
+                          working: working && !awaitingConfirmation,
+                          label: 'Retry operation',
+                        ),
+                      if (pending == null &&
+                          !operationCompleted &&
+                          preview['allowed'] == true)
+                        for (final operation in actions)
+                          _SoaActionButton(
+                            onPressed: working
+                                ? null
+                                : () => perform(
+                                    Map<String, dynamic>.from(operation as Map),
                                   ),
-                                  children: [
-                                    if (row['billing_rec_id'] != null)
-                                      Text('Bill: ${row['billing_rec_id']}'),
-                                    if (row['payment_id'] != null)
-                                      Text('Payment: ${row['payment_id']}'),
-                                    if (row['source_status_before'] != null)
-                                      Text(
-                                        'Status: ${row['source_status_before']} → ${row['source_status_after']}',
+                            working: working && !awaitingConfirmation,
+                            label: _label(operation['op_type']?.toString()),
+                          ),
+                    ];
+                    final secondaryActions = <Widget>[
+                      TextButton.icon(
+                        onPressed: working
+                            ? null
+                            : () async {
+                                change(() => working = true);
+                                try {
+                                  await refresh();
+                                  message = operationCompleted
+                                      ? completionMessage
+                                      : '';
+                                } catch (e) {
+                                  message = e.toString();
+                                }
+                                if (context.mounted) {
+                                  change(() => working = false);
+                                }
+                              },
+                        icon: const Icon(Icons.refresh_rounded, size: 18),
+                        label: const Text('Refresh'),
+                      ),
+                      TextButton.icon(
+                        onPressed: working
+                            ? null
+                            : () async {
+                                change(() {
+                                  working = true;
+                                  message = '';
+                                  reconciliation = null;
+                                  reconciliationFromRejectedOperation = false;
+                                });
+                                try {
+                                  reconciliation = Map<String, dynamic>.from(
+                                    await _call('reconcile') as Map,
+                                  );
+                                } catch (e) {
+                                  message = _soaCorrectionError(e);
+                                  reconciliation = _soaReconciliationFailure(e);
+                                }
+                                if (context.mounted) {
+                                  change(() => working = false);
+                                }
+                              },
+                        icon: const Icon(Icons.fact_check_outlined, size: 18),
+                        label: const Text('Check balances'),
+                      ),
+                    ];
+                    return PopScope(
+                      canPop: !working,
+                      child: SafeArea(
+                        top: false,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(
+                                16,
+                                16,
+                                16,
+                                12,
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: colors.primary.withValues(
+                                        alpha: .12,
                                       ),
-                                    if (row['outcome'] != null)
-                                      Text('Outcome: ${row['outcome']}'),
-                                    ExpansionTile(
-                                      title: const Text('Archived details'),
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
+                                    child: Icon(
+                                      Symbols.undo,
+                                      color: theme.colorScheme.error,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        SelectableText(
-                                          const JsonEncoder.withIndent(
-                                            '  ',
-                                          ).convert(row),
+                                        Text(
+                                          action == null
+                                              ? 'Reversal history'
+                                              : 'Reverse SOA entry',
+                                          style: theme.textTheme.titleLarge
+                                              ?.copyWith(
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          action == null
+                                              ? 'View reversals and check account balances.'
+                                              : 'Review the entry and provide a reason.',
+                                          style: theme.textTheme.bodyMedium
+                                              ?.copyWith(
+                                                color: colors.onSurfaceVariant,
+                                              ),
                                         ),
                                       ],
                                     ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Divider(height: 1),
+                            if (working && !awaitingConfirmation)
+                              const LinearProgressIndicator(minHeight: 2),
+                            Flexible(
+                              child: SingleChildScrollView(
+                                padding: const EdgeInsets.fromLTRB(
+                                  16,
+                                  12,
+                                  16,
+                                  16,
+                                ),
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    if (action != null) ...[
+                                      _SoaEntrySummary(
+                                        entry: selectedEntry,
+                                        operation: _label(
+                                          action['op_type']?.toString(),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 12),
+                                    ],
+                                    if (showCompletedNotice) ...[
+                                      _SoaNotice(
+                                        icon: Icons.check_circle_outline,
+                                        text: message,
+                                      ),
+                                      const SizedBox(height: 12),
+                                    ],
+                                    if (action != null && !operationCompleted)
+                                      for (final block
+                                          in (preview['reasons'] as List?) ??
+                                              []) ...[
+                                        _SoaNotice(
+                                          icon: Icons.info_outline,
+                                          text: block.toString(),
+                                          attention: true,
+                                        ),
+                                        const SizedBox(height: 12),
+                                      ],
+                                    if (action != null && !operationCompleted)
+                                      for (final application
+                                          in (preview['applications']
+                                                  as List?) ??
+                                              []) ...[
+                                        _SoaNotice(
+                                          icon: Icons.link_rounded,
+                                          text:
+                                              'Application ${application['payment_apply_id']}: principal ${_money(application['principal'])}, interest ${_money(application['interest'])}',
+                                        ),
+                                        const SizedBox(height: 12),
+                                      ],
+                                    if (action != null || pending != null) ...[
+                                      TextField(
+                                        controller: reason,
+                                        enabled: !working && pending == null,
+                                        maxLines: 1,
+                                        textCapitalization:
+                                            TextCapitalization.sentences,
+                                        decoration: InputDecoration(
+                                          labelText: 'Reason (required)',
+                                          alignLabelWithHint: true,
+                                          floatingLabelBehavior:
+                                              FloatingLabelBehavior.always,
+                                          hintText:
+                                              'Explain why this entry needs to be reversed.',
+                                          helperText:
+                                              'Saved with the reversal history.',
+                                          helperMaxLines: 2,
+                                          filled: true,
+                                          fillColor: colors.surfaceContainerLow,
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                horizontal: 12,
+                                                vertical: 10,
+                                              ),
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              5,
+                                            ),
+                                          ),
+                                          enabledBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              5,
+                                            ),
+                                            borderSide: BorderSide(
+                                              color: colors.outlineVariant,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 12),
+                                      Text(
+                                        'Eligibility is checked again when you confirm. The original entry will be archived.',
+                                        style: theme.textTheme.bodySmall
+                                            ?.copyWith(
+                                              color: colors.onSurfaceVariant,
+                                            ),
+                                      ),
+                                    ],
+                                    if (message.isNotEmpty &&
+                                        !showCompletedNotice) ...[
+                                      const SizedBox(height: 12),
+                                      _SoaNotice(
+                                        icon:
+                                            message.startsWith(
+                                              'Operation completed',
+                                            )
+                                            ? Icons.check_circle_outline
+                                            : Icons.info_outline,
+                                        text: message,
+                                        attention: !message.startsWith(
+                                          'Operation completed',
+                                        ),
+                                      ),
+                                    ],
+                                    if (pending != null) ...[
+                                      const SizedBox(height: 12),
+                                      const _SoaNotice(
+                                        icon: Icons.pending_outlined,
+                                        text:
+                                            'The operation has not been confirmed. Retry to confirm the result before starting another operation.',
+                                        attention: true,
+                                      ),
+                                    ],
+                                    const SizedBox(height: 16),
+                                    if (action != null) ...[
+                                      _SoaDetails(
+                                        title: 'Entry details',
+                                        tooltip:
+                                            'View all fields for the selected SOA entry.',
+                                        details: selectedEntry,
+                                      ),
+                                      const SizedBox(height: 8),
+                                    ],
+                                    if (action != null &&
+                                        entryPreview['source'] != null) ...[
+                                      _SoaDetails(
+                                        title: 'Source details',
+                                        tooltip: operationCompleted
+                                            ? 'View the source details captured before this reversal.'
+                                            : 'View the bill, payment or application linked to this entry.',
+                                        details: entryPreview['source'],
+                                      ),
+                                      const SizedBox(height: 8),
+                                    ],
+                                    if (reconciliation != null) ...[
+                                      _SoaPanel(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.stretch,
+                                          children: [
+                                            Text(
+                                              '${reconciliationFromRejectedOperation ? 'Attempted operation balance check' : 'Balance check'}: ${reconciliation!['passed'] == true ? 'Passed' : 'Needs attention'}',
+                                              style: theme.textTheme.titleSmall
+                                                  ?.copyWith(
+                                                    color:
+                                                        reconciliation!['passed'] ==
+                                                            true
+                                                        ? null
+                                                        : colors.error,
+                                                  ),
+                                            ),
+                                            const SizedBox(height: 12),
+                                            if (reconciliationFromRejectedOperation) ...[
+                                              const Text(
+                                                'The operation was rejected and no changes were saved. These figures describe the attempted change.',
+                                              ),
+                                              const SizedBox(height: 12),
+                                            ],
+                                            _SoaValues(
+                                              values: {
+                                                'Balance owed': _money(
+                                                  reconciliation!['total'],
+                                                  debt: true,
+                                                ),
+                                                'Principal': _money(
+                                                  reconciliation!['principal'],
+                                                  debt: true,
+                                                ),
+                                                'Interest': _money(
+                                                  reconciliation!['interest'],
+                                                  debt: true,
+                                                ),
+                                                'Unapplied funds': _money(
+                                                  reconciliation!['unapplied'],
+                                                ),
+                                              },
+                                            ),
+                                            for (final issue
+                                                in (reconciliation!['issues']
+                                                        as List?) ??
+                                                    [])
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                  top: 12,
+                                                ),
+                                                child: _SoaNotice(
+                                                  icon: Icons.info_outline,
+                                                  text: _soaReconciliationIssue(
+                                                    issue,
+                                                  ),
+                                                  attention: true,
+                                                ),
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 10),
+                                    ],
+                                    _SoaPanel(
+                                      padding: EdgeInsets.zero,
+                                      child: ExpansionTile(
+                                        tilePadding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                        ),
+                                        childrenPadding:
+                                            const EdgeInsets.fromLTRB(
+                                              12,
+                                              0,
+                                              12,
+                                              12,
+                                            ),
+                                        shape: const Border(),
+                                        collapsedShape: const Border(),
+                                        title: Tooltip(
+                                          waitDuration: const Duration(
+                                            milliseconds: 500,
+                                          ),
+                                          message:
+                                              'View previous reversals, including who made them and why.',
+                                          child: Text(
+                                            'Reversal history',
+                                            style: theme.textTheme.titleSmall,
+                                          ),
+                                        ),
+                                        subtitle: Text(
+                                          history.isEmpty
+                                              ? 'No reversals recorded'
+                                              : '${history.length} recorded ${history.length == 1 ? 'operation' : 'operations'}',
+                                        ),
+                                        children: [
+                                          if (history.isEmpty)
+                                            const Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: Text(
+                                                'Completed operations will appear here.',
+                                              ),
+                                            ),
+                                          for (final record in history)
+                                            ExpansionTile(
+                                              tilePadding: EdgeInsets.zero,
+                                              childrenPadding:
+                                                  const EdgeInsets.only(
+                                                    bottom: 12,
+                                                  ),
+                                              title: Text(
+                                                _label(
+                                                  record['op_type']?.toString(),
+                                                ),
+                                              ),
+                                              subtitle: Text(
+                                                '${_soaDate(record['op_timestamp'])} · ${record['op_username']}\n${record['reason']}',
+                                              ),
+                                              children: [
+                                                if (record['billing_rec_id'] !=
+                                                    null)
+                                                  Text(
+                                                    'Bill: ${record['billing_rec_id']}',
+                                                  ),
+                                                if (record['payment_id'] !=
+                                                    null)
+                                                  Text(
+                                                    'Payment: ${record['payment_id']}',
+                                                  ),
+                                                if (record['source_status_before'] !=
+                                                    null)
+                                                  Text(
+                                                    'Status: ${record['source_status_before']} → ${record['source_status_after']}',
+                                                  ),
+                                                if (record['outcome'] != null)
+                                                  Text(
+                                                    'Outcome: ${record['outcome']}',
+                                                  ),
+                                                _SoaDetails(
+                                                  title: 'Archived details',
+                                                  details: record,
+                                                ),
+                                              ],
+                                            ),
+                                        ],
+                                      ),
+                                    ),
                                   ],
                                 ),
-                            ],
-                          ),
+                              ),
+                            ),
+                            _SoaFooter(
+                              primaryActions: primaryActions,
+                              secondaryActions: secondaryActions,
+                              onDone: working
+                                  ? null
+                                  : () => Navigator.pop(dialogContext),
+                            ),
+                          ],
                         ),
                       ),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: working
-                              ? null
-                              : () => Navigator.pop(dialogContext),
-                          child: const Text('Done'),
-                        ),
-                      ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
-              );
-            },
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
+    // Keep the controller alive until the closing animation removes the field.
+    await sheetRoute?.completed;
     reason.dispose();
     if (mounted && action == null) await _refresh();
     if (mounted) {
@@ -678,29 +936,41 @@ class WgtSoaCorrectionState extends State<WgtSoaCorrection> {
   Widget build(BuildContext context) => Column(
     mainAxisSize: MainAxisSize.min,
     children: [
-      WgtCommButton(
-        label: 'Check reversible entry',
-        enabled: _latestShown && !_busy && _pending == null,
-        inComm: _busy && !_sheetOpen,
-        labelStyle: TextStyle(
-          color: Theme.of(context).colorScheme.onSecondary,
-          fontSize: 13.5,
-        ),
-        onPressed: _checkEntries,
-      ),
-      if (_pending != null || _correctionId != null)
-        TextButton(
-          onPressed: _busy ? null : () => _manage(),
-          child: Text(
-            _pending != null ? 'Retry operation' : 'Manage correction',
+      Wrap(
+        alignment: WrapAlignment.center,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 8,
+        runSpacing: 8,
+        children: [
+          WgtCommButton(
+            label: _pending != null ? 'Retry operation' : 'History / balances',
+            enabled: !_busy,
+            labelStyle: TextStyle(
+              color: Theme.of(context).colorScheme.onSecondary,
+              fontSize: 13.5,
+            ),
+            onPressed: () {
+              unawaited(_manage());
+            },
           ),
-        ),
-      if (!_latestShown && _error.isEmpty)
-        const Text('Show the latest entries to check for a reversal.'),
-      if (_correctionId != null)
-        const Text(
-          'Correction in progress — billing, matching and GIRO paused.',
-        ),
+          Tooltip(
+            waitDuration: const Duration(milliseconds: 500),
+            message: !_latestShown && _error.isEmpty
+                ? 'Show the latest entries to check for a reversal.'
+                : '',
+            child: WgtCommButton(
+              label: 'Check reversible entry',
+              enabled: _latestShown && !_busy && _pending == null,
+              inComm: _busy && !_sheetOpen,
+              labelStyle: TextStyle(
+                color: Theme.of(context).colorScheme.onSecondary,
+                fontSize: 13.5,
+              ),
+              onPressed: _checkEntries,
+            ),
+          ),
+        ],
+      ),
       if (_error.isNotEmpty)
         ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 420),
@@ -711,6 +981,507 @@ class WgtSoaCorrectionState extends State<WgtSoaCorrection> {
           ),
         ),
     ],
+  );
+}
+
+ThemeData _soaSheetTheme(BuildContext context) {
+  final theme = Theme.of(context);
+  final colors = theme.colorScheme;
+  final border = colors.onSurface.withValues(alpha: .16);
+  final primary = colors.brightness == Brightness.light
+      ? Color.alphaBlend(Colors.black.withValues(alpha: .32), colors.primary)
+      : colors.primary;
+  return theme.copyWith(
+    colorScheme: colors.copyWith(
+      primary: primary,
+      onPrimary: primary.computeLuminance() > .4 ? Colors.black : Colors.white,
+      onSurfaceVariant: colors.onSurface.withValues(alpha: .65),
+      outlineVariant: border,
+      surfaceContainerLow: Color.alphaBlend(
+        colors.onSurface.withValues(alpha: .045),
+        colors.surface,
+      ),
+    ),
+    dividerColor: border,
+    textButtonTheme: TextButtonThemeData(
+      style: (theme.textButtonTheme.style ?? const ButtonStyle()).copyWith(
+        shape: const WidgetStatePropertyAll(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(5)),
+          ),
+        ),
+      ),
+    ),
+    tooltipTheme: theme.tooltipTheme.copyWith(
+      decoration: BoxDecoration(
+        color: colors.inverseSurface,
+        borderRadius: BorderRadius.circular(5),
+      ),
+    ),
+  );
+}
+
+class _SoaPanel extends StatelessWidget {
+  const _SoaPanel({
+    required this.child,
+    this.padding = const EdgeInsets.all(12),
+    this.borderRadius = 5,
+  });
+  final Widget child;
+  final EdgeInsetsGeometry padding;
+  final double borderRadius;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: padding,
+    decoration: BoxDecoration(
+      color: Theme.of(context).colorScheme.surfaceContainerLow,
+      border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+      borderRadius: BorderRadius.circular(borderRadius),
+    ),
+    child: child,
+  );
+}
+
+class _SoaNotice extends StatelessWidget {
+  const _SoaNotice({
+    required this.icon,
+    required this.text,
+    this.attention = false,
+  });
+  final IconData icon;
+  final String text;
+  final bool attention;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final color = attention ? colors.error : colors.primary;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: .08),
+        borderRadius: BorderRadius.circular(5),
+        border: Border.all(color: color.withValues(alpha: .25)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 20, color: color),
+          const SizedBox(width: 12),
+          Expanded(
+            child: SelectableText(
+              text,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+const _soaReconciliationErrorPrefixes = [
+  'Reconciliation failed:',
+  'Reconciliation must pass before closing:',
+];
+
+Map<String, dynamic>? _soaReconciliationFailure(Object error) {
+  final message = error.toString();
+  for (final prefix in _soaReconciliationErrorPrefixes) {
+    final start = message.indexOf(prefix);
+    if (start < 0) continue;
+    try {
+      final value = jsonDecode(message.substring(start + prefix.length).trim());
+      if (value is Map && value['passed'] == false && value['issues'] is List) {
+        return Map<String, dynamic>.from(value);
+      }
+    } on FormatException {
+      return null;
+    }
+  }
+  return null;
+}
+
+String _soaReconciliationIssue(dynamic issue) {
+  if (issue is! Map) return issue.toString();
+  final source = switch (issue['table']) {
+    'billing_rec' => 'Bill',
+    'payment' => 'Payment',
+    'payment_apply' => 'Payment Apply',
+    'tenant_soa' => 'SOA entry',
+    _ => 'Record',
+  };
+  final message = switch (issue['message']) {
+    'Invoice remaining amount differs' =>
+      'Remaining amount does not match the bill total minus applied payments.',
+    'Balance or bucket projection differs' =>
+      'Stored balances do not match the SOA entries.',
+    'Payment status or availability differs' =>
+      'Payment status or available amount does not match its applications.',
+    final value => value?.toString() ?? 'Balance check needs attention.',
+  };
+  return '$source${issue['id'] == null ? '' : ' #${issue['id']}'}: $message';
+}
+
+String _soaCorrectionError(Object error) {
+  final failure = _soaReconciliationFailure(error);
+  if (failure != null) {
+    return 'Balance check failed.\n${(failure['issues'] as List).map(_soaReconciliationIssue).join('\n')}';
+  }
+  if (_soaReconciliationErrorPrefixes.any(error.toString().contains)) {
+    return 'Balance check failed. Refresh the account and check balances for details.';
+  }
+  return error.toString();
+}
+
+String _soaDate(dynamic value) {
+  final date = DateTime.tryParse(value?.toString() ?? '');
+  if (date == null) return value?.toString() ?? '—';
+  return DateFormat(
+    date.hour == 0 && date.minute == 0 && date.second == 0
+        ? 'dd MMM yyyy'
+        : 'dd MMM yyyy · HH:mm',
+  ).format(date);
+}
+
+String _soaValue(String field, dynamic value) {
+  if (field.contains('timestamp')) return _soaDate(value);
+  if (const {
+    'credit_amount',
+    'debit_amount',
+    'change_usage',
+    'change_interest',
+    'balance',
+    'balance_usage',
+    'balance_interest',
+    'principal',
+    'interest',
+  }.contains(field)) {
+    return num.tryParse(value?.toString() ?? '')?.toStringAsFixed(2) ?? '—';
+  }
+  if (value is Map || value is List) {
+    return const JsonEncoder.withIndent('  ').convert(value);
+  }
+  return value?.toString() ?? '—';
+}
+
+class _SoaEntrySummary extends StatelessWidget {
+  const _SoaEntrySummary({required this.entry, required this.operation});
+  final Map<String, dynamic> entry;
+  final String operation;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final entryValue = entry['entry_type']?.toString();
+    final entryType = PagSoaEntryType.values
+        .where((type) => type.value == entryValue || type.tag == entryValue)
+        .firstOrNull;
+    final type = switch (entry['entry_type']?.toString()) {
+      'payment' => 'Payment',
+      'bill' => 'Bill',
+      'pya' || 'payment_apply' => 'Payment Apply',
+      final value => value ?? 'Entry',
+    };
+    return _SoaPanel(
+      borderRadius: 5,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            'Action: $operation',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.error,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: Divider(height: 1),
+          ),
+          Text(
+            'SELECTED ENTRY',
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+              letterSpacing: 1.2,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              if (entryType != null) ...[
+                Container(
+                  constraints: const BoxConstraints(minHeight: 23),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 3,
+                    vertical: 1,
+                  ),
+                  decoration: BoxDecoration(
+                    color: entryType.color,
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Text(
+                    entryType.tag,
+                    style: TextStyle(
+                      color: theme.colorScheme.onSurface,
+                      fontSize: 13.5,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+              ],
+              Expanded(
+                child: Text(
+                  '$type · #${entry['id'] ?? '—'}',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            _soaDate(entry['entry_timestamp']),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 12,
+            runSpacing: 8,
+            children: [
+              for (final field in [
+                'billing_rec_id',
+                'payment_id',
+                'payment_apply_id',
+                'credit_amount',
+                'debit_amount',
+                'change_usage',
+                'change_interest',
+                'balance',
+                'balance_usage',
+                'balance_interest',
+              ])
+                if (entry[field] != null)
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(minWidth: 130),
+                    child: Semantics(
+                      label:
+                          '${_fieldLabel(field)}: ${_soaValue(field, entry[field])}',
+                      excludeSemantics: true,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _fieldLabel(field),
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            _soaValue(field, entry[field]),
+                            style: theme.textTheme.titleMedium,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SoaValues extends StatelessWidget {
+  const _SoaValues({required this.values});
+  final Map<String, dynamic> values;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      for (final entry in values.entries)
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                flex: 2,
+                child: Text(
+                  entry.key,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(flex: 3, child: SelectableText(entry.value.toString())),
+            ],
+          ),
+        ),
+    ],
+  );
+}
+
+class _SoaDetails extends StatelessWidget {
+  const _SoaDetails({required this.title, required this.details, this.tooltip});
+  final String title;
+  final dynamic details;
+  final String? tooltip;
+
+  @override
+  Widget build(BuildContext context) => _SoaPanel(
+    padding: EdgeInsets.zero,
+    child: ExpansionTile(
+      tilePadding: const EdgeInsets.symmetric(horizontal: 12),
+      childrenPadding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+      shape: const Border(),
+      collapsedShape: const Border(),
+      title: Tooltip(
+        message: tooltip ?? '',
+        waitDuration: const Duration(milliseconds: 500),
+        child: Text(title, style: Theme.of(context).textTheme.titleSmall),
+      ),
+      children: [
+        if (details is Map)
+          _SoaValues(
+            values: {
+              for (final entry in (details as Map).entries)
+                _fieldLabel(entry.key.toString()): _soaValue(
+                  entry.key.toString(),
+                  entry.value,
+                ),
+            },
+          )
+        else
+          SelectableText(_soaValue('', details)),
+      ],
+    ),
+  );
+}
+
+class _SoaActionButton extends StatelessWidget {
+  const _SoaActionButton({
+    required this.label,
+    required this.working,
+    required this.onPressed,
+  });
+  final String label;
+  final bool working;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final style = DefaultTextStyle.of(context).style.merge(
+      TextStyle(
+        color: Theme.of(context).colorScheme.onSecondary,
+        fontSize: 13.5,
+      ),
+    );
+    final labelSize = TextPainter(
+      text: TextSpan(text: label, style: style),
+      textDirection: Directionality.of(context),
+      textScaler: MediaQuery.textScalerOf(context),
+    )..layout();
+    final width = labelSize.width + 26 + (working ? 29 : 0);
+    labelSize.dispose();
+    return Semantics(
+      button: true,
+      enabled: onPressed != null,
+      child: LayoutBuilder(
+        builder: (context, constraints) => WgtCommButton(
+          label: label,
+          width: min(width, constraints.maxWidth),
+          enabled: onPressed != null,
+          inComm: working,
+          labelStyle: style,
+          labelWidget: Flexible(
+            child: Text(label, style: style, textAlign: TextAlign.center),
+          ),
+          // The sheet owns the busy state, including the confirmation dialog.
+          onPressed: onPressed == null
+              ? null
+              : () {
+                  onPressed!();
+                },
+        ),
+      ),
+    );
+  }
+}
+
+class _SoaFooter extends StatelessWidget {
+  const _SoaFooter({
+    required this.primaryActions,
+    required this.secondaryActions,
+    required this.onDone,
+  });
+  final List<Widget> primaryActions;
+  final List<Widget> secondaryActions;
+  final VoidCallback? onDone;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+    decoration: BoxDecoration(
+      color: Theme.of(context).colorScheme.surface,
+      border: Border(
+        top: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+      ),
+    ),
+    child: LayoutBuilder(
+      builder: (context, constraints) {
+        final done = TextButton(onPressed: onDone, child: const Text('Done'));
+        final primary = Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: primaryActions,
+        );
+        final secondary = Wrap(
+          spacing: 4,
+          runSpacing: 4,
+          children: secondaryActions,
+        );
+        if (constraints.maxWidth < 600 ||
+            MediaQuery.textScalerOf(context).scale(1) > 1.2) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              secondary,
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  done,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: primary,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          );
+        }
+        return Row(
+          children: [
+            Expanded(child: secondary),
+            done,
+            const SizedBox(width: 8),
+            primary,
+          ],
+        );
+      },
+    ),
   );
 }
 
@@ -726,8 +1497,14 @@ String _fieldLabel(String field) =>
       'balance': 'Balance',
       'balance_usage': 'Principal balance',
       'balance_interest': 'Interest balance',
+      'id': 'ID',
+      'entry_type': 'Entry type',
+      'entry_timestamp': 'Entry date',
+      'op_timestamp': 'Operation date',
+      'principal': 'Principal',
+      'interest': 'Interest',
     }[field] ??
-    field;
+    field.replaceAll('_', ' ');
 
 bool soaListShowsLatest(
   List<Map<String, dynamic>> rows,

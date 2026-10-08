@@ -1,4 +1,6 @@
 import 'dart:developer' as dev;
+import 'package:material_symbols_icons/symbols.dart';
+
 import 'wgt_soa_correction.dart';
 
 import 'package:buff_helper/pag_helper/def_helper/dh_list.dart';
@@ -46,7 +48,6 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
   DateTime? _pickedMonth;
   bool _isFetchingSoa = false;
   int _correctionRefresh = 0;
-  bool _correctionHeld = false;
   final _correctionKey = GlobalKey<WgtSoaCorrectionState>();
   Map<String, Map<String, dynamic>> _reverseActions = {};
 
@@ -179,9 +180,6 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
               onChanged: () {
                 if (mounted) setState(() => _correctionRefresh++);
               },
-              onHoldChanged: (held) {
-                if (mounted) setState(() => _correctionHeld = held);
-              },
             ),
             Text(
               accountNumber.isEmpty
@@ -207,7 +205,6 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
     return WgtCommButton(
       label: 'Check SoA Entry',
       enabled:
-          !_correctionHeld &&
           !_isFetchingSoa &&
           !_isUpdatingSoa &&
           !_updated &&
@@ -240,8 +237,8 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
         return IconButton(
           key: ValueKey('reverse-soa-${row['id']}'),
           tooltip: 'Reverse this entry',
-          icon: const Icon(Icons.undo),
-          color: Theme.of(context).colorScheme.primary,
+          icon: const Icon(Symbols.undo),
+          color: Theme.of(context).colorScheme.error,
           onPressed: () => _correctionKey.currentState?.openEntry(action, row),
         );
       },
