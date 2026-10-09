@@ -10,6 +10,7 @@ import 'package:buff_helper/xt_ui/wdgt/info/get_error_text_prompt.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 import 'package:buff_helper/xt_ui/xt_helpers.dart';
 import 'package:flutter/material.dart';
+import '../../../def_helper/dh_ems_meter_allocation.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
@@ -80,10 +81,10 @@ class _WgtTenantMeterGroupAssignmentState
 
   String get _serviceType =>
       widget.appContext.appContextType == PagAppContextType.ems
-          ? MeterGroupServiceType.ems.value
-          : widget.appContext.appContextType == PagAppContextType.evs
-              ? MeterGroupServiceType.evs.value
-              : MeterGroupServiceType.unknown.value;
+      ? MeterGroupServiceType.ems.value
+      : widget.appContext.appContextType == PagAppContextType.evs
+      ? MeterGroupServiceType.evs.value
+      : MeterGroupServiceType.unknown.value;
 
   Future<void> _doAutoPopulate() async {
     if (_isFetching) {
@@ -91,7 +92,8 @@ class _WgtTenantMeterGroupAssignmentState
     }
 
     dev.log(
-        'Fetching scope meter group list for item group ${widget.strItemGroupIndex}');
+      'Fetching scope meter group list for item group ${widget.strItemGroupIndex}',
+    );
 
     Map<String, dynamic> queryMap = {
       'scope': loggedInUser!.selectedScope.toScopeMap(),
@@ -211,8 +213,10 @@ class _WgtTenantMeterGroupAssignmentState
       }
     } catch (e) {
       dev.log('Error fetching item group scope matching item list: $e');
-      _fetchErrorText =
-          getErrorText(e, defaultErrorText: 'Error fetching item group data');
+      _fetchErrorText = getErrorText(
+        e,
+        defaultErrorText: 'Error fetching item group data',
+      );
 
       rethrow;
     } finally {
@@ -235,9 +239,11 @@ class _WgtTenantMeterGroupAssignmentState
             .toList();
     if ((_scopeMismatchItemList ?? []).isNotEmpty) {
       assignmentList.clear();
-      assignmentList.addAll(_scopeMismatchItemList!
-          .where((item) => item['assigned_new'] != null)
-          .toList());
+      assignmentList.addAll(
+        _scopeMismatchItemList!
+            .where((item) => item['assigned_new'] != null)
+            .toList(),
+      );
     }
     Map<String, dynamic> queryMap = {
       'scope': loggedInUser!.selectedScope.toScopeMap(),
@@ -272,8 +278,10 @@ class _WgtTenantMeterGroupAssignmentState
       // }
     } catch (e) {
       dev.log('Error committing tenant meter group assignment: $e');
-      _commitErrorText =
-          getErrorText(e, defaultErrorText: 'Error committing assignment');
+      _commitErrorText = getErrorText(
+        e,
+        defaultErrorText: 'Error committing assignment',
+      );
 
       setState(() {});
     } finally {
@@ -316,8 +324,10 @@ class _WgtTenantMeterGroupAssignmentState
   void initState() {
     super.initState();
 
-    loggedInUser =
-        Provider.of<PagUserProvider>(context, listen: false).currentUser;
+    loggedInUser = Provider.of<PagUserProvider>(
+      context,
+      listen: false,
+    ).currentUser;
   }
 
   @override
@@ -368,10 +378,7 @@ class _WgtTenantMeterGroupAssignmentState
       fetchData = true;
     }
     if (_fetchErrorText.isNotEmpty) {
-      return getErrorTextPrompt(
-        context: context,
-        errorText: _fetchErrorText,
-      );
+      return getErrorTextPrompt(context: context, errorText: _fetchErrorText);
     }
     return fetchData
         ? FutureBuilder(
@@ -409,8 +416,8 @@ class _WgtTenantMeterGroupAssignmentState
       margin: const EdgeInsets.symmetric(horizontal: 5),
       child: (_scopeMismatchItemList ?? []).isNotEmpty
           ?
-          // resolve scope mismatch item list
-          getScopeMismatchItemList(listHeight)
+            // resolve scope mismatch item list
+            getScopeMismatchItemList(listHeight)
           : getScopeItemList(),
     );
   }
@@ -434,20 +441,29 @@ class _WgtTenantMeterGroupAssignmentState
     }
     return Container(
       decoration: BoxDecoration(
-        border:
-            Border.all(color: Theme.of(context).colorScheme.error, width: 5),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.error,
+          width: 5,
+        ),
         borderRadius: BorderRadius.circular(5),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
       child: Column(
         children: [
           Text(
-              'The following list contains the meter group(s) with mismatched scope to the tenant',
-              style: TextStyle(
-                  color: Theme.of(context).colorScheme.error, fontSize: 18)),
-          Text('Clear this scope mismatch list before assignment op',
-              style: TextStyle(
-                  color: Theme.of(context).colorScheme.error, fontSize: 18)),
+            'The following list contains the meter group(s) with mismatched scope to the tenant',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.error,
+              fontSize: 18,
+            ),
+          ),
+          Text(
+            'Clear this scope mismatch list before assignment op',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.error,
+              fontSize: 18,
+            ),
+          ),
           verticalSpaceSmall,
           SizedBox(
             height: listHeight,
@@ -482,15 +498,16 @@ class _WgtTenantMeterGroupAssignmentState
             height: 39,
             child: TextField(
               controller: _itemNamefilterController,
-              readOnly: _isCommitting ||
+              readOnly:
+                  _isCommitting ||
                   _isCommitted ||
                   {_itemGroupScopeMatchingItemList ?? []}.isEmpty,
               decoration: InputDecoration(
-                  hintText: 'Meter Group Name',
-                  hintStyle: TextStyle(
-                      color: Theme.of(context)
-                          .hintColor) // prefixIcon: Icon(Icons.search),
-                  ),
+                hintText: 'Meter Group Name',
+                hintStyle: TextStyle(
+                  color: Theme.of(context).hintColor,
+                ), // prefixIcon: Icon(Icons.search),
+              ),
               onChanged: (value) {
                 setState(() {
                   _itemNameFilterStr = value.trim().toLowerCase();
@@ -507,15 +524,16 @@ class _WgtTenantMeterGroupAssignmentState
             height: 39,
             child: TextField(
               controller: _itemLabelFilterController,
-              readOnly: _isCommitting ||
+              readOnly:
+                  _isCommitting ||
                   _isCommitted ||
                   {_itemGroupScopeMatchingItemList ?? []}.isEmpty,
               decoration: InputDecoration(
-                  hintText: 'Meter Group Label',
-                  hintStyle: TextStyle(
-                      color: Theme.of(context)
-                          .hintColor) // prefixIcon: Icon(Icons.search),
-                  ),
+                hintText: 'Meter Group Label',
+                hintStyle: TextStyle(
+                  color: Theme.of(context).hintColor,
+                ), // prefixIcon: Icon(Icons.search),
+              ),
               onChanged: (value) {
                 setState(() {
                   _itemLabelFilterStr = value.trim().toLowerCase();
@@ -533,7 +551,8 @@ class _WgtTenantMeterGroupAssignmentState
         ),
         horizontalSpaceSmall,
         InkWell(
-          onTap: !_modified ||
+          onTap:
+              !_modified ||
                   _isCommitting ||
                   _isCommitted ||
                   (_itemGroupScopeMatchingItemList ?? []).isEmpty
@@ -550,18 +569,16 @@ class _WgtTenantMeterGroupAssignmentState
                   ),
                 )
               : _commitErrorText.isNotEmpty
-                  ? getErrorTextPrompt(
-                      context: context,
-                      errorText: _commitErrorText,
-                    )
-                  : _isCommitting
-                      ? const WgtPagWait(size: 21)
-                      : Icon(
-                          Icons.cloud_upload,
-                          color: _modified
-                              ? commitColor
-                              : Theme.of(context).hintColor,
-                        ),
+              ? getErrorTextPrompt(
+                  context: context,
+                  errorText: _commitErrorText,
+                )
+              : _isCommitting
+              ? const WgtPagWait(size: 21)
+              : Icon(
+                  Icons.cloud_upload,
+                  color: _modified ? commitColor : Theme.of(context).hintColor,
+                ),
         ),
         // if (_hasTptMismatchAssignmentError)
         //   Container(
@@ -651,13 +668,15 @@ class _WgtTenantMeterGroupAssignmentState
   bool _showItem(Map<String, dynamic> item) {
     if (_itemNameFilterStr.isNotEmpty) {
       String? name = item['name'];
-      bool nameMatches = (name ?? '').isNotEmpty &&
+      bool nameMatches =
+          (name ?? '').isNotEmpty &&
           (name ?? '').toLowerCase().contains(_itemNameFilterStr);
       return nameMatches;
     }
     if (_itemLabelFilterStr.isNotEmpty) {
       String? label = item['label'];
-      bool labelMatches = (label ?? '').isNotEmpty &&
+      bool labelMatches =
+          (label ?? '').isNotEmpty &&
           (label ?? '').toLowerCase().contains(_itemLabelFilterStr);
       return labelMatches;
     }
@@ -727,8 +746,9 @@ class _WgtTenantMeterGroupAssignmentState
     String? itemScopeSiteGroupName = itemInfo['mg_scope_site_group_name'];
     String? itemScopeSiteGroupLabel = itemInfo['mg_scope_site_group_label'];
 
-    PagTenantLcStatus? tenantLcStatusEnum =
-        PagTenantLcStatus.byValue(tenantLcStatus);
+    PagTenantLcStatus? tenantLcStatusEnum = PagTenantLcStatus.byValue(
+      tenantLcStatus,
+    );
 
     bool assigned = itemInfo['assigned'] ?? false;
 
@@ -741,7 +761,10 @@ class _WgtTenantMeterGroupAssignmentState
       color: Theme.of(context).hintColor.withAlpha(150),
     );
 
-    bool disabled = tenantLcStatusEnum == PagTenantLcStatus.terminated;
+    bool disabled =
+        tenantLcStatusEnum == PagTenantLcStatus.terminated ||
+        tenantLcStatusEnum == PagTenantLcStatus.mfd ||
+        tenantLcStatusEnum == PagTenantLcStatus.offboarding;
 
     String disabledText = '';
     if (itemInfo['used_for_billing'] == true) {
@@ -758,7 +781,8 @@ class _WgtTenantMeterGroupAssignmentState
       disabledText = 'Already assigned to: $tenantLabel';
     }
 
-    bool checked = itemInfo['assigned_new'] ??
+    bool checked =
+        itemInfo['assigned_new'] ??
         (itemInfo['assigned_to_this_tenant'] == true ||
             itemInfo['assigned'] == true);
 
@@ -903,16 +927,20 @@ class _WgtTenantMeterGroupAssignmentState
     }
     if (itemInfo == null) {
       return getErrorTextPrompt(
-          context: context, errorText: 'Error: Item not found');
+        context: context,
+        errorText: 'Error: Item not found',
+      );
     }
     Map<String, dynamic>? assignmentInfo = itemInfo['assignment_info'];
     if (assignmentInfo == null) {
       return getErrorTextPrompt(
-          context: context, errorText: 'Error: Assignment info not found');
+        context: context,
+        errorText: 'Error: Assignment info not found',
+      );
     }
     final meterTeantAssignmentList = assignmentInfo['meter_tenant_assignment'];
     List<Widget> assignmentWidgetList = [];
-    int assignedToActiveTenantCount = 0;
+    final activePercentagesByMeter = <String, double>{};
     for (Map<String, dynamic> assignment in meterTeantAssignmentList ?? []) {
       String meterName = assignment['meter_name'] ?? '';
       String meterLabel = assignment['meter_label'] ?? '';
@@ -920,34 +948,32 @@ class _WgtTenantMeterGroupAssignmentState
       String meterGroupName = assignment['meter_group_name'] ?? '';
       String meterGroupLabel = assignment['meter_group_label'] ?? '';
       double percentage =
-          double.tryParse(assignment['percentage'] ?? '0.0') ?? 0.0;
+          meterAllocationPercentage(assignment['percentage']) ?? 0;
 
       final tenantInfo = assignment['tenant_info'];
       String tenantName = tenantInfo?['name'] ?? '';
       String tenantLabel = tenantInfo?['label'] ?? '';
       String tenantLcStatus = tenantInfo?['lc_status'] ?? '';
-      PagTenantLcStatus? tenantLcStatusEnum =
-          PagTenantLcStatus.byTag(tenantLcStatus);
-      tenantLcStatusEnum ??= PagTenantLcStatus.normal;
-      if (tenantInfo != null) {
-        if (tenantLcStatusEnum == PagTenantLcStatus.normal ||
-            tenantLcStatusEnum == PagTenantLcStatus.onboarding ||
-            tenantLcStatusEnum == PagTenantLcStatus.offboarding) {
-          assignedToActiveTenantCount++;
+      final tenantLcStatusEnum = PagTenantLcStatus.byValue(tenantLcStatus);
+      final meterGroupIsAssignedToActiveTenant = meterAllocationHasActiveTenant(
+        tenantInfo,
+      );
+      if (meterGroupIsAssignedToActiveTenant) {
+        final meterKey =
+            (assignment['meter_id'] ??
+                    assignment['meter_sn'] ??
+                    assignment['meter_name'] ??
+                    '')
+                .toString();
+        activePercentagesByMeter[meterKey] =
+            (activePercentagesByMeter[meterKey] ?? 0) + percentage;
+        if (activePercentagesByMeter[meterKey]! > 100.000001) {
+          return getErrorTextPrompt(
+            context: context,
+            errorText:
+                'Error: Total percentage assigned to active tenants exceeds 100%',
+          );
         }
-      }
-
-      bool meterGroupIsAssignedToActiveTenant = false;
-      if (assignedToActiveTenantCount != 0) {
-        meterGroupIsAssignedToActiveTenant = true;
-      }
-
-      if (assignedToActiveTenantCount > 1) {
-        return getErrorTextPrompt(
-          context: context,
-          errorText:
-              'Error: Multiple active tenants assigned to this meter group',
-        );
       }
 
       Widget assignmentWidget = Padding(
@@ -960,9 +986,10 @@ class _WgtTenantMeterGroupAssignmentState
               child: Text(
                 meterGroupName,
                 style: TextStyle(
-                    color: meterGroupIsAssignedToActiveTenant
-                        ? Colors.greenAccent
-                        : Theme.of(context).hintColor),
+                  color: meterGroupIsAssignedToActiveTenant
+                      ? Colors.greenAccent
+                      : Theme.of(context).hintColor,
+                ),
               ),
             ),
             horizontalSpaceTiny,
@@ -1007,9 +1034,7 @@ class _WgtTenantMeterGroupAssignmentState
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ...assignmentWidgetList,
-        ],
+        children: [...assignmentWidgetList],
       ),
     );
   }

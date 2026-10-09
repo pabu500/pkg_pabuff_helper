@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../xt_ui/style/evs2_colors.dart';
 import '../../../../xt_ui/wdgt/input/wgt_text_field2.dart';
 import '../../../../xt_ui/xt_helpers.dart';
-import '../../../def_helper/dh_pag_tenant.dart';
+import '../../../def_helper/dh_ems_meter_allocation.dart';
 import '../../../model/mdl_pag_app_config.dart';
 
 class WgtMeterAssignmentOp extends StatefulWidget {
@@ -12,6 +12,7 @@ class WgtMeterAssignmentOp extends StatefulWidget {
   final Map<String, dynamic> meterInfo;
   final void Function(double, String) onPercentageChanged;
   final bool readOnly;
+  final Map<String, dynamic>? currentTenantInfo;
 
   const WgtMeterAssignmentOp({
     super.key,
@@ -20,6 +21,7 @@ class WgtMeterAssignmentOp extends StatefulWidget {
     required this.meterInfo,
     required this.onPercentageChanged,
     this.readOnly = false,
+    this.currentTenantInfo,
   });
 
   @override
@@ -49,196 +51,108 @@ class _WgtMeterAssignmentOpState extends State<WgtMeterAssignmentOp> {
   void _loadAssignmentBar() {
     assignmentBarWidgetList.clear();
     _totalPercentAssignedToThisMeter = 0;
-    _currentMeterGroupAssignedToTenant = false;
     _disableOp = false;
     _hasAssignmentError = false;
     _assignmentErrorMsg = '';
     _disabledMessage = '';
 
-    final assignmentInfo = widget.meterInfo['assignment'];
-    // bool infoFetched = widget.meterInfo['info_fetched'] ?? false;
-    // bool hasAssignmentInfo = assignmentInfo != null && assignmentInfo.isNotEmpty;
-    // bool needToCheck = !hasAssignmentInfo && !infoFetched;
+    final assignments = List<Map<String, dynamic>>.from(
+      widget.meterInfo['assignment'] ?? [],
+    );
+    final current = assignments
+        .where(
+          (assignment) =>
+              assignment['meter_group_id']?.toString() ==
+              widget.strMeterGroupId,
+        )
+        .firstOrNull;
+    _percentAssignedToThisGroup ??=
+        meterAllocationPercentage(current?['percentage']) ?? 0;
+    final currentTenant = widget.currentTenantInfo ?? current?['tenant_info'];
+    _currentMeterGroupAssignedToTenant = meterAllocationHasActiveTenant(
+      currentTenant,
+    );
 
-    double maxAssignedWidth = barWidth - 2;
-
-    // if (hasAssignmentInfo) {
-    final meterGroupAssignmentList = assignmentInfo ?? [];
-
-    String barMessage = '';
-
-    // if there is a new meter percentage assigned to this group,
-    // and this meter is not in the assignment list, add it to the list
-    // so that the bar can show the new percentage assigned to this group
-    if (_percentAssignedToThisGroupNew != null) {
-      bool assignmentListContainsThisMeter = meterGroupAssignmentList.any(
-        (assignment) => assignment['meter_group_id'] == widget.strMeterGroupId,
-      );
-      if (!assignmentListContainsThisMeter) {
-        meterGroupAssignmentList.add({
-          'meter_group_id': widget.strMeterGroupId,
-          'meter_group_name': 'Current Meter Group',
-          'meter_group_label': '',
-          'percentage': _percentAssignedToThisGroupNew.toString(),
-        });
-      }
+    // Build a preview without changing the fetched allocations.
+    final preview = assignments
+        .map((assignment) => Map<String, dynamic>.from(assignment))
+        .toList();
+    if (current == null) {
+      preview.add({
+        'meter_group_id': widget.strMeterGroupId,
+        'meter_group_name': 'Current Meter Group',
+        'percentage': '0',
+        'tenant_info': currentTenant,
+      });
     }
-
-    for (var meterGroupAssignment in meterGroupAssignmentList) {
-      final assignmentPercentage = _parsePercentage(
-        meterGroupAssignment['percentage'],
-      );
-      // Communication meter-group assignments intentionally have no
-      // percentage and do not participate in EMS/EVS allocation.
-      if (assignmentPercentage == null) {
+    for (final assignment in preview) {
+      final isCurrent =
+          assignment['meter_group_id']?.toString() == widget.strMeterGroupId;
+      if (isCurrent) {
+        assignment['percentage'] =
+            _percentAssignedToThisGroupNew ?? _percentAssignedToThisGroup;
+        assignment['tenant_info'] = currentTenant;
+      }
+      final percentage = meterAllocationPercentage(assignment['percentage']);
+      if (percentage == null ||
+          !meterAllocationHasActiveTenant(assignment['tenant_info'])) {
         continue;
       }
-
-      Map<String, dynamic> barInfo = {};
-
-      bool isCurrentMeterGroup =
-          meterGroupAssignment['meter_group_id'] == widget.strMeterGroupId;
-
-      if (isCurrentMeterGroup) {
-        _percentAssignedToThisGroup ??= assignmentPercentage;
-        // barInfo['mg_self_percentage'] = _percentAssignedToThisGroup;
-      }
-
-      String meterGroupName = meterGroupAssignment['meter_group_name'] ?? '';
-      String meterGroupLabel = meterGroupAssignment['meter_group_label'] ?? '';
-
-      double? meterPercentage = assignmentPercentage;
-      if (isCurrentMeterGroup && _percentAssignedToThisGroupNew != null) {
-        meterPercentage = _percentAssignedToThisGroupNew;
-      }
-
-      double barWidth = (meterPercentage ?? 0.0) / 100.0 * maxAssignedWidth;
-
-      final tenantInfo = meterGroupAssignment['tenant_info'];
-      bool isAssignedToTenant = tenantInfo != null && tenantInfo.isNotEmpty;
-
-      // // do not count unassigned meter groups in the total percentage
-      // // assigned to this meter
-      // // so that percentage assigned to unassigned meter groups
-      // // is available for assignment to other tenants
-      // if (!isAssignedToTenant) {
-      //   continue; // skip unassigned meter groups
-      // }
-
-      if (isAssignedToTenant) {
-        final tenantLcStatusStr = tenantInfo['lc_status'] ?? '';
-        final tenantLcStatus = PagTenantLcStatus.byValue(tenantLcStatusStr);
-
-        // NOTE: not counting terminated and MFD tenants
-        // in the total percentage assigned to this meter
-        // so percentage assigned to terminated or MFD tenants
-        // is available for assignment to other tenants
-        if (tenantLcStatus == PagTenantLcStatus.terminated ||
-            tenantLcStatus == PagTenantLcStatus.mfd) {
-          continue; // skip terminated tenants
-        }
-      }
-
       _totalPercentAssignedToThisMeter =
-          (_totalPercentAssignedToThisMeter ?? 0.0) + (meterPercentage ?? 0.0);
-      if (_totalPercentAssignedToThisMeter! > 100.0) {
-        _hasAssignmentError = true;
-        _assignmentErrorMsg =
-            'Total percentage assigned to this meter exceeds 100%';
-        _disableOp = true;
-      } else if (_totalPercentAssignedToThisMeter! > 99.9999999) {
-        if (!isCurrentMeterGroup) {
-          _disableOp = true;
-          _disabledMessage =
-              'Total percentage assigned to this meter is 100%, cannot assign more';
-        }
-      } else {
-        _hasAssignmentError = false;
-        _assignmentErrorMsg = '';
-        _disableOp = false;
-      }
-
-      // bool isAssignedToTenant = tenantInfo != null && tenantInfo.isNotEmpty;
-      if (isAssignedToTenant) {
-        // tenantAssignmentList.add(tenantInfo);
-        if (isCurrentMeterGroup) {
-          _currentMeterGroupAssignedToTenant = true;
-        }
-
-        // totalPercentAssignedToTenant += meterPercentage ?? 0.0;
-        String tenantName = tenantInfo['name'] ?? 'Unknown Tenant';
-        String tenantLabel = tenantInfo['label'] ?? '';
-        barInfo['tenant_id'] = tenantInfo['id'];
-        barInfo['tenant_name'] = tenantName;
-        barInfo['tenant_label'] = tenantLabel;
-        barInfo['tenant_lc_status'] = tenantInfo['lc_status'] ?? '';
-        barInfo['tenant_percentage'] = meterPercentage ?? 0.0;
-      }
-
-      barMessage = '$meterPercentage% -> $meterGroupName ($meterGroupLabel) ';
-
-      if (isAssignedToTenant) {
-        String tenantName = barInfo['tenant_name'];
-        String tenantLabel = barInfo['tenant_label'];
-        if (tenantName.isNotEmpty) {
-          barMessage = '$barMessage\n-> $tenantName ($tenantLabel)';
-        }
-      }
-
-      Color barColor = Colors.grey.shade700;
-      if (isCurrentMeterGroup) {
-        // this is the current meter group, use selfColor
-        barColor = Colors.blue; // selfColor;
-        if (_percentAssignedToThisGroupNew != null) {
-          barColor = commitColor;
-        }
-      }
-
-      Widget barWidget = Tooltip(
-        message: barMessage,
-        child: Container(
-          width: barWidth,
-          color: barColor,
+          _totalPercentAssignedToThisMeter! + percentage;
+      final tenant = assignment['tenant_info'];
+      assignmentBarWidgetList.add(
+        Tooltip(
+          message:
+              '$percentage% -> ${assignment['meter_group_name'] ?? ''}\n'
+              '-> ${tenant['name'] ?? ''} (${tenant['label'] ?? ''})',
+          child: Container(
+            width: percentage.clamp(0, 100) / 100 * (barWidth - 2),
+            color: isCurrent
+                ? _percentAssignedToThisGroupNew == null
+                      ? Colors.blue
+                      : commitColor
+                : Colors.grey.shade700,
+          ),
         ),
       );
-      assignmentBarWidgetList.add(barWidget);
-      // }
-
-      // when
-      // 1. this mg is not assigned to any tenant, and
-      // 2. there is a percentage assigned to this mg, and
-      // 3. there is an assignment error (total percentage > 100%)
-      // allow op (to remove this meter from this mg) when
-      if (!_currentMeterGroupAssignedToTenant &&
-          _percentAssignedToThisGroup != null &&
-          _hasAssignmentError) {
-        _disableOp = false;
-        _disabledMessage =
-            'please remove this meter from this meter group to fix the assignment error';
-      }
     }
 
+    _hasAssignmentError = _totalPercentAssignedToThisMeter! > 100.000001;
+    // Existing over-allocation must remain editable so it can be reduced.
+    // An inactive group can be edited even when active allocations use 100%.
+    if (_currentMeterGroupAssignedToTenant &&
+        _percentAssignedToThisGroupNew == null &&
+        _percentAssignedToThisGroup! == 0 &&
+        _totalPercentAssignedToThisMeter! >= 99.999999) {
+      _disableOp = true;
+      _disabledMessage = 'This meter is fully allocated to active tenants';
+    }
+    if (_hasAssignmentError &&
+        _currentMeterGroupAssignedToTenant &&
+        _percentAssignedToThisGroupNew != null &&
+        _percentAssignedToThisGroupNew! > _percentAssignedToThisGroup!) {
+      _assignmentErrorMsg =
+          'Total percentage assigned to active tenants exceeds 100%';
+    }
     if (widget.readOnly) {
       _disableOp = true;
-      _disabledMessage = '1-on-1 meter group assignments are immutable';
+      _disabledMessage = 'Meter group assignments are read-only';
     }
-  }
-
-  double? _parsePercentage(dynamic value) {
-    if (value == null) {
-      return null;
-    }
-    if (value is num) {
-      return value.toDouble();
-    }
-    return double.tryParse(value.toString());
   }
 
   @override
   void initState() {
     super.initState();
 
+    _percentAssignedToThisGroupNew = meterAllocationPercentage(
+      widget
+          .meterInfo['updated_meter_assignment_to_this_meter_group']?['percentage'],
+    );
     _loadAssignmentBar();
+    if (_percentAssignedToThisGroupNew == _percentAssignedToThisGroup) {
+      _percentAssignedToThisGroupNew = null;
+    }
   }
 
   @override
@@ -259,22 +173,19 @@ class _WgtMeterAssignmentOpState extends State<WgtMeterAssignmentOp> {
                 borderRadius: BorderRadius.circular(5),
                 border: Border.all(color: Theme.of(context).hintColor),
               ),
-              child: _totalPercentAssignedToThisMeter != null &&
-                      _totalPercentAssignedToThisMeter! > 100
+              child:
+                  _totalPercentAssignedToThisMeter != null &&
+                      _totalPercentAssignedToThisMeter! > 100.000001
                   ? Tooltip(
-                      message: _assignmentErrorMsg,
+                      message:
+                          'Total percentage assigned to active tenants exceeds 100%',
                       waitDuration: const Duration(milliseconds: 500),
                       child: Container(
                         width: barWidth,
                         color: Theme.of(context).colorScheme.error,
                       ),
                     )
-                  : Row(
-                      children: [
-                        ...assignmentBarWidgetList,
-                        const Spacer(),
-                      ],
-                    ),
+                  : Row(children: [...assignmentBarWidgetList, const Spacer()]),
             ),
             horizontalSpaceSmall,
             Tooltip(
@@ -287,8 +198,8 @@ class _WgtMeterAssignmentOpState extends State<WgtMeterAssignmentOp> {
                   key: _inputRefreshKey,
                   appConfig: widget.appConfig,
                   enabled: !_disableOp,
-                  initialValue: _percentAssignedToThisGroupNew
-                          ?.toStringAsFixed(3) ??
+                  initialValue:
+                      _percentAssignedToThisGroupNew?.toStringAsFixed(3) ??
                       _percentAssignedToThisGroup?.toStringAsFixed(3) ??
                       // _totalPercentAssignedToThisMeter?.toStringAsFixed(3) ??
                       '0.000',
@@ -300,14 +211,19 @@ class _WgtMeterAssignmentOpState extends State<WgtMeterAssignmentOp> {
                     border: const OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(5)),
                     ),
-                    contentPadding:
-                        const EdgeInsets.symmetric(vertical: 1, horizontal: 3),
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 1,
+                      horizontal: 3,
+                    ),
                   ),
                   onChanged: (value) {
                     setState(() {
-                      double? newPercentage = double.tryParse(value);
+                      double? newPercentage = meterAllocationPercentage(value);
                       if (newPercentage != null && newPercentage > 100.0) {
                         newPercentage = 100.0;
+                      }
+                      if (newPercentage != null && newPercentage < 0) {
+                        newPercentage = 0;
                       }
                       _percentAssignedToThisGroupNew = newPercentage;
                       if (((_percentAssignedToThisGroupNew ?? 0.0) -
@@ -334,11 +250,12 @@ class _WgtMeterAssignmentOpState extends State<WgtMeterAssignmentOp> {
                       _loadAssignmentBar();
                       _inputRefreshKey = UniqueKey();
                       FocusScope.of(context).unfocus();
-                      if (_percentAssignedToThisGroupNew != null) {
-                        widget.onPercentageChanged(
-                            _percentAssignedToThisGroupNew ?? 0.0,
-                            _assignmentErrorMsg);
-                      }
+                      widget.onPercentageChanged(
+                        _percentAssignedToThisGroupNew ??
+                            _percentAssignedToThisGroup ??
+                            0,
+                        _assignmentErrorMsg,
+                      );
                     });
                   },
                 ),
@@ -357,10 +274,12 @@ class _WgtMeterAssignmentOpState extends State<WgtMeterAssignmentOp> {
                     : () {
                         setState(() {
                           _percentAssignedToThisGroupNew = null;
+                          _inputRefreshKey = UniqueKey();
                           _loadAssignmentBar();
                           widget.onPercentageChanged(
-                              _percentAssignedToThisGroup ?? 0.0,
-                              _assignmentErrorMsg);
+                            _percentAssignedToThisGroup ?? 0.0,
+                            _assignmentErrorMsg,
+                          );
                         });
                       },
                 child: Icon(
