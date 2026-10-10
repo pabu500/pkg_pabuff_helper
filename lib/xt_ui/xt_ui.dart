@@ -34,6 +34,7 @@ export 'wdgt/list/wgt_dashboard_list.dart';
 export 'painter/pattern_painter.dart';
 export 'wdgt/scope/get_effective_scope_tag.dart';
 export 'wdgt/ctrl/wgt_dash_control.dart';
+export 'wdgt/ctrl/wgt_pag_dashboard_control.dart';
 export 'wdgt/input/wgt_text_field2.dart';
 export 'wdgt/input/wgt_finder_field_input.dart';
 export 'wdgt/input/wgt_view_edit_field.dart';
