@@ -6,6 +6,7 @@ import '../../../../xt_ui/wdgt/info/get_error_text_prompt.dart';
 import '../../../../xt_ui/wdgt/wgt_pag_wait.dart';
 import '../../../../xt_ui/xt_helpers.dart';
 import '../../../def_helper/dh_device.dart';
+import '../../../def_helper/dh_ems_meter_allocation.dart';
 import '../../../def_helper/dh_pag_tenant.dart';
 import '../../../def_helper/dh_scope.dart';
 import '../../../def_helper/dh_pag_item.dart';
@@ -24,6 +25,9 @@ class WgtMeterGroupAssignmentItem extends StatefulWidget {
     required this.getMeterAssignment,
     required this.strItemGroupIndex,
     this.assignmentReadOnly = false,
+    this.currentTenantInfo,
+    this.meterGroupName = 'Current Meter Group',
+    this.meterGroupLabel = '',
     this.regFresh,
     this.onModified,
   });
@@ -33,6 +37,9 @@ class WgtMeterGroupAssignmentItem extends StatefulWidget {
   final Map<String, dynamic> itemInfo;
   final String strItemGroupIndex;
   final bool assignmentReadOnly;
+  final Map<String, dynamic>? currentTenantInfo;
+  final String meterGroupName;
+  final String meterGroupLabel;
   final void Function(void Function(bool isComm, bool isEnabled))? regFresh;
   final Future<void> Function(Map<String, dynamic> itemInfo) getMeterAssignment;
   final void Function(String)? onModified;
@@ -119,10 +126,7 @@ class _WgtMeterGroupAssignmentItemState
     // return widget;
     return _isComm
         ? const WgtPagWait(size: 21)
-        : InkWell(
-            onTap: !_isEnabled ? null : () {},
-            child: getAssignmentRow(),
-          );
+        : InkWell(onTap: !_isEnabled ? null : () {}, child: getAssignmentRow());
   }
 
   Widget getAssignmentRow() {
@@ -240,15 +244,16 @@ class _WgtMeterGroupAssignmentItemState
   }
 
   ({bool assignedToAnyMeterGroup, bool assignedToThisMeterGroup})
-      _getMeterGroupAssignmentState() {
+  _getMeterGroupAssignmentState() {
     final assignedMeterGroupId =
         _itemInfo['meter_group_id'] ?? _itemInfo['assigned_item_group_id'];
     final hasAssignedMeterGroupId =
         (assignedMeterGroupId?.toString() ?? '').isNotEmpty;
     final assignedToThisMeterGroup =
         _isTrue(_itemInfo['is_assigned_to_this_meter_group']) ||
-            assignedMeterGroupId?.toString() == widget.strItemGroupIndex;
-    final assignedToAnyMeterGroup = assignedToThisMeterGroup ||
+        assignedMeterGroupId?.toString() == widget.strItemGroupIndex;
+    final assignedToAnyMeterGroup =
+        assignedToThisMeterGroup ||
         _isTrue(_itemInfo['is_assigned_to_meter_group']) ||
         hasAssignedMeterGroupId;
 
@@ -275,10 +280,7 @@ class _WgtMeterGroupAssignmentItemState
       );
     }
 
-    return (
-      assignedToAnyMeterGroup: false,
-      assignedToThisMeterGroup: false,
-    );
+    return (assignedToAnyMeterGroup: false, assignedToThisMeterGroup: false);
   }
 
   Color _getMeterIconColor() {
@@ -341,29 +343,48 @@ class _WgtMeterGroupAssignmentItemState
       strMeterGroupId: widget.strItemGroupIndex,
       meterInfo: itemInfo,
       readOnly: widget.assignmentReadOnly,
+      currentTenantInfo: widget.currentTenantInfo,
       onPercentageChanged: (newPercentage, assignmentErrorMessage) {
         final assignment = itemInfo['assignment'] ?? [];
 
         // find the assignment to this meter group
         Map<String, dynamic> assignmentToThisMeterGroup = assignment.firstWhere(
           (assignment) =>
-              assignment['meter_group_id'] == widget.strItemGroupIndex,
-          orElse: () => {},
+              assignment['meter_group_id']?.toString() ==
+              widget.strItemGroupIndex,
+          orElse: () => <String, dynamic>{
+            'meter_group_id': widget.strItemGroupIndex,
+            'meter_group_name': widget.meterGroupName,
+            'meter_group_label': widget.meterGroupLabel,
+            'tenant_info': widget.currentTenantInfo,
+            'percentage': '0',
+          },
         );
-        assert(assignmentToThisMeterGroup.isNotEmpty,
-            'Assignment to this meter group not found');
 
         // update the assignment to this meter group with the new percentage
         Map<String, dynamic> updatedAssignmentToThisMeterGroup = {};
         updatedAssignmentToThisMeterGroup.addAll(assignmentToThisMeterGroup);
-        updatedAssignmentToThisMeterGroup['percentage'] =
-            newPercentage.toString();
+        if (widget.currentTenantInfo != null) {
+          updatedAssignmentToThisMeterGroup['tenant_info'] =
+              widget.currentTenantInfo;
+        }
+        updatedAssignmentToThisMeterGroup['percentage'] = newPercentage
+            .toString();
 
         setState(() {
-          itemInfo['updated_meter_assignment_to_this_meter_group'] =
-              updatedAssignmentToThisMeterGroup;
-          itemInfo['assignment_error_message'] = assignmentErrorMessage;
-
+          final originalPercentage =
+              meterAllocationPercentage(
+                assignmentToThisMeterGroup['percentage'],
+              ) ??
+              0;
+          if ((newPercentage - originalPercentage).abs() <= 0.000001) {
+            itemInfo.remove('updated_meter_assignment_to_this_meter_group');
+            itemInfo.remove('assignment_error_message');
+          } else {
+            itemInfo['updated_meter_assignment_to_this_meter_group'] =
+                updatedAssignmentToThisMeterGroup;
+            itemInfo['assignment_error_message'] = assignmentErrorMessage;
+          }
           widget.onModified?.call(assignmentErrorMessage);
         });
       },
@@ -377,20 +398,25 @@ class _WgtMeterGroupAssignmentItemState
     }
     bool isCurrentMeterGroupAssignmentUpdated =
         _itemInfo['updated_meter_assignment_to_this_meter_group'] != null;
-    final assignmentList = _itemInfo['assignment'];
+    final assignmentList = List<Map<String, dynamic>>.from(
+      (_itemInfo['assignment'] ?? []).map(
+        (assignment) => Map<String, dynamic>.from(assignment),
+      ),
+    );
     String assignmentErrorMessage = _itemInfo['assignment_error_message'] ?? '';
     if (_itemInfo['updated_meter_assignment_to_this_meter_group'] != null) {
       // replace the assginment of the current meter group with the updated assignment
       final updatedAssignment =
           _itemInfo['updated_meter_assignment_to_this_meter_group'];
-      if (assignmentList is List) {
-        int index = assignmentList.indexWhere((assignment) =>
-            assignment['meter_group_id'] == widget.strItemGroupIndex);
-        if (index != -1) {
-          assignmentList[index] = updatedAssignment;
-        } else {
-          assignmentList.add(updatedAssignment);
-        }
+      final index = assignmentList.indexWhere(
+        (assignment) =>
+            assignment['meter_group_id']?.toString() ==
+            widget.strItemGroupIndex,
+      );
+      if (index != -1) {
+        assignmentList[index] = updatedAssignment;
+      } else {
+        assignmentList.add(updatedAssignment);
       }
     }
     // if (assignment == null || assignment.isEmpty) {
@@ -402,23 +428,18 @@ class _WgtMeterGroupAssignmentItemState
     //   }
     // }
     final meterTeantAssignmentList = assignmentList;
-    if (meterTeantAssignmentList == null || meterTeantAssignmentList.isEmpty) {
+    if (meterTeantAssignmentList.isEmpty) {
       return Text(
         'This meter has not been assigned to any meter group',
         style: TextStyle(color: Theme.of(context).hintColor),
       );
     }
     List<Widget> assignmentWidgetList = [];
-    int assignedToActiveTenantCount = 0;
     double totalPercentageAssignedToActiveTenant = 0.0;
-    for (Map<String, dynamic> assignment in meterTeantAssignmentList ?? []) {
-      String meterName = assignment['meter_name'] ?? '';
-      String meterLabel = assignment['meter_label'] ?? '';
-      String meterSn = assignment['meter_sn'] ?? '';
+    for (Map<String, dynamic> assignment in meterTeantAssignmentList) {
       String meterGroupName = assignment['meter_group_name'] ?? '';
-      String meterGroupLabel = assignment['meter_group_label'] ?? '';
       double percentage =
-          double.tryParse(assignment['percentage'] ?? '0.0') ?? 0.0;
+          meterAllocationPercentage(assignment['percentage']) ?? 0;
 
       bool isThisMeterGroup =
           assignment['meter_group_id'] == widget.strItemGroupIndex;
@@ -431,21 +452,12 @@ class _WgtMeterGroupAssignmentItemState
       PagTenantLcStatus? tenantLcStatusEnum;
       if (isAssignedToTenant) {
         tenantLcStatusEnum = PagTenantLcStatus.byValue(tenantLcStatus);
-        if (tenantLcStatusEnum == PagTenantLcStatus.normal ||
-            tenantLcStatusEnum == PagTenantLcStatus.onboarding ||
-            tenantLcStatusEnum == PagTenantLcStatus.offboarding) {
-          assignedToActiveTenantCount++;
+        if (meterAllocationHasActiveTenant(tenantInfo)) {
           totalPercentageAssignedToActiveTenant += percentage;
         }
       }
 
-      bool meterGroupIsAssignedToActiveTenant = false;
-      if (assignedToActiveTenantCount != 0) {
-        meterGroupIsAssignedToActiveTenant = true;
-      }
-
-      // if (assignedToActiveTenantCount > 1) {
-      if (totalPercentageAssignedToActiveTenant > 100.0) {
+      if (totalPercentageAssignedToActiveTenant > 100.000001) {
         return getErrorTextPrompt(
           context: context,
           errorText:
@@ -458,8 +470,11 @@ class _WgtMeterGroupAssignmentItemState
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(PagItemKind.meterGroup.iconData,
-                color: Theme.of(context).hintColor, size: 18),
+            Icon(
+              PagItemKind.meterGroup.iconData,
+              color: Theme.of(context).hintColor,
+              size: 18,
+            ),
             horizontalSpaceTiny,
             Tooltip(
               message: isThisMeterGroup ? 'This meter group' : '',
@@ -467,11 +482,12 @@ class _WgtMeterGroupAssignmentItemState
               child: Container(
                 decoration: BoxDecoration(
                   border: Border.all(
-                      color: isThisMeterGroup
-                          ? assignmentErrorMessage.isNotEmpty
+                    color: isThisMeterGroup
+                        ? assignmentErrorMessage.isNotEmpty
                               ? Theme.of(context).colorScheme.error
                               : Theme.of(context).colorScheme.primary
-                          : Theme.of(context).hintColor.withAlpha(50)),
+                        : Theme.of(context).hintColor.withAlpha(50),
+                  ),
                   borderRadius: BorderRadius.circular(5),
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
@@ -480,11 +496,12 @@ class _WgtMeterGroupAssignmentItemState
                   child: SelectableText(
                     meterGroupName,
                     style: TextStyle(
-                        color:
-                            //  meterGroupIsAssignedToActiveTenant
-                            //     ? Colors.greenAccent.withAlpha(210)
-                            //     :
-                            Theme.of(context).hintColor),
+                      color:
+                          //  meterGroupIsAssignedToActiveTenant
+                          //     ? Colors.greenAccent.withAlpha(210)
+                          //     :
+                          Theme.of(context).hintColor,
+                    ),
                   ),
                 ),
               ),
@@ -497,17 +514,23 @@ class _WgtMeterGroupAssignmentItemState
                 style: TextStyle(
                   color:
                       isCurrentMeterGroupAssignmentUpdated && isThisMeterGroup
-                          ? assignmentErrorMessage.isNotEmpty
-                              ? Theme.of(context).colorScheme.error
-                              : commitColor.withAlpha(210)
-                          : Theme.of(context).hintColor,
+                      ? assignmentErrorMessage.isNotEmpty
+                            ? Theme.of(context).colorScheme.error
+                            : commitColor.withAlpha(210)
+                      : Theme.of(context).hintColor,
                 ),
               ),
             ),
-            Icon(Symbols.arrow_right,
-                size: 18, color: Theme.of(context).hintColor),
-            Icon(PagItemKind.tenant.iconData,
-                color: Theme.of(context).hintColor, size: 18),
+            Icon(
+              Symbols.arrow_right,
+              size: 18,
+              color: Theme.of(context).hintColor,
+            ),
+            Icon(
+              PagItemKind.tenant.iconData,
+              color: Theme.of(context).hintColor,
+              size: 18,
+            ),
             horizontalSpaceTiny,
             Tooltip(
               message: tenantLabel,
@@ -542,9 +565,7 @@ class _WgtMeterGroupAssignmentItemState
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ...assignmentWidgetList,
-        ],
+        children: [...assignmentWidgetList],
       ),
     );
   }
