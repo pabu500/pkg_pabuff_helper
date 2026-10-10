@@ -38,6 +38,7 @@ class WgtPagLs extends StatefulWidget {
     this.loadOnInit = false,
     this.sortBy,
     this.sortOrder,
+    this.createItemBuilder,
   });
 
   final MdlPagAppConfig appConfig;
@@ -64,6 +65,7 @@ class WgtPagLs extends StatefulWidget {
   final bool loadOnInit;
   final String? sortBy;
   final String? sortOrder;
+  final Widget Function(VoidCallback onCreated)? createItemBuilder;
 
   @override
   State<WgtPagLs> createState() => _WgtPagLsState();
@@ -220,6 +222,7 @@ class _WgtPagLsState extends State<WgtPagLs> {
           listContextType: widget.listContextType,
           // use bottom sheet instead of pane mode switcher
           enablePaneModeSwitcher: false,
+          createItemBuilder: widget.createItemBuilder,
           prefKey: prefKey,
           additionalColumnConfig: widget.additionalColumnConfig,
           getPaneWidget: widget.getPaneWidget,

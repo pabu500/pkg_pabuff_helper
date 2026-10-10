@@ -112,6 +112,7 @@ class WgtListSearchItemFlexi extends StatefulWidget {
     this.isEditableByAcl,
     this.isCreatableByAcl,
     this.rowLeadingBuilder,
+    this.createItemBuilder,
   });
 
   final MdlPagAppConfig appConfig;
@@ -164,6 +165,9 @@ class WgtListSearchItemFlexi extends StatefulWidget {
   final bool? isEditableByAcl;
   final bool? isCreatableByAcl;
   final Widget Function(Map<String, dynamic>)? rowLeadingBuilder;
+
+  /// Builds a custom creation form and reports successful creation to the list.
+  final Widget Function(VoidCallback onCreated)? createItemBuilder;
 
   @override
   State<WgtListSearchItemFlexi> createState() => _WgtListSearchItemFlexiState();
@@ -2174,7 +2178,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
   }
 
   Widget getAddItemButton() {
-    if (context.isPhone) {
+    if (context.isPhone && widget.createItemBuilder == null) {
       return Container();
     }
     if (widget.appConfig.portalType != PagPortalType.pagConsole) {
@@ -2211,6 +2215,27 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     }
 
     Color buttonColor = Theme.of(context).colorScheme.primary;
+
+    final createItemBuilder = widget.createItemBuilder;
+    if (createItemBuilder != null) {
+      return IconButton(
+        tooltip: 'Create ${widget.itemKind.name}',
+        icon: Icon(Icons.add, color: buttonColor),
+        onPressed: () {
+          bool itemCreated = false;
+          xtShowModelBottomSheet(
+            context,
+            createItemBuilder(() => itemCreated = true),
+            onClosed: () {
+              if (!mounted || !itemCreated) return;
+              setState(() {
+                _listContentRefreshKey = UniqueKey();
+              });
+            },
+          );
+        },
+      );
+    }
 
     if (widget.itemKind == PagItemKind.tenant ||
         widget.itemKind == PagItemKind.finance ||
