@@ -141,6 +141,13 @@ class WgtMultiParaBarChartState extends State<WgtMultiParaBarChart> {
 
   void _loadChartData() {
     _rawBarGroups.clear();
+    _showingBarGroups.clear();
+    _xTitles = [];
+    _maxY = 0;
+    _timeStampStart = 0;
+    _timeStampEnd = 0;
+    _touchedGroupIndex = -1;
+    if (widget.chartData.isEmpty) return;
 
     for (Map<String, dynamic> groupBars in widget.chartData) {
       int x = groupBars['x'];
@@ -262,6 +269,28 @@ class WgtMultiParaBarChartState extends State<WgtMultiParaBarChart> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.chartData.isEmpty) {
+      _loadChartData();
+      // Recalculate bar widths when readings become available again.
+      _chartWidth = null;
+      return AspectRatio(
+        aspectRatio: widget.ratio,
+        child: Padding(
+          padding: widget.padding,
+          child: Center(
+            child: Text(
+              'no data for the duration',
+              style: TextStyle(
+                color: Theme.of(context).hintColor.withAlpha(80),
+                fontSize: 34,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     if (widget.chartKey != null) {
       if (_chartKey != widget.chartKey) {
         _chartKey = widget.chartKey;
