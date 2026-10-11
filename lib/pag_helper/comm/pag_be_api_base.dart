@@ -397,6 +397,8 @@ class PagUrlBase {
 
   // Tenant Manager
   static const String eptPagCreateTenant = '/ems/tenant/create_tenant';
+  static const String eptPagGetTenantOnbInfo = '/ems/tenant/get_tenant_onb_info';
+  static const String eptPagSaveTenantOnbInfo = '/ems/tenant/save_tenant_onb_info';
   static const String eptPagOffboardTenant = '/ems/tenant/offboard_tenant';
   static const String eptPagGetTenantOffbInfo =
       '/ems/tenant/get_tenant_offb_info';
