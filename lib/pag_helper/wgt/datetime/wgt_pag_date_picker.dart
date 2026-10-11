@@ -1,6 +1,5 @@
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 class WgtPagDatePicker extends StatefulWidget {
@@ -55,7 +54,8 @@ class _WgtPagDatePickerState extends State<WgtPagDatePicker> {
           widget.initialDate ?? getTargetLocalDatetimeNow(widget.timeZone),
       // fieldHintText: sDateFormate,
       firstDate: widget.defaultFirstDate ?? DateTime(2020),
-      lastDate: widget.defaultLastDate ??
+      lastDate:
+          widget.defaultLastDate ??
           DateTime.now().add(const Duration(days: 60)),
     );
     if (d != null) {
@@ -87,61 +87,77 @@ class _WgtPagDatePickerState extends State<WgtPagDatePicker> {
         decoration: panelBoxDecor(boarderColor),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-          child: Row(
-            mainAxisAlignment: widget.mainAxisAlignment,
-            children: <Widget>[
-              if (widget.label != null && _selectedDateTime != null)
-                Text(widget.labelWhenDateIsSelected ?? widget.label!,
-                    style: TextStyle(
-                      // fontSize: 16,
-                      color: Theme.of(context).hintColor,
-                    )),
-              widget.prefix ?? Container(),
-              InkWell(
-                onTap: !widget.enableEdit
-                    ? null
-                    : () {
-                        _selectDate(context);
-                      },
-                child: Text(_selectedDateText,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      // fontSize: 18,
-                      color: _selectedDateTime == null
-                          ? Theme.of(context).hintColor
-                          : null,
-                    )),
-              ),
-              _selectedDateTime == null
-                  ? Container()
-                  : IconButton(
-                      icon: const Icon(Icons.clear),
-                      tooltip: 'Tap to clear date',
-                      onPressed: !widget.enableEdit
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              Widget fitText(Widget child) =>
+                  constraints.hasBoundedWidth ? Flexible(child: child) : child;
+              return Row(
+                mainAxisAlignment: widget.mainAxisAlignment,
+                children: <Widget>[
+                  if (widget.label != null && _selectedDateTime != null)
+                    fitText(
+                      Text(
+                        widget.labelWhenDateIsSelected ?? widget.label!,
+                        style: TextStyle(
+                          // fontSize: 16,
+                          color: Theme.of(context).hintColor,
+                        ),
+                      ),
+                    ),
+                  widget.prefix ?? Container(),
+                  fitText(
+                    InkWell(
+                      onTap: !widget.enableEdit
                           ? null
                           : () {
-                              if (widget.onDateCleared != null) {
-                                widget.onDateCleared!();
-                              }
-                              setState(() {
-                                _selectedDateText =
-                                    widget.label ?? 'Select date';
-                                _selectedDateTime = null;
-                              });
+                              _selectDate(context);
                             },
+                      child: Text(
+                        _selectedDateText,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          // fontSize: 18,
+                          color: _selectedDateTime == null
+                              ? Theme.of(context).hintColor
+                              : null,
+                        ),
+                      ),
                     ),
-              IconButton(
-                icon: Icon(Icons.calendar_today,
-                    color: Theme.of(context).colorScheme.primary),
-                tooltip: 'Tap to open date picker',
-                onPressed: !widget.enableEdit
-                    ? null
-                    : () {
-                        _selectDate(context);
-                      },
-              ),
-              widget.suffix ?? Container(),
-            ],
+                  ),
+                  _selectedDateTime == null
+                      ? Container()
+                      : IconButton(
+                          icon: const Icon(Icons.clear),
+                          tooltip: 'Tap to clear date',
+                          onPressed: !widget.enableEdit
+                              ? null
+                              : () {
+                                  if (widget.onDateCleared != null) {
+                                    widget.onDateCleared!();
+                                  }
+                                  setState(() {
+                                    _selectedDateText =
+                                        widget.label ?? 'Select date';
+                                    _selectedDateTime = null;
+                                  });
+                                },
+                        ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.calendar_today,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    tooltip: 'Tap to open date picker',
+                    onPressed: !widget.enableEdit
+                        ? null
+                        : () {
+                            _selectDate(context);
+                          },
+                  ),
+                  widget.suffix ?? Container(),
+                ],
+              );
+            },
           ),
         ),
       ),

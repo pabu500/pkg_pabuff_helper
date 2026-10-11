@@ -87,6 +87,7 @@ class _WgtTextFieldState extends State<WgtTextField> {
   late final TextEditingController _controller;
   // late final FocusNode _focusNode;
 
+  bool _hasBeenFocused = false;
   String _errorText = '';
   bool _waiting = false;
   String _checkUniqueResultText = '';
@@ -163,6 +164,11 @@ class _WgtTextFieldState extends State<WgtTextField> {
       descendantsAreFocusable: widget.enabled,
       canRequestFocus: widget.enabled,
       onFocusChange: (value) {
+        if (value) {
+          _hasBeenFocused = true;
+        } else if (!_hasBeenFocused) {
+          return;
+        }
         if (!value) {
           if (widget.validator != null) {
             _isValidated = false;
