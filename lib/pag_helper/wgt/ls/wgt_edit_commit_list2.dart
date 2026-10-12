@@ -650,7 +650,7 @@ class _WgtPagEditCommitList2State extends State<WgtPagEditCommitList2> {
 
       String originalFullText = '';
       if (row[ctrlItem.colKey] != null) {
-        originalFullText = row[ctrlItem.colKey].toString();
+        originalFullText = ctrlItem.formatDisplayValue(row[ctrlItem.colKey]);
         // if (ctrlItem['prefix'] != null) {
         //   originalFullText = ctrlItem['prefix'] + originalFullText;
         // }

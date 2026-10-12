@@ -6,6 +6,7 @@ import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 
 import '../../def_helper/dh_acl.dart';
+import '../../def_helper/dh_pag_acl.dart';
 import '../../def_helper/dh_device.dart';
 import '../../def_helper/dh_pag_finance.dart';
 import '../../def_helper/dh_pag_org.dart';
@@ -54,13 +55,15 @@ class MdlPagListController /*extends ChangeNotifier*/ {
 
   factory MdlPagListController.fromJson(Map<String, dynamic> json,
       {PagListContextType? listContextType,
-      PagScopeType? currentScopeType}) {
+      PagScopeType? currentScopeType,
+      PagPortalType? currentPortalType}) {
     List<MdlListColController> listConfigItemList = [];
     if (json['list_config'] != null) {
       for (var listConfigItem in json['list_config']) {
         listConfigItem = MdlListColController.fromJson(listConfigItem,
             listContextType: listContextType,
-            currentScopeType: currentScopeType);
+            currentScopeType: currentScopeType,
+            currentPortalType: currentPortalType);
         listConfigItemList.add(listConfigItem);
       }
     }

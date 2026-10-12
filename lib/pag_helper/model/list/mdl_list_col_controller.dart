@@ -1,8 +1,10 @@
 import 'dart:developer' as dev;
+
 import 'package:buff_helper/pag_helper/def_helper/dh_list.dart';
 import 'package:flutter/material.dart';
 
 import '../../def_helper/dh_scope.dart';
+import '../../def_helper/dh_pag_acl.dart';
 
 enum PagFilterWidgetType { INPUT, SELECT, DATE, DATETIME, INPUT_SELECT }
 
@@ -33,15 +35,18 @@ class MdlListColController {
   String colTitle;
   String filterLabel;
   double colWidth;
-  bool showColumn;
+  bool _showColumn;
   bool showEditPanel;
   bool showOnCard;
   bool showTimestampAsDate;
+  bool showTime;
   int rowOnCard;
   int rowOrder = 1;
   bool showSort;
   String sortOrder;
-  bool hidden;
+  bool _hidden;
+  List<String> hiddenAtPortalType;
+  PagPortalType? currentPortalType;
   PagFilterWidgetType filterWidgetType;
   PagFilterGroupType filterGroupType;
   PagFilterDataType filterDataType;
@@ -106,9 +111,12 @@ class MdlListColController {
     this.rowOrder = 1,
     this.showSort = false,
     this.sortOrder = 'desc',
-    this.hidden = false,
+    bool hidden = false,
+    this.hiddenAtPortalType = const [],
+    this.currentPortalType,
     this.filterWidgetType = PagFilterWidgetType.INPUT,
     this.showTimestampAsDate = false,
+    this.showTime = true,
     this.filterGroupType = PagFilterGroupType.other,
     this.filterDataType = PagFilterDataType.string,
     this.getListEpt,
@@ -147,8 +155,32 @@ class MdlListColController {
     this.opInfo,
     this.isCompactFilter = false,
     this.showScanner = false,
-    this.showColumn = true,
-  });
+    bool showColumn = true,
+  }) : _showColumn = showColumn,
+       _hidden = hidden;
+
+  bool get isHiddenAtPortal =>
+      currentPortalType != null &&
+      hiddenAtPortalType.contains(currentPortalType!.value);
+
+  bool get hidden => _hidden || isHiddenAtPortal;
+  set hidden(bool value) => _hidden = value;
+
+  // Enforce portal restrictions even when saved preferences set visibility.
+  bool get showColumn => _showColumn && !isHiddenAtPortal;
+  set showColumn(bool value) => _showColumn = value;
+
+  String formatDisplayValue(dynamic value) {
+    final text = value?.toString() ?? '';
+    if (filterGroupType == PagFilterGroupType.datetime &&
+        (showTimestampAsDate || !showTime)) {
+      final dateTime = value is DateTime ? value : DateTime.tryParse(text);
+      if (dateTime != null) {
+        return '${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}';
+      }
+    }
+    return text;
+  }
 
   //getter isJoinKey
   bool get isJoinKey => joinKey != null;
@@ -198,6 +230,7 @@ class MdlListColController {
     Map<String, dynamic> json, {
     PagListContextType? listContextType,
     PagScopeType? currentScopeType,
+    PagPortalType? currentPortalType,
   }) {
     String? colKey = json['colKey'] ?? json['col_key'] ?? json['fieldKey'];
     if (colKey == null) {
@@ -266,6 +299,14 @@ class MdlListColController {
       isVisibleAtScope = false;
     }
 
+    final hiddenAtPortalTypeValue = json['hidden_at_portal_type'];
+    final hiddenAtPortalType = hiddenAtPortalTypeValue is List
+        ? hiddenAtPortalTypeValue.map((value) => value.toString()).toList()
+        : <String>[];
+    final isHiddenAtPortal =
+        currentPortalType != null &&
+        hiddenAtPortalType.contains(currentPortalType.value);
+
     bool showColumn = isVisibleAtScope;
     bool showEditPanel = true;
     if (json['show'] != null) {
@@ -298,7 +339,7 @@ class MdlListColController {
       }
     }
 
-    if (permHidden) {
+    if (permHidden || isHiddenAtPortal) {
       showEditPanel = false;
     }
 
@@ -553,6 +594,14 @@ class MdlListColController {
       }
     }
 
+    bool showTime = true;
+    final showTimeValue = json['show_time'];
+    if (showTimeValue is bool) {
+      showTime = showTimeValue;
+    } else if (showTimeValue is String) {
+      showTime = showTimeValue.toLowerCase() == 'true';
+    }
+
     int rowOrder = 0;
     if (json['row_order'] != null) {
       dynamic rowOrderValue = json['row_order'];
@@ -669,11 +718,13 @@ class MdlListColController {
       colWidth: width,
       showColumn: showColumn,
       showEditPanel: showEditPanel,
-      showOnCard: showOnCard,
+      showOnCard: showOnCard && !isHiddenAtPortal,
       rowOnCard: rowOnCard,
       showSort: showSort,
       sortOrder: sortOrder,
       hidden: permHidden,
+      hiddenAtPortalType: hiddenAtPortalType,
+      currentPortalType: currentPortalType,
       filterWidgetType: filterWidgetType,
       filterGroupType: filterGroupType,
       filterDataType: filterDataType,
@@ -698,8 +749,9 @@ class MdlListColController {
       // requiredOnOnb: requiredOnOnb,
       // requiredOnFormCreate: requiredOnFormCreate,
       showInputOnFormCreate: showInputOnFormCreate,
-      showFilter: showFilter,
+      showFilter: showFilter && !isHiddenAtPortal,
       showTimestampAsDate: showTimestampAsDate,
+      showTime: showTime,
       rowOrder: rowOrder,
       isCompactFilter: isCompactFilter,
       pinned: pinned,
@@ -731,7 +783,8 @@ class MdlListColController {
     data['row_on_card'] = rowOnCard;
     data['show_sort'] = showSort.toString();
     // data['custHidden'] = hidden.toString();
-    data['hidden'] = hidden.toString();
+    data['hidden'] = _hidden.toString();
+    data['hidden_at_portal_type'] = hiddenAtPortalType;
     data['col_widget_type'] = colWidgetType.name;
     data['filter_widget_type'] = filterWidgetType.name;
     // data['editorWidgetType'] = editorWidgetType.name;
@@ -756,6 +809,7 @@ class MdlListColController {
     data['show_input_on_form_create'] = showInputOnFormCreate.toString();
     data['show_filter'] = showFilter.toString();
     data['show_timestamp_as_date'] = showTimestampAsDate.toString();
+    data['show_time'] = showTime.toString();
     data['row_order'] = rowOrder;
     // data['op_info_list'] = opInfoList;
     data['op_info'] = opInfo;

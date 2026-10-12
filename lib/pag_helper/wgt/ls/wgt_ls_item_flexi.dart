@@ -277,7 +277,8 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           MdlPagListController listController = MdlPagListController.fromJson(
               listInfoMap,
               listContextType: widget.listContextType,
-              currentScopeType: loggedInUser!.selectedScope.getScopeType());
+              currentScopeType: loggedInUser!.selectedScope.getScopeType(),
+              currentPortalType: widget.appConfig.portalType);
           _listControllerList.add(listController);
         }
       }
@@ -291,7 +292,8 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
             MdlListColController listColController =
                 MdlListColController.fromJson(listConfigMap,
                     currentScopeType:
-                        loggedInUser!.selectedScope.getScopeType());
+                        loggedInUser!.selectedScope.getScopeType(),
+                    currentPortalType: widget.appConfig.portalType);
 
             //skip if the listConfigMap is already in the list
             bool isExist = false;
@@ -2107,6 +2109,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                       _listControllerList.add(
                         MdlPagListController.fromJson(
                           config,
+                          currentPortalType: widget.appConfig.portalType,
                           currentScopeType: loggedInUser!.selectedScope
                               .getScopeType(),
                         ),

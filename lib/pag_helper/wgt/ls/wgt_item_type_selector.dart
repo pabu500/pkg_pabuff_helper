@@ -126,7 +126,8 @@ class _WgtItemTypeSelectorState extends State<WgtItemTypeSelector> {
           MdlPagListController listController =
               MdlPagListController.fromJson(listInfoMap,
                   currentScopeType:
-                      loggedInUser!.selectedScope.getScopeType());
+                      loggedInUser!.selectedScope.getScopeType(),
+                  currentPortalType: widget.appConfig.portalType);
           _listControllerList.add(listController);
         }
       }

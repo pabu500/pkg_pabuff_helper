@@ -203,7 +203,7 @@ class _WgtCardListState extends State<WgtCardList> {
 
         String originalFullText = '';
         if (row[ctrlItem.colKey] != null) {
-          originalFullText = row[ctrlItem.colKey].toString();
+          originalFullText = ctrlItem.formatDisplayValue(row[ctrlItem.colKey]);
         }
 
         if (ctrlItem.useComma || ctrlItem.decimal != null) {
@@ -212,16 +212,6 @@ class _WgtCardListState extends State<WgtCardList> {
             decimal: ctrlItem.decimal ?? 2,
           );
           originalFullText += ' ';
-        }
-
-        if (ctrlItem.filterGroupType == PagFilterGroupType.datetime) {
-          if (ctrlItem.showTimestampAsDate && row[ctrlItem.colKey] != null) {
-            DateTime? dateTime = DateTime.tryParse(row[ctrlItem.colKey]);
-            if (dateTime != null) {
-              originalFullText =
-                  '${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}';
-            }
-          }
         }
 
         bool showTag = true;
