@@ -1052,6 +1052,17 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
             }));
   }
 
+  String? get _targetUserPortalTypeStr {
+    final fromInfo = widget.itemInfoMap?['portal_type_str'];
+    if (fromInfo is String && fromInfo.trim().isNotEmpty) return fromInfo;
+    for (final field in widget.fieldList) {
+      if (field['col_key'] != 'portal_type_str') continue;
+      final value = field['val'] ?? field['value'];
+      if (value is String) return value;
+    }
+    return null;
+  }
+
   Widget getUserRoleSetter() {
     if (!isEditableByAcl ||
         (widget.itemKind != PagItemKind.user) ||
@@ -1064,8 +1075,9 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
         child: WgtUesrRoleSetter(
             appConfig: widget.appConfig,
             loggedInUser: _loggedInUser!,
+            key: ValueKey(widget.strItemIndex),
             userIndexStr: widget.strItemIndex,
-            height: 350,
+            targetPortalTypeStr: _targetUserPortalTypeStr,
             onUserRoleListLoaded: (List<Map<String, dynamic>> userRoleList) {
               if (userRoleList.isEmpty) {
                 return;
