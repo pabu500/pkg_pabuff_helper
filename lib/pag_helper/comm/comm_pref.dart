@@ -6,10 +6,91 @@ import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_controller.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
+import 'package:buff_helper/up_helper/helper/device_def.dart';
 
 const String _getPrefEndpoint = '/pref/get_pref';
 const String _setPrefEndpoint = '/pref/set_pref';
 const String _resetPrefEndpoint = '/pref/reset_pref';
+
+class PagDashboardMeterTypePreference {
+  const PagDashboardMeterTypePreference({
+    required this.found,
+    required this.meterType,
+    required this.revision,
+  });
+
+  factory PagDashboardMeterTypePreference.fromResult(dynamic result) {
+    if (result is! Map) throw Exception('Invalid preference response');
+    final revisionValue = result['revision'];
+    final prefValue = result['pref_value'];
+    final tag = prefValue is Map && prefValue['schema_version'] == 1
+        ? prefValue['meter_type']
+        : null;
+    return PagDashboardMeterTypePreference(
+      found: result['found'] == true,
+      meterType: tag is String ? getMeterType(tag) : null,
+      revision: revisionValue is num
+          ? revisionValue.toInt()
+          : int.tryParse(revisionValue?.toString() ?? '') ?? 0,
+    );
+  }
+
+  final bool found;
+  final MeterType? meterType;
+  final int revision;
+}
+
+String getDashboardMeterTypePrefKey(String pageRoute) =>
+    'dashboard.$pageRoute.meter_type';
+
+Future<PagDashboardMeterTypePreference> getDashboardMeterTypePreference({
+  required MdlPagAppConfig appConfig,
+  required MdlPagUser user,
+  required int projectId,
+  required String prefKey,
+}) async {
+  final result = await ex2(
+    endpoint: _getPrefEndpoint,
+    crudType: 'read',
+    opStr: 'get dashboard meter type preference',
+    appConfig: appConfig,
+    queryMap: {
+      'project_id': projectId,
+      'portal_type': appConfig.portalType.value,
+      'pref_key': prefKey,
+    },
+    svcClaim: _claimFor(user),
+  );
+  return PagDashboardMeterTypePreference.fromResult(result);
+}
+
+Future<PagDashboardMeterTypePreference> setDashboardMeterTypePreference({
+  required MdlPagAppConfig appConfig,
+  required MdlPagUser user,
+  required int projectId,
+  required String prefKey,
+  required MeterType meterType,
+  required int expectedRevision,
+}) async {
+  final result = await ex2(
+    endpoint: _setPrefEndpoint,
+    crudType: 'update',
+    opStr: 'save dashboard meter type preference',
+    appConfig: appConfig,
+    queryMap: {
+      'project_id': projectId,
+      'portal_type': appConfig.portalType.value,
+      'pref_key': prefKey,
+      'expected_revision': expectedRevision,
+      'pref_value': {
+        'schema_version': 1,
+        'meter_type': getMeterTypeTag(meterType),
+      },
+    },
+    svcClaim: _claimFor(user),
+  );
+  return PagDashboardMeterTypePreference.fromResult(result);
+}
 
 class PagListColumnPreference {
   const PagListColumnPreference({
