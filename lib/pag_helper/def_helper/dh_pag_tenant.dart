@@ -235,18 +235,11 @@ String? validateTenantLabelNotRequired(String value) {
 }
 
 String? validateRemark(String value) {
-  if (value.trim().isEmpty) {
-    return null; // allow empty
+  // Remarks are optional. Accept ordinary and common pasted nonbreaking spaces.
+  final invalidCharacters = RegExp(r"[^-a-zA-Z0-9 ./'()+&#@,_:\u00a0\u2007\u202f]");
+  if (value.length > 255 || invalidCharacters.hasMatch(value)) {
+    return "alphanumeric, spaces, /, +, -, #, &, @, (), ., ', comma, underscore, colon only and length 1-255";
   }
-
-  // length 1-255, alphanumeric, space, /, ', +, -, #, @, (), .
-  String pattern = r"^[-a-zA-Z0-9 ./'()+&#@]{1,255}$";
-  RegExp regExp = RegExp(pattern);
-
-  if (!regExp.hasMatch(value)) {
-    return 'alphanumeric, space, /, +, -, #, &, @, (), ., only and length 1-255';
-  }
-
   return null;
 }
 
@@ -1044,7 +1037,7 @@ final List<Map<String, dynamic>> listConfigBaseTenantExt = [
     'col_type': 'string',
     'width': 150,
     'is_mapping_required': false,
-    'validator': validateTenantLabel,
+    'validator': validateRemark,
   },
   // {
   //   'col_key': 'initial_balance',
