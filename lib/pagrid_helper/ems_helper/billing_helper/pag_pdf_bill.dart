@@ -342,7 +342,7 @@ class PagPdfBillCwP2 {
             pw.SizedBox(
               width: 250,
               child: pw.Text(
-                'Meter Usage Details for $billLabel',
+                'Meter Usage Details for $invoiceNumber',
                 style: styleLarge.copyWith(fontWeight: pw.FontWeight.bold),
               ),
             ),
