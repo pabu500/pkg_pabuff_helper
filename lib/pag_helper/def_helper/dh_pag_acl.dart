@@ -20,15 +20,9 @@ enum PagPortalType {
   pagCmApp('pag-cm-app', 'Ops CM App', 'cmapp', Colors.indigo),
   pagEmsTp('pag-ems-tp', 'EMS Tenant Portal', 'tp', Colors.purple),
   pagEvsCp('pag-evs-cp', 'EVS Consume Portal', 'cp', Colors.orange),
-  none('none', 'None', 'none', Colors.grey),
-  ;
+  none('none', 'None', 'none', Colors.grey);
 
-  const PagPortalType(
-    this.value,
-    this.label,
-    this.tag,
-    this.color,
-  );
+  const PagPortalType(this.value, this.label, this.tag, this.color);
 
   final String value;
   final String label;
@@ -36,33 +30,26 @@ enum PagPortalType {
   final Color color;
 
   static PagPortalType byValue(String? value) =>
-      enumByValue<PagPortalType>(
-        value,
-        values,
-        (e) => e.value,
-      ) ??
-      none;
+      enumByValue<PagPortalType>(value, values, (e) => e.value) ?? none;
 }
 
 enum PagRoleType {
   sysAdmin('sys_admin', 'System Admin', 'sysadmin', Colors.red),
   projectAdmin(
-      'project_admin', 'Project Admin', 'projectadmin', Colors.redAccent),
+    'project_admin',
+    'Project Admin',
+    'projectadmin',
+    Colors.redAccent,
+  ),
   subAdmin('sub_admin', 'Sub Admin', 'subadmin', Colors.yellow),
   ops('ops', 'Ops', 'ops', Colors.teal),
   siteOps('site_ops', 'Site Ops', 'siteops', Colors.orange),
   billingOps('billing_ops', 'Billing Ops', 'billingops', Colors.indigo),
   tenant('tenant', 'EMS Tenant', 'tenant', Colors.purple),
   consumer('consumer', 'EVS Consumer', 'consumer', Colors.green),
-  unknown('unknown', 'Unknown', 'unknown', Colors.grey),
-  ;
+  unknown('unknown', 'Unknown', 'unknown', Colors.grey);
 
-  const PagRoleType(
-    this.value,
-    this.label,
-    this.tag,
-    this.color,
-  );
+  const PagRoleType(this.value, this.label, this.tag, this.color);
 
   final String value;
   final String label;
@@ -70,12 +57,7 @@ enum PagRoleType {
   final Color color;
 
   static PagRoleType byValue(String? value) =>
-      enumByValue<PagRoleType>(
-        value,
-        values,
-        (e) => e.value,
-      ) ??
-      unknown;
+      enumByValue<PagRoleType>(value, values, (e) => e.value) ?? unknown;
 }
 
 String? validateRoleTag(String? value) {
@@ -86,9 +68,7 @@ String? validateRoleTag(String? value) {
   // Allowed:
   // 2-8 chars
   // alphanumeric, underscore, dash
-  final validCharacters = RegExp(
-    r"""^[a-zA-Z0-9\-_]{2,8}$""",
-  );
+  final validCharacters = RegExp(r"""^[a-zA-Z0-9\-_]{2,8}$""");
 
   if (!validCharacters.hasMatch(value)) {
     return 'must be 2-8 characters and can only contain letters, numbers, hyphens, and underscores';
@@ -97,8 +77,10 @@ String? validateRoleTag(String? value) {
   return null;
 }
 
-String? Function(String) getRoleValidator(String key,
-    {bool isValueRequired = true}) {
+String? Function(String) getRoleValidator(
+  String key, {
+  bool isValueRequired = true,
+}) {
   switch (key) {
     case 'label':
       return getValidator(validateItemLabel, isValueRequired);
@@ -122,13 +104,18 @@ String? getResNameByItemType(dynamic itemType) {
   return null;
 }
 
-String? getResNameByPageRouteSection(MdlPagAppContext appContext,
-    PagPageRoute pageRoute, PageSection pageSection) {
+String? getResNameByPageRouteSection(
+  MdlPagAppContext appContext,
+  PagPageRoute pageRoute,
+  PageSection pageSection,
+) {
   return '${appContext.name}.${pageRoute.name}.${pageSection.name}';
 }
 
 String getResNameByPageRoute(
-    MdlPagAppContext appContext, PagPageRoute pageRoute) {
+  MdlPagAppContext appContext,
+  PagPageRoute pageRoute,
+) {
   return '${appContext.name}.${pageRoute.name}';
 }
 
@@ -186,10 +173,7 @@ Future<dynamic> checkAcl2(
       final operation = operationValue is AclOperation
           ? operationValue.name
           : operationValue as String;
-      permRequestList.add({
-        'res_label': resLabel,
-        'operation': operation,
-      });
+      permRequestList.add({'res_label': resLabel, 'operation': operation});
     }
 
     final aclResult = await ex2(
@@ -214,10 +198,6 @@ Future<dynamic> checkAcl2(
     // Keep 'error'/'message' populated so they can show why.
     final message = e.toString();
     dev.log('checkAcl2 error: $message');
-    return {
-      'result': 'error',
-      'error': message,
-      'message': message,
-    };
+    return {'result': 'error', 'error': message, 'message': message};
   }
 }
