@@ -446,6 +446,8 @@ class PagUrlBase {
   // Meter Group Manager
   static const String eptPagCreateMeterGroup =
       '/ems/meter_group/create_meter_group';
+  static const String eptPagDeleteMeterGroup =
+      '/ems/meter_group/delete_meter_group';
   static const String eptPagGetMeterGroupMetertList =
       '/ems/meter_group/get_meter_group_meter_list';
   // static const String eptGetMeterMeterGroupAssignment =

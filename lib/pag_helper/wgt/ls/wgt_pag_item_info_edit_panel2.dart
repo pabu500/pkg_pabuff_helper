@@ -97,6 +97,16 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
 
   bool get isEditableByAcl => widget.isEditableByAcl;
 
+  bool get _isEmsMeterGroup {
+    if (widget.itemKind != PagItemKind.meterGroup) return false;
+    final serviceType = widget.itemInfoMap?['service_type'] ??
+        widget.fieldList
+            .where((field) => field['col_key'] == 'service_type')
+            .map((field) => field['value'])
+            .firstOrNull;
+    return (serviceType is Map ? serviceType['value'] : serviceType) == 'ems';
+  }
+
   late bool isDeleteableItem;
   late final bool isDeleteableByAcl;
   bool _isDeleting = false;
@@ -308,6 +318,75 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
         });
       }
     }
+  }
+
+  Future<Map<String, dynamic>> _doDeleteMeterGroup(String itemName) async {
+    if (_isDeleting) return {'error': 'Deletion is already in progress'};
+    setState(() {
+      _isDeleting = true;
+      _deleteResultText = '';
+    });
+    try {
+      final result = await ex2(
+        endpoint: PagUrlBase.eptPagDeleteMeterGroup,
+        crudType: 'delete',
+        opStr: 'delete meter group',
+        appConfig: widget.appConfig,
+        queryMap: {
+          'scope': _loggedInUser!.selectedScope.toScopeMap(),
+          'meter_group_id': widget.strItemIndex,
+          'meter_group_name': itemName,
+        },
+        svcClaim: MdlPagSvcClaim2(
+          userId: _loggedInUser!.id,
+          username: _loggedInUser!.username,
+          roleId: _loggedInUser!.selectedRole?.id,
+          roleName: _loggedInUser!.selectedRole?.name,
+          roleLabel: _loggedInUser!.selectedRole?.label,
+          userScope: _loggedInUser!.selectedScope.toScopeMap(),
+          permRequestList: [
+            {
+              'res_label': 'ems.emsMeterGroupManager.meterGroupList',
+              'operation': 'delete',
+            }
+          ],
+        ),
+      );
+      if (result is! Map<String, dynamic> ||
+          result['id']?.toString() != widget.strItemIndex) {
+        return {'error': 'Deletion could not be confirmed. Refresh the list to check the meter group'};
+      }
+      return result;
+    } catch (e) {
+      return {'error': getErrorText(e, defaultErrorText: 'Error deleting meter group')};
+    } finally {
+      if (mounted) setState(() => _isDeleting = false);
+    }
+  }
+
+  void _showDeleteMeterGroupConfirmation(String itemName) {
+    showDialog(
+      context: context,
+      builder: (context) => WgtConfirmBox(
+        title: 'Delete Meter Group',
+        message1: 'This will delete the meter group and its meter links. The meters will remain.',
+        message2: 'The group must be unassigned and unused by bills or onboarding/offboarding readings.',
+        opName: 'delete_meter_group',
+        keyInConfirmStrList: ['delete', itemName],
+        itemCount: 1,
+        onConfirm: () async {
+          final result = await _doDeleteMeterGroup(itemName);
+          if (!mounted) return;
+          if (result['error'] != null) {
+            setState(() => _deleteResultText = result['error'].toString());
+            return;
+          }
+          setState(() => _deleteResultText = 'Item deleted');
+          widget.onUpdate?.call();
+          Navigator.of(this.context).pop();
+        },
+      ),
+    );
   }
 
   Future<dynamic> _doDeleteScope(
@@ -615,6 +694,9 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
       case PagItemKind.resourceType:
         isDeleteableItem = true;
         break;
+      case PagItemKind.meterGroup:
+        isDeleteableItem = _isEmsMeterGroup;
+        break;
       case PagItemKind.acl:
         isDeleteableItem = widget.itemTypeEnum is PagAclType;
         break;
@@ -630,6 +712,7 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
     final bool isAclItem =
         widget.itemKind == PagItemKind.acl && widget.itemTypeEnum is PagAclType;
     final bool isResourceTypeItem = widget.itemKind == PagItemKind.resourceType;
+    final bool isMeterGroupItem = _isEmsMeterGroup;
     final bool isScopeItem = widget.itemKind == PagItemKind.scope &&
         widget.itemTypeEnum is PagScopeType;
     final bool deleteSucceeded = _deleteResultText == 'Item deleted';
@@ -665,7 +748,7 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
               Stack(children: [
-                if (!isScopeItem &&
+                if (!isScopeItem && !isMeterGroupItem &&
                     isDeleteableItem &&
                     isDeleteableByAcl &&
                     isItemMFD)
@@ -735,6 +818,17 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
                     child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
+                          if (isMeterGroupItem &&
+                              isDeleteableItem &&
+                              isDeleteableByAcl)
+                            _isDeleting
+                                ? const WgtPagWait(size: 21)
+                                : IconButton(
+                                    tooltip: 'Delete meter group',
+                                    icon: Icon(Icons.delete,
+                                        color: Theme.of(context).colorScheme.error),
+                                    onPressed: () => _showDeleteMeterGroupConfirmation(itemName),
+                                  ),
                           if (isAclItem &&
                               isDeleteableItem &&
                               isDeleteableByAcl)
@@ -818,7 +912,7 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
               ]),
               // verticalSpaceSmall,
               const Divider(height: 1),
-              if ((isAclItem || isResourceTypeItem || isScopeItem) &&
+              if ((isAclItem || isResourceTypeItem || isScopeItem || isMeterGroupItem) &&
                   _deleteResultText.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
