@@ -346,7 +346,7 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
           userScope: _loggedInUser!.selectedScope.toScopeMap(),
           permRequestList: [
             {
-              'res_label': 'ems.emsMeterGroupManager.meterGroupList',
+              'res_label': 'emsMeterGroup',
               'operation': 'delete',
             }
           ],

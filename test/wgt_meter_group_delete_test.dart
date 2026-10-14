@@ -197,7 +197,7 @@ void main() {
           expect(payload.toString(), contains(groupName));
           expect(
             payload.toString(),
-            contains('ems.emsMeterGroupManager.meterGroupList'),
+            contains('emsMeterGroup'),
           );
           expect(payload.toString(), contains('delete'));
         },
