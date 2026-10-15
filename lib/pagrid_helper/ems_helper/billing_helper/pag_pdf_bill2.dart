@@ -1,4 +1,3 @@
-import 'dart:math';
 
 import 'package:buff_helper/pagrid_helper/ems_helper/tenant/mdl_ems_type_usage_r2.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_ems_type_usage_calc_rl2.dart';
@@ -301,6 +300,7 @@ class PagPdfBillCwP2Gen3 {
       header: _buildHeaderP2,
       // footer: _buildFooter,
       build: (context) => [
+        ..._getUsageTrending(),
         _getMeterTypeMeterListUsage(),
       ],
     );
@@ -1886,197 +1886,107 @@ class PagPdfBillCwP2Gen3 {
     );
   }
 
+  List<pw.Widget> _getUsageTrending() {
+    final charts = <pw.Widget>[];
+    void addChart(String label, String unit, List<Map<String, dynamic>>? data) {
+      if (data == null || data.isEmpty) return;
+      charts.add(pw.Container(
+        height: 115,
+        margin: const pw.EdgeInsets.only(top: 5, bottom: 5),
+        padding: const pw.EdgeInsets.all(5),
+        decoration: pw.BoxDecoration(
+          border: pw.Border.all(color: PdfColors.grey500, width: 0.5),
+        ),
+        child: pw.Row(children: [
+          _getTrending(data),
+          pw.Expanded(child: pw.Column(
+            mainAxisAlignment: pw.MainAxisAlignment.center,
+            children: [
+              pw.Text(label, style: styleNormal.copyWith(fontWeight: pw.FontWeight.bold)),
+              pw.Text('Usage ($unit)', style: styleSmall),
+            ],
+          )),
+        ]),
+      ));
+    }
+    addChart('Electricity', 'kWh', trendingE);
+    addChart('Water', 'm³', trendingW);
+    addChart('Chilled Water', 'kWh', trendingB);
+    addChart('Natural Gas', 'm³', trendingN);
+    addChart('Gas', 'm³', trendingG);
+    addChart('Solar Energy', 'kWh', trendingSE1);
+    if (charts.isEmpty) return charts;
+    return [
+      pw.Padding(
+        padding: const pw.EdgeInsets.only(top: 8),
+        child: pw.Text('Consumption History',
+          style: styleLarge.copyWith(fontWeight: pw.FontWeight.bold)),
+      ),
+      ...charts,
+      pw.SizedBox(height: 8),
+    ];
+  }
+
   pw.Widget _getTrending(List<Map<String, dynamic>>? trending) {
-    if (trending == null) {
-      return pw.SizedBox();
-    }
-    if (trending.isEmpty) {
-      return pw.SizedBox();
-    }
-    if ((trending).isNotEmpty) {
-      //reverse the list
-      trending = trending.reversed.toList();
-    }
+    if (trending == null || trending.isEmpty) return pw.SizedBox();
 
-    int lookBackMonthCap = 6;
-    int lookBackMonth = trending.length;
-    if (lookBackMonth > lookBackMonthCap) {
-      lookBackMonth = lookBackMonthCap;
+    // Work on copies so repeated downloads do not change the billed history.
+    final months = trending.take(6)
+        .map((item) => Map<String, dynamic>.from(item))
+        .toList().reversed.toList();
+    // A first bill needs a nonzero x-axis range, without a fictitious month.
+    if (months.length == 1) {
+      months.insert(0, {'label': '', 'value': 0.0});
     }
+    final lastIndex = months.length - 1;
+    const labelStyle = pw.TextStyle(color: _darkColor, fontSize: 9);
 
-    List<Map<String, dynamic>> trendingLastMonthSuper = [];
-    for (int i = 0; i < lookBackMonth; i++) {
-      trending[i]['label'] = trending[i]['label'] + '';
-      String valueStr = getBarNumberStr(trending[i]['value'] as double);
-      trending[i]['valueStr'] = valueStr;
-
-      var item = trending[i];
-      if (i == lookBackMonth - 1) {
-        trendingLastMonthSuper.add({
-          'label': item['label'],
-          'value': item['value'],
-          'valueStr': '',
-        });
-      } else {
-        trendingLastMonthSuper.add({
-          'label': item['label'],
-          'value': 0,
-          'valueStr': '',
-        });
-      }
-    }
-
-    //if length less then lookBackMonth, add empty data
-    if (trending.length < lookBackMonth) {
-      for (int i = 0; i < lookBackMonth - trending.length; i++) {
-        trending.insert(0, {
-          'label': '',
-          'value': 0,
-          'valueStr': '',
-        });
-        trendingLastMonthSuper.insert(0, {
-          'label': '',
-          'value': 0,
-          'valueStr': '',
-        });
-      }
-    }
-
-    pw.TextStyle labelStyle = const pw.TextStyle(
-      color: _darkColor,
-      fontSize: 9,
-    );
-    return pw.Container(
+    return pw.SizedBox(
       height: 100,
       width: 350,
-      child: trending.isEmpty
-          ? pw.SizedBox()
-          : pw.Stack(
-              children: [
-                pw.Chart(
-                  left: pw.Container(
-                    alignment: pw.Alignment.topCenter,
-                    margin: const pw.EdgeInsets.only(right: 5, top: 10),
-                    child: pw.Transform.rotateBox(
-                      angle: pi / 2,
-                      child: pw.Text(''),
-                    ),
-                  ),
-                  grid: pw.CartesianGrid(
-                    xAxis: pw.FixedAxis.fromStrings(
-                      color: PdfColors.white,
-                      List<String>.generate(
-                        lookBackMonth, // trending.length,
-                        (index) =>
-                            // '${trending?[index]['label']}\n ${trending?[index]['value']}',
-                            // '${trending?[index]['label']}',
-                            '',
-                      ),
-                      marginStart: 30,
-                      marginEnd: 30,
-                      ticks: false,
-                      textStyle: const pw.TextStyle(
-                        color: PdfColors.grey,
-                        fontSize: 9,
-                      ),
-                      buildLabel: (num i) {
-                        int index = i.toInt();
-                        return pw.Transform.translate(
-                          offset: const PdfPoint(-10, 0),
-                          child: pw.Column(
-                            children: [
-                              pw.Text('_',
-                                  style: labelStyle.copyWith(
-                                      color: PdfColors.white)),
-                              pw.Text('_',
-                                  style: labelStyle.copyWith(
-                                      color: PdfColors.white)),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                    yAxis: _getTrendingAxis(trending),
-                  ),
-                  datasets: [
-                    pw.BarDataSet(
-                      color: PdfColors.white,
-                      legend: tableHeaders[2],
-                      width: 15,
-                      offset: -10,
-                      borderColor: PdfColors.grey,
-                      data: List<pw.PointChartValue>.generate(
-                        lookBackMonth, // trending.length,
-                        (i) {
-                          final v = trending?[i]['value'] as num;
-                          return pw.PointChartValue(i.toDouble(), v.toDouble());
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-                pw.Chart(
-                  left: pw.Container(
-                    alignment: pw.Alignment.topCenter,
-                    margin: const pw.EdgeInsets.only(right: 5, top: 10),
-                    child: pw.Transform.rotateBox(
-                      angle: pi / 2,
-                      child: pw.Text(''),
-                    ),
-                  ),
-                  grid: pw.CartesianGrid(
-                    xAxis: pw.FixedAxis.fromStrings(
-                      color: PdfColors.grey300,
-                      List<String>.generate(
-                        lookBackMonth, //trending.length,
-                        (index) =>
-                            // trending?[index]['label'] as String,
-                            '',
-                      ),
-                      marginStart: 30,
-                      marginEnd: 30,
-                      ticks: false,
-                      textStyle: const pw.TextStyle(
-                        color: PdfColors.grey,
-                        fontSize: 9,
-                      ),
-                      buildLabel: (num i) {
-                        int index = i.toInt();
-                        String monthLabel =
-                            _getMonthLable(trending?[index]['label'] as String);
-                        return pw.Transform.translate(
-                          offset: const PdfPoint(-10, 0),
-                          child: pw.Column(
-                            children: [
-                              pw.Text(monthLabel, style: labelStyle),
-                              pw.Text((trending?[index]['valueStr'] ?? ''),
-                                  style: labelStyle),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                    yAxis: _getTrendingAxis(trending),
-                  ),
-                  datasets: [
-                    pw.BarDataSet(
-                      color: PdfColors.grey,
-                      legend: tableHeaders[2],
-                      width: 15,
-                      offset: -10,
-                      borderColor: PdfColors.grey,
-                      data: List<pw.PointChartValue>.generate(
-                        lookBackMonth, //trending.length,
-                        (i) {
-                          final v = trendingLastMonthSuper[i]['value'] as num;
-                          return pw.PointChartValue(i.toDouble(), v.toDouble());
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+      child: pw.Chart(
+        grid: pw.CartesianGrid(
+          xAxis: pw.FixedAxis.fromStrings(
+            List<String>.filled(months.length, ''),
+            color: PdfColors.grey300,
+            marginStart: 30,
+            marginEnd: 30,
+            ticks: false,
+            buildLabel: (num i) {
+              final item = months[i.toInt()];
+              final label = item['label'] as String;
+              return pw.Transform.translate(
+                offset: const PdfPoint(-10, 0),
+                child: pw.Column(children: [
+                  pw.Text(_getMonthLable(label), style: labelStyle),
+                  pw.Text(label.isEmpty ? '' : getBarNumberStr(item['value'] as double),
+                      style: labelStyle),
+                ]),
+              );
+            },
+          ),
+          yAxis: _getTrendingAxis(months),
+        ),
+        // Both series share one grid; separate overlaid charts draw two axes.
+        datasets: [
+          pw.BarDataSet(
+            color: PdfColors.white,
+            borderColor: PdfColors.grey,
+            width: 15,
+            offset: -10,
+            data: List<pw.PointChartValue>.generate(lastIndex, (i) =>
+                pw.PointChartValue(i.toDouble(), (months[i]['value'] as num).toDouble())),
+          ),
+          pw.BarDataSet(
+            color: PdfColors.grey,
+            borderColor: PdfColors.grey,
+            width: 15,
+            offset: -10,
+            data: [pw.PointChartValue(lastIndex.toDouble(),
+                (months[lastIndex]['value'] as num).toDouble())],
+          ),
+        ],
+      ),
     );
   }
 

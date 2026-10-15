@@ -1,3 +1,4 @@
+import 'bill_usage_trending.dart';
 import '../../../util/date_time_util.dart';
 import '../tenant/pag_ems_type_usage_calc_rl2.dart';
 
@@ -186,6 +187,12 @@ Map<String, dynamic> prepCalcedBillInfoRl2(Map<String, dynamic> billInfo) {
   final lineItemLabel3 = compositeUsageCalcRl.getLineItemLabel(false, false);
   final lineItemAmount3 = compositeUsageCalcRl.getLineItemAmount(false, false);
 
+  final usageTrending = prepBillUsageTrending(billInfo, {
+    for (final type in ['E', 'W', 'B', 'N', 'G', 'SE1'])
+      if (singularUsageCalcList.any((calc) => calc.getTypeUsage(type)?.usage != null))
+        type: compositeUsageCalcRl.getTypeUsage(type)?.usageFactored,
+  });
+
   final Map<String, dynamic> calcedBillInfo = {
     'billingRecName': billInfo['name'] ?? '',
     'billLabel': billInfo['bill_label'] ?? '',
@@ -237,13 +244,12 @@ Map<String, dynamic> prepCalcedBillInfoRl2(Map<String, dynamic> billInfo) {
     'typeCostN': compositeUsageCalcRl.getTypeUsage('N')?.cost,
     'typeCostG': compositeUsageCalcRl.getTypeUsage('G')?.cost,
     'typeCostSE1': compositeUsageCalcRl.getTypeUsage('SE1')?.cost,
-    // Trending snapshots are not part of the Gen3 singular billing record.
-    'trendingE': const <Map<String, dynamic>>[],
-    'trendingW': const <Map<String, dynamic>>[],
-    'trendingB': const <Map<String, dynamic>>[],
-    'trendingN': const <Map<String, dynamic>>[],
-    'trendingG': const <Map<String, dynamic>>[],
-    'trendingSE1': const <Map<String, dynamic>>[],
+    'trendingE': usageTrending['E'],
+    'trendingW': usageTrending['W'],
+    'trendingB': usageTrending['B'],
+    'trendingN': usageTrending['N'],
+    'trendingG': usageTrending['G'],
+    'trendingSE1': usageTrending['SE1'],
     'lineItemList': compositeUsageCalcRl.lineItemList,
     'lineItemLabel1': lineItemLabel1,
     'lineItemValue1': lineItemAmount1,
