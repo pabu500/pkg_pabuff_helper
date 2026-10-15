@@ -26,6 +26,7 @@ import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 
 import '../../../pagrid_helper/comm_helper/local_storage.dart';
 import '../../../util/date_time_util.dart';
+import '../../../xt_ui/wdgt/dropdown/wgt_dropdown_selector.dart';
 import '../../../xt_ui/wdgt/get_collapsed_bar.dart';
 import '../../../xt_ui/wdgt/info/get_error_text_prompt.dart';
 import '../../../xt_ui/xt_helpers.dart';
@@ -2019,9 +2020,25 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   }
 
   Widget getDropDownButton(MdlListColController colController, bool isFull) {
-    final bool enableEdit = widget.isInitialValueMutable ||
+    final bool enableEdit =
+        widget.isInitialValueMutable ||
         !widget.initialFilterMap.containsKey(colController.colKey);
     List<Map<String, dynamic>> list = colController.valueList ?? [];
+    final useTaskTypeSelector =
+        widget.itemKind == PagItemKind.jobType &&
+        colController.colKey == 'task_type';
+
+    void onSelected(String? value) {
+      if (value != null && value == colController.filterValue?['value']) {
+        return;
+      }
+      setState(() {
+        colController.filterValue = value == null ? null : {'value': value};
+        _enableSearch = _enableSearchButton();
+      });
+      widget.onModified?.call();
+    }
+
     return Padding(
       padding: const EdgeInsets.only(left: 8, right: 8, bottom: 5),
       child: SizedBox(
@@ -2032,50 +2049,55 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
           children: [
             if (isFull) getPin(listColController: colController),
             if (isFull) horizontalSpaceSmall,
-            DropdownButton<String>(
-              key:
-                  UniqueKey(), // prevent reuse of the same widget (and its state)
-              hint: Padding(
+            if (useTaskTypeSelector)
+              WgtDropdownSelector(
+                key: ValueKey((
+                  colController.colKey,
+                  colController.filterResetKey,
+                  colController.filterValue?['value'],
+                )),
+                width: 250,
+                height: 55,
+                hint: colController.filterLabel,
+                items: list.map((item) => item['value'] as String).toList(),
+                initialValue: colController.filterValue?['value'],
+                isInitialValueMutable: enableEdit,
+                onSelected: onSelected,
+              )
+            else
+              DropdownButton<String>(
+                key: UniqueKey(), // prevent reuse of the same widget (and its state)
+                hint: Padding(
                   padding: const EdgeInsets.only(bottom: 3.0),
-                  child: Text(colController.filterLabel,
-                      style: _dropDownListHintStyle)),
-              value: colController.filterValue?['value'],
-              // isDense: true,
-              // itemHeight: 55,
-              focusColor: Theme.of(context).hoverColor,
-              underline: _dropDownUnderline,
-              icon: const Icon(Icons.arrow_drop_down),
-              iconSize: 21,
-              style: TextStyle(color: Theme.of(context).colorScheme.primary),
-              onChanged: !enableEdit
-                  ? null
-                  : (String? value) async {
-                      if (value != null) {
-                        if (value == colController.filterValue?['value']) {
-                          return;
-                        }
-                      }
-                      setState(() {
-                        colController.filterValue = {'value': value};
-                        _enableSearch = _enableSearchButton();
-                      });
-
-                      widget.onModified?.call();
-                    },
-              items: list
-                  .map<DropdownMenuItem<String>>((Map<String, dynamic> value) {
-                return DropdownMenuItem<String>(
-                  value: value['value'],
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 3.0),
-                    child: Text(
-                      value['label'],
-                      style: _dropDownListTextStyle,
-                    ),
+                  child: Text(
+                    colController.filterLabel,
+                    style: _dropDownListHintStyle,
                   ),
-                );
-              }).toList(),
-            ),
+                ),
+                value: colController.filterValue?['value'],
+                // isDense: true,
+                // itemHeight: 55,
+                focusColor: Theme.of(context).hoverColor,
+                underline: _dropDownUnderline,
+                icon: const Icon(Icons.arrow_drop_down),
+                iconSize: 21,
+                style: TextStyle(color: Theme.of(context).colorScheme.primary),
+                onChanged: !enableEdit ? null : onSelected,
+                items: list.map<DropdownMenuItem<String>>((
+                  Map<String, dynamic> value,
+                ) {
+                  return DropdownMenuItem<String>(
+                    value: value['value'],
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 3.0),
+                      child: Text(
+                        value['label'],
+                        style: _dropDownListTextStyle,
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
           ],
         ),
       ),
