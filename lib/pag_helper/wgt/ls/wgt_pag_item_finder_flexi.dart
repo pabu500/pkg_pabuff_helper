@@ -2059,7 +2059,8 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
                 width: 250,
                 height: 55,
                 hint: colController.filterLabel,
-                items: list.map((item) => item['value'] as String).toList(),
+                items: list.map((item) => item['value'] as String).toList()
+                  ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase())),
                 initialValue: colController.filterValue?['value'],
                 isInitialValueMutable: enableEdit,
                 onSelected: onSelected,
