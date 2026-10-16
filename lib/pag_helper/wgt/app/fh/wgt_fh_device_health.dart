@@ -163,31 +163,20 @@ class _WgtFhDeviceHealthState extends State<WgtFhDeviceHealth> {
         _meterHealthData.addAll(meterHealthInfo);
 
         String commCheckResult = _meterHealthData['comm_check_result'] ?? '';
-        if (commCheckResult == 'ok') {
-          // remove the meter tag from the error list
-          final content = _deviceHealthData['content'];
-          final errorList = content['el'] ?? [];
-          for (var errMeterTag in errorList) {
-            if (errMeterTag == _selectedMeterInfo['meter_tag']) {
-              errorList.remove(errMeterTag);
-              break;
-            }
+        if (commCheckResult == 'ok' || commCheckResult == 'fail') {
+          final content = Map<String, dynamic>.from(
+              _deviceHealthData['content'] ?? <String, dynamic>{});
+          final errorList = List<String>.from(content['el'] ?? <String>[]);
+          final meterTag = _selectedMeterInfo['meter_tag'] as String;
+
+          if (commCheckResult == 'ok') {
+            errorList.removeWhere((tag) => tag == meterTag);
+          } else if (!errorList.contains(meterTag)) {
+            errorList.add(meterTag);
           }
-        }
-        if (commCheckResult == 'fail') {
-          // add the meter tag to the error list if not already there
-          final content = _deviceHealthData['content'];
-          final errorList = content['el'] ?? [];
-          bool alreadyInList = false;
-          for (var errMeterTag in errorList) {
-            if (errMeterTag == _selectedMeterInfo['meter_tag']) {
-              alreadyInList = true;
-              break;
-            }
-          }
-          if (!alreadyInList) {
-            errorList.add(_selectedMeterInfo['meter_tag']);
-          }
+
+          content['el'] = errorList;
+          _deviceHealthData['content'] = content;
         }
       }
     } catch (e) {
