@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 
 import '../../../comm/comm_ex.dart';
 import '../../../comm/pag_be_api_base.dart';
+import '../../../def_helper/dh_page_route.dart';
+import '../../../def_helper/dh_pag_acl.dart';
 import '../../../def_helper/dh_pag_finance.dart';
 import '../../../def_helper/dh_pag_item.dart';
 import '../../../model/acl/mdl_pag_svc_claim.dart';
@@ -248,6 +250,11 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
       // itemType: PagFinanceType.soa,
       itemTypeListStr: PagFinanceType.tenantSoa.value,
       prefKey: widget.pagAppContext.route,
+      aclResLabel: getResNameByPageRouteSection(
+        widget.pagAppContext,
+        PagPageRoute.tenantManager,
+        PageSection.tenantSoA,
+      ),
       listContextType: PagListContextType.soa,
       showTimeRangePicker: true,
       timeRangePickerWidget: getTimeRangePicker(),
