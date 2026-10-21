@@ -79,14 +79,16 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
   bool _isProjectScope = false;
 
   bool get _isPageSectionResourceType {
-    final normalizedLabel =
-        _resTypeLabel?.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '').toLowerCase();
+    final normalizedLabel = _resTypeLabel
+        ?.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '')
+        .toLowerCase();
     return normalizedLabel == 'pagesection';
   }
 
   bool get _isPageRouteResourceType {
-    final normalizedLabel =
-        _resTypeLabel?.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '').toLowerCase();
+    final normalizedLabel = _resTypeLabel
+        ?.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '')
+        .toLowerCase();
     return normalizedLabel == 'pagpageroute';
   }
 
@@ -190,9 +192,7 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
         crudType: 'read',
         opStr: 'get resource type list',
         appConfig: widget.appConfig,
-        queryMap: {
-          'scope': widget.loggedInUser.selectedScope.toScopeMap(),
-        },
+        queryMap: {'scope': widget.loggedInUser.selectedScope.toScopeMap()},
         svcClaim: MdlPagSvcClaim(
           userId: widget.loggedInUser.id,
           username: widget.loggedInUser.username,
@@ -212,8 +212,10 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
       }
     } catch (e) {
       dev.log('error: $e');
-      _resTypeListErrorText = getErrorText(e,
-          defaultErrorText: 'Error fetching resource type list');
+      _resTypeListErrorText = getErrorText(
+        e,
+        defaultErrorText: 'Error fetching resource type list',
+      );
     } finally {
       setState(() {
         _isFetchingResTypeList = false;
@@ -339,8 +341,9 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
           } else if (snapshot.hasError) {
             return Center(
               child: getErrorTextPrompt(
-                  context: context,
-                  errorText: 'Error fetching resource type list'),
+                context: context,
+                errorText: 'Error fetching resource type list',
+              ),
             );
           } else {
             return _buildForm();
@@ -356,7 +359,9 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
     if (_resTypeListErrorText.isNotEmpty) {
       return Center(
         child: getErrorTextPrompt(
-            context: context, errorText: _resTypeListErrorText),
+          context: context,
+          errorText: _resTypeListErrorText,
+        ),
       );
     }
     return SingleChildScrollView(
@@ -388,43 +393,46 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
                     label: _createWait
                         ? 'Creating resource...'
                         : _createSuccess
-                            ? '✓ Resource created'
-                            : 'Create Resource',
+                        ? '✓ Resource created'
+                        : 'Create Resource',
                     onPressed:
                         !_checkEnableButton() //_selectedProjectScope == null
-                            ? null
-                            : () async {
-                                await _createItem();
-                                if (_newItem &&
-                                    !_createSuccess &&
-                                    _errorText.isNotEmpty) {
-                                  // don't reset the form if there is an error creating the item, allow user to fix the error
+                        ? null
+                        : () async {
+                            await _createItem();
+                            if (_newItem &&
+                                !_createSuccess &&
+                                _errorText.isNotEmpty) {
+                              // don't reset the form if there is an error creating the item, allow user to fix the error
+                            } else {
+                              // reset the form
+                              setState(() {
+                                // _newItem = true;
+                                if (_isPageResourceType) {
+                                  _resetPageResourceSelection();
                                 } else {
-                                  // reset the form
-                                  setState(() {
-                                    // _newItem = true;
-                                    if (_isPageResourceType) {
-                                      _resetPageResourceSelection();
-                                    } else {
-                                      _newItemLabel = null;
-                                      _isNewItemLabelValidated = false;
-                                      _newItemLabelResetKey = UniqueKey();
-                                    }
-
-                                    _itemScopeMap.clear();
-                                    _scopeSetterKey = UniqueKey();
-                                  });
-
-                                  widget.onCreated?.call();
+                                  _newItemLabel = null;
+                                  _isNewItemLabelValidated = false;
+                                  _newItemLabelResetKey = UniqueKey();
                                 }
-                              },
+
+                                _itemScopeMap.clear();
+                                _scopeSetterKey = UniqueKey();
+                              });
+
+                              widget.onCreated?.call();
+                            }
+                          },
                   ),
                   if (_newItem && !_createSuccess && _errorText.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.all(5.0),
-                      child: Text(_errorText,
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.error)),
+                      child: Text(
+                        _errorText,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
                     ),
                   if (!_newItem && _createSuccess && _errorText.isEmpty)
                     Padding(
@@ -432,7 +440,8 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
                       child: Text(
                         'Resource ${_newItemName ?? ''} created',
                         style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary),
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
                       ),
                     ),
                   verticalSpaceRegular,
@@ -460,49 +469,52 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
             borderRadius: BorderRadius.circular(5),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-          child: Column(children: [
-            WgtTextField(
-              key: _newItemLabelResetKey,
-              appConfig: widget.appConfig,
-              initialValue: _newItemLabel,
-              hintText: 'Label',
-              labelText: 'Label',
-              maxLength: maxFullNameLength,
-              enabled: !_isPageResourceType,
-              showClearButton: !_isPageResourceType,
-              requireUnique: !_isPageResourceType,
-              validator: validateResLabel,
-              checkUnique: doPagCheckUnique,
-              uniqueKey: 'label',
-              itemTableName: '$projectName.acl_res_$projectName',
-              suffix:
-                  _isPageResourceType ? _getGeneratedLabelStatusWidget() : null,
-              onChanged: (val) {
-                setState(() {
-                  if (val != _newItemLabel) {
-                    _errorText = '';
-                  }
-                });
-                if (val.trim().isNotEmpty) {
+          child: Column(
+            children: [
+              WgtTextField(
+                key: _newItemLabelResetKey,
+                appConfig: widget.appConfig,
+                initialValue: _newItemLabel,
+                hintText: 'Label',
+                labelText: 'Label',
+                maxLength: maxFullNameLength,
+                enabled: !_isPageResourceType,
+                showClearButton: !_isPageResourceType,
+                requireUnique: !_isPageResourceType,
+                validator: validateResLabel,
+                checkUnique: doPagCheckUnique,
+                uniqueKey: 'label',
+                itemTableName: '$projectName.acl_res_$projectName',
+                suffix: _isPageResourceType
+                    ? _getGeneratedLabelStatusWidget()
+                    : null,
+                onChanged: (val) {
                   setState(() {
-                    _newItem = true;
-                    _createSuccess = false;
+                    if (val != _newItemLabel) {
+                      _errorText = '';
+                    }
                   });
-                }
-                _newItemLabel = val;
-                return null;
-              },
-              onValidate: (String? result) {
-                setState(() {
-                  if (result == null) {
-                    _isNewItemLabelValidated = true;
-                  } else {
-                    _isNewItemLabelValidated = false;
+                  if (val.trim().isNotEmpty) {
+                    setState(() {
+                      _newItem = true;
+                      _createSuccess = false;
+                    });
                   }
-                });
-              },
-            ),
-          ]),
+                  _newItemLabel = val;
+                  return null;
+                },
+                onValidate: (String? result) {
+                  setState(() {
+                    if (result == null) {
+                      _isNewItemLabelValidated = true;
+                    } else {
+                      _isNewItemLabelValidated = false;
+                    }
+                  });
+                },
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -520,76 +532,78 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
             borderRadius: BorderRadius.circular(5),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-          child: Column(children: [
-            // WgtTextField(
-            //   key: _resourceTypeNameResetKey,
-            //   appConfig: widget.appConfig,
-            //   hintText: 'Resource Type Name',
-            //   labelText: 'Resource Type Name',
-            //   maxLength: maxFullNameLength,
-            //   validator: validateItemLabel,
-            //   onChanged: (val) {
-            //     setState(() {
-            //       _isEditing = true;
-            //       if (val != _resourceTypeName) {
-            //         _errorText = '';
-            //       }
-            //     });
-            //     if (val.trim().isNotEmpty) {
-            //       setState(() {
-            //         _newItem = true;
-            //         _createSuccess = false;
-            //       });
-            //     }
-            //     _resourceTypeName = val;
-            //     return null;
-            //   },
-            //   onEditingComplete: () {
-            //     setState(() {
-            //       _isEditing = false;
-            //     });
-            //   },
-            //   onValidate: (String? result) {
-            //     setState(() {
-            //       if (result == null) {
-            //         _isResourceTypeNameValidated = true;
-            //       } else {
-            //         _isResourceTypeNameValidated = false;
-            //       }
-            //     });
-            //   },
-            // ),
-            WgtDropdownSelector(
-              key: _resTypeNameResetKey,
-              hint: 'Select Resource Type',
-              items: _resTypeLabelList,
-              controller: resTypeLabelController,
-              initialValue: _resTypeLabel,
-              // isInitialValueMutable: widget.fixedItemLabel == null,
-              height: 50,
-              width: 420,
-              onSelected: (String? value) {
-                if (value == _resTypeLabel) {
-                  return;
-                }
-                final wasPageResourceType = _isPageResourceType;
-                setState(() {
-                  _resTypeLabel = value;
-                  if (wasPageResourceType || _isPageResourceType) {
-                    _resetPageResourceSelection();
+          child: Column(
+            children: [
+              // WgtTextField(
+              //   key: _resourceTypeNameResetKey,
+              //   appConfig: widget.appConfig,
+              //   hintText: 'Resource Type Name',
+              //   labelText: 'Resource Type Name',
+              //   maxLength: maxFullNameLength,
+              //   validator: validateItemLabel,
+              //   onChanged: (val) {
+              //     setState(() {
+              //       _isEditing = true;
+              //       if (val != _resourceTypeName) {
+              //         _errorText = '';
+              //       }
+              //     });
+              //     if (val.trim().isNotEmpty) {
+              //       setState(() {
+              //         _newItem = true;
+              //         _createSuccess = false;
+              //       });
+              //     }
+              //     _resourceTypeName = val;
+              //     return null;
+              //   },
+              //   onEditingComplete: () {
+              //     setState(() {
+              //       _isEditing = false;
+              //     });
+              //   },
+              //   onValidate: (String? result) {
+              //     setState(() {
+              //       if (result == null) {
+              //         _isResourceTypeNameValidated = true;
+              //       } else {
+              //         _isResourceTypeNameValidated = false;
+              //       }
+              //     });
+              //   },
+              // ),
+              WgtDropdownSelector(
+                key: _resTypeNameResetKey,
+                hint: 'Select Resource Type',
+                items: _resTypeLabelList,
+                controller: resTypeLabelController,
+                initialValue: _resTypeLabel,
+                // isInitialValueMutable: widget.fixedItemLabel == null,
+                height: 50,
+                width: 420,
+                onSelected: (String? value) {
+                  if (value == _resTypeLabel) {
+                    return;
                   }
-                  // _enableSearch = _enableSearchButton();
-                  _errorText = '';
-                  _newItem = true;
-                  _createSuccess = false;
+                  final wasPageResourceType = _isPageResourceType;
+                  setState(() {
+                    _resTypeLabel = value;
+                    if (wasPageResourceType || _isPageResourceType) {
+                      _resetPageResourceSelection();
+                    }
+                    // _enableSearch = _enableSearchButton();
+                    _errorText = '';
+                    _newItem = true;
+                    _createSuccess = false;
 
-                  _checkEnableButton();
-                });
-                // widget.onModified?.call();
-                // widget.onLabelSelected?.call(_resourceTypeLabel!);
-              },
-            ),
-          ]),
+                    _checkEnableButton();
+                  });
+                  // widget.onModified?.call();
+                  // widget.onLabelSelected?.call(_resourceTypeLabel!);
+                },
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -601,9 +615,7 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
 
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(
-          color: Theme.of(context).hintColor.withAlpha(30),
-        ),
+        border: Border.all(color: Theme.of(context).hintColor.withAlpha(30)),
         borderRadius: BorderRadius.circular(5),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
@@ -621,8 +633,8 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
                 _selectedAppContext = value == null
                     ? null
                     : appContextList
-                        .where((appContext) => appContext.name == value)
-                        .firstOrNull;
+                          .where((appContext) => appContext.name == value)
+                          .firstOrNull;
                 _selectedPageRoute = null;
                 _selectedPageSection = null;
                 _pageRouteController.clear();
@@ -649,8 +661,8 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
                   _selectedPageRoute = value == null
                       ? null
                       : pageRoutes
-                          .where((pageRoute) => pageRoute.name == value)
-                          .firstOrNull;
+                            .where((pageRoute) => pageRoute.name == value)
+                            .firstOrNull;
                   _selectedPageSection = null;
                   _pageSectionController.clear();
                   _clearGeneratedLabel();
@@ -667,8 +679,9 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
             WgtDropdownSelector(
               key: ValueKey('page-section-${_selectedPageRoute!.name}'),
               hint: 'Select Page Section',
-              items:
-                  pageSections.map((pageSection) => pageSection.name).toList(),
+              items: pageSections
+                  .map((pageSection) => pageSection.name)
+                  .toList(),
               controller: _pageSectionController,
               initialValue: _selectedPageSection?.name,
               height: 50,
@@ -678,8 +691,8 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
                   _selectedPageSection = value == null
                       ? null
                       : pageSections
-                          .where((pageSection) => pageSection.name == value)
-                          .firstOrNull;
+                            .where((pageSection) => pageSection.name == value)
+                            .firstOrNull;
                 });
                 await _updateGeneratedPageResourceLabel();
               },

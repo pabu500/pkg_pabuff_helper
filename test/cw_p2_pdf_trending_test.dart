@@ -1,4 +1,7 @@
 import 'dart:io';
+import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/meter_usage_cost_rounding.dart';
+import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_ems_type_usage_calc_rl.dart';
+import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_ems_type_usage_calc_rl2.dart';
 import 'dart:typed_data';
 import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/pag_pdf_bill.dart'
     as gen2;
@@ -17,7 +20,13 @@ class _OfflineCache extends PdfMemoryCache {
     required Uri uri,
     bool cache = true,
     Map<String, String>? headers,
-  }) async => throw StateError('offline test');
+  }) async {
+    final fontDir = Platform.environment['CWP2_PDF_FONT_DIR'];
+    if (fontDir != null) {
+      return File('$fontDir/$name.ttf').readAsBytes();
+    }
+    throw StateError('offline test');
+  }
 }
 
 void main() {
@@ -25,7 +34,104 @@ void main() {
   final originalCache = PdfBaseCache.defaultCache;
   setUp(() => PdfBaseCache.defaultCache = _OfflineCache());
   tearDown(() => PdfBaseCache.defaultCache = originalCache);
+  test('meter cents reconcile to the billed total including half cents', () {
+    final rounding = MeterUsageCostRounding();
+    final costs = [for (var i = 0; i < 3; i++) rounding.add(1, 0.335)!];
+    expect(costs, [0.34, 0.33, 0.34]);
+    expect(costs.reduce((a, b) => a + b), closeTo(1.01, 1e-9));
+    expect(MeterUsageCostRounding().add(2.5, 253.87), 634.68);
+    expect(MeterUsageCostRounding().add(0, 1), 0);
+    expect(MeterUsageCostRounding().add(null, 1), isNull);
+    expect(MeterUsageCostRounding().add(1, null), isNull);
+    expect(MeterUsageCostRounding().add(-10, 2), -20);
+  });
   for (final gen in [2, 3]) {
+    test(
+      'Gen$gen meter costs render with allocation and billing rate',
+      () async {
+        final legacyCalc = PagEmsTypeUsageCalcRl(
+          costDecimals: 2,
+          billedAutoUsageE: 5000.5,
+          billedUsageFactorE: 2,
+          billedRateE: 0.335,
+          lineItemList: const [],
+        )..doSingularCalc();
+        final calc = PagEmsTypeUsageCalcRl2(
+          costDecimals: 2,
+          meterType: 'E',
+          billedAutoUsage: 10001,
+          billedRate: 0.335,
+          lineItemList: const [],
+        )..doSingularCalc();
+        final slot = <String, dynamic>{
+          'from_timestamp': '2026-09-01T00:00:00',
+          'to_timestamp': '2026-10-01T00:00:00',
+          'exclude_auto_usage': 'false',
+          'meter_type_rate_info': <String, dynamic>{},
+          'usage_calc_rl': legacyCalc,
+          'usage_calc_rl2': calc,
+          'tenant_usage_summary': {
+            'meter_group_usage_list': [
+              {
+                'meter_type': 'E',
+                'meter_group_usage_summary': {
+                  'meter_usage_list': [
+                    for (final usage in ['10000', '1'])
+                      {
+                        'meter_usage_summary': {
+                          'meter_sn': '20110310-000039',
+                          'building_label': 'Tower One',
+                          'location_label': '#12-123',
+                          'first_reading_timestamp': '2026-09-01T00:00:00',
+                          'last_reading_timestamp': '2026-10-01T00:00:00',
+                          'first_reading_value': '123456.789',
+                          'last_reading_value': '133456.789',
+                          'usage': usage,
+                          'percentage': '50',
+                          'multiplier_factor': '2',
+                        },
+                      },
+                  ],
+                },
+              },
+            ],
+          },
+        };
+        final doc = pw.Document();
+        doc.addPage(
+          await _invoice(gen, null, singularUsage: [slot]).getPage2(),
+        );
+        final bytes = await doc.save();
+        expect(bytes.length, greaterThan(1000));
+        expect(doc.document.pdfPageList.pages.length, 1);
+        final output = Platform.environment['CWP2_PDF_PREVIEW_DIR'];
+        if (output != null) {
+          await File('$output/gen$gen-meter-cost.pdf').writeAsBytes(bytes);
+        }
+        final multiSlot = pw.Document();
+        multiSlot.addPage(
+          await _invoice(
+            gen,
+            null,
+            singularUsage: [
+              slot,
+              {
+                ...slot,
+                'from_timestamp': '2026-10-01T00:00:00',
+                'to_timestamp': '2026-11-01T00:00:00',
+              },
+            ],
+          ).getPage2(),
+        );
+        final multiSlotBytes = await multiSlot.save();
+        expect(multiSlot.document.pdfPageList.pages.length, 1);
+        if (output != null) {
+          await File(
+            '$output/gen$gen-multi-slot.pdf',
+          ).writeAsBytes(multiSlotBytes);
+        }
+      },
+    );
     test('Gen$gen charts paginate and leave billing data unchanged', () async {
       final trending = <Map<String, dynamic>>[
         for (var month = 9; month >= 2; month--)
@@ -69,7 +175,11 @@ void main() {
   }
 }
 
-dynamic _invoice(int gen, List<Map<String, dynamic>>? trending) {
+dynamic _invoice(
+  int gen,
+  List<Map<String, dynamic>>? trending, {
+  List<Map<String, dynamic>> singularUsage = const [],
+}) {
   final constructor = gen == 2
       ? gen2.PagPdfBillCwP2.new
       : gen3.PagPdfBillCwP2Gen3.new;
@@ -136,7 +246,7 @@ dynamic _invoice(int gen, List<Map<String, dynamic>>? trending) {
     #baseColor: PdfColors.blueGrey,
     #accentColor: PdfColors.blueGrey,
     #assetFolder: null,
-    #tenantSingularUsageInfoList: <Map<String, dynamic>>[],
+    #tenantSingularUsageInfoList: List<Map<String, dynamic>>.of(singularUsage),
     #miniSoaInfo: null,
     #billedAmgrCompanyTradingName: null,
     #billedAmgrCompanyRegNumber: null,
