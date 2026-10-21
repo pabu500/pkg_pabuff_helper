@@ -30,7 +30,7 @@ const String glb_salutation_callout =
     'Please provide a valid salutation (alphabets only, at least 3 characters)';
 const String glb_regNG_loginName = r"[^a-zA-Z0-9-]+";
 
-const String glb_reg_email = r"^[a-zA-Z0-9._-]+@[a-zA-Z0-9_-]+\.[a-zA-Z]+";
+const String glb_reg_email = r"^[a-zA-Z0-9._+-]+@[a-zA-Z0-9_-]+\.[a-zA-Z]+";
 const String glb_email_callout = 'Please provide a valid email address';
 const String glb_regNG_email = r"[^a-zA-Z0-9@. ]+|([@\.])([@\.])";
 
