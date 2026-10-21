@@ -155,6 +155,9 @@ class _WgtUesrRoleSetterState extends State<WgtUesrRoleSetter> {
   // Use the target user's saved profile, so removing a role during an edit
   // does not change which roles can be added in the same edit.
   bool _matchesProfile(Map<String, dynamic> role) {
+    // Admins can assign a first role from another portal profile.
+    if (widget.loggedInUser.selectedRole?.isAdmin() ?? false) return true;
+
     final profileTypes = widget.targetPortalTypeStr
         ?.split(',')
         .map((type) => type.trim())
