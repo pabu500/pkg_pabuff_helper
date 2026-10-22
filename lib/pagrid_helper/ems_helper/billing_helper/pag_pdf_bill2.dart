@@ -1621,8 +1621,10 @@ class PagPdfBillCwP2Gen3 {
           pw.Align(
             alignment: pw.Alignment.centerLeft,
             child: pw.Text(
-              'Remarks: FRT = First Reading Time; FRV = First Reading Value; '
-              'LRT = Last Reading Time; LRV = Last Reading Value.',
+              'Remarks: FRV = First Reading Value; FRT = First Reading Time; '
+              'LRV = Last Reading Value; LRT = Last Reading Time.\n'
+              'Unless otherwise stated, Reading Time is taken as 00:00 hrs '
+              'of the stated dates.',
               style: styleTiny,
             ),
           ),
