@@ -108,11 +108,13 @@ class PagPdfBillCwP2 {
     required this.strCollectionStartDate,
     required this.strCollectionEndDate,
     this.showBillingGen2Hint = false,
+    this.tenantLcs = '',
   });
 
   final String customerCompanyTradingName;
   final String customerName;
   final String tenantAccountNumber;
+  final String tenantLcs;
   final String tenantBillingAddressLine1;
   final String tenantBillingAddressLine2;
   final String tenantBillingAddressLine3;
@@ -542,7 +544,10 @@ class PagPdfBillCwP2 {
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
                 // pw.SizedBox(height: 20),
-                pw.Text('TAX INVOICE',
+                pw.Text(
+                    tenantLcs == 'final_bill'
+                        ? 'FINAL TAX INVOICE'
+                        : 'TAX INVOICE',
                     style: styleLarge.copyWith(fontWeight: pw.FontWeight.bold)),
                 pw.SizedBox(height: 5),
                 pw.Table(

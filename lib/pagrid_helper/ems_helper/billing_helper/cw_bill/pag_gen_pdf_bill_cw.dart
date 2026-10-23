@@ -22,6 +22,7 @@ Future<Uint8List> generatePagInvoice(
     customerCompanyTradingName:
         calcedBillInfoRl['customerCompanyTradingName'] ?? '',
     tenantAccountNumber: calcedBillInfoRl['tenantAccountNumber'] ?? '',
+    tenantLcs: calcedBillInfoRl['tenantLcs'] ?? '',
     strDepositAmount: calcedBillInfoRl['strDepositAmount'] ?? '',
     paymentMethod: calcedBillInfoRl['paymentMethod'] ?? '',
     tenantBillingAddressLine1:
