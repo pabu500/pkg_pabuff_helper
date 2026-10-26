@@ -400,7 +400,12 @@ class _WgtPagItemHistoryGetterState extends State<WgtPagItemHistoryGetter> {
           }
         }
         if (_readingTotalKeys.isEmpty) {
-          _readingTotalKeys = historyList.first['readings'].keys.toList();
+          // This filter keeps battery_percentage out of the fallback keys used to generate chart datasets.
+          _readingTotalKeys = (historyList.first['readings']
+                  as Map<String, dynamic>)
+              .keys
+              .where((key) => key != 'battery_percentage')
+              .toList();
         }
 
         _historyMeta.clear();
