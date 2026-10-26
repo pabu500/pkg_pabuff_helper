@@ -17,8 +17,11 @@ Future<dynamic> doPagCheckUnique(
     String url = PagUrlController(null, appConfig)
         .getUrl(PagSvcType.oresvc2, PagUrlBase.eptCheckItemExists);
 
-    final response =
-        await http.get(Uri.parse('$url?t=$table&field=$field&val=$val'));
+    final response = await http.get(Uri.parse(url).replace(queryParameters: {
+      't': table,
+      'field': field,
+      'val': val,
+    }));
 
     if (response.statusCode == 200) {
       final result = jsonDecode(response.body);
