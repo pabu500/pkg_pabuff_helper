@@ -105,13 +105,14 @@ class _WgtPagHistoryRepListState extends State<WgtPagHistoryRepList> {
         // }
         listConfig.add({
           'fieldKey': keyName,
-          'title': fieldKey['field'] ?? widget.valTitle ?? 'val',
+          'title': fieldKey['display_header'] ?? fieldKey['field'] ?? widget.valTitle ?? 'val',
           'width': fieldKey['width'] ?? 150,
         });
         listConfig.add({
           'fieldKey': '${fieldKey['field']}_diff',
           'title': widget.valDiffTitle ?? '${fieldKey['field']}_diff',
           'width': fieldKey['width'] ?? 150,
+          'show': fieldKey['show_diff'] ?? true,
         });
         if (keyName == 'a_imp') {
           listConfig.add({
@@ -138,17 +139,6 @@ class _WgtPagHistoryRepListState extends State<WgtPagHistoryRepList> {
       _unit = selectedReadingTypeConfig['unit'] as String;
       _decimals = selectedReadingTypeConfig['decimals'] as int? ?? 0;
     }
-    final hasBatteryPercentage = widget.iniHistoryData.any((row) {
-      final readings = row['readings'];
-      return readings is Map && readings.containsKey('battery_percentage');
-    });
-    if (hasBatteryPercentage) {
-      listConfig.add({
-        'fieldKey': 'battery_percentage',
-        'title': 'Battery%',
-        'width': 90,
-      });
-    }
   }
 
   void _getHistory() {
@@ -161,8 +151,6 @@ class _WgtPagHistoryRepListState extends State<WgtPagHistoryRepList> {
 
       Map<String, dynamic> newRow = {};
       newRow['time'] = time;
-      // Keep null as missing; zero is a valid battery percentage.
-      newRow['battery_percentage'] = readings['battery_percentage']?['val'];
       if (widget.fullCols) {
         bool isEstRow = data['is_est'] == 0 ? false : true;
         newRow['is_estimated'] = isEstRow;
@@ -173,8 +161,6 @@ class _WgtPagHistoryRepListState extends State<WgtPagHistoryRepList> {
       }
       bool hasInsertZero = false;
       for (String key in readings.keys) {
-        // Battery is a gauge; it has no usage difference or usage flags.
-        if (key == 'battery_percentage') continue;
         //get total
         newRow[key] = readings[key]['rt'];
         if (widget.fullCols) {

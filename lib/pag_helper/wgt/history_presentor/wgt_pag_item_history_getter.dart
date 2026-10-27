@@ -400,12 +400,7 @@ class _WgtPagItemHistoryGetterState extends State<WgtPagItemHistoryGetter> {
           }
         }
         if (_readingTotalKeys.isEmpty) {
-          // This filter keeps battery_percentage out of the fallback keys used to generate chart datasets.
-          _readingTotalKeys = (historyList.first['readings']
-                  as Map<String, dynamic>)
-              .keys
-              .where((key) => key != 'battery_percentage')
-              .toList();
+           _readingTotalKeys = historyList.first['readings'].keys.toList();
         }
 
         _historyMeta.clear();
@@ -447,6 +442,7 @@ class _WgtPagItemHistoryGetterState extends State<WgtPagItemHistoryGetter> {
       }
 
       widget.onResult({
+        'meter_type': itemHistoryInfo['meter_type'],
         'rawDataCheckMeta': rawDataCheckMeta,
         'historyData': _historyData,
         'dataSet': _selectedHistoryDataSets,
@@ -582,17 +578,20 @@ class _WgtPagItemHistoryGetterState extends State<WgtPagItemHistoryGetter> {
               });
         } else {
           Map<String, dynamic> readingPair = readingParts[key] ?? {};
-          double readingTotal = readingPair['rt'];
+          num? readingTotal = readingPair['rt'];
           int isReadingTotalEstimated = readingPair['rt_is_est'] ?? 0;
-          double readingDiff = readingPair['rd'];
+          num? readingDiff = readingPair['rd'];
           int isReadingDiffEstimated = readingPair['rd_is_est'] ?? 0;
           int isReadingDiffOt = readingPair['rd_ot'] ?? 0;
           int isReadingDiffNeg = readingPair['rd_neg'] ?? 0;
           int isRestart = readingPair['rd_is_restart'] ?? 0;
 
-          double displayValue = widget.dataType == DataType.total
-              ? widget.factor * readingTotal
-              : widget.factor * readingDiff;
+          num? selectedValue =
+              widget.dataType == DataType.total ? readingTotal : readingDiff;
+          if (selectedValue == null) {
+            continue;
+          }
+          double displayValue = widget.factor * selectedValue;
           if (widget.dataType == DataType.diff && isReadingDiffOt == 1) {
             displayValue = 0;
           }
