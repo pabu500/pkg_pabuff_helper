@@ -204,13 +204,15 @@ class _WgtPagItemHistoryPresenterState
     return table;
   }
 
-  void _iniHistorySetting() {
+  void _setReadingTypeConfig(dynamic itemSubType) {
+    final selectedChartReadingTypeKey =
+        _readingTypeConfig.isEmpty ? null : _selectedChartReadingTypeKey;
     if (widget.itemKind == PagItemKind.device) {
       assert(widget.itemType is PagDeviceCat);
       assert(
-          widget.itemSubType is MeterType || widget.itemSubType is SensorType);
+          itemSubType is MeterType || itemSubType is SensorType);
 
-      switch (widget.itemSubType) {
+      switch (itemSubType) {
         case MeterType.electricity1p ||
               MeterType.water ||
               MeterType.gas ||
@@ -228,12 +230,36 @@ class _WgtPagItemHistoryPresenterState
               ],
               'timeKey': 'time',
               'decimals': 3,
-              'unit': getDeivceTypeUnit(widget.itemSubType),
+              'unit': getDeivceTypeUnit(itemSubType),
               'chartType': ChartType.bar,
               'dataType': DataType.diff,
               'color': Colors.blue.withAlpha(210),
               'width': 150,
             }
+          });
+          break;
+        case MeterType.water2:
+          _selectedChartReadingTypeKey = 'val_meter';
+          _readingTypeConfig.clear();
+          _readingTypeConfig.addAll({
+            'val_meter': {
+              'title': 'Water',
+              'dataFields': [
+                {'field': 'val'},
+                {
+                  'field': 'battery_percentage',
+                  'display_header': 'Battery%',
+                  'show_diff': false,
+                },
+              ],
+              'timeKey': 'time',
+              'decimals': 3,
+              'unit': getDeivceTypeUnit(itemSubType),
+              'chartType': ChartType.bar,
+              'dataType': DataType.diff,
+              'color': Colors.blue.withAlpha(210),
+              'width': 150,
+            },
           });
           break;
         case MeterType.electricity3p:
@@ -393,7 +419,7 @@ class _WgtPagItemHistoryPresenterState
               SensorType.switchSensor:
           _selectedChartReadingTypeKey = 'val_sensor';
           String valColName = "val";
-          switch (widget.itemSubType) {
+          switch (itemSubType) {
             case SensorType.temperature || SensorType.temperature_humidity:
               valColName = "temperature_val";
               break;
@@ -423,7 +449,7 @@ class _WgtPagItemHistoryPresenterState
               ],
               'timeKey': 'time',
               'decimals': 1,
-              'unit': getDeivceTypeUnit(widget.itemSubType),
+              'unit': getDeivceTypeUnit(itemSubType),
               'chartType': ChartType.line,
               'dataType': DataType.total,
               'color': Colors.blue.withAlpha(210),
@@ -432,11 +458,28 @@ class _WgtPagItemHistoryPresenterState
           });
           break;
         default:
-          throw Exception('Unsupported itemSubType: ${widget.itemSubType}');
+          throw Exception('Unsupported itemSubType: $itemSubType');
       }
     }
 
     assert(_readingTypeConfig.isNotEmpty);
+
+    // If the selected chart reading type key exists in the reading type config, use it.
+    if (_readingTypeConfig.containsKey(selectedChartReadingTypeKey)) {
+      _selectedChartReadingTypeKey = selectedChartReadingTypeKey!;
+    }
+    _selectedMultiFields.clear();
+    _selectedMultiFields.add(ValueItem(
+        label: _readingTypeConfig[_selectedChartReadingTypeKey]['title'],
+        value: _selectedChartReadingTypeKey));
+    _selectedDataFieldsForList.clear();
+    _selectedDataFieldsForList.addAll(
+        _readingTypeConfig[_selectedChartReadingTypeKey]['dataFields']
+            as List<Map<String, dynamic>>);
+  }
+
+  void _iniHistorySetting() {
+    _setReadingTypeConfig(widget.itemSubType);
 
     _displayType = widget.displayType ?? HistroyDisplayType.chart;
     if (!widget.config.contains('chart_core') &&
@@ -466,14 +509,6 @@ class _WgtPagItemHistoryPresenterState
     }
     _defaultChartReadingTypeKey = _selectedChartReadingTypeKey;
 
-    _selectedMultiFields.clear();
-    _selectedMultiFields.add(ValueItem(
-        label: _readingTypeConfig[_selectedChartReadingTypeKey]['title'],
-        value: _selectedChartReadingTypeKey));
-    _selectedDataFieldsForList.clear();
-    _selectedDataFieldsForList.addAll(
-        _readingTypeConfig[_selectedChartReadingTypeKey]['dataFields']
-            as List<Map<String, dynamic>>);
   }
 
   void _updateSelectedDataFieldsList() {
@@ -676,6 +711,11 @@ class _WgtPagItemHistoryPresenterState
                         }
                       });
                       return;
+                    }
+
+                    if (getMeterType(resultMap['meter_type'] ?? '') != null) {
+                      _setReadingTypeConfig(
+                          getMeterType(resultMap['meter_type']));
                     }
 
                     if (kDebugMode) {
