@@ -145,8 +145,10 @@ Future<dynamic> _request(
   Map<String, dynamic> query,
 ) async {
   const storage = FlutterSecureStorage();
-  final token = await storage.read(key: 'pag_user_token');
-  if (token == null || token.isEmpty) {
+  final token = user.resetPasswordToken == 'flag_reset'
+      ? null
+      : user.loginToken ?? await storage.read(key: 'pag_user_token');
+  if (token == null || token.trim().isEmpty) {
     throw const PagConsoleSettingsException(
       'Please sign in again',
       statusCode: 401,

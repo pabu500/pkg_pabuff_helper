@@ -51,6 +51,8 @@ class MdlPagUser {
   bool? enabled = false;
   bool? prefDarkMode = false;
   bool? isLoggedin = false;
+  // Active login credential only; never include it in serialized user profiles.
+  String? loginToken;
   List<Map<String, dynamic>>? venderCredList;
 
   List<MdlPagRole> roleList;
@@ -98,6 +100,7 @@ class MdlPagUser {
   });
 
   void logout() {
+    loginToken = null;
     id = 0;
     username = '';
     email = '';
