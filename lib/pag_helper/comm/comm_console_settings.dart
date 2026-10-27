@@ -10,6 +10,9 @@ import '../model/mdl_svc_query.dart';
 import 'comm_helper.dart';
 import 'pag_be_api_base.dart';
 
+const defaultProjectConsoleDisabledMessage =
+    'Console access for this project is currently disabled. Please contact your System Admin.';
+
 class PagConsoleSettingsException implements Exception {
   const PagConsoleSettingsException(this.message, {this.statusCode});
 
@@ -28,12 +31,16 @@ class PagProjectConsoleSetting {
     required this.projectLabel,
     required this.enabled,
     required this.revision,
+    this.disabledMessage = defaultProjectConsoleDisabledMessage,
     this.lifecycleStatus,
   });
 
   factory PagProjectConsoleSetting.fromJson(Map<String, dynamic> json) {
     final enabled = json['enable_project_console'];
-    if (enabled is! bool || json['project_name'] is! String) {
+    if (enabled is! bool ||
+        json['project_name'] is! String ||
+        (json['disabled_message'] != null &&
+            json['disabled_message'] is! String)) {
       throw const FormatException('Invalid project settings response');
     }
     return PagProjectConsoleSetting(
@@ -42,6 +49,9 @@ class PagProjectConsoleSetting {
       projectLabel: json['project_label'] as String? ?? '',
       enabled: enabled,
       revision: _integer(json['revision']),
+      disabledMessage:
+          json['disabled_message'] as String? ??
+          defaultProjectConsoleDisabledMessage,
       lifecycleStatus: json['lc_status'] as String?,
     );
   }
@@ -52,16 +62,21 @@ class PagProjectConsoleSetting {
   final String? lifecycleStatus;
   final bool enabled;
   final int revision;
+  final String disabledMessage;
 
-  PagProjectConsoleSetting copyWith({bool? enabled, int? revision}) =>
-      PagProjectConsoleSetting(
-        projectId: projectId,
-        projectName: projectName,
-        projectLabel: projectLabel,
-        lifecycleStatus: lifecycleStatus,
-        enabled: enabled ?? this.enabled,
-        revision: revision ?? this.revision,
-      );
+  PagProjectConsoleSetting copyWith({
+    bool? enabled,
+    int? revision,
+    String? disabledMessage,
+  }) => PagProjectConsoleSetting(
+    projectId: projectId,
+    projectName: projectName,
+    projectLabel: projectLabel,
+    lifecycleStatus: lifecycleStatus,
+    enabled: enabled ?? this.enabled,
+    revision: revision ?? this.revision,
+    disabledMessage: disabledMessage ?? this.disabledMessage,
+  );
 }
 
 Future<List<PagProjectConsoleSetting>> getConsoleProjectSettings({
@@ -88,23 +103,38 @@ Future<PagProjectConsoleSetting> updateConsoleProjectSetting({
   required MdlPagUser user,
   required PagProjectConsoleSetting setting,
   required bool enabled,
+  String? disabledMessage,
 }) async {
+  final message = (disabledMessage ?? setting.disabledMessage).trim();
+  if (message.isEmpty ||
+      message.runes.length > 500 ||
+      message.contains('\u0000')) {
+    throw const PagConsoleSettingsException(
+      'Enter a message between 1 and 500 characters.',
+    );
+  }
   final result = await _request(appConfig, user, '/console/update_settings', {
     'project_id': setting.projectId,
     'section': 'platform',
     'expected_revision': setting.revision,
-    'settings_value': {'schema_version': 1, 'enable_project_console': enabled},
+    'settings_value': {
+      'schema_version': 1,
+      'enable_project_console': enabled,
+      'disabled_message': message,
+    },
   });
   if (result is! Map ||
       _integer(result['project_id'], minimum: 1) != setting.projectId ||
       result['enable_project_console'] is! bool ||
       result['enable_project_console'] != enabled ||
+      result['disabled_message'] != message ||
       _integer(result['revision']) != setting.revision + 1) {
     throw const FormatException('Invalid saved project settings response');
   }
   return setting.copyWith(
     enabled: result['enable_project_console'] as bool,
     revision: _integer(result['revision']),
+    disabledMessage: result['disabled_message'] as String,
   );
 }
 
