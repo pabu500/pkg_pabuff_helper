@@ -9,6 +9,7 @@ class MdlPagRole {
   String name;
   String? label;
   String? tag;
+  String? type;
   int rank;
   PagPortalType portalType;
   PagScopeType scopeType;
@@ -20,6 +21,7 @@ class MdlPagRole {
     required this.name,
     this.label,
     this.tag,
+    this.type,
     this.rank = -1,
     this.portalType = PagPortalType.none,
     this.scopeType = PagScopeType.none,
@@ -77,6 +79,7 @@ class MdlPagRole {
       name: json['name'],
       label: json['label'],
       tag: json['tag'],
+      type: json['type'],
       rank: rank,
       portalType: portalType,
       scopeType: sType,
@@ -91,6 +94,7 @@ class MdlPagRole {
       'name': name,
       'label': label,
       'tag': tag,
+      'type': type,
       'rank': rank,
       // 'portal_type_label': portalType.label,
       // 'portal_type_name': portalType.name,
