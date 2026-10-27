@@ -39,6 +39,7 @@ class WgtScopeSetter extends StatefulWidget {
     // flexScope means the scope can be set to either SG, S, B, LG or L
     // if false, the scope must be set from SG all the way down to L
     this.isFlexiScope = false,
+    this.autoCascadeScopeFilter = true,
     this.updateUiOnly = false,
     this.allowProjectScope = false,
   });
@@ -57,8 +58,12 @@ class WgtScopeSetter extends StatefulWidget {
   final bool showCommitted;
   final String committedMessage;
   final bool isFlexiScope;
+
+  /// Automatically select a sole child scope after selection or loading.
+  /// Saved scope selections are restored regardless of this option.
+  final bool autoCascadeScopeFilter;
   final bool
-      updateUiOnly; // if true, the scope setter will not commit the scope
+  updateUiOnly; // if true, the scope setter will not commit the scope
   final bool allowProjectScope;
 
   @override
@@ -90,23 +95,24 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
     latitude: -1,
     longitude: -1,
   );
-  final nullLocation = MdlPagLocation(
-    id: -1,
-    name: '',
-    label: '-- None --',
-  );
+  final nullLocation = MdlPagLocation(id: -1, name: '', label: '-- None --');
 
   // the setter cannot set a scope that is beyond the prevailing scope
   late final MdlPagScopeProfile prevailingScope;
 
   late final TextStyle dropDownListTextStyle = TextStyle(
-      fontSize: 15,
-      color: Theme.of(context).colorScheme.onSurface,
-      fontWeight: FontWeight.w500);
-  late final TextStyle dropDownListHintStyle =
-      TextStyle(fontSize: 15, color: Theme.of(context).hintColor);
-  late final Widget dropDownUnderline =
-      Container(height: 1, color: Theme.of(context).hintColor.withAlpha(75));
+    fontSize: 15,
+    color: Theme.of(context).colorScheme.onSurface,
+    fontWeight: FontWeight.w500,
+  );
+  late final TextStyle dropDownListHintStyle = TextStyle(
+    fontSize: 15,
+    color: Theme.of(context).hintColor,
+  );
+  late final Widget dropDownUnderline = Container(
+    height: 1,
+    color: Theme.of(context).hintColor.withAlpha(75),
+  );
 
   final List<MdlPagSiteGroupProfile> _siteGroupProfileList = [];
   final List<MdlPagSiteProfile> _siteProfileList = [];
@@ -172,26 +178,29 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
       'scope': loggedInUser!.selectedScope.toScopeMap(),
       // must use id, not name or label
       // 'location_group_id_value': _selectedLocationGroupProfile!.id.toString(),
-      'scope_type': widget.forScopeType ==
+      'scope_type':
+          widget.forScopeType ==
               null // scope setter is used for items other than scope
           ? PagScopeType.locationGroup.name
           : widget.forScopeType!.name,
-      'parent_id': widget.forScopeType ==
+      'parent_id':
+          widget.forScopeType ==
               null // scope setter is used for items other than scope
           ? _selectedLocationGroupProfile!.id.toString()
           : widget.forScopeType == PagScopeType.site
-              ? _selectedSiteGroupProfile!.id.toString()
-              : widget.forScopeType == PagScopeType.building
-                  ? _selectedSiteProfile!.id.toString()
-                  : widget.forScopeType == PagScopeType.locationGroup
-                      ? _selectedBuildingProfile!.id.toString()
-                      : widget.forScopeType == PagScopeType.location
-                          ? _selectedLocationGroupProfile!.id.toString()
-                          : '',
+          ? _selectedSiteGroupProfile!.id.toString()
+          : widget.forScopeType == PagScopeType.building
+          ? _selectedSiteProfile!.id.toString()
+          : widget.forScopeType == PagScopeType.locationGroup
+          ? _selectedBuildingProfile!.id.toString()
+          : widget.forScopeType == PagScopeType.location
+          ? _selectedLocationGroupProfile!.id.toString()
+          : '',
     };
 
     dev.log(
-        'selected _selectedLocationGroupProfile: ${_selectedLocationGroupProfile?.name}');
+      'selected _selectedLocationGroupProfile: ${_selectedLocationGroupProfile?.name}',
+    );
 
     try {
       final result = await getScopeChildrenList(
@@ -265,7 +274,7 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
 
     _selectedLocationGroupProfile?.locationList = _locationList;
 
-    if (_locationList.length == 1) {
+    if (widget.autoCascadeScopeFilter && _locationList.length == 1) {
       _selectedLocation = _locationList.first;
     }
 
@@ -277,8 +286,9 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
         _selectedLocation?.name ?? widget.itemScopeMap?['location_name'];
     dev.log('_selectedLocation: ${_selectedLocation?.name}');
     dev.log('locationName: $locationName');
-    _selectedLocation =
-        _selectedLocationGroupProfile!.getLocationByName(locationName);
+    _selectedLocation = _selectedLocationGroupProfile!.getLocationByName(
+      locationName,
+    );
 
     dev.log('selected _selectedLocation: ${_selectedLocation?.name}');
 
@@ -318,7 +328,8 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
     // use widget.itemScopeMap to set the location group
     // after any commit, _selectedLocationGroupProfile is set to the committed location group
     // and no longer use the value from widget.itemScopeMap
-    String? locationGroupName = _selectedLocationGroupProfile?.name ??
+    String? locationGroupName =
+        _selectedLocationGroupProfile?.name ??
         widget.itemScopeMap?['location_group_name'];
     _selectedLocationGroupProfile = _selectedBuildingProfile!
         .getLocationGroupProfileByName(locationGroupName);
@@ -356,8 +367,9 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
     // and no longer use the value from widget.itemScopeMap
     String? buildingName =
         _selectedBuildingProfile?.name ?? widget.itemScopeMap?['building_name'];
-    _selectedBuildingProfile =
-        _selectedSiteProfile!.getBuildingProfileByName(buildingName);
+    _selectedBuildingProfile = _selectedSiteProfile!.getBuildingProfileByName(
+      buildingName,
+    );
 
     if (_selectedBuildingProfile != null) {
       bool hasSelectedBuilding = false;
@@ -392,8 +404,9 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
     // and no longer use the value from widget.itemScopeMap
     String? siteName =
         _selectedSiteProfile?.name ?? widget.itemScopeMap?['site_name'];
-    _selectedSiteProfile =
-        _selectedSiteGroupProfile!.getSiteProfileByName(siteName);
+    _selectedSiteProfile = _selectedSiteGroupProfile!.getSiteProfileByName(
+      siteName,
+    );
 
     if (_selectedSiteProfile != null) {
       bool hasSelectedSite = false;
@@ -424,7 +437,8 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
     // use widget.itemScopeMap to set the site group
     // after any commit, _selectedSiteGroupProfile is set to the committed site group
     // and no longer use the value from widget.itemScopeMap
-    String? siteGroupName = _selectedSiteGroupProfile?.name ??
+    String? siteGroupName =
+        _selectedSiteGroupProfile?.name ??
         widget.itemScopeMap?['site_group_name'];
     _selectedSiteGroupProfile = prevailingScope.projectProfile!
         .getSiteGroupProfileByName(siteGroupName);
@@ -457,12 +471,15 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
     } else {
       if (loggedInUser!.selectedScope.projectProfile != null) {
         _siteGroupProfileList.addAll(
-            loggedInUser!.selectedScope.projectProfile!.siteGroupProfileList);
+          loggedInUser!.selectedScope.projectProfile!.siteGroupProfileList,
+        );
       }
     }
     if (widget.forScopeType == PagScopeType.site) {
-      assert(_selectedSiteGroupProfile == null ||
-          _siteGroupProfileList.contains(_selectedSiteGroupProfile));
+      assert(
+        _selectedSiteGroupProfile == null ||
+            _siteGroupProfileList.contains(_selectedSiteGroupProfile),
+      );
     }
 
     if (prevailingScope.siteProfile != null) {
@@ -477,8 +494,10 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
     }
 
     if (widget.forScopeType == PagScopeType.building) {
-      assert(_selectedSiteProfile == null ||
-          _siteProfileList.contains(_selectedSiteProfile));
+      assert(
+        _selectedSiteProfile == null ||
+            _siteProfileList.contains(_selectedSiteProfile),
+      );
     }
 
     if (prevailingScope.buildingProfile != null) {
@@ -493,16 +512,19 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
     }
 
     if (widget.forScopeType == PagScopeType.locationGroup) {
-      assert(_selectedBuildingProfile == null ||
-          _buildingProfileList.contains(_selectedBuildingProfile));
+      assert(
+        _selectedBuildingProfile == null ||
+            _buildingProfileList.contains(_selectedBuildingProfile),
+      );
     }
 
     if (prevailingScope.locationGroupProfile != null) {
       _locationGroupProfileList.add(prevailingScope.locationGroupProfile!);
     } else {
       if (_selectedBuildingProfile != null) {
-        _locationGroupProfileList
-            .addAll(_selectedBuildingProfile!.locationGroupProfileList);
+        _locationGroupProfileList.addAll(
+          _selectedBuildingProfile!.locationGroupProfileList,
+        );
       }
     }
     if (widget.isFlexiScope) {
@@ -510,8 +532,10 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
     }
 
     if (widget.forScopeType == PagScopeType.location) {
-      assert(_selectedLocationGroupProfile == null ||
-          _locationGroupProfileList.contains(_selectedLocationGroupProfile));
+      assert(
+        _selectedLocationGroupProfile == null ||
+            _locationGroupProfileList.contains(_selectedLocationGroupProfile),
+      );
     }
 
     // if (_selectedLocation != null) {
@@ -593,8 +617,10 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
   void initState() {
     super.initState();
 
-    loggedInUser =
-        Provider.of<PagUserProvider>(context, listen: false).currentUser;
+    loggedInUser = Provider.of<PagUserProvider>(
+      context,
+      listen: false,
+    ).currentUser;
 
     _committedMessage = widget.committedMessage;
 
@@ -606,20 +632,23 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
         .getSiteGroupProfileByName(siteGroupName);
 
     String? siteName = widget.itemScopeMap?['site_name'];
-    originalSiteProfile =
-        originalSiteGroupProfile?.getSiteProfileByName(siteName);
+    originalSiteProfile = originalSiteGroupProfile?.getSiteProfileByName(
+      siteName,
+    );
 
     String? buildingName = widget.itemScopeMap?['building_name'];
-    originalBuildingProfile =
-        originalSiteProfile?.getBuildingProfileByName(buildingName);
+    originalBuildingProfile = originalSiteProfile?.getBuildingProfileByName(
+      buildingName,
+    );
 
     String? locationGroupName = widget.itemScopeMap?['location_group_name'];
     originalLocationGroupProfile = originalBuildingProfile
         ?.getLocationGroupProfileByName(locationGroupName);
 
     String? locationName = widget.itemScopeMap?['location_name'];
-    originalLocation =
-        originalLocationGroupProfile?.getLocationByName(locationName);
+    originalLocation = originalLocationGroupProfile?.getLocationByName(
+      locationName,
+    );
 
     _iniScopePreLoad();
   }
@@ -642,16 +671,21 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
       pullChildrenList = true;
     }
 
-    bool case1 = (widget.forScopeType == PagScopeType.location &&
+    bool case1 =
+        (widget.forScopeType == PagScopeType.location &&
         _selectedLocation == null);
     // bool case2 = (widget.forItemKind != PagItemKind.scope && _selectedLocation == null);
-    bool case3 = (widget.forScopeType == PagScopeType.locationGroup &&
+    bool case3 =
+        (widget.forScopeType == PagScopeType.locationGroup &&
         _selectedLocationGroupProfile == null);
-    bool case4 = (widget.forScopeType == PagScopeType.building &&
+    bool case4 =
+        (widget.forScopeType == PagScopeType.building &&
         _selectedBuildingProfile == null);
-    bool case5 = (widget.forScopeType == PagScopeType.site &&
+    bool case5 =
+        (widget.forScopeType == PagScopeType.site &&
         _selectedSiteProfile == null);
-    bool case6 = (widget.forScopeType == PagScopeType.siteGroup &&
+    bool case6 =
+        (widget.forScopeType == PagScopeType.siteGroup &&
         _selectedSiteGroupProfile == null);
 
     if (case1 || /*case2 ||*/ case3 || case4 || case5 || case6) {
@@ -675,8 +709,10 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
     Widget? scopeIcon;
     PagScopeType? itemScopeType = widget.initialScope?.getScopeType();
     if (widget.isSingleLabel) {
-      assert(itemScopeType != null,
-          'itemScopeType cannot be null when isSingleLabel is true');
+      assert(
+        itemScopeType != null,
+        'itemScopeType cannot be null when isSingleLabel is true',
+      );
       scopeIcon = getScopeIcon(context, itemScopeType!, size: 21);
     }
 
@@ -729,7 +765,9 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
                                 dev.log('waiting scope list...');
 
                                 return const SizedBox(
-                                    height: 35, child: WgtPagWait(size: 21));
+                                  height: 35,
+                                  child: WgtPagWait(size: 21),
+                                );
                               default:
                                 if (snapshot.hasError) {
                                   dev.log(snapshot.error.toString());
@@ -743,7 +781,8 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
                                         builder: (context, constraints) {
                                           return ConstrainedBox(
                                             constraints: BoxConstraints(
-                                                maxWidth: constraints.maxWidth),
+                                              maxWidth: constraints.maxWidth,
+                                            ),
                                             child: getErrorTextPrompt(
                                               context: context,
                                               errorText: _errorText,
@@ -788,22 +827,23 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
       children: [
         //checkbox to select project scope
         Checkbox(
-            value: _isProjectScope,
-            onChanged: !_isEditing
-                ? null
-                : (bool? value) {
-                    setState(() {
-                      _isProjectScope = value ?? false;
-                      if (_isProjectScope) {
-                        _selectedSiteGroupProfile = null;
-                        _selectedSiteProfile = null;
-                        _selectedBuildingProfile = null;
-                        _selectedLocationGroupProfile = null;
-                        _selectedLocation = null;
-                      }
-                      _markModified();
-                    });
-                  }),
+          value: _isProjectScope,
+          onChanged: !_isEditing
+              ? null
+              : (bool? value) {
+                  setState(() {
+                    _isProjectScope = value ?? false;
+                    if (_isProjectScope) {
+                      _selectedSiteGroupProfile = null;
+                      _selectedSiteProfile = null;
+                      _selectedBuildingProfile = null;
+                      _selectedLocationGroupProfile = null;
+                      _selectedLocation = null;
+                    }
+                    _markModified();
+                  });
+                },
+        ),
         Text('Project Scope', style: dropDownListHintStyle),
       ],
     );
@@ -822,21 +862,21 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
         return [
           getSiteGroupScopeSelector(),
           getSiteScopeSelector(),
-          getBuildingScopeSelector()
+          getBuildingScopeSelector(),
         ];
       case PagScopeType.location:
         return [
           getSiteGroupScopeSelector(),
           getSiteScopeSelector(),
           getBuildingScopeSelector(),
-          getLocationGroupScopeSelector()
+          getLocationGroupScopeSelector(),
         ];
       default:
         return [
           getSiteGroupScopeSelector(),
           getSiteScopeSelector(),
           getBuildingScopeSelector(),
-          getLocationGroupScopeSelector()
+          getLocationGroupScopeSelector(),
         ];
     }
   }
@@ -848,90 +888,103 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
     return Row(
       children: [
         Container(
-            width: widget.labelWidth,
-            alignment: Alignment.centerRight,
-            child: Text('Site Group: ', style: dropDownListHintStyle)),
+          width: widget.labelWidth,
+          alignment: Alignment.centerRight,
+          child: Text('Site Group: ', style: dropDownListHintStyle),
+        ),
         IgnorePointer(
           ignoring: !_isEditing,
           child: DropdownButton<MdlPagSiteGroupProfile>(
-              key: _siteGroupInputSelectKey,
-              hint: Padding(
-                  padding: const EdgeInsets.only(bottom: 3.0),
-                  child: Text('Site Group', style: dropDownListHintStyle)),
-              value: _selectedSiteGroupProfile,
-              focusColor: Theme.of(context).hoverColor,
-              underline: dropDownUnderline,
-              icon: const Icon(Icons.arrow_drop_down),
-              iconSize: 21,
-              style: TextStyle(color: Theme.of(context).colorScheme.primary),
-              onChanged: (MdlPagSiteGroupProfile? value) {
-                if (_selectedSiteGroupProfile == value) {
-                  return;
-                }
-                setState(() {
-                  _selectedSiteGroupProfile = value;
-                  _selectedSiteProfile = null;
-                  _selectedBuildingProfile = null;
-                  _selectedLocationGroupProfile = null;
-                  _selectedLocation = null;
+            key: _siteGroupInputSelectKey,
+            hint: Padding(
+              padding: const EdgeInsets.only(bottom: 3.0),
+              child: Text('Site Group', style: dropDownListHintStyle),
+            ),
+            value: _selectedSiteGroupProfile,
+            focusColor: Theme.of(context).hoverColor,
+            underline: dropDownUnderline,
+            icon: const Icon(Icons.arrow_drop_down),
+            iconSize: 21,
+            style: TextStyle(color: Theme.of(context).colorScheme.primary),
+            onChanged: (MdlPagSiteGroupProfile? value) {
+              if (_selectedSiteGroupProfile == value) {
+                return;
+              }
+              setState(() {
+                _selectedSiteGroupProfile = value;
+                _selectedSiteProfile = null;
+                _selectedBuildingProfile = null;
+                _selectedLocationGroupProfile = null;
+                _selectedLocation = null;
 
-                  _markModified();
+                _markModified();
 
-                  _siteProfileList.clear();
-                  _siteProfileList
-                      .addAll(_selectedSiteGroupProfile!.siteProfileList);
-                  if (_siteProfileList.length == 1) {
-                    _selectedSiteProfile = _siteProfileList[0];
-                  }
-
-                  _buildingProfileList.clear();
-                  if (_selectedSiteProfile != null) {
-                    _buildingProfileList
-                        .addAll(_selectedSiteProfile!.buildingProfileList);
-                    if (_buildingProfileList.length == 1) {
-                      _selectedBuildingProfile = _buildingProfileList[0];
-                    }
-                  }
-
-                  _locationGroupProfileList.clear();
-                  if (_selectedBuildingProfile != null) {
-                    _locationGroupProfileList.addAll(
-                        _selectedBuildingProfile!.locationGroupProfileList);
-                    if (_locationGroupProfileList.length == 1) {
-                      _selectedLocationGroupProfile =
-                          _locationGroupProfileList[0];
-                    }
-                    if (widget.isFlexiScope) {
-                      _locationGroupProfileList.add(nullLocationGroupProfile);
-                    }
-                  }
-
-                  _locationList.clear();
-                  if (_selectedLocationGroupProfile != null) {
-                    _locationList
-                        .addAll(_selectedLocationGroupProfile!.locationList);
-                    if (_locationList.length == 1) {
-                      _selectedLocation = _locationList[0];
-                    }
-                  }
-                });
-              },
-              items: _siteGroupProfileList
-                  .map<DropdownMenuItem<MdlPagSiteGroupProfile>>(
-                      (MdlPagSiteGroupProfile siteGroupProfile) {
-                return DropdownMenuItem<MdlPagSiteGroupProfile>(
-                  value: siteGroupProfile,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 3.0),
-                    child: Text(
-                      siteGroupProfile.label,
-                      style: _isEditing
-                          ? dropDownListTextStyle
-                          : dropDownListHintStyle,
-                    ),
-                  ),
+                _siteProfileList.clear();
+                _siteProfileList.addAll(
+                  _selectedSiteGroupProfile!.siteProfileList,
                 );
-              }).toList()),
+                if (widget.autoCascadeScopeFilter &&
+                    _siteProfileList.length == 1) {
+                  _selectedSiteProfile = _siteProfileList[0];
+                }
+
+                _buildingProfileList.clear();
+                if (_selectedSiteProfile != null) {
+                  _buildingProfileList.addAll(
+                    _selectedSiteProfile!.buildingProfileList,
+                  );
+                  if (widget.autoCascadeScopeFilter &&
+                      _buildingProfileList.length == 1) {
+                    _selectedBuildingProfile = _buildingProfileList[0];
+                  }
+                }
+
+                _locationGroupProfileList.clear();
+                if (_selectedBuildingProfile != null) {
+                  _locationGroupProfileList.addAll(
+                    _selectedBuildingProfile!.locationGroupProfileList,
+                  );
+                  if (widget.autoCascadeScopeFilter &&
+                      _locationGroupProfileList.length == 1) {
+                    _selectedLocationGroupProfile =
+                        _locationGroupProfileList[0];
+                  }
+                  if (widget.isFlexiScope) {
+                    _locationGroupProfileList.add(nullLocationGroupProfile);
+                  }
+                }
+
+                _locationList.clear();
+                if (_selectedLocationGroupProfile != null) {
+                  _locationList.addAll(
+                    _selectedLocationGroupProfile!.locationList,
+                  );
+                  if (widget.autoCascadeScopeFilter &&
+                      _locationList.length == 1) {
+                    _selectedLocation = _locationList[0];
+                  }
+                }
+              });
+            },
+            items: _siteGroupProfileList
+                .map<DropdownMenuItem<MdlPagSiteGroupProfile>>((
+                  MdlPagSiteGroupProfile siteGroupProfile,
+                ) {
+                  return DropdownMenuItem<MdlPagSiteGroupProfile>(
+                    value: siteGroupProfile,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 3.0),
+                      child: Text(
+                        siteGroupProfile.label,
+                        style: _isEditing
+                            ? dropDownListTextStyle
+                            : dropDownListHintStyle,
+                      ),
+                    ),
+                  );
+                })
+                .toList(),
+          ),
         ),
       ],
     );
@@ -944,84 +997,94 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
     return Row(
       children: [
         Container(
-            width: widget.labelWidth,
-            alignment: Alignment.centerRight,
-            child: Text('Site: ', style: dropDownListHintStyle)),
+          width: widget.labelWidth,
+          alignment: Alignment.centerRight,
+          child: Text('Site: ', style: dropDownListHintStyle),
+        ),
         IgnorePointer(
           ignoring: !_isEditing,
           child: DropdownButton<MdlPagSiteProfile>(
-              key: _siteInputSelectKey,
-              hint: Padding(
-                  padding: const EdgeInsets.only(bottom: 3.0),
-                  child: Text('Site', style: dropDownListHintStyle)),
-              value: _selectedSiteProfile,
-              focusColor: Theme.of(context).hoverColor,
-              underline: dropDownUnderline,
-              icon: const Icon(Icons.arrow_drop_down),
-              iconSize: 21,
-              style: TextStyle(color: Theme.of(context).colorScheme.primary),
-              onChanged: (MdlPagSiteProfile? value) {
-                if (_selectedSiteProfile == value) {
-                  return;
+            key: _siteInputSelectKey,
+            hint: Padding(
+              padding: const EdgeInsets.only(bottom: 3.0),
+              child: Text('Site', style: dropDownListHintStyle),
+            ),
+            value: _selectedSiteProfile,
+            focusColor: Theme.of(context).hoverColor,
+            underline: dropDownUnderline,
+            icon: const Icon(Icons.arrow_drop_down),
+            iconSize: 21,
+            style: TextStyle(color: Theme.of(context).colorScheme.primary),
+            onChanged: (MdlPagSiteProfile? value) {
+              if (_selectedSiteProfile == value) {
+                return;
+              }
+              setState(() {
+                _selectedSiteProfile = value;
+                if (widget.isFlexiScope && _selectedSiteProfile!.id == -1) {
+                  _selectedSiteProfile = null;
                 }
-                setState(() {
-                  _selectedSiteProfile = value;
-                  if (widget.isFlexiScope && _selectedSiteProfile!.id == -1) {
-                    _selectedSiteProfile = null;
-                  }
-                  _selectedBuildingProfile = null;
-                  _selectedLocationGroupProfile = null;
-                  _selectedLocation = null;
+                _selectedBuildingProfile = null;
+                _selectedLocationGroupProfile = null;
+                _selectedLocation = null;
 
-                  _markModified();
+                _markModified();
 
-                  _buildingProfileList.clear();
-                  if (_selectedSiteProfile != null) {
-                    _buildingProfileList
-                        .addAll(_selectedSiteProfile!.buildingProfileList);
-                    if (_buildingProfileList.length == 1) {
-                      _selectedBuildingProfile = _buildingProfileList[0];
-                    }
+                _buildingProfileList.clear();
+                if (_selectedSiteProfile != null) {
+                  _buildingProfileList.addAll(
+                    _selectedSiteProfile!.buildingProfileList,
+                  );
+                  if (widget.autoCascadeScopeFilter &&
+                      _buildingProfileList.length == 1) {
+                    _selectedBuildingProfile = _buildingProfileList[0];
                   }
+                }
 
-                  _locationGroupProfileList.clear();
-                  if (_selectedBuildingProfile != null) {
-                    _locationGroupProfileList.addAll(
-                        _selectedBuildingProfile!.locationGroupProfileList);
-                    if (_locationGroupProfileList.length == 1) {
-                      _selectedLocationGroupProfile =
-                          _locationGroupProfileList[0];
-                    }
-                    if (widget.isFlexiScope) {
-                      _locationGroupProfileList.add(nullLocationGroupProfile);
-                    }
+                _locationGroupProfileList.clear();
+                if (_selectedBuildingProfile != null) {
+                  _locationGroupProfileList.addAll(
+                    _selectedBuildingProfile!.locationGroupProfileList,
+                  );
+                  if (widget.autoCascadeScopeFilter &&
+                      _locationGroupProfileList.length == 1) {
+                    _selectedLocationGroupProfile =
+                        _locationGroupProfileList[0];
                   }
+                  if (widget.isFlexiScope) {
+                    _locationGroupProfileList.add(nullLocationGroupProfile);
+                  }
+                }
 
-                  _locationList.clear();
-                  if (_selectedLocationGroupProfile != null) {
-                    _locationList
-                        .addAll(_selectedLocationGroupProfile!.locationList);
-                    if (_locationList.length == 1) {
-                      _selectedLocation = _locationList[0];
-                    }
+                _locationList.clear();
+                if (_selectedLocationGroupProfile != null) {
+                  _locationList.addAll(
+                    _selectedLocationGroupProfile!.locationList,
+                  );
+                  if (widget.autoCascadeScopeFilter &&
+                      _locationList.length == 1) {
+                    _selectedLocation = _locationList[0];
                   }
-                });
-              },
-              items: _siteProfileList.map<DropdownMenuItem<MdlPagSiteProfile>>(
-                  (MdlPagSiteProfile siteProfile) {
-                return DropdownMenuItem<MdlPagSiteProfile>(
-                  value: siteProfile,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 3.0),
-                    child: Text(
-                      siteProfile.label,
-                      style: _isEditing
-                          ? dropDownListTextStyle
-                          : dropDownListHintStyle,
-                    ),
+                }
+              });
+            },
+            items: _siteProfileList.map<DropdownMenuItem<MdlPagSiteProfile>>((
+              MdlPagSiteProfile siteProfile,
+            ) {
+              return DropdownMenuItem<MdlPagSiteProfile>(
+                value: siteProfile,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 3.0),
+                  child: Text(
+                    siteProfile.label,
+                    style: _isEditing
+                        ? dropDownListTextStyle
+                        : dropDownListHintStyle,
                   ),
-                );
-              }).toList()),
+                ),
+              );
+            }).toList(),
+          ),
         ),
       ],
     );
@@ -1034,77 +1097,85 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
     return Row(
       children: [
         Container(
-            width: widget.labelWidth,
-            alignment: Alignment.centerRight,
-            child: Text('Building: ', style: dropDownListHintStyle)),
+          width: widget.labelWidth,
+          alignment: Alignment.centerRight,
+          child: Text('Building: ', style: dropDownListHintStyle),
+        ),
         IgnorePointer(
           ignoring: !_isEditing,
           child: DropdownButton<MdlPagBuildingProfile>(
-              key: _buildingInputSelectKey,
-              hint: Padding(
-                  padding: const EdgeInsets.only(bottom: 3.0),
-                  child: Text('Building', style: dropDownListHintStyle)),
-              value: _selectedBuildingProfile,
-              focusColor: Theme.of(context).hoverColor,
-              underline: dropDownUnderline,
-              icon: const Icon(Icons.arrow_drop_down),
-              iconSize: 21,
-              style: TextStyle(color: Theme.of(context).colorScheme.primary),
-              onChanged: (MdlPagBuildingProfile? value) {
-                if (_selectedBuildingProfile == value) {
-                  return;
+            key: _buildingInputSelectKey,
+            hint: Padding(
+              padding: const EdgeInsets.only(bottom: 3.0),
+              child: Text('Building', style: dropDownListHintStyle),
+            ),
+            value: _selectedBuildingProfile,
+            focusColor: Theme.of(context).hoverColor,
+            underline: dropDownUnderline,
+            icon: const Icon(Icons.arrow_drop_down),
+            iconSize: 21,
+            style: TextStyle(color: Theme.of(context).colorScheme.primary),
+            onChanged: (MdlPagBuildingProfile? value) {
+              if (_selectedBuildingProfile == value) {
+                return;
+              }
+
+              setState(() {
+                _selectedBuildingProfile = value;
+                if (widget.isFlexiScope && _selectedBuildingProfile!.id == -1) {
+                  _selectedBuildingProfile = null;
+                }
+                _selectedLocationGroupProfile = null;
+                _selectedLocation = null;
+
+                _markModified();
+
+                _locationGroupProfileList.clear();
+                if (_selectedBuildingProfile != null) {
+                  _locationGroupProfileList.addAll(
+                    _selectedBuildingProfile!.locationGroupProfileList,
+                  );
+                  if (widget.autoCascadeScopeFilter &&
+                      _locationGroupProfileList.length == 1) {
+                    _selectedLocationGroupProfile =
+                        _locationGroupProfileList[0];
+                  }
+                  if (widget.isFlexiScope) {
+                    _locationGroupProfileList.add(nullLocationGroupProfile);
+                  }
                 }
 
-                setState(() {
-                  _selectedBuildingProfile = value;
-                  if (widget.isFlexiScope &&
-                      _selectedBuildingProfile!.id == -1) {
-                    _selectedBuildingProfile = null;
+                _locationList.clear();
+                if (_selectedLocationGroupProfile != null) {
+                  _locationList.addAll(
+                    _selectedLocationGroupProfile!.locationList,
+                  );
+                  if (widget.autoCascadeScopeFilter &&
+                      _locationList.length == 1) {
+                    _selectedLocation = _locationList[0];
                   }
-                  _selectedLocationGroupProfile = null;
-                  _selectedLocation = null;
-
-                  _markModified();
-
-                  _locationGroupProfileList.clear();
-                  if (_selectedBuildingProfile != null) {
-                    _locationGroupProfileList.addAll(
-                        _selectedBuildingProfile!.locationGroupProfileList);
-                    if (_locationGroupProfileList.length == 1) {
-                      _selectedLocationGroupProfile =
-                          _locationGroupProfileList[0];
-                    }
-                    if (widget.isFlexiScope) {
-                      _locationGroupProfileList.add(nullLocationGroupProfile);
-                    }
-                  }
-
-                  _locationList.clear();
-                  if (_selectedLocationGroupProfile != null) {
-                    _locationList
-                        .addAll(_selectedLocationGroupProfile!.locationList);
-                    if (_locationList.length == 1) {
-                      _selectedLocation = _locationList[0];
-                    }
-                  }
-                });
-              },
-              items: _buildingProfileList
-                  .map<DropdownMenuItem<MdlPagBuildingProfile>>(
-                      (MdlPagBuildingProfile buildingProfile) {
-                return DropdownMenuItem<MdlPagBuildingProfile>(
-                  value: buildingProfile,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 3.0),
-                    child: Text(
-                      buildingProfile.label,
-                      style: _isEditing
-                          ? dropDownListTextStyle
-                          : dropDownListHintStyle,
+                }
+              });
+            },
+            items: _buildingProfileList
+                .map<DropdownMenuItem<MdlPagBuildingProfile>>((
+                  MdlPagBuildingProfile buildingProfile,
+                ) {
+                  return DropdownMenuItem<MdlPagBuildingProfile>(
+                    value: buildingProfile,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 3.0),
+                      child: Text(
+                        buildingProfile.label,
+                        style: _isEditing
+                            ? dropDownListTextStyle
+                            : dropDownListHintStyle,
+                      ),
                     ),
-                  ),
-                );
-              }).toList()),
+                  );
+                })
+                .toList(),
+          ),
         ),
       ],
     );
@@ -1117,72 +1188,78 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
     return Row(
       children: [
         Container(
-            width: widget.labelWidth,
-            alignment: Alignment.centerRight,
-            child: Text('Location Group: ', style: dropDownListHintStyle)),
+          width: widget.labelWidth,
+          alignment: Alignment.centerRight,
+          child: Text('Location Group: ', style: dropDownListHintStyle),
+        ),
         IgnorePointer(
           ignoring: !_isEditing,
           child: DropdownButton<MdlPagLocationGroupProfile>(
-              key: _locationGroupInputSelectKey,
-              hint: Padding(
-                  padding: const EdgeInsets.only(bottom: 3.0),
-                  child: Text('Location Group', style: dropDownListHintStyle)),
-              value: _selectedLocationGroupProfile,
-              focusColor: Theme.of(context).hoverColor,
-              underline: dropDownUnderline,
-              icon: const Icon(Icons.arrow_drop_down),
-              iconSize: 21,
-              style: TextStyle(color: Theme.of(context).colorScheme.primary),
-              onChanged: (MdlPagLocationGroupProfile? value) async {
-                dev.log('onChanged location group: ${value?.label}');
-                if (_selectedLocationGroupProfile == value) {
+            key: _locationGroupInputSelectKey,
+            hint: Padding(
+              padding: const EdgeInsets.only(bottom: 3.0),
+              child: Text('Location Group', style: dropDownListHintStyle),
+            ),
+            value: _selectedLocationGroupProfile,
+            focusColor: Theme.of(context).hoverColor,
+            underline: dropDownUnderline,
+            icon: const Icon(Icons.arrow_drop_down),
+            iconSize: 21,
+            style: TextStyle(color: Theme.of(context).colorScheme.primary),
+            onChanged: (MdlPagLocationGroupProfile? value) async {
+              dev.log('onChanged location group: ${value?.label}');
+              if (_selectedLocationGroupProfile == value) {
+                return;
+              }
+              if (_selectedLocationGroupProfile == null) {
+                if (value?.id == -1) {
                   return;
                 }
-                if (_selectedLocationGroupProfile == null) {
-                  if (value?.id == -1) {
-                    return;
-                  }
+              }
+
+              // if (widget.forScopeType != PagScopeType.location) {
+              //   await _getParentScopeChildrenList();
+              // }
+
+              setState(() {
+                _selectedLocationGroupProfile = value;
+
+                if (value?.id == -1) {
+                  _selectedLocationGroupProfile = null;
                 }
 
-                // if (widget.forScopeType != PagScopeType.location) {
-                //   await _getParentScopeChildrenList();
-                // }
-
-                setState(() {
-                  _selectedLocationGroupProfile = value;
-
-                  if (value?.id == -1) {
-                    _selectedLocationGroupProfile = null;
-                  }
-
-                  _selectedLocation = null;
-                  if (_locationList.length == 1) {
-                    _selectedLocation = _locationList[0];
-                  }
-
-                  _markModified();
-                });
-
-                if (widget.forScopeType != PagScopeType.location) {
-                  await _getParentScopeChildrenList();
+                _selectedLocation = null;
+                if (widget.autoCascadeScopeFilter &&
+                    _locationList.length == 1) {
+                  _selectedLocation = _locationList[0];
                 }
-              },
-              items: _locationGroupProfileList
-                  .map<DropdownMenuItem<MdlPagLocationGroupProfile>>(
-                      (MdlPagLocationGroupProfile locationGroupProfile) {
-                return DropdownMenuItem<MdlPagLocationGroupProfile>(
-                  value: locationGroupProfile,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 3.0),
-                    child: Text(
-                      locationGroupProfile.label,
-                      style: _isEditing
-                          ? dropDownListTextStyle
-                          : dropDownListHintStyle,
+
+                _markModified();
+              });
+
+              if (widget.forScopeType != PagScopeType.location) {
+                await _getParentScopeChildrenList();
+              }
+            },
+            items: _locationGroupProfileList
+                .map<DropdownMenuItem<MdlPagLocationGroupProfile>>((
+                  MdlPagLocationGroupProfile locationGroupProfile,
+                ) {
+                  return DropdownMenuItem<MdlPagLocationGroupProfile>(
+                    value: locationGroupProfile,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 3.0),
+                      child: Text(
+                        locationGroupProfile.label,
+                        style: _isEditing
+                            ? dropDownListTextStyle
+                            : dropDownListHintStyle,
+                      ),
                     ),
-                  ),
-                );
-              }).toList()),
+                  );
+                })
+                .toList(),
+          ),
         ),
       ],
     );
@@ -1196,9 +1273,10 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
     return Row(
       children: [
         Container(
-            width: widget.labelWidth,
-            alignment: Alignment.centerRight,
-            child: Text('Location: ', style: dropDownListHintStyle)),
+          width: widget.labelWidth,
+          alignment: Alignment.centerRight,
+          child: Text('Location: ', style: dropDownListHintStyle),
+        ),
         IgnorePointer(
           ignoring: !_isEditing,
           child: WgtInputDropdown(
@@ -1208,13 +1286,16 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
             // key: UniqueKey(), // prevent reuse of the same widget (and its state)
             hint: 'Location',
             enabled: _isEditing,
-            textStyle:
-                _isEditing ? dropDownListTextStyle : dropDownListHintStyle,
+            textStyle: _isEditing
+                ? dropDownListTextStyle
+                : dropDownListHintStyle,
             items: _locationList
-                .map((MdlPagLocation location) => {
-                      'value': location.id.toString(),
-                      'label': location.label,
-                    })
+                .map(
+                  (MdlPagLocation location) => {
+                    'value': location.id.toString(),
+                    'label': location.label,
+                  },
+                )
                 .toList(),
             // if null the widget will use its own controller
             // but if want to control the value from outside the dropdown widget,
@@ -1232,8 +1313,9 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
                 return;
               }
               MdlPagLocation? location = _locationList.firstWhere(
-                  (MdlPagLocation location) =>
-                      location.id.toString() == value['value']);
+                (MdlPagLocation location) =>
+                    location.id.toString() == value['value'],
+              );
               if (_selectedLocation == location) {
                 return;
               }
@@ -1261,10 +1343,10 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
   Widget getControl({String errorText = ''}) {
     final bool isChanged =
         _selectedSiteGroupProfile != originalSiteGroupProfile ||
-            _selectedSiteProfile != originalSiteProfile ||
-            _selectedBuildingProfile != originalBuildingProfile ||
-            _selectedLocationGroupProfile != originalLocationGroupProfile ||
-            _selectedLocation != originalLocation;
+        _selectedSiteProfile != originalSiteProfile ||
+        _selectedBuildingProfile != originalBuildingProfile ||
+        _selectedLocationGroupProfile != originalLocationGroupProfile ||
+        _selectedLocation != originalLocation;
 
     // check enable commit
     bool enableCommit = errorText.isEmpty && _committedMessage.isEmpty;
@@ -1370,204 +1452,208 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
             _isFetchingChildrenList
                 ? Container()
                 : _isEditing
-                    ? IconButton(
-                        icon: Icon(Icons.check,
-                            color: enableCommit
-                                ? Theme.of(context).colorScheme.primary
-                                : null),
-                        onPressed: !enableCommit
-                            ? null
-                            : () async {
-                                bool isNull = _isNullScope();
+                ? IconButton(
+                    icon: Icon(
+                      Icons.check,
+                      color: enableCommit
+                          ? Theme.of(context).colorScheme.primary
+                          : null,
+                    ),
+                    onPressed: !enableCommit
+                        ? null
+                        : () async {
+                            bool isNull = _isNullScope();
 
-                                if (isNull && !widget.allowProjectScope) {
-                                  setState(() {
-                                    _isEditing = false;
-                                  });
-                                  return;
-                                }
-                                if (widget.allowProjectScope &&
-                                    _isProjectScope) {
-                                } else {
-                                  bool isEqual = true;
-                                  if (widget.forScopeType !=
-                                      PagScopeType.siteGroup) {
-                                    isEqual = isEqual &&
-                                        (_selectedSiteGroupProfile ==
-                                            originalSiteGroupProfile);
-                                  }
-                                  if (widget.forScopeType !=
-                                      PagScopeType.site) {
-                                    isEqual = isEqual &&
-                                        (_selectedSiteProfile ==
-                                            originalSiteProfile);
-                                  }
-                                  if (widget.forScopeType !=
-                                      PagScopeType.building) {
-                                    isEqual = isEqual &&
-                                        (_selectedBuildingProfile ==
-                                            originalBuildingProfile);
-                                  }
-                                  if (widget.forScopeType !=
-                                      PagScopeType.locationGroup) {
-                                    isEqual = isEqual &&
-                                        (_selectedLocationGroupProfile ==
-                                            originalLocationGroupProfile);
-                                  }
-                                  // if (widget.forItemKind != PagItemKind.scope) {
-                                  if ((widget.forScopeType !=
-                                          PagScopeType.location) ||
-                                      (widget.forItemKind !=
-                                          PagItemKind.scope)) {
-                                    isEqual = isEqual &&
-                                        (_selectedLocation == originalLocation);
-                                  }
-                                  if (isEqual) {
-                                    setState(() {
-                                      _isEditing = false;
-                                    });
-                                    return;
-                                  }
-                                }
-
-                                if (!_isModified) {
-                                  setState(() {
-                                    _isEditing = false;
-                                  });
-                                  return;
-                                }
-
-                                dynamic scope;
-                                switch (widget.forScopeType) {
-                                  case PagScopeType.siteGroup:
-                                    break;
-                                  case PagScopeType.site:
-                                    scope = _selectedSiteGroupProfile;
-                                    break;
-                                  case PagScopeType.building:
-                                    scope = _selectedSiteProfile;
-                                    break;
-                                  case PagScopeType.locationGroup:
-                                    scope = _selectedBuildingProfile;
-                                    break;
-                                  case PagScopeType.location:
-                                    scope = _selectedLocationGroupProfile;
-                                    break;
-                                  default:
-                                    // setting scope for item kind other than scope
-                                    scope = _selectedLocation;
-                                    break;
-                                }
-
-                                bool updateUiOnly = false;
-                                if (widget.forItemKind == PagItemKind.tariff ||
-                                    widget.forItemKind == PagItemKind.tenant ||
-                                    widget.forItemKind == PagItemKind.device ||
-                                    widget.forItemKind == PagItemKind.acl) {
-                                  updateUiOnly = true;
-                                }
-                                if (widget.updateUiOnly) {
-                                  updateUiOnly = true;
-                                }
-
-                                // do not get leaf scope if forScopeType is specified
-                                // (the scope setter is used to set for scope, e.g. create scope)
-                                if (widget.forScopeType == null) {
-                                  // get leaf scope
-                                  if (_selectedLocation != null &&
-                                      _selectedLocation?.id != -1) {
-                                    scope = _selectedLocation;
-                                  } else if (_selectedLocationGroupProfile !=
-                                          null &&
-                                      _selectedLocationGroupProfile?.id != -1) {
-                                    scope = _selectedLocationGroupProfile;
-                                  } else if (_selectedBuildingProfile != null &&
-                                      _selectedBuildingProfile?.id != -1) {
-                                    scope = _selectedBuildingProfile;
-                                  } else if (_selectedSiteProfile != null &&
-                                      _selectedSiteProfile?.id != -1) {
-                                    scope = _selectedSiteProfile;
-                                  } else if (_selectedSiteGroupProfile !=
-                                          null &&
-                                      _selectedSiteGroupProfile?.id != -1) {
-                                    scope = _selectedSiteGroupProfile;
-                                  }
-                                }
-
-                                // // always add project id and name to the scope
-                                // scope = scope.copyWith(
-                                //   projectId: loggedInUser!
-                                //       .selectedScope.projectProfile!.id,
-                                //   projectName: loggedInUser!
-                                //       .selectedScope.projectProfile!.name,
-                                // );
-
-                                if (updateUiOnly) {
-                                  // update UI only
-                                  setState(() {
-                                    _isEditing = false;
-                                  });
-
-                                  widget.onScopeSet?.call(scope);
-                                } else {
-                                  // commit to db
-                                  final result =
-                                      await widget.onScopeSet?.call(scope);
-
-                                  if (result == null) {
-                                    dev.log('Error setting scope');
-
-                                    return;
-                                  }
-
-                                  if (result['error'] == null) {
-                                    _errorText = '';
-                                    _updateOriginalScope();
-                                    _showCommitted = widget.showCommitted;
-                                    // _newParentScopeSeletedFromList = false;
-                                    if (result['show_committed'] != null) {
-                                      _showCommitted = result['show_committed'];
-                                    }
-                                    _committedMessage =
-                                        result['message'] ?? 'Change committed';
-                                  } else {
-                                    dev.log(
-                                        'Error setting scope: ${result['error']}');
-                                    if (result['error'] is Map) {
-                                      String? status =
-                                          result['error']['status'];
-                                      if (status != null) {
-                                        status = 'm:$status';
-                                      }
-                                      _errorText = getErrorText(status,
-                                          defaultErrorText:
-                                              'Error setting scope');
-                                      _committedMessage = _errorText;
-                                    } else {
-                                      _committedMessage = 'Error setting scope';
-                                      _errorText = 'Error setting scope';
-                                    }
-                                  }
-
-                                  setState(() {
-                                    _isEditing = false;
-                                    _isReset = false;
-                                  });
-                                }
-                              },
-                      )
-                    : !widget.isEditable
-                        ? Container()
-                        : IconButton(
-                            icon: Icon(Icons.edit,
-                                color: Theme.of(context).hintColor),
-                            onPressed: () {
+                            if (isNull && !widget.allowProjectScope) {
                               setState(() {
-                                _isEditing = true;
-                                _showCommitted = false;
+                                _isEditing = false;
                               });
-                            },
-                          ),
+                              return;
+                            }
+                            if (widget.allowProjectScope && _isProjectScope) {
+                            } else {
+                              bool isEqual = true;
+                              if (widget.forScopeType !=
+                                  PagScopeType.siteGroup) {
+                                isEqual =
+                                    isEqual &&
+                                    (_selectedSiteGroupProfile ==
+                                        originalSiteGroupProfile);
+                              }
+                              if (widget.forScopeType != PagScopeType.site) {
+                                isEqual =
+                                    isEqual &&
+                                    (_selectedSiteProfile ==
+                                        originalSiteProfile);
+                              }
+                              if (widget.forScopeType !=
+                                  PagScopeType.building) {
+                                isEqual =
+                                    isEqual &&
+                                    (_selectedBuildingProfile ==
+                                        originalBuildingProfile);
+                              }
+                              if (widget.forScopeType !=
+                                  PagScopeType.locationGroup) {
+                                isEqual =
+                                    isEqual &&
+                                    (_selectedLocationGroupProfile ==
+                                        originalLocationGroupProfile);
+                              }
+                              // if (widget.forItemKind != PagItemKind.scope) {
+                              if ((widget.forScopeType !=
+                                      PagScopeType.location) ||
+                                  (widget.forItemKind != PagItemKind.scope)) {
+                                isEqual =
+                                    isEqual &&
+                                    (_selectedLocation == originalLocation);
+                              }
+                              if (isEqual) {
+                                setState(() {
+                                  _isEditing = false;
+                                });
+                                return;
+                              }
+                            }
+
+                            if (!_isModified) {
+                              setState(() {
+                                _isEditing = false;
+                              });
+                              return;
+                            }
+
+                            dynamic scope;
+                            switch (widget.forScopeType) {
+                              case PagScopeType.siteGroup:
+                                break;
+                              case PagScopeType.site:
+                                scope = _selectedSiteGroupProfile;
+                                break;
+                              case PagScopeType.building:
+                                scope = _selectedSiteProfile;
+                                break;
+                              case PagScopeType.locationGroup:
+                                scope = _selectedBuildingProfile;
+                                break;
+                              case PagScopeType.location:
+                                scope = _selectedLocationGroupProfile;
+                                break;
+                              default:
+                                // setting scope for item kind other than scope
+                                scope = _selectedLocation;
+                                break;
+                            }
+
+                            bool updateUiOnly = false;
+                            if (widget.forItemKind == PagItemKind.tariff ||
+                                widget.forItemKind == PagItemKind.tenant ||
+                                widget.forItemKind == PagItemKind.device ||
+                                widget.forItemKind == PagItemKind.acl) {
+                              updateUiOnly = true;
+                            }
+                            if (widget.updateUiOnly) {
+                              updateUiOnly = true;
+                            }
+
+                            // do not get leaf scope if forScopeType is specified
+                            // (the scope setter is used to set for scope, e.g. create scope)
+                            if (widget.forScopeType == null) {
+                              // get leaf scope
+                              if (_selectedLocation != null &&
+                                  _selectedLocation?.id != -1) {
+                                scope = _selectedLocation;
+                              } else if (_selectedLocationGroupProfile !=
+                                      null &&
+                                  _selectedLocationGroupProfile?.id != -1) {
+                                scope = _selectedLocationGroupProfile;
+                              } else if (_selectedBuildingProfile != null &&
+                                  _selectedBuildingProfile?.id != -1) {
+                                scope = _selectedBuildingProfile;
+                              } else if (_selectedSiteProfile != null &&
+                                  _selectedSiteProfile?.id != -1) {
+                                scope = _selectedSiteProfile;
+                              } else if (_selectedSiteGroupProfile != null &&
+                                  _selectedSiteGroupProfile?.id != -1) {
+                                scope = _selectedSiteGroupProfile;
+                              }
+                            }
+
+                            // // always add project id and name to the scope
+                            // scope = scope.copyWith(
+                            //   projectId: loggedInUser!
+                            //       .selectedScope.projectProfile!.id,
+                            //   projectName: loggedInUser!
+                            //       .selectedScope.projectProfile!.name,
+                            // );
+
+                            if (updateUiOnly) {
+                              // update UI only
+                              setState(() {
+                                _isEditing = false;
+                              });
+
+                              widget.onScopeSet?.call(scope);
+                            } else {
+                              // commit to db
+                              final result = await widget.onScopeSet?.call(
+                                scope,
+                              );
+
+                              if (result == null) {
+                                dev.log('Error setting scope');
+
+                                return;
+                              }
+
+                              if (result['error'] == null) {
+                                _errorText = '';
+                                _updateOriginalScope();
+                                _showCommitted = widget.showCommitted;
+                                // _newParentScopeSeletedFromList = false;
+                                if (result['show_committed'] != null) {
+                                  _showCommitted = result['show_committed'];
+                                }
+                                _committedMessage =
+                                    result['message'] ?? 'Change committed';
+                              } else {
+                                dev.log(
+                                  'Error setting scope: ${result['error']}',
+                                );
+                                if (result['error'] is Map) {
+                                  String? status = result['error']['status'];
+                                  if (status != null) {
+                                    status = 'm:$status';
+                                  }
+                                  _errorText = getErrorText(
+                                    status,
+                                    defaultErrorText: 'Error setting scope',
+                                  );
+                                  _committedMessage = _errorText;
+                                } else {
+                                  _committedMessage = 'Error setting scope';
+                                  _errorText = 'Error setting scope';
+                                }
+                              }
+
+                              setState(() {
+                                _isEditing = false;
+                                _isReset = false;
+                              });
+                            }
+                          },
+                  )
+                : !widget.isEditable
+                ? Container()
+                : IconButton(
+                    icon: Icon(Icons.edit, color: Theme.of(context).hintColor),
+                    onPressed: () {
+                      setState(() {
+                        _isEditing = true;
+                        _showCommitted = false;
+                      });
+                    },
+                  ),
             horizontalSpaceSmall,
           ],
         ),

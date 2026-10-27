@@ -95,16 +95,10 @@ class _CreateTariffPackageState extends State<WgtCreateTariffPackage> {
   // hard coded for now
   // multiple TPs with diff cycle days can be created
   // under SP LT Cycle type
-  List<String> systemCycleTypeList = [
-    'SP LT Cycle',
-  ];
+  List<String> systemCycleTypeList = ['SP LT Cycle'];
 
-  List<String> systemRateTypeList = [
-    'SP LT Rate',
-  ];
-  List<String> regularRateTypeList = [
-    'FTF',
-  ];
+  List<String> systemRateTypeList = ['SP LT Rate'];
+  List<String> regularRateTypeList = ['FTF'];
 
   List<String>? _selectedRateTypeList;
 
@@ -168,14 +162,15 @@ class _CreateTariffPackageState extends State<WgtCreateTariffPackage> {
       }
 
       queryMap['interest_rate'] = _interestRateStr;
-      queryMap['interest_duration'] =
-          _selectedInterestDuration!.name.toLowerCase();
+      queryMap['interest_duration'] = _selectedInterestDuration!.name
+          .toLowerCase();
       if (_selectedPaymentTermStr != null) {
         queryMap['payment_term'] = _selectedPaymentTermStr!;
       }
 
-      queryMap['interest_start_date_type'] =
-          _selectedInterestStartDateType!.value.toLowerCase();
+      queryMap['interest_start_date_type'] = _selectedInterestStartDateType!
+          .value
+          .toLowerCase();
 
       result = await doCreatePagTariffPackage(
         widget.loggedInUser,
@@ -199,8 +194,10 @@ class _CreateTariffPackageState extends State<WgtCreateTariffPackage> {
       dev.log('error: $e');
 
       // setState(() {
-      _errorText =
-          getErrorText(e, defaultErrorText: 'Error creating tariff package');
+      _errorText = getErrorText(
+        e,
+        defaultErrorText: 'Error creating tariff package',
+      );
 
       _newItem = true;
       _createSuccess = false;
@@ -245,8 +242,10 @@ class _CreateTariffPackageState extends State<WgtCreateTariffPackage> {
     //     Provider.of<PagUserProvider>(context, listen: false).currentUser;
 
     _visibleRoleList.clear();
-    _visibleRoleList.addAll(widget.loggedInUser.selectedScope.projectProfile!
-        .getVisibleRoleInfoList());
+    _visibleRoleList.addAll(
+      widget.loggedInUser.selectedScope.projectProfile!
+          .getVisibleRoleInfoList(),
+    );
   }
 
   @override
@@ -262,32 +261,33 @@ class _CreateTariffPackageState extends State<WgtCreateTariffPackage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SizedBox(
-              width: width,
-              child: pullData
-                  ? FutureBuilder(
-                      future: _doResolveTpConfig(),
-                      builder: (context, snapshot) {
-                        switch (snapshot.connectionState) {
-                          case ConnectionState.waiting:
-                            dev.log('waiting...');
+            width: width,
+            child: pullData
+                ? FutureBuilder(
+                    future: _doResolveTpConfig(),
+                    builder: (context, snapshot) {
+                      switch (snapshot.connectionState) {
+                        case ConnectionState.waiting:
+                          dev.log('waiting...');
+                          return const Align(
+                            alignment: Alignment.topCenter,
+                            child: WgtPagWait(size: 35),
+                          );
+                        default:
+                          if (snapshot.hasError) {
+                            dev.log('error: ${snapshot.error}');
                             return const Align(
                               alignment: Alignment.topCenter,
-                              child: WgtPagWait(size: 35),
+                              child: Text('Error loading config'),
                             );
-                          default:
-                            if (snapshot.hasError) {
-                              dev.log('error: ${snapshot.error}');
-                              return const Align(
-                                alignment: Alignment.topCenter,
-                                child: Text('Error loading config'),
-                              );
-                            } else {
-                              return getCompletedWidget();
-                            }
-                        }
-                      },
-                    )
-                  : getCompletedWidget()),
+                          } else {
+                            return getCompletedWidget();
+                          }
+                      }
+                    },
+                  )
+                : getCompletedWidget(),
+          ),
         ],
       ),
     );
@@ -323,9 +323,10 @@ class _CreateTariffPackageState extends State<WgtCreateTariffPackage> {
             label: _createWait
                 ? 'Creating tariff package...'
                 : _createSuccess
-                    ? '✓ Tariff package created'
-                    : 'Create Tariff Package',
-            onPressed: !_checkEnableButton() //_selectedProjectScope == null
+                ? '✓ Tariff package created'
+                : 'Create Tariff Package',
+            onPressed:
+                !_checkEnableButton() //_selectedProjectScope == null
                 ? null
                 : () async {
                     await _createItem();
@@ -359,8 +360,10 @@ class _CreateTariffPackageState extends State<WgtCreateTariffPackage> {
           if (_newItem && !_createSuccess && _errorText.isNotEmpty)
             Padding(
               padding: const EdgeInsets.all(5.0),
-              child: Text(_errorText,
-                  style: TextStyle(color: Theme.of(context).colorScheme.error)),
+              child: Text(
+                _errorText,
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
             ),
           if (!_newItem && _createSuccess && _errorText.isEmpty)
             Padding(
@@ -385,13 +388,18 @@ class _CreateTariffPackageState extends State<WgtCreateTariffPackage> {
       PagTariffPackageTypeCat.systemCycle,
     ];
     TextStyle dropDownListTextStyle = TextStyle(
-        fontSize: 15,
-        color: Theme.of(context).colorScheme.onSurface,
-        fontWeight: FontWeight.w500);
-    TextStyle dropDownListHintStyle =
-        TextStyle(fontSize: 15, color: Theme.of(context).hintColor);
-    Widget dropDownUnderline =
-        Container(height: 1, color: Theme.of(context).hintColor.withAlpha(75));
+      fontSize: 15,
+      color: Theme.of(context).colorScheme.onSurface,
+      fontWeight: FontWeight.w500,
+    );
+    TextStyle dropDownListHintStyle = TextStyle(
+      fontSize: 15,
+      color: Theme.of(context).hintColor,
+    );
+    Widget dropDownUnderline = Container(
+      height: 1,
+      color: Theme.of(context).hintColor.withAlpha(75),
+    );
     return Column(
       children: [
         Row(
@@ -401,83 +409,88 @@ class _CreateTariffPackageState extends State<WgtCreateTariffPackage> {
               width: 95,
               child: Align(
                 alignment: AlignmentDirectional.centerEnd,
-                child: Text('Base Type:',
-                    style: TextStyle(color: Theme.of(context).hintColor)),
+                child: Text(
+                  'Base Type:',
+                  style: TextStyle(color: Theme.of(context).hintColor),
+                ),
               ),
             ),
             horizontalSpaceSmall,
             SizedBox(
               width: 95,
               child: DropdownButton<PagTariffPackageTypeCat>(
-                  alignment: AlignmentDirectional.centerStart,
-                  hint: Padding(
-                      padding: const EdgeInsets.only(bottom: 3.0),
-                      child: Text('Rate Type', style: dropDownListHintStyle)),
-                  value: _selectedPackageTypeCat,
-                  focusColor: Theme.of(context).hoverColor,
-                  underline: dropDownUnderline,
-                  icon: const Icon(Icons.arrow_drop_down),
-                  iconSize: 21,
-                  style:
-                      TextStyle(color: Theme.of(context).colorScheme.primary),
-                  onChanged: (PagTariffPackageTypeCat? value) async {
-                    if (value != null) {
-                      if (value == _selectedPackageTypeCat) {
-                        return;
-                      }
+                alignment: AlignmentDirectional.centerStart,
+                hint: Padding(
+                  padding: const EdgeInsets.only(bottom: 3.0),
+                  child: Text('Rate Type', style: dropDownListHintStyle),
+                ),
+                value: _selectedPackageTypeCat,
+                focusColor: Theme.of(context).hoverColor,
+                underline: dropDownUnderline,
+                icon: const Icon(Icons.arrow_drop_down),
+                iconSize: 21,
+                style: TextStyle(color: Theme.of(context).colorScheme.primary),
+                onChanged: (PagTariffPackageTypeCat? value) async {
+                  if (value != null) {
+                    if (value == _selectedPackageTypeCat) {
+                      return;
                     }
-                    setState(() {
-                      _selectedPackageTypeCat = value;
-                      _newItem = true;
-                      _createSuccess = false;
-                      if (_selectedPackageTypeCat ==
-                          PagTariffPackageTypeCat.systemCycle) {
-                        _selectedRateTypeList = systemCycleTypeList;
-                        if (systemCycleTypeList.length == 1) {
-                          _selectedTariffPackageTypeLabelStr =
-                              systemCycleTypeList.first;
-                        } else {
-                          _selectedTariffPackageTypeLabelStr = null;
-                        }
+                  }
+                  setState(() {
+                    _selectedPackageTypeCat = value;
+                    _newItem = true;
+                    _createSuccess = false;
+                    if (_selectedPackageTypeCat ==
+                        PagTariffPackageTypeCat.systemCycle) {
+                      _selectedRateTypeList = systemCycleTypeList;
+                      if (systemCycleTypeList.length == 1) {
+                        _selectedTariffPackageTypeLabelStr =
+                            systemCycleTypeList.first;
+                      } else {
+                        _selectedTariffPackageTypeLabelStr = null;
+                      }
+                      if (systemRateTypeList.length == 1) {
+                        _selectedSysRatePackageTypeStr =
+                            systemRateTypeList.first;
+                      } else {
+                        _selectedSysRatePackageTypeStr = null;
+                      }
+                    } else if (_selectedPackageTypeCat ==
+                        PagTariffPackageTypeCat.systemRate) {
+                      _selectedRateTypeList = systemRateTypeList;
+                      if (systemRateTypeList.length == 1) {
+                        _selectedTariffPackageTypeLabelStr =
+                            systemRateTypeList.first;
                         if (systemRateTypeList.length == 1) {
                           _selectedSysRatePackageTypeStr =
                               systemRateTypeList.first;
                         } else {
                           _selectedSysRatePackageTypeStr = null;
                         }
-                      } else if (_selectedPackageTypeCat ==
-                          PagTariffPackageTypeCat.systemRate) {
-                        _selectedRateTypeList = systemRateTypeList;
-                        if (systemRateTypeList.length == 1) {
-                          _selectedTariffPackageTypeLabelStr =
-                              systemRateTypeList.first;
-                          if (systemRateTypeList.length == 1) {
-                            _selectedSysRatePackageTypeStr =
-                                systemRateTypeList.first;
-                          } else {
-                            _selectedSysRatePackageTypeStr = null;
-                          }
-                        } else {
-                          _selectedTariffPackageTypeLabelStr = null;
-                        }
                       } else {
-                        _selectedTariffPackageTypeLabelStr =
-                            regularRateTypeList.first;
-                        _selectedRateTypeList = regularRateTypeList;
+                        _selectedTariffPackageTypeLabelStr = null;
                       }
-                    });
-                  },
-                  items: tpTypeList
-                      .map<DropdownMenuItem<PagTariffPackageTypeCat>>(
-                          (PagTariffPackageTypeCat value) {
-                    return DropdownMenuItem<PagTariffPackageTypeCat>(
-                      value: value,
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 3.0),
-                        child: Text(value.label),
-                      ),
-                    );
-                  }).toList()),
+                    } else {
+                      _selectedTariffPackageTypeLabelStr =
+                          regularRateTypeList.first;
+                      _selectedRateTypeList = regularRateTypeList;
+                    }
+                  });
+                },
+                items: tpTypeList
+                    .map<DropdownMenuItem<PagTariffPackageTypeCat>>((
+                      PagTariffPackageTypeCat value,
+                    ) {
+                      return DropdownMenuItem<PagTariffPackageTypeCat>(
+                        value: value,
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 3.0),
+                          child: Text(value.label),
+                        ),
+                      );
+                    })
+                    .toList(),
+              ),
             ),
           ],
         ),
@@ -488,56 +501,63 @@ class _CreateTariffPackageState extends State<WgtCreateTariffPackage> {
               SizedBox(
                 width: 95,
                 child: Align(
-                    alignment: AlignmentDirectional.centerEnd,
-                    child: Text('Package Type:',
-                        style: TextStyle(color: Theme.of(context).hintColor))),
+                  alignment: AlignmentDirectional.centerEnd,
+                  child: Text(
+                    'Package Type:',
+                    style: TextStyle(color: Theme.of(context).hintColor),
+                  ),
+                ),
               ),
               horizontalSpaceSmall,
               SizedBox(
                 width: 95,
                 child: DropdownButton<String>(
-                    alignment: AlignmentDirectional.centerStart,
-                    hint: Padding(
-                        padding: const EdgeInsets.only(bottom: 3.0),
-                        child: Text('Rate Type', style: dropDownListHintStyle)),
-                    value: _selectedTariffPackageTypeLabelStr,
-                    focusColor: Theme.of(context).hoverColor,
-                    underline: dropDownUnderline,
-                    icon: const Icon(Icons.arrow_drop_down),
-                    iconSize: 21,
-                    style:
-                        TextStyle(color: Theme.of(context).colorScheme.primary),
-                    onChanged: (String? value) async {
-                      if (value != null) {
-                        if (value == _selectedTariffPackageTypeLabelStr) {
-                          return;
+                  alignment: AlignmentDirectional.centerStart,
+                  hint: Padding(
+                    padding: const EdgeInsets.only(bottom: 3.0),
+                    child: Text('Rate Type', style: dropDownListHintStyle),
+                  ),
+                  value: _selectedTariffPackageTypeLabelStr,
+                  focusColor: Theme.of(context).hoverColor,
+                  underline: dropDownUnderline,
+                  icon: const Icon(Icons.arrow_drop_down),
+                  iconSize: 21,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  onChanged: (String? value) async {
+                    if (value != null) {
+                      if (value == _selectedTariffPackageTypeLabelStr) {
+                        return;
+                      }
+                    }
+                    setState(() {
+                      _selectedTariffPackageTypeLabelStr = value;
+                      _newItem = true;
+                      _createSuccess = false;
+                      if (_selectedPackageTypeCat ==
+                          PagTariffPackageTypeCat.systemCycle) {
+                        if (systemRateTypeList.length == 1) {
+                          _selectedSysRatePackageTypeStr =
+                              systemRateTypeList.first;
+                        } else {
+                          _selectedSysRatePackageTypeStr = null;
                         }
                       }
-                      setState(() {
-                        _selectedTariffPackageTypeLabelStr = value;
-                        _newItem = true;
-                        _createSuccess = false;
-                        if (_selectedPackageTypeCat ==
-                            PagTariffPackageTypeCat.systemCycle) {
-                          if (systemRateTypeList.length == 1) {
-                            _selectedSysRatePackageTypeStr =
-                                systemRateTypeList.first;
-                          } else {
-                            _selectedSysRatePackageTypeStr = null;
-                          }
-                        }
-                      });
-                    },
-                    items: (_selectedRateTypeList ?? [])
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 3.0),
-                          child: Text(value),
-                        ),
-                      );
-                    }).toList()),
+                    });
+                  },
+                  items: (_selectedRateTypeList ?? [])
+                      .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 3.0),
+                            child: Text(value),
+                          ),
+                        );
+                      })
+                      .toList(),
+                ),
               ),
             ],
           ),
@@ -549,47 +569,53 @@ class _CreateTariffPackageState extends State<WgtCreateTariffPackage> {
                 width: 95,
                 child: Align(
                   alignment: AlignmentDirectional.centerEnd,
-                  child: Text('Sys Rate:',
-                      style: TextStyle(color: Theme.of(context).hintColor)),
+                  child: Text(
+                    'Sys Rate:',
+                    style: TextStyle(color: Theme.of(context).hintColor),
+                  ),
                 ),
               ),
               horizontalSpaceSmall,
               SizedBox(
                 width: 95,
                 child: DropdownButton<String>(
-                    alignment: AlignmentDirectional.centerStart,
-                    hint: Padding(
-                        padding: const EdgeInsets.only(bottom: 3.0),
-                        child: Text('Sys Rate', style: dropDownListHintStyle)),
-                    value: _selectedSysRatePackageTypeStr,
-                    focusColor: Theme.of(context).hoverColor,
-                    underline: dropDownUnderline,
-                    icon: const Icon(Icons.arrow_drop_down),
-                    iconSize: 21,
-                    style:
-                        TextStyle(color: Theme.of(context).colorScheme.primary),
-                    onChanged: (String? value) async {
-                      if (value != null) {
-                        if (value == _selectedSysRatePackageTypeStr) {
-                          return;
-                        }
+                  alignment: AlignmentDirectional.centerStart,
+                  hint: Padding(
+                    padding: const EdgeInsets.only(bottom: 3.0),
+                    child: Text('Sys Rate', style: dropDownListHintStyle),
+                  ),
+                  value: _selectedSysRatePackageTypeStr,
+                  focusColor: Theme.of(context).hoverColor,
+                  underline: dropDownUnderline,
+                  icon: const Icon(Icons.arrow_drop_down),
+                  iconSize: 21,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  onChanged: (String? value) async {
+                    if (value != null) {
+                      if (value == _selectedSysRatePackageTypeStr) {
+                        return;
                       }
-                      setState(() {
-                        _selectedSysRatePackageTypeStr = value;
-                        _newItem = true;
-                        _createSuccess = false;
-                      });
-                    },
-                    items: (systemRateTypeList)
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 3.0),
-                          child: Text(value),
-                        ),
-                      );
-                    }).toList()),
+                    }
+                    setState(() {
+                      _selectedSysRatePackageTypeStr = value;
+                      _newItem = true;
+                      _createSuccess = false;
+                    });
+                  },
+                  items: (systemRateTypeList).map<DropdownMenuItem<String>>((
+                    String value,
+                  ) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 3.0),
+                        child: Text(value),
+                      ),
+                    );
+                  }).toList(),
+                ),
               ),
             ],
           ),
@@ -599,18 +625,20 @@ class _CreateTariffPackageState extends State<WgtCreateTariffPackage> {
 
   Widget getMeterTypeSelector() {
     // hard code for now
-    List<MeterTypeTag> meterTypeList = [
-      MeterTypeTag.E,
-      MeterTypeTag.W,
-    ];
+    List<MeterTypeTag> meterTypeList = [MeterTypeTag.E, MeterTypeTag.W];
     TextStyle dropDownListTextStyle = TextStyle(
-        fontSize: 15,
-        color: Theme.of(context).colorScheme.onSurface,
-        fontWeight: FontWeight.w500);
-    TextStyle dropDownListHintStyle =
-        TextStyle(fontSize: 15, color: Theme.of(context).hintColor);
-    Widget dropDownUnderline =
-        Container(height: 1, color: Theme.of(context).hintColor.withAlpha(75));
+      fontSize: 15,
+      color: Theme.of(context).colorScheme.onSurface,
+      fontWeight: FontWeight.w500,
+    );
+    TextStyle dropDownListHintStyle = TextStyle(
+      fontSize: 15,
+      color: Theme.of(context).hintColor,
+    );
+    Widget dropDownUnderline = Container(
+      height: 1,
+      color: Theme.of(context).hintColor.withAlpha(75),
+    );
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
@@ -618,49 +646,54 @@ class _CreateTariffPackageState extends State<WgtCreateTariffPackage> {
           width: 95,
           child: Align(
             alignment: AlignmentDirectional.centerEnd,
-            child: Text('Meter Type:',
-                style: TextStyle(color: Theme.of(context).hintColor)),
+            child: Text(
+              'Meter Type:',
+              style: TextStyle(color: Theme.of(context).hintColor),
+            ),
           ),
         ),
         horizontalSpaceSmall,
         SizedBox(
           width: 96,
           child: DropdownButton<MeterTypeTag>(
-              alignment: AlignmentDirectional.centerStart,
-              hint: Padding(
-                  padding: const EdgeInsets.only(bottom: 3.0),
-                  child: Text('Meter Type', style: dropDownListHintStyle)),
-              value: _selectedMeterType,
-              focusColor: Theme.of(context).hoverColor,
-              underline: dropDownUnderline,
-              icon: const Icon(Icons.arrow_drop_down),
-              iconSize: 21,
-              style: TextStyle(color: Theme.of(context).colorScheme.primary),
-              onChanged: (MeterTypeTag? value) async {
-                if (value != null) {
-                  if (value == _selectedMeterType) {
-                    return;
-                  }
+            alignment: AlignmentDirectional.centerStart,
+            hint: Padding(
+              padding: const EdgeInsets.only(bottom: 3.0),
+              child: Text('Meter Type', style: dropDownListHintStyle),
+            ),
+            value: _selectedMeterType,
+            focusColor: Theme.of(context).hoverColor,
+            underline: dropDownUnderline,
+            icon: const Icon(Icons.arrow_drop_down),
+            iconSize: 21,
+            style: TextStyle(color: Theme.of(context).colorScheme.primary),
+            onChanged: (MeterTypeTag? value) async {
+              if (value != null) {
+                if (value == _selectedMeterType) {
+                  return;
                 }
-                setState(() {
-                  _selectedMeterType = value!;
-                  _newItem = true;
-                  _createSuccess = false;
-                });
-              },
-              items: meterTypeList
-                  .map<DropdownMenuItem<MeterTypeTag>>((MeterTypeTag value) {
-                return DropdownMenuItem<MeterTypeTag>(
-                  value: value,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 3.0),
-                    child: Text(
-                      value.name,
-                      // style: dropDownListTextStyle,
-                    ),
+              }
+              setState(() {
+                _selectedMeterType = value!;
+                _newItem = true;
+                _createSuccess = false;
+              });
+            },
+            items: meterTypeList.map<DropdownMenuItem<MeterTypeTag>>((
+              MeterTypeTag value,
+            ) {
+              return DropdownMenuItem<MeterTypeTag>(
+                value: value,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 3.0),
+                  child: Text(
+                    value.name,
+                    // style: dropDownListTextStyle,
                   ),
-                );
-              }).toList()),
+                ),
+              );
+            }).toList(),
+          ),
         ),
       ],
     );
@@ -675,13 +708,18 @@ class _CreateTariffPackageState extends State<WgtCreateTariffPackage> {
     }
 
     TextStyle dropDownListTextStyle = TextStyle(
-        fontSize: 15,
-        color: Theme.of(context).colorScheme.onSurface,
-        fontWeight: FontWeight.w500);
-    TextStyle dropDownListHintStyle =
-        TextStyle(fontSize: 15, color: Theme.of(context).hintColor);
-    Widget dropDownUnderline =
-        Container(height: 1, color: Theme.of(context).hintColor.withAlpha(75));
+      fontSize: 15,
+      color: Theme.of(context).colorScheme.onSurface,
+      fontWeight: FontWeight.w500,
+    );
+    TextStyle dropDownListHintStyle = TextStyle(
+      fontSize: 15,
+      color: Theme.of(context).hintColor,
+    );
+    Widget dropDownUnderline = Container(
+      height: 1,
+      color: Theme.of(context).hintColor.withAlpha(75),
+    );
 
     // dropdown
     return Row(
@@ -691,48 +729,52 @@ class _CreateTariffPackageState extends State<WgtCreateTariffPackage> {
           width: 95,
           child: Align(
             alignment: AlignmentDirectional.centerEnd,
-            child: Text('Cycle Date:',
-                style: TextStyle(color: Theme.of(context).hintColor)),
+            child: Text(
+              'Cycle Date:',
+              style: TextStyle(color: Theme.of(context).hintColor),
+            ),
           ),
         ),
         horizontalSpaceSmall,
         SizedBox(
           width: 96,
           child: DropdownButton<String>(
-              alignment: AlignmentDirectional.centerStart,
-              hint: Padding(
-                  padding: const EdgeInsets.only(bottom: 3.0),
-                  child: Text('Cycle Date', style: dropDownListHintStyle)),
-              value: _selectedCycleDay,
-              focusColor: Theme.of(context).hoverColor,
-              underline: dropDownUnderline,
-              icon: const Icon(Icons.arrow_drop_down),
-              iconSize: 21,
-              style: TextStyle(color: Theme.of(context).colorScheme.primary),
-              onChanged: (String? value) async {
-                if (value != null) {
-                  if (value == _selectedMeterType?.name) {
-                    return;
-                  }
+            alignment: AlignmentDirectional.centerStart,
+            hint: Padding(
+              padding: const EdgeInsets.only(bottom: 3.0),
+              child: Text('Cycle Date', style: dropDownListHintStyle),
+            ),
+            value: _selectedCycleDay,
+            focusColor: Theme.of(context).hoverColor,
+            underline: dropDownUnderline,
+            icon: const Icon(Icons.arrow_drop_down),
+            iconSize: 21,
+            style: TextStyle(color: Theme.of(context).colorScheme.primary),
+            onChanged: (String? value) async {
+              if (value != null) {
+                if (value == _selectedMeterType?.name) {
+                  return;
                 }
-                setState(() {
-                  _selectedCycleDay = value!;
-                  _newItem = true;
-                  _createSuccess = false;
-                });
-              },
-              items: cycleDates.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 3.0),
-                    child: Text(
-                      value,
-                      // style: dropDownListTextStyle,
-                    ),
+              }
+              setState(() {
+                _selectedCycleDay = value!;
+                _newItem = true;
+                _createSuccess = false;
+              });
+            },
+            items: cycleDates.map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 3.0),
+                  child: Text(
+                    value,
+                    // style: dropDownListTextStyle,
                   ),
-                );
-              }).toList()),
+                ),
+              );
+            }).toList(),
+          ),
         ),
       ],
     );
@@ -747,13 +789,18 @@ class _CreateTariffPackageState extends State<WgtCreateTariffPackage> {
     }
 
     TextStyle dropDownListTextStyle = TextStyle(
-        fontSize: 15,
-        color: Theme.of(context).colorScheme.onSurface,
-        fontWeight: FontWeight.w500);
-    TextStyle dropDownListHintStyle =
-        TextStyle(fontSize: 15, color: Theme.of(context).hintColor);
-    Widget dropDownUnderline =
-        Container(height: 1, color: Theme.of(context).hintColor.withAlpha(75));
+      fontSize: 15,
+      color: Theme.of(context).colorScheme.onSurface,
+      fontWeight: FontWeight.w500,
+    );
+    TextStyle dropDownListHintStyle = TextStyle(
+      fontSize: 15,
+      color: Theme.of(context).hintColor,
+    );
+    Widget dropDownUnderline = Container(
+      height: 1,
+      color: Theme.of(context).hintColor.withAlpha(75),
+    );
 
     // dropdown
     return Row(
@@ -763,45 +810,49 @@ class _CreateTariffPackageState extends State<WgtCreateTariffPackage> {
           width: 95,
           child: Align(
             alignment: AlignmentDirectional.centerEnd,
-            child: Text('Pmt. Term:',
-                style: TextStyle(color: Theme.of(context).hintColor)),
+            child: Text(
+              'Pmt. Term:',
+              style: TextStyle(color: Theme.of(context).hintColor),
+            ),
           ),
         ),
         horizontalSpaceSmall,
         SizedBox(
           width: 96,
           child: DropdownButton<String>(
-              alignment: AlignmentDirectional.centerStart,
-              hint: Padding(
-                  padding: const EdgeInsets.only(bottom: 3.0),
-                  child: Text('Pmt. Term', style: dropDownListHintStyle)),
-              value: _selectedPaymentTermStr,
-              focusColor: Theme.of(context).hoverColor,
-              underline: dropDownUnderline,
-              icon: const Icon(Icons.arrow_drop_down),
-              iconSize: 21,
-              style: TextStyle(color: Theme.of(context).colorScheme.primary),
-              onChanged: (String? value) async {
-                if (value != null) {
-                  if (value == _selectedMeterType?.name) {
-                    return;
-                  }
+            alignment: AlignmentDirectional.centerStart,
+            hint: Padding(
+              padding: const EdgeInsets.only(bottom: 3.0),
+              child: Text('Pmt. Term', style: dropDownListHintStyle),
+            ),
+            value: _selectedPaymentTermStr,
+            focusColor: Theme.of(context).hoverColor,
+            underline: dropDownUnderline,
+            icon: const Icon(Icons.arrow_drop_down),
+            iconSize: 21,
+            style: TextStyle(color: Theme.of(context).colorScheme.primary),
+            onChanged: (String? value) async {
+              if (value != null) {
+                if (value == _selectedMeterType?.name) {
+                  return;
                 }
-                setState(() {
-                  _selectedPaymentTermStr = value!;
-                  _newItem = true;
-                  _createSuccess = false;
-                });
-              },
-              items: paymentTerms.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 3.0),
-                    child: Text(value),
-                  ),
-                );
-              }).toList()),
+              }
+              setState(() {
+                _selectedPaymentTermStr = value!;
+                _newItem = true;
+                _createSuccess = false;
+              });
+            },
+            items: paymentTerms.map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 3.0),
+                  child: Text(value),
+                ),
+              );
+            }).toList(),
+          ),
         ),
       ],
     );
@@ -813,13 +864,18 @@ class _CreateTariffPackageState extends State<WgtCreateTariffPackage> {
       PagInterestDurationType.annum,
     ];
     TextStyle dropDownListTextStyle = TextStyle(
-        fontSize: 15,
-        color: Theme.of(context).colorScheme.onSurface,
-        fontWeight: FontWeight.w500);
-    TextStyle dropDownListHintStyle =
-        TextStyle(fontSize: 15, color: Theme.of(context).hintColor);
-    Widget dropDownUnderline =
-        Container(height: 1, color: Theme.of(context).hintColor.withAlpha(75));
+      fontSize: 15,
+      color: Theme.of(context).colorScheme.onSurface,
+      fontWeight: FontWeight.w500,
+    );
+    TextStyle dropDownListHintStyle = TextStyle(
+      fontSize: 15,
+      color: Theme.of(context).hintColor,
+    );
+    Widget dropDownUnderline = Container(
+      height: 1,
+      color: Theme.of(context).hintColor.withAlpha(75),
+    );
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
@@ -827,49 +883,54 @@ class _CreateTariffPackageState extends State<WgtCreateTariffPackage> {
           width: 95,
           child: Align(
             alignment: AlignmentDirectional.centerEnd,
-            child: Text('Int. Dur.:',
-                style: TextStyle(color: Theme.of(context).hintColor)),
+            child: Text(
+              'Int. Dur.:',
+              style: TextStyle(color: Theme.of(context).hintColor),
+            ),
           ),
         ),
         horizontalSpaceSmall,
         SizedBox(
           width: 96,
           child: DropdownButton<PagInterestDurationType>(
-              alignment: AlignmentDirectional.centerStart,
-              hint: Padding(
-                  padding: const EdgeInsets.only(bottom: 3.0),
-                  child: Text('Int. Dur.', style: dropDownListHintStyle)),
-              value: _selectedInterestDuration,
-              focusColor: Theme.of(context).hoverColor,
-              underline: dropDownUnderline,
-              icon: const Icon(Icons.arrow_drop_down),
-              iconSize: 21,
-              style: TextStyle(color: Theme.of(context).colorScheme.primary),
-              onChanged: (PagInterestDurationType? value) async {
-                if (value != null) {
-                  if (value == _selectedInterestDuration) {
-                    return;
-                  }
+            alignment: AlignmentDirectional.centerStart,
+            hint: Padding(
+              padding: const EdgeInsets.only(bottom: 3.0),
+              child: Text('Int. Dur.', style: dropDownListHintStyle),
+            ),
+            value: _selectedInterestDuration,
+            focusColor: Theme.of(context).hoverColor,
+            underline: dropDownUnderline,
+            icon: const Icon(Icons.arrow_drop_down),
+            iconSize: 21,
+            style: TextStyle(color: Theme.of(context).colorScheme.primary),
+            onChanged: (PagInterestDurationType? value) async {
+              if (value != null) {
+                if (value == _selectedInterestDuration) {
+                  return;
                 }
-                setState(() {
-                  _selectedInterestDuration = value!;
-                  _newItem = true;
-                  _createSuccess = false;
-                });
-              },
-              items: intDur.map<DropdownMenuItem<PagInterestDurationType>>(
-                  (PagInterestDurationType value) {
-                return DropdownMenuItem<PagInterestDurationType>(
-                  value: value,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 3.0),
-                    child: Text(
-                      value.name,
-                      // style: dropDownListTextStyle,
-                    ),
+              }
+              setState(() {
+                _selectedInterestDuration = value!;
+                _newItem = true;
+                _createSuccess = false;
+              });
+            },
+            items: intDur.map<DropdownMenuItem<PagInterestDurationType>>((
+              PagInterestDurationType value,
+            ) {
+              return DropdownMenuItem<PagInterestDurationType>(
+                value: value,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 3.0),
+                  child: Text(
+                    value.name,
+                    // style: dropDownListTextStyle,
                   ),
-                );
-              }).toList()),
+                ),
+              );
+            }).toList(),
+          ),
         ),
       ],
     );
@@ -881,13 +942,18 @@ class _CreateTariffPackageState extends State<WgtCreateTariffPackage> {
       PagInterestStartDateType.billDate,
     ];
     TextStyle dropDownListTextStyle = TextStyle(
-        fontSize: 15,
-        color: Theme.of(context).colorScheme.onSurface,
-        fontWeight: FontWeight.w500);
-    TextStyle dropDownListHintStyle =
-        TextStyle(fontSize: 15, color: Theme.of(context).hintColor);
-    Widget dropDownUnderline =
-        Container(height: 1, color: Theme.of(context).hintColor.withAlpha(75));
+      fontSize: 15,
+      color: Theme.of(context).colorScheme.onSurface,
+      fontWeight: FontWeight.w500,
+    );
+    TextStyle dropDownListHintStyle = TextStyle(
+      fontSize: 15,
+      color: Theme.of(context).hintColor,
+    );
+    Widget dropDownUnderline = Container(
+      height: 1,
+      color: Theme.of(context).hintColor.withAlpha(75),
+    );
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
@@ -895,50 +961,56 @@ class _CreateTariffPackageState extends State<WgtCreateTariffPackage> {
           width: 95,
           child: Align(
             alignment: AlignmentDirectional.centerEnd,
-            child: Text('Int. Start Date:',
-                style: TextStyle(color: Theme.of(context).hintColor)),
+            child: Text(
+              'Int. Start Date:',
+              style: TextStyle(color: Theme.of(context).hintColor),
+            ),
           ),
         ),
         horizontalSpaceSmall,
         SizedBox(
           width: 120,
           child: DropdownButton<PagInterestStartDateType>(
-              alignment: AlignmentDirectional.centerStart,
-              hint: Padding(
-                  padding: const EdgeInsets.only(bottom: 3.0),
-                  child: Text('Int. Start Date', style: dropDownListHintStyle)),
-              value: _selectedInterestStartDateType,
-              focusColor: Theme.of(context).hoverColor,
-              underline: dropDownUnderline,
-              icon: const Icon(Icons.arrow_drop_down),
-              iconSize: 21,
-              style: TextStyle(color: Theme.of(context).colorScheme.primary),
-              onChanged: (PagInterestStartDateType? value) async {
-                if (value != null) {
-                  if (value == _selectedInterestStartDateType) {
-                    return;
-                  }
+            alignment: AlignmentDirectional.centerStart,
+            hint: Padding(
+              padding: const EdgeInsets.only(bottom: 3.0),
+              child: Text('Int. Start Date', style: dropDownListHintStyle),
+            ),
+            value: _selectedInterestStartDateType,
+            focusColor: Theme.of(context).hoverColor,
+            underline: dropDownUnderline,
+            icon: const Icon(Icons.arrow_drop_down),
+            iconSize: 21,
+            style: TextStyle(color: Theme.of(context).colorScheme.primary),
+            onChanged: (PagInterestStartDateType? value) async {
+              if (value != null) {
+                if (value == _selectedInterestStartDateType) {
+                  return;
                 }
-                setState(() {
-                  _selectedInterestStartDateType = value!;
-                  _newItem = true;
-                  _createSuccess = false;
-                });
-              },
-              items: intStartDateType
-                  .map<DropdownMenuItem<PagInterestStartDateType>>(
-                      (PagInterestStartDateType value) {
-                return DropdownMenuItem<PagInterestStartDateType>(
-                  value: value,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 3.0),
-                    child: Text(
-                      value.name,
-                      // style: dropDownListTextStyle,
+              }
+              setState(() {
+                _selectedInterestStartDateType = value!;
+                _newItem = true;
+                _createSuccess = false;
+              });
+            },
+            items: intStartDateType
+                .map<DropdownMenuItem<PagInterestStartDateType>>((
+                  PagInterestStartDateType value,
+                ) {
+                  return DropdownMenuItem<PagInterestStartDateType>(
+                    value: value,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 3.0),
+                      child: Text(
+                        value.name,
+                        // style: dropDownListTextStyle,
+                      ),
                     ),
-                  ),
-                );
-              }).toList()),
+                  );
+                })
+                .toList(),
+          ),
         ),
       ],
     );
@@ -952,8 +1024,10 @@ class _CreateTariffPackageState extends State<WgtCreateTariffPackage> {
           width: 95,
           child: Align(
             alignment: AlignmentDirectional.centerEnd,
-            child: Text('Int. Rate (%):',
-                style: TextStyle(color: Theme.of(context).hintColor)),
+            child: Text(
+              'Int. Rate (%):',
+              style: TextStyle(color: Theme.of(context).hintColor),
+            ),
           ),
         ),
         horizontalSpaceSmall,
@@ -1040,43 +1114,45 @@ class _CreateTariffPackageState extends State<WgtCreateTariffPackage> {
         initalValueMap: initalValueMap,
         onUpdate:
             (PagTreeNode rootNode, List<Map<String, dynamic>> childreanList) {
-          String validatedResult = validateTpRateList(
-              tpTypeCat: _selectedPackageTypeCat!,
-              rateList: childreanList,
-              tpComingMonthCount: _tpComingMonthCount,
-              timezone: widget.loggedInUser.selectedScope.getProjectTimezone());
-          if (validatedResult != 'valid') {
-            dev.log('Invalid list');
+              String validatedResult = validateTpRateList(
+                tpTypeCat: _selectedPackageTypeCat!,
+                rateList: childreanList,
+                tpComingMonthCount: _tpComingMonthCount,
+                timezone: widget.loggedInUser.selectedScope
+                    .getProjectTimezone(),
+              );
+              if (validatedResult != 'valid') {
+                dev.log('Invalid list');
 
-            setState(() {
-              _errorText = validatedResult;
-              _newItem = true;
-              _createSuccess = false;
-            });
-            return;
-          }
-
-          setState(() {
-            _newItem = true;
-            _newItemLabel = rootNode.label;
-            _createSuccess = false;
-            _itemChildrenGroupTreeRoot = rootNode;
-            _itemChildrenList.clear();
-            _itemChildrenList.addAll(childreanList);
-            for (var element in childreanList) {
-              if (element['from_datetime'] == null ||
-                  element['to_datetime'] == null) {
-                _itemChildrenList.clear();
-                break;
-              } else {
-                DateTime fromDateTime = element['from_datetime'];
-                DateTime toDateTime = element['to_datetime'];
-                element['from_timestamp'] = fromDateTime.toIso8601String();
-                element['to_timestamp'] = toDateTime.toIso8601String();
+                setState(() {
+                  _errorText = validatedResult;
+                  _newItem = true;
+                  _createSuccess = false;
+                });
+                return;
               }
-            }
-          });
-        },
+
+              setState(() {
+                _newItem = true;
+                _newItemLabel = rootNode.label;
+                _createSuccess = false;
+                _itemChildrenGroupTreeRoot = rootNode;
+                _itemChildrenList.clear();
+                _itemChildrenList.addAll(childreanList);
+                for (var element in childreanList) {
+                  if (element['from_datetime'] == null ||
+                      element['to_datetime'] == null) {
+                    _itemChildrenList.clear();
+                    break;
+                  } else {
+                    DateTime fromDateTime = element['from_datetime'];
+                    DateTime toDateTime = element['to_datetime'];
+                    element['from_timestamp'] = fromDateTime.toIso8601String();
+                    element['to_timestamp'] = toDateTime.toIso8601String();
+                  }
+                }
+              });
+            },
         // newItemWidget: getNewSubWidget(),
       ),
     );
@@ -1093,6 +1169,7 @@ class _CreateTariffPackageState extends State<WgtCreateTariffPackage> {
         // itemScopeMap: widget.itemScopeMap!,
         forItemKind: PagItemKind.tariff,
         // forScopeType: widget.itemType is PagScopeType ? widget.itemType : null,
+        autoCascadeScopeFilter: false,
         onScopeSet: (dynamic profile) {
           if (profile == null) {
             if (kDebugMode) {

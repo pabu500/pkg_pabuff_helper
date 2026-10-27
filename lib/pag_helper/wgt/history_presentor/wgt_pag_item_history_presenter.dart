@@ -2,7 +2,6 @@ import 'package:buff_helper/pag_helper/def_helper/dh_pag_item.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/xt_ui/wdgt/file/wgt_save_table.dart';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -145,9 +144,9 @@ class _WgtPagItemHistoryPresenterState
   final List<Map<String, dynamic>> _selectedDataFieldsForList = [];
   bool _selectedFieldsChanged = false;
   final List<Map<String, List<Map<String, dynamic>>>>
-      _selectedHistoryDataSetsForChart = [];
+  _selectedHistoryDataSetsForChart = [];
   final List<Map<String, List<Map<String, dynamic>>>>
-      _selectedHistoryDataSetsForList = [];
+  _selectedHistoryDataSetsForList = [];
 
   String _tooManyRecordsText = '';
   String _emptyResultText = '';
@@ -187,9 +186,11 @@ class _WgtPagItemHistoryPresenterState
     }
     table.add(header);
 
-    for (var i = 0;
-        i < selectedHistoryDataSets.first.values.first.length;
-        i++) {
+    for (
+      var i = 0;
+      i < selectedHistoryDataSets.first.values.first.length;
+      i++
+    ) {
       List<dynamic> row = [];
       row.add(selectedHistoryDataSets.first.values.first[i]['time']);
       for (var element in selectedHistoryDataSets) {
@@ -205,18 +206,18 @@ class _WgtPagItemHistoryPresenterState
   }
 
   void _setReadingTypeConfig(dynamic itemSubType) {
-    final selectedChartReadingTypeKey =
-        _readingTypeConfig.isEmpty ? null : _selectedChartReadingTypeKey;
+    final selectedChartReadingTypeKey = _readingTypeConfig.isEmpty
+        ? null
+        : _selectedChartReadingTypeKey;
     if (widget.itemKind == PagItemKind.device) {
       assert(widget.itemType is PagDeviceCat);
-      assert(
-          itemSubType is MeterType || itemSubType is SensorType);
+      assert(itemSubType is MeterType || itemSubType is SensorType);
 
       switch (itemSubType) {
         case MeterType.electricity1p ||
-              MeterType.water ||
-              MeterType.gas ||
-              MeterType.newater:
+            MeterType.water ||
+            MeterType.gas ||
+            MeterType.newater:
           _selectedChartReadingTypeKey = 'val_meter';
 
           _readingTypeConfig.clear();
@@ -224,9 +225,7 @@ class _WgtPagItemHistoryPresenterState
             'val_meter': {
               'title': 'kWh',
               'dataFields': [
-                {
-                  'field': 'val',
-                }
+                {'field': 'val'},
               ],
               'timeKey': 'time',
               'decimals': 3,
@@ -235,7 +234,7 @@ class _WgtPagItemHistoryPresenterState
               'dataType': DataType.diff,
               'color': Colors.blue.withAlpha(210),
               'width': 150,
-            }
+            },
           });
           break;
         case MeterType.water2:
@@ -274,9 +273,7 @@ class _WgtPagItemHistoryPresenterState
             'val_meter': {
               'title': 'kWh',
               'dataFields': [
-                {
-                  'field': 'val',
-                }
+                {'field': 'val'},
               ],
               'unit': 'kWh',
               'decimals': 3,
@@ -287,9 +284,7 @@ class _WgtPagItemHistoryPresenterState
             'flow': {
               'title': 'Flow (m3/h)',
               'dataFields': [
-                {
-                  'field': 'flow',
-                }
+                {'field': 'flow'},
               ],
               'unit': '',
               // 'decimals': 1,
@@ -300,9 +295,7 @@ class _WgtPagItemHistoryPresenterState
             'power': {
               'title': 'Power (kW)',
               'dataFields': [
-                {
-                  'field': 'power',
-                }
+                {'field': 'power'},
               ],
               'unit': 'kW',
               'chartType': ChartType.line,
@@ -312,9 +305,7 @@ class _WgtPagItemHistoryPresenterState
             'volume': {
               'title': 'Volume (m3)',
               'dataFields': [
-                {
-                  'field': 'volume',
-                },
+                {'field': 'volume'},
               ],
               'unit': 'm3',
               'chartType': ChartType.bar,
@@ -324,9 +315,7 @@ class _WgtPagItemHistoryPresenterState
             'forward_temp': {
               'title': 'Forward Temp (°C)',
               'dataFields': [
-                {
-                  'field': 'forward_temp',
-                },
+                {'field': 'forward_temp'},
               ],
               'unit': '°C',
               'chartType': ChartType.line,
@@ -336,9 +325,7 @@ class _WgtPagItemHistoryPresenterState
             'return_temp': {
               'title': 'Return Temp (°C)',
               'dataFields': [
-                {
-                  'field': 'return_temp',
-                }
+                {'field': 'return_temp'},
               ],
               'unit': '°C',
               'chartType': ChartType.line,
@@ -385,9 +372,7 @@ class _WgtPagItemHistoryPresenterState
             'import_total': {
               'title': 'Import Energy (kWh)',
               'dataFields': [
-                {
-                  'field': 'import_total',
-                }
+                {'field': 'import_total'},
               ],
               'unit': 'kWh',
               'chartType': ChartType.bar,
@@ -397,9 +382,7 @@ class _WgtPagItemHistoryPresenterState
             'export_total': {
               'title': 'Exported Energy (kWh)',
               'dataFields': [
-                {
-                  'field': 'export_total',
-                }
+                {'field': 'export_total'},
               ],
               'unit': 'kWh',
               'chartType': ChartType.bar,
@@ -410,13 +393,13 @@ class _WgtPagItemHistoryPresenterState
 
           break;
         case SensorType.temperature ||
-              SensorType.humidity ||
-              SensorType.ir ||
-              SensorType.light ||
-              SensorType.co2 ||
-              SensorType.fan ||
-              SensorType.temperature_humidity ||
-              SensorType.switchSensor:
+            SensorType.humidity ||
+            SensorType.ir ||
+            SensorType.light ||
+            SensorType.co2 ||
+            SensorType.fan ||
+            SensorType.temperature_humidity ||
+            SensorType.switchSensor:
           _selectedChartReadingTypeKey = 'val_sensor';
           String valColName = "val";
           switch (itemSubType) {
@@ -443,9 +426,7 @@ class _WgtPagItemHistoryPresenterState
             'val_sensor': {
               'title': '',
               'dataFields': [
-                {
-                  'field': valColName,
-                }
+                {'field': valColName},
               ],
               'timeKey': 'time',
               'decimals': 1,
@@ -454,7 +435,7 @@ class _WgtPagItemHistoryPresenterState
               'dataType': DataType.total,
               'color': Colors.blue.withAlpha(210),
               'width': 150,
-            }
+            },
           });
           break;
         default:
@@ -469,13 +450,17 @@ class _WgtPagItemHistoryPresenterState
       _selectedChartReadingTypeKey = selectedChartReadingTypeKey!;
     }
     _selectedMultiFields.clear();
-    _selectedMultiFields.add(ValueItem(
+    _selectedMultiFields.add(
+      ValueItem(
         label: _readingTypeConfig[_selectedChartReadingTypeKey]['title'],
-        value: _selectedChartReadingTypeKey));
+        value: _selectedChartReadingTypeKey,
+      ),
+    );
     _selectedDataFieldsForList.clear();
     _selectedDataFieldsForList.addAll(
-        _readingTypeConfig[_selectedChartReadingTypeKey]['dataFields']
-            as List<Map<String, dynamic>>);
+      _readingTypeConfig[_selectedChartReadingTypeKey]['dataFields']
+          as List<Map<String, dynamic>>,
+    );
   }
 
   void _iniHistorySetting() {
@@ -490,7 +475,8 @@ class _WgtPagItemHistoryPresenterState
     _showDivider = widget.config.isEmpty || widget.config.contains('divider');
     _showHistoryGetter =
         widget.config.isEmpty || widget.config.contains('history_getter');
-    _showMeta = !_isHistoryLoading &&
+    _showMeta =
+        !_isHistoryLoading &&
         (widget.config.isEmpty || widget.config.contains('meta'));
 
     _chartKeyExt = widget.chartKey /* ?? UniqueKey()*/;
@@ -508,14 +494,15 @@ class _WgtPagItemHistoryPresenterState
       _selectedChartReadingTypeKey = 'score1';
     }
     _defaultChartReadingTypeKey = _selectedChartReadingTypeKey;
-
   }
 
   void _updateSelectedDataFieldsList() {
     _selectedDataFieldsForList.clear();
     for (var item in _selectedMultiFields) {
-      _selectedDataFieldsForList.addAll(_readingTypeConfig[item.value!]
-          ['dataFields'] as List<Map<String, dynamic>>);
+      _selectedDataFieldsForList.addAll(
+        _readingTypeConfig[item.value!]['dataFields']
+            as List<Map<String, dynamic>>,
+      );
     }
 
     _selectedChartReadingTypeKey =
@@ -556,7 +543,8 @@ class _WgtPagItemHistoryPresenterState
       width: widget.width,
       height: widget.height,
       decoration: BoxDecoration(
-        color: widget.bgColor ??
+        color:
+            widget.bgColor ??
             (Theme.of(context).brightness == Brightness.light
                 ? Theme.of(context).cardColor
                 : null),
@@ -582,15 +570,21 @@ class _WgtPagItemHistoryPresenterState
           _errorText.isNotEmpty
               ? Expanded(
                   child: Center(
-                      child: getErrorTextPrompt(
-                          context: context, errorText: _errorText)),
+                    child: getErrorTextPrompt(
+                      context: context,
+                      errorText: _errorText,
+                    ),
+                  ),
                 )
               : WgtPagItemHistoryGetter(
                   loggedInUser: widget.loggedInUser,
                   appConfig: widget.appConfig,
                   genMeta: widget.genMeta,
-                  forceAlignTimeRange: _getReadingTypeConfig(
-                          _selectedChartReadingTypeKey, 'chartType') ==
+                  forceAlignTimeRange:
+                      _getReadingTypeConfig(
+                        _selectedChartReadingTypeKey,
+                        'chartType',
+                      ) ==
                       ChartType.bar,
                   getterParentLoaded: _isHistoryLoaded,
                   getByJob: _getByJob,
@@ -606,27 +600,41 @@ class _WgtPagItemHistoryPresenterState
                   lookBackMinutes: widget.lookBackMinutes,
                   dataFields: _displayType == HistroyDisplayType.chart
                       ? _getReadingTypeConfig(
-                              _selectedChartReadingTypeKey, 'dataFields')
-                          as List<Map<String, dynamic>>
+                              _selectedChartReadingTypeKey,
+                              'dataFields',
+                            )
+                            as List<Map<String, dynamic>>
                       : _selectedDataFieldsForList,
-                  dataType: _getReadingTypeConfig(
-                      _selectedChartReadingTypeKey, 'dataType') as DataType,
-                  factor: _getReadingTypeConfig(
-                          _selectedChartReadingTypeKey, 'factor') as double? ??
+                  dataType:
+                      _getReadingTypeConfig(
+                            _selectedChartReadingTypeKey,
+                            'dataType',
+                          )
+                          as DataType,
+                  factor:
+                      _getReadingTypeConfig(
+                            _selectedChartReadingTypeKey,
+                            'factor',
+                          )
+                          as double? ??
                       1,
                   clearRepeatedReadingsOnly:
                       _displayType == HistroyDisplayType.chart ? false : true,
-                  rawDataCheck:
-                      _displayType == HistroyDisplayType.chart ? false : true,
+                  rawDataCheck: _displayType == HistroyDisplayType.chart
+                      ? false
+                      : true,
                   resetRange: _resetRange,
-                  showNormalization: widget.showNormalization ??
+                  showNormalization:
+                      widget.showNormalization ??
                           _displayType == HistroyDisplayType.chart
                       ? true
                       : false,
-                  allowNormalize:
-                      _displayType == HistroyDisplayType.chart ? true : false,
-                  allowConsolidation:
-                      _displayType == HistroyDisplayType.chart ? true : false,
+                  allowNormalize: _displayType == HistroyDisplayType.chart
+                      ? true
+                      : false,
+                  allowConsolidation: _displayType == HistroyDisplayType.chart
+                      ? true
+                      : false,
                   maxDuration: _displayType == HistroyDisplayType.chart
                       ? const Duration(days: 7)
                       : const Duration(days: 180),
@@ -699,7 +707,8 @@ class _WgtPagItemHistoryPresenterState
                     } else if (resultMap['emptyResultText'] != null) {
                       if (kDebugMode) {
                         print(
-                            'emptyResultText: ${resultMap['emptyResultText']}');
+                          'emptyResultText: ${resultMap['emptyResultText']}',
+                        );
                       }
                       setState(() {
                         _isHistoryLoading = false;
@@ -715,7 +724,8 @@ class _WgtPagItemHistoryPresenterState
 
                     if (getMeterType(resultMap['meter_type'] ?? '') != null) {
                       _setReadingTypeConfig(
-                          getMeterType(resultMap['meter_type']));
+                        getMeterType(resultMap['meter_type']),
+                      );
                     }
 
                     if (kDebugMode) {
@@ -760,26 +770,33 @@ class _WgtPagItemHistoryPresenterState
                       //get subset from dataSet with key = _selectedChartReadingTypeKey
                       List<Map<String, dynamic>> seletedDataFileds =
                           _getReadingTypeConfig(
-                                  _selectedChartReadingTypeKey, 'dataFields')
+                                _selectedChartReadingTypeKey,
+                                'dataFields',
+                              )
                               as List<Map<String, dynamic>>;
                       List<Map<String, List<Map<String, dynamic>>>>
-                          seletedDataSetForChart = [];
+                      seletedDataSetForChart = [];
                       List<Map<String, dynamic>> selectedLegendForChart = [];
                       for (Map<String, List<Map<String, dynamic>>> dataSetItem
                           in dataSet) {
                         String key = dataSetItem.keys.first;
-                        if (seletedDataFileds
-                            .any((element) => element['field'] == key)) {
+                        if (seletedDataFileds.any(
+                          (element) => element['field'] == key,
+                        )) {
                           seletedDataSetForChart.add(dataSetItem);
                         }
                         if (legend.any((element) => element['name'] == key)) {
-                          selectedLegendForChart.add(legend
-                              .firstWhere((element) => element['name'] == key));
+                          selectedLegendForChart.add(
+                            legend.firstWhere(
+                              (element) => element['name'] == key,
+                            ),
+                          );
                         }
                       }
                       _selectedHistoryDataSetsForChart.clear();
-                      _selectedHistoryDataSetsForChart
-                          .addAll(seletedDataSetForChart);
+                      _selectedHistoryDataSetsForChart.addAll(
+                        seletedDataSetForChart,
+                      );
                       _legendChart.clear();
                       _legendChart.addAll(selectedLegendForChart);
                     } else {
@@ -845,10 +862,9 @@ class _WgtPagItemHistoryPresenterState
                           size: 34,
                           color: _displayType == HistroyDisplayType.chart
                               ? Theme.of(context).highlightColor.withAlpha(210)
-                              : Theme.of(context)
-                                  .colorScheme
-                                  .primary
-                                  .withAlpha(210),
+                              : Theme.of(
+                                  context,
+                                ).colorScheme.primary.withAlpha(210),
                         ),
                         onTap: () {
                           // if _endDate is more than 7 days from startDate, reset endDate to 7 days from startDate
@@ -871,10 +887,12 @@ class _WgtPagItemHistoryPresenterState
 
                             _selectedDataFieldsForList.clear();
                             _selectedDataFieldsForList.addAll(
-                                _getReadingTypeConfig(
-                                        _selectedChartReadingTypeKey,
-                                        'dataFields')
-                                    as List<Map<String, dynamic>>);
+                              _getReadingTypeConfig(
+                                    _selectedChartReadingTypeKey,
+                                    'dataFields',
+                                  )
+                                  as List<Map<String, dynamic>>,
+                            );
 
                             if (_inNormalizeMode) {
                               // _rawListToNormalizedChartPull = true;
@@ -897,10 +915,9 @@ class _WgtPagItemHistoryPresenterState
                           size: 34,
                           color: _displayType == HistroyDisplayType.table
                               ? Theme.of(context).highlightColor.withAlpha(210)
-                              : Theme.of(context)
-                                  .colorScheme
-                                  .primary
-                                  .withAlpha(210),
+                              : Theme.of(
+                                  context,
+                                ).colorScheme.primary.withAlpha(210),
                         ),
                         onTap: () {
                           setState(() {
@@ -916,18 +933,24 @@ class _WgtPagItemHistoryPresenterState
 
                             _selectedDataFieldsForList.clear();
                             _selectedDataFieldsForList.addAll(
-                                _getReadingTypeConfig(
-                                        _selectedChartReadingTypeKey,
-                                        'dataFields')
-                                    as List<Map<String, dynamic>>);
+                              _getReadingTypeConfig(
+                                    _selectedChartReadingTypeKey,
+                                    'dataFields',
+                                  )
+                                  as List<Map<String, dynamic>>,
+                            );
                             _selectedMultiFields.clear();
-                            _selectedMultiFields.add(ValueItem(
-                                label: _readingTypeConfig[
-                                    _selectedChartReadingTypeKey]['title'],
-                                value: _selectedChartReadingTypeKey));
+                            _selectedMultiFields.add(
+                              ValueItem(
+                                label:
+                                    _readingTypeConfig[_selectedChartReadingTypeKey]['title'],
+                                value: _selectedChartReadingTypeKey,
+                              ),
+                            );
                             _controller.selectedOptions.clear();
-                            _controller.selectedOptions
-                                .addAll(_selectedMultiFields);
+                            _controller.selectedOptions.addAll(
+                              _selectedMultiFields,
+                            );
                             _selectedFieldsChanged = false;
                             _intRefreshKey = UniqueKey();
                             _isHistoryLoaded = false;
@@ -946,9 +969,10 @@ class _WgtPagItemHistoryPresenterState
                     Text(
                       widget.displayId ?? widget.itemId,
                       style: TextStyle(
-                          // fontSize: 21,
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).hintColor),
+                        // fontSize: 21,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).hintColor,
+                      ),
                     ),
                     horizontalSpaceSmall,
                     // (widget.itemType == ItemType.meter_3p ||widget.itemType == ItemType.fleet_health)
@@ -1048,9 +1072,12 @@ class _WgtPagItemHistoryPresenterState
           // _iniHistorySetting();
 
           _selectedMultiFields.clear();
-          _selectedMultiFields.add(ValueItem(
+          _selectedMultiFields.add(
+            ValueItem(
               label: _readingTypeConfig[_selectedChartReadingTypeKey]['title'],
-              value: _selectedChartReadingTypeKey));
+              value: _selectedChartReadingTypeKey,
+            ),
+          );
 
           // _chartKeyExt = UniqueKey();
           // _intRefreshKey = UniqueKey();
@@ -1061,12 +1088,14 @@ class _WgtPagItemHistoryPresenterState
       items: items.keys.map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,
-          child: Text(_readingTypeConfig[value]['title'],
-              style: TextStyle(
-                color: value == _selectedChartReadingTypeKey
-                    ? Theme.of(context).colorScheme.primary
-                    : null,
-              )),
+          child: Text(
+            _readingTypeConfig[value]['title'],
+            style: TextStyle(
+              color: value == _selectedChartReadingTypeKey
+                  ? Theme.of(context).colorScheme.primary
+                  : null,
+            ),
+          ),
         );
       }).toList(),
     );
@@ -1080,10 +1109,9 @@ class _WgtPagItemHistoryPresenterState
 
     List<ValueItem<String>> options = [];
     for (var item in items.keys) {
-      options.add(ValueItem(
-        label: _readingTypeConfig[item]['title'],
-        value: item,
-      ));
+      options.add(
+        ValueItem(label: _readingTypeConfig[item]['title'], value: item),
+      );
     }
 
     return Row(
@@ -1092,9 +1120,7 @@ class _WgtPagItemHistoryPresenterState
           width: 360,
           height: 60,
           child: MultiSelectDropDown<String>(
-            options: <ValueItem<String>>[
-              ...options,
-            ],
+            options: <ValueItem<String>>[...options],
             selectedOptions: _selectedMultiFields,
             // showClearIcon: true,
             controller: _controller,
@@ -1115,24 +1141,32 @@ class _WgtPagItemHistoryPresenterState
             hintColor: Theme.of(context).hintColor,
             // backgroundColor: Theme.of(context).cardColor, //Colors.blue,
             fieldBackgroundColor: Theme.of(context).cardColor,
-            optionsBackgroundColor:
-                Theme.of(context).cardColor, //Colors.yellow,
+            optionsBackgroundColor: Theme.of(
+              context,
+            ).cardColor, //Colors.yellow,
             focusedBorderColor: Colors.transparent,
-            selectedOptionBackgroundColor:
-                Theme.of(context).cardColor, //Colors.purple,
+            selectedOptionBackgroundColor: Theme.of(
+              context,
+            ).cardColor, //Colors.purple,
             maxItems: 8,
             selectionType: SelectionType.multi,
             chipConfig: ChipConfig(
-                deleteIcon: _selectedMultiFields.length == 1
-                    ? Icon(Icons.minimize,
-                        size: 0, color: Theme.of(context).colorScheme.primary)
-                    : const Icon(Icons.cancel),
-                radius: 5,
-                backgroundColor: Theme.of(context).colorScheme.primary),
+              deleteIcon: _selectedMultiFields.length == 1
+                  ? Icon(
+                      Icons.minimize,
+                      size: 0,
+                      color: Theme.of(context).colorScheme.primary,
+                    )
+                  : const Icon(Icons.cancel),
+              radius: 5,
+              backgroundColor: Theme.of(context).colorScheme.primary,
+            ),
 
             dropdownHeight: items.length * 40.0 + 10,
-            optionTextStyle:
-                TextStyle(color: Theme.of(context).hintColor, fontSize: 15),
+            optionTextStyle: TextStyle(
+              color: Theme.of(context).hintColor,
+              fontSize: 15,
+            ),
             selectedOptionIcon: Icon(
               Icons.check_circle,
               color: Theme.of(context).colorScheme.primary,
@@ -1222,8 +1256,8 @@ class _WgtPagItemHistoryPresenterState
         if (_showMeta) getMetaRow(),
         widget.reserveTooltipSpace
             ? (_displayType == HistroyDisplayType.chart
-                ? verticalSpaceMedium
-                : verticalSpaceTiny)
+                  ? verticalSpaceMedium
+                  : verticalSpaceTiny)
             : Container(),
         SizedBox(
           width: widget.width,
@@ -1231,15 +1265,13 @@ class _WgtPagItemHistoryPresenterState
           child: _isHistoryLoading
               ? Align(
                   alignment: Alignment.center,
-                  child: xtWait(
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
+                  child: xtWait(color: Theme.of(context).colorScheme.primary),
                 )
               : _displayType == HistroyDisplayType.chart
-                  ? getChartRepresentation()
-                  : _displayType == HistroyDisplayType.table
-                      ? getListRepresentation()
-                      : Container(),
+              ? getChartRepresentation()
+              : _displayType == HistroyDisplayType.table
+              ? getListRepresentation()
+              : Container(),
         ),
       ],
     );
@@ -1250,10 +1282,7 @@ class _WgtPagItemHistoryPresenterState
       return Center(
         child: Text(
           'Too many records to display',
-          style: TextStyle(
-            color: Theme.of(context).hintColor,
-            fontSize: 21,
-          ),
+          style: TextStyle(color: Theme.of(context).hintColor, fontSize: 21),
         ),
       );
     }
@@ -1305,8 +1334,8 @@ class _WgtPagItemHistoryPresenterState
             as DataType;
     int decimals =
         _getReadingTypeConfig(_selectedChartReadingTypeKey, 'decimals')
-                as int? ??
-            2;
+            as int? ??
+        2;
 
     return _displayType == HistroyDisplayType.table
         ? Row(
@@ -1332,24 +1361,27 @@ class _WgtPagItemHistoryPresenterState
                 selectable: true,
                 spaceInBetween: 1,
                 keyText: 'Missing:',
-                valueText:
-                    _missingCount == null ? 'N/A' : _missingCount.toString(),
+                valueText: _missingCount == null
+                    ? 'N/A'
+                    : _missingCount.toString(),
               ),
               horizontalSpaceTiny,
               xtKeyValueText(
                 selectable: true,
                 spaceInBetween: 1,
                 keyText: 'Neg Total:',
-                valueText:
-                    _negTotalCount == null ? 'N/A' : _negTotalCount.toString(),
+                valueText: _negTotalCount == null
+                    ? 'N/A'
+                    : _negTotalCount.toString(),
               ),
               horizontalSpaceTiny,
               xtKeyValueText(
                 selectable: true,
                 spaceInBetween: 1,
                 keyText: 'Neg Diff:',
-                valueText:
-                    _negDiffCount == null ? 'N/A' : _negDiffCount.toString(),
+                valueText: _negDiffCount == null
+                    ? 'N/A'
+                    : _negDiffCount.toString(),
               ),
               horizontalSpaceTiny,
               xtKeyValueText(
@@ -1369,53 +1401,55 @@ class _WgtPagItemHistoryPresenterState
               (_displayType == HistroyDisplayType.table &&
                       _selectedDataFieldsForList.length > 1)
                   ? const SizedBox(width: 360)
-                  : Wrap(children: [
-                      dataType == DataType.total
-                          ? Container()
-                          : xtKeyValueText(
-                              selectable: true,
-                              spaceInBetween: 1,
-                              keyText: 'Sum:',
-                              valueText: _total.toStringAsFixed(decimals),
-                            ),
-                      horizontalSpaceTiny,
-                      xtKeyValueText(
-                        selectable: true,
-                        spaceInBetween: 1,
-                        keyText: 'Min:',
-                        valueText: _historyMeta.isEmpty
-                            ? 'N/A'
-                            : (_minY).toStringAsFixed(decimals),
-                      ),
-                      horizontalSpaceTiny,
-                      xtKeyValueText(
-                        selectable: true,
-                        spaceInBetween: 1,
-                        keyText: 'Max:',
-                        valueText: _historyMeta.isEmpty
-                            ? 'N/A'
-                            : (_maxY).toStringAsFixed(decimals),
-                      ),
-                      horizontalSpaceTiny,
-                      xtKeyValueText(
-                        selectable: true,
-                        spaceInBetween: 1,
-                        keyText: 'Avg:',
-                        valueText: _historyMeta.isEmpty
-                            ? 'N/A'
-                            : _avgY.toStringAsFixed(decimals),
-                      ),
-                      horizontalSpaceTiny,
-                      xtKeyValueText(
-                        selectable: true,
-                        spaceInBetween: 1,
-                        keyText: 'Med:',
-                        valueText: _historyMeta.isEmpty
-                            ? 'N/A'
-                            : _medianY.toStringAsFixed(decimals),
-                      ),
-                      horizontalSpaceSmall,
-                    ]),
+                  : Wrap(
+                      children: [
+                        dataType == DataType.total
+                            ? Container()
+                            : xtKeyValueText(
+                                selectable: true,
+                                spaceInBetween: 1,
+                                keyText: 'Sum:',
+                                valueText: _total.toStringAsFixed(decimals),
+                              ),
+                        horizontalSpaceTiny,
+                        xtKeyValueText(
+                          selectable: true,
+                          spaceInBetween: 1,
+                          keyText: 'Min:',
+                          valueText: _historyMeta.isEmpty
+                              ? 'N/A'
+                              : (_minY).toStringAsFixed(decimals),
+                        ),
+                        horizontalSpaceTiny,
+                        xtKeyValueText(
+                          selectable: true,
+                          spaceInBetween: 1,
+                          keyText: 'Max:',
+                          valueText: _historyMeta.isEmpty
+                              ? 'N/A'
+                              : (_maxY).toStringAsFixed(decimals),
+                        ),
+                        horizontalSpaceTiny,
+                        xtKeyValueText(
+                          selectable: true,
+                          spaceInBetween: 1,
+                          keyText: 'Avg:',
+                          valueText: _historyMeta.isEmpty
+                              ? 'N/A'
+                              : _avgY.toStringAsFixed(decimals),
+                        ),
+                        horizontalSpaceTiny,
+                        xtKeyValueText(
+                          selectable: true,
+                          spaceInBetween: 1,
+                          keyText: 'Med:',
+                          valueText: _historyMeta.isEmpty
+                              ? 'N/A'
+                              : _medianY.toStringAsFixed(decimals),
+                        ),
+                        horizontalSpaceSmall,
+                      ],
+                    ),
               _intervalStr.isNotEmpty
                   ? Padding(
                       padding: const EdgeInsets.only(right: 13.0),
@@ -1428,7 +1462,9 @@ class _WgtPagItemHistoryPresenterState
                             borderRadius: BorderRadius.circular(3),
                           ),
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 3, vertical: 1),
+                            horizontal: 3,
+                            vertical: 1,
+                          ),
                           child: Text(
                             _intervalStr,
                             style: const TextStyle(
