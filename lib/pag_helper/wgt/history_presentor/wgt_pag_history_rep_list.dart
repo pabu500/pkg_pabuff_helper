@@ -105,13 +105,14 @@ class _WgtPagHistoryRepListState extends State<WgtPagHistoryRepList> {
         // }
         listConfig.add({
           'fieldKey': keyName,
-          'title': fieldKey['field'] ?? widget.valTitle ?? 'val',
+          'title': fieldKey['display_header'] ?? fieldKey['field'] ?? widget.valTitle ?? 'val',
           'width': fieldKey['width'] ?? 150,
         });
         listConfig.add({
           'fieldKey': '${fieldKey['field']}_diff',
           'title': widget.valDiffTitle ?? '${fieldKey['field']}_diff',
           'width': fieldKey['width'] ?? 150,
+          'show': fieldKey['show_diff'] ?? true,
         });
         if (keyName == 'a_imp') {
           listConfig.add({
