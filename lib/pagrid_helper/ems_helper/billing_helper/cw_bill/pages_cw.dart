@@ -31,6 +31,7 @@ Future<Uint8List> generateInvoice(
     customerAccountId: billInfo['customerAccountId'] ?? '',
     customerAddress: billInfo['customerAddress'] ?? '',
     customerType: billInfo['customerType'],
+    tenantLcs: billInfo['tenantLcs'] ?? '',
     gst: billInfo['gst'],
     paymentInfo: billInfo['paymentInfo'] ?? '',
     billTimeRangeStr: billInfo['billTimeRangeStr'],
@@ -112,6 +113,7 @@ class Bill {
     required this.lineItemValue1,
     required this.baseColor,
     required this.accentColor,
+    this.tenantLcs = '',
   });
 
   final String customerLabel;
@@ -119,6 +121,7 @@ class Bill {
   final String customerAccountId;
   final String customerAddress;
   final String customerType;
+  final String tenantLcs;
   final double? gst;
   final String billingRecName;
   final String billFromStr;
@@ -327,7 +330,9 @@ class Bill {
                 pw.Text(
                     customerType == 'cw_nus_internal'
                         ? 'MEMO' //'UTILITES INVOICE'
-                        : 'TAX INVOICE',
+                        : tenantLcs == 'final_bill'
+                            ? 'FINAL TAX INVOICE'
+                            : 'TAX INVOICE',
                     style: pw.TextStyle(
                         color: _darkColor,
                         fontSize: 12,

@@ -33,6 +33,7 @@ enum MeterType {
   newater,
   btu,
   bidirection,
+  water2,
   // manualElectricity1p,
 }
 
@@ -70,6 +71,8 @@ String getMeterTypeTag(MeterType meterType) {
       return 'E3P';
     case MeterType.water:
       return 'W';
+    case MeterType.water2:
+      return 'W2';
     case MeterType.gas:
       return 'G';
     case MeterType.newater:
@@ -116,6 +119,8 @@ MeterType? getMeterType(String meterTypeTag) {
       return MeterType.electricity3p;
     case 'W':
       return MeterType.water;
+    case 'W2':
+      return MeterType.water2;
     case 'G':
       return MeterType.gas;
     case 'N':
@@ -240,6 +245,7 @@ String getDeivceTypeUnit(dynamic deviceSubType, {String? displayContextStr}) {
     case MeterType.electricity3p:
       return 'kWh';
     case MeterType.water:
+    case MeterType.water2:
       return 'm³';
     case MeterType.gas:
       return 'm³';
@@ -280,6 +286,7 @@ String getDeivceTypeUnitK(dynamic deviceSubType, {String? displayContextStr}) {
     case MeterType.electricity3p:
       return 'MWh';
     case MeterType.water:
+    case MeterType.water2:
       return 'km³';
     case MeterType.gas:
       return 'km³';
@@ -333,6 +340,7 @@ Map<String, dynamic> getDeivceTypeUnitSet(dynamic deviceSubType,
       unitG = 'TWh';
       break;
     case MeterType.water:
+    case MeterType.water2:
       unit = 'm³';
       unitK = 'km³';
       unitM = 'Gm³';
@@ -429,6 +437,7 @@ String getDeivceTypeLabel(dynamic deviceSubType) {
     case MeterType.electricity3p:
       return 'Electricity 3P';
     case MeterType.water:
+    case MeterType.water2:
       return 'Water';
     case MeterType.gas:
       return 'Gas';
@@ -462,6 +471,7 @@ Color getDeivceTypeColor(dynamic deviceSubType) {
     case MeterType.electricity3p:
       return Colors.orangeAccent;
     case MeterType.water:
+    case MeterType.water2:
       return Colors.cyanAccent.shade400;
     case MeterType.gas:
       return Colors.redAccent;
@@ -539,6 +549,7 @@ Widget getDeviceTypeIcon(dynamic deviceSubType,
         color: iconColor ?? Colors.orangeAccent,
       );
     case MeterType.water:
+    case MeterType.water2:
       return Icon(
         Symbols.water,
         size: theIconSize,

@@ -74,6 +74,7 @@ class _CreateUserState extends State<WgtCreateUser2> {
   bool _isLoginNameValidated = false;
   String? _email;
   bool _isEmailValidated = false;
+  bool _emailExists = false;
   String? _phone;
   bool _isPhoneValidated = false;
   String? _password;
@@ -117,6 +118,23 @@ class _CreateUserState extends State<WgtCreateUser2> {
   // to hold the selected role list to be sent to the backend
   final List<Map<String, dynamic>> _selectedRoleList = [];
 
+  Future<void> _checkEmailExists() async {
+    final email = _email?.trim();
+    if (email == null || email.isEmpty || !_isEmailValidated) return;
+
+    try {
+      final result = await doPagCheckUnique(
+          widget.appConfig, 'email', email.toLowerCase(), 'pag.pag_user');
+      if (!mounted || _createSuccess || _email?.trim() != email ||
+          !_isEmailValidated) return;
+      setState(() {
+        _emailExists = result['exists'] == true;
+      });
+    } catch (_) {
+      // Availability is advisory; a failed lookup must not affect validation.
+    }
+  }
+
   Future<void> _createItem() async {
     setState(() {
       _createSuccess = false;
@@ -131,7 +149,8 @@ class _CreateUserState extends State<WgtCreateUser2> {
       // queryMap['portal_type'] = _portalType!.name;
       queryMap['fullname'] = _fullName;
       queryMap['username'] = _loginName;
-      queryMap['email'] = _email;
+      queryMap['email'] = _email?.trim();
+      queryMap['allow_duplicate_email'] = true;
       queryMap['phone'] = _phone;
       queryMap['designation'] = _designation;
       queryMap['remark'] = _remark;
@@ -168,7 +187,8 @@ class _CreateUserState extends State<WgtCreateUser2> {
 
       dev.log('error: $eStr');
 
-      if (eStr.contains('email')) {
+      if (eStr.contains('email') &&
+          (eStr.contains('already') || eStr.contains('duplicate'))) {
         _errorText = 'Email already exists';
       } else if (eStr.contains('username')) {
         _errorText = 'Username already exists';
@@ -614,6 +634,7 @@ class _CreateUserState extends State<WgtCreateUser2> {
                             ? null
                             : () async {
                                 await _createItem();
+                                if (!mounted || !_createSuccess) return;
 
                                 // reset the form
                                 setState(() {
@@ -630,6 +651,7 @@ class _CreateUserState extends State<WgtCreateUser2> {
                                   _loginName = null;
                                   _loginNameResetKey = UniqueKey();
                                   _email = null;
+                                  _emailExists = false;
                                   _emailResetKey = UniqueKey();
                                   _phone = null;
                                   _phoneResetKey = UniqueKey();
@@ -812,34 +834,11 @@ class _CreateUserState extends State<WgtCreateUser2> {
               labelText: 'Email',
               key: _emailResetKey,
               maxLength: maxEmailLength,
-              checkUnique: _selectedAuthProvider != AuthProvider.local
-                  ? doPagCheckUnique
-                  : null,
-              onUniqueCheck: (dynamic existsResult) {
-                if (existsResult is String) {
-                  if (existsResult == 'error') {
-                    setState(() {
-                      _isEmailValidated = false;
-                    });
-                  }
-                } else if (existsResult is bool) {
-                  if (existsResult) {
-                    setState(() {
-                      _isEmailValidated = false;
-                    });
-                  } else {
-                    setState(() {
-                      _isEmailValidated = true;
-                    });
-                  }
-                }
-              },
-              uniqueKey: 'email',
-              itemTableName: 'pag.pag_user',
               validator: validateEmail,
               onChanged: (val) {
                 setState(() {
                   _isEditing = true;
+                  _emailExists = false;
                   if (val != _email) {
                     _errorText = '';
                   }
@@ -857,6 +856,7 @@ class _CreateUserState extends State<WgtCreateUser2> {
                 setState(() {
                   _isEditing = false;
                 });
+                _checkEmailExists();
               },
               onValidate: (String? result) {
                 setState(() {
@@ -868,6 +868,12 @@ class _CreateUserState extends State<WgtCreateUser2> {
                 });
               },
             ),
+            if (_emailExists)
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text('Email already exists',
+                    style: TextStyle(color: Colors.orange.shade700)),
+              ),
             WgtTextField(
               resetKey: _phoneResetKey,
               hintText: 'Phone',
@@ -1473,6 +1479,7 @@ class _CreateUserState extends State<WgtCreateUser2> {
                   _newCreate = true;
                   _createSuccess = false;
                   _email = null;
+                  _emailExists = false;
                   _emailResetKey = UniqueKey();
                   // _phone = null;
                   _phoneResetKey = UniqueKey();

@@ -139,8 +139,9 @@ Future<dynamic> doCreateUser(
       return 'success';
     } else {
       Map<String, dynamic> responseBody = jsonDecode(response.body);
-      throw Exception(
-          responseBody['error']['message'] ?? 'Failed to create user');
+      final error = responseBody['error'];
+      final message = error is Map ? error['message'] : error;
+      throw Exception(message ?? 'Failed to create user');
     }
   } catch (err) {
     throw Exception(err);
