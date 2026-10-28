@@ -400,7 +400,7 @@ class _WgtPagItemHistoryGetterState extends State<WgtPagItemHistoryGetter> {
           }
         }
         if (_readingTotalKeys.isEmpty) {
-           _readingTotalKeys = historyList.first['readings'].keys.toList();
+          _readingTotalKeys = historyList.first['readings'].keys.toList();
         }
 
         _historyMeta.clear();
@@ -586,8 +586,9 @@ class _WgtPagItemHistoryGetterState extends State<WgtPagItemHistoryGetter> {
           int isReadingDiffNeg = readingPair['rd_neg'] ?? 0;
           int isRestart = readingPair['rd_is_restart'] ?? 0;
 
-          num? selectedValue =
-              widget.dataType == DataType.total ? readingTotal : readingDiff;
+          num? selectedValue = widget.dataType == DataType.total
+              ? readingTotal
+              : readingDiff;
           if (selectedValue == null) {
             continue;
           }

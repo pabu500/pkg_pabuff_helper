@@ -38,15 +38,23 @@ Future<MdlPagUser> doLoginPag(
   if (response.statusCode == 200) {
     dev.log('usersvc comm: getting token from response body');
 
-    MdlPagUser user = MdlPagUser.fromJson2(jsonDecode(response.body));
+    final responseBody = jsonDecode(response.body) as Map<String, dynamic>;
+    MdlPagUser user = MdlPagUser.fromJson2(responseBody);
 
     // Do not write token to secure storage if resetPasswordToken is 'flag_reset'
     if (user.resetPasswordToken != 'flag_reset') {
+      final token = responseBody['token'];
+      if (token is! String || token.trim().isEmpty) {
+        throw Exception('Authentication service did not return a login token');
+      }
+      // Keep this credential with its user even when browser storage is unavailable.
+      user.loginToken = token;
       try {
-        String token = jsonDecode(response.body)['token'];
         await secStorage.write(key: 'pag_user_token', value: token);
       } catch (err) {
-        dev.log('usersvc comm: error writing token to secure storage: $err');
+        dev.log(
+          'usersvc comm: token storage unavailable; using active session',
+        );
       }
     }
 
