@@ -45,6 +45,12 @@ enum PagRoleType {
   ops('ops', 'Ops', 'ops', Colors.teal),
   siteOps('site_ops', 'Site Ops', 'siteops', Colors.orange),
   billingOps('billing_ops', 'Billing Ops', 'billingops', Colors.indigo),
+  billingManager(
+    'billing_manager',
+    'Billing Manager',
+    'billingmanager',
+    Colors.indigoAccent,
+  ),
   tenant('tenant', 'EMS Tenant', 'tenant', Colors.purple),
   consumer('consumer', 'EVS Consumer', 'consumer', Colors.green),
   unknown('unknown', 'Unknown', 'unknown', Colors.grey);

@@ -5,6 +5,7 @@ import 'package:buff_helper/pag_helper/comm/comm_pag_item.dart';
 import 'package:buff_helper/pag_helper/comm/pag_be_api_base.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_acl.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_item.dart';
+import 'package:buff_helper/pag_helper/model/acl/mdl_pag_role.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_building_profile.dart';
@@ -87,6 +88,7 @@ class _CreateRoleState extends State<WgtCreateRole> {
       queryMap['role_type'] = _roleType?.value;
       queryMap['item_scope_info'] = _itemScopeMap;
 
+      final projectProfile = widget.loggedInUser.selectedScope.projectProfile!;
       final result = await ex(
         endpoint: PagUrlBase.eptPagCreateRole,
         crudType: 'create',
@@ -105,7 +107,13 @@ class _CreateRoleState extends State<WgtCreateRole> {
         ),
       );
 
-      _newItemName = result['name'];
+      final createdRole = MdlPagRole.fromJson(Map<String, dynamic>.from(result));
+      projectProfile.visibleRoleList = [
+        for (final role in projectProfile.visibleRoleList)
+          if (role.id != createdRole.id) role,
+        createdRole,
+      ];
+      _newItemName = createdRole.name;
 
       _newItem = false;
       _createSuccess = true;
@@ -482,12 +490,24 @@ class _CreateRoleState extends State<WgtCreateRole> {
         appConfig: widget.appConfig,
         width: width,
         labelWidth: 130,
+        allowProjectScope: true,
+        autoCascadeScopeFilter: false,
+        updateUiOnly: true,
         // itemScopeMap: widget.itemScopeMap!,
         forItemKind: PagItemKind.role,
         // forScopeType: widget.itemType is PagScopeType ? widget.itemType : null,
         onScopeSet: (dynamic profile) {
           if (profile == null) {
-            dev.log('Profile is null');
+            setState(() {
+              _newItem = true;
+              _itemScopeMap
+                ..clear()
+                ..addAll({
+                  'project_id': widget.loggedInUser.selectedScope.projectProfile!.id
+                      .toString(),
+                  'project_name': projectName,
+                });
+            });
             return {};
           }
           String scopeIdColName = '';
@@ -515,6 +535,9 @@ class _CreateRoleState extends State<WgtCreateRole> {
           }
           setState(() {
             _newItem = true;
+            _itemScopeMap.clear();
+            _itemScopeMap['project_id'] =
+                widget.loggedInUser.selectedScope.projectProfile!.id.toString();
             _itemScopeMap['project_name'] = projectName;
             _itemScopeMap[scopeIdColName] = profile.id.toString();
             _itemScopeMap[scopeName] = profile.name;
