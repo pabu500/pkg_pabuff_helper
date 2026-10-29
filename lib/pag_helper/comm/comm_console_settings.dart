@@ -138,6 +138,54 @@ Future<PagProjectConsoleSetting> updateConsoleProjectSetting({
   );
 }
 
+/// Whether the console is open for the selected role's project.
+class PagConsoleAccess {
+  const PagConsoleAccess({
+    required this.enabled,
+    this.projectId,
+    this.projectName = '',
+    this.projectLabel = '',
+    this.disabledMessage = defaultProjectConsoleDisabledMessage,
+  });
+
+  factory PagConsoleAccess.fromJson(Map<String, dynamic> json) {
+    final enabled = json['enable_project_console'];
+    final message = json['disabled_message'];
+    if (enabled is! bool || (message != null && message is! String)) {
+      throw const FormatException('Invalid console access response');
+    }
+    final projectId = json['project_id'];
+    return PagConsoleAccess(
+      enabled: enabled,
+      projectId: projectId == null ? null : _integer(projectId, minimum: 1),
+      projectName: json['project_name'] as String? ?? '',
+      projectLabel: json['project_label'] as String? ?? '',
+      disabledMessage: (message as String?) ?? defaultProjectConsoleDisabledMessage,
+    );
+  }
+
+  final bool enabled;
+  final int? projectId;
+  final String projectName;
+  final String projectLabel;
+  final String disabledMessage;
+
+  String get projectDisplayName =>
+      projectLabel.isNotEmpty ? projectLabel : projectName;
+}
+
+/// Checks console access for [user]'s selected role.
+Future<PagConsoleAccess> getConsoleAccess({
+  required MdlPagAppConfig appConfig,
+  required MdlPagUser user,
+}) async {
+  final result = await _request(appConfig, user, '/console/get_access', {});
+  if (result is! Map) {
+    throw const FormatException('Invalid console access response');
+  }
+  return PagConsoleAccess.fromJson(Map<String, dynamic>.from(result));
+}
+
 Future<dynamic> _request(
   MdlPagAppConfig appConfig,
   MdlPagUser user,
