@@ -97,6 +97,41 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
   String _commitErrorText = '';
 
   bool _showExistingApplies = false;
+  bool _canKeepEarlierUnapplied = false;
+  bool _holdOverrideEnabled = false;
+  bool _keepEarlierUnapplied = false;
+  String _holdAccessError = '';
+  final _holdOverrideReason = TextEditingController();
+
+  Future<void> _fetchHoldAccess() async {
+    try {
+      final access = await getPaymentHoldAccess(
+        widget.appConfig,
+        {'scope': widget.loggedInUser.selectedScope.toScopeMap()},
+        MdlPagSvcClaim(
+          userId: widget.loggedInUser.id,
+          username: widget.loggedInUser.username,
+        ),
+        loginToken: widget.loggedInUser.loginToken,
+      );
+      if (!mounted) return;
+      setState(() {
+        _canKeepEarlierUnapplied = access['is_authorized'] == true;
+        _holdOverrideEnabled = access['enabled'] == true;
+        _holdAccessError = '';
+        if (!_canKeepEarlierUnapplied || !_holdOverrideEnabled) {
+          _keepEarlierUnapplied = false;
+        }
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _canKeepEarlierUnapplied = false;
+        _keepEarlierUnapplied = false;
+        _holdAccessError = e.toString().replaceFirst('Exception: ', '');
+      });
+    }
+  }
 
   final Map<String, dynamic> _initialBalancePaymentInfo = {};
 
@@ -186,6 +221,13 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
       return;
     }
 
+    if (_keepEarlierUnapplied &&
+        (!_canKeepEarlierUnapplied ||
+            !_holdOverrideEnabled ||
+            _holdOverrideReason.text.trim().isEmpty)) {
+      return;
+    }
+
     final totalAppliedFromPayment =
         (_initialPaymentAmountToApply != null &&
             _availablePaymentAmountToApply != null)
@@ -197,6 +239,10 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
       'tenant_id': widget.tenantInfo['tenant_id'] ?? '',
       'payment_id': _paymentInfo['id'] ?? '',
       'apply_list': _paymentApplyInfoListNew,
+      if (_keepEarlierUnapplied) ...{
+        'keep_earlier_unapplied': true,
+        'hold_override_reason': _holdOverrideReason.text.trim(),
+      },
     };
     setState(() {
       _isCommitting = true;
@@ -215,6 +261,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
           target: '',
           operation: '',
         ),
+        loginToken: widget.loggedInUser.loginToken,
       );
       dev.log('Commit payment match apply result: $result');
       // refresh the payment info
@@ -227,7 +274,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
     } finally {
       if (mounted) {
         _isCommitting = false;
-        _isCommitted = true;
+        _isCommitted = _commitErrorText.isEmpty;
         setState(() {});
         if (_commitErrorText.isNotEmpty) {
           showInfoDialog(context, 'Error', _commitErrorText);
@@ -603,6 +650,13 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
     _lcStatusDisplay = PagPaymentLcStatus.byValue(
       widget.defaultPaymentLcStatusStr,
     );
+    _fetchHoldAccess();
+  }
+
+  @override
+  void dispose() {
+    _holdOverrideReason.dispose();
+    super.dispose();
   }
 
   @override
@@ -704,6 +758,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
             ),
           ],
         ),
+        getPaymentHoldControls(),
         getPaymentApplyListOfThisPayment(),
         getIniBalPaymentInfo(),
         fetchingMatchingOpInfo
@@ -1254,6 +1309,10 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
       okToCommit = false;
       hintMsg = 'Available amount to apply must not be negative';
     }
+    if (_keepEarlierUnapplied && _holdOverrideReason.text.trim().isEmpty) {
+      okToCommit = false;
+      hintMsg = 'Enter a reason for keeping earlier payments unapplied';
+    }
 
     return Padding(
       padding: const EdgeInsets.only(left: 21),
@@ -1276,6 +1335,157 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
                     ),
                   ),
                 ),
+        ],
+      ),
+    );
+  }
+
+  Widget getPaymentHoldControls() {
+    if (_lcStatusDisplay != PagPaymentLcStatus.released || _isCommitted) {
+      return const SizedBox.shrink();
+    }
+    final hintColor = Theme.of(context).hintColor;
+    final errorColor = Theme.of(context).colorScheme.error;
+    final cautionColor = Colors.amber.shade600;
+
+    if (_holdAccessError.isNotEmpty) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(13, 6, 13, 6),
+        child: Row(
+          children: [
+            Icon(Symbols.error, size: 18, color: errorColor),
+            const SizedBox(width: 6),
+            Flexible(
+              child: Text(
+                'Could not check payment override access: $_holdAccessError',
+                style: TextStyle(fontSize: 13, color: errorColor),
+              ),
+            ),
+            TextButton(
+              onPressed: _isCommitting ? null : _fetchHoldAccess,
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      );
+    }
+    if (!_canKeepEarlierUnapplied) return const SizedBox.shrink();
+
+    final canToggle = _holdOverrideEnabled && !_isCommitting;
+    final selected = _keepEarlierUnapplied;
+    final subtitle = _holdOverrideEnabled
+        ? 'Use only when earlier released payments still have unapplied amounts.'
+        : 'Payment override is currently disabled.';
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.fromLTRB(2, 14, 2, 6),
+      padding: const EdgeInsets.fromLTRB(2, 8, 13, 8),
+      decoration: BoxDecoration(
+        color: selected ? cautionColor.withAlpha(22) : null,
+        borderRadius: BorderRadius.circular(5),
+        border: Border.all(
+          color: selected ? cautionColor.withAlpha(150) : Colors.transparent,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          InkWell(
+            borderRadius: BorderRadius.circular(5),
+            onTap: canToggle
+                ? () => setState(() => _keepEarlierUnapplied = !selected)
+                : null,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Checkbox(
+                  value: selected,
+                  activeColor: cautionColor,
+                  onChanged: canToggle
+                      ? (value) =>
+                            setState(() => _keepEarlierUnapplied = value ?? false)
+                      : null,
+                ),
+                Flexible(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Keep earlier payments unapplied',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: _holdOverrideEnabled ? null : hintColor,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle,
+                        style: TextStyle(fontSize: 13, color: hintColor),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (selected) ...[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(42, 6, 0, 0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Symbols.warning, size: 18, color: cautionColor),
+                  const SizedBox(width: 6),
+                  Flexible(
+                    child: Text(
+                      'Earlier released payments with unapplied amounts will stay '
+                      'unapplied. While a bill is unpaid, the next bill run for '
+                      'this tenant stays blocked until they are applied.',
+                      style: TextStyle(fontSize: 13, color: cautionColor),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(42, 10, 0, 0),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 520),
+                child: TextField(
+                  controller: _holdOverrideReason,
+                  enabled: !_isCommitting,
+                  maxLines: 1,
+                  textCapitalization: TextCapitalization.sentences,
+                  decoration: InputDecoration(
+                    labelText: 'Reason (required)',
+                    alignLabelWithHint: true,
+                    floatingLabelBehavior: FloatingLabelBehavior.always,
+                    hintText: 'Explain why earlier payments are kept unapplied.',
+                    helperText: 'Saved with the payment override audit record.',
+                    helperMaxLines: 2,
+                    filled: true,
+                    fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5),
+                      borderSide: BorderSide(
+                        color: Theme.of(context).colorScheme.outlineVariant,
+                      ),
+                    ),
+                  ),
+                  onChanged: (_) => setState(() {}),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

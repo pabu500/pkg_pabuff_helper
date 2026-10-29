@@ -5,6 +5,9 @@ import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pag_helper/model/mdl_svc_query.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+import 'comm_helper.dart';
 
 // Future<dynamic> doFinPostPayment(
 //   MdlPagAppConfig appConfig,
@@ -297,56 +300,86 @@ Future<dynamic> fetchPaymentMatchOpInfo(
 Future<dynamic> commitPaymentApply(
   MdlPagAppConfig appConfig,
   Map<String, dynamic> queryMap,
+  MdlPagSvcClaim svcClaim, {
+  String? loginToken,
+  http.Client? client,
+}) => _paymentHoldRequest(
+  appConfig,
+  queryMap,
+  svcClaim,
+  PagUrlBase.eptCommitPaymentApply,
+  requireLogin: queryMap['keep_earlier_unapplied'] == true,
+  loginToken: loginToken,
+  client: client,
+);
+
+Future<dynamic> getPaymentHoldAccess(
+  MdlPagAppConfig appConfig,
+  Map<String, dynamic> queryMap,
+  MdlPagSvcClaim svcClaim, {
+  String? loginToken,
+  http.Client? client,
+}) => _paymentHoldRequest(
+  appConfig,
+  queryMap,
+  svcClaim,
+  '/ems/fin/get_payment_hold_access',
+  requireLogin: true,
+  loginToken: loginToken,
+  client: client,
+);
+
+Future<dynamic> _paymentHoldRequest(
+  MdlPagAppConfig appConfig,
+  Map<String, dynamic> queryMap,
   MdlPagSvcClaim svcClaim,
-) async {
+  String endpoint, {
+  required bool requireLogin,
+  String? loginToken,
+  http.Client? client,
+}) async {
   svcClaim.svcName = PagSvcType.oresvc2.name;
-  svcClaim.endpoint = PagUrlBase.eptCommitPaymentApply;
-
-  String svcToken = '';
-  // try {
-  //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
-  // } catch (err) {
-  //   throw Exception(err);
-  // }
-
-  final response = await http.post(
-    Uri.parse(PagUrlController(null, appConfig)
-        .getUrl(PagSvcType.oresvc2, svcClaim.endpoint!)),
-    headers: <String, String>{
+  svcClaim.endpoint = endpoint;
+  var token = loginToken?.trim() ?? '';
+  if (token.isEmpty) {
+    try {
+      token =
+          (await const FlutterSecureStorage().read(
+            key: 'pag_user_token',
+          ))?.trim() ??
+          '';
+    } catch (_) {
+      // An active session token works even when browser storage is unavailable.
+    }
+  }
+  if (requireLogin && token.isEmpty) throw Exception('Please sign in again');
+  final response = await (client?.post ?? http.post)(
+    Uri.parse(
+      PagUrlController(null, appConfig).getUrl(PagSvcType.oresvc2, endpoint),
+    ),
+    headers: {
       'Content-Type': 'application/json; charset=UTF-8',
-      'Authorization': 'Bearer $svcToken',
+      'Authorization': 'Bearer $token',
     },
     body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
   );
-
-  if (response.statusCode == 200) {
-    // If the server did return a 200 OK response, parse the JSON.
-    final responseBody = jsonDecode(response.body);
-
-    if (responseBody['info'] != null) {
-      throw Exception(responseBody['info']);
+  if (response.statusCode != 200) {
+    var message = response.statusCode == 401
+        ? 'Please sign in again'
+        : 'Unable to apply payment. Please try again.';
+    try {
+      final body = jsonDecode(response.body);
+      if (body is Map &&
+          body['error'] is Map &&
+          body['error']['message'] is String) {
+        message = body['error']['message'];
+      }
+    } on FormatException {
+      /* A proxy may return a non-JSON response. */
     }
-    if (responseBody['error'] != null) {
-      throw Exception(responseBody['error']['message']);
-    }
-    final data = responseBody['data'];
-    if (data == null) {
-      throw Exception("No data found in the response");
-    }
-    final result = data['result'];
-    if (result == null) {
-      throw Exception("No result found in the response");
-    }
-    String? resultKey = data['result_key'];
-    if (resultKey == null && resultKey!.isEmpty) {
-      throw Exception("Error: $resultKey");
-    }
-    return result[resultKey];
-  } else if (response.statusCode == 403) {
-    throw Exception("You are not authorized to perform this operation");
-  } else {
-    throw Exception(jsonDecode(response.body)['error']);
+    throw Exception(message);
   }
+  return getResultFromResp(response.body);
 }
 
 Future<dynamic> doCreateAdjustmentNote(
