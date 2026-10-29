@@ -26,8 +26,11 @@ class WgtPaymentHoldOverride extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hintColor = Theme.of(context).hintColor;
-    final errorColor = Theme.of(context).colorScheme.error;
+    final theme = Theme.of(context);
+    final bodyStyle = theme.textTheme.bodyMedium!;
+    final captionStyle = bodyStyle.copyWith(fontSize: 13);
+    final hintColor = theme.hintColor;
+    final errorColor = theme.colorScheme.error;
     final cautionColor = Colors.amber.shade600;
 
     if (accessError.isNotEmpty) {
@@ -40,7 +43,7 @@ class WgtPaymentHoldOverride extends StatelessWidget {
             Flexible(
               child: Text(
                 'Could not check payment override access: $accessError',
-                style: TextStyle(fontSize: 13, color: errorColor),
+                style: captionStyle.copyWith(color: errorColor),
               ),
             ),
             TextButton(
@@ -92,15 +95,15 @@ class WgtPaymentHoldOverride extends StatelessWidget {
                     children: [
                       Text(
                         label,
-                        style: TextStyle(
+                        style: bodyStyle.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: enabled ? null : hintColor,
+                          color: enabled ? bodyStyle.color : hintColor,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         subtitle,
-                        style: TextStyle(fontSize: 13, color: hintColor),
+                        style: captionStyle.copyWith(color: hintColor),
                       ),
                     ],
                   ),
@@ -119,7 +122,7 @@ class WgtPaymentHoldOverride extends StatelessWidget {
                   Flexible(
                     child: Text(
                       warning,
-                      style: TextStyle(fontSize: 13, color: cautionColor),
+                      style: captionStyle.copyWith(color: cautionColor),
                     ),
                   ),
                 ],
@@ -131,11 +134,15 @@ class WgtPaymentHoldOverride extends StatelessWidget {
                 constraints: const BoxConstraints(maxWidth: 520),
                 child: TextField(
                   controller: reason,
+                  style: bodyStyle,
                   enabled: !busy,
                   maxLines: 1,
                   textCapitalization: TextCapitalization.sentences,
                   decoration: InputDecoration(
                     labelText: 'Reason (required)',
+                    labelStyle: bodyStyle,
+                    hintStyle: captionStyle.copyWith(color: hintColor),
+                    helperStyle: captionStyle.copyWith(color: hintColor),
                     alignLabelWithHint: true,
                     floatingLabelBehavior: FloatingLabelBehavior.always,
                     hintText: reasonHint,
