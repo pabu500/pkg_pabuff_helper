@@ -77,7 +77,7 @@ Future<dynamic> doPagCheckOpList(
         var errorKey = error.keys.first;
         if (!headers.contains(errorKey)) {
           //replace the error map's key to 'status'
-          error = {'status': error[errorKey]};
+          error = {'status': error['message'] ?? error[errorKey]};
           item['error'] = error;
         }
         dev.log(item['status']);
