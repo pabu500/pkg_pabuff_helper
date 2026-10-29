@@ -133,7 +133,7 @@ class _WgtCreateGatewayState extends State<WgtCreateGateway> {
       );
 
       final listInfoList = result as List<dynamic>?;
-      if (listInfoList == null || listInfoList.length > 1) {
+      if (listInfoList == null || listInfoList.length != 1) {
         throw Exception('Failed to get list info list');
       }
 
@@ -157,7 +157,7 @@ class _WgtCreateGatewayState extends State<WgtCreateGateway> {
         final colKey = colController.colKey;
         if (colKey == 'label') {
           _isLabelRequired = colController.requiredForOp('form_create');
-        } else if (colKey == 'sn' || colKey == 'motherboard_sn') {
+        } else if (colKey == 'sn') {
           _isSnRequired = colController.requiredForOp('form_create');
         } else if (colKey == 'iccid') {
           _isIccidRequired = colController.requiredForOp('form_create');
@@ -202,10 +202,10 @@ class _WgtCreateGatewayState extends State<WgtCreateGateway> {
         'scope': widget.loggedInUser.selectedScope.toScopeMap(),
         'item_kind': PagItemKind.device.value,
         'device_cat': PagDeviceCat.gateway.value,
-        'iccid': _iccid,
-        'ip': _ip,
-        'sn': _sn,
-        'model': _model,
+        'iccid': _iccid?.trim(),
+        'ip': _ip?.trim(),
+        'sn': _sn?.trim(),
+        'model': _model?.trim(),
       };
 
       dynamic result;
@@ -297,19 +297,6 @@ class _WgtCreateGatewayState extends State<WgtCreateGateway> {
     } else if (!_isLabelValidated) {
       return false;
     }
-    // if ((_iccid == null || _ip == null) && _sn == null) {
-    //   return false;
-    // }
-    // if (_model == PagModelEnum.gen1 || _model == PagModelEnum.gen2) {
-    //   if (!_isIccidValidated || !_isIpValidated) {
-    //     return false;
-    //   }
-    // }
-    // if (_model == PagModelEnum.gen3) {
-    //   if (!_isSnValidated) {
-    //     return false;
-    //   }
-    // }
 
     return true;
   }
@@ -392,34 +379,36 @@ class _WgtCreateGatewayState extends State<WgtCreateGateway> {
                 : () async {
                     await _createItem();
 
-                    // reset the form
-                    setState(() {
-                      // _newItem = true;
-                      _newCreate = false;
-                      _createWait = false;
-                      // _createSuccess = false;
-                      // _errorText = '';
-                      // _newItem = true;
+                    if (_createSuccess) {
+                      // reset the form
+                      setState(() {
+                        // _newItem = true;
+                        _newCreate = false;
+                        _createWait = false;
+                        // _createSuccess = false;
+                        // _errorText = '';
+                        // _newItem = true;
 
-                      _label = null;
-                      _iccid = null;
-                      _ip = null;
-                      _model = null;
-                      _sn = null;
+                        _label = null;
+                        _iccid = null;
+                        _ip = null;
+                        _model = null;
+                        _sn = null;
 
-                      _isIccidValidated = false;
-                      _isIpValidated = false;
-                      _isSnValidated = false;
-                      _isModelValidated = false;
+                        _isIccidValidated = false;
+                        _isIpValidated = false;
+                        _isSnValidated = false;
+                        _isModelValidated = false;
 
-                      _labelResetKey = UniqueKey();
-                      _ipResetKey = UniqueKey();
-                      _snResetKey = UniqueKey();
-                      _modelResetKey = UniqueKey();
-                      _iccidResetKey = UniqueKey();
-                    });
+                        _labelResetKey = UniqueKey();
+                        _ipResetKey = UniqueKey();
+                        _snResetKey = UniqueKey();
+                        _modelResetKey = UniqueKey();
+                        _iccidResetKey = UniqueKey();
+                      });
 
-                    widget.onCreated?.call();
+                      widget.onCreated?.call();
+                    }
                   },
           ),
           if (_newItem && !_createSuccess && _errorText.isNotEmpty)
@@ -440,8 +429,6 @@ class _WgtCreateGatewayState extends State<WgtCreateGateway> {
   Widget getItemBlock() {
     MdlPagScopeProfile scopeProfile = widget.loggedInUser.selectedScope;
     String projectName = scopeProfile.projectProfile!.name;
-    // bool isNotGen3Gateway =
-    //     _model == PagModelEnum.gen1 || _model == PagModelEnum.gen2;
 
     return Column(
       children: [
@@ -455,7 +442,6 @@ class _WgtCreateGatewayState extends State<WgtCreateGateway> {
           ),
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
           child: Column(children: [
-            // if (isNotGen3Gateway) ...[
             WgtTextField(
               key: _modelResetKey,
               appConfig: widget.appConfig,
@@ -632,12 +618,11 @@ class _WgtCreateGatewayState extends State<WgtCreateGateway> {
                 });
               },
             ),
-            // ] else ...[
             WgtTextField(
               key: _snResetKey,
               appConfig: widget.appConfig,
-              hintText: 'SN',
-              labelText: 'SN',
+              hintText: 'Serial Number',
+              labelText: 'Serial Number',
               maxLength: maxFullNameLength,
               validator: getValidator(validateSerialNumber, _isSnRequired),
               checkUnique: doPagCheckUnique,
@@ -674,7 +659,6 @@ class _WgtCreateGatewayState extends State<WgtCreateGateway> {
                 });
               },
             ),
-            // ]
           ]),
         ),
       ],
