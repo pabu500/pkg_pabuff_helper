@@ -491,6 +491,7 @@ class _CreateRoleState extends State<WgtCreateRole> {
         width: width,
         labelWidth: 130,
         allowProjectScope: true,
+        autoCascadeScopeFilter: false,
         updateUiOnly: true,
         // itemScopeMap: widget.itemScopeMap!,
         forItemKind: PagItemKind.role,
