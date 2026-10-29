@@ -35,6 +35,7 @@ class WgtDashControl extends StatefulWidget {
     this.onUpdateMainSubDeltaMeterSel,
     this.onUpdateTop,
     this.getList,
+    this.extraControl,
   });
 
   final Function(LookbackType) onUpdateLookbackType;
@@ -61,6 +62,10 @@ class WgtDashControl extends StatefulWidget {
   final Function(Map<String, bool>)? onUpdateMainSubDeltaMeterSel;
   final Function(String)? onUpdateTop;
   final List<List<dynamic>> Function()? getList;
+
+  /// Optional control shown in its own container between the main/sub
+  /// selector and the download button (e.g. a view-mode toggle).
+  final Widget? extraControl;
 
   @override
   State<WgtDashControl> createState() => _WgtDashControlState();
@@ -281,6 +286,7 @@ class _WgtDashControlState extends State<WgtDashControl> {
                         ],
                       ),
                     if (widget.showMainMeterSwitch) getMainMeterDeltaSelector(),
+                    if (widget.extraControl != null) getExtraControl(),
                     if (widget.showDownload) getDownload(),
                     horizontalSpaceSmall,
                   ],
@@ -413,6 +419,26 @@ class _WgtDashControlState extends State<WgtDashControl> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget getExtraControl() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 5),
+      margin: const EdgeInsets.only(left: 8),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primary.withAlpha(180),
+        borderRadius: BorderRadius.circular(5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(30),
+            spreadRadius: 3,
+            blurRadius: 5,
+            offset: const Offset(1, 3),
+          ),
+        ],
+      ),
+      child: widget.extraControl,
     );
   }
 
