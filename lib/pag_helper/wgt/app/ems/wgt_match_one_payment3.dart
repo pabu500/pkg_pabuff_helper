@@ -1,3 +1,4 @@
+import 'wgt_payment_hold_override.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_item.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
@@ -647,11 +648,14 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
   @override
   void initState() {
     super.initState();
+    _holdOverrideReason.addListener(_refreshHoldReason);
     _lcStatusDisplay = PagPaymentLcStatus.byValue(
       widget.defaultPaymentLcStatusStr,
     );
     _fetchHoldAccess();
   }
+
+  void _refreshHoldReason() { if (mounted) setState(() {}); }
 
   @override
   void dispose() {
@@ -1341,153 +1345,17 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
   }
 
   Widget getPaymentHoldControls() {
-    if (_lcStatusDisplay != PagPaymentLcStatus.released || _isCommitted) {
-      return const SizedBox.shrink();
-    }
-    final hintColor = Theme.of(context).hintColor;
-    final errorColor = Theme.of(context).colorScheme.error;
-    final cautionColor = Colors.amber.shade600;
-
-    if (_holdAccessError.isNotEmpty) {
-      return Padding(
-        padding: const EdgeInsets.fromLTRB(13, 6, 13, 6),
-        child: Row(
-          children: [
-            Icon(Symbols.error, size: 18, color: errorColor),
-            const SizedBox(width: 6),
-            Flexible(
-              child: Text(
-                'Could not check payment override access: $_holdAccessError',
-                style: TextStyle(fontSize: 13, color: errorColor),
-              ),
-            ),
-            TextButton(
-              onPressed: _isCommitting ? null : _fetchHoldAccess,
-              child: const Text('Retry'),
-            ),
-          ],
-        ),
-      );
-    }
-    if (!_canKeepEarlierUnapplied) return const SizedBox.shrink();
-
-    final canToggle = _holdOverrideEnabled && !_isCommitting;
-    final selected = _keepEarlierUnapplied;
-    final subtitle = _holdOverrideEnabled
-        ? 'Use only when earlier released payments still have unapplied amounts.'
-        : 'Payment override is currently disabled.';
-
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.fromLTRB(2, 14, 2, 6),
-      padding: const EdgeInsets.fromLTRB(2, 8, 13, 8),
-      decoration: BoxDecoration(
-        color: selected ? cautionColor.withAlpha(22) : null,
-        borderRadius: BorderRadius.circular(5),
-        border: Border.all(
-          color: selected ? cautionColor.withAlpha(150) : Colors.transparent,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          InkWell(
-            borderRadius: BorderRadius.circular(5),
-            onTap: canToggle
-                ? () => setState(() => _keepEarlierUnapplied = !selected)
-                : null,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Checkbox(
-                  value: selected,
-                  activeColor: cautionColor,
-                  onChanged: canToggle
-                      ? (value) =>
-                            setState(() => _keepEarlierUnapplied = value ?? false)
-                      : null,
-                ),
-                Flexible(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Keep earlier payments unapplied',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: _holdOverrideEnabled ? null : hintColor,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        subtitle,
-                        style: TextStyle(fontSize: 13, color: hintColor),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          if (selected) ...[
-            Padding(
-              padding: const EdgeInsets.fromLTRB(42, 6, 0, 0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(Symbols.warning, size: 18, color: cautionColor),
-                  const SizedBox(width: 6),
-                  Flexible(
-                    child: Text(
-                      'Earlier released payments with unapplied amounts will stay '
-                      'unapplied. While a bill is unpaid, the next bill run for '
-                      'this tenant stays blocked until they are applied.',
-                      style: TextStyle(fontSize: 13, color: cautionColor),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(42, 10, 0, 0),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 520),
-                child: TextField(
-                  controller: _holdOverrideReason,
-                  enabled: !_isCommitting,
-                  maxLines: 1,
-                  textCapitalization: TextCapitalization.sentences,
-                  decoration: InputDecoration(
-                    labelText: 'Reason (required)',
-                    alignLabelWithHint: true,
-                    floatingLabelBehavior: FloatingLabelBehavior.always,
-                    hintText: 'Explain why earlier payments are kept unapplied.',
-                    helperText: 'Saved with the payment override audit record.',
-                    helperMaxLines: 2,
-                    filled: true,
-                    fillColor: Theme.of(context).colorScheme.surfaceContainerLow,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 10,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(5),
-                      borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.outlineVariant,
-                      ),
-                    ),
-                  ),
-                  onChanged: (_) => setState(() {}),
-                ),
-              ),
-            ),
-          ],
-        ],
-      ),
+    if (_lcStatusDisplay != PagPaymentLcStatus.released || _isCommitted) return const SizedBox.shrink();
+    return WgtPaymentHoldOverride(
+      authorized: _canKeepEarlierUnapplied, enabled: _holdOverrideEnabled,
+      selected: _keepEarlierUnapplied, busy: _isCommitting, accessError: _holdAccessError,
+      reason: _holdOverrideReason, onRetry: _fetchHoldAccess,
+      onChanged: (value) => setState(() => _keepEarlierUnapplied = value),
+      label: 'Keep earlier payments unapplied',
+      description: 'Use only when earlier released payments still have unapplied amounts.',
+      warning: 'Earlier released payments with unapplied amounts will stay unapplied. '
+          'If older bills remain unpaid, generating the next bill needs a separate override.',
+      reasonHint: 'Explain why earlier payments are kept unapplied.',
     );
   }
 

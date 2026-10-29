@@ -303,7 +303,7 @@ Future<dynamic> commitPaymentApply(
   MdlPagSvcClaim svcClaim, {
   String? loginToken,
   http.Client? client,
-}) => _paymentHoldRequest(
+}) => paymentHoldRequest(
   appConfig,
   queryMap,
   svcClaim,
@@ -319,7 +319,7 @@ Future<dynamic> getPaymentHoldAccess(
   MdlPagSvcClaim svcClaim, {
   String? loginToken,
   http.Client? client,
-}) => _paymentHoldRequest(
+}) => paymentHoldRequest(
   appConfig,
   queryMap,
   svcClaim,
@@ -329,12 +329,13 @@ Future<dynamic> getPaymentHoldAccess(
   client: client,
 );
 
-Future<dynamic> _paymentHoldRequest(
+Future<dynamic> paymentHoldRequest(
   MdlPagAppConfig appConfig,
   Map<String, dynamic> queryMap,
   MdlPagSvcClaim svcClaim,
   String endpoint, {
   required bool requireLogin,
+  String failureMessage = 'Unable to apply payment. Please try again.',
   String? loginToken,
   http.Client? client,
 }) async {
@@ -366,7 +367,7 @@ Future<dynamic> _paymentHoldRequest(
   if (response.statusCode != 200) {
     var message = response.statusCode == 401
         ? 'Please sign in again'
-        : 'Unable to apply payment. Please try again.';
+        : failureMessage;
     try {
       final body = jsonDecode(response.body);
       if (body is Map &&
