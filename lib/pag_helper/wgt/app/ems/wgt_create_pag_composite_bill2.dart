@@ -1,3 +1,5 @@
+import 'bill_payment_hold_controller.dart';
+import 'wgt_payment_hold_override.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_tenant.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_list.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_item.dart';
@@ -107,7 +109,11 @@ class _WgtCreatePagCompositeBill2State
 
   final List<Map<String, dynamic>> _assignedTpInfoList = [];
 
+  late final _paymentHold = BillPaymentHoldController(widget.appConfig, widget.loggedInUser);
+  void _refreshPaymentHold() { if (mounted) setState(() {}); }
+
   Future<dynamic> _genBill() async {
+    if (!_createIniBalBill && !_paymentHold.valid) return;
     if (_totalTenantCount != 1) {
       dev.log('Please select 1 tenant');
 
@@ -132,6 +138,7 @@ class _WgtCreatePagCompositeBill2State
         'gen_by': widget.loggedInUser.username,
         'singular_bill_info_list': _singularBillInfoList,
         'create_initial_balance_bill': _createIniBalBill.toString(),
+        if (!_createIniBalBill) ..._paymentHold.requestFields,
       };
       if (_billDate != null) {
         queryMap['bill_date_timestamp'] = _billDate!.toIso8601String();
@@ -175,6 +182,7 @@ class _WgtCreatePagCompositeBill2State
           scope: '',
           operation: AclOperation.create.name,
         ),
+        loginToken: widget.loggedInUser.loginToken,
       );
       if (result['error'] != null) {
         dev.log(result['error']);
@@ -185,6 +193,7 @@ class _WgtCreatePagCompositeBill2State
         _billResult = result; //result['result'];
       });
 
+      _paymentHold.reset();
       widget.onCreated?.call();
     } catch (err) {
       dev.log('Error generating bill: $err');
@@ -394,10 +403,19 @@ class _WgtCreatePagCompositeBill2State
   @override
   void initState() {
     super.initState();
+    _paymentHold.addListener(_refreshPaymentHold);
+    _paymentHold.fetchAccess();
 
     // _loggedInUser = Provider.of<PagUserProvider>(context, listen: false).currentUser;
 
     _viewOnly = false;
+  }
+
+  @override
+  void dispose() {
+    _paymentHold.removeListener(_refreshPaymentHold);
+    _paymentHold.dispose();
+    super.dispose();
   }
 
   @override
@@ -428,6 +446,7 @@ class _WgtCreatePagCompositeBill2State
                   },
                   onResult: (Map<String, dynamic> result) {
                     _resetAll();
+                    _paymentHold.reset();
 
                     setState(() {
                       if (result['item_list'] != null) {
@@ -480,6 +499,17 @@ class _WgtCreatePagCompositeBill2State
                 getCollectionStartDate(),
                 verticalSpaceSmall,
                 getCollectionEndDate(),
+                if (!_createIniBalBill) WgtPaymentHoldOverride(
+                  authorized: _paymentHold.authorized, enabled: _paymentHold.enabled,
+                  selected: _paymentHold.selected, busy: _generatingBill,
+                  accessError: _paymentHold.accessError, reason: _paymentHold.reason,
+                  onRetry: _paymentHold.fetchAccess, onChanged: _paymentHold.select,
+                  label: 'Allow bill generation with unapplied payments',
+                  description: 'Generate this bill while earlier payments and unpaid bills remain open.',
+                  warning: 'Earlier payments will stay unapplied and older bills will stay unpaid. '
+                      'Interest and the account payable calculation are unchanged.',
+                  reasonHint: 'Explain why this bill should be generated before matching earlier payments.',
+                ),
                 verticalSpaceSmall,
                 if (_billResult.isEmpty && _errorText.isEmpty)
                   getGenBillButton(),
@@ -1637,6 +1667,7 @@ class _WgtCreatePagCompositeBill2State
     if (_createIniBalBill) {
       enableGenBill = _tenantOK;
     }
+    enableGenBill = enableGenBill && (_createIniBalBill || _paymentHold.valid);
     return Padding(
       padding: sidePadding,
       child: SizedBox(

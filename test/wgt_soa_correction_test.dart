@@ -275,7 +275,7 @@ void main() {
     );
   });
 
-  testWidgets('check requires page one, newest order and actual account head', (
+  testWidgets('check supports any page without the account head', (
     tester,
   ) async {
     final host = await mount(tester, normalRequest);
@@ -287,7 +287,7 @@ void main() {
     ]) {
       await host.correction.currentState!.updateList(result);
       await tester.pumpAndSettle();
-      expect(checkEnabled(tester), false);
+      expect(checkEnabled(tester), true);
     }
     await host.correction.currentState!.updateList(listResult());
     await tester.pumpAndSettle();
@@ -299,6 +299,76 @@ void main() {
     host.correction.currentState!.invalidateList();
     await tester.pumpAndSettle();
     expect(checkEnabled(tester), false);
+  });
+
+  testWidgets('page two discovers and previews a non-top candidate', (
+    tester,
+  ) async {
+    final calls = <String>[];
+    final host = await mount(tester, (action, body) async {
+      calls.add(action);
+      return normalRequest(action, body);
+    });
+    await host.correction.currentState!.updateList(
+      listResult(page: 2, items: [rows[1]]),
+    );
+    await tester.pumpAndSettle();
+    expect(calls.where((call) => call == 'candidates'), isEmpty);
+    await tester.tap(find.text('Check reversible entry'));
+    await tester.pumpAndSettle();
+    expect(host.actions.keys, ['199']);
+    expect(calls.where((call) => call == 'candidates').length, 1);
+    await tester.tap(find.byKey(const ValueKey('reverse-199')));
+    await tester.pumpAndSettle();
+    expect(find.text('Payment Apply · #199'), findsOneWidget);
+    expect(find.byType(BottomSheet), findsOneWidget);
+  });
+
+  testWidgets('candidate reasons explain blocked visible rows', (tester) async {
+    final host = await mount(
+      tester,
+      (action, body) async => {
+        ...rootPreview(),
+        'actions': [],
+        'reasons': [],
+        'candidates': [
+          {
+            'target_soa_id': 199,
+            'eligible': false,
+            'reasons': ['Remove the newest application first'],
+          },
+        ],
+      },
+    );
+    await check(tester, host);
+    expect(host.actions, isEmpty);
+    expect(find.text('Remove the newest application first'), findsOneWidget);
+  });
+
+  testWidgets('changed account snapshot requires a fresh list', (tester) async {
+    var changed = false;
+    final host = await mount(
+      tester,
+      (action, body) async => {
+        ...rootPreview(),
+        if (changed) 'max_soa_id': 201,
+      },
+    );
+    await host.correction.currentState!.updateList(
+      listResult(page: 2, items: [rows[1]]),
+    );
+    await tester.pumpAndSettle();
+    changed = true;
+    await tester.tap(find.text('Check reversible entry'));
+    await tester.pumpAndSettle();
+    expect(host.actions, isEmpty);
+    expect(checkEnabled(tester), isFalse);
+    expect(
+      find.text(
+        'The latest entries changed. Refresh the list and check again.',
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets(

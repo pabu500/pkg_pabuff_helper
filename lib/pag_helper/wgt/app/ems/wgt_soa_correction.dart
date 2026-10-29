@@ -39,8 +39,7 @@ class WgtSoaCorrectionState extends State<WgtSoaCorrection> {
   bool _sheetOpen = false;
   Map<String, dynamic>? _pending;
   List<Map<String, dynamic>> _visibleRows = [];
-  Map<String, dynamic> _listQuery = {};
-  bool _latestShown = false;
+  bool _candidatesReady = false;
   int _viewRevision = 0;
   Future<dynamic> _call(String action, [Map<String, dynamic> body = const {}]) {
     if (widget.request != null) return widget.request!(action, body);
@@ -77,7 +76,7 @@ class WgtSoaCorrectionState extends State<WgtSoaCorrection> {
   void invalidateList() {
     _viewRevision++;
     if (!mounted) return;
-    setState(() => _latestShown = false);
+    setState(() => _candidatesReady = false);
     widget.onActionsChanged({});
   }
 
@@ -88,20 +87,14 @@ class WgtSoaCorrectionState extends State<WgtSoaCorrection> {
         .whereType<Map>()
         .map((row) => Map<String, dynamic>.from(row))
         .toList();
-    _listQuery = Map<String, dynamic>.from((result['query_map'] as Map?) ?? {});
-    _listQuery['current_page'] =
-        result['current_page'] ?? _listQuery['current_page'];
     if (result['error'] != null || _visibleRows.isEmpty) return;
     try {
       final preview = Map<String, dynamic>.from(await _call('preview') as Map);
       if (!mounted || revision != _viewRevision) return;
       setState(() {
         _preview = preview;
-        _latestShown = soaListShowsLatest(
-          _visibleRows,
-          _listQuery,
-          preview['top_soa_id'],
-        );
+        _candidatesReady =
+            preview['top_soa_id'] != null && preview['max_soa_id'] != null;
         _error = '';
       });
     } catch (e) {
@@ -112,7 +105,7 @@ class WgtSoaCorrectionState extends State<WgtSoaCorrection> {
   }
 
   Future<void> _checkEntries() async {
-    if (!_latestShown || _busy) return;
+    if (!_candidatesReady || _busy) return;
     final revision = _viewRevision;
     String checkError = '';
     widget.onActionsChanged({});
@@ -121,29 +114,37 @@ class WgtSoaCorrectionState extends State<WgtSoaCorrection> {
       _error = '';
     });
     try {
-      final preview = Map<String, dynamic>.from(await _call('preview') as Map);
-      if (!mounted || revision != _viewRevision) return;
-      final latest = soaListShowsLatest(
-        _visibleRows,
-        _listQuery,
-        preview['top_soa_id'],
+      final preview = Map<String, dynamic>.from(
+        await _call('candidates') as Map,
       );
+      if (!mounted || revision != _viewRevision) return;
+      final latest =
+          preview['top_soa_id']?.toString() ==
+              _preview['top_soa_id']?.toString() &&
+          preview['max_soa_id']?.toString() ==
+              _preview['max_soa_id']?.toString();
       final actions = latest
           ? soaActionsByRow(preview, _visibleRows)
           : <String, Map<String, dynamic>>{};
-      final reasons = (preview['reasons'] as List?) ?? [];
+      final visibleIds = _visibleRows.map((r) => r['id']?.toString()).toSet();
+      final reasons = <dynamic>{
+        ...((preview['reasons'] as List?) ?? []),
+        for (final candidate in (preview['candidates'] as List?) ?? [])
+          if (visibleIds.contains(candidate['target_soa_id']?.toString()))
+            ...((candidate['reasons'] as List?) ?? []),
+      }.toList();
       checkError = !latest
           ? 'The latest entries changed. Refresh the list and check again.'
           : actions.isNotEmpty
           ? ''
+          : reasons.isNotEmpty
+          ? reasons.join('\n')
           : (preview['actions'] as List?)?.isNotEmpty == true
           ? 'The reversible entry is outside this page. Show more entries and check again.'
-          : reasons.isEmpty
-          ? 'No reversible entry found.'
-          : reasons.join('\n');
+          : 'No reversible entry found.';
       setState(() {
         _preview = preview;
-        _latestShown = latest;
+        _candidatesReady = latest;
       });
       widget.onActionsChanged(actions);
     } catch (e) {
@@ -171,7 +172,7 @@ class WgtSoaCorrectionState extends State<WgtSoaCorrection> {
     Map<String, dynamic> action,
     Map<String, dynamic> row,
   ) async {
-    if (!_latestShown || _busy || _pending != null) return;
+    if (!_candidatesReady || _busy || _pending != null) return;
     await _manage(action: action, row: row);
   }
 
@@ -955,12 +956,12 @@ class WgtSoaCorrectionState extends State<WgtSoaCorrection> {
           ),
           Tooltip(
             waitDuration: const Duration(milliseconds: 500),
-            message: !_latestShown && _error.isEmpty
-                ? 'Show the latest entries to check for a reversal.'
+            message: !_candidatesReady && _error.isEmpty
+                ? 'Load the entries to check for a reversal.'
                 : '',
             child: WgtCommButton(
               label: 'Check reversible entry',
-              enabled: _latestShown && !_busy && _pending == null,
+              enabled: _candidatesReady && !_busy && _pending == null,
               inComm: _busy && !_sheetOpen,
               labelStyle: TextStyle(
                 color: Theme.of(context).colorScheme.onSecondary,
@@ -1505,20 +1506,6 @@ String _fieldLabel(String field) =>
       'interest': 'Interest',
     }[field] ??
     field.replaceAll('_', ' ');
-
-bool soaListShowsLatest(
-  List<Map<String, dynamic>> rows,
-  Map<String, dynamic> query,
-  dynamic topId,
-) {
-  if (topId == null || rows.isEmpty) return false;
-  if (int.tryParse(query['current_page']?.toString() ?? '') != 1) return false;
-  if (query['sort_by']?.toString() != 'entry_timestamp' ||
-      query['sort_order']?.toString() != 'desc') {
-    return false;
-  }
-  return rows.any((row) => row['id']?.toString() == topId.toString());
-}
 
 Map<String, Map<String, dynamic>> soaActionsByRow(
   Map<String, dynamic> preview,
