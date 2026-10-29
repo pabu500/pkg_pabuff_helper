@@ -75,6 +75,7 @@ Future<dynamic> doPagCreateDevice(
   svcClaim.endpoint = PagUrlBase.eptPagCreateDevice2;
 
   String svcToken = '';
+  queryMap['item_kind'] = 'device';
   // try {
   //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
   // } catch (err) {

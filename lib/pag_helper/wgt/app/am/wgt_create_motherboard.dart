@@ -71,8 +71,8 @@ class _WgtCreateMotherboardState extends State<WgtCreateMotherboard> {
       Map<String, dynamic> queryMap = {};
       queryMap['device_cat'] = PagDeviceCat.motherboard.name;
       queryMap['scope'] = widget.loggedInUser.selectedScope.toScopeMap();
-      queryMap['sn'] = _sn;
-      queryMap['model'] = _model;
+      queryMap['sn'] = _sn?.trim();
+      queryMap['model'] = _model?.trim();
       queryMap['type'] = _selectedType;
 
       dynamic result;
@@ -90,7 +90,7 @@ class _WgtCreateMotherboardState extends State<WgtCreateMotherboard> {
         ),
       );
 
-      _sn = result['sn'];
+      _sn = queryMap['sn'];
       _newItemName = result['name'];
 
       _newItem = false;
@@ -100,7 +100,7 @@ class _WgtCreateMotherboardState extends State<WgtCreateMotherboard> {
         print('error: $e');
       }
       // setState(() {
-      _errorText = 'Error creating item';
+      _errorText = getErrorText(e, defaultErrorText: 'Error creating motherboard');
       String eStr = e.toString().toLowerCase();
       if (kDebugMode) {
         print('error: $eStr');
@@ -177,19 +177,21 @@ class _WgtCreateMotherboardState extends State<WgtCreateMotherboard> {
                             : () async {
                                 await _createItem();
 
-                                // reset the form
-                                setState(() {
-                                  // _newItem = true;
-                                  _newCreate = false;
-                                  _createWait = false;
-                                  // _createSuccess = false;
-                                  // _errorText = '';
-                                  // _newItem = true;
+                                if (_createSuccess) {
+                                  // reset the form
+                                  setState(() {
+                                    // _newItem = true;
+                                    _newCreate = false;
+                                    _createWait = false;
+                                    // _createSuccess = false;
+                                    // _errorText = '';
+                                    // _newItem = true;
 
-                                  _sn = null;
-                                });
+                                    _sn = null;
+                                  });
 
-                                widget.onCreated?.call();
+                                  widget.onCreated?.call();
+                                }
                               },
                   ),
                   if (_newItem && !_createSuccess && _errorText.isNotEmpty)

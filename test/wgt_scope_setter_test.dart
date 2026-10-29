@@ -66,7 +66,7 @@ class ScopeFixture {
 
   Future<void> show(
     WidgetTester tester, {
-    bool? autoCascade,
+    bool autoCascade = false,
     Map<String, dynamic>? savedScope,
   }) async {
     tester.view.physicalSize = const Size(1200, 1000);
@@ -87,12 +87,12 @@ class ScopeFixture {
     );
     final provider = PagUserProvider()..setCurrentUser(user);
     // Omit the parameter in the default case to exercise the public default.
-    final setter = autoCascade != null
+    final setter = autoCascade
         ? WgtScopeSetter(
             appConfig: config,
             width: 600,
             forItemKind: PagItemKind.tariff,
-            autoCascadeScopeFilter: autoCascade,
+            autoCascadeScopeFilter: true,
             itemScopeMap: savedScope,
             onScopeSet: (scope) => committed = scope,
           )
@@ -141,10 +141,10 @@ Future<void> select<T>(WidgetTester tester, T value) async {
 
 void main() {
   testWidgets(
-    'disabling cascading leaves children unselected and commits site scope',
+    'default leaves sole children unselected and commits site scope',
     (tester) async {
       final fixture = ScopeFixture();
-      await fixture.show(tester, autoCascade: false);
+      await fixture.show(tester);
       await select(tester, fixture.siteGroup);
       expect(dropdown<MdlPagSiteProfile>(tester).value, isNull);
       expect(
@@ -166,11 +166,11 @@ void main() {
   );
 
   testWidgets(
-    'disabling cascading leaves location groups and fetched locations unselected',
+    'default leaves sole location group and fetched location unselected',
     (tester) async {
       final fixture = ScopeFixture();
       await http.runWithClient(() async {
-        await fixture.show(tester, autoCascade: false);
+        await fixture.show(tester);
         await select(tester, fixture.siteGroup);
         await select(tester, fixture.site);
         await select(tester, fixture.building);
@@ -190,38 +190,31 @@ void main() {
     },
   );
 
-  for (final autoCascade in <bool?>[null, true]) {
-    testWidgets(
-      autoCascade == null
-          ? 'default cascades through sole children including fetched locations'
-          : 'explicit true cascades through sole children including fetched locations',
-      (tester) async {
-        final fixture = ScopeFixture();
-        await http.runWithClient(() async {
-          await fixture.show(tester, autoCascade: autoCascade);
-          await select(tester, fixture.siteGroup);
-          expect(dropdown<MdlPagSiteProfile>(tester).value, fixture.site);
-          expect(
-            dropdown<MdlPagBuildingProfile>(tester).value,
-            fixture.building,
-          );
-          expect(
-            dropdown<MdlPagLocationGroupProfile>(tester).value,
-            fixture.locationGroup,
-          );
-          final locationInput = tester.widget<WgtInputDropdown>(
-            find.byType(WgtInputDropdown),
-          );
-          expect(locationInput.initialValue!['value'], '5');
-          expect(fixture.fetches, 1);
-          await tester.tap(find.byIcon(Icons.check));
-          await tester.pumpAndSettle();
-          expect(fixture.committed, fixture.location);
-          expect(tester.takeException(), isNull);
-        }, fixture.client);
-      },
-    );
-  }
+  testWidgets(
+    'opting in cascades through sole children including fetched locations',
+    (tester) async {
+      final fixture = ScopeFixture();
+      await http.runWithClient(() async {
+        await fixture.show(tester, autoCascade: true);
+        await select(tester, fixture.siteGroup);
+        expect(dropdown<MdlPagSiteProfile>(tester).value, fixture.site);
+        expect(dropdown<MdlPagBuildingProfile>(tester).value, fixture.building);
+        expect(
+          dropdown<MdlPagLocationGroupProfile>(tester).value,
+          fixture.locationGroup,
+        );
+        final locationInput = tester.widget<WgtInputDropdown>(
+          find.byType(WgtInputDropdown),
+        );
+        expect(locationInput.initialValue!['value'], '5');
+        expect(fixture.fetches, 1);
+        await tester.tap(find.byIcon(Icons.check));
+        await tester.pumpAndSettle();
+        expect(fixture.committed, fixture.location);
+        expect(tester.takeException(), isNull);
+      }, fixture.client);
+    },
+  );
 
   testWidgets('default preserves an existing saved scope', (tester) async {
     final fixture = ScopeFixture();
