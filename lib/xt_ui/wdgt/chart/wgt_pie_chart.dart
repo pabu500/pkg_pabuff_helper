@@ -337,7 +337,7 @@ class WgtPieChartState extends State<WgtPieChart> {
             : widget.maxIdicators! < widget.chartData.length
                 ? widget.maxIdicators!
                 : widget.chartData.length, (i) {
-      return InkWell(
+      final indicator = InkWell(
         onTap: widget.onIdicatorTap == null
             ? null
             : () {
@@ -405,6 +405,8 @@ class WgtPieChartState extends State<WgtPieChart> {
           ),
         ),
       );
+      final tooltip = widget.chartData[i]['tooltip'] as String?;
+      return tooltip == null ? indicator : Tooltip(message: tooltip, child: indicator);
     });
   }
 

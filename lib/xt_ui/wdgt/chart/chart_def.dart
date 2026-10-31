@@ -29,6 +29,7 @@ enum LookbackType {
   last_14d,
   mtd,
   all,
+  prev_day,
 }
 
 enum TopStatType {
@@ -49,6 +50,8 @@ String getLookbackTypeLabel(LookbackType lookbackType) {
   switch (lookbackType) {
     case LookbackType.last_24h:
       return '24h';
+    case LookbackType.prev_day:
+      return 'Prev day';
     case LookbackType.last_48h:
       return '48h';
     case LookbackType.last_72h:
@@ -72,6 +75,7 @@ String getLookbackTypeTimeFormat(LookbackType lookbackType) {
     case LookbackType.last_48h:
     case LookbackType.last_72h:
       return 'HH:mm';
+    case LookbackType.prev_day:
     case LookbackType.last_7d:
     case LookbackType.mtd:
     case LookbackType.all:

@@ -1,9 +1,9 @@
 import 'dart:math';
-import 'dart:ui' show FontFeature;
 
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'wgt_stat_detail_card.dart';
 
 class WgtMultiParaBarChart2 extends StatefulWidget {
   WgtMultiParaBarChart2({
@@ -272,7 +272,7 @@ class WgtMultiParaBarChart2State extends State<WgtMultiParaBarChart2> {
           toY: groupBars['y'] as double,
           color: color,
           width: widget.barWidth ?? 5,
-          borderSide: _partialOutline(groupBars, color),
+          borderSide: _partialOutline(groupBars, Colors.red),
         ),
       );
     }
@@ -740,145 +740,9 @@ class WgtMultiParaBarChart2State extends State<WgtMultiParaBarChart2> {
     );
   }
 
-  /// Card for a structured `detail`:
-  /// {title, status, sections: [{name?, color?, rows: [{label, value}]}], note?}
-  Widget _detailCard(BuildContext context, Map<String, dynamic> detail) {
-    final scheme = Theme.of(context).colorScheme;
-    final warn = _warning(context);
-    final primary = scheme.onSurface;
-    final muted = scheme.onSurfaceVariant;
-    final (chipLabel, chipColor) = switch (detail['status']) {
-      'partial' => ('Partial', warn),
-      'incomplete' => ('No total', warn),
-      'approximate' => ('Approximate', scheme.primary),
-      _ => ('Complete', muted),
-    };
-    final sections = (detail['sections'] as List? ?? const []).cast<Map>();
-    final labelStyle = TextStyle(fontSize: 12, color: muted, height: 1.4);
-    final valueStyle = TextStyle(
-      fontSize: 12,
-      color: primary,
-      height: 1.4,
-      fontFeatures: const [FontFeature.tabularFigures()],
-    );
-
-    Widget cellRow(Map cell) => Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('${cell['label']}', style: labelStyle),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Text(
-            '${cell['value']}',
-            style: valueStyle,
-            textAlign: TextAlign.right,
-          ),
-        ),
-      ],
-    );
-
-    return Material(
-      type: MaterialType.transparency,
-      child: Container(
-        width: 264,
-        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-        decoration: BoxDecoration(
-          color: scheme.surfaceContainerHigh,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: scheme.outlineVariant.withAlpha(140)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withAlpha(50),
-              blurRadius: 14,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    '${detail['title'] ?? ''}',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: primary,
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: chipColor.withAlpha(40),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    chipLabel,
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w500,
-                      color: chipColor,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            for (var i = 0; i < sections.length; i++) ...[
-              if (i > 0) const SizedBox(height: 8),
-              if (sections[i]['name'] != null)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 2),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: sections[i]['color'] as Color? ?? muted,
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        '${sections[i]['name']}',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: primary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              for (final cell
-                  in (sections[i]['rows'] as List? ?? const []).cast<Map>())
-                Padding(
-                  padding: EdgeInsets.only(
-                    left: sections[i]['name'] != null ? 14 : 0,
-                  ),
-                  child: cellRow(cell),
-                ),
-            ],
-            if (detail['note'] != null) ...[
-              const SizedBox(height: 8),
-              Text(
-                '${detail['note']}',
-                style: TextStyle(fontSize: 11, color: muted, height: 1.35),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
+  /// Card for a structured `detail` (see [WgtStatDetailCard]).
+  Widget _detailCard(BuildContext context, Map<String, dynamic> detail) =>
+      WgtStatDetailCard(detail: detail, warningColor: _warning(context));
 
   Widget leftTitles(double value, TitleMeta meta) {
     double max = meta.max;
