@@ -122,7 +122,7 @@ class WgtPaymentHoldOverride extends StatelessWidget {
                   Flexible(
                     child: Text(
                       warning,
-                      style: captionStyle.copyWith(color: cautionColor),
+                      style: captionStyle.copyWith(color: hintColor),
                     ),
                   ),
                 ],
