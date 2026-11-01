@@ -51,6 +51,7 @@ class WgtMultiParaBarChart2 extends StatefulWidget {
     this.fitXLabelsHorizontally = false,
     this.statusSummary,
     this.statusAction,
+    this.showStatusRow = true,
     this.yAxisLabel,
     this.warningColor,
     Color? barColor,
@@ -137,6 +138,11 @@ class WgtMultiParaBarChart2 extends StatefulWidget {
 
   /// Optional control shown after [statusSummary], e.g. a strict-view toggle.
   final Widget? statusAction;
+
+  /// When false the summary/legend row under the chart is not drawn; the caller
+  /// shows it elsewhere (e.g. a [WgtStatDetailCard] built with
+  /// [multiParaBarLegendRows]).
+  final bool showStatusRow;
 
   /// Unit caption shown above the Y axis, e.g. 'kWh'.
   final String? yAxisLabel;
@@ -847,7 +853,9 @@ class WgtMultiParaBarChart2State extends State<WgtMultiParaBarChart2> {
 
   bool get _showUnitCaption => widget.yAxisLabel?.isNotEmpty ?? false;
 
-  bool get _showStatusRow => widget.statusSummary != null || _hasQualityStatus;
+  bool get _showStatusRow =>
+      widget.showStatusRow &&
+      (widget.statusSummary != null || _hasQualityStatus);
 
   /// Unit caption above the Y axis (e.g. 'kWh').
   /// Height reserved for X labels: rotated labels use the configured size,
@@ -1103,14 +1111,8 @@ class WgtMultiParaBarChart2State extends State<WgtMultiParaBarChart2> {
   static const double _coverageGood = 0.9;
   static const double _coverageFair = 0.7;
 
-  Color _coverageColor(BuildContext context, double coverage) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    if (coverage >= _coverageGood) {
-      return dark ? const Color(0xFF7CC48E) : Colors.green.shade700;
-    }
-    if (coverage >= _coverageFair) return _warning(context);
-    return dark ? const Color(0xFFE3A64A) : Colors.amber.shade900;
-  }
+  Color _coverageColor(BuildContext context, double coverage) =>
+      multiParaCoverageColor(context, coverage, _warning(context));
 
   Widget _coverageStrip(double? coverage, Color warn) {
     final width = _barWidth.clamp(8.0, 36.0).toDouble();
@@ -1364,4 +1366,73 @@ class _DetailCardLayout extends SingleChildLayoutDelegate {
   @override
   bool shouldRelayout(_DetailCardLayout oldDelegate) =>
       oldDelegate.anchor != anchor;
+}
+
+/// Coverage colour for a day: green from 90%, the warning colour from 70%,
+/// amber below. Shared by the coverage strip and [multiParaBarLegendRows].
+Color multiParaCoverageColor(
+  BuildContext context,
+  double coverage,
+  Color warning,
+) {
+  final dark = Theme.of(context).brightness == Brightness.dark;
+  if (coverage >= WgtMultiParaBarChart2State._coverageGood) {
+    return dark ? const Color(0xFF7CC48E) : Colors.green.shade700;
+  }
+  if (coverage >= WgtMultiParaBarChart2State._coverageFair) return warning;
+  return dark ? const Color(0xFFE3A64A) : Colors.amber.shade900;
+}
+
+/// Legend rows for the bar states present in [chartData], in the
+/// [WgtStatDetailCard] row shape ({label, value, marker}), so a caller can show
+/// the legend in a card instead of the chart's status row.
+List<Map<String, dynamic>> multiParaBarLegendRows(
+  BuildContext context,
+  List<Map<String, dynamic>> chartData, {
+  required Color mutedColor,
+  Color? warningColor,
+}) {
+  final warn = warningColor ?? WgtStatDetailCard.defaultWarningColor(context);
+  final statuses = chartData.map((row) => row['status']).toSet();
+  final hasQuality = statuses.any(
+    (s) => s == 'incomplete' || s == 'partial' || s == 'approximate',
+  );
+  final hasCoverage = chartData.any((row) => row['coverage'] is num);
+  Widget swatch({Color? fill, Color? border}) => Container(
+    width: 10,
+    height: 10,
+    decoration: BoxDecoration(
+      color: fill,
+      border: border == null ? null : Border.all(color: border),
+      borderRadius: BorderRadius.circular(2),
+    ),
+  );
+  Widget strip(Color color) => Container(
+    width: 14,
+    height: 4,
+    decoration: BoxDecoration(
+      color: color,
+      borderRadius: BorderRadius.circular(2),
+    ),
+  );
+  Map<String, dynamic> row(Widget marker, String label) =>
+      {'marker': marker, 'label': label, 'value': ''};
+  return [
+    if (hasQuality && hasCoverage)
+      for (final (band, label) in const [
+        (0.95, 'Meter coverage ≥90%'),
+        (0.8, 'Meter coverage 70–89%'),
+        (0.5, 'Meter coverage <70%'),
+      ])
+        row(strip(multiParaCoverageColor(context, band, warn)), label),
+    if (statuses.contains('incomplete'))
+      row(Icon(Icons.info_outline_rounded, size: 13, color: warn), 'No total'),
+    if (statuses.contains('partial'))
+      row(swatch(fill: mutedColor.withAlpha(50), border: mutedColor), 'Partial'),
+    if (hasQuality && statuses.contains('complete'))
+      row(swatch(fill: mutedColor), 'Complete'),
+    if (statuses.contains('approximate'))
+      row(Text('≈', style: TextStyle(fontSize: 11, color: mutedColor)),
+          'Approximate boundary'),
+  ];
 }

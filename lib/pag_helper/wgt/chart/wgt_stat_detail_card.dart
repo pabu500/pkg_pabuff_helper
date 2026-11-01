@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 
 /// Detail card shared by chart bars and dashboard stat cards.
 ///
-/// `detail` = {title, status, sections: [{name?, color?, rows: [{label, value}]}], note?}
+/// `detail` = {title, status, sections: [{name?, color?, rows: [{label, value, marker?}]}], note?}
+/// A row's optional `marker` (a small widget, e.g. a legend swatch) is drawn before its label.
 /// `status` picks the chip: partial, incomplete, approximate, otherwise complete.
 class WgtStatDetailCard extends StatelessWidget {
   const WgtStatDetailCard({
@@ -50,8 +51,14 @@ class WgtStatDetailCard extends StatelessWidget {
     );
 
     Widget cellRow(Map cell) => Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: cell['marker'] is Widget
+          ? CrossAxisAlignment.center
+          : CrossAxisAlignment.start,
       children: [
+        if (cell['marker'] is Widget) ...[
+          SizedBox(width: 18, child: Center(child: cell['marker'] as Widget)),
+          const SizedBox(width: 6),
+        ],
         Text('${cell['label']}', style: labelStyle),
         const SizedBox(width: 16),
         Expanded(
