@@ -264,6 +264,7 @@ class _WgtTenantMeterGroupAssignmentState
           target: '',
           operation: 'update',
         ),
+        user: loggedInUser,
       );
 
       if (data['error'] != null) {

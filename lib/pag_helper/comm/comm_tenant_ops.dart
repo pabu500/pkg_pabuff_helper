@@ -1,33 +1,30 @@
+import 'comm_tenant_auth.dart';
 import 'dart:convert';
 
 import 'package:buff_helper/pag_helper/comm/pag_be_api_base.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
+import '../model/mdl_pag_user.dart';
 import 'package:buff_helper/pag_helper/model/mdl_svc_query.dart';
 import 'package:http/http.dart' as http;
 
 Future<dynamic> commitTenantMeterGroupList(
   MdlPagAppConfig appConfig,
   Map<String, dynamic> queryMap,
-  MdlPagSvcClaim svcClaim,
-) async {
+  MdlPagSvcClaim svcClaim, {
+  MdlPagUser? user,
+}) async {
   svcClaim.svcName = PagSvcType.oresvc2.name;
   svcClaim.endpoint = PagUrlBase.eptPagUpdateTenantMeterGroupList;
 
-  String svcToken = '';
-  // try {
-  //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
-  // } catch (err) {
-  //   throw Exception(err);
-  // }
-
   final response = await http.post(
-    Uri.parse(PagUrlController(null, appConfig)
-        .getUrl(PagSvcType.oresvc2, svcClaim.endpoint!)),
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-      'Authorization': 'Bearer $svcToken',
-    },
+    Uri.parse(
+      PagUrlController(
+        null,
+        appConfig,
+      ).getUrl(PagSvcType.oresvc2, svcClaim.endpoint!),
+    ),
+    headers: await tenantOperationHeaders(svcClaim, user: user),
     body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
   );
 

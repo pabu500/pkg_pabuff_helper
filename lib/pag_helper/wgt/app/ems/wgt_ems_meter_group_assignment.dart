@@ -258,6 +258,7 @@ class _WgtEmsMeterGroupAssignmentState
     try {
       await ex(
         endpoint: PagUrlBase.eptUpdateEmsMeterGroupMeterList,
+        user: loggedInUser,
         crudType: 'update',
         opStr: 'commit meter group assignment',
         appConfig: widget.appConfig,

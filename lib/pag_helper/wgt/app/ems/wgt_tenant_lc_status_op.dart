@@ -1,13 +1,11 @@
-import 'package:buff_helper/pag_helper/def_helper/dh_pag_item.dart';
-import 'package:buff_helper/pkg_buff_helper.dart';
-import 'dart:developer' as dev;
-
+import 'wgt_tenant_termination_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:material_symbols_icons/symbols.dart';
-
-import '../../../../pagrid_helper/batch_op_helper/wgt_confirm_box.dart';
 import '../../../comm/comm_tenant.dart';
+import '../../../comm/comm_tenant_auth.dart';
 import '../../../def_helper/dh_pag_tenant.dart';
+import '../../../def_helper/dh_pag_item.dart';
 import '../../../model/acl/mdl_pag_svc_claim.dart';
 import '../../../model/mdl_pag_app_config.dart';
 import '../../wgt_comm_button.dart';
@@ -22,205 +20,229 @@ class WgtPagTenantLcStatusOp extends StatefulWidget {
     this.onCommitted,
     this.enableEdit = false,
   });
-
   final MdlPagAppConfig appConfig;
   final MdlPagUser? loggedInUser;
   final Map<String, dynamic> tenantInfo;
   final PagTenantLcStatus initialStatus;
   final Function? onCommitted;
   final bool enableEdit;
-
   @override
-  State<WgtPagTenantLcStatusOp> createState() => _WgtPagTenantLcStatusOpState();
+  State<WgtPagTenantLcStatusOp> createState() => _TenantLcStatusState();
 }
 
-class _WgtPagTenantLcStatusOpState extends State<WgtPagTenantLcStatusOp> {
-  late final tagTextStyle = TextStyle(
-    color: Theme.of(context).colorScheme.onPrimary,
-  );
-  late final tagTextStyleHighLight = TextStyle(
-    color: Theme.of(context).colorScheme.onPrimary,
-    fontSize: 25,
-    fontWeight: FontWeight.bold,
-  );
+class _TenantLcStatusState extends State<WgtPagTenantLcStatusOp> {
+  late PagTenantLcStatus _current = widget.initialStatus;
+  late PagTenantLcStatus _selected = widget.initialStatus;
+  Map<String, dynamic> _targets = {};
+  bool _loading = false;
+  bool _committing = false;
+  String _error = '';
+  int _version = 0;
+  @override
+  void initState() {
+    super.initState();
+    _loadCheck();
+  }
 
-  late PagTenantLcStatus _selectedLcStatus = widget.initialStatus;
+  @override
+  void didUpdateWidget(covariant WgtPagTenantLcStatusOp oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.tenantInfo['id'] != widget.tenantInfo['id'] ||
+        oldWidget.initialStatus != widget.initialStatus ||
+        oldWidget.enableEdit != widget.enableEdit) {
+      _current = widget.initialStatus;
+      _selected = _current;
+      _targets = {};
+      _loadCheck();
+    }
+  }
 
-  bool _isCommitting = false;
-  String _errorText = '';
-
-  Future<void> _commit() async {
-    if (_isCommitting) return;
-
-    final queryMap = {
-      'scope': widget.loggedInUser?.selectedScope.toScopeMap(),
-      'item_info': {
-        'item_id': widget.tenantInfo['id'],
-        'tenant_lc_status': widget.tenantInfo['lc_status'],
-      },
-      'item_kind': PagItemKind.tenant.value,
-      'target_lc_status': _selectedLcStatus.value,
-    };
+  Future<void> _loadCheck() async {
+    final version = ++_version;
+    if (_current != PagTenantLcStatus.offboarding || !widget.enableEdit) return;
+    setState(() {
+      _loading = true;
+      _error = '';
+    });
     try {
-      _isCommitting = true;
-      _errorText = '';
-
-      final result = await updateTenantLcStatus(
-          widget.appConfig,
-          queryMap,
-          MdlPagSvcClaim(
-            scope: '',
-            target: '',
-            operation: '',
-          ));
-      dev.log('Tenant Lc Status update result: $result');
-      final newStatus = result['lc_status'];
-      PagTenantLcStatus updatedStatus = PagTenantLcStatus.byValue(newStatus);
-      setState(() {
-        _selectedLcStatus = updatedStatus;
+      final user = widget.loggedInUser;
+      if (user == null) throw Exception('Please sign in again');
+      final result = await getTenantLcTransitionCheck(widget.appConfig, user, {
+        'scope': user.selectedScope.toScopeMap(),
+        'tenant_id': widget.tenantInfo['id'].toString(),
       });
-      widget.onCommitted?.call(updatedStatus);
+      if (mounted && version == _version) {
+        setState(() {
+          _targets = Map<String, dynamic>.from(result['targets'] as Map);
+        });
+      }
     } catch (e) {
-      dev.log('Error committing LC status: $e');
-
-      _errorText =
-          getErrorText(e, defaultErrorText: 'Error committing LC status');
+      if (mounted && version == _version) {
+        setState(() {
+          _targets = {};
+          _error = getErrorText(
+            e,
+            defaultErrorText: 'Unable to check tenant transitions',
+          );
+        });
+      }
     } finally {
-      _isCommitting = false;
+      if (mounted && version == _version) {
+        setState(() {
+          _loading = false;
+        });
+      }
+    }
+  }
+
+  Map<String, dynamic> _target(PagTenantLcStatus status) =>
+      Map<String, dynamic>.from(_targets[status.value] as Map? ?? {});
+  List<String> _reasons(PagTenantLcStatus status) =>
+      (_target(status)['reasons'] as List? ?? [])
+          .map((e) => e.toString())
+          .toList();
+  bool _eligible(PagTenantLcStatus status) =>
+      widget.enableEdit &&
+      !_loading &&
+      !_committing &&
+      _current == PagTenantLcStatus.offboarding &&
+      (status == PagTenantLcStatus.normal ||
+          status == PagTenantLcStatus.terminated) &&
+      _target(status)['eligible'] == true;
+  Future<void> _commit() async {
+    if (!_eligible(_selected)) return;
+    Map<String, dynamic> confirmation = {};
+    if (_selected == PagTenantLcStatus.terminated) {
+      await _loadCheck();
+      if (!mounted || !_eligible(_selected)) return;
+      final result = await showDialog<Map<String, dynamic>>(
+        context: context,
+        builder: (_) => WgtTenantTerminationDialog(
+          tenantName: widget.tenantInfo['name']?.toString() ?? '',
+          info: _target(_selected),
+        ),
+      );
+      if (result == null || !mounted) return;
+      confirmation = result;
+    }
+    final user = widget.loggedInUser;
+    if (user == null) return;
+    setState(() {
+      _committing = true;
+      _error = '';
+    });
+    try {
+      final result = await updateTenantLcStatus(
+        widget.appConfig,
+        {
+          'scope': user.selectedScope.toScopeMap(),
+          'item_info': {'item_id': widget.tenantInfo['id'].toString()},
+          'item_kind': PagItemKind.tenant.value,
+          'target_lc_status': _selected.value,
+          ...confirmation,
+        },
+        MdlPagSvcClaim(
+          username: user.username,
+          userId: user.id,
+          roleId: user.selectedRole?.id,
+        ),
+        user: user,
+      );
+      if (!mounted) return;
+      final status = PagTenantLcStatus.byValue(result['lc_status']);
+      setState(() {
+        _current = status;
+        _selected = status;
+      });
+      widget.onCommitted?.call(status);
+    } catch (e) {
       if (mounted) {
-        setState(() {});
-        if (_errorText.isNotEmpty) {
-          showInfoDialog(context, 'Error', _errorText);
-        }
+        setState(() {
+          _error = getErrorText(
+            e,
+            defaultErrorText: 'Unable to update tenant status',
+          );
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _committing = false;
+        });
       }
     }
   }
 
   @override
-  Widget build(BuildContext context) {
-    // return Container();
-    return Opacity(
-      opacity: widget.enableEdit ? 1.0 : 0.5,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+  Widget build(BuildContext context) => Column(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Row(
         children: [
-          Row(
-            children: [
-              getLcStatusButton(PagTenantLcStatus.mfd),
-              horizontalSpaceLarge,
-              getLcStatusButton(PagTenantLcStatus.onboarding),
+          for (final status in [
+            PagTenantLcStatus.mfd,
+            PagTenantLcStatus.onboarding,
+            PagTenantLcStatus.normal,
+            PagTenantLcStatus.offboarding,
+            PagTenantLcStatus.terminated,
+          ]) ...[
+            if (status != PagTenantLcStatus.mfd)
               Icon(Symbols.chevron_forward, color: Theme.of(context).hintColor),
-              getLcStatusButton(PagTenantLcStatus.normal),
-              Icon(Symbols.chevron_forward, color: Theme.of(context).hintColor),
-              getLcStatusButton(PagTenantLcStatus.offboarding),
-              Icon(Symbols.chevron_forward, color: Theme.of(context).hintColor),
-              getLcStatusButton(PagTenantLcStatus.terminated),
-              getCommitButton(),
-            ],
-          ),
-          if (_errorText.isNotEmpty)
-            getErrorTextPrompt(context: context, errorText: _errorText)
+            Tooltip(
+              message: _reasons(status).join('\n'),
+              child: InkWell(
+                onTap: _eligible(status)
+                    ? () => setState(() => _selected = status)
+                    : null,
+                child: Opacity(
+                  opacity: _eligible(status) || _selected == status ? 1 : 0.5,
+                  child: getTenantLcStatusTagWidget(
+                    context,
+                    status,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimary,
+                      fontSize: _selected == status ? 25 : null,
+                      fontWeight: _selected == status ? FontWeight.bold : null,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+          if (_selected != _current)
+            Padding(
+              padding: const EdgeInsets.only(left: 21),
+              child: WgtCommButton(
+                enabled: _eligible(_selected),
+                label: 'Commit',
+                onPressed: _commit,
+              ),
+            ),
+          if (_loading)
+            const Padding(
+              padding: EdgeInsets.all(8),
+              child: SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(),
+              ),
+            ),
+          if (widget.enableEdit && _current == PagTenantLcStatus.offboarding)
+            IconButton(
+              onPressed: _loading || _committing ? null : _loadCheck,
+              tooltip: 'Refresh eligibility',
+              icon: const Icon(Icons.refresh),
+            ),
         ],
       ),
-    );
-  }
-
-  Widget getLcStatusButton(PagTenantLcStatus targetStatus) {
-    final tagTextStyle = TextStyle(
-      color: Theme.of(context).colorScheme.onPrimary,
-    );
-    final tagTextStyleHighLight = TextStyle(
-      color: Theme.of(context).colorScheme.onPrimary,
-      fontSize: 25,
-      fontWeight: FontWeight.bold,
-    );
-
-    bool clickEnabled = _selectedLcStatus != targetStatus;
-    bool highlighted = _selectedLcStatus == targetStatus;
-    switch (widget.initialStatus) {
-      case PagTenantLcStatus.mfd:
-        clickEnabled = false;
-        break;
-      case PagTenantLcStatus.onboarding:
-        clickEnabled = false;
-        break;
-      case PagTenantLcStatus.normal:
-        // clickEnabled = targetStatus != PagTenantLcStatus.onboarding;
-        clickEnabled = false; // requires offboarding flow
-        break;
-      case PagTenantLcStatus.offboarding:
-        // clickEnabled = targetStatus != PagTenantLcStatus.onboarding;
-        clickEnabled = targetStatus == PagTenantLcStatus.normal;
-        break;
-      case PagTenantLcStatus.terminated:
-        clickEnabled = false;
-        break;
-      default:
-    }
-
-    return InkWell(
-      onTap: !widget.enableEdit || !clickEnabled
-          ? null
-          : () {
-              setState(() {
-                _selectedLcStatus = targetStatus;
-              });
-            },
-      child: Opacity(
-        opacity: clickEnabled || highlighted ? 1.0 : 0.5,
-        child: getTenantLcStatusTagWidget(
-          context,
-          targetStatus,
-          style: targetStatus == _selectedLcStatus
-              ? tagTextStyleHighLight
-              : tagTextStyle,
-        ),
-      ),
-    );
-  }
-
-  Widget getCommitButton() {
-    if (_selectedLcStatus == widget.initialStatus) {
-      return Container();
-    }
-
-    bool targetIsMfd = _selectedLcStatus == PagTenantLcStatus.mfd;
-    bool targetIsTerminated = _selectedLcStatus == PagTenantLcStatus.terminated;
-    String itemRef = widget.tenantInfo['name'] ?? 'unknown_tenant_name';
-
-    return Padding(
-      padding: const EdgeInsets.only(left: 21),
-      child: WgtCommButton(
-        enabled: !_isCommitting && _errorText.isEmpty,
-        label: 'Commit',
-        onPressed: () async {
-          !targetIsMfd && !targetIsTerminated
-              ? await _commit()
-              : showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return WgtConfirmBox(
-                      title: targetIsMfd
-                          ? 'MFD Confirmation'
-                          : 'Terminate Confirmation',
-                      message1:
-                          'This operation is not reversible. Are you sure to proceed?',
-                      message2:
-                          'It\'s recommended to double check before proceeding',
-                      opName: targetIsMfd ? 'tenant_mfd' : 'tenant_terminate',
-                      keyInConfirmStrList: [
-                        targetIsMfd ? 'mfd' : 'terminate',
-                        itemRef,
-                      ],
-                      itemCount: 1,
-                      onConfirm: () async {
-                        await _commit();
-                      },
-                    );
-                  },
-                );
-        },
-      ),
-    );
-  }
+      if (_error.isNotEmpty)
+        getErrorTextPrompt(context: context, errorText: _error),
+      for (final status in [
+        PagTenantLcStatus.normal,
+        PagTenantLcStatus.terminated,
+      ])
+        if (_reasons(status).isNotEmpty)
+          Text('${status.value}: ${_reasons(status).join('; ')}'),
+    ],
+  );
 }

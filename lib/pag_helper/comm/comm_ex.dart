@@ -1,3 +1,5 @@
+import 'comm_tenant_auth.dart';
+import '../model/mdl_pag_user.dart';
 import 'dart:convert';
 import 'dart:io';
 
@@ -34,12 +36,20 @@ Future<dynamic> ex({
   required MdlPagAppConfig appConfig,
   required Map<String, dynamic> queryMap,
   required MdlPagSvcClaim svcClaim,
+  MdlPagUser? user,
   bool authenticated = false,
   bool structuredErrors = false,
 }) async {
   svcClaim.svcName = PagSvcType.oresvc2.name;
   svcClaim.endpoint = endpoint;
 
+  final tenantWrite = const {
+    '/ems/tenant/save_tenant_onb_info',
+    '/ems/meter_group/update_ems_meter_group_meter_list',
+  }.contains(endpoint);
+  final tenantHeaders = tenantWrite
+      ? await tenantOperationHeaders(svcClaim, user: user)
+      : null;
   String svcToken = '';
   if (authenticated) {
     const storage = FlutterSecureStorage();
@@ -63,10 +73,12 @@ Future<dynamic> ex({
           appConfig,
         ).getUrl(PagSvcType.oresvc2, svcClaim.endpoint!),
       ),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $svcToken',
-      },
+      headers:
+          tenantHeaders ??
+          <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Authorization': 'Bearer $svcToken',
+          },
       body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
     );
 

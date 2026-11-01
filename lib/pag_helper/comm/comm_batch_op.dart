@@ -1,3 +1,4 @@
+import 'comm_tenant_auth.dart';
 import 'dart:convert';
 import 'dart:developer' as dev;
 
@@ -28,8 +29,12 @@ Future<dynamic> doPagCheckOpList(
   // }
 
   final response = await http.post(
-    Uri.parse(PagUrlController(loggedInUser, appConfig)
-        .getUrl(PagSvcType.oresvc2, svcClaim.endpoint!)),
+    Uri.parse(
+      PagUrlController(
+        loggedInUser,
+        appConfig,
+      ).getUrl(PagSvcType.oresvc2, svcClaim.endpoint!),
+    ),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
       'Authorization': 'Bearer $svcToken',
@@ -114,12 +119,20 @@ Future<dynamic> doBatchOp(
   // }
 
   final response = await http.post(
-    Uri.parse(PagUrlController(null, appConfig)
-        .getUrl(PagSvcType.oresvc2, svcClaim.endpoint!)),
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-      'Authorization': 'Bearer $svcToken',
-    },
+    Uri.parse(
+      PagUrlController(
+        null,
+        appConfig,
+      ).getUrl(PagSvcType.oresvc2, svcClaim.endpoint!),
+    ),
+    headers:
+        queryMap['op_name'].toString().contains('Tenant') ||
+            queryMap['op_name'].toString().contains('MeterGroup')
+        ? await tenantOperationHeaders(svcClaim)
+        : <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Authorization': 'Bearer $svcToken',
+          },
     body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
   );
 
@@ -180,21 +193,27 @@ Future<dynamic> doOpSingleKeyValUpdate(
   }
   try {
     final response = await http.post(
-      Uri.parse(PagUrlController(loggedInUser, appConfig)
-          .getUrl(PagSvcType.oresvc2, svcClaim.endpoint!)),
+      Uri.parse(
+        PagUrlController(
+          loggedInUser,
+          appConfig,
+        ).getUrl(PagSvcType.oresvc2, svcClaim.endpoint!),
+      ),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $svcToken',
       },
-      body: jsonEncode(MdlPagSvcQuery(svcClaim, <String, dynamic>{
-        'op_name': opName,
-        'item_type': itemType.name,
-        'item_id_type': itemIdType != null ? itemIdType.name : '',
-        'key_name': targetFields,
-        'op_list': opList,
-        'scheduled_time': timeStr,
-        'project_scope': projectScope,
-      }).toJson()),
+      body: jsonEncode(
+        MdlPagSvcQuery(svcClaim, <String, dynamic>{
+          'op_name': opName,
+          'item_type': itemType.name,
+          'item_id_type': itemIdType != null ? itemIdType.name : '',
+          'key_name': targetFields,
+          'op_list': opList,
+          'scheduled_time': timeStr,
+          'project_scope': projectScope,
+        }).toJson(),
+      ),
     );
 
     if (response.statusCode == 200) {
@@ -241,8 +260,12 @@ Future<dynamic> doPagOpMultiKeyValUpdate(
   // }
   try {
     final response = await http.post(
-      Uri.parse(PagUrlController(loggedInUser, appConfig)
-          .getUrl(PagSvcType.oresvc2, svcClaim.endpoint!)),
+      Uri.parse(
+        PagUrlController(
+          loggedInUser,
+          appConfig,
+        ).getUrl(PagSvcType.oresvc2, svcClaim.endpoint!),
+      ),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $svcToken',
@@ -290,7 +313,8 @@ Future<Map<String, dynamic>> updatePagBatchOpProgress(
   try {
     final response = await http.get(
       Uri.parse(
-          "${PagUrlController(loggedInUser, appConfig).getUrl(PagSvcType.oresvc2, PagUrlBase.eptPollingBatchOpProgress)}?op=$opName"),
+        "${PagUrlController(loggedInUser, appConfig).getUrl(PagSvcType.oresvc2, PagUrlBase.eptPollingBatchOpProgress)}?op=$opName",
+      ),
     );
 
     if (response.statusCode == 200) {
