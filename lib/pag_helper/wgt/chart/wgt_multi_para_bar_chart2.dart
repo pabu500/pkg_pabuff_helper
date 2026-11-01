@@ -1029,35 +1029,46 @@ class WgtMultiParaBarChart2State extends State<WgtMultiParaBarChart2> {
       ...legendItems,
     ];
 
+    final summary = <Widget>[
+      if (widget.statusSummary != null)
+        Tooltip(
+          message: widget.statusSummary!,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.info_outline_rounded, size: 14, color: warn),
+              const SizedBox(width: 4),
+              Flexible(
+                child: Text(
+                  widget.statusSummary!,
+                  style: small.copyWith(color: warn),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
+      if (widget.statusAction != null) widget.statusAction!,
+    ];
+    Widget row(List<Widget> children) => Wrap(
+      alignment: WrapAlignment.center,
+      spacing: 12,
+      runSpacing: 4,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: children,
+    );
+
     return Padding(
       // Centred over the plot area (offset by the Y-axis label column).
       padding: EdgeInsets.only(top: 6, left: _leftReserve),
-      child: Wrap(
-        alignment: WrapAlignment.center,
-        spacing: 12,
-        runSpacing: 4,
-        crossAxisAlignment: WrapCrossAlignment.center,
+      // Summary on the first row, legend always on its own second row.
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (widget.statusSummary != null)
-            Tooltip(
-              message: widget.statusSummary!,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.info_outline_rounded, size: 14, color: warn),
-                  const SizedBox(width: 4),
-                  Flexible(
-                    child: Text(
-                      widget.statusSummary!,
-                      style: small.copyWith(color: warn),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          if (widget.statusAction != null) widget.statusAction!,
-          ...legend,
+          if (summary.isNotEmpty) row(summary),
+          if (summary.isNotEmpty && legend.isNotEmpty) const SizedBox(height: 4),
+          if (legend.isNotEmpty) row(legend),
         ],
       ),
     );
