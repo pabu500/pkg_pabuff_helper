@@ -43,6 +43,7 @@ class WgtPieChart extends StatefulWidget {
     this.titleWidget,
     this.getColorList,
     this.startDegreeOffset,
+    this.largestTowardDegree,
     this.showLabel = true,
     this.showTouchedLabel = true,
     this.defaultShowLabel = true,
@@ -89,6 +90,14 @@ class WgtPieChart extends StatefulWidget {
   final double? rightPadding;
   final Widget? titleWidget;
   final double? startDegreeOffset;
+
+  /// When set, slices are drawn largest-first around this angle (0 = right,
+  /// 90 = bottom, 180 = left): the largest is centred on it, the next largest
+  /// alternate on either side, and the smallest end up opposite. Use it to
+  /// keep small slices' labels away from a neighbouring list. Overrides
+  /// [startDegreeOffset]. Only the drawing order changes: colours, the
+  /// indicator list and [onSectionTap] indices still follow [chartData].
+  final double? largestTowardDegree;
   final bool showLabel;
   final bool showTouchedLabel;
   final List<Color> Function()? getColorList;
@@ -181,7 +190,7 @@ class WgtPieChartState extends State<WgtPieChart> {
                           centerSpaceRadius: widget.centerSize,
                           sectionsSpace: 0.5,
                           sections: showingSections(),
-                          startDegreeOffset: widget.startDegreeOffset ?? -90,
+                          startDegreeOffset: _startDegreeOffset,
                           pieTouchData: PieTouchData(
                             enabled: widget.enableTouch,
                             touchCallback: !widget.enableTouch
@@ -223,8 +232,9 @@ class WgtPieChartState extends State<WgtPieChart> {
                                         touchedIndex = -1;
                                         return;
                                       }
-                                      touchedIndex = pieTouchResponse
-                                          .touchedSection!.touchedSectionIndex;
+                                      touchedIndex = _chartIndex(
+                                          pieTouchResponse.touchedSection!
+                                              .touchedSectionIndex);
                                       // if (kDebugMode) {
                                       //   print('touchedIndex 1: $touchedIndex');
                                       // }
@@ -294,8 +304,60 @@ class WgtPieChartState extends State<WgtPieChart> {
     );
   }
 
-  List<PieChartSectionData> showingSections() {
-    return List.generate(widget.chartData.length, (i) {
+  double _value(int i) =>
+      ((widget.chartData[i]['value'] as num?) ?? 0).toDouble();
+
+  /// [chartData] indices in drawing order (see [largestTowardDegree]).
+  List<int> get _displayOrder {
+    final count = widget.chartData.length;
+    if (widget.largestTowardDegree == null || count < 3) {
+      return List<int>.generate(count, (i) => i);
+    }
+    final bySize = List<int>.generate(count, (i) => i)
+      ..sort((a, b) {
+        final c = _value(b).compareTo(_value(a));
+        return c != 0 ? c : a.compareTo(b);
+      });
+    final order = <int>[bySize.first];
+    for (var k = 1; k < bySize.length; k++) {
+      // Alternate: 2nd largest clockwise after it, 3rd before it, and so on.
+      if (k.isOdd) {
+        order.add(bySize[k]);
+      } else {
+        order.insert(0, bySize[k]);
+      }
+    }
+    return order;
+  }
+
+  /// Start angle that centres the largest slice on [largestTowardDegree].
+  double get _startDegreeOffset {
+    final toward = widget.largestTowardDegree;
+    if (toward == null) return widget.startDegreeOffset ?? -90;
+    final order = _displayOrder;
+    final total = order.fold<double>(0, (sum, i) => sum + _value(i));
+    if (order.isEmpty || total <= 0) return toward;
+    final largest = order.reduce((a, b) => _value(b) > _value(a) ? b : a);
+    var before = 0.0;
+    for (final i in order) {
+      if (i == largest) break;
+      before += _value(i);
+    }
+    return toward - 360 * (before + _value(largest) / 2) / total;
+  }
+
+  /// Maps a drawn section position back to its [chartData] index.
+  int _chartIndex(int sectionIndex) {
+    final order = _displayOrder;
+    return sectionIndex < 0 || sectionIndex >= order.length
+        ? -1
+        : order[sectionIndex];
+  }
+
+  List<PieChartSectionData> showingSections() =>
+      [for (final i in _displayOrder) _section(i)];
+
+  PieChartSectionData _section(int i) {
       final isTouched = i == touchedIndex;
       // final fontSize = isTouched ? 25.0 : 16.0;
       // if (kDebugMode) {
@@ -325,7 +387,6 @@ class WgtPieChartState extends State<WgtPieChart> {
         borderSide: widget.getBorderSide?.call(i),
         gradient: widget.getGradient?.call(i),
       );
-    });
   }
 
   List<Widget> getIndicators() {
