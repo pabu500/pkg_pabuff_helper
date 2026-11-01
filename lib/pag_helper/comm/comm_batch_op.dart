@@ -252,7 +252,8 @@ Future<dynamic> doPagOpMultiKeyValUpdate(
   svcClaim.svcName = PagSvcType.oresvc2.name;
   svcClaim.endpoint = PagUrlBase.eptDoOpUpdateMultiKeyVal;
 
-  String svcToken = '';
+  // the server verifies the login token against the claimed user before any generic write
+  final headers = await tenantOperationHeaders(svcClaim, user: loggedInUser);
   // try {
   //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
   // } catch (err) {
@@ -266,13 +267,13 @@ Future<dynamic> doPagOpMultiKeyValUpdate(
           appConfig,
         ).getUrl(PagSvcType.oresvc2, svcClaim.endpoint!),
       ),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $svcToken',
-      },
+      headers: headers,
       body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
     );
 
+    if (response.statusCode == 401) {
+      throw Exception('Please sign in again');
+    }
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response, parse the JSON.
       final responseBody = jsonDecode(response.body);

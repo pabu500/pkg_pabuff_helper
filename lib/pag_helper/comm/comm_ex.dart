@@ -46,6 +46,7 @@ Future<dynamic> ex({
   final tenantWrite = const {
     '/ems/tenant/save_tenant_onb_info',
     '/ems/meter_group/update_ems_meter_group_meter_list',
+    '/key_val_update/do_op_key_val_update',
   }.contains(endpoint);
   final tenantHeaders = tenantWrite
       ? await tenantOperationHeaders(svcClaim, user: user)
