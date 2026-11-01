@@ -2,6 +2,7 @@ import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:fl_chart/fl_chart.dart';
+import 'package:buff_helper/pag_helper/wgt/chart/wgt_stat_detail_card.dart';
 import 'package:flutter/material.dart';
 
 import 'wgt_pie_chart_item_indicator.dart';
@@ -466,6 +467,21 @@ class WgtPieChartState extends State<WgtPieChart> {
           ),
         ),
       );
+      // A structured `detail` gets the shared detail card (same style as the
+      // trending bar and top-stat tooltips); otherwise the plain `tooltip`.
+      final detail = widget.chartData[i]['detail'];
+      if (detail is Map) {
+        return Tooltip(
+          richMessage: WidgetSpan(
+            child: WgtStatDetailCard(
+              detail: Map<String, dynamic>.from(detail),
+            ),
+          ),
+          decoration: const BoxDecoration(),
+          padding: EdgeInsets.zero,
+          child: indicator,
+        );
+      }
       final tooltip = widget.chartData[i]['tooltip'] as String?;
       return tooltip == null ? indicator : Tooltip(message: tooltip, child: indicator);
     });
