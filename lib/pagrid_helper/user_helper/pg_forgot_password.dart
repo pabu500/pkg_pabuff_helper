@@ -203,6 +203,16 @@ class _PgForgotPasswordState extends State<PgForgotPassword> {
                       : 'Please email ${widget.supportEmail} for assistance.',
                   textAlign: TextAlign.center,
                 ),
+                if (widget.supportEmail.isNotEmpty) ...[
+                  verticalSpaceSmall,
+                  const Text(
+                    'By contacting this mailbox, you consent to EVS collecting and using '
+                    'the personal data you provide for the purpose of investigating, '
+                    'responding to, and resolving your EVS enquiry.\n'
+                    'EVS is operated by Power Automation Pte Ltd.',
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ],
               verticalSpaceMedium,
               TextButton(
