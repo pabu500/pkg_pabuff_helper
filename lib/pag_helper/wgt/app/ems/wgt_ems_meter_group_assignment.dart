@@ -183,10 +183,15 @@ class _WgtEmsMeterGroupAssignmentState
       'meter_id': itemInfo['item_id'],
     };
 
-    itemInfo['is_fetching'] = true;
+    if (!mounted) return;
+    setState(() {
+      itemInfo['is_fetching'] = true;
+      itemInfo.remove('assignment_fetch_error');
+    });
     try {
       final result = await ex(
         endpoint: PagUrlBase.eptPagGetMeterTenantAssignment,
+        structuredErrors: true,
         crudType: 'read',
         opStr: 'get meter assignment',
         appConfig: widget.appConfig,
@@ -207,12 +212,14 @@ class _WgtEmsMeterGroupAssignmentState
       itemInfo['info_fetched'] = true;
     } catch (e) {
       dev.log(e.toString());
-
+      itemInfo['assignment_fetch_error'] = getErrorText(
+        e,
+        defaultErrorText: 'Unable to load meter assignments. Please try again.',
+      );
       rethrow;
     } finally {
-      setState(() {
-        itemInfo['is_fetching'] = false;
-      });
+      itemInfo['is_fetching'] = false;
+      if (mounted) setState(() {});
     }
   }
 
@@ -286,6 +293,7 @@ class _WgtEmsMeterGroupAssignmentState
         itemInfo.remove('is_fetching');
         itemInfo.remove('info_fetched');
         itemInfo.remove('assignment_error_message');
+        itemInfo.remove('assignment_fetch_error');
       }
     } catch (e) {
       dev.log(e.toString());
@@ -353,39 +361,33 @@ class _WgtEmsMeterGroupAssignmentState
   Future<void> _checkAllAssignments() async {
     if (_isFetchingAllAssignmentInfo) return;
 
-    final queryMap = <String, dynamic>{
-      'scope': loggedInUser!.selectedScope.toScopeMap(),
-    };
     setState(() {
       _isFetchingAllAssignmentInfo = true;
       _isAllAssignmentInfoFetched = false;
     });
 
     for (var itemInfo in _itemGroupScopeMatchingItemList ?? []) {
-      queryMap['tenant_id'] = itemInfo['tenant_id'];
-      queryMap['payment_amount'] = itemInfo['amount'];
-      queryMap['value_timestamp'] = itemInfo['value_timestamp'];
-      queryMap['lc_status'] = itemInfo['lc_status'];
-
-      itemInfo['is_comm']?.call(true, false);
-
-      bool showResult = false;
+      if (!mounted) return;
+      if (itemInfo['info_fetched'] == true) continue;
       try {
         await _getMeterAssignment(itemInfo);
       } catch (e) {
         dev.log('Error fetching assignment for item ${itemInfo['id']}: $e');
-      } finally {
-        itemInfo['is_comm']?.call(false, showResult);
       }
     }
 
+    if (!mounted) return;
     // sort meters assigned to this meter group to the top
     dev.log('Sorting meter group assignments');
     _sortItemGroupScopeMatchingItemList();
 
     setState(() {
       _isFetchingAllAssignmentInfo = false;
-      _isAllAssignmentInfoFetched = true;
+      _isAllAssignmentInfoFetched =
+          _itemGroupScopeMatchingItemList?.every(
+            (item) => item['info_fetched'] == true,
+          ) ??
+          false;
     });
   }
 
@@ -645,6 +647,7 @@ class _WgtEmsMeterGroupAssignmentState
           waitDuration: const Duration(milliseconds: 500),
           child: WgtCommButton(
             label: 'Check All Assignments',
+            inComm: _isFetchingAllAssignmentInfo,
             height: 35,
             labelStyle: TextStyle(
               color: Theme.of(context).colorScheme.onSecondary,
@@ -652,6 +655,7 @@ class _WgtEmsMeterGroupAssignmentState
             ),
             onPressed:
                 (_itemGroupScopeMatchingItemList ?? []).isEmpty ||
+                    _isFetchingAllAssignmentInfo ||
                     _isAllAssignmentInfoFetched ||
                     tooManyRows
                 ? null

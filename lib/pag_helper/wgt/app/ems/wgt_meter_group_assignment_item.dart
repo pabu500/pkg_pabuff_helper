@@ -5,6 +5,7 @@ import '../../../../xt_ui/style/evs2_colors.dart';
 import '../../../../xt_ui/wdgt/info/get_error_text_prompt.dart';
 import '../../../../xt_ui/wdgt/wgt_pag_wait.dart';
 import '../../../../xt_ui/xt_helpers.dart';
+import '../../../../up_helper/exceptions.dart';
 import '../../../def_helper/dh_device.dart';
 import '../../../def_helper/dh_ems_meter_allocation.dart';
 import '../../../def_helper/dh_pag_tenant.dart';
@@ -316,25 +317,48 @@ class _WgtMeterGroupAssignmentItemState
     double margin = 150;
 
     if (needToCheck) {
-      return WgtCommButton(
-        label: 'Check Assignment',
-        labelStyle: TextStyle(
-          color: Theme.of(context).colorScheme.onSecondary,
-          fontSize: 13.5,
-        ),
+      final fetchError = itemInfo['assignment_fetch_error'] as String? ?? '';
+      final isFetching = itemInfo['is_fetching'] == true;
+      return SizedBox(
         width: barWidth + margin,
-        onPressed: () async {
-          if (itemInfo['is_fetching'] ?? false) {
-            return;
-          }
-          if (itemInfo['assignment'] == null) {
-            await widget.getMeterAssignment(itemInfo);
-          }
-
-          setState(() {
-            // _selectedMeterIndexStr = itemInfo['id'];
-          });
-        },
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            WgtCommButton(
+              label: fetchError.isEmpty
+                  ? 'Check Assignment'
+                  : 'Retry Assignment',
+              enabled: !isFetching,
+              inComm: isFetching,
+              labelStyle: TextStyle(
+                color: Theme.of(context).colorScheme.onSecondary,
+                fontSize: 13.5,
+              ),
+              width: barWidth + margin,
+              onPressed: () async {
+                if (itemInfo['is_fetching'] ?? false) {
+                  return;
+                }
+                setState(() => itemInfo.remove('assignment_fetch_error'));
+                try {
+                  if (itemInfo['assignment'] == null) {
+                    await widget.getMeterAssignment(itemInfo);
+                  }
+                } catch (e) {
+                  itemInfo['assignment_fetch_error'] = getErrorText(
+                    e,
+                    defaultErrorText:
+                        'Unable to load meter assignments. Please try again.',
+                  );
+                } finally {
+                  if (mounted) setState(() {});
+                }
+              },
+            ),
+            if (fetchError.isNotEmpty)
+              getErrorTextPrompt(context: context, errorText: fetchError),
+          ],
+        ),
       );
     }
 
