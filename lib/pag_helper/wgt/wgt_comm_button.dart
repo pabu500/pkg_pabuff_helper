@@ -2,7 +2,7 @@ import 'dart:developer' as dev;
 
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class WgtCommButton extends StatefulWidget {
   const WgtCommButton({

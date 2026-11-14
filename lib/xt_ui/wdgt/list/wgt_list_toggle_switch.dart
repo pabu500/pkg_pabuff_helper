@@ -1,5 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:toggle_switch/toggle_switch.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'wgt_edit_commit_list.dart';
 
@@ -38,8 +37,9 @@ class _WgtListToggleSwithState extends State<WgtListToggleSwith> {
     if (_modified) {
       if (widget.modifiedRow == null || widget.fieldKey == null) return;
 
-      widget.modifiedRow![widget.fieldKey!] =
-          _currentLabelIndex == 1 ? true : false;
+      widget.modifiedRow![widget.fieldKey!] = _currentLabelIndex == 1
+          ? true
+          : false;
       if (widget.flagModified != null) {
         widget.flagModified!(true);
       }
@@ -69,44 +69,51 @@ class _WgtListToggleSwithState extends State<WgtListToggleSwith> {
       child: Row(
         children: [
           // Text('test'),
-          ToggleSwitch(
-            minWidth: 25.0,
-            minHeight: _modified ? 12 : 15.0,
-            cornerRadius: 8.0,
-            activeBgColors: (widget.disabled != null && widget.disabled!)
-                ? [
-                    [Colors.grey],
-                    [Colors.grey]
-                  ]
-                : [
-                    [Colors.red[500]!],
-                    [Colors.green[500]!]
-                  ],
-            borderColor: _modified ? [Colors.amber.shade900] : null,
-            borderWidth: _modified ? 2 : null,
-            activeFgColor: Colors.white,
-            inactiveBgColor: Colors.grey[400]!,
-            inactiveFgColor: Colors.white,
-            initialLabelIndex: _currentLabelIndex,
-            totalSwitches: 2,
-            labels: ["Yes", "No"],
-            radiusStyle: true,
-            onToggle: (widget.disabled != null && widget.disabled!)
-                ? null
-                : (index) {
-                    print('switched to: $index');
+          DecoratedBox(
+            decoration: BoxDecoration(
+              color: Colors.grey[400],
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: ToggleButtons(
+              constraints: BoxConstraints(
+                minWidth: 25,
+                minHeight: _modified ? 12 : 15,
+              ),
+              borderRadius: BorderRadius.circular(8),
+              fillColor: widget.disabled == true
+                  ? Colors.grey
+                  : _currentLabelIndex == 0
+                  ? Colors.red[500]
+                  : Colors.green[500],
+              color: Colors.white,
+              selectedColor: Colors.white,
+              disabledColor: Colors.white,
+              borderColor: _modified
+                  ? Colors.amber.shade900
+                  : Colors.transparent,
+              selectedBorderColor: _modified
+                  ? Colors.amber.shade900
+                  : Colors.transparent,
+              borderWidth: _modified ? 2 : 0,
+              isSelected: [_currentLabelIndex == 0, _currentLabelIndex == 1],
+              onPressed: (widget.disabled != null && widget.disabled!)
+                  ? null
+                  : (index) {
+                      print('switched to: $index');
 
-                    //when using static index,
-                    //setState rebuilds and assigns same initialLabelIndex
-                    // need to assign dynamic index to initialLabelIndex when
-                    // using setState as shown below,
-                    setState(() {
-                      _modified = index != widget.initialLabelIndex;
-                      _currentLabelIndex = index!;
-                    });
+                      //when using static index,
+                      //setState rebuilds and assigns same initialLabelIndex
+                      // need to assign dynamic index to initialLabelIndex when
+                      // using setState as shown below,
+                      setState(() {
+                        _modified = index != widget.initialLabelIndex;
+                        _currentLabelIndex = index;
+                      });
 
-                    _updateList();
-                  },
+                      _updateList();
+                    },
+              children: const [Text('Yes'), Text('No')],
+            ),
           ),
         ],
       ),

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 Widget getEffectiveScopeTag(BuildContext context, String effectiveScopeStr,
     {Color? bgColor, Color? textColor, Offset? offset}) {

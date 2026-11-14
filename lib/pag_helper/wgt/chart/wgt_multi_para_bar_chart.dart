@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class WgtMultiParaBarChart extends StatefulWidget {
   WgtMultiParaBarChart({

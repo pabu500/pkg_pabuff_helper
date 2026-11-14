@@ -5,7 +5,7 @@ import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
 import 'package:buff_helper/pag_helper/wgt/app/ems/wgt_meter_assignment_op.dart';
 import 'package:buff_helper/pag_helper/wgt/app/ems/wgt_meter_group_assignment_item.dart';
 import 'package:buff_helper/xt_ui/wdgt/input/wgt_text_field2.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 final config = MdlPagAppConfig(

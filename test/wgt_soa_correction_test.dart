@@ -12,7 +12,7 @@ import 'package:buff_helper/pag_helper/model/list/mdl_list_controller.dart';
 import 'package:buff_helper/pag_helper/wgt/app/ems/wgt_soa_correction.dart';
 import 'package:buff_helper/pag_helper/wgt/ls/wgt_pag_edit_commit_list.dart';
 import 'package:buff_helper/pag_helper/wgt/wgt_comm_button.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 final rows = <Map<String, dynamic>>[

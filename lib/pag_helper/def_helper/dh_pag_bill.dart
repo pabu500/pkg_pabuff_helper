@@ -1,5 +1,5 @@
 import 'package:buff_helper/pag_helper/def_helper/enum_helper.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 enum PagBillGenType {
   manual('Manual', 'manual', 'm', Colors.orangeAccent),

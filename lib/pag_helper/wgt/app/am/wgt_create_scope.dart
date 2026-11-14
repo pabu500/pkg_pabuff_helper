@@ -14,7 +14,7 @@ import 'package:buff_helper/pag_helper/model/scope/mdl_pag_site_profile.dart';
 import 'package:buff_helper/pag_helper/wgt/scope/wgt_scope_setter.dart';
 import 'package:buff_helper/pag_helper/wgt/wgt_comm_button.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:buff_helper/pag_helper/comm/comm_scope.dart';
 
 import '../../../model/mdl_pag_app_config.dart';

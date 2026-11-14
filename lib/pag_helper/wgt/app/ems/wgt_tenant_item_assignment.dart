@@ -1,6 +1,6 @@
 import 'package:buff_helper/pag_helper/wgt/app/ems/wgt_tenant_bci_assignment.dart';
 import 'package:buff_helper/pag_helper/wgt/app/ems/wgt_tenant_meter_group_assignment.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../../../../xt_ui/style/evs2_colors.dart';
 import '../../../../xt_ui/xt_helpers.dart';

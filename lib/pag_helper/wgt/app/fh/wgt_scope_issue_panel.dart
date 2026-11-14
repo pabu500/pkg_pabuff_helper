@@ -1,7 +1,7 @@
 import 'package:buff_helper/pag_helper/def_helper/def_fleet_health.dart';
 import 'package:buff_helper/pag_helper/wgt/ls/wgt_pag_dashboard_list.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 class WgtScopeEventIssuePanel extends StatefulWidget {

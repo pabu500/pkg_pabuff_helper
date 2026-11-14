@@ -1,5 +1,5 @@
 import 'package:buff_helper/util/xt_util.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class WgtUsageBar extends StatelessWidget {
   const WgtUsageBar({

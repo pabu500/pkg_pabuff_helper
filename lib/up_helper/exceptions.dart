@@ -1,5 +1,5 @@
 import 'package:buff_helper/xt_ui/wdgt/info/get_copy.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class InvalidCredentialsException implements Exception {
   final String message;

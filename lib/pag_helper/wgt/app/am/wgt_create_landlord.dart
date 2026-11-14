@@ -14,7 +14,7 @@ import 'package:buff_helper/pag_helper/wgt/scope/wgt_scope_setter.dart';
 import 'package:buff_helper/pag_helper/wgt/wgt_comm_button.dart';
 import 'package:buff_helper/pag_helper/wgt/wgt_input_dropdown.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class WgtCreateLandlord extends StatefulWidget {
   const WgtCreateLandlord({

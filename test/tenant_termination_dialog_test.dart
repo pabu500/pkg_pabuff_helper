@@ -1,7 +1,7 @@
 library;
 
 import 'package:buff_helper/pag_helper/wgt/app/ems/wgt_tenant_termination_dialog.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

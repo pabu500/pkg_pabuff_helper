@@ -1,7 +1,7 @@
 import 'package:buff_helper/xt_ui/wdgt/info/empty_result.dart';
 import 'package:buff_helper/xt_ui/wdgt/xtInfoBox.dart';
 import 'package:buff_helper/xt_ui/xt_helpers.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 Widget getTypeTag(BuildContext context, String type) {
   return Container(

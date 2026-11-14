@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 const Color evs2NUSblue = Color(0xff1d427c);
 const Color evs2NUSorange = Color(0xffec8023);

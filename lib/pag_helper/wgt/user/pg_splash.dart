@@ -8,7 +8,7 @@ import 'package:buff_helper/util/util.dart';
 import 'package:buff_helper/xt_ui/wdgt/info/get_error_text_prompt.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:buff_helper/pag_helper/comm/comm_batch_op.dart';
 import 'package:buff_helper/pag_helper/wgt/progress/wgt_progress_bar.dart';

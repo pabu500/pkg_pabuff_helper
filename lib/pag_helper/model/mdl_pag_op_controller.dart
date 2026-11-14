@@ -1,6 +1,6 @@
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 
 import '../def_helper/dh_pag_item.dart';
