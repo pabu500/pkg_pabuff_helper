@@ -390,7 +390,10 @@ class _WgtMeterGroupAssignmentItemState
         updatedAssignmentToThisMeterGroup.addAll(assignmentToThisMeterGroup);
         if (widget.currentTenantInfo != null) {
           updatedAssignmentToThisMeterGroup['tenant_info'] =
-              widget.currentTenantInfo;
+              meterAllocationTenantInfo(
+                assignmentToThisMeterGroup['tenant_info'],
+                widget.currentTenantInfo,
+              );
         }
         updatedAssignmentToThisMeterGroup['percentage'] = newPercentage
             .toString();

@@ -176,8 +176,11 @@ class _TenantLcStatusState extends State<WgtPagTenantLcStatusOp> {
   @override
   Widget build(BuildContext context) => Column(
     mainAxisSize: MainAxisSize.min,
+    crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Row(
+      Wrap(
+        crossAxisAlignment: WrapCrossAlignment.center,
+        runSpacing: 8,
         children: [
           for (final status in [
             PagTenantLcStatus.mfd,
@@ -185,30 +188,41 @@ class _TenantLcStatusState extends State<WgtPagTenantLcStatusOp> {
             PagTenantLcStatus.normal,
             PagTenantLcStatus.offboarding,
             PagTenantLcStatus.terminated,
-          ]) ...[
-            if (status != PagTenantLcStatus.mfd)
-              Icon(Symbols.chevron_forward, color: Theme.of(context).hintColor),
-            Tooltip(
-              message: _reasons(status).join('\n'),
-              child: InkWell(
-                onTap: _eligible(status)
-                    ? () => setState(() => _selected = status)
-                    : null,
-                child: Opacity(
-                  opacity: _eligible(status) || _selected == status ? 1 : 0.5,
-                  child: getTenantLcStatusTagWidget(
-                    context,
-                    status,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onPrimary,
-                      fontSize: _selected == status ? 25 : null,
-                      fontWeight: _selected == status ? FontWeight.bold : null,
+          ])
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (status != PagTenantLcStatus.mfd)
+                  Icon(
+                    Symbols.chevron_forward,
+                    color: Theme.of(context).hintColor,
+                  ),
+                Tooltip(
+                  message: _reasons(status).join('\n'),
+                  child: InkWell(
+                    onTap: _eligible(status)
+                        ? () => setState(() => _selected = status)
+                        : null,
+                    child: Opacity(
+                      opacity: _eligible(status) || _selected == status
+                          ? 1
+                          : 0.5,
+                      child: getTenantLcStatusTagWidget(
+                        context,
+                        status,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onPrimary,
+                          fontSize: _selected == status ? 25 : null,
+                          fontWeight: _selected == status
+                              ? FontWeight.bold
+                              : null,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
+              ],
             ),
-          ],
           if (_selected != _current)
             Padding(
               padding: const EdgeInsets.only(left: 21),
@@ -236,13 +250,243 @@ class _TenantLcStatusState extends State<WgtPagTenantLcStatusOp> {
         ],
       ),
       if (_error.isNotEmpty)
-        getErrorTextPrompt(context: context, errorText: _error),
+        Padding(
+          padding: const EdgeInsets.only(top: 10),
+          child: _TenantLcNotice.error(message: _error),
+        ),
       for (final status in [
         PagTenantLcStatus.normal,
         PagTenantLcStatus.terminated,
       ])
         if (_reasons(status).isNotEmpty)
-          Text('${status.value}: ${_reasons(status).join('; ')}'),
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: _TenantLcNotice.blocked(
+              key: ValueKey('lc-notice-${status.value}'),
+              title: status == PagTenantLcStatus.normal
+                  ? 'Return to Normal unavailable'
+                  : 'Termination unavailable',
+              reasons: _reasons(status),
+            ),
+          ),
     ],
   );
+}
+
+/// Compact, theme-aware panel for lifecycle transition messages.
+///
+/// [blocked] is the neutral treatment for normal eligibility guidance (what
+/// must happen before a transition is allowed). [error] is reserved for
+/// actual request failures and uses the theme's error container colors.
+/// Blocked panels start collapsed (title + reason count) and expand from
+/// their header to show every reason.
+class _TenantLcNotice extends StatefulWidget {
+  const _TenantLcNotice.blocked({
+    super.key,
+    required String this.title,
+    required this.reasons,
+  }) : message = null,
+       isError = false;
+  const _TenantLcNotice.error({required String this.message})
+    : title = null,
+      reasons = const [],
+      isError = true;
+
+  final String? title;
+  final List<String> reasons;
+  final String? message;
+  final bool isError;
+
+  @override
+  State<_TenantLcNotice> createState() => _TenantLcNoticeState();
+}
+
+class _TenantLcNoticeState extends State<_TenantLcNotice> {
+  bool _expanded = false;
+
+  String? get title => widget.title;
+  List<String> get reasons => widget.reasons;
+  String? get message => widget.message;
+  bool get isError => widget.isError;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final background = isError
+        ? cs.errorContainer
+        : cs.surfaceContainerHighest.withValues(alpha: 0.5);
+    final border = isError
+        ? cs.error.withValues(alpha: 0.5)
+        : cs.outlineVariant;
+    final foreground = isError ? cs.onErrorContainer : cs.onSurface;
+    final secondary = isError ? cs.onErrorContainer : cs.onSurfaceVariant;
+    final iconColor = isError ? cs.error : cs.onSurfaceVariant;
+    final bodyStyle = (theme.textTheme.bodyMedium ?? const TextStyle())
+        .copyWith(color: secondary, height: 1.35);
+
+    final icon = Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: Icon(
+        isError ? Symbols.error : Symbols.info,
+        size: 18,
+        color: iconColor,
+      ),
+    );
+
+    if (isError) {
+      return _frame(
+        background: background,
+        border: border,
+        liveRegion: true,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(10, 10, 12, 10),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              icon,
+              Expanded(
+                child: Text(
+                  message ?? '',
+                  style: bodyStyle.copyWith(color: foreground),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final header = Semantics(
+      button: true,
+      expanded: _expanded,
+      child: InkWell(
+        onTap: () => setState(() => _expanded = !_expanded),
+        borderRadius: _expanded
+            ? const BorderRadius.vertical(top: Radius.circular(8))
+            : BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(10, 8, 6, 8),
+          child: Row(
+            children: [
+              icon,
+              Expanded(
+                child: Text(
+                  title ?? '',
+                  style: (theme.textTheme.titleSmall ?? const TextStyle())
+                      .copyWith(color: foreground, fontWeight: FontWeight.w600),
+                ),
+              ),
+              if (!_expanded)
+                Padding(
+                  padding: const EdgeInsets.only(left: 8),
+                  child: Text(
+                    reasons.length == 1
+                        ? '1 reason'
+                        : '${reasons.length} reasons',
+                    style: (theme.textTheme.labelMedium ?? const TextStyle())
+                        .copyWith(color: secondary),
+                  ),
+                ),
+              AnimatedRotation(
+                turns: _expanded ? 0.5 : 0,
+                duration: const Duration(milliseconds: 150),
+                child: Icon(
+                  Symbols.expand_more,
+                  size: 20,
+                  color: secondary,
+                  semanticLabel: _expanded ? 'Hide reasons' : 'Show reasons',
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    final body = Padding(
+      // Align reasons with the title text (past the 18px icon + 8px gap).
+      padding: const EdgeInsets.fromLTRB(36, 0, 12, 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (final (i, reason) in reasons.indexed)
+            Padding(
+              padding: EdgeInsets.only(top: i == 0 ? 0 : 6),
+              child: _bullet(reason, bodyStyle, secondary),
+            ),
+        ],
+      ),
+    );
+
+    return _frame(
+      background: background,
+      border: border,
+      liveRegion: false,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          header,
+          AnimatedSize(
+            duration: const Duration(milliseconds: 150),
+            alignment: Alignment.topCenter,
+            child: _expanded ? body : const SizedBox(width: double.infinity),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _bullet(String reason, TextStyle bodyStyle, Color dotColor) => Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Padding(
+        // Centre the dot on the first line of wrapped text.
+        padding: EdgeInsets.only(
+          top: ((bodyStyle.fontSize ?? 14) * 1.35 - 5) / 2,
+          right: 8,
+        ),
+        child: Container(
+          width: 5,
+          height: 5,
+          decoration: BoxDecoration(
+            color: dotColor.withValues(alpha: 0.7),
+            shape: BoxShape.circle,
+          ),
+        ),
+      ),
+      Expanded(child: Text(reason, style: bodyStyle)),
+    ],
+  );
+
+  Widget _frame({
+    required Color background,
+    required Color border,
+    required bool liveRegion,
+    required Widget child,
+  }) {
+    final panel = Semantics(
+      container: true,
+      liveRegion: liveRegion,
+      child: Material(
+        color: background,
+        shape: RoundedRectangleBorder(
+          side: BorderSide(color: border),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: child,
+      ),
+    );
+    // Stretch to the available width so stacked panels align; fall back to
+    // a sensible width if ever placed in an unbounded parent.
+    return LayoutBuilder(
+      builder: (context, constraints) => SizedBox(
+        width: constraints.hasBoundedWidth ? constraints.maxWidth : 480,
+        child: panel,
+      ),
+    );
+  }
 }

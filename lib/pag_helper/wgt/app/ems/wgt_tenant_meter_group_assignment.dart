@@ -719,33 +719,48 @@ class _WgtTenantMeterGroupAssignmentState
   }
 
   Widget getItemRow(Map<String, dynamic> itemInfo, int index) {
+    // Matching rows use plain scope fields; mismatch rows use mg_scope_*.
+    final scopeInfo = {
+      ...itemInfo,
+      for (final level in [
+        'location',
+        'location_group',
+        'building',
+        'site',
+        'site_group',
+      ])
+        for (final field in ['id', 'name', 'label'])
+          'mg_scope_${level}_$field':
+              itemInfo['mg_scope_${level}_$field'] ??
+              itemInfo['${level}_$field'],
+    };
     String meterGroupName = itemInfo['name'] ?? '-';
     String meterGroupLabel = itemInfo['label'] ?? '-';
     String tenantName = itemInfo['tenant_name'] ?? '-';
     String tenantLabel = itemInfo['tenant_label'] ?? '-';
     String? tenantLcStatus = itemInfo['tenant_lc_status'];
 
-    String? itemScopeLocationId = itemInfo['mg_scope_location_id'];
-    String? itemScopeLocationName = itemInfo['mg_scope_location_name'];
-    String? itemScopeLocationLabel = itemInfo['mg_scope_location_label'];
+    String? itemScopeLocationId = scopeInfo['mg_scope_location_id'];
+    String? itemScopeLocationName = scopeInfo['mg_scope_location_name'];
+    String? itemScopeLocationLabel = scopeInfo['mg_scope_location_label'];
 
-    String? itemScopeLocationGroupId = itemInfo['mg_scope_location_group_id'];
+    String? itemScopeLocationGroupId = scopeInfo['mg_scope_location_group_id'];
     String? itemScopeLocationGroupName =
-        itemInfo['mg_scope_location_group_name'];
+        scopeInfo['mg_scope_location_group_name'];
     String? itemScopeLocationGroupLabel =
-        itemInfo['mg_scope_location_group_label'];
+        scopeInfo['mg_scope_location_group_label'];
 
-    String? itemScopeBuildingId = itemInfo['mg_scope_building_id'];
-    String? itemScopeBuildingName = itemInfo['mg_scope_building_name'];
-    String? itemScopeBuildingLabel = itemInfo['mg_scope_building_label'];
+    String? itemScopeBuildingId = scopeInfo['mg_scope_building_id'];
+    String? itemScopeBuildingName = scopeInfo['mg_scope_building_name'];
+    String? itemScopeBuildingLabel = scopeInfo['mg_scope_building_label'];
 
-    String? itemScopeSiteId = itemInfo['mg_scope_site_id'];
-    String? itemScopeSiteName = itemInfo['mg_scope_site_name'];
-    String? itemScopeSiteLabel = itemInfo['mg_scope_site_label'];
+    String? itemScopeSiteId = scopeInfo['mg_scope_site_id'];
+    String? itemScopeSiteName = scopeInfo['mg_scope_site_name'];
+    String? itemScopeSiteLabel = scopeInfo['mg_scope_site_label'];
 
-    String? itemScopeSiteGroupId = itemInfo['mg_scope_site_group_id'];
-    String? itemScopeSiteGroupName = itemInfo['mg_scope_site_group_name'];
-    String? itemScopeSiteGroupLabel = itemInfo['mg_scope_site_group_label'];
+    String? itemScopeSiteGroupId = scopeInfo['mg_scope_site_group_id'];
+    String? itemScopeSiteGroupName = scopeInfo['mg_scope_site_group_name'];
+    String? itemScopeSiteGroupLabel = scopeInfo['mg_scope_site_group_label'];
 
     PagTenantLcStatus? tenantLcStatusEnum = PagTenantLcStatus.byValue(
       tenantLcStatus,
@@ -844,7 +859,7 @@ class _WgtTenantMeterGroupAssignmentState
                   });
                 },
                 child: Icon(
-                  _selectedMeterGroupIndexStr == itemInfo['id']
+                  itemInfo['show_scope'] == true
                       ? Symbols.expand_less
                       : Symbols.expand_more,
                   color: Theme.of(context).hintColor,
@@ -899,7 +914,13 @@ class _WgtTenantMeterGroupAssignmentState
             child: Row(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [getScopeLabel(context, itemScope)],
+              children: [
+                if (itemInfo.containsKey('meter_group_scope_id') &&
+                    itemInfo['meter_group_scope_id'] == null)
+                  const Text('No scope assigned')
+                else
+                  getScopeLabel(context, itemScope, showProjectLabel: true),
+              ],
             ),
           ),
         if (_selectedMeterGroupIndexStr == itemInfo['id']) getAssignmentMap(),

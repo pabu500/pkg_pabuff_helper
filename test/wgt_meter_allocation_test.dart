@@ -72,6 +72,123 @@ void main() {
     expect(meterAllocationHasActiveTenant({}), isFalse);
   });
 
+  test('offboarding capacity follows handover and final-release flags', () {
+    for (final flag in ['named', 'final_released']) {
+      for (final value in [true, 'true', 'TRUE', 't']) {
+        expect(
+          meterAllocationHasActiveTenant({...tenant('offb'), flag: value}),
+          isFalse,
+        );
+        // Flags never release capacity while the tenant is active again.
+        expect(
+          meterAllocationHasActiveTenant({...tenant('normal'), flag: value}),
+          isTrue,
+        );
+      }
+      for (final value in [false, 'false', 'f', null]) {
+        expect(
+          meterAllocationHasActiveTenant({...tenant('offb'), flag: value}),
+          isTrue,
+        );
+      }
+    }
+    expect(
+      meterAllocationHasActiveTenant({
+        ...tenant('offb'),
+        'last_reading_timestamp': '2026-11-14',
+        'last_reading_value': '100',
+      }),
+      isTrue,
+    );
+  });
+
+  test('preview keeps handover flags only for the same tenant', () {
+    final historical = {...tenant('offb'), 'named': true};
+    expect(
+      meterAllocationHasActiveTenant(
+        meterAllocationTenantInfo(historical, tenant('offb')),
+      ),
+      isFalse,
+    );
+    final replacement = meterAllocationTenantInfo(historical, {
+      ...tenant('offb'),
+      'id': '10',
+    });
+    expect(replacement!.containsKey('named'), isFalse);
+    expect(meterAllocationHasActiveTenant(replacement), isTrue);
+    expect(meterAllocationTenantInfo(historical, {}), isEmpty);
+  });
+
+  for (final flag in ['named', 'final_released']) {
+    testWidgets(
+      'historical offboarding $flag does not trigger over-allocation',
+      (tester) async {
+        tester.view.physicalSize = const Size(1400, 800);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        final rows = [
+          {
+            ...allocation('8', 100, 'offb'),
+            'tenant_info': {...tenant('offb'), flag: 't'},
+          },
+          allocation('5', 100, 'onb'),
+        ];
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: Center(
+                child: WgtMeterGroupAssignmentItem(
+                  appConfig: config,
+                  loggedInUser: MdlPagUser(),
+                  strItemGroupIndex: '5',
+                  currentTenantInfo: tenant('onb'),
+                  itemInfo: {
+                    'project_name': 'cw_p2',
+                    'project_id': '1',
+                    'item_id': '618',
+                    'item_name': 'e-85202266',
+                    'meter_sn': '1042310300527',
+                    'assignment': rows,
+                    'info_fetched': true,
+                  },
+                  getMeterAssignment: (_) async {},
+                ),
+              ),
+            ),
+          ),
+        );
+        expect(find.textContaining('exceeds 100%'), findsNothing);
+        expect(find.text('MG 8'), findsOneWidget);
+        expect(
+          find.byTooltip(
+            'Total percentage assigned to active tenants exceeds 100%',
+          ),
+          findsNothing,
+        );
+        expect(tester.takeException(), isNull);
+
+        // Viewing the old group's read-only bar must also retain its flags.
+        await showEditor(
+          tester,
+          [
+            {...rows.first, 'meter_group_id': '5'},
+            allocation('8', 100, 'onb'),
+          ],
+          currentStatus: 'offb',
+          readOnly: true,
+        );
+        expect(
+          find.byTooltip(
+            'Total percentage assigned to active tenants exceeds 100%',
+          ),
+          findsNothing,
+        );
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
+
   testWidgets('unassigned 100% group does not block a new active allocation', (
     tester,
   ) async {

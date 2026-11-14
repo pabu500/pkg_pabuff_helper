@@ -68,7 +68,10 @@ class _WgtMeterAssignmentOpState extends State<WgtMeterAssignmentOp> {
         .firstOrNull;
     _percentAssignedToThisGroup ??=
         meterAllocationPercentage(current?['percentage']) ?? 0;
-    final currentTenant = widget.currentTenantInfo ?? current?['tenant_info'];
+    final currentTenant = meterAllocationTenantInfo(
+      current?['tenant_info'],
+      widget.currentTenantInfo,
+    );
     _currentMeterGroupAssignedToTenant = meterAllocationHasActiveTenant(
       currentTenant,
     );
