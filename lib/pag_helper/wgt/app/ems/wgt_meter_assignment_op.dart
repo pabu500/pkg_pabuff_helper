@@ -168,27 +168,43 @@ class _WgtMeterAssignmentOpState extends State<WgtMeterAssignmentOp> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              height: 25,
-              width: barWidth,
-              decoration: BoxDecoration(
-                color: Colors.transparent,
-                borderRadius: BorderRadius.circular(5),
-                border: Border.all(color: Theme.of(context).hintColor),
-              ),
-              child:
-                  _totalPercentAssignedToThisMeter != null &&
-                      _totalPercentAssignedToThisMeter! > 100.000001
-                  ? Tooltip(
-                      message:
-                          'Total percentage assigned to active tenants exceeds 100%',
-                      waitDuration: const Duration(milliseconds: 500),
-                      child: Container(
-                        width: barWidth,
-                        color: Theme.of(context).colorScheme.error,
+            Tooltip(
+              message:
+                  'Active tenants: ${(_totalPercentAssignedToThisMeter ?? 0).toStringAsFixed(2)}% of 100%\n'
+                  'Only allocations to active tenants count toward the 100% limit.',
+              child: Container(
+                height: 25,
+                width: barWidth,
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(5),
+                  border: Border.all(color: Theme.of(context).hintColor),
+                ),
+                child:
+                    _totalPercentAssignedToThisMeter != null &&
+                        _totalPercentAssignedToThisMeter! > 100.000001
+                    ? Tooltip(
+                        message: 'Total percentage assigned to active tenants exceeds 100%',
+                        waitDuration: const Duration(milliseconds: 500),
+                        child: Container(
+                          width: barWidth,
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      )
+                    : (_totalPercentAssignedToThisMeter ?? 0) == 0
+                    ? Center(
+                        child: Text(
+                          'No active-tenant allocation',
+                          style: TextStyle(
+                            color: Theme.of(context).hintColor,
+                            fontSize: 11,
+                          ),
+                        ),
+                      )
+                    : Row(
+                        children: [...assignmentBarWidgetList, const Spacer()],
                       ),
-                    )
-                  : Row(children: [...assignmentBarWidgetList, const Spacer()]),
+              ),
             ),
             horizontalSpaceSmall,
             Tooltip(

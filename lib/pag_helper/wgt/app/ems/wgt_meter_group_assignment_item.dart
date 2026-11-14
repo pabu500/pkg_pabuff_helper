@@ -462,6 +462,7 @@ class _WgtMeterGroupAssignmentItemState
       );
     }
     List<Widget> assignmentWidgetList = [];
+    bool hasNotCountedAllocation = false;
     double totalPercentageAssignedToActiveTenant = 0.0;
     for (Map<String, dynamic> assignment in meterTeantAssignmentList) {
       String meterGroupName = assignment['meter_group_name'] ?? '';
@@ -472,6 +473,10 @@ class _WgtMeterGroupAssignmentItemState
           assignment['meter_group_id'] == widget.strItemGroupIndex;
 
       final tenantInfo = assignment['tenant_info'];
+      final countsTowardActiveTotal = meterAllocationHasActiveTenant(
+        tenantInfo,
+      );
+      hasNotCountedAllocation |= !countsTowardActiveTotal;
       bool isAssignedToTenant = tenantInfo != null && tenantInfo.isNotEmpty;
       String tenantName = tenantInfo?['name'] ?? '';
       String tenantLabel = tenantInfo?['label'] ?? '';
@@ -483,6 +488,10 @@ class _WgtMeterGroupAssignmentItemState
           totalPercentageAssignedToActiveTenant += percentage;
         }
       }
+      final notCountedMessage = !isAssignedToTenant
+          ? 'Not counted: no tenant'
+          : 'Not counted: tenant ${tenantLcStatusEnum!.label}'
+                '${tenantLcStatusEnum == PagTenantLcStatus.offboarding ? ' (allocation released)' : ''}';
 
       if (totalPercentageAssignedToActiveTenant > 100.000001) {
         return getErrorTextPrompt(
@@ -536,15 +545,20 @@ class _WgtMeterGroupAssignmentItemState
             horizontalSpaceTiny,
             SizedBox(
               width: 60,
-              child: Text(
-                '${percentage.toStringAsFixed(2)}%',
-                style: TextStyle(
-                  color:
-                      isCurrentMeterGroupAssignmentUpdated && isThisMeterGroup
-                      ? assignmentErrorMessage.isNotEmpty
-                            ? Theme.of(context).colorScheme.error
-                            : commitColor.withAlpha(210)
-                      : Theme.of(context).hintColor,
+              child: Tooltip(
+                message: countsTowardActiveTotal ? '' : notCountedMessage,
+                child: Text(
+                  '${percentage.toStringAsFixed(2)}%',
+                  style: TextStyle(
+                    color:
+                        isCurrentMeterGroupAssignmentUpdated && isThisMeterGroup
+                        ? assignmentErrorMessage.isNotEmpty
+                              ? Theme.of(context).colorScheme.error
+                              : commitColor.withAlpha(210)
+                        : countsTowardActiveTotal
+                        ? Theme.of(context).hintColor
+                        : Theme.of(context).hintColor.withAlpha(120),
+                  ),
                 ),
               ),
             ),
@@ -565,7 +579,7 @@ class _WgtMeterGroupAssignmentItemState
                 width: 175,
                 child: tenantName.isEmpty
                     ? Text(
-                        '-',
+                        'No tenant',
                         style: TextStyle(color: Theme.of(context).hintColor),
                       )
                     : SelectableText(
@@ -592,7 +606,20 @@ class _WgtMeterGroupAssignmentItemState
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [...assignmentWidgetList],
+        children: [
+          ...assignmentWidgetList,
+          if (hasNotCountedAllocation)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                'Only allocations to active tenants count toward 100%',
+                style: TextStyle(
+                  color: Theme.of(context).hintColor,
+                  fontSize: 12,
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
