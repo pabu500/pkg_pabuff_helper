@@ -73,29 +73,40 @@ class _WgtNewEditTenantUserState extends State<WgtNewEditTenantUser> {
   bool _isSearchingNewItemInfo = false;
   String _addNewItemErrorText = '';
 
-  Map<String, dynamic>? _newItemInfo;
+  int _lookupVersion = 0;
+
+  bool _userAlreadyListed({String? userId}) {
+    return (widget.groupItemList ?? []).any((item) {
+      if (item['edit_type'] == 'remove') return false;
+      final existingId = (item['user_id'] ?? item['id'])?.toString();
+      final existingUsername =
+          (item['username'] ?? item['item_name'] ?? item['name'])
+              ?.toString()
+              .trim();
+      return (userId != null && existingId == userId) ||
+          (existingUsername != null && existingUsername == _username?.trim());
+    });
+  }
 
   Future<dynamic> _getItemInfo() async {
-    if (_username == null) {
+    if (isUpdate || _username == null || _username!.trim().isEmpty) {
       return;
     }
-
+    final lookupVersion = ++_lookupVersion;
+    final username = _username!.trim();
     setState(() {
       _isEditing = false;
       _isSearchingNewItemInfo = true;
       _addNewItemErrorText = '';
+      _strUserId = null;
     });
 
-    // search _newItemName in _groupItems and
-    // if found, return error
-    for (var item in widget.groupItemList ?? []) {
-      if (item['item_name'] == _username || item['name'] == _username) {
-        _addNewItemErrorText = 'Item already exists';
-        setState(() {
-          _isSearchingNewItemInfo = false;
-        });
-        return;
-      }
+    if (_userAlreadyListed()) {
+      setState(() {
+        _addNewItemErrorText = 'User already belongs to this tenant';
+        _isSearchingNewItemInfo = false;
+      });
+      return;
     }
 
     try {
@@ -103,9 +114,9 @@ class _WgtNewEditTenantUserState extends State<WgtNewEditTenantUser> {
         "scope": widget.loggedInUser.selectedScope.toScopeMap(),
         "item_kind": PagItemKind.user.name,
         "item_id_type": ItemIdType.name.name,
-        "item_id_value": _username!.trim(),
+        "item_id_value": username,
       };
-      _newItemInfo = await getPagItemInfo(
+      final itemInfo = await getPagItemInfo(
         widget.loggedInUser,
         widget.appConfig,
         queryMap,
@@ -117,25 +128,24 @@ class _WgtNewEditTenantUserState extends State<WgtNewEditTenantUser> {
           operation: 'read',
         ),
       );
-      if (_newItemInfo != null) {
-        _strUserId = _newItemInfo!['id'].toString();
+      if (!mounted || lookupVersion != _lookupVersion) return;
+      final userId = itemInfo?['id']?.toString();
+      if (userId == null || userId.isEmpty) {
+        _addNewItemErrorText = defaultErrorText;
+      } else if (_userAlreadyListed(userId: userId)) {
+        _addNewItemErrorText = 'User already belongs to this tenant';
+      } else {
+        _strUserId = userId;
       }
-      // if (_newItemInfo != null) {
-      //   _groupItemList.insert(0, _newItemInfo!);
-      //   _isModified = true;
-      //   _modifyTypeStr = 'add';
-      //   _newItemCount++;
-      //   _showCommitted = false;
-      // }
-      // _isAdding = false;
-
-      // widget.onAddItem?.call(_newItemInfo);
     } catch (e) {
+      if (!mounted || lookupVersion != _lookupVersion) return;
       dev.log(e.toString());
-      _addNewItemErrorText =
-          getErrorText(e, defaultErrorText: defaultErrorText);
+      _addNewItemErrorText = getErrorText(
+        e,
+        defaultErrorText: defaultErrorText,
+      );
     } finally {
-      if (mounted) {
+      if (mounted && lookupVersion == _lookupVersion) {
         setState(() {
           _isSearchingNewItemInfo = false;
         });
@@ -231,10 +241,10 @@ class _WgtNewEditTenantUserState extends State<WgtNewEditTenantUser> {
         {
           'user_id': widget.initialValueMap?['id'].toString(),
           'username': _username,
-          'receive_billing_notification':
-              _receiveBillingNotification.toString(),
+          'receive_billing_notification': _receiveBillingNotification
+              .toString(),
           'checked': true,
-        }
+        },
       ],
     };
 
@@ -269,8 +279,10 @@ class _WgtNewEditTenantUserState extends State<WgtNewEditTenantUser> {
   @override
   void initState() {
     super.initState();
-    _loggedInUser =
-        Provider.of<PagUserProvider>(context, listen: false).currentUser;
+    _loggedInUser = Provider.of<PagUserProvider>(
+      context,
+      listen: false,
+    ).currentUser;
 
     if (widget.initialValueMap != null) {
       _username = widget.initialValueMap?['username'];
@@ -298,26 +310,17 @@ class _WgtNewEditTenantUserState extends State<WgtNewEditTenantUser> {
           validator: validateUsername,
           onChanged: (val) {
             setState(() {
+              _lookupVersion++;
+              _username = val;
               _isEditing = true;
-              if (val != _username) {
-                _errorText = '';
-              }
+              _isSearchingNewItemInfo = false;
+              _strUserId = null;
+              _errorText = '';
+              _addNewItemErrorText = '';
             });
-            if (val.trim().isNotEmpty) {
-              setState(() {
-                _username = val;
-              });
-            }
-
             return null;
           },
-          onEditingComplete: () async {
-            await _getItemInfo();
-            if (mounted)
-              setState(() {
-                _isEditing = false;
-              });
-          },
+          onEditingComplete: _getItemInfo,
           onValidate: (String? result) {
             setState(() {
               if (result == null) {
@@ -361,15 +364,19 @@ class _WgtNewEditTenantUserState extends State<WgtNewEditTenantUser> {
   }
 
   Widget getOpButton() {
-    bool enableAdd = _username != null &&
+    bool enableAdd =
+        _username != null &&
         _username!.trim().isNotEmpty &&
-        _isUsernameValidated;
+        _isUsernameValidated &&
+        _strUserId != null &&
+        !_isSearchingNewItemInfo;
 
     String? strReceiveBillingNotificationIniVal =
         widget.initialValueMap?['receive_billing_notification'];
     bool recevieBillingNotificationIniVal =
         'true' == strReceiveBillingNotificationIniVal;
-    bool enableUpdate = _username != widget.initialValueMap?['username'] ||
+    bool enableUpdate =
+        _username != widget.initialValueMap?['username'] ||
         _receiveBillingNotification != recevieBillingNotificationIniVal;
 
     bool enableOp = isUpdate ? enableUpdate : enableAdd;
@@ -396,10 +403,18 @@ class _WgtNewEditTenantUserState extends State<WgtNewEditTenantUser> {
               onTap: !enableOp
                   ? null
                   : () {
+                      if (!isUpdate && _userAlreadyListed(userId: _strUserId)) {
+                        setState(() {
+                          _addNewItemErrorText =
+                              'User already belongs to this tenant';
+                        });
+                        return;
+                      }
                       Map<String, dynamic> userInfo = {
                         'tenant_id': widget.strItemGroupId,
-                        'username': _username,
+                        'username': _username?.trim(),
                         'user_id': _strUserId,
+                        'id': _strUserId,
                         'receive_billing_notification':
                             (_receiveBillingNotification ?? false).toString(),
                       };
@@ -410,13 +425,14 @@ class _WgtNewEditTenantUserState extends State<WgtNewEditTenantUser> {
                       }
                     },
               child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                  child: Text(
-                    isUpdate ? 'Update' : 'Add',
-                    style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSecondary),
-                  )),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                child: Text(
+                  isUpdate ? 'Update' : 'Add',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSecondary,
+                  ),
+                ),
+              ),
             ),
           ),
         horizontalSpaceSmall,
