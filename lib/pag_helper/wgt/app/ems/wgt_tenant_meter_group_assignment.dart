@@ -10,7 +10,9 @@ import 'package:buff_helper/xt_ui/wdgt/info/get_error_text_prompt.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 import 'package:buff_helper/xt_ui/xt_helpers.dart';
 import 'package:material_ui/material_ui.dart';
+
 import '../../../def_helper/dh_ems_meter_allocation.dart';
+
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
@@ -992,8 +994,7 @@ class _WgtTenantMeterGroupAssignmentState
         if (activePercentagesByMeter[meterKey]! > 100.000001) {
           return getErrorTextPrompt(
             context: context,
-            errorText:
-                'Error: Total percentage assigned to active tenants exceeds 100%',
+            errorText: 'Error: Total percentage assigned to active tenants exceeds 100%',
           );
         }
       }
