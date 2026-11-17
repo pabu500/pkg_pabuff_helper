@@ -1,12 +1,12 @@
 import 'dart:convert';
-import 'dart:io';
 
-import 'package:flutter/foundation.dart';
-import 'package:material_ui/material_ui.dart';
-import 'package:csv/csv.dart';
-import 'package:file_picker/file_picker.dart';
 import 'dart:developer' as dev;
+
+import 'package:material_ui/material_ui.dart';
+import 'package:file_picker/file_picker.dart';
+
 import '../info/empty_result.dart';
+import 'parse_csv_table.dart';
 
 class WgtSubmitTable extends StatefulWidget {
   const WgtSubmitTable({
@@ -46,23 +46,25 @@ class _WgtSubmitTableState extends State<WgtSubmitTable> {
       );
     } catch (e) {
       dev.log('picker error: $e');
-    }
-    if (result != null) {
-      try {
-        Uint8List? uploadfile = await result.readAsBytes();
-        if (uploadfile == null) {
-          if (mounted) {
-            showSnackBar(context, 'Please select a csv file');
-          }
-          return;
+      if (mounted) {
+        if (widget.onImportError != null) {
+          widget.onImportError!(e);
+        } else {
+          showSnackBar(context, 'Unable to select CSV file: $e');
         }
+      }
+    }
+    if (result != null && mounted) {
+      try {
+        final uploadfile = await result.readAsBytes();
 
-        final bytes = utf8.decode(uploadfile.toList());
-        final csv = const CsvToListConverter(
-          shouldParseNumbers: false,
-          eol: "\r\n",
-          fieldDelimiter: ",",
-        ).convert(bytes);
+        final csv = parseCsvTable(utf8.decode(uploadfile.toList()));
+        if (!mounted) return;
+        if (csv.isEmpty) {
+          throw const FormatException(
+            'CSV is empty. Select a file with headers and data rows.',
+          );
+        }
 
         List<String> header = csv[0].map((e) => e.toString()).toList();
 
@@ -84,7 +86,13 @@ class _WgtSubmitTableState extends State<WgtSubmitTable> {
         }
       } catch (e) {
         dev.log('error in _getCsv: ${e.toString()}');
-        widget.onImportError?.call(e);
+        if (mounted) {
+          if (widget.onImportError != null) {
+            widget.onImportError!(e);
+          } else {
+            showSnackBar(context, 'Unable to read CSV file: $e');
+          }
+        }
       }
     }
 

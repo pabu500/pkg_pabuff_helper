@@ -63,3 +63,41 @@ Future<Map<String, dynamic>> getTenantLcTransitionCheck(
   );
   return Map<String, dynamic>.from(getResultFromResp(response.body) as Map);
 }
+
+/// Keep conversion errors readable without changing shared transport exceptions.
+String previousSystemDebtorErrorText(Object? error) {
+  if (error is Map) {
+    return previousSystemDebtorErrorText(error['message'] ?? error['error']);
+  }
+  final text = (error is StateError ? error.message : error?.toString() ?? '')
+      .trim()
+      .replaceFirst(RegExp(r'^(?:(?:Exception:|Bad state:|m:|q:)\s*)+'), '')
+      .trim();
+  return text.isEmpty ? 'Conversion failed' : text;
+}
+
+Future<Map<String, dynamic>> convertPreviousSystemDebtor(
+  MdlPagAppConfig appConfig,
+  MdlPagUser user,
+  Map<String, dynamic> query,
+) async {
+  const endpoint = '/ems/tenant/convert_previous_system_debtor';
+  final claim = MdlPagSvcClaim(
+    svcName: PagSvcType.oresvc2.name,
+    endpoint: endpoint,
+  );
+  final headers = await tenantOperationHeaders(claim, user: user);
+  final response = await http.post(
+    Uri.parse(
+      PagUrlController(user, appConfig).getUrl(PagSvcType.oresvc2, endpoint),
+    ),
+    headers: headers,
+    body: jsonEncode(MdlPagSvcQuery(claim, query).toJson()),
+  );
+  final result = Map<String, dynamic>.from(
+    getResultFromResp(response.body) as Map,
+  );
+  return Map<String, dynamic>.from(
+    result['previous_system_debtor'] as Map? ?? result,
+  );
+}
