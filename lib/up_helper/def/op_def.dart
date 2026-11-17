@@ -322,7 +322,7 @@ Map<String, dynamic> getIsMainTag(row, fieldKey) {
 
 const topUpMax = 100;
 const topUpMin = 0.01;
-const resetMax = 100;
+const resetMax = 300;
 const resetMin = -100;
 
 String? validatorTopup(String? value) {
