@@ -18,7 +18,7 @@ import 'package:buff_helper/pag_helper/wgt/scope/wgt_scope_setter.dart';
 import 'package:buff_helper/pag_helper/wgt/wgt_comm_button.dart';
 import 'package:buff_helper/pag_helper/pag_app_context_list.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../../../../../xt_ui/wdgt/wgt_pag_wait.dart';
 import '../../../../def_helper/dh_acl.dart';

@@ -1,7 +1,7 @@
 import 'package:buff_helper/up_helper/up_helper.dart';
 import 'package:buff_helper/util/string_util.dart';
 import 'package:buff_helper/xt_ui/xt_ui.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../../app_helper/pagrid_app_config.dart';
 import '../../chart_helper/history_presentor/wgt_item_history_presenter.dart';

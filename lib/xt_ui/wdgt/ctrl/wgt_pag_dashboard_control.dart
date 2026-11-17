@@ -1,6 +1,6 @@
 import 'package:buff_helper/pag_helper/model/mdl_pag_project_profile.dart';
 import 'package:buff_helper/up_helper/helper/device_def.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import 'wgt_meter_type_selector.dart';

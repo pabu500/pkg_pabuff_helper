@@ -9,7 +9,7 @@ import 'package:buff_helper/xt_ui/util/xt_util_InputFieldValidator.dart';
 import 'package:buff_helper/xt_ui/wdgt/input/wgt_text_field2.dart';
 import 'package:buff_helper/xt_ui/xt_globals.dart';
 import 'package:buff_helper/xt_ui/xt_helpers.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../up_helper/enum/enum_item.dart';

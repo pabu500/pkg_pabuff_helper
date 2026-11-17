@@ -3,7 +3,7 @@ import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/up_helper/helper/tenant_def.dart';
 import 'package:flutter/foundation.dart';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class WgtTenantFinder2 extends StatefulWidget {
   const WgtTenantFinder2({

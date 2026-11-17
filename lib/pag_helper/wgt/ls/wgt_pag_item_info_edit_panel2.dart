@@ -18,7 +18,7 @@ import 'package:buff_helper/pag_helper/wgt/ls/wgt_item_delete_op.dart';
 import 'package:buff_helper/pagrid_helper/batch_op_helper/wgt_confirm_box.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:buff_helper/pag_helper/def_helper/def_item_group.dart';
 import 'package:provider/provider.dart';
 import 'dart:developer' as dev;
@@ -747,6 +747,38 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+              if (widget.itemKind == PagItemKind.tenant) ...[
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(_itemDisplayName ?? '',
+                            style: TextStyle(
+                                fontSize: 21,
+                                fontWeight: FontWeight.w500,
+                                color: Theme.of(context).hintColor)),
+                      ),
+                      getCopyButton(context, _itemDisplayName ?? '',
+                          direction: 'left'),
+                      IconButton(
+                        tooltip: 'Close properties',
+                        icon: const Icon(Icons.close),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          if (_fieldUpdated) widget.onClose?.call();
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 0, 8, 12),
+                  child: getLcStatusOp(widget.fieldList.firstWhere(
+                      (element) => element['col_key'] == 'lc_status',
+                      orElse: () => {})),
+                ),
+              ] else
               Stack(children: [
                 if (!isScopeItem && !isMeterGroupItem &&
                     isDeleteableItem &&
@@ -1550,23 +1582,25 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
                   },
                 ),
               ),
-            WgtPagTenantLcStatusOp(
-              key: _lcStatusOpsKey,
-              appConfig: widget.appConfig,
-              loggedInUser: _loggedInUser!,
-              enableEdit: true,
-              tenantInfo: widget.itemInfoMap!,
-              initialStatus: _lcStatusDisplay!,
-              onCommitted: (newStatus) {
-                setState(() {
-                  _lcStatusOpsKey = UniqueKey();
-                  field['lc_status'] = newStatus.value;
+            Expanded(
+              child: WgtPagTenantLcStatusOp(
+                key: _lcStatusOpsKey,
+                appConfig: widget.appConfig,
+                loggedInUser: _loggedInUser!,
+                enableEdit: true,
+                tenantInfo: widget.itemInfoMap!,
+                initialStatus: _lcStatusDisplay!,
+                onCommitted: (newStatus) {
+                  setState(() {
+                    _lcStatusOpsKey = UniqueKey();
+                    field['lc_status'] = newStatus.value;
 
-                  _lcStatusDisplay = newStatus;
-                });
-                dev.log('on committed: $newStatus');
-                widget.onUpdate?.call();
-              },
+                    _lcStatusDisplay = newStatus;
+                  });
+                  dev.log('on committed: $newStatus');
+                  widget.onUpdate?.call();
+                },
+              ),
             ),
           ],
         );

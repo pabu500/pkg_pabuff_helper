@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 void populateListItemMeterUsage(Map<String, dynamic> item) {
   if (item['meter_usage_summary'] == null) return;
@@ -52,7 +52,7 @@ dynamic _applyMeterMultiplier(dynamic usage, dynamic multiplierFactor) {
   return usage is String ? factoredUsage.toString() : factoredUsage;
 }
 
-void populateListItemTenantUsage(Map<String, dynamic> item, var meterTypeList) {
+void populateListItemTenantUsage(Map<String, dynamic> item, dynamic meterTypeList) {
   if (item['tenant_usage_summary'] == null) return;
 
   var tenantUsageSummary = item['tenant_usage_summary'];

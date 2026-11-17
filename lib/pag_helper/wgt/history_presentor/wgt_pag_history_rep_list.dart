@@ -4,7 +4,7 @@ import 'package:buff_helper/xt_ui/wdgt/file/wgt_save_table.dart';
 import 'package:buff_helper/xt_ui/wdgt/list/evs2_list_text.dart';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../../model/mdl_pag_app_config.dart';
 import '../job/wgt_post_job.dart';

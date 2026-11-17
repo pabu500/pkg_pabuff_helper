@@ -2,7 +2,7 @@ import 'dart:math';
 import 'dart:typed_data';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/up_helper/helper/tenant_def.dart';
-import 'package:flutter/material.dart' as mt;
+import 'package:material_ui/material_ui.dart' as mt;
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';

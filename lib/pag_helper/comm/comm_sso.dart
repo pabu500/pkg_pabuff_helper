@@ -2,7 +2,7 @@ import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:convert';

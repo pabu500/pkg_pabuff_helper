@@ -14,7 +14,7 @@ import 'package:buff_helper/pag_helper/model/scope/mdl_pag_site_group_profile.da
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_site_profile.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 
 import '../../model/mdl_pag_app_config.dart';
@@ -258,7 +258,7 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
     }
   }
 
-  void _onLocationListFetched(var result) {
+  void _onLocationListFetched(dynamic result) {
     if (widget.isFlexiScope && _selectedLocation?.id == -1) {
       // return;
     }
@@ -312,7 +312,7 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
     setState(() {});
   }
 
-  void _onLocationGroupListFetched(var result) {
+  void _onLocationGroupListFetched(dynamic result) {
     _locationGroupProfileList.clear();
     for (var item in result['scope_info_list']) {
       _locationGroupProfileList.add(MdlPagLocationGroupProfile.fromJson(item));
@@ -350,7 +350,7 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
     }
   }
 
-  void _onBuildingListFetched(var result) {
+  void _onBuildingListFetched(dynamic result) {
     _buildingProfileList.clear();
     for (var item in result['scope_info_list']) {
       _buildingProfileList.add(MdlPagBuildingProfile.fromJson(item));
@@ -387,7 +387,7 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
     }
   }
 
-  void _onSiteListFetched(var result) {
+  void _onSiteListFetched(dynamic result) {
     _siteProfileList.clear();
     for (var item in result['scope_info_list']) {
       _siteProfileList.add(MdlPagSiteProfile.fromJson(item));
@@ -424,7 +424,7 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
     }
   }
 
-  void _onSiteGroupListFetched(var result) {
+  void _onSiteGroupListFetched(dynamic result) {
     _siteGroupProfileList.clear();
     for (var item in result['scope_info_list']) {
       _siteGroupProfileList.add(MdlPagSiteGroupProfile.fromJson(item));

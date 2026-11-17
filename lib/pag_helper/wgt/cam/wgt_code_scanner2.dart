@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:buff_helper/xt_ui/style/evs2_colors.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import 'scanner_error_widget.dart';

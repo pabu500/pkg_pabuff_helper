@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:buff_helper/pag_helper/wgt/chart/wgt_stat_detail_card.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'wgt_pie_chart_item_indicator.dart';
 

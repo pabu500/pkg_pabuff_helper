@@ -22,7 +22,7 @@ import 'package:buff_helper/xt_ui/wdgt/wgt_popup_button.dart';
 import 'package:buff_helper/xt_ui/wdgt/xtInfoBox.dart';
 import 'package:buff_helper/xt_ui/wdgt/xtWait.dart';
 import 'package:buff_helper/xt_ui/xt_helpers.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'dart:developer' as dev;
 

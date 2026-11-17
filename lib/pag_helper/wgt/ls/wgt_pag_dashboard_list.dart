@@ -5,7 +5,7 @@ import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/xt_ui/wdgt/file/wgt_save_table.dart';
 import 'package:buff_helper/xt_ui/wdgt/list/evs2_list_text.dart';
 import 'package:buff_helper/xt_ui/wdgt/list/wgt_usage_bar.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class WgtPagDashboardList extends StatefulWidget {
   const WgtPagDashboardList({

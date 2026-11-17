@@ -1,7 +1,7 @@
 import 'package:buff_helper/up_helper/up_helper.dart';
 import 'package:buff_helper/util/string_util.dart';
 import 'package:buff_helper/xt_ui/xt_ui.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../../../pag_helper/def_helper/dh_pag_item.dart';
 import '../../../pag_helper/model/mdl_history.dart';

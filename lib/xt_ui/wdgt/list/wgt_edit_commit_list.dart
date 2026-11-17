@@ -3,7 +3,7 @@ import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/xt_ui/wdgt/list/wgt_list_column_customize.dart';
 import 'package:flutter/foundation.dart';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import '../../../pagrid_helper/app_helper/pagrid_app_config.dart';
 import '../wgt_popup_button.dart';
 import 'evs2_list_text.dart';

@@ -7,7 +7,7 @@ import 'package:buff_helper/pag_helper/comm/comm_sso.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_signin_button/button_list.dart';
 import 'package:flutter_signin_button/button_view.dart';
 import 'package:go_router/go_router.dart';

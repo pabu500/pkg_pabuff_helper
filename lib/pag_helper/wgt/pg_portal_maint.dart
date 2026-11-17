@@ -2,7 +2,7 @@
  * 
 */
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class PgPortalMaint extends StatelessWidget {
   const PgPortalMaint({super.key});

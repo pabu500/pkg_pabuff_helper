@@ -1,3 +1,4 @@
+import 'comm_tenant_auth.dart';
 import 'dart:convert';
 import 'package:buff_helper/pag_helper/comm/comm_helper.dart';
 import 'package:http/http.dart' as http;
@@ -61,21 +62,15 @@ Future<dynamic> doPagOffboardTenant(
   svcClaim.svcName = PagSvcType.oresvc2.name;
   svcClaim.endpoint = PagUrlBase.eptPagOffboardTenant;
 
-  String svcToken = '';
-  // try {
-  //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
-  // } catch (err) {
-  //   throw Exception(err);
-  // }
-
   try {
     final response = await http.post(
-      Uri.parse(PagUrlController(loggedInUser, appConfig)
-          .getUrl(PagSvcType.oresvc2, svcClaim.endpoint!)),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $svcToken',
-      },
+      Uri.parse(
+        PagUrlController(
+          loggedInUser,
+          appConfig,
+        ).getUrl(PagSvcType.oresvc2, svcClaim.endpoint!),
+      ),
+      headers: await tenantOperationHeaders(svcClaim, user: loggedInUser),
       body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
     );
 
@@ -124,8 +119,12 @@ Future<dynamic> getTenantOffboardingInfo(
 
   try {
     final response = await http.post(
-      Uri.parse(PagUrlController(null, appConfig)
-          .getUrl(PagSvcType.oresvc2, svcClaim.endpoint!)),
+      Uri.parse(
+        PagUrlController(
+          null,
+          appConfig,
+        ).getUrl(PagSvcType.oresvc2, svcClaim.endpoint!),
+      ),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $svcToken',
@@ -164,26 +163,21 @@ Future<dynamic> getTenantOffboardingInfo(
 Future<dynamic> updateTenantOffboardingInfo(
   MdlPagAppConfig appConfig,
   Map<String, dynamic> queryMap,
-  MdlPagSvcClaim svcClaim,
-) async {
+  MdlPagSvcClaim svcClaim, {
+  MdlPagUser? user,
+}) async {
   svcClaim.svcName = PagSvcType.oresvc2.name;
   svcClaim.endpoint = PagUrlBase.eptPagUpdateTenantOffbInfo;
 
-  String svcToken = '';
-  // try {
-  //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
-  // } catch (err) {
-  //   throw Exception(err);
-  // }
-
   try {
     final response = await http.post(
-      Uri.parse(PagUrlController(null, appConfig)
-          .getUrl(PagSvcType.oresvc2, svcClaim.endpoint!)),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer $svcToken',
-      },
+      Uri.parse(
+        PagUrlController(
+          null,
+          appConfig,
+        ).getUrl(PagSvcType.oresvc2, svcClaim.endpoint!),
+      ),
+      headers: await tenantOperationHeaders(svcClaim, user: user),
       body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
     );
 
@@ -237,8 +231,12 @@ Future<dynamic> doGetScopeMeterGroupList(
 
   try {
     final response = await http.post(
-      Uri.parse(PagUrlController(null, appConfig)
-          .getUrl(PagSvcType.oresvc2, svcClaim.endpoint!)),
+      Uri.parse(
+        PagUrlController(
+          null,
+          appConfig,
+        ).getUrl(PagSvcType.oresvc2, svcClaim.endpoint!),
+      ),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $svcToken',
@@ -287,8 +285,12 @@ Future<dynamic> doGetScopeBciList(
 
   try {
     final response = await http.post(
-      Uri.parse(PagUrlController(null, appConfig)
-          .getUrl(PagSvcType.oresvc2, svcClaim.endpoint!)),
+      Uri.parse(
+        PagUrlController(
+          null,
+          appConfig,
+        ).getUrl(PagSvcType.oresvc2, svcClaim.endpoint!),
+      ),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $svcToken',
@@ -297,8 +299,10 @@ Future<dynamic> doGetScopeBciList(
     );
 
     if (response.statusCode == 200) {
-      return getResultFromResp(response.body,
-          defualtErrorMsg: 'Failed to get scope bci list');
+      return getResultFromResp(
+        response.body,
+        defualtErrorMsg: 'Failed to get scope bci list',
+      );
     } else {
       throw Exception('Failed to get scope bci list');
     }
@@ -329,8 +333,12 @@ Future<dynamic> getMeterTenantAssignment(
 
   try {
     final response = await http.post(
-      Uri.parse(PagUrlController(null, appConfig)
-          .getUrl(PagSvcType.oresvc2, svcClaim.endpoint!)),
+      Uri.parse(
+        PagUrlController(
+          null,
+          appConfig,
+        ).getUrl(PagSvcType.oresvc2, svcClaim.endpoint!),
+      ),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $svcToken',
@@ -339,8 +347,10 @@ Future<dynamic> getMeterTenantAssignment(
     );
 
     if (response.statusCode == 200) {
-      return getResultFromResp(response.body,
-          defualtErrorMsg: 'Failed to get meter tenant assignment');
+      return getResultFromResp(
+        response.body,
+        defualtErrorMsg: 'Failed to get meter tenant assignment',
+      );
     } else {
       throw Exception('Failed to get meter tenant assignment');
     }
@@ -371,8 +381,12 @@ Future<dynamic> doGetTenantMeterAssignment(
 
   try {
     final response = await http.post(
-      Uri.parse(PagUrlController(null, appConfig)
-          .getUrl(PagSvcType.oresvc2, svcClaim.endpoint!)),
+      Uri.parse(
+        PagUrlController(
+          null,
+          appConfig,
+        ).getUrl(PagSvcType.oresvc2, svcClaim.endpoint!),
+      ),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $svcToken',
@@ -421,8 +435,12 @@ Future<dynamic> doGetTenantSoa(
 
   try {
     final response = await http.post(
-      Uri.parse(PagUrlController(null, appConfig)
-          .getUrl(PagSvcType.oresvc2, svcClaim.endpoint!)),
+      Uri.parse(
+        PagUrlController(
+          null,
+          appConfig,
+        ).getUrl(PagSvcType.oresvc2, svcClaim.endpoint!),
+      ),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $svcToken',
@@ -477,8 +495,12 @@ Future<dynamic> getTenantUserList(
   // }
 
   final response = await http.post(
-    Uri.parse(PagUrlController(loggedInUser, pagAppConfig)
-        .getUrl(PagSvcType.oresvc2, svcClaim.endpoint!)),
+    Uri.parse(
+      PagUrlController(
+        loggedInUser,
+        pagAppConfig,
+      ).getUrl(PagSvcType.oresvc2, svcClaim.endpoint!),
+    ),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
       'Authorization': 'Bearer $svcToken',
@@ -515,25 +537,20 @@ Future<dynamic> getTenantUserList(
 Future<dynamic> updateTenantLcStatus(
   MdlPagAppConfig appConfig,
   Map<String, dynamic> queryMap,
-  MdlPagSvcClaim svcClaim,
-) async {
+  MdlPagSvcClaim svcClaim, {
+  MdlPagUser? user,
+}) async {
   svcClaim.svcName = PagSvcType.oresvc2.name;
   svcClaim.endpoint = PagUrlBase.eptUpdateItemLcStatus;
 
-  String svcToken = '';
-  // try {
-  //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
-  // } catch (err) {
-  //   throw Exception(err);
-  // }
-
   final response = await http.post(
-    Uri.parse(PagUrlController(null, appConfig)
-        .getUrl(PagSvcType.oresvc2, svcClaim.endpoint!)),
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-      'Authorization': 'Bearer $svcToken',
-    },
+    Uri.parse(
+      PagUrlController(
+        null,
+        appConfig,
+      ).getUrl(PagSvcType.oresvc2, svcClaim.endpoint!),
+    ),
+    headers: await tenantOperationHeaders(svcClaim, user: user),
     body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
   );
 

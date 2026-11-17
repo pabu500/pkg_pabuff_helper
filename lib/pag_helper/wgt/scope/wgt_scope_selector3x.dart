@@ -10,7 +10,7 @@ import 'package:buff_helper/pag_helper/wgt_project_logo.dart';
 import 'package:buff_helper/pagrid_helper/comm_helper/local_storage.dart';
 import 'package:buff_helper/xt_ui/xt_ui.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 

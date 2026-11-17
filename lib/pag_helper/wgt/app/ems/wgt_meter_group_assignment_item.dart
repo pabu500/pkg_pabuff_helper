@@ -1,10 +1,11 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../../xt_ui/style/evs2_colors.dart';
 import '../../../../xt_ui/wdgt/info/get_error_text_prompt.dart';
 import '../../../../xt_ui/wdgt/wgt_pag_wait.dart';
 import '../../../../xt_ui/xt_helpers.dart';
+import '../../../../up_helper/exceptions.dart';
 import '../../../def_helper/dh_device.dart';
 import '../../../def_helper/dh_ems_meter_allocation.dart';
 import '../../../def_helper/dh_pag_tenant.dart';
@@ -316,25 +317,48 @@ class _WgtMeterGroupAssignmentItemState
     double margin = 150;
 
     if (needToCheck) {
-      return WgtCommButton(
-        label: 'Check Assignment',
-        labelStyle: TextStyle(
-          color: Theme.of(context).colorScheme.onSecondary,
-          fontSize: 13.5,
-        ),
+      final fetchError = itemInfo['assignment_fetch_error'] as String? ?? '';
+      final isFetching = itemInfo['is_fetching'] == true;
+      return SizedBox(
         width: barWidth + margin,
-        onPressed: () async {
-          if (itemInfo['is_fetching'] ?? false) {
-            return;
-          }
-          if (itemInfo['assignment'] == null) {
-            await widget.getMeterAssignment(itemInfo);
-          }
-
-          setState(() {
-            // _selectedMeterIndexStr = itemInfo['id'];
-          });
-        },
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            WgtCommButton(
+              label: fetchError.isEmpty
+                  ? 'Check Assignment'
+                  : 'Retry Assignment',
+              enabled: !isFetching,
+              inComm: isFetching,
+              labelStyle: TextStyle(
+                color: Theme.of(context).colorScheme.onSecondary,
+                fontSize: 13.5,
+              ),
+              width: barWidth + margin,
+              onPressed: () async {
+                if (itemInfo['is_fetching'] ?? false) {
+                  return;
+                }
+                setState(() => itemInfo.remove('assignment_fetch_error'));
+                try {
+                  if (itemInfo['assignment'] == null) {
+                    await widget.getMeterAssignment(itemInfo);
+                  }
+                } catch (e) {
+                  itemInfo['assignment_fetch_error'] = getErrorText(
+                    e,
+                    defaultErrorText:
+                        'Unable to load meter assignments. Please try again.',
+                  );
+                } finally {
+                  if (mounted) setState(() {});
+                }
+              },
+            ),
+            if (fetchError.isNotEmpty)
+              getErrorTextPrompt(context: context, errorText: fetchError),
+          ],
+        ),
       );
     }
 
@@ -366,7 +390,10 @@ class _WgtMeterGroupAssignmentItemState
         updatedAssignmentToThisMeterGroup.addAll(assignmentToThisMeterGroup);
         if (widget.currentTenantInfo != null) {
           updatedAssignmentToThisMeterGroup['tenant_info'] =
-              widget.currentTenantInfo;
+              meterAllocationTenantInfo(
+                assignmentToThisMeterGroup['tenant_info'],
+                widget.currentTenantInfo,
+              );
         }
         updatedAssignmentToThisMeterGroup['percentage'] = newPercentage
             .toString();
@@ -435,6 +462,7 @@ class _WgtMeterGroupAssignmentItemState
       );
     }
     List<Widget> assignmentWidgetList = [];
+    bool hasNotCountedAllocation = false;
     double totalPercentageAssignedToActiveTenant = 0.0;
     for (Map<String, dynamic> assignment in meterTeantAssignmentList) {
       String meterGroupName = assignment['meter_group_name'] ?? '';
@@ -445,6 +473,10 @@ class _WgtMeterGroupAssignmentItemState
           assignment['meter_group_id'] == widget.strItemGroupIndex;
 
       final tenantInfo = assignment['tenant_info'];
+      final countsTowardActiveTotal = meterAllocationHasActiveTenant(
+        tenantInfo,
+      );
+      hasNotCountedAllocation |= !countsTowardActiveTotal;
       bool isAssignedToTenant = tenantInfo != null && tenantInfo.isNotEmpty;
       String tenantName = tenantInfo?['name'] ?? '';
       String tenantLabel = tenantInfo?['label'] ?? '';
@@ -456,6 +488,10 @@ class _WgtMeterGroupAssignmentItemState
           totalPercentageAssignedToActiveTenant += percentage;
         }
       }
+      final notCountedMessage = !isAssignedToTenant
+          ? 'Not counted: no tenant'
+          : 'Not counted: tenant ${tenantLcStatusEnum!.label}'
+                '${tenantLcStatusEnum == PagTenantLcStatus.offboarding ? ' (allocation released)' : ''}';
 
       if (totalPercentageAssignedToActiveTenant > 100.000001) {
         return getErrorTextPrompt(
@@ -509,15 +545,20 @@ class _WgtMeterGroupAssignmentItemState
             horizontalSpaceTiny,
             SizedBox(
               width: 60,
-              child: Text(
-                '${percentage.toStringAsFixed(2)}%',
-                style: TextStyle(
-                  color:
-                      isCurrentMeterGroupAssignmentUpdated && isThisMeterGroup
-                      ? assignmentErrorMessage.isNotEmpty
-                            ? Theme.of(context).colorScheme.error
-                            : commitColor.withAlpha(210)
-                      : Theme.of(context).hintColor,
+              child: Tooltip(
+                message: countsTowardActiveTotal ? '' : notCountedMessage,
+                child: Text(
+                  '${percentage.toStringAsFixed(2)}%',
+                  style: TextStyle(
+                    color:
+                        isCurrentMeterGroupAssignmentUpdated && isThisMeterGroup
+                        ? assignmentErrorMessage.isNotEmpty
+                              ? Theme.of(context).colorScheme.error
+                              : commitColor.withAlpha(210)
+                        : countsTowardActiveTotal
+                        ? Theme.of(context).hintColor
+                        : Theme.of(context).hintColor.withAlpha(120),
+                  ),
                 ),
               ),
             ),
@@ -538,7 +579,7 @@ class _WgtMeterGroupAssignmentItemState
                 width: 175,
                 child: tenantName.isEmpty
                     ? Text(
-                        '-',
+                        'No tenant',
                         style: TextStyle(color: Theme.of(context).hintColor),
                       )
                     : SelectableText(
@@ -565,7 +606,20 @@ class _WgtMeterGroupAssignmentItemState
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [...assignmentWidgetList],
+        children: [
+          ...assignmentWidgetList,
+          if (hasNotCountedAllocation)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                'Only allocations to active tenants count toward 100%',
+                style: TextStyle(
+                  color: Theme.of(context).hintColor,
+                  fontSize: 12,
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
