@@ -12,6 +12,7 @@ import '../../../pag_helper/def_helper/dh_device.dart';
 import '../../../pag_helper/def_helper/dh_pag_tenant.dart';
 import '../../../util/string_util.dart';
 import '../../../util/util.dart';
+import 'cw_bill/invoice_label_cw.dart';
 import 'meter_usage_cost_rounding.dart';
 
 const int boltIcon = 0xea0b;
@@ -709,9 +710,7 @@ class PagPdfBillCwP2Gen3 {
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
             pw.Text(
-                showBillingGen2Hint
-                    ? 'Issued on behalf of:'
-                    : 'Issued on behalf of',
+                showBillingGen2Hint ? '$cwBillingOnBehalfOf:' : cwBillingOnBehalfOf,
                 style: styleSmall),
             pw.Text(billedAmgrCompanyTradingName ?? '',
                 maxLines: 2,

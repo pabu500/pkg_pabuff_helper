@@ -9,6 +9,8 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
+import 'invoice_label_cw.dart';
+
 const int boltIcon = 0xea0b;
 const int waterIcon = 0xf084;
 const int hvacIcon = 0xf10e;
@@ -324,7 +326,7 @@ class Bill {
           child: pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                pw.Text('Issued on behalf of', style: textStyle),
+                pw.Text(cwBillingOnBehalfOf, style: textStyle),
                 pw.Text('National University of Singapore', style: textStyle),
                 pw.SizedBox(height: 20),
                 pw.Text(
