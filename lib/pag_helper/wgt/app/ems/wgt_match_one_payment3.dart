@@ -5,6 +5,7 @@ import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_bill.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'dart:developer' as dev;
 
@@ -84,7 +85,19 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
   final List<Map<String, dynamic>> _paymentApplyInfoListNew = [];
 
   double? _initialPaymentAmountToApply;
-  double? _availablePaymentAmountToApply;
+  int? _availablePaymentCents;
+  double? get _availablePaymentAmountToApply =>
+      _availablePaymentCents == null ? null : _availablePaymentCents! / 100;
+
+  static final _amountPattern = RegExp(r'^\d*(\.\d{0,2})?$');
+  static final _amountFormatters = [
+    TextInputFormatter.withFunction((oldValue, newValue) {
+      final amount = double.tryParse(newValue.text) ?? 0.0;
+      return _amountPattern.hasMatch(newValue.text) && (amount * 100).isFinite
+          ? newValue
+          : oldValue;
+    }),
+  ];
 
   final Color balColor = Colors.green.shade900.withAlpha(210);
   final Color paymentColor = Colors.green.shade600.withAlpha(210);
@@ -180,7 +193,9 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
       }
 
       _initialPaymentAmountToApply = _paymentAmount;
-      _availablePaymentAmountToApply = _paymentAmount;
+      _availablePaymentCents = _paymentAmount == null
+          ? null
+          : (_paymentAmount * 100).round();
 
       for (var paymentApplyInfo in paymentApplyInfoList) {
         _paymentApplyInfoListExisting.add(paymentApplyInfo);
@@ -195,11 +210,9 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
               paymentApplyInfo['interest_amount_from_payment'] ?? '0.0',
             ) ??
             0.0;
-        double totalAppliedFromPayment =
-            appliedAmountUsageFromPayment + appliedAmountInterestFromPayment;
-
-        _availablePaymentAmountToApply =
-            _availablePaymentAmountToApply! - totalAppliedFromPayment;
+        _availablePaymentCents = _availablePaymentCents! -
+            (appliedAmountUsageFromPayment * 100).round() -
+            (appliedAmountInterestFromPayment * 100).round();
       }
     } catch (e) {
       dev.log('Error fetching match op info: $e');
@@ -215,10 +228,20 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
     }
   }
 
+  bool get _hasCommittableAllocation {
+    if (_paymentApplyInfoListNew.isEmpty || (_availablePaymentCents ?? -1) < 0) {
+      return false;
+    }
+    if (!_inManualOverride) return true;
+    return _paymentApplyInfoListNew.every((apply) {
+      final principal = apply['usage_amount_from_payment'] as double?;
+      final interest = apply['interest_amount_from_payment'] as double?;
+      return principal != null && interest != null && principal + interest > 0;
+    });
+  }
+
   Future<dynamic> _commitApply() async {
-    if (_isCommitting ||
-        _isCommitted ||
-        _availablePaymentAmountToApply == null) {
+    if (_isCommitting || _isCommitted || !_hasCommittableAllocation) {
       return;
     }
 
@@ -228,12 +251,6 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
             _holdOverrideReason.text.trim().isEmpty)) {
       return;
     }
-
-    final totalAppliedFromPayment =
-        (_initialPaymentAmountToApply != null &&
-            _availablePaymentAmountToApply != null)
-        ? (_initialPaymentAmountToApply! - _availablePaymentAmountToApply!)
-        : 0.0;
 
     Map<String, dynamic> queryMap = {
       'scope': widget.loggedInUser.selectedScope.toScopeMap(),
@@ -523,7 +540,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
     }
 
     setState(() {
-      _availablePaymentAmountToApply = outBucketThisPayment;
+      _availablePaymentCents = (outBucketThisPayment * 100).round();
       _isPopulated = true;
     });
   }
@@ -565,42 +582,37 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
     final billInfo = _billList[index];
     final billingRecId = billInfo['id'] ?? '';
     final inBucket = fieldKey.contains('usage_amount') ? 'usage' : 'interest';
-    final outBucket = fieldKey.contains('from_bal') ? 'bal' : 'payment';
-    bool found = false;
-    double diff = 0.0;
+    final newValue = double.tryParse(value);
+    if (_availablePaymentCents == null) return;
 
-    for (var item in _paymentApplyInfoListNew) {
-      if (item['billing_rec_id'] == billingRecId) {
-        final oldValue =
-            double.tryParse(item[fieldKey]?.toString() ?? '0.0') ?? 0.0;
-        final newValue = double.tryParse(value) ?? 0.0;
-        item[fieldKey] = newValue;
-        item['is_custom_apply_$inBucket'] = true;
-        diff = newValue - oldValue;
-        found = true;
-        break;
+    setState(() {
+      var apply = _paymentApplyInfoListNew
+          .where((item) => item['billing_rec_id'] == billingRecId)
+          .firstOrNull;
+      if (apply == null) {
+        if (value.isEmpty) return;
+        apply = {
+          'billing_rec_id': billingRecId,
+          'billing_rec_gen_type': billInfo['gen_type'] ?? '',
+        };
+        _paymentApplyInfoListNew.add(apply);
       }
-    }
-
-    if (!found) {
-      final newValue = double.tryParse(value) ?? 0.0;
-      diff = newValue;
-      _paymentApplyInfoListNew.add({
-        'billing_rec_id': billingRecId,
-        'billing_rec_gen_type': billInfo['gen_type'] ?? '',
-        fieldKey: newValue,
-        'is_custom_apply_$inBucket': true,
-      });
-    }
-
-    if (inBucket == 'usage') {
-      _availablePaymentAmountToApply =
-          (_availablePaymentAmountToApply ?? 0.0) - diff;
-    } else {
-      _availablePaymentAmountToApply =
-          (_availablePaymentAmountToApply ?? 0.0) - diff;
-    }
-    _checkFullyPaid();
+      final oldValue = apply[fieldKey] as double?;
+      _availablePaymentCents = _availablePaymentCents! +
+          ((oldValue ?? 0) * 100).round() - ((newValue ?? 0) * 100).round();
+      if (value.isEmpty) {
+        apply.remove(fieldKey);
+        apply.remove('is_custom_apply_$inBucket');
+      } else {
+        apply[fieldKey] = newValue;
+        apply['is_custom_apply_$inBucket'] = true;
+      }
+      if (!apply.containsKey('usage_amount_from_payment') &&
+          !apply.containsKey('interest_amount_from_payment')) {
+        _paymentApplyInfoListNew.remove(apply);
+      }
+      _checkFullyPaid();
+    });
   }
 
   double _getBillBalanceToBePaid(
@@ -831,14 +843,19 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
     //   isEnabled = false;
     // }
     // }
-    if (_lcStatusDisplay == PagPaymentLcStatus.matched) {
+    if (_lcStatusDisplay == PagPaymentLcStatus.matched ||
+        _isCommitting ||
+        _isCommitted) {
       isEnabled = false;
     }
 
-    final initialValueUsageFromPmt = isMatchedBill
+    // Manual entries are additional allocations on top of any posted ones.
+    final showAmounts = isMatchedBill &&
+        (!_inManualOverride || _paymentApplyInfoListNew.isNotEmpty);
+    final initialValueUsageFromPmt = showAmounts
         ? appliedAmountUsageFromPmt?.toStringAsFixed(2)
         : null;
-    final initialValueInterestFromPmt = isMatchedBill
+    final initialValueInterestFromPmt = showAmounts
         ? appliedAmountInterestFromPmt?.toStringAsFixed(2)
         : null;
     final valWidth = 105.0;
@@ -852,15 +869,6 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
     } else {
       if (_isPopulated) {
         valueColor = commitColor;
-      }
-    }
-
-    for (var item in _paymentApplyInfoListNew) {
-      if (item['billing_rec_id'] == billingRecId) {
-        // populate initial values from the new apply list
-        item['usage_amount_from_payment'] ??= initialValueUsageFromPmt;
-        item['interest_amount_from_payment'] ??= initialValueInterestFromPmt;
-        break;
       }
     }
 
@@ -884,11 +892,14 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
               SizedBox(
                 width: valWidth,
                 child: WgtTextField(
-                  key: UniqueKey(),
+                  key: _inManualOverride
+                      ? ValueKey('principal-$billingRecId')
+                      : ValueKey(('principal', billingRecId, initialValueUsageFromPmt)),
                   appConfig: widget.appConfig,
                   loggedInUser: widget.loggedInUser,
                   hintText: 'Principal',
                   labelText: 'Principal',
+                  inputFormatters: _amountFormatters,
                   enabled: isEnabled,
                   initialValue: initialValueUsageFromPmt,
                   textStyle: TextStyle(color: valueColor),
@@ -899,9 +910,6 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
                       value,
                     );
                   },
-                  onEditingComplete: () {
-                    setState(() {});
-                  },
                   onClear: () {
                     _updateCustomApply(index, 'usage_amount_from_payment', '');
                   },
@@ -911,11 +919,14 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
               SizedBox(
                 width: valWidth,
                 child: WgtTextField(
-                  key: UniqueKey(),
+                  key: _inManualOverride
+                      ? ValueKey('interest-$billingRecId')
+                      : ValueKey(('interest', billingRecId, initialValueInterestFromPmt)),
                   appConfig: widget.appConfig,
                   loggedInUser: widget.loggedInUser,
                   hintText: 'Interest',
                   labelText: 'Interest',
+                  inputFormatters: _amountFormatters,
                   enabled: isEnabled,
                   initialValue: initialValueInterestFromPmt,
                   textStyle: TextStyle(color: valueColor),
@@ -925,9 +936,6 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
                       'interest_amount_from_payment',
                       value,
                     );
-                  },
-                  onEditingComplete: () {
-                    setState(() {});
                   },
                   onClear: () {
                     _updateCustomApply(
@@ -1013,20 +1021,12 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
 
     for (var applyInfo in applyInfoList) {
       if (applyInfo['billing_rec_id'] == billingRecId) {
-        appliedAmountUsageFromPmt =
-            applyInfo['usage_amount_from_payment'] is String
-            ? double.tryParse(
-                    applyInfo['usage_amount_from_payment'] ?? '0.0',
-                  ) ??
-                  0.0
-            : applyInfo['usage_amount_from_payment'] ?? 0.0;
-        appliedAmountInterestFromPmt =
-            applyInfo['interest_amount_from_payment'] is String
-            ? double.tryParse(
-                    applyInfo['interest_amount_from_payment'] ?? '0.0',
-                  ) ??
-                  0.0
-            : applyInfo['interest_amount_from_payment'] ?? 0.0;
+        appliedAmountUsageFromPmt = double.tryParse(
+          applyInfo['usage_amount_from_payment']?.toString() ?? '',
+        );
+        appliedAmountInterestFromPmt = double.tryParse(
+          applyInfo['interest_amount_from_payment']?.toString() ?? '',
+        );
 
         // final appliedAmountUsage = (appliedAmountUsageFromBal ?? 0.0) + (appliedAmountUsageFromPmt ?? 0.0);
         // final appliedAmountInterest = (appliedAmountInterestFromBal ?? 0.0) + (appliedAmountInterestFromPmt ?? 0.0);
@@ -1272,15 +1272,7 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
   }
 
   Widget getCommitApply() {
-    if (_paymentApplyInfoListNew.isEmpty) {
-      return Container();
-    }
-    if ((_availablePaymentAmountToApply == null)) {
-      return Container();
-    }
-    if ((_availablePaymentAmountToApply! < 0.0)) {
-      return Container();
-    }
+    if (!_hasCommittableAllocation) return const SizedBox.shrink();
 
     if (_isCommitted) {
       if (_commitErrorText.isEmpty) {
@@ -1306,12 +1298,6 @@ class _WgtMatchOnePayment3State extends State<WgtMatchOnePayment3> {
         widget.paymentMatchingInfo!['lc_status'] != 'released') {
       okToCommit = false;
       hintMsg = 'Payment must be in released status to commit';
-    }
-    // available amount to apply must be at least 0
-    else if (_availablePaymentAmountToApply != null &&
-        _availablePaymentAmountToApply! < -0.00001) {
-      okToCommit = false;
-      hintMsg = 'Available amount to apply must not be negative';
     }
     if (_keepEarlierUnapplied && _holdOverrideReason.text.trim().isEmpty) {
       okToCommit = false;

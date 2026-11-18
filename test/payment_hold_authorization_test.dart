@@ -62,30 +62,27 @@ void main() {
     },
   );
 
-  test(
-    'override request preserves explicit consent and reason with a signed token',
-    () async {
-      final client = MockClient((request) async {
-        expect(request.url.path, '/ems/fin/commit_payment_apply');
-        expect(request.headers['Authorization'], 'Bearer signed-user-token');
-        final payload = jsonDecode(request.body)['request'];
-        expect(payload['keep_earlier_unapplied'], true);
-        expect(payload['hold_override_reason'], 'Tenant reconciliation');
-        return result('commit_payment_apply_result', {'applied': true});
-      });
-      await commitPaymentApply(
-        config,
-        {
-          'keep_earlier_unapplied': true,
-          'hold_override_reason': 'Tenant reconciliation',
-        },
-        MdlPagSvcClaim(userId: 194, username: 'dexter-cw'),
-        loginToken: 'signed-user-token',
-        client: client,
-      );
-      client.close();
-    },
-  );
+  test('override request preserves explicit consent and reason with a signed token', () async {
+    final client = MockClient((request) async {
+      expect(request.url.path, '/ems/fin/commit_payment_apply');
+      expect(request.headers['Authorization'], 'Bearer signed-user-token');
+      final payload = jsonDecode(request.body)['request'];
+      expect(payload['keep_earlier_unapplied'], true);
+      expect(payload['hold_override_reason'], 'Tenant reconciliation');
+      return result('commit_payment_apply_result', {'applied': true});
+    });
+    await commitPaymentApply(
+      config,
+      {
+        'keep_earlier_unapplied': true,
+        'hold_override_reason': 'Tenant reconciliation',
+      },
+      MdlPagSvcClaim(userId: 194, username: 'dexter-cw'),
+      loginToken: 'signed-user-token',
+      client: client,
+    );
+    client.close();
+  });
 
   test(
     'normal application does not opt into overriding earlier payments',
@@ -143,6 +140,9 @@ void main() {
     WidgetTester tester, {
     required bool authorized,
     bool enabled = true,
+    String amount = '100',
+    List<Map<String, dynamic>> bills = const [],
+    List<Map<String, dynamic>> existingApplies = const [],
   }) async {
     tester.view.physicalSize = const Size(1800, 1200);
     tester.view.devicePixelRatio = 1;
@@ -164,9 +164,9 @@ void main() {
                     'tenant_id': '1',
                   },
                   defaultPaymentLcStatusStr: 'released',
-                  paymentMatchingInfo: const {
+                  paymentMatchingInfo: {
                     'id': '12',
-                    'amount': '100',
+                    'amount': amount,
                     'lc_status': 'released',
                   },
                 ),
@@ -185,12 +185,113 @@ void main() {
         }
         return result('payment_match_op_info', {
           'payment_info': {'id': '12'},
-          'bill_list': [],
-          'payment_apply_info_list': [],
+          'bill_list': bills,
+          'payment_apply_info_list': existingApplies,
         });
       }),
     );
   }
+
+  testWidgets(
+    'manual Commit requires both amounts on every entered bill and a nonnegative balance',
+    (tester) async {
+      await pumpPayment(
+        tester,
+        authorized: false,
+        amount: '2035.57',
+        bills: [
+          {
+            'id': '7',
+            'lc_status': 'released',
+            'billed_interest_amount': '36.59',
+          },
+          {'id': '8', 'lc_status': 'released'},
+        ],
+        existingApplies: [
+          {'billing_rec_id': '6', 'usage_amount_from_payment': '1998.98'},
+        ],
+      );
+      await tester.tap(find.byType(Switch));
+      await tester.pump();
+      Finder amountField(String key) => find.descendant(
+        of: find.byKey(ValueKey(key)),
+        matching: find.byType(TextField),
+      );
+      final field = amountField('interest-7');
+      final principal = amountField('principal-7');
+      final commit = find.widgetWithIcon(IconButton, Icons.cloud_upload);
+      expect(commit, findsNothing);
+      await tester.enterText(field, '36.');
+      await tester.pump();
+      expect(tester.widget<TextField>(field).controller!.text, '36.');
+      tester.testTextInput.enterText('36.59');
+      await tester.pump();
+      expect(commit, findsNothing);
+      expect(find.text(' 0.00 '), findsOneWidget);
+      await tester.enterText(principal, '0');
+      await tester.pump();
+      expect(tester.widget<IconButton>(commit).onPressed, isNotNull);
+      expect(tester.testTextInput.hasAnyClients, isTrue);
+
+      await tester.tap(
+        find.descendant(
+          of: find.byKey(const ValueKey('principal-7')),
+          matching: find.byIcon(Icons.clear),
+        ),
+      );
+      await tester.pump();
+      expect(commit, findsNothing);
+      await tester.enterText(principal, '.');
+      await tester.pump();
+      expect(commit, findsNothing);
+      await tester.enterText(principal, '0.00');
+      await tester.pump();
+      expect(tester.widget<IconButton>(commit).onPressed, isNotNull);
+
+      await tester.enterText(amountField('principal-8'), '0');
+      await tester.pump();
+      expect(commit, findsNothing);
+      await tester.enterText(amountField('principal-8'), '');
+      await tester.pump();
+      expect(tester.widget<IconButton>(commit).onPressed, isNotNull);
+
+      await tester.enterText(field, '36.60');
+      await tester.pump();
+      expect(find.text(' -0.01 '), findsOneWidget);
+      expect(commit, findsNothing);
+
+      tester.testTextInput.enterText('36.59');
+      await tester.pump();
+      expect(tester.widget<IconButton>(commit).onPressed, isNotNull);
+      tester.testTextInput.enterText('');
+      await tester.pump();
+      expect(find.text(' 36.59 '), findsOneWidget);
+      expect(commit, findsNothing);
+
+      tester.testTextInput.enterText('0');
+      await tester.pump();
+      expect(commit, findsNothing);
+      tester.testTextInput.enterText('36.59');
+      await tester.pump();
+      Map<String, dynamic>? submitted;
+      await http.runWithClient(
+        () async {
+          await tester.tap(commit);
+          await tester.pumpAndSettle();
+        },
+        () => MockClient((request) async {
+          expect(request.url.path, '/ems/fin/commit_payment_apply');
+          submitted = jsonDecode(request.body)['request'];
+          return result('commit_payment_apply_result', {'applied': true});
+        }),
+      );
+      final allocation = (submitted!['apply_list'] as List).single;
+      expect(allocation['billing_rec_id'], '7');
+      expect(allocation['usage_amount_from_payment'], 0);
+      expect(allocation['interest_amount_from_payment'], 36.59);
+      expect(find.text('Apply Committed'), findsOneWidget);
+    },
+  );
 
   testWidgets(
     'authorized user explicitly selects override before entering a reason',
