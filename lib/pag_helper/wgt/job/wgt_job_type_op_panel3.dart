@@ -9,7 +9,7 @@ import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/xt_ui/wdgt/datetime/wgt_date_picker.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:multi_dropdown/multiselect_dropdown.dart';
+import 'package:multi_dropdown/multi_dropdown.dart';
 
 import '../../comm/comm_ex.dart';
 import '../../comm/pag_be_api_base.dart';
@@ -661,63 +661,64 @@ class _WgtJobTypeOpPanel3State extends State<WgtJobTypeOpPanel3> {
             SizedBox(
               width: dropdownWidth,
               height: 45,
-              child: MultiSelectDropDown<String>(
-                hint: 'Select',
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                options: const [
-                  ValueItem(label: 'E', value: 'E'),
-                  ValueItem(label: 'W', value: 'W'),
-                  ValueItem(label: 'G', value: 'G'),
+              child: MultiDropdown<String>(
+                items: [
+                  for (final type in ['E', 'W', 'G'])
+                    DropdownItem(
+                      label: type,
+                      value: type,
+                      selected: _selectedMeterTypeList.contains(type),
+                    ),
                 ],
-                selectedOptions: _selectedMeterTypeList
-                    .map((type) => ValueItem<String>(label: type, value: type))
-                    .toList(),
-                selectionType: SelectionType.multi,
-                searchEnabled: false,
-                dropdownHeight: 144,
-                borderRadius: 5,
-                hintColor: Theme.of(context).hintColor.withAlpha(89),
-                hintStyle: TextStyle(
+                fieldDecoration: FieldDecoration(
+                  hintText: 'Select',
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  borderRadius: 5,
+                  hintStyle: TextStyle(
                     fontSize: 15,
-                    color: Theme.of(context).hintColor.withAlpha(89)),
-                hintPadding: EdgeInsets.zero,
-                fieldBackgroundColor: colors.surface,
-                dropdownBackgroundColor: colors.surface,
-                optionsBackgroundColor: colors.surface,
-                selectedOptionBackgroundColor: colors.surfaceContainerHighest,
-                selectedOptionTextColor: colors.onSurface,
-                borderColor: _selectedMeterTypeList.isEmpty
-                    ? Theme.of(context).hintColor.withAlpha(50)
-                    : colors.primary,
-                borderWidth: _selectedMeterTypeList.isEmpty ? 1 : 2,
-                focusedBorderWidth: 2,
-                focusedBorderColor: colors.primary,
-                dropdownBorderRadius: 5,
-                suffixIcon: Icon(Icons.arrow_drop_down, color: colors.onSurface),
-                clearIcon: Icon(Icons.close_outlined,
-                    size: 20, color: colors.onSurfaceVariant),
-                optionTextStyle:
-                    TextStyle(color: colors.onSurface),
-                selectedOptionIcon: Icon(
-                  Icons.check_box,
-                  color: colors.primary,
+                    color: Theme.of(context).hintColor.withAlpha(89),
+                  ),
+                  backgroundColor: colors.surface,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5),
+                    borderSide: BorderSide(
+                      color: _selectedMeterTypeList.isEmpty
+                          ? Theme.of(context).hintColor.withAlpha(50)
+                          : colors.primary,
+                      width: _selectedMeterTypeList.isEmpty ? 1 : 2,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5),
+                    borderSide: BorderSide(color: colors.primary, width: 2),
+                  ),
+                  suffixIcon: Icon(Icons.arrow_drop_down, color: colors.onSurface),
+                  showClearIcon: true,
                 ),
-                chipConfig: ChipConfig(
-                  wrapType: WrapType.scroll,
-                  radius: 5,
-                  labelStyle: chipLabelStyle,
-                  deleteIcon: const Icon(Icons.cancel, size: 18),
+                dropdownDecoration: DropdownDecoration(
+                  maxHeight: 144,
+                  borderRadius: BorderRadius.circular(5),
+                  backgroundColor: colors.surface,
+                ),
+                dropdownItemDecoration: DropdownItemDecoration(
+                  backgroundColor: colors.surface,
+                  selectedBackgroundColor: colors.surfaceContainerHighest,
+                  textColor: colors.onSurface,
+                  selectedTextColor: colors.onSurface,
+                  selectedIcon: Icon(Icons.check_box, color: colors.primary),
+                ),
+                chipDecoration: ChipDecoration(
+                  wrap: false,
+                  borderRadius: BorderRadius.circular(5),
+                  labelStyle: chipLabelStyle.copyWith(color: colors.onPrimary),
+                  deleteIcon: Icon(Icons.cancel, size: 18, color: colors.onPrimary),
                   backgroundColor: colors.primary,
-                  labelColor: colors.onPrimary,
-                  deleteIconColor: colors.onPrimary,
                 ),
-                onOptionSelected: (options) {
+                onSelectionChange: (values) {
                   setState(() {
                     _selectedMeterTypeList
                       ..clear()
-                      ..addAll(options
-                          .map((option) => option.value)
-                          .whereType<String>());
+                      ..addAll(values);
                   });
                 },
               ),

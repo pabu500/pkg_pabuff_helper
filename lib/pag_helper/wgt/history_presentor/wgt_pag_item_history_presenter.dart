@@ -5,7 +5,7 @@ import 'package:buff_helper/xt_ui/wdgt/file/wgt_save_table.dart';
 import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:multi_dropdown/multiselect_dropdown.dart';
+import 'package:multi_dropdown/multi_dropdown.dart';
 import '../../def_helper/dh_device.dart';
 import '../../model/mdl_history.dart';
 import '../../model/mdl_pag_app_config.dart';
@@ -139,7 +139,7 @@ class _WgtPagItemHistoryPresenterState
   List<Map<String, dynamic>> _legendChart = [];
   // List<Map<String, dynamic>> _legendList = [];
   final List<Map<String, dynamic>> _historyDataForList = [];
-  final List<ValueItem<String>> _selectedMultiFields = [];
+  final List<DropdownItem<String>> _selectedMultiFields = [];
   // final List<Map<String, dynamic>> _selectedDataFieldsChart = [];
   final List<Map<String, dynamic>> _selectedDataFieldsForList = [];
   bool _selectedFieldsChanged = false;
@@ -159,6 +159,7 @@ class _WgtPagItemHistoryPresenterState
   late final String _defaultChartReadingTypeKey;
 
   final MultiSelectController<String> _controller = MultiSelectController();
+  bool _syncingFieldSelection = false;
 
   late final Map<String, dynamic> _readingTypeConfig;
 
@@ -451,7 +452,7 @@ class _WgtPagItemHistoryPresenterState
     }
     _selectedMultiFields.clear();
     _selectedMultiFields.add(
-      ValueItem(
+      DropdownItem(
         label: _readingTypeConfig[_selectedChartReadingTypeKey]['title'],
         value: _selectedChartReadingTypeKey,
       ),
@@ -500,13 +501,13 @@ class _WgtPagItemHistoryPresenterState
     _selectedDataFieldsForList.clear();
     for (var item in _selectedMultiFields) {
       _selectedDataFieldsForList.addAll(
-        _readingTypeConfig[item.value!]['dataFields']
+        _readingTypeConfig[item.value]['dataFields']
             as List<Map<String, dynamic>>,
       );
     }
 
     _selectedChartReadingTypeKey =
-        _selectedMultiFields.first.value ?? _defaultChartReadingTypeKey;
+        _selectedMultiFields.isEmpty ? _defaultChartReadingTypeKey : _selectedMultiFields.first.value;
     _startDate = widget.startDate;
     _endDate = widget.endDate;
   }
@@ -521,6 +522,13 @@ class _WgtPagItemHistoryPresenterState
     _readingTypeConfig = {};
 
     _iniHistorySetting();
+  }
+
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -882,7 +890,7 @@ class _WgtPagItemHistoryPresenterState
                             // _currentMainChartReading = _selectedDataFieldsList.first['field'] as String;
                             if (_selectedMultiFields.isNotEmpty) {
                               _selectedChartReadingTypeKey =
-                                  _selectedMultiFields.first.value!;
+                                  _selectedMultiFields.first.value;
                             }
 
                             _selectedDataFieldsForList.clear();
@@ -941,16 +949,13 @@ class _WgtPagItemHistoryPresenterState
                             );
                             _selectedMultiFields.clear();
                             _selectedMultiFields.add(
-                              ValueItem(
+                              DropdownItem(
                                 label:
                                     _readingTypeConfig[_selectedChartReadingTypeKey]['title'],
                                 value: _selectedChartReadingTypeKey,
                               ),
                             );
-                            _controller.selectedOptions.clear();
-                            _controller.selectedOptions.addAll(
-                              _selectedMultiFields,
-                            );
+                            _syncFieldSelection();
                             _selectedFieldsChanged = false;
                             _intRefreshKey = UniqueKey();
                             _isHistoryLoaded = false;
@@ -1073,11 +1078,12 @@ class _WgtPagItemHistoryPresenterState
 
           _selectedMultiFields.clear();
           _selectedMultiFields.add(
-            ValueItem(
+            DropdownItem(
               label: _readingTypeConfig[_selectedChartReadingTypeKey]['title'],
               value: _selectedChartReadingTypeKey,
             ),
           );
+          _syncFieldSelection();
 
           // _chartKeyExt = UniqueKey();
           // _intRefreshKey = UniqueKey();
@@ -1101,16 +1107,32 @@ class _WgtPagItemHistoryPresenterState
     );
   }
 
+
+  void _syncFieldSelection() {
+    if (_controller.items.isEmpty) return;
+    final selectedValues = _selectedMultiFields.map((item) => item.value).toSet();
+    // Changing the active chart field must not create a pending Apply action.
+    _syncingFieldSelection = true;
+    try {
+      _controller.setItems([
+        for (final item in _controller.items)
+          item.copyWith(selected: selectedValues.contains(item.value)),
+      ]);
+    } finally {
+      _syncingFieldSelection = false;
+    }
+  }
+
   Widget getFieldSelector() {
     //remove 'val' from _readingTypeConfig
     Map<String, dynamic> items = {};
     items.addAll(_readingTypeConfig);
     items.remove('val');
 
-    List<ValueItem<String>> options = [];
+    List<DropdownItem<String>> options = [];
     for (var item in items.keys) {
       options.add(
-        ValueItem(label: _readingTypeConfig[item]['title'], value: item),
+        DropdownItem(label: _readingTypeConfig[item]['title'], value: item),
       );
     }
 
@@ -1119,68 +1141,71 @@ class _WgtPagItemHistoryPresenterState
         SizedBox(
           width: 360,
           height: 60,
-          child: MultiSelectDropDown<String>(
-            options: <ValueItem<String>>[...options],
-            selectedOptions: _selectedMultiFields,
-            // showClearIcon: true,
+          child: MultiDropdown<String>(
+            items: [
+              for (final option in options)
+                option.copyWith(
+                  selected: _selectedMultiFields.any(
+                    (selected) => selected.value == option.value,
+                  ),
+                ),
+            ],
             controller: _controller,
-            onOptionSelected: (options) {
-              // debugPrint(options.toString());
-              // // at least one option must be selected
-              // if (_selectedFields.length == 1 && options.isEmpty) {
-              //   _controller.addSelectedOption(_selectedFields.first);
-              //   return;
-              // }
-              _selectedMultiFields.clear();
-              _selectedMultiFields.addAll(options);
+            maxSelections: 8,
+            onSelectionChange: (_) {
+              if (_syncingFieldSelection) return;
+              _selectedMultiFields
+                ..clear()
+                ..addAll(_controller.selectedItems);
               setState(() {
                 _selectedFieldsChanged = true;
               });
             },
-            borderRadius: 5,
-            hintColor: Theme.of(context).hintColor,
-            // backgroundColor: Theme.of(context).cardColor, //Colors.blue,
-            fieldBackgroundColor: Theme.of(context).cardColor,
-            optionsBackgroundColor: Theme.of(
-              context,
-            ).cardColor, //Colors.yellow,
-            focusedBorderColor: Colors.transparent,
-            selectedOptionBackgroundColor: Theme.of(
-              context,
-            ).cardColor, //Colors.purple,
-            maxItems: 8,
-            selectionType: SelectionType.multi,
-            chipConfig: ChipConfig(
+            fieldDecoration: FieldDecoration(
+              borderRadius: 5,
+              hintStyle: TextStyle(color: Theme.of(context).hintColor),
+              backgroundColor: Theme.of(context).cardColor,
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(5),
+                borderSide: const BorderSide(color: Colors.transparent),
+              ),
+              showClearIcon: false,
+            ),
+            chipDecoration: ChipDecoration(
+              wrap: false,
               deleteIcon: _selectedMultiFields.length == 1
                   ? Icon(
                       Icons.minimize,
                       size: 0,
                       color: Theme.of(context).colorScheme.primary,
                     )
-                  : const Icon(Icons.cancel),
-              radius: 5,
+                  : const Icon(Icons.cancel, color: Colors.white),
+              borderRadius: BorderRadius.circular(5),
               backgroundColor: Theme.of(context).colorScheme.primary,
+              labelStyle: const TextStyle(color: Colors.white),
             ),
-
-            dropdownHeight: items.length * 40.0 + 10,
-            optionTextStyle: TextStyle(
-              color: Theme.of(context).hintColor,
-              fontSize: 15,
+            dropdownDecoration: DropdownDecoration(
+              maxHeight: items.length * 40.0 + 10,
+              marginTop: 2,
+              backgroundColor: Theme.of(context).cardColor,
             ),
-            selectedOptionIcon: Icon(
-              Icons.check_circle,
-              color: Theme.of(context).colorScheme.primary,
+            dropdownItemDecoration: DropdownItemDecoration(
+              backgroundColor: Theme.of(context).cardColor,
+              selectedBackgroundColor: Theme.of(context).cardColor,
+              textColor: Theme.of(context).hintColor,
+              textStyle: const TextStyle(fontSize: 15),
+              selectedTextColor: Colors.white,
+              selectedIcon: Icon(
+                Icons.check_circle,
+                color: Theme.of(context).colorScheme.primary,
+              ),
             ),
-            // borderWidth: 2,
-            selectedOptionTextColor: Colors.white,
-            // searchEnabled: true,
-            dropdownMargin: 2,
-            optionSeparator: SizedBox(
+            itemSeparator: SizedBox(
               height: 1,
               child: Divider(
                 indent: 5,
                 endIndent: 5,
-                color: Theme.of(context).hintColor.withAlpha(130),
+                color: Theme.of(context).hintColor.withAlpha(128),
               ),
             ),
           ),
@@ -1313,7 +1338,7 @@ class _WgtPagItemHistoryPresenterState
       appConfig: widget.appConfig,
       itemId: formatFileName(widget.displayId ?? widget.itemId),
       readingTypeConfig: _readingTypeConfig,
-      readingTypes: _selectedMultiFields.map((e) => e.value!).toList(),
+      readingTypes: _selectedMultiFields.map((e) => e.value).toList(),
       listKey: _intRefreshKey,
       lookBackMinutes: _selectedTimeRangeMinutes,
       iniHistoryData: _historyDataForList,
