@@ -4,7 +4,7 @@ version: 2.24.12
 homepage:
 
 environment:
-  sdk: '>=3.13.0 <4.0.0'
+  sdk: '>=3.14.0 <4.0.0'
   flutter: ">=3.47.0"
 
 dependencies:
@@ -23,14 +23,14 @@ dependencies:
   material_symbols_icons: ^4.2928.1
   # firebase_auth: ^5.1.0
   firebase_auth: ^6.5.3
-  month_picker_dialog: ^5.1.3
-  calendar_date_picker2: ^1.0.2
+  month_picker_dialog: ^7.0.0
+  calendar_date_picker2: ^4.0.0
   pdf: ^3.12.0
   archive: ^3.6.1
   pdf_widget_wrapper: ^1.0.4
   printing: ^5.14.3
   path_provider: ^2.1.3
-  multi_dropdown: ^2.1.4
+  multi_dropdown: ^4.0.0
   # open_file: ^3.5.10
   open_file: ^3.5.11
   http: ^1.4.0
@@ -48,7 +48,7 @@ dependencies:
   url_launcher: ^6.3.2
   local_auth: ^2.2.0
   # flutter_fancy_tree_view: ^1.6.0
-  flutter_fancy_tree_view2: ^1.6.3
+  flutter_fancy_tree_view2: ^2.0.0
   # two_dimensional_scrollables: ^0.3.6
   path_drawing: ^1.0.1
   latlong2: ^0.9.1
