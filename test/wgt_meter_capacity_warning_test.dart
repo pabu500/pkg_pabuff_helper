@@ -95,6 +95,40 @@ const refusal =
     'Meter Meter 620 (SN620) is already 100% allocated to active tenants (other group → Donald V2). Assigning mg-e-35700730 would make it 200%.\nMeter Meter 621 (SN621) is already 100% allocated to active tenants (other group → Donald V2). Assigning mg-e-35700730 would make it 200%.';
 
 void main() {
+  testWidgets('server-authorized handover clears the advisory after saving', (
+    tester,
+  ) async {
+    await http.runWithClient(
+      () async {
+        await dialog(tester, Brightness.light);
+        await tester.tap(find.byType(Checkbox));
+        await tester.pumpAndSettle();
+        expect(find.byType(WgtMeterAllocationWarning), findsOneWidget);
+        await tester.tap(find.byIcon(Icons.cloud_upload));
+        await tester.pumpAndSettle();
+        expect(find.text('✓ Committed'), findsOneWidget);
+        expect(find.byType(WgtMeterAllocationWarning), findsNothing);
+        expect(tester.takeException(), isNull);
+      },
+      () => MockClient((request) async {
+        if (request.url.path.endsWith('get_tenant_scope_meter_group_list')) {
+          return scope();
+        }
+        if (request.url.path.endsWith('get_meter_group_meter_list')) {
+          return meters();
+        }
+        if (request.url.path.endsWith('get_meter_tenant_assignment')) {
+          return allocations('offb');
+        }
+        return http.Response(
+          jsonEncode({
+            'data': {'success': true},
+          }),
+          200,
+        );
+      }),
+    );
+  });
   for (final brightness in Brightness.values) {
     testWidgets(
       'tenantless warning remains editable and clears at zero in $brightness',

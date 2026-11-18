@@ -341,6 +341,8 @@ class _WgtTenantMeterGroupAssignmentState
         throw Exception(error is Map ? error['message'] : error);
       }
       committed = true;
+      _capacityRequests.clear();
+      _capacityWarnings.clear();
 
       // clear assginment info from the item list
       // for (Map<String, dynamic> itemInfo in _itemGroupScopeMatchingItemList!) {
