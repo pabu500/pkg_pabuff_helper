@@ -692,8 +692,10 @@ class _WgtScopeSetterState extends State<WgtScopeSetter> {
       pullChildrenList = true;
     }
 
-    // for scope, or for item kinds with flexi scope
-    if (widget.forItemKind == PagItemKind.scope ||
+    // A scope's parent is already in the selector tree.
+    if (widget.forItemKind == PagItemKind.scope && widget.forScopeType != null) {
+      pullChildrenList = false;
+    } else if (widget.forItemKind == PagItemKind.scope ||
         widget.forItemKind == PagItemKind.meterGroup ||
         widget.forItemKind == PagItemKind.tariff ||
         widget.forItemKind == PagItemKind.acl) {

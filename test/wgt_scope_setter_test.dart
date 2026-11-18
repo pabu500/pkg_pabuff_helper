@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_acl.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_item.dart';
+import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_project_profile.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_user.dart';
@@ -67,6 +68,7 @@ class ScopeFixture {
   Future<void> show(
     WidgetTester tester, {
     bool autoCascade = false,
+    PagScopeType? forScopeType,
     Map<String, dynamic>? savedScope,
   }) async {
     tester.view.physicalSize = const Size(1200, 1000);
@@ -91,7 +93,11 @@ class ScopeFixture {
         ? WgtScopeSetter(
             appConfig: config,
             width: 600,
-            forItemKind: PagItemKind.tariff,
+            forItemKind: forScopeType == null
+                ? PagItemKind.tariff
+                : PagItemKind.scope,
+            forScopeType: forScopeType,
+            updateUiOnly: forScopeType != null,
             autoCascadeScopeFilter: true,
             itemScopeMap: savedScope,
             onScopeSet: (scope) => committed = scope,
@@ -140,6 +146,27 @@ Future<void> select<T>(WidgetTester tester, T value) async {
 }
 
 void main() {
+  testWidgets(
+    'new location group confirms the building without loading locations',
+    (tester) async {
+      final fixture = ScopeFixture();
+      await http.runWithClient(() async {
+        await fixture.show(
+          tester,
+          autoCascade: true,
+          forScopeType: PagScopeType.locationGroup,
+        );
+        await select(tester, fixture.siteGroup);
+        expect(dropdown<MdlPagBuildingProfile>(tester).value, fixture.building);
+        expect(fixture.fetches, 0);
+        await tester.tap(find.byIcon(Icons.check));
+        await tester.pumpAndSettle();
+        expect(fixture.committed, same(fixture.building));
+        expect(tester.takeException(), isNull);
+      }, fixture.client);
+    },
+  );
+
   testWidgets(
     'default leaves sole children unselected and commits site scope',
     (tester) async {
