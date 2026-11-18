@@ -14,6 +14,7 @@ import '../../../pag_helper/def_helper/dh_pag_tenant.dart';
 import '../../../util/string_util.dart';
 import '../../../util/util.dart';
 import 'cw_bill/invoice_label_cw.dart';
+import 'cw_bill/meter_reading_table.dart';
 import 'meter_usage_cost_rounding.dart';
 
 const int boltIcon = 0xea0b;
@@ -533,6 +534,9 @@ class PagPdfBillCwP2 {
 
     PagPaymentMethod paymentMethodEnum =
         PagPaymentMethod.byValue(paymentMethod);
+    final paymentMode = paymentMethodEnum == PagPaymentMethod.giro
+        ? 'GIRO'
+        : paymentMethodEnum.label;
 
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -581,7 +585,7 @@ class PagPdfBillCwP2 {
                       ]),
                       pw.TableRow(children: [
                         pw.Text(' Payment Mode', style: styleNormal),
-                        pw.Text(' ${paymentMethodEnum.label}',
+                        pw.Text(' $paymentMode',
                             style: styleNormal),
                       ]),
                     ]),
@@ -1615,10 +1619,7 @@ class PagPdfBillCwP2 {
           pw.Align(
             alignment: pw.Alignment.centerLeft,
             child: pw.Text(
-              'Remarks: FRV = First Reading Value; FRT = First Reading Time; '
-              'LRV = Last Reading Value; LRT = Last Reading Time.\n'
-              'Unless otherwise stated, Reading Time is taken as 00:00 hrs '
-              'of the stated dates.',
+              cwMeterReadingRemarks,
               style: styleTiny,
             ),
           ),
@@ -1702,7 +1703,7 @@ class PagPdfBillCwP2 {
     // String slotStr = '  ${slotFromTimestampStr.substring(0, 10)} - ${slotToTimestampStr.substring(0, 10)}';
     String genType = singularUsageInfo['gen_type'] ?? '';
     String excludeAutoUsageStr = singularUsageInfo['exclude_auto_usage'] ?? '';
-    List<pw.TableRow> typeGroupList = [];
+    final typeGroupList = <List<String>>[];
     final costRounding = MeterUsageCostRounding();
     if ('true' == excludeAutoUsageStr) {
       return _getManualUsage2(singularUsageInfo, targetMeterTypeTag);
@@ -1742,13 +1743,9 @@ class PagPdfBillCwP2 {
           String meterSn = meterUsageSummary['meter_sn'] ?? '';
           String locatinLabel = meterUsageSummary['location_label'] ?? '';
           String buildingLabel = meterUsageSummary['building_label'] ?? '';
-          String strFirstReadingTime =
-              meterUsageSummary['first_reading_timestamp'] ?? '';
           String strFirstReading =
               meterUsageSummary['first_reading_value'] ?? '';
 
-          String strLastReadingTime =
-              meterUsageSummary['last_reading_timestamp'] ?? '';
           String strLastReading = meterUsageSummary['last_reading_value'] ?? '';
           final rawUsage = double.tryParse(
             meterUsageSummary['usage']?.toString() ?? '',
@@ -1768,40 +1765,17 @@ class PagPdfBillCwP2 {
           final strCost = cost == null
               ? ''
               : getCommaNumberStr(cost, decimal: 2);
-          if (strFirstReadingTime.length > 10) {
-            strFirstReadingTime = strFirstReadingTime.substring(0, 10);
-          }
-          if (strLastReadingTime.length > 10) {
-            strLastReadingTime = strLastReadingTime.substring(0, 10);
-          }
 
-          typeGroupList.add(
-            pw.TableRow(
-              children: [
-                pw.Text('  $buildingLabel', style: styleTiny),
-                pw.Text('  $meterSn', style: styleTiny),
-                pw.Text('  $locatinLabel', style: styleTiny),
-                pw.Text('  $strFirstReading', style: styleTiny),
-                pw.Text('  $strFirstReadingTime', style: styleTiny),
-                pw.Text('  $strLastReading', style: styleTiny),
-                pw.Text('  $strLastReadingTime', style: styleTiny),
-                pw.Text(
-                  '  x${typeUsageFactor?.toStringAsFixed(0) ?? ''}',
-                  style: styleTiny,
-                ),
-                pw.Text('  $strUsage', style: styleTiny),
-                pw.Text('  ${meterType.unit}', style: styleTiny),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.symmetric(horizontal: 3),
-                  child: pw.Text(
-                    strCost,
-                    style: styleTiny,
-                    textAlign: pw.TextAlign.right,
-                  ),
-                ),
-              ],
-            ),
-          );
+          typeGroupList.add([
+            buildingLabel,
+            meterSn,
+            locatinLabel,
+            strFirstReading,
+            strLastReading,
+            'x${typeUsageFactor?.toStringAsFixed(0) ?? ''}',
+            strUsage,
+            strCost,
+          ]);
         }
       }
       if (typeGroupList.isEmpty) {
@@ -1825,41 +1799,10 @@ class PagPdfBillCwP2 {
           ],
         ),
         pw.SizedBox(height: 2),
-        pw.Table(
-          border: pw.TableBorder.all(color: PdfColors.grey600, width: 0.5),
-          columnWidths: {
-            0: const pw.FixedColumnWidth(72),
-            1: const pw.FixedColumnWidth(96),
-            2: const pw.FixedColumnWidth(48),
-            3: const pw.FixedColumnWidth(65),
-            4: const pw.FixedColumnWidth(60),
-            5: const pw.FixedColumnWidth(65),
-            6: const pw.FixedColumnWidth(60),
-            7: const pw.FixedColumnWidth(25),
-            8: const pw.FixedColumnWidth(60),
-            9: const pw.FixedColumnWidth(30),
-            10: const pw.FixedColumnWidth(78),
-          },
-          defaultVerticalAlignment: pw.TableCellVerticalAlignment.middle,
-          children: [
-            pw.TableRow(
-              children: [
-                pw.Text('  Building', style: styleTiny),
-                pw.Text('  Meter S/N', style: styleTiny),
-                pw.Text('  Unit #', style: styleTiny),
-                pw.Text('  FRV', style: styleTiny),
-                pw.Text('  FRT', style: styleTiny),
-                pw.Text('  LRV', style: styleTiny),
-                pw.Text('  LRT', style: styleTiny),
-                pw.Text('  M', style: styleTiny),
-                pw.Text('  Usage', style: styleTiny),
-                pw.Text('  Unit', style: styleTiny),
-                pw.Text(r'  Usage Cost ($)', style: styleTiny),
-              ],
-            ),
-            // ...meterUsageInfoList,
-            ...typeGroupList,
-          ],
+        cwMeterReadingTable(
+          unit: meterType.unit,
+          style: styleTiny,
+          rows: typeGroupList,
         ),
       ],
     );
