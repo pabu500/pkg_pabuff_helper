@@ -20,6 +20,9 @@ import '../../../../up_helper/exceptions.dart';
 import '../../../comm/comm_ex.dart';
 
 import '../../../comm/comm_tenant_ops.dart';
+import '../../../comm/comm_tenant.dart';
+import '../../../comm/comm_meter_group.dart';
+import 'wgt_meter_allocation_warning.dart';
 import '../../../comm/pag_be_api_base.dart';
 import '../../../def_helper/dh_meter_group.dart';
 import '../../../def_helper/dh_pag_tenant.dart';
@@ -80,6 +83,68 @@ class _WgtTenantMeterGroupAssignmentState
   String _itemLabelFilterStr = '';
 
   String? _selectedMeterGroupIndexStr;
+  final Map<String, Object> _capacityRequests = {};
+  final Map<String, String> _capacityWarnings = {};
+
+  MdlPagSvcClaim _readClaim() => MdlPagSvcClaim(
+    username: loggedInUser!.username,
+    userId: loggedInUser!.id,
+    scope: '',
+    target: '',
+    operation: 'read',
+  );
+
+  Future<void> _checkGroupCapacity(Map<String, dynamic> item) async {
+    final group = item['id'].toString();
+    final request = Object();
+    _capacityRequests[group] = request;
+    setState(() => _capacityWarnings[group] = 'Checking meter allocations…');
+    try {
+      final scope = loggedInUser!.selectedScope.toScopeMap();
+      final data = await doGetMeterGroupMeterList(widget.appConfig, {
+        'scope': scope,
+        'item_group_id': group,
+        'service_type': _serviceType,
+      }, _readClaim());
+      final meters = List<Map<String, dynamic>>.from(
+        data['item_group_item_list'],
+      );
+      final conflicts = <String>[];
+      for (final meter in meters) {
+        if (!mounted || _capacityRequests[group] != request) return;
+        final data = await getMeterTenantAssignment(widget.appConfig, {
+          'scope': scope,
+          'meter_id': meter['meter_id'].toString(),
+        }, _readClaim());
+        final allocations = List<Map<String, dynamic>>.from(data);
+        // Receiving tenants must be onb/normal. Count their proposed group once;
+        // leave the early-offboarding exception to the authoritative backend.
+        var total = meterAllocationPercentage(meter['percentage']) ?? 0;
+        for (final allocation in allocations) {
+          if (allocation['meter_group_id']?.toString() == group) continue;
+          if (meterAllocationHasActiveTenant(allocation['tenant_info'])) {
+            total += meterAllocationPercentage(allocation['percentage']) ?? 0;
+          }
+        }
+        if (total > 100.000001) {
+          conflicts.add(
+            '${meter['name'] ?? meter['meter_name'] ?? meter['meter_id']} (${meter['meter_sn'] ?? 'S/N unavailable'}): ${total.toStringAsFixed(2)}%',
+          );
+        }
+      }
+      if (!mounted || _capacityRequests[group] != request) return;
+      setState(() {
+        _capacityWarnings[group] = conflicts.isEmpty
+            ? ''
+            : 'Assigning this group may exceed 100%: ${conflicts.join('; ')}. The server will check handover eligibility when you save.';
+      });
+    } catch (e) {
+      if (!mounted || _capacityRequests[group] != request) return;
+      setState(
+        () => _capacityWarnings[group] = 'Unable to check meter allocations. The server will validate when you save. Untick and tick to retry.',
+      );
+    }
+  }
 
   String get _serviceType =>
       widget.appContext.appContextType == PagAppContextType.ems
@@ -253,6 +318,8 @@ class _WgtTenantMeterGroupAssignmentState
       'service_type': _serviceType,
       'item_assignment_list': assignmentList,
     };
+    var committed = false;
+    _commitErrorText = '';
     try {
       _isCommitting = true;
 
@@ -270,8 +337,10 @@ class _WgtTenantMeterGroupAssignmentState
       );
 
       if (data['error'] != null) {
-        throw Exception(data['error']);
+        final error = data['error'];
+        throw Exception(error is Map ? error['message'] : error);
       }
+      committed = true;
 
       // clear assginment info from the item list
       // for (Map<String, dynamic> itemInfo in _itemGroupScopeMatchingItemList!) {
@@ -290,8 +359,8 @@ class _WgtTenantMeterGroupAssignmentState
     } finally {
       setState(() {
         _isCommitting = false;
-        _isCommitted = true;
-        _modified = false;
+        _isCommitted = committed;
+        if (committed) _modified = false;
       });
     }
   }
@@ -365,6 +434,14 @@ class _WgtTenantMeterGroupAssignmentState
           const Divider(),
           verticalSpaceTiny,
           getOpRow(),
+          if (_commitErrorText.isNotEmpty)
+            SizedBox(
+              width: 600,
+              child: getErrorTextPrompt(
+                context: context,
+                errorText: _commitErrorText,
+              ),
+            ),
           verticalSpaceSmall,
           Padding(
             padding: const EdgeInsets.only(top: 5.0),
@@ -570,11 +647,6 @@ class _WgtTenantMeterGroupAssignmentState
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.primary,
                   ),
-                )
-              : _commitErrorText.isNotEmpty
-              ? getErrorTextPrompt(
-                  context: context,
-                  errorText: _commitErrorText,
                 )
               : _isCommitting
               ? const WgtPagWait(size: 21)
@@ -898,17 +970,30 @@ class _WgtTenantMeterGroupAssignmentState
                         setState(() {
                           if (value == null) return;
                           itemInfo['assigned_new'] = value;
+                          final group = itemInfo['id'].toString();
+                          _capacityRequests.remove(group);
+                          _capacityWarnings.remove(group);
                           if (itemInfo['assigned'] !=
                               itemInfo['assigned_new']) {
                             _modified = true;
                           }
                         });
                         _checkModified();
+                        if (value == true && itemInfo['assigned'] != true) {
+                          _checkGroupCapacity(itemInfo);
+                        }
                       },
               ),
             ),
           ],
         ),
+        if ((_capacityWarnings[itemInfo['id'].toString()] ?? '').isNotEmpty)
+          SizedBox(
+            width: 510,
+            child: WgtMeterAllocationWarning(
+              _capacityWarnings[itemInfo['id'].toString()]!,
+            ),
+          ),
         // if (isNonScopeMatching || (checked && !disabled))
         if (itemInfo['show_scope'] == true)
           Padding(

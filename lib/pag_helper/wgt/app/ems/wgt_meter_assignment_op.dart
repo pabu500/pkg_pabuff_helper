@@ -5,6 +5,7 @@ import '../../../../xt_ui/wdgt/input/wgt_text_field2.dart';
 import '../../../../xt_ui/xt_helpers.dart';
 import '../../../def_helper/dh_ems_meter_allocation.dart';
 import '../../../model/mdl_pag_app_config.dart';
+import 'wgt_meter_allocation_warning.dart';
 
 class WgtMeterAssignmentOp extends StatefulWidget {
   final MdlPagAppConfig appConfig;
@@ -47,6 +48,7 @@ class _WgtMeterAssignmentOpState extends State<WgtMeterAssignmentOp> {
   String _disabledMessage = '';
   bool _hasAssignmentError = false;
   String _assignmentErrorMsg = '';
+  String _tenantAssignmentWarning = '';
 
   void _loadAssignmentBar() {
     assignmentBarWidgetList.clear();
@@ -142,6 +144,14 @@ class _WgtMeterAssignmentOpState extends State<WgtMeterAssignmentOp> {
       _disableOp = true;
       _disabledMessage = 'Meter group assignments are read-only';
     }
+    final proposed =
+        _percentAssignedToThisGroupNew ?? _percentAssignedToThisGroup ?? 0;
+    _tenantAssignmentWarning =
+        !_currentMeterGroupAssignedToTenant &&
+            proposed > 0 &&
+            _totalPercentAssignedToThisMeter! + proposed > 100.000001
+        ? 'Already ${_totalPercentAssignedToThisMeter!.toStringAsFixed(2)}% allocated to active tenants; assigning a tenant to this group will be refused.'
+        : '';
   }
 
   @override
@@ -165,151 +175,167 @@ class _WgtMeterAssignmentOpState extends State<WgtMeterAssignmentOp> {
       waitDuration: const Duration(milliseconds: 500),
       child: SizedBox(
         width: barWidth + opWidth,
-        child: Row(
+        child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Tooltip(
-              message:
-                  'Active tenants: ${(_totalPercentAssignedToThisMeter ?? 0).toStringAsFixed(2)}% of 100%\n'
-                  'Only allocations to active tenants count toward the 100% limit.',
-              child: Container(
-                height: 25,
-                width: barWidth,
-                decoration: BoxDecoration(
-                  color: Colors.transparent,
-                  borderRadius: BorderRadius.circular(5),
-                  border: Border.all(color: Theme.of(context).hintColor),
-                ),
-                child:
-                    _totalPercentAssignedToThisMeter != null &&
-                        _totalPercentAssignedToThisMeter! > 100.000001
-                    ? Tooltip(
-                        message: 'Total percentage assigned to active tenants exceeds 100%',
-                        waitDuration: const Duration(milliseconds: 500),
-                        child: Container(
-                          width: barWidth,
-                          color: Theme.of(context).colorScheme.error,
-                        ),
-                      )
-                    : (_totalPercentAssignedToThisMeter ?? 0) == 0
-                    ? Center(
-                        child: Text(
-                          'No active-tenant allocation',
-                          style: TextStyle(
-                            color: Theme.of(context).hintColor,
-                            fontSize: 11,
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Tooltip(
+                  message:
+                      'Active tenants: ${(_totalPercentAssignedToThisMeter ?? 0).toStringAsFixed(2)}% of 100%\n'
+                      'Only allocations to active tenants count toward the 100% limit.',
+                  child: Container(
+                    height: 25,
+                    width: barWidth,
+                    decoration: BoxDecoration(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(5),
+                      border: Border.all(color: Theme.of(context).hintColor),
+                    ),
+                    child:
+                        _totalPercentAssignedToThisMeter != null &&
+                            _totalPercentAssignedToThisMeter! > 100.000001
+                        ? Tooltip(
+                            message: 'Total percentage assigned to active tenants exceeds 100%',
+                            waitDuration: const Duration(milliseconds: 500),
+                            child: Container(
+                              width: barWidth,
+                              color: Theme.of(context).colorScheme.error,
+                            ),
+                          )
+                        : (_totalPercentAssignedToThisMeter ?? 0) == 0
+                        ? Center(
+                            child: Text(
+                              'No active-tenant allocation',
+                              style: TextStyle(
+                                color: Theme.of(context).hintColor,
+                                fontSize: 11,
+                              ),
+                            ),
+                          )
+                        : Row(
+                            children: [
+                              ...assignmentBarWidgetList,
+                              const Spacer(),
+                            ],
                           ),
-                        ),
-                      )
-                    : Row(
-                        children: [...assignmentBarWidgetList, const Spacer()],
-                      ),
-              ),
-            ),
-            horizontalSpaceSmall,
-            Tooltip(
-              message: _disabledMessage,
-              waitDuration: const Duration(milliseconds: 500),
-              child: SizedBox(
-                width: 95,
-                height: 30,
-                child: WgtTextField(
-                  key: _inputRefreshKey,
-                  appConfig: widget.appConfig,
-                  enabled: !_disableOp,
-                  initialValue:
-                      _percentAssignedToThisGroupNew?.toStringAsFixed(3) ??
-                      _percentAssignedToThisGroup?.toStringAsFixed(3) ??
-                      // _totalPercentAssignedToThisMeter?.toStringAsFixed(3) ??
-                      '0.000',
-                  decoration: InputDecoration(
-                    hintText: 'percentage',
-                    hintStyle: TextStyle(color: Theme.of(context).hintColor),
-                    suffixText: '%',
-                    suffixStyle: TextStyle(color: Theme.of(context).hintColor),
-                    border: const OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(5)),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: 1,
-                      horizontal: 3,
-                    ),
                   ),
-                  onChanged: (value) {
-                    setState(() {
-                      double? newPercentage = meterAllocationPercentage(value);
-                      if (newPercentage != null && newPercentage > 100.0) {
-                        newPercentage = 100.0;
-                      }
-                      if (newPercentage != null && newPercentage < 0) {
-                        newPercentage = 0;
-                      }
-                      _percentAssignedToThisGroupNew = newPercentage;
-                      if (((_percentAssignedToThisGroupNew ?? 0.0) -
-                                  (_percentAssignedToThisGroup ?? 0.0))
-                              .abs() <
-                          0.00001) {
-                        _percentAssignedToThisGroupNew = null;
-                      }
-                      // _inputRefreshKey = UniqueKey();
-                      // _loadAssignmentBar();
-                      // if (newPercentage != null) {
-                      //   widget.onPercentageChanged(newPercentage);
-                      // }
-                    });
-                  },
-                  onEditingComplete: () {
-                    setState(() {
-                      // if (((_percentAssignedToThisGroupNew ?? 0.0) -
-                      //             (_percentAssignedToThisGroup ?? 0.0))
-                      //         .abs() <
-                      //     0.00001) {
-                      //   _percentAssignedToThisGroupNew = null;
-                      // }
-                      _loadAssignmentBar();
-                      _inputRefreshKey = UniqueKey();
-                      FocusScope.of(context).unfocus();
-                      widget.onPercentageChanged(
-                        _percentAssignedToThisGroupNew ??
-                            _percentAssignedToThisGroup ??
-                            0,
-                        _assignmentErrorMsg,
-                      );
-                    });
-                  },
                 ),
-              ),
-            ),
-            horizontalSpaceSmall,
-            Tooltip(
-              message: _percentAssignedToThisGroupNew == null
-                  ? ''
-                  : 'Reset to previous value',
-              waitDuration: const Duration(milliseconds: 500),
-              child: InkWell(
-                // reset
-                onTap: _percentAssignedToThisGroupNew == null
-                    ? null
-                    : () {
+                horizontalSpaceSmall,
+                Tooltip(
+                  message: _disabledMessage,
+                  waitDuration: const Duration(milliseconds: 500),
+                  child: SizedBox(
+                    width: 95,
+                    height: 30,
+                    child: WgtTextField(
+                      key: _inputRefreshKey,
+                      appConfig: widget.appConfig,
+                      enabled: !_disableOp,
+                      initialValue:
+                          _percentAssignedToThisGroupNew?.toStringAsFixed(3) ??
+                          _percentAssignedToThisGroup?.toStringAsFixed(3) ??
+                          // _totalPercentAssignedToThisMeter?.toStringAsFixed(3) ??
+                          '0.000',
+                      decoration: InputDecoration(
+                        hintText: 'percentage',
+                        hintStyle: TextStyle(
+                          color: Theme.of(context).hintColor,
+                        ),
+                        suffixText: '%',
+                        suffixStyle: TextStyle(
+                          color: Theme.of(context).hintColor,
+                        ),
+                        border: const OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(5)),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 1,
+                          horizontal: 3,
+                        ),
+                      ),
+                      onChanged: (value) {
                         setState(() {
-                          _percentAssignedToThisGroupNew = null;
-                          _inputRefreshKey = UniqueKey();
+                          double? newPercentage = meterAllocationPercentage(
+                            value,
+                          );
+                          if (newPercentage != null && newPercentage > 100.0) {
+                            newPercentage = 100.0;
+                          }
+                          if (newPercentage != null && newPercentage < 0) {
+                            newPercentage = 0;
+                          }
+                          _percentAssignedToThisGroupNew = newPercentage;
+                          if (((_percentAssignedToThisGroupNew ?? 0.0) -
+                                      (_percentAssignedToThisGroup ?? 0.0))
+                                  .abs() <
+                              0.00001) {
+                            _percentAssignedToThisGroupNew = null;
+                          }
+                          // _inputRefreshKey = UniqueKey();
+                          // _loadAssignmentBar();
+                          // if (newPercentage != null) {
+                          //   widget.onPercentageChanged(newPercentage);
+                          // }
+                        });
+                      },
+                      onEditingComplete: () {
+                        setState(() {
+                          // if (((_percentAssignedToThisGroupNew ?? 0.0) -
+                          //             (_percentAssignedToThisGroup ?? 0.0))
+                          //         .abs() <
+                          //     0.00001) {
+                          //   _percentAssignedToThisGroupNew = null;
+                          // }
                           _loadAssignmentBar();
+                          _inputRefreshKey = UniqueKey();
+                          FocusScope.of(context).unfocus();
                           widget.onPercentageChanged(
-                            _percentAssignedToThisGroup ?? 0.0,
+                            _percentAssignedToThisGroupNew ??
+                                _percentAssignedToThisGroup ??
+                                0,
                             _assignmentErrorMsg,
                           );
                         });
                       },
-                child: Icon(
-                  Icons.refresh,
-                  size: 20,
-                  color: _percentAssignedToThisGroupNew == null
-                      ? Theme.of(context).hintColor
-                      : Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
                 ),
-              ),
+                horizontalSpaceSmall,
+                Tooltip(
+                  message: _percentAssignedToThisGroupNew == null
+                      ? ''
+                      : 'Reset to previous value',
+                  waitDuration: const Duration(milliseconds: 500),
+                  child: InkWell(
+                    // reset
+                    onTap: _percentAssignedToThisGroupNew == null
+                        ? null
+                        : () {
+                            setState(() {
+                              _percentAssignedToThisGroupNew = null;
+                              _inputRefreshKey = UniqueKey();
+                              _loadAssignmentBar();
+                              widget.onPercentageChanged(
+                                _percentAssignedToThisGroup ?? 0.0,
+                                _assignmentErrorMsg,
+                              );
+                            });
+                          },
+                    child: Icon(
+                      Icons.refresh,
+                      size: 20,
+                      color: _percentAssignedToThisGroupNew == null
+                          ? Theme.of(context).hintColor
+                          : Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                ),
+              ],
             ),
+            if (_tenantAssignmentWarning.isNotEmpty)
+              WgtMeterAllocationWarning(_tenantAssignmentWarning),
           ],
         ),
       ),
