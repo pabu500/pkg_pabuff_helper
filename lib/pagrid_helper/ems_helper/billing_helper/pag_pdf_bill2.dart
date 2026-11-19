@@ -13,6 +13,7 @@ import '../../../pag_helper/def_helper/dh_pag_tenant.dart';
 import '../../../util/string_util.dart';
 import '../../../util/util.dart';
 import 'cw_bill/invoice_label_cw.dart';
+import 'cw_bill/landlord_logo_cw.dart';
 import 'cw_bill/meter_reading_table.dart';
 import 'meter_usage_cost_rounding.dart';
 
@@ -102,6 +103,7 @@ class PagPdfBillCwP2Gen3 {
     required this.baseColor,
     required this.accentColor,
     required this.assetFolder,
+    this.landlordLogoPngBase64,
     required this.tenantSingularUsageInfoList,
     required this.miniSoaInfo,
     required this.billedAmgrCompanyTradingName,
@@ -186,6 +188,7 @@ class PagPdfBillCwP2Gen3 {
   final PdfColor baseColor;
   final PdfColor accentColor;
   final String? assetFolder;
+  final String? landlordLogoPngBase64;
   final List<Map<String, dynamic>> tenantSingularUsageInfoList;
   final Map<String, dynamic>? miniSoaInfo;
   final String? billedAmgrCompanyTradingName;
@@ -257,9 +260,7 @@ class PagPdfBillCwP2Gen3 {
     double pageWidth = PdfPageFormat.a4.width;
     dev.log('Page width: $pageWidth');
 
-    if (logo != null) {
-      _logo = logo;
-    }
+    final headerLogo = buildCwInvoiceHeaderLogo(landlordLogoPngBase64, logo ?? _logo);
 
     return pw.MultiPage(
       pageTheme: pw.PageTheme(
@@ -269,7 +270,7 @@ class PagPdfBillCwP2Gen3 {
           icons: await PdfGoogleFonts.materialSymbolsOutlinedRegular(),
         ),
       ),
-      header: _buildHeaderP1,
+      header: (context) => _buildHeaderP1(context, headerLogo),
       footer: _buildFooter,
       build: (context) => [
         _contentHeader(context),
@@ -311,7 +312,7 @@ class PagPdfBillCwP2Gen3 {
     );
   }
 
-  pw.Widget _buildHeaderP1(pw.Context context) {
+  pw.Widget _buildHeaderP1(pw.Context context, pw.Widget logo) {
     // int codePoint = mt.Icons.abc.codePoint;
     //hex
     return pw.Column(
@@ -324,7 +325,7 @@ class PagPdfBillCwP2Gen3 {
               child: pw.Column(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 mainAxisSize: pw.MainAxisSize.min,
-                children: [_getLogo(), _getBillerInfo()],
+                children: [logo, _getBillerInfo()],
               ),
             ),
             pw.Expanded(child: pw.Container()),
@@ -364,16 +365,6 @@ class PagPdfBillCwP2Gen3 {
           ],
         ),
       ],
-    );
-  }
-
-  pw.Widget _getLogo({dynamic logo}) {
-    dynamic displayLogo = logo ?? _logo;
-    return pw.Container(
-      alignment: pw.Alignment.topLeft,
-      // padding: const pw.EdgeInsets.only(bottom: 8, left: 30),
-      height: 39,
-      child: displayLogo != null ? pw.Image(displayLogo) : pw.PdfLogo(),
     );
   }
 

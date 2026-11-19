@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:buff_helper/pag_helper/comm/comm_pag_item.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_acl.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_item.dart';
@@ -18,6 +21,7 @@ import 'package:buff_helper/pag_helper/wgt/ls/wgt_item_delete_op.dart';
 import 'package:buff_helper/pagrid_helper/batch_op_helper/wgt_confirm_box.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:buff_helper/pag_helper/def_helper/def_item_group.dart';
 import 'package:provider/provider.dart';
@@ -28,6 +32,7 @@ import '../../comm/comm_fin_ops.dart';
 import '../../comm/pag_be_api_base.dart';
 import '../../def_helper/dh_acl.dart';
 import '../../def_helper/dh_device.dart';
+import '../../def_helper/dh_pag_org.dart';
 import '../../def_helper/dh_pag_finance.dart';
 import '../../def_helper/dh_pag_tariff.dart';
 import '../../def_helper/dh_pag_tenant.dart';
@@ -39,6 +44,8 @@ import '../scope/wgt_scope_setter.dart';
 import '../tree/wgt_item_group_tree.dart';
 import '../user/wgt_op_reset_password.dart';
 import '../user/wgt_uesr_role_setter.dart';
+import 'landlord_logo_picker_options.dart'
+    if (dart.library.js_interop) 'landlord_logo_picker_options_web.dart';
 
 class WgtPagItemInfoEditPanel2 extends StatefulWidget {
   const WgtPagItemInfoEditPanel2({
@@ -53,6 +60,7 @@ class WgtPagItemInfoEditPanel2 extends StatefulWidget {
     this.listController,
     this.itemScopeMap,
     this.itemInfoMap,
+    this.loadLandlordLogo,
     this.onClose,
     this.onUpdate,
     this.onScopeTreeUpdate,
@@ -67,6 +75,7 @@ class WgtPagItemInfoEditPanel2 extends StatefulWidget {
   final MdlPagListController? listController;
   final Map<String, dynamic>? itemScopeMap;
   final Map<String, dynamic>? itemInfoMap;
+  final Future<Uint8List> Function(String id)? loadLandlordLogo;
   final List<Map<String, dynamic>> fieldList;
   final bool isEditableByAcl;
   final dynamic itemTypeEnum;
@@ -90,6 +99,10 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
 
   String _currentField = '';
   bool _fieldUpdated = false;
+  bool _savingLandlordLogo = false;
+  bool _hasLandlordLogo = false;
+  Future<Uint8List>? _landlordLogoPreview;
+  String? _landlordLogoError;
 
   final List<Widget> fields = [];
 
@@ -667,6 +680,11 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
         Provider.of<PagUserProvider>(context, listen: false).currentUser;
     _itemDisplayName = widget.itemDisplayName;
     _fieldUpdated = false;
+    if (widget.itemTypeEnum == PagOrgType.landlord &&
+        widget.itemInfoMap?['has_landlord_logo'].toString() == 'true') {
+      _hasLandlordLogo = true;
+      _landlordLogoPreview = widget.loadLandlordLogo?.call(widget.strItemIndex);
+    }
 
     bool isAtProjectLevel =
         _loggedInUser!.selectedScope.isAtScopeType(PagScopeType.project);
@@ -982,6 +1000,177 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
             ])));
   }
 
+  Future<Uint8List?> _pickLandlordLogo() async {
+    final file = await FilePicker.pickFile(
+      type: FileType.custom,
+      allowedExtensions: const ['png'],
+      webOptions: landlordLogoPickerOptions,
+    );
+    if (file == null || !mounted) return null;
+    final size = await file.length();
+    if (size != null && size > 256 * 1024) {
+      throw const FormatException('Select a PNG up to 256 KB.');
+    }
+    final bytes = await file.readAsBytes();
+    if (bytes.isEmpty) {
+      throw const FormatException('Could not read the selected PNG.');
+    }
+    if (bytes.length > 256 * 1024) {
+      throw const FormatException('Select a PNG up to 256 KB.');
+    }
+    return bytes;
+  }
+
+  Future<void> _saveLandlordLogo({bool clear = false}) async {
+    if (_savingLandlordLogo) return;
+    setState(() {
+      _savingLandlordLogo = true;
+      _landlordLogoError = null;
+    });
+    try {
+      final bytes = clear ? null : await _pickLandlordLogo();
+      if (!mounted || (!clear && bytes == null)) return;
+      final result = await _updateProfile(
+        'logo_png_base64',
+        bytes == null ? '' : base64Encode(bytes),
+      );
+      if (!mounted) return;
+      final error = result.firstOrNull?['error'];
+      if (result.isEmpty || error != null) {
+        setState(() {
+          _landlordLogoError =
+              (error is Map ? error['status'] : error)?.toString() ??
+                  'Could not save the landlord logo.';
+        });
+        return;
+      }
+      setState(() {
+        _hasLandlordLogo = bytes != null;
+        _landlordLogoPreview = bytes == null ? null : Future.value(bytes);
+        _fieldUpdated = true;
+      });
+      widget.onUpdate?.call();
+    } on FormatException catch (e) {
+      if (mounted) setState(() => _landlordLogoError = e.message);
+    } catch (_) {
+      if (mounted) {
+        setState(() => _landlordLogoError = 'Could not save the landlord logo.');
+      }
+    } finally {
+      if (mounted) setState(() => _savingLandlordLogo = false);
+    }
+  }
+
+  Widget _landlordLogoField() {
+    final hintColor = Theme.of(context).hintColor;
+    final uploadLabel = _hasLandlordLogo ? 'Replace PNG' : 'Upload PNG';
+    Widget logoButton(IconData icon, String tooltip, VoidCallback action,
+            {Color? color}) =>
+        SizedBox(
+          width: 40,
+          height: 28,
+          child: IconButton(
+            onPressed: _savingLandlordLogo ? null : action,
+            icon: Icon(icon),
+            color: color ?? hintColor,
+            padding: EdgeInsets.zero,
+            visualDensity: VisualDensity.compact,
+            tooltip: tooltip,
+          ),
+        );
+    return Padding(
+      padding: const EdgeInsets.only(top: 5),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              SizedBox(
+                width: labelWidth,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 5),
+                  child: Text(
+                    'Landlord Logo',
+                    textAlign: TextAlign.right,
+                    style: TextStyle(color: hintColor),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 8),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: hintColor, width: 0.5),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: _savingLandlordLogo || !_hasLandlordLogo
+                      ? Text(
+                          _savingLandlordLogo ? 'Saving…' : 'No logo uploaded',
+                          style: TextStyle(color: hintColor),
+                        )
+                      : FutureBuilder<Uint8List>(
+                          future: _landlordLogoPreview,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Text('Loading logo…');
+                            }
+                            final bytes = snapshot.data;
+                            if (bytes == null) return const Text('Logo preview unavailable');
+                            return ColoredBox(
+                              color: Colors.white,
+                              child: Padding(
+                                padding: const EdgeInsets.all(4),
+                                child: Image.memory(
+                                  bytes,
+                                  height: 72,
+                                  fit: BoxFit.contain,
+                                  semanticLabel: '${widget.itemDisplayName} landlord logo',
+                                  errorBuilder: (_, __, ___) =>
+                                      const Text('Logo preview unavailable'),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                ),
+              ),
+              SizedBox(
+                width: 40,
+                child: isEditableByAcl
+                    ? Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          logoButton(
+                            Icons.upload_file,
+                            '$uploadLabel\nUp to 256 KB and 1024 × 1024 pixels',
+                            () => _saveLandlordLogo(),
+                          ),
+                          if (_hasLandlordLogo)
+                            logoButton(
+                              Icons.close,
+                              'Clear logo',
+                              () => _saveLandlordLogo(clear: true),
+                              color: Theme.of(context).colorScheme.error,
+                            ),
+                        ],
+                      )
+                    : null,
+              ),
+              const SizedBox(width: 35),
+            ],
+          ),
+          if (_landlordLogoError case final message?)
+            Padding(
+              padding: EdgeInsets.only(left: labelWidth, right: 75, top: 4),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: getErrorTextPrompt(context: context, errorText: message),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
   List<Widget> getFields() {
     // List<Widget> fields = [];
 
@@ -1144,6 +1333,10 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
                   })
               : Container());
       // fields.add(verticalSpaceSmall);
+    }
+    if (widget.itemTypeEnum == PagOrgType.landlord &&
+        _loggedInUser?.selectedScope.projectProfile?.name == 'cw_p2') {
+      fields.add(_landlordLogoField());
     }
     return fields;
   }

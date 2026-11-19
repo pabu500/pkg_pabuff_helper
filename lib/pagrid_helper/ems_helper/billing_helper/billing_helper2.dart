@@ -263,6 +263,7 @@ Map<String, dynamic> prepCalcedBillInfoRl2(Map<String, dynamic> billInfo) {
     'miniSoaInfo': miniSoaInfo,
     'tenantSingularUsageInfoList': singularUsageList,
     'billedAmgrCompanyTradingName': billedAmgrCompanyTradingName,
+    'landlordLogoPngBase64': billInfo['landlord_logo_png_base64'],
     'billedAmgrCompanyRegNumber': billedAmgrCompanyRegNumber,
     'billedAmgrGstRegNumber': billedAmgrGstRegNumber,
     'amgrAddressLine1': amgrAddressLine1,

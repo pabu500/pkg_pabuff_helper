@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:buff_helper/pag_helper/comm/comm_pag_item.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_device.dart';
@@ -352,6 +353,43 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     }
   }
 
+  Future<Uint8List> _fetchLandlordLogo(String id) async {
+    final result = await _readList({
+      ..._queryMap,
+      'filter_value_info': {'id': id},
+      'sel': 'cw_p2.landlord_cw_p2.id, cw_p2.landlord_cw_p2.logo_png_base64',
+      'current_page': '1',
+      'max_rows_per_page': '1',
+    });
+    final row = (result['item_list'] as List).single;
+    if (row['id'].toString() != id) {
+      throw StateError('Landlord record changed');
+    }
+    return base64Decode(row['logo_png_base64'] as String);
+  }
+
+  Future<dynamic> _readList(Map<String, dynamic> query) {
+    return fetchItemList2(
+      widget.appConfig,
+      query,
+      MdlPagSvcClaim2(
+        userId: loggedInUser!.id,
+        username: loggedInUser!.username,
+        roleId: loggedInUser!.selectedRole?.id,
+        roleName: loggedInUser!.selectedRole?.name,
+        roleLabel: loggedInUser!.selectedRole?.label,
+        userScope: loggedInUser!.selectedScope.toScopeMap(),
+        permRequestList: [
+          {
+            'res_label': widget.aclResLabel ??
+                getItemTypeValue(_selectedListController!.itemTypeEnum),
+            'operation': 'read',
+          }
+        ],
+      ),
+    );
+  }
+
   Future<dynamic> _getItemList({bool isRefresh = false}) async {
     if (_queryMap.isEmpty) {
       dev.log('queryMap is empty');
@@ -373,25 +411,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     if (widget.listContextType == PagListContextType.soa) {}
 
     try {
-      itemFindResult = await fetchItemList2(
-        widget.appConfig,
-        _queryMap,
-        MdlPagSvcClaim2(
-          userId: loggedInUser!.id,
-          username: loggedInUser!.username,
-          roleId: loggedInUser!.selectedRole?.id,
-          roleName: loggedInUser!.selectedRole?.name,
-          roleLabel: loggedInUser!.selectedRole?.label,
-          userScope: loggedInUser!.selectedScope.toScopeMap(),
-          permRequestList: [
-            {
-              'res_label': widget.aclResLabel ??
-                  getItemTypeValue(_selectedListController!.itemTypeEnum),
-              'operation': 'read',
-            }
-          ],
-        ),
-      );
+      itemFindResult = await _readList(_queryMap);
 
       _paneResultKey = UniqueKey();
       List<Map<String, dynamic>> itemList = itemFindResult['item_list'];
@@ -839,6 +859,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                         listController: _selectedListController,
                         itemScopeMap: itemScopeMap,
                         itemInfoMap: item,
+                        loadLandlordLogo: _fetchLandlordLogo,
                         onScopeTreeUpdate: widget.onScopeTreeUpdate,
                         validateTreeChildren: widget.validateTreeChildren,
                         customProperties: customProperties,

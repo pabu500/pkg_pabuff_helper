@@ -80,6 +80,7 @@ Future<Uint8List> generatePagInvoice2(
     billedBciInfoList: calcedBillInfoRl['billedBciInfoList'] ?? [],
     miniSoaInfo: calcedBillInfoRl['miniSoaInfo'] ?? {},
     assetFolder: assetFolder,
+    landlordLogoPngBase64: calcedBillInfoRl['landlordLogoPngBase64'] as String?,
     tenantSingularUsageInfoList:
         calcedBillInfoRl['tenantSingularUsageInfoList'] ?? [],
     billedAmgrCompanyTradingName:

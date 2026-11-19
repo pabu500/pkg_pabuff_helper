@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:ui' as ui;
 import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/meter_usage_cost_rounding.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_ems_type_usage_calc_rl.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_ems_type_usage_calc_rl2.dart';
@@ -46,6 +48,28 @@ void main() {
     expect(MeterUsageCostRounding().add(-10, 2), -20);
   });
   for (final gen in [2, 3]) {
+    test('Gen$gen compiled invoices retain each landlord logo when saved', () async {
+      final fallback = pw.MemoryImage(await _testPng(1));
+      final invoices = [
+        _invoice(gen, null, landlordLogo: base64Encode(await _testPng(7))),
+        _invoice(gen, null, landlordLogo: base64Encode(await _testPng(9))),
+        _invoice(gen, null),
+      ];
+      final doc = pw.Document();
+      for (final invoice in invoices) {
+        doc.addPage(await invoice.getPage1(logo: fallback));
+        doc.addPage(await invoice.getPage2(logo: fallback));
+      }
+      await doc.save();
+
+      final pages = doc.document.pdfPageList.pages;
+      expect(pages.length, 6);
+      for (final (index, width) in [7, 9, 1].indexed) {
+        final images = pages[index * 2].xObjects.values.whereType<PdfImage>();
+        expect(images.single.width, width);
+        expect(pages[index * 2 + 1].xObjects.values.whereType<PdfImage>(), isEmpty);
+      }
+    });
     test(
       'Gen$gen meter costs render with allocation and billing rate',
       () async {
@@ -179,6 +203,7 @@ dynamic _invoice(
   int gen,
   List<Map<String, dynamic>>? trending, {
   List<Map<String, dynamic>> singularUsage = const [],
+  String? landlordLogo,
 }) {
   final constructor = gen == 2
       ? gen2.PagPdfBillCwP2.new
@@ -197,10 +222,10 @@ dynamic _invoice(
     #billingRecName: '',
     #billLabel: '',
     #invoiceNumber: 'CWP2-2026-09-001',
-    #strFrom: '',
-    #strTo: '',
+    #strFrom: '2026-09-01T00:00:00',
+    #strTo: '2026-10-01T00:00:00',
     #strEffectiveTo: '',
-    #strBillDate: '',
+    #strBillDate: '2026-10-05T00:00:00',
     #strBillTimeRange: '',
     #subTotalAmount: null,
     #gstAmount: null,
@@ -241,11 +266,12 @@ dynamic _invoice(
     #lineItemLabel3: null,
     #lineItemValue3: null,
     #billedBciInfoList: null,
-    #payableAmount: null,
-    #strDueDate: '',
+    #payableAmount: 0.0,
+    #strDueDate: '2026-10-21T00:00:00',
     #baseColor: PdfColors.blueGrey,
     #accentColor: PdfColors.blueGrey,
     #assetFolder: null,
+    #landlordLogoPngBase64: landlordLogo,
     #tenantSingularUsageInfoList: List<Map<String, dynamic>>.of(singularUsage),
     #miniSoaInfo: null,
     #billedAmgrCompanyTradingName: null,
@@ -261,7 +287,18 @@ dynamic _invoice(
     #amgrBankBranchCode: null,
     #amgrBankSwiftCode: null,
     #amgrBankPayNow: null,
-    #strCollectionStartDate: '',
-    #strCollectionEndDate: '',
+    #strCollectionStartDate: '2026-09-01T00:00:00',
+    #strCollectionEndDate: '2026-09-30T00:00:00',
   });
+}
+
+Future<Uint8List> _testPng(int width) async {
+  final recorder = ui.PictureRecorder();
+  ui.Canvas(recorder).drawColor(const ui.Color(0xff008080), ui.BlendMode.src);
+  final picture = recorder.endRecording();
+  final image = await picture.toImage(width, 3);
+  final png = (await image.toByteData(format: ui.ImageByteFormat.png))!;
+  image.dispose();
+  picture.dispose();
+  return png.buffer.asUint8List(png.offsetInBytes, png.lengthInBytes);
 }
