@@ -31,6 +31,10 @@ Future<MdlPagUser> doLoginPag(
           formData[PagUserKey.authProvider.name] ?? '',
       // PagUserKey.destPortal.name: 'pag_console',
       'portal_type': formData['portal_type'] ?? '',
+      if (formData['firebase_id_token'] != null)
+        'firebase_id_token': formData['firebase_id_token']!,
+      if (formData['microsoft_id_token'] != null)
+        'microsoft_id_token': formData['microsoft_id_token']!,
       // 'portal_type_label': formData['portal_type_label'] ?? '',
     }),
   );

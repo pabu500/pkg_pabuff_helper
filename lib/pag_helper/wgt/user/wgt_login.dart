@@ -3,7 +3,6 @@ import 'dart:async';
 import 'dart:developer' as dev;
 import 'package:buff_helper/pag_helper/comm/comm_user_service.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
-import 'package:buff_helper/pag_helper/comm/comm_sso.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -39,6 +38,7 @@ class _WgtLoginState extends State<WgtLogin> {
   final String keyLocalAuthEnabled = "keyLocalAuthEnabled";
 
   bool _isLoggingIn = false;
+  bool _isSigningInWithMicrosoft = false;
   bool _hasLoggedIn = false;
   bool _failedLogin = false;
   String _errorTextLocal = '';
@@ -49,6 +49,8 @@ class _WgtLoginState extends State<WgtLogin> {
   Future<MdlPagUser?> _login({
     String authProvider = 'local',
     String email = '',
+    String? firebaseIdToken,
+    String? microsoftIdToken,
   }) async {
     if (_isLoggingIn) {
       return null;
@@ -63,13 +65,15 @@ class _WgtLoginState extends State<WgtLogin> {
       MdlPagUser user = await doLoginPag(
         widget.appConfig,
         Map.of({
-          PagUserKey.username.name: _username,
-          PagUserKey.password.name: _password,
+          PagUserKey.username.name: authProvider == 'local' ? _username : '',
+          PagUserKey.password.name: authProvider == 'local' ? _password : '',
           PagUserKey.email.name: email,
           PagUserKey.authProvider.name: authProvider,
           // 'portal_type_name': widget.appConfig.portalType.name,
           // 'portal_type_label': widget.appConfig.portalType.label,
           'portal_type': widget.appConfig.portalType.value,
+          if (firebaseIdToken != null) 'firebase_id_token': firebaseIdToken,
+          if (microsoftIdToken != null) 'microsoft_id_token': microsoftIdToken,
         }),
       );
 
@@ -98,17 +102,20 @@ class _WgtLoginState extends State<WgtLogin> {
       //   throw Exception('no access to this project portal');
       // }
 
-      if (_savePassword) {
+      if (_savePassword && authProvider == 'local') {
         _saveToStorage();
       }
 
       return user;
     } catch (e) {
+      if (!mounted) return null;
       if (kDebugMode) {
         print(e);
       }
       String message = e.toString();
-      String errorText = 'login error';
+      String errorText = authProvider == 'microsoft'
+          ? 'Microsoft sign-in failed. Please try again.'
+          : 'login error';
       if (message.toLowerCase().contains('auth provider mismatch')) {
         errorText = 'auth provider mismatch';
       }
@@ -139,9 +146,11 @@ class _WgtLoginState extends State<WgtLogin> {
         _isLoggingIn = false;
       });
     } finally {
-      setState(() {
-        _isLoggingIn = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoggingIn = false;
+        });
+      }
     }
     return null;
   }
@@ -199,152 +208,56 @@ class _WgtLoginState extends State<WgtLogin> {
   //   }
   // }
   void loginWithMicrosoft(BuildContext context) async {
-    String? accessToken;
-
+    if (_isSigningInWithMicrosoft || _isLoggingIn) return;
+    setState(() {
+      _isSigningInWithMicrosoft = true;
+      _errorTextSso = '';
+    });
+    final auth = FirebaseAuth.instance;
     try {
-      Map<String, dynamic> microsoftAuthInfo = {};
-
-      final OAuthProvider authProvider = OAuthProvider('microsoft.com');
-
-      authProvider.setCustomParameters({
+      final provider = OAuthProvider('microsoft.com');
+      provider.setCustomParameters({
         'tenant': '4c4e8b31-4a28-4d6a-ba59-49a718162e33',
       });
-
-      // await Future.delayed(const Duration(seconds: 1));
-      if (kDebugMode) {
-        print('Microsoft login started');
+      provider.addScope('email');
+      final credential = await auth.signInWithPopup(provider);
+      final firebaseIdToken = await credential.user?.getIdToken();
+      final oauthCredential = credential.credential;
+      final microsoftIdToken = oauthCredential is OAuthCredential
+          ? oauthCredential.idToken
+          : null;
+      if (firebaseIdToken == null || microsoftIdToken == null) {
+        throw StateError('SSO identity token missing');
       }
-
-      final UserCredential userCredential =
-          await FirebaseAuth.instance.signInWithPopup(authProvider);
-
-      if (kDebugMode) {
-        // print('Microsoft login completed');
+      if (!mounted) {
+        await auth.signOut();
+        return;
       }
-
-      if (userCredential.credential != null) {
-        accessToken = userCredential.credential!.accessToken;
-        microsoftAuthInfo['accessToken'] = accessToken;
-        // print('accessToken: ${userCredential.credential!.accessToken}');
+      // Identity and email are verified by usersvc2. The email-only preflight
+      // cannot authenticate a user and is no longer part of login.
+      final user = await _login(
+        authProvider: 'microsoft',
+        firebaseIdToken: firebaseIdToken,
+        microsoftIdToken: microsoftIdToken,
+      );
+      if (user == null) {
+        await auth.signOut();
+      } else if (mounted) {
+        widget.onLoggedIn?.call(user);
       }
-
-      final String? idToken =
-          await FirebaseAuth.instance.currentUser!.getIdToken();
-
-      // print('idToken: $idToken');
-
-      if (idToken == null) {
-        if (kDebugMode) {
-          print(idToken ?? "No Id token");
-        }
-        throw Exception('INT:id token not found');
-      } else {
-        microsoftAuthInfo['credentialUid'] = userCredential.user!.uid;
-        // print('credentialUid: ${userCredential.user!.uid}');
-
-        Map<String, dynamic> result = await _validateAccessToken();
-        if (result['error'] != null) {
-          if (kDebugMode) {
-            print('Microsoft login failed: ${result['error']}');
-          }
-          // setState(() {
-          //   _errorTextSso = result['error'] ?? 'Microsoft login failed';
-          // });
-          throw Exception('INT:${result['error']}');
-        } else {
-          _login(authProvider: 'microsoft', email: result['email']).then(
-            (user) {
-              if (user != null) {
-                widget.onLoggedIn?.call(user);
-              }
-            },
-          );
-        }
+    } catch (_) {
+      // Provider exceptions may contain credentials; never print them.
+      try {
+        await auth.signOut();
+      } catch (_) {}
+      if (mounted) {
+        setState(() {
+          _errorTextSso = 'Microsoft sign-in failed. Please try again.';
+        });
       }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Microsoft login failed: $e');
-      }
-
-      // clear login after failed login
-      if (accessToken != null) {
-        // print('Clearing login');
-        FirebaseAuth.instance.signOut();
-      }
-
-      String error = e.toString();
-
-      setState(() {
-        if (error.contains('Exception: INT:')) {
-          _errorTextSso = error.substring(15);
-        } else {
-          _errorTextSso = 'Microsoft login failed';
-        }
-      });
+    } finally {
+      if (mounted) setState(() => _isSigningInWithMicrosoft = false);
     }
-  }
-
-  Future<Map<String, dynamic>> _validateAccessToken() async {
-    try {
-      final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-      final IdTokenResult tokenResult =
-          await firebaseAuth.currentUser!.getIdTokenResult();
-
-      if (tokenResult.token == null) {
-        // print('Token is null');
-        return {'error': 'SSO token error'};
-      } else {
-        // UserSession.idToken = tokenResult.token;
-        // UserSession.firebaseUid = firebaseAuth.currentUser!.uid;
-        String email =
-            decodeEmailAddress(FirebaseAuth.instance.currentUser!.email!);
-        dynamic data = await pagVerifyEmailAddress(
-          null,
-          widget.appConfig,
-          {
-            'email': email,
-            'auth_provider': 'microsoft',
-          },
-        );
-        if (data == null) {
-          // print('data is null');
-          return {'error': 'email verification failed'};
-        }
-        dynamic verifyResult = data['verify_result'];
-        if (verifyResult == null) {
-          // print('verify_result is null');
-          return {'error': 'failed to obtain verification result'};
-        }
-        String? isSsoEmailValid = verifyResult['is_sso_email_valid'];
-        if (isSsoEmailValid == "true") {
-          // print('Email is valid');
-          verifyResult['email'] = email;
-          return verifyResult;
-        }
-
-        return {'error': 'email is not valid'};
-      }
-    } catch (e) {
-      String error = e.toString();
-      // Token validation failed
-      if (kDebugMode) {
-        print('Token validation failed: $e');
-      }
-      if (error.toLowerCase().contains('auth provider mismatch')) {
-        return {'error': 'auth provider mismatch'};
-      }
-      if (error.toLowerCase().contains('verify sso email address')) {
-        return {'error': 'failed to verify sso email address'};
-      }
-      return {'error': 'token validation failed'};
-    }
-  }
-
-  String decodeEmailAddress(String rawEmail) {
-    List<String> emailList = rawEmail.split('#ext#');
-    String email = emailList[0].replaceAll('_', '@');
-
-    return email;
   }
 
   @override
@@ -352,6 +265,7 @@ class _WgtLoginState extends State<WgtLogin> {
     dev.log('WgtLogin.build()');
 
     bool enabled = !_isLoggingIn &&
+        !_isSigningInWithMicrosoft &&
         _username.isNotEmpty &&
         _password.isNotEmpty &&
         _errorTextLocal.isEmpty;

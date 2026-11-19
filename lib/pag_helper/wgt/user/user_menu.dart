@@ -160,11 +160,11 @@ class _UserMenuState extends State<UserMenu> {
   }
 }
 
-void onSelected(
+Future<void> onSelected(
   BuildContext context,
   String item,
   PagThemeProvider themeNotifier,
-) {
+) async {
   // ThemeModel themeNotifier = Provider.of<ThemeModel>(context);
   switch (item) {
     case 'myProfile':
@@ -189,9 +189,9 @@ void onSelected(
           Provider.of<PagUserProvider>(context, listen: false).currentUser;
       user?.logout();
 
-      pagLogoutSso(context);
+      await pagLogoutSso(context);
 
-      context.go('/project_public_front');
+      if (context.mounted) context.go('/project_public_front');
       break;
   }
 }

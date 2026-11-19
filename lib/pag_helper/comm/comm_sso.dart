@@ -46,7 +46,7 @@ Future<void> pagLogoutSso(BuildContext context) async {
     return;
   }
   try {
-    auth.signOut();
+    await auth.signOut();
     // var logoutUrl = 'https://login.microsoftonline.com/common/oauth2/logout?post_logout_redirect_uri=https://test-pag.web-ems.com';
 
     // Redirect the user to the logout URL
