@@ -1023,6 +1023,13 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
         }
       }
 
+      final refreshScopeTree = widget.itemKind == PagItemKind.scope &&
+          !const {
+            'address_line_1',
+            'address_line_2',
+            'address_line_3',
+          }.contains(field['col_key']);
+
       fields.add((field['widget'] ?? 'input') == 'input'
           ? Padding(
               padding: const EdgeInsets.only(top: 5.0),
@@ -1053,7 +1060,7 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
                         _fieldUpdated = true;
                         widget.onUpdate?.call();
                       });
-                      if (widget.itemKind == PagItemKind.scope) {
+                      if (refreshScopeTree) {
                         widget.onScopeTreeUpdate?.call();
                       }
                     } else {
@@ -1122,7 +1129,7 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
                         _fieldUpdated = true;
                         widget.onUpdate?.call();
                       });
-                      if (widget.itemKind == PagItemKind.scope) {
+                      if (refreshScopeTree) {
                         widget.onScopeTreeUpdate?.call();
                       }
                     } else {

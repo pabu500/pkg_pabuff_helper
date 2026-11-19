@@ -426,6 +426,11 @@ String? Function(String) getScopeValidator(String key,
       return getValidator(validateLabelScope, isValueRequired);
     case 'site_group_label':
       return getValidator(validateLabelScope, isValueRequired);
+    case 'address_line_1':
+    case 'address_line_2':
+    case 'address_line_3':
+      return (value) =>
+          value.runes.length > 255 ? 'Maximum 255 characters' : null;
     default:
       dev.log('No validator found for key: $key');
       return (String? value) {
