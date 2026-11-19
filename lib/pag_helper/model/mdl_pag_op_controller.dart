@@ -55,7 +55,8 @@ class MdlPagOpController {
   Function doCheckOpList;
   Function? additonalCheck;
   Future<dynamic> Function(
-      MdlPagAppConfig, Map<String, dynamic>, MdlPagSvcClaim)? doOp;
+      MdlPagAppConfig, Map<String, dynamic>, MdlPagSvcClaim,
+      {MdlPagUser? user})? doOp;
   Function? onUpdateSeleted;
   Function? onRefreshListItems;
   Function? onFlagListModified;
@@ -246,6 +247,7 @@ class MdlPagOpController {
       // scheduledTime,
       queryMap,
       svcClaim,
+      user: loggedInUser,
     );
 
     Color successColor = Colors.green;

@@ -1,5 +1,6 @@
 import 'comm_tenant_auth.dart';
 import '../model/mdl_pag_user.dart';
+
 import 'dart:convert';
 import 'dart:io';
 
@@ -48,11 +49,8 @@ Future<dynamic> ex({
     '/ems/meter_group/update_ems_meter_group_meter_list',
     '/key_val_update/do_op_key_val_update',
   }.contains(endpoint);
-  final tenantHeaders = tenantWrite
-      ? await tenantOperationHeaders(svcClaim, user: user)
-      : null;
   String svcToken = '';
-  if (authenticated) {
+  if (authenticated && !tenantWrite) {
     const storage = FlutterSecureStorage();
     svcToken = await storage.read(key: 'pag_user_token') ?? '';
     if (svcToken.isEmpty) throw Exception('Please sign in again');
@@ -67,21 +65,23 @@ Future<dynamic> ex({
   queryMap['query_check_portal_type'] = portalType.name;
 
   try {
-    final response = await http.post(
+    Future<http.Response> send(Map<String, String> headers) => http.post(
       Uri.parse(
         PagUrlController(
           null,
           appConfig,
         ).getUrl(PagSvcType.oresvc2, svcClaim.endpoint!),
       ),
-      headers:
-          tenantHeaders ??
-          <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-            'Authorization': 'Bearer $svcToken',
-          },
+      headers: headers,
       body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
     );
+
+    final response = tenantWrite
+        ? await sendTenantOperation(svcClaim, user, send)
+        : await send({
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Authorization': 'Bearer $svcToken',
+          });
 
     int scode = successCode;
     if (crudType == 'create') {

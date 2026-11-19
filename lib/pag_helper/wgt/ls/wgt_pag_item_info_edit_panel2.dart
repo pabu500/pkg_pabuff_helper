@@ -179,6 +179,7 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
 
       final result = await ex(
         endpoint: PagUrlBase.eptDoOpKeyValUpdate,
+        user: _loggedInUser,
         crudType: 'update',
         opStr: 'update key value',
         appConfig: widget.appConfig,

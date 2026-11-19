@@ -10,37 +10,90 @@ import '../model/mdl_svc_query.dart';
 import 'comm_helper.dart';
 import 'pag_be_api_base.dart';
 
-/// The server verifies the signature and binds the token subject to the claim.
+class SessionExpiredException implements Exception {
+  const SessionExpiredException({this.handled = false});
+  final bool handled;
+  @override
+  String toString() => 'm:Your session has expired. Please sign in again.';
+}
+
+Map<String, dynamic> loginTokenClaims(String? token) {
+  try {
+    final parts = token?.split('.');
+    if (parts == null || parts.length != 3) {
+      throw const SessionExpiredException();
+    }
+    return Map<String, dynamic>.from(
+      jsonDecode(utf8.decode(base64Url.decode(base64Url.normalize(parts[1]))))
+          as Map,
+    );
+  } catch (_) {
+    throw const SessionExpiredException();
+  }
+}
+
+/// Checks the credential selected for this request. Renewal is owned by the console.
 Future<Map<String, String>> tenantOperationHeaders(
   MdlPagSvcClaim claim, {
   MdlPagUser? user,
 }) async {
+  await user?.ensureLoginSession?.call();
   if (user?.resetPasswordToken == 'flag_reset') {
-    throw Exception('Please sign in again');
+    throw const SessionExpiredException();
   }
-  final token =
-      user?.loginToken ??
-      await const FlutterSecureStorage().read(key: 'pag_user_token');
+  final token = user != null
+      ? user.loginToken
+      : await const FlutterSecureStorage().read(key: 'pag_user_token');
   if (token == null || token.trim().isEmpty) {
-    throw Exception('Please sign in again');
+    throw const SessionExpiredException();
   }
+  final payload = loginTokenClaims(token);
+  if (payload['sub'] is! String || (payload['sub'] as String).isEmpty) {
+    throw const SessionExpiredException();
+  }
+  final username = user?.username ?? claim.username ?? payload['sub'];
+  if (payload['sub'] != username) throw const SessionExpiredException();
   if (user != null) {
     claim.username = user.username;
     claim.userId = user.id;
     claim.roleId = user.selectedRole?.id;
-  } else if (claim.username == null || claim.username!.isEmpty) {
-    final parts = token.split('.');
-    if (parts.length != 3) throw Exception('Please sign in again');
-    final payload = jsonDecode(
-      utf8.decode(base64Url.decode(base64Url.normalize(parts[1]))),
-    );
-    claim.username = payload['sub'] as String?;
+  } else {
+    claim.username = username as String?;
   }
   claim.userId ??= 0;
   return {
     'Content-Type': 'application/json; charset=UTF-8',
     'Authorization': 'Bearer $token',
   };
+}
+
+/// A guard rejection ends the session without replaying the operation.
+Future<http.Response> sendTenantOperation(
+  MdlPagSvcClaim claim,
+  MdlPagUser? user,
+  Future<http.Response> Function(Map<String, String> headers) send,
+) async {
+  final headers = await tenantOperationHeaders(claim, user: user);
+  // Keep the session handler for requests still in flight when logout clears it.
+  final onExpired = user?.onSessionExpired;
+  final response = await send(headers);
+  if (_isTenantGuardRejection(response)) {
+    await onExpired?.call();
+    throw SessionExpiredException(handled: onExpired != null);
+  }
+  return response;
+}
+
+bool _isTenantGuardRejection(http.Response response) {
+  if (response.statusCode != 401) return false;
+  try {
+    final body = jsonDecode(response.body);
+    return body is Map &&
+        body['error'] is Map &&
+        body['error']['message'] == 'Please sign in again';
+  } catch (_) {
+    return false;
+  }
 }
 
 Future<Map<String, dynamic>> getTenantLcTransitionCheck(
@@ -53,13 +106,16 @@ Future<Map<String, dynamic>> getTenantLcTransitionCheck(
     svcName: PagSvcType.oresvc2.name,
     endpoint: endpoint,
   );
-  final headers = await tenantOperationHeaders(claim, user: user);
-  final response = await http.post(
-    Uri.parse(
-      PagUrlController(user, appConfig).getUrl(PagSvcType.oresvc2, endpoint),
+  final response = await sendTenantOperation(
+    claim,
+    user,
+    (headers) => http.post(
+      Uri.parse(
+        PagUrlController(user, appConfig).getUrl(PagSvcType.oresvc2, endpoint),
+      ),
+      headers: headers,
+      body: jsonEncode(MdlPagSvcQuery(claim, query).toJson()),
     ),
-    headers: headers,
-    body: jsonEncode(MdlPagSvcQuery(claim, query).toJson()),
   );
   return Map<String, dynamic>.from(getResultFromResp(response.body) as Map);
 }
@@ -86,13 +142,16 @@ Future<Map<String, dynamic>> convertPreviousSystemDebtor(
     svcName: PagSvcType.oresvc2.name,
     endpoint: endpoint,
   );
-  final headers = await tenantOperationHeaders(claim, user: user);
-  final response = await http.post(
-    Uri.parse(
-      PagUrlController(user, appConfig).getUrl(PagSvcType.oresvc2, endpoint),
+  final response = await sendTenantOperation(
+    claim,
+    user,
+    (headers) => http.post(
+      Uri.parse(
+        PagUrlController(user, appConfig).getUrl(PagSvcType.oresvc2, endpoint),
+      ),
+      headers: headers,
+      body: jsonEncode(MdlPagSvcQuery(claim, query).toJson()),
     ),
-    headers: headers,
-    body: jsonEncode(MdlPagSvcQuery(claim, query).toJson()),
   );
   final result = Map<String, dynamic>.from(
     getResultFromResp(response.body) as Map,

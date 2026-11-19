@@ -23,7 +23,7 @@ Future<void> dialog(WidgetTester tester, Brightness brightness) async {
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
-  final user = MdlPagUser()..loginToken = 'test-token';
+  final user = MdlPagUser(username: 'tester')..loginToken = 'e30.eyJzdWIiOiJ0ZXN0ZXIiLCJleHAiOjQxMDI0NDQ4MDB9.signature';
   await tester.pumpWidget(
     ChangeNotifierProvider.value(
       value: PagUserProvider()..setCurrentUser(user),

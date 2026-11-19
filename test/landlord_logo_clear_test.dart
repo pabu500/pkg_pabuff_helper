@@ -23,10 +23,11 @@ void main() {
     'clear is below replace and removes the saved logo only on success',
     (tester) async {
       FlutterSecureStorage.setMockInitialValues({
-        'pag_user_token': 'test-token',
+        'pag_user_token': 'e30.eyJzdWIiOiJ0ZXN0ZXIiLCJleHAiOjQxMDI0NDQ4MDB9.signature',
       });
       addTearDown(() => FlutterSecureStorage.setMockInitialValues({}));
       final user = MdlPagUser(id: 1, username: 'tester')
+        ..loginToken = 'e30.eyJzdWIiOiJ0ZXN0ZXIiLCJleHAiOjQxMDI0NDQ4MDB9.signature'
         ..selectedScope = MdlPagScopeProfile(
           projectProfile: MdlPagProjectProfile(
             id: 1,

@@ -22,9 +22,10 @@ void main() {
   testWidgets('building address saves do not reload the portal', (
     tester,
   ) async {
-    FlutterSecureStorage.setMockInitialValues({'pag_user_token': 'test-token'});
+    FlutterSecureStorage.setMockInitialValues({'pag_user_token': 'e30.eyJzdWIiOiJ0ZXN0ZXIiLCJleHAiOjQxMDI0NDQ4MDB9.signature'});
     addTearDown(() => FlutterSecureStorage.setMockInitialValues({}));
     final user = MdlPagUser(id: 1, username: 'tester')
+        ..loginToken = 'e30.eyJzdWIiOiJ0ZXN0ZXIiLCJleHAiOjQxMDI0NDQ4MDB9.signature'
       ..selectedScope = MdlPagScopeProfile(
         projectProfile: MdlPagProjectProfile(
           id: 1,

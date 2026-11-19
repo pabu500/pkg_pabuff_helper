@@ -1,4 +1,5 @@
 import 'comm_tenant_auth.dart';
+
 import 'dart:convert';
 import 'dart:developer' as dev;
 
@@ -11,6 +12,25 @@ import 'package:buff_helper/util/date_time_util.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:http/http.dart' as http;
 import 'package:buff_helper/pag_helper/comm/pag_be_api_base.dart';
+
+String _batchOpErrorMessage(dynamic error, String fallback) {
+  final message = error is Map ? error['message'] : error;
+  return message is String && message.trim().isNotEmpty ? message : fallback;
+}
+
+Exception _batchOpHttpError(http.Response response) {
+  dynamic body;
+  try {
+    body = jsonDecode(response.body);
+  } on FormatException {
+    // Gateways may return an empty body or HTML.
+  }
+  final fallback = response.statusCode == 401
+      ? 'Please sign in again'
+      : 'HTTP ${response.statusCode}';
+  final error = body is Map ? body['error'] : null;
+  return Exception('m:${_batchOpErrorMessage(error, fallback)}');
+}
 
 Future<dynamic> doPagCheckOpList(
   MdlPagAppConfig appConfig,
@@ -46,7 +66,9 @@ Future<dynamic> doPagCheckOpList(
     // If the server did return a 200 OK response, parse the JSON.
     final responseBody = jsonDecode(response.body);
     if (responseBody['error'] != null) {
-      throw Exception(responseBody['error']['message']);
+      throw Exception(
+        'm:${_batchOpErrorMessage(responseBody['error'], 'Operation failed')}',
+      );
     }
     final data = responseBody['data'];
     if (data == null) {
@@ -97,17 +119,18 @@ Future<dynamic> doPagCheckOpList(
     }
     return listChecked;
   } else if (response.statusCode == 403) {
-    throw Exception("You are not authorized to perform this operation");
+    throw Exception('m:You are not authorized to perform this operation');
   } else {
-    throw Exception(jsonDecode(response.body)['error']);
+    throw _batchOpHttpError(response);
   }
 }
 
 Future<dynamic> doBatchOp(
   MdlPagAppConfig appConfig,
   Map<String, dynamic> queryMap,
-  MdlPagSvcClaim svcClaim,
-) async {
+  MdlPagSvcClaim svcClaim, {
+  MdlPagUser? user,
+}) async {
   svcClaim.svcName = PagSvcType.oresvc2.name;
   svcClaim.endpoint = PagUrlBase.eptDoBatchOp;
 
@@ -118,29 +141,31 @@ Future<dynamic> doBatchOp(
   //   throw Exception(err);
   // }
 
-  final response = await http.post(
+  Future<http.Response> send(Map<String, String> headers) => http.post(
     Uri.parse(
       PagUrlController(
         null,
         appConfig,
       ).getUrl(PagSvcType.oresvc2, svcClaim.endpoint!),
     ),
-    headers:
-        queryMap['op_name'].toString().contains('Tenant') ||
-            queryMap['op_name'].toString().contains('MeterGroup')
-        ? await tenantOperationHeaders(svcClaim)
-        : <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-            'Authorization': 'Bearer $svcToken',
-          },
+    headers: headers,
     body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
   );
+  final tenantOp =
+      queryMap['op_name'].toString().contains('Tenant') ||
+      queryMap['op_name'].toString().contains('MeterGroup');
+  final response = tenantOp
+      ? await sendTenantOperation(svcClaim, user, send)
+      : await send({
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $svcToken',
+        });
 
   if (response.statusCode == 200) {
     final responseBody = jsonDecode(response.body);
     final error = responseBody['error'];
     if (error != null) {
-      throw Exception(error);
+      throw Exception('m:${_batchOpErrorMessage(error, 'Operation failed')}');
     }
     final data = responseBody['data'];
     if (data == null) {
@@ -159,9 +184,9 @@ Future<dynamic> doBatchOp(
     }
     return result[resultKey];
   } else if (response.statusCode == 403) {
-    throw Exception("You are not authorized to perform this operation");
+    throw Exception('m:You are not authorized to perform this operation');
   } else {
-    throw Exception(jsonDecode(response.body)['error']);
+    throw _batchOpHttpError(response);
   }
 }
 
@@ -253,33 +278,37 @@ Future<dynamic> doPagOpMultiKeyValUpdate(
   svcClaim.endpoint = PagUrlBase.eptDoOpUpdateMultiKeyVal;
 
   // the server verifies the login token against the claimed user before any generic write
-  final headers = await tenantOperationHeaders(svcClaim, user: loggedInUser);
+
   // try {
   //   svcToken = await svcGate(svcClaim /*, queryByUser*/);
   // } catch (err) {
   //   throw Exception(err);
   // }
   try {
-    final response = await http.post(
-      Uri.parse(
-        PagUrlController(
-          loggedInUser,
-          appConfig,
-        ).getUrl(PagSvcType.oresvc2, svcClaim.endpoint!),
+    final response = await sendTenantOperation(
+      svcClaim,
+      loggedInUser,
+      (headers) => http.post(
+        Uri.parse(
+          PagUrlController(
+            loggedInUser,
+            appConfig,
+          ).getUrl(PagSvcType.oresvc2, svcClaim.endpoint!),
+        ),
+        headers: headers,
+        body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
       ),
-      headers: headers,
-      body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
     );
 
     if (response.statusCode == 401) {
-      throw Exception('Please sign in again');
+      throw _batchOpHttpError(response);
     }
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response, parse the JSON.
       final responseBody = jsonDecode(response.body);
       final error = responseBody['error'];
       if (error != null) {
-        throw Exception(error);
+        throw Exception('m:${_batchOpErrorMessage(error, 'Operation failed')}');
       }
       // throw Exception('test error');
       final data = responseBody['data'];
@@ -297,9 +326,9 @@ Future<dynamic> doPagOpMultiKeyValUpdate(
       }
       return listOped;
     } else if (response.statusCode == 403) {
-      throw Exception("You are not authorized to perform this operation");
+      throw Exception('m:You are not authorized to perform this operation');
     } else {
-      throw Exception(jsonDecode(response.body)['error']);
+      throw _batchOpHttpError(response);
     }
   } catch (err) {
     throw Exception(err);

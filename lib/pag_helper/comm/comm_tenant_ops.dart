@@ -1,10 +1,13 @@
 import 'comm_tenant_auth.dart';
+
 import 'dart:convert';
 
 import 'package:buff_helper/pag_helper/comm/pag_be_api_base.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
+
 import '../model/mdl_pag_user.dart';
+
 import 'package:buff_helper/pag_helper/model/mdl_svc_query.dart';
 import 'package:http/http.dart' as http;
 
@@ -17,15 +20,19 @@ Future<dynamic> commitTenantMeterGroupList(
   svcClaim.svcName = PagSvcType.oresvc2.name;
   svcClaim.endpoint = PagUrlBase.eptPagUpdateTenantMeterGroupList;
 
-  final response = await http.post(
-    Uri.parse(
-      PagUrlController(
-        null,
-        appConfig,
-      ).getUrl(PagSvcType.oresvc2, svcClaim.endpoint!),
+  final response = await sendTenantOperation(
+    svcClaim,
+    user,
+    (headers) => http.post(
+      Uri.parse(
+        PagUrlController(
+          null,
+          appConfig,
+        ).getUrl(PagSvcType.oresvc2, svcClaim.endpoint!),
+      ),
+      headers: headers,
+      body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
     ),
-    headers: await tenantOperationHeaders(svcClaim, user: user),
-    body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
   );
 
   if (response.statusCode == 200) {

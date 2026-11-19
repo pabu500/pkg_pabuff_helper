@@ -53,6 +53,9 @@ class MdlPagUser {
   bool? isLoggedin = false;
   // Active login credential only; never include it in serialized user profiles.
   String? loginToken;
+  // Installed by the console session owner; excluded from serialized profiles.
+  Future<void> Function()? ensureLoginSession;
+  Future<void> Function()? onSessionExpired;
   List<Map<String, dynamic>>? venderCredList;
 
   List<MdlPagRole> roleList;
@@ -100,6 +103,8 @@ class MdlPagUser {
   });
 
   void logout() {
+    ensureLoginSession = null;
+    onSessionExpired = null;
     loginToken = null;
     id = 0;
     username = '';

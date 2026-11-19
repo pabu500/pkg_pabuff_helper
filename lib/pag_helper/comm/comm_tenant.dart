@@ -1,5 +1,7 @@
 import 'comm_tenant_auth.dart';
+
 import 'dart:convert';
+
 import 'package:buff_helper/pag_helper/comm/comm_helper.dart';
 import 'package:http/http.dart' as http;
 
@@ -63,15 +65,19 @@ Future<dynamic> doPagOffboardTenant(
   svcClaim.endpoint = PagUrlBase.eptPagOffboardTenant;
 
   try {
-    final response = await http.post(
-      Uri.parse(
-        PagUrlController(
-          loggedInUser,
-          appConfig,
-        ).getUrl(PagSvcType.oresvc2, svcClaim.endpoint!),
+    final response = await sendTenantOperation(
+      svcClaim,
+      loggedInUser,
+      (headers) => http.post(
+        Uri.parse(
+          PagUrlController(
+            loggedInUser,
+            appConfig,
+          ).getUrl(PagSvcType.oresvc2, svcClaim.endpoint!),
+        ),
+        headers: headers,
+        body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
       ),
-      headers: await tenantOperationHeaders(svcClaim, user: loggedInUser),
-      body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
     );
 
     if (response.statusCode == 200) {
@@ -95,9 +101,12 @@ Future<dynamic> doPagOffboardTenant(
       return result[resultKey];
     } else {
       Map<String, dynamic> responseBody = jsonDecode(response.body);
-      throw Exception(responseBody['error']);
+      throw Exception(
+        'm:${responseBody['error'] is Map ? responseBody['error']['message'] : responseBody['error']}',
+      );
     }
   } catch (err) {
+    if (err is SessionExpiredException) rethrow;
     throw Exception(err);
   }
 }
@@ -170,15 +179,19 @@ Future<dynamic> updateTenantOffboardingInfo(
   svcClaim.endpoint = PagUrlBase.eptPagUpdateTenantOffbInfo;
 
   try {
-    final response = await http.post(
-      Uri.parse(
-        PagUrlController(
-          null,
-          appConfig,
-        ).getUrl(PagSvcType.oresvc2, svcClaim.endpoint!),
+    final response = await sendTenantOperation(
+      svcClaim,
+      user,
+      (headers) => http.post(
+        Uri.parse(
+          PagUrlController(
+            null,
+            appConfig,
+          ).getUrl(PagSvcType.oresvc2, svcClaim.endpoint!),
+        ),
+        headers: headers,
+        body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
       ),
-      headers: await tenantOperationHeaders(svcClaim, user: user),
-      body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
     );
 
     if (response.statusCode == 200) {
@@ -202,7 +215,9 @@ Future<dynamic> updateTenantOffboardingInfo(
       return result[resultKey];
     } else {
       Map<String, dynamic> responseBody = jsonDecode(response.body);
-      throw Exception(responseBody['error']);
+      throw Exception(
+        'm:${responseBody['error'] is Map ? responseBody['error']['message'] : responseBody['error']}',
+      );
     }
   } catch (err) {
     rethrow;
@@ -543,15 +558,19 @@ Future<dynamic> updateTenantLcStatus(
   svcClaim.svcName = PagSvcType.oresvc2.name;
   svcClaim.endpoint = PagUrlBase.eptUpdateItemLcStatus;
 
-  final response = await http.post(
-    Uri.parse(
-      PagUrlController(
-        null,
-        appConfig,
-      ).getUrl(PagSvcType.oresvc2, svcClaim.endpoint!),
+  final response = await sendTenantOperation(
+    svcClaim,
+    user,
+    (headers) => http.post(
+      Uri.parse(
+        PagUrlController(
+          null,
+          appConfig,
+        ).getUrl(PagSvcType.oresvc2, svcClaim.endpoint!),
+      ),
+      headers: headers,
+      body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
     ),
-    headers: await tenantOperationHeaders(svcClaim, user: user),
-    body: jsonEncode(MdlPagSvcQuery(svcClaim, queryMap).toJson()),
   );
 
   if (response.statusCode == 200) {
@@ -580,6 +599,7 @@ Future<dynamic> updateTenantLcStatus(
   } else if (response.statusCode == 403) {
     throw Exception("You are not authorized to perform this operation");
   } else {
-    throw Exception(jsonDecode(response.body)['error']);
+    final error = jsonDecode(response.body)['error'];
+    throw Exception('m:${error is Map ? error['message'] : error}');
   }
 }

@@ -33,7 +33,7 @@ void main() {
         addTearDown(tester.view.resetPhysicalSize);
         addTearDown(tester.view.resetDevicePixelRatio);
         final user = MdlPagUser(id: 1, username: 'tester')
-          ..loginToken = 'test-token'
+          ..loginToken = 'e30.eyJzdWIiOiJ0ZXN0ZXIiLCJleHAiOjQxMDI0NDQ4MDB9.signature'
           ..selectedRole = MdlPagRole(
             id: 2,
             name: 'project-admin',
