@@ -164,29 +164,36 @@ class _TenantLcStatusState extends State<WgtPagTenantLcStatusOp> {
       _confirming = true;
       Map<String, dynamic>? result;
       try {
-        result = await showDialog<Map<String, dynamic>>(
-          context: context,
-          builder: (_) => selected == PagTenantLcStatus.mfd
-              ? WgtTenantMfdDialog(
-                  tenantName: widget.tenantInfo['name']?.toString() ?? '',
-                  info: _target(selected),
-                )
-              : WgtTenantTerminationDialog(
-                  tenantName: widget.tenantInfo['name']?.toString() ?? '',
-                  info: _target(selected),
-                ),
-        );
+        if (selected == PagTenantLcStatus.mfd) {
+          await showDialog<void>(
+            context: context,
+            builder: (_) => WgtTenantMfdDialog(
+              tenantName: widget.tenantInfo['name']?.toString() ?? '',
+              info: _target(selected),
+              onConfirm: (value) => result = value,
+            ),
+          );
+        } else {
+          result = await showDialog<Map<String, dynamic>>(
+            context: context,
+            builder: (_) => WgtTenantTerminationDialog(
+              tenantName: widget.tenantInfo['name']?.toString() ?? '',
+              info: _target(selected),
+            ),
+          );
+        }
       } finally {
         _confirming = false;
       }
-      if (result == null ||
+      final confirmedResult = result;
+      if (confirmedResult == null ||
           !mounted ||
           version != _version ||
           tenantId != widget.tenantInfo['id'].toString() ||
           !_eligible(selected)) {
         return;
       }
-      confirmation = result;
+      confirmation = confirmedResult;
     }
     final user = widget.loggedInUser;
     if (user == null) return;

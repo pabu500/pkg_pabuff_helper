@@ -10,6 +10,7 @@ import 'package:buff_helper/pag_helper/model/provider/pag_user_provider.dart';
 import 'package:buff_helper/pag_helper/model/scope/mdl_pag_scope_profile.dart';
 import 'package:buff_helper/pag_helper/wgt/app/ems/wgt_tenant_lc_status_op.dart';
 import 'package:buff_helper/pag_helper/wgt/ls/wgt_pag_item_info_edit_panel2.dart';
+import 'package:buff_helper/pagrid_helper/batch_op_helper/wgt_confirm_box.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -83,6 +84,16 @@ void main() {
             await tester.pump();
             await tester.pump(const Duration(milliseconds: 350));
             expect(previews, 2);
+            expect(find.byType(WgtConfirmBox), findsOneWidget);
+            await tester.tap(find.text('Cancel'));
+            await tester.pumpAndSettle();
+            expect(writes, 0);
+            expect(committed, isNull);
+            expect(find.byType(WgtConfirmBox), findsNothing);
+            await tester.tap(find.text('Commit'));
+            await tester.pump();
+            await tester.pump(const Duration(milliseconds: 350));
+            expect(previews, 3);
             if (status == PagTenantLcStatus.terminated) {
               expect(find.text('• Group 10'), findsOneWidget);
               expect(
@@ -97,14 +108,44 @@ void main() {
                 findsOneWidget,
               );
             }
-            await tester.enterText(find.byType(TextField), 'Reason');
-            await tester.tap(
-              find.text(
-                status == PagTenantLcStatus.onboarding
-                    ? 'Cancel tenant'
-                    : 'Mark MFD',
-              ),
+            expect(find.text('MFD Confirmation'), findsOneWidget);
+            expect(
+              find.text('Confirm tenant_mfd  for 1 item?', findRichText: true),
+              findsOneWidget,
             );
+            final confirm = find.widgetWithText(TextButton, 'Confirm');
+            expect(tester.widget<TextButton>(confirm).onPressed, isNull);
+            await tester.enterText(
+              find.byWidgetPredicate(
+                (widget) =>
+                    widget is TextField && widget.decoration?.hintText == 'mfd',
+              ),
+              'mfd',
+            );
+            await tester.pump();
+            expect(tester.widget<TextButton>(confirm).onPressed, isNull);
+            final tenantInput = find.byWidgetPredicate(
+              (widget) =>
+                  widget is TextField &&
+                  widget.decoration?.hintText == 'Tenant',
+            );
+            await tester.enterText(tenantInput, 'Tenant');
+            await tester.pump();
+            expect(tester.widget<TextButton>(confirm).onPressed, isNotNull);
+            await tester.enterText(tenantInput, 'Wrong tenant');
+            await tester.pump();
+            expect(tester.widget<TextButton>(confirm).onPressed, isNull);
+            await tester.enterText(tenantInput, 'Tenant');
+            await tester.pump();
+            await tester.enterText(
+              find.byWidgetPredicate(
+                (widget) =>
+                    widget is TextField &&
+                    widget.decoration?.labelText == 'Remark (optional)',
+              ),
+              '  Reason  ',
+            );
+            await tester.tap(find.text('Confirm'));
             await tester.pumpAndSettle();
             expect(writes, 1);
             expect(committed, PagTenantLcStatus.mfd);
@@ -136,6 +177,7 @@ void main() {
             expect(req.headers['Authorization'], startsWith('Bearer '));
             // Audit values are never accepted from the UI body.
             expect(req.body, contains('mfd_remark'));
+            expect(req.body, contains('"mfd_remark":"Reason"'));
             expect(req.body, isNot(contains('mfd_by')));
             expect(req.body, isNot(contains('op_username')));
             return response({'lc_status': 'mfd'});
@@ -273,11 +315,11 @@ void main() {
                 itemKind: PagItemKind.tenant,
                 strItemIndex: '1',
                 itemDisplayName: 'Tenant',
-                itemInfoMap: const {
+                itemInfoMap: Map<String, dynamic>.of(const {
                   'id': '1',
                   'name': 'Tenant',
                   'lc_status': 'mfd',
-                },
+                }),
                 fieldList: const [
                   {
                     'col_key': 'name',

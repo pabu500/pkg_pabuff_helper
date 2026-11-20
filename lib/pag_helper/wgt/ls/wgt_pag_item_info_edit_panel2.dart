@@ -771,22 +771,39 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   child: Row(
                     children: [
+                      const SizedBox(width: 48),
                       Expanded(
-                        child: Text(_itemDisplayName ?? '',
-                            style: TextStyle(
-                                fontSize: 21,
-                                fontWeight: FontWeight.w500,
-                                color: Theme.of(context).hintColor)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Flexible(
+                              child: Text(_itemDisplayName ?? '',
+                                  textAlign: TextAlign.center,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                      fontSize: 21,
+                                      fontWeight: FontWeight.w500,
+                                      color: Theme.of(context).hintColor)),
+                            ),
+                            SizedBox(
+                              width: 40,
+                              child: getCopyButton(
+                                  context, _itemDisplayName ?? '',
+                                  direction: 'left'),
+                            ),
+                          ],
+                        ),
                       ),
-                      getCopyButton(context, _itemDisplayName ?? '',
-                          direction: 'left'),
-                      IconButton(
-                        tooltip: 'Close properties',
-                        icon: const Icon(Icons.close),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          if (_fieldUpdated) widget.onClose?.call();
-                        },
+                      SizedBox(
+                        width: 48,
+                        child: IconButton(
+                          tooltip: 'Close properties',
+                          icon: const Icon(Icons.close),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            if (_fieldUpdated) widget.onClose?.call();
+                          },
+                        ),
                       ),
                     ],
                   ),

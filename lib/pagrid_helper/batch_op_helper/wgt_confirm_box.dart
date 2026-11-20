@@ -7,6 +7,7 @@ class WgtConfirmBox extends StatefulWidget {
     this.title = 'Confirm',
     this.titleWidget,
     this.contentWidget,
+    this.footerWidget,
     this.keyInConfirmStrList = const [],
     required this.onConfirm,
     this.opName = '',
@@ -19,6 +20,9 @@ class WgtConfirmBox extends StatefulWidget {
   final String title;
   final Widget? titleWidget;
   final Widget? contentWidget;
+
+  /// Extra content below the standard confirmation summary and inputs.
+  final Widget? footerWidget;
   final Function onConfirm;
   final String opName;
   final int itemCount;
@@ -88,7 +92,7 @@ class _WgtConfirmBoxState extends State<WgtConfirmBox> {
       return widget.contentWidget!;
     }
 
-    return widget.keyInConfirmStrList.isEmpty
+    final content = widget.keyInConfirmStrList.isEmpty
         ? getDefualtContent()
         : Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -185,6 +189,14 @@ class _WgtConfirmBoxState extends State<WgtConfirmBox> {
               ),
             ],
           );
+    if (widget.footerWidget == null) return content;
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [content, verticalSpaceSmall, widget.footerWidget!],
+      ),
+    );
   }
 
   Widget getDefualtContent() {
