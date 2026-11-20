@@ -697,7 +697,7 @@ class PagPdfBillCwP2Gen3 {
           style: styleSmall.copyWith(fontWeight: pw.FontWeight.bold),
         ),
         pw.Text(
-          'If invoice due date falls on a non-business day, GIRO deduction (if applicable) will be processed on the next business day. If deduction is unsuccessful, late payment interest will accrue daily from the due date until the invoice is fully settled.',
+          'If invoice due date falls on a non-business day, GIRO deduction (if applicable) will be processed on the next business day.',
           style: styleSmall,
         ),
       ],
