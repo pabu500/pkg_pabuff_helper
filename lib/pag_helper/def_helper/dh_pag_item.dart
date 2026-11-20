@@ -136,9 +136,9 @@ String? validateItemLabel(String? value) {
   // Allowed:
   // alphanumeric, space, hyphen, underscore,
   // parentheses, period, comma, slash, ampersand, plus,
-  // hash, colon, semicolon, double quote, single quote
+  // hash, colon, semicolon, double quote, single quote, dollar sign
   final validCharacters = RegExp(
-    r"""^[a-zA-Z0-9\s\-_().,/&+#:;"']+$""",
+    r"""^[a-zA-Z0-9\s\-_().,/&+#:;"'$]+$""",
   );
 
   if (!validCharacters.hasMatch(value)) {
