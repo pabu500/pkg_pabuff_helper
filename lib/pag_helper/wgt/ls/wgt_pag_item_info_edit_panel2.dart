@@ -1752,37 +1752,6 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             horizontalSpaceRegular,
-            if (_lcStatusDisplay == PagTenantLcStatus.mfd)
-              Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: WgtItemDeleteOp(
-                  appConfig: widget.appConfig,
-                  itemKind: PagItemKind.tenant,
-                  itemType: '',
-                  itemIndexStr: widget.strItemIndex,
-                  itemDeleteRef: widget.strItemIndex,
-                  onDeleting: () {
-                    setState(() {
-                      _isDeleting = true;
-                    });
-                  },
-                  onDeleted: (Map<String, dynamic> result) {
-                    setState(() {
-                      _isDeleting = false;
-                      if (result['error'] != null) {
-                        setState(() {
-                          _deleteResultText = result['error'];
-                        });
-                      } else {
-                        setState(() {
-                          _deleteResultText = 'Item deleted';
-                        });
-                      }
-                    });
-                    widget.onUpdate?.call();
-                  },
-                ),
-              ),
             Expanded(
               child: WgtPagTenantLcStatusOp(
                 key: _lcStatusOpsKey,

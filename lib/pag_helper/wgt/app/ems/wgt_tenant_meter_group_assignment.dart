@@ -1,3 +1,4 @@
+import 'tenant_lifecycle_changes.dart';
 import 'dart:developer' as dev;
 
 import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
@@ -641,6 +642,12 @@ class _WgtTenantMeterGroupAssignmentState
               ? null
               : () async {
                   await _doCommit();
+                  if (_isCommitted && _commitErrorText.isEmpty) {
+                    TenantLifecycleChanges.groupsSaved(
+                      widget.itemScope.toScopeMap()['project_name']?.toString() ?? '',
+                      widget.strItemGroupIndex,
+                    );
+                  }
                   widget.onUpdate?.call();
                 },
           child: _isCommitted && _commitErrorText.isEmpty

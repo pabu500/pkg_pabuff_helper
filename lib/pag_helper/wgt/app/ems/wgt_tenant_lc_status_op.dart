@@ -1,7 +1,13 @@
+import 'dart:async';
+
+import 'tenant_lifecycle_changes.dart';
+import 'wgt_tenant_mfd_dialog.dart';
 import 'wgt_tenant_termination_dialog.dart';
+
 import 'package:material_ui/material_ui.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:material_symbols_icons/symbols.dart';
+
 import '../../../comm/comm_tenant.dart';
 import '../../../comm/comm_tenant_auth.dart';
 import '../../../def_helper/dh_pag_tenant.dart';
@@ -38,11 +44,32 @@ class _TenantLcStatusState extends State<WgtPagTenantLcStatusOp> {
   bool _committing = false;
   String _error = '';
   int _version = 0;
+  bool _confirming = false;
+  StreamSubscription<({String project, String tenant})>? _assignmentChanges;
   @override
   void initState() {
     super.initState();
+    _assignmentChanges = TenantLifecycleChanges.stream.listen((change) {
+      if (change.tenant == widget.tenantInfo['id'].toString() &&
+          change.project ==
+              widget.loggedInUser?.selectedScope.toScopeMap()['project_name']) {
+        _loadCheck();
+      }
+    });
     _loadCheck();
   }
+
+  @override
+  void dispose() {
+    _assignmentChanges?.cancel();
+    super.dispose();
+  }
+
+  bool get _hasManualTargets => const [
+    PagTenantLcStatus.offboarding,
+    PagTenantLcStatus.onboarding,
+    PagTenantLcStatus.terminated,
+  ].contains(_current);
 
   @override
   void didUpdateWidget(covariant WgtPagTenantLcStatusOp oldWidget) {
@@ -59,7 +86,14 @@ class _TenantLcStatusState extends State<WgtPagTenantLcStatusOp> {
 
   Future<void> _loadCheck() async {
     final version = ++_version;
-    if (_current != PagTenantLcStatus.offboarding || !widget.enableEdit) return;
+    if (!_hasManualTargets || !widget.enableEdit) {
+      setState(() {
+        _loading = false;
+        _targets = {};
+        _error = '';
+      });
+      return;
+    }
     setState(() {
       _loading = true;
       _error = '';
@@ -105,24 +139,53 @@ class _TenantLcStatusState extends State<WgtPagTenantLcStatusOp> {
       widget.enableEdit &&
       !_loading &&
       !_committing &&
-      _current == PagTenantLcStatus.offboarding &&
-      (status == PagTenantLcStatus.normal ||
-          status == PagTenantLcStatus.terminated) &&
+      ((_current == PagTenantLcStatus.offboarding &&
+              (status == PagTenantLcStatus.normal ||
+                  status == PagTenantLcStatus.terminated)) ||
+          (status == PagTenantLcStatus.mfd &&
+              (_current == PagTenantLcStatus.onboarding ||
+                  _current == PagTenantLcStatus.terminated))) &&
       _target(status)['eligible'] == true;
   Future<void> _commit() async {
-    if (!_eligible(_selected)) return;
+    if (_confirming || !_eligible(_selected)) return;
+    final tenantId = widget.tenantInfo['id'].toString();
+    final selected = _selected;
     Map<String, dynamic> confirmation = {};
-    if (_selected == PagTenantLcStatus.terminated) {
+    if (_selected == PagTenantLcStatus.terminated ||
+        _selected == PagTenantLcStatus.mfd) {
       await _loadCheck();
-      if (!mounted || !_eligible(_selected)) return;
-      final result = await showDialog<Map<String, dynamic>>(
-        context: context,
-        builder: (_) => WgtTenantTerminationDialog(
-          tenantName: widget.tenantInfo['name']?.toString() ?? '',
-          info: _target(_selected),
-        ),
-      );
-      if (result == null || !mounted) return;
+      if (!mounted ||
+          _selected != selected ||
+          tenantId != widget.tenantInfo['id'].toString() ||
+          !_eligible(selected)) {
+        return;
+      }
+      final version = _version;
+      _confirming = true;
+      Map<String, dynamic>? result;
+      try {
+        result = await showDialog<Map<String, dynamic>>(
+          context: context,
+          builder: (_) => selected == PagTenantLcStatus.mfd
+              ? WgtTenantMfdDialog(
+                  tenantName: widget.tenantInfo['name']?.toString() ?? '',
+                  info: _target(selected),
+                )
+              : WgtTenantTerminationDialog(
+                  tenantName: widget.tenantInfo['name']?.toString() ?? '',
+                  info: _target(selected),
+                ),
+        );
+      } finally {
+        _confirming = false;
+      }
+      if (result == null ||
+          !mounted ||
+          version != _version ||
+          tenantId != widget.tenantInfo['id'].toString() ||
+          !_eligible(selected)) {
+        return;
+      }
       confirmation = result;
     }
     final user = widget.loggedInUser;
@@ -136,9 +199,9 @@ class _TenantLcStatusState extends State<WgtPagTenantLcStatusOp> {
         widget.appConfig,
         {
           'scope': user.selectedScope.toScopeMap(),
-          'item_info': {'item_id': widget.tenantInfo['id'].toString()},
+          'item_info': {'item_id': tenantId},
           'item_kind': PagItemKind.tenant.value,
-          'target_lc_status': _selected.value,
+          'target_lc_status': selected.value,
           ...confirmation,
         },
         MdlPagSvcClaim(
@@ -148,13 +211,14 @@ class _TenantLcStatusState extends State<WgtPagTenantLcStatusOp> {
         ),
         user: user,
       );
-      if (!mounted) return;
+      if (!mounted || tenantId != widget.tenantInfo['id'].toString()) return;
       final status = PagTenantLcStatus.byValue(result['lc_status']);
       setState(() {
         _current = status;
         _selected = status;
       });
       widget.onCommitted?.call(status);
+      if (mounted) await _loadCheck();
     } catch (e) {
       if (mounted) {
         setState(() {
@@ -241,7 +305,7 @@ class _TenantLcStatusState extends State<WgtPagTenantLcStatusOp> {
                 child: CircularProgressIndicator(),
               ),
             ),
-          if (widget.enableEdit && _current == PagTenantLcStatus.offboarding)
+          if (widget.enableEdit && _hasManualTargets)
             IconButton(
               onPressed: _loading || _committing ? null : _loadCheck,
               tooltip: 'Refresh eligibility',
@@ -255,15 +319,22 @@ class _TenantLcStatusState extends State<WgtPagTenantLcStatusOp> {
           child: _TenantLcNotice.error(message: _error),
         ),
       for (final status in [
-        PagTenantLcStatus.normal,
-        PagTenantLcStatus.terminated,
+        if (_current == PagTenantLcStatus.offboarding) ...[
+          PagTenantLcStatus.normal,
+          PagTenantLcStatus.terminated,
+        ],
+        if (_current == PagTenantLcStatus.onboarding ||
+            _current == PagTenantLcStatus.terminated)
+          PagTenantLcStatus.mfd,
       ])
         if (_reasons(status).isNotEmpty)
           Padding(
             padding: const EdgeInsets.only(top: 10),
             child: _TenantLcNotice.blocked(
               key: ValueKey('lc-notice-${status.value}'),
-              title: status == PagTenantLcStatus.normal
+              title: status == PagTenantLcStatus.mfd
+                  ? 'Mark for deletion unavailable'
+                  : status == PagTenantLcStatus.normal
                   ? 'Return to Normal unavailable'
                   : 'Termination unavailable',
               reasons: _reasons(status),
