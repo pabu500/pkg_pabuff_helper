@@ -1,4 +1,3 @@
-
 import 'package:buff_helper/pagrid_helper/ems_helper/tenant/mdl_ems_type_usage_r2.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_ems_type_usage_calc_rl2.dart';
 import 'package:flutter/services.dart';
@@ -6,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+
 import 'dart:developer' as dev;
 
 import '../../../pag_helper/def_helper/dh_device.dart';
@@ -220,15 +220,23 @@ class PagPdfBillCwP2Gen3 {
   final double size5 = 12;
   final double size6 = 13;
 
-  late final pw.TextStyle styleTiny =
-      pw.TextStyle(fontSize: size0, color: _darkColor);
+  late final pw.TextStyle styleTiny = pw.TextStyle(
+    fontSize: size0,
+    color: _darkColor,
+  );
 
-  late final pw.TextStyle styleSmall =
-      pw.TextStyle(fontSize: size1, color: _darkColor);
-  late final pw.TextStyle styleNormal =
-      pw.TextStyle(fontSize: size2, color: _darkColor);
-  late final pw.TextStyle styleLarge =
-      pw.TextStyle(fontSize: size3, color: _darkColor);
+  late final pw.TextStyle styleSmall = pw.TextStyle(
+    fontSize: size1,
+    color: _darkColor,
+  );
+  late final pw.TextStyle styleNormal = pw.TextStyle(
+    fontSize: size2,
+    color: _darkColor,
+  );
+  late final pw.TextStyle styleLarge = pw.TextStyle(
+    fontSize: size3,
+    color: _darkColor,
+  );
 
   final double footnoteWidth = 470;
 
@@ -240,10 +248,9 @@ class PagPdfBillCwP2Gen3 {
 
     // mt.AssetImage logoImage = const mt.AssetImage("assets/images/cw_logo_r_s.png");
     _logo = //await rootBundle.loadString('assets/images/C&W_Services_Logo_Color.png');
-        pw.MemoryImage(
+    pw.MemoryImage(
       // (await rootBundle.load('$assetFolder/cw_logo_r_s.png'))
-      (await rootBundle.load('$assetFolder/transparent_32x32.png'))
-          .buffer
+      (await rootBundle.load('$assetFolder/transparent_32x32.png')).buffer
           .asUint8List(),
     );
     // _bgShape = await rootBundle.loadString('$assetFolder/invoice.svg');
@@ -260,7 +267,10 @@ class PagPdfBillCwP2Gen3 {
     double pageWidth = PdfPageFormat.a4.width;
     dev.log('Page width: $pageWidth');
 
-    final headerLogo = buildCwInvoiceHeaderLogo(landlordLogoPngBase64, logo ?? _logo);
+    final headerLogo = buildCwInvoiceHeaderLogo(
+      landlordLogoPngBase64,
+      logo ?? _logo,
+    );
 
     return pw.MultiPage(
       pageTheme: pw.PageTheme(
@@ -387,15 +397,18 @@ class PagPdfBillCwP2Gen3 {
                 pw.Row(
                   mainAxisAlignment: pw.MainAxisAlignment.start,
                   children: [
-                    pw.Text('Payment by Telegraphic Transfer (T/T) or PayNow',
-                        style: styleSmall),
+                    pw.Text(
+                      'Payment by Telegraphic Transfer (T/T) or PayNow',
+                      style: styleSmall,
+                    ),
                   ],
                 ),
                 pw.Row(
                   children: [
                     pw.Text(
-                        'Please quote Account Number & Invoice Number(s) & remit to:',
-                        style: styleSmall),
+                      'Please quote Account Number & Invoice Number(s) & remit to:',
+                      style: styleSmall,
+                    ),
                   ],
                 ),
                 pw.Table(
@@ -404,18 +417,27 @@ class PagPdfBillCwP2Gen3 {
                     1: const pw.FixedColumnWidth(180),
                   },
                   children: [
-                    pw.TableRow(children: [
-                      pw.Text('Account Name:', style: styleSmall),
-                      pw.Text(amgrBankAccountName ?? '-', style: styleSmall),
-                    ]),
-                    pw.TableRow(children: [
-                      pw.Text('Account Number:', style: styleSmall),
-                      pw.Text(amgrBankAccountNumber ?? '-', style: styleSmall),
-                    ]),
-                    pw.TableRow(children: [
-                      pw.Text('Bank Name:', style: styleSmall),
-                      pw.Text(amgrBankLabel ?? '-', style: styleSmall),
-                    ]),
+                    pw.TableRow(
+                      children: [
+                        pw.Text('Account Name:', style: styleSmall),
+                        pw.Text(amgrBankAccountName ?? '-', style: styleSmall),
+                      ],
+                    ),
+                    pw.TableRow(
+                      children: [
+                        pw.Text('Account Number:', style: styleSmall),
+                        pw.Text(
+                          amgrBankAccountNumber ?? '-',
+                          style: styleSmall,
+                        ),
+                      ],
+                    ),
+                    pw.TableRow(
+                      children: [
+                        pw.Text('Bank Name:', style: styleSmall),
+                        pw.Text(amgrBankLabel ?? '-', style: styleSmall),
+                      ],
+                    ),
                   ],
                 ),
                 pw.SizedBox(height: 3),
@@ -427,18 +449,22 @@ class PagPdfBillCwP2Gen3 {
                     3: const pw.FixedColumnWidth(60),
                   },
                   children: [
-                    pw.TableRow(children: [
-                      pw.Text('Bank Code:', style: styleSmall),
-                      pw.Text('Branch Code:', style: styleSmall),
-                      pw.Text('Swift Code:', style: styleSmall),
-                      pw.Text('PayNow:', style: styleSmall),
-                    ]),
-                    pw.TableRow(children: [
-                      pw.Text(amgrBankCode ?? '-', style: styleSmall),
-                      pw.Text(amgrBankBranchCode ?? '-', style: styleSmall),
-                      pw.Text(amgrBankSwiftCode ?? '-', style: styleSmall),
-                      pw.Text(amgrBankPayNow ?? '-', style: styleSmall),
-                    ]),
+                    pw.TableRow(
+                      children: [
+                        pw.Text('Bank Code:', style: styleSmall),
+                        pw.Text('Branch Code:', style: styleSmall),
+                        pw.Text('Swift Code:', style: styleSmall),
+                        pw.Text('PayNow:', style: styleSmall),
+                      ],
+                    ),
+                    pw.TableRow(
+                      children: [
+                        pw.Text(amgrBankCode ?? '-', style: styleSmall),
+                        pw.Text(amgrBankBranchCode ?? '-', style: styleSmall),
+                        pw.Text(amgrBankSwiftCode ?? '-', style: styleSmall),
+                        pw.Text(amgrBankPayNow ?? '-', style: styleSmall),
+                      ],
+                    ),
                   ],
                 ),
                 pw.Row(
@@ -457,31 +483,45 @@ class PagPdfBillCwP2Gen3 {
             },
             border: pw.TableBorder.all(color: PdfColors.grey600, width: 0.5),
             children: [
-              pw.TableRow(children: [
-                pw.Text(' Account No',
-                    style: styleSmall.copyWith(fontWeight: pw.FontWeight.bold)),
-                pw.Text(' $tenantAccountNumber',
-                    style:
-                        styleNormal.copyWith(fontWeight: pw.FontWeight.bold)),
-              ]),
-              pw.TableRow(children: [
-                pw.Text(' Invoice No',
-                    style: styleSmall.copyWith(fontWeight: pw.FontWeight.bold)),
-                pw.Text(' $invoiceNumber',
-                    style:
-                        styleNormal.copyWith(fontWeight: pw.FontWeight.bold)),
-              ]),
-              pw.TableRow(children: [
-                pw.Text(' Total Amt.',
-                    style: styleSmall.copyWith(fontWeight: pw.FontWeight.bold)),
-                pw.Text(
+              pw.TableRow(
+                children: [
+                  pw.Text(
+                    ' Account No',
+                    style: styleSmall.copyWith(fontWeight: pw.FontWeight.bold),
+                  ),
+                  pw.Text(
+                    ' $tenantAccountNumber',
+                    style: styleNormal.copyWith(fontWeight: pw.FontWeight.bold),
+                  ),
+                ],
+              ),
+              pw.TableRow(
+                children: [
+                  pw.Text(
+                    ' Invoice No',
+                    style: styleSmall.copyWith(fontWeight: pw.FontWeight.bold),
+                  ),
+                  pw.Text(
+                    ' $invoiceNumber',
+                    style: styleNormal.copyWith(fontWeight: pw.FontWeight.bold),
+                  ),
+                ],
+              ),
+              pw.TableRow(
+                children: [
+                  pw.Text(
+                    ' Total Amt.',
+                    style: styleSmall.copyWith(fontWeight: pw.FontWeight.bold),
+                  ),
+                  pw.Text(
                     payableAmount != null
                         // ? ' \$${payableAmount.toString()}'
                         ? ' \$${getCommaNumberStr(payableAmount!, decimal: 2)}'
                         : '-',
-                    style:
-                        styleNormal.copyWith(fontWeight: pw.FontWeight.bold)),
-              ]),
+                    style: styleNormal.copyWith(fontWeight: pw.FontWeight.bold),
+                  ),
+                ],
+              ),
             ],
           ),
         ],
@@ -490,18 +530,16 @@ class PagPdfBillCwP2Gen3 {
   }
 
   pw.PageTheme _buildTheme(
-      PdfPageFormat pageFormat, pw.Font base, pw.Font bold, pw.Font italic) {
+    PdfPageFormat pageFormat,
+    pw.Font base,
+    pw.Font bold,
+    pw.Font italic,
+  ) {
     return pw.PageTheme(
       pageFormat: pageFormat,
-      theme: pw.ThemeData.withFont(
-        base: base,
-        bold: bold,
-        italic: italic,
-      ),
-      buildBackground: (context) => pw.FullPage(
-        ignoreMargins: true,
-        child: pw.SvgImage(svg: _bgShape!),
-      ),
+      theme: pw.ThemeData.withFont(base: base, bold: bold, italic: italic),
+      buildBackground: (context) =>
+          pw.FullPage(ignoreMargins: true, child: pw.SvgImage(svg: _bgShape!)),
     );
   }
 
@@ -513,18 +551,20 @@ class PagPdfBillCwP2Gen3 {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        pw.Text(customerCompanyTradingName,
-            style: styleLarge.copyWith(fontWeight: pw.FontWeight.bold)),
+        pw.Text(
+          customerCompanyTradingName,
+          style: styleLarge.copyWith(fontWeight: pw.FontWeight.bold),
+        ),
         // pw.SizedBox(height: 2),
-        pw.Row(children: [
-          pw.Text(tenantBillingAddressLine1, style: styleNormal),
-        ]),
-        pw.Row(children: [
-          pw.Text(tenantBillingAddressLine2, style: styleNormal),
-        ]),
-        pw.Row(children: [
-          pw.Text(tenantBillingAddressLine3, style: styleNormal),
-        ]),
+        pw.Row(
+          children: [pw.Text(tenantBillingAddressLine1, style: styleNormal)],
+        ),
+        pw.Row(
+          children: [pw.Text(tenantBillingAddressLine2, style: styleNormal)],
+        ),
+        pw.Row(
+          children: [pw.Text(tenantBillingAddressLine3, style: styleNormal)],
+        ),
       ],
     );
   }
@@ -533,8 +573,9 @@ class PagPdfBillCwP2Gen3 {
     double depositAmount =
         double.tryParse(strDepositAmount.replaceAll(',', '')) ?? 0;
 
-    PagPaymentMethod paymentMethodEnum =
-        PagPaymentMethod.byValue(paymentMethod);
+    PagPaymentMethod paymentMethodEnum = PagPaymentMethod.byValue(
+      paymentMethod,
+    );
     final paymentMode = paymentMethodEnum == PagPaymentMethod.giro
         ? 'GIRO'
         : paymentMethodEnum.label;
@@ -547,75 +588,101 @@ class PagPdfBillCwP2Gen3 {
           height: 125,
           width: 210,
           child: pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                // pw.SizedBox(height: 20),
-                pw.Text(
-                    tenantLcs == 'final_bill'
-                        ? 'FINAL TAX INVOICE'
-                        : 'TAX INVOICE',
-                    style: styleLarge.copyWith(fontWeight: pw.FontWeight.bold)),
-                pw.SizedBox(height: 5),
-                pw.Table(
-                    border: pw.TableBorder.all(
-                        color: PdfColors.grey600, width: 0.5),
-                    columnWidths: {
-                      0: const pw.FixedColumnWidth(30),
-                      1: const pw.FixedColumnWidth(55),
-                    },
-                    defaultVerticalAlignment:
-                        pw.TableCellVerticalAlignment.middle,
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              // pw.SizedBox(height: 20),
+              pw.Text(
+                tenantLcs == 'final_bill' ? 'FINAL TAX INVOICE' : 'TAX INVOICE',
+                style: styleLarge.copyWith(fontWeight: pw.FontWeight.bold),
+              ),
+              pw.SizedBox(height: 5),
+              pw.Table(
+                border: pw.TableBorder.all(
+                  color: PdfColors.grey600,
+                  width: 0.5,
+                ),
+                columnWidths: {
+                  0: const pw.FixedColumnWidth(30),
+                  1: const pw.FixedColumnWidth(55),
+                },
+                defaultVerticalAlignment: pw.TableCellVerticalAlignment.middle,
+                children: [
+                  pw.TableRow(
                     children: [
-                      pw.TableRow(children: [
-                        pw.Text(' Account No.', style: styleNormal),
-                        pw.Text(' $tenantAccountNumber', style: styleNormal)
-                      ]),
-                      pw.TableRow(children: [
-                        pw.Text(' Invoice No.', style: styleNormal),
-                        pw.Text(' $invoiceNumber', style: styleNormal),
-                      ]),
-                      pw.TableRow(children: [
-                        pw.Text(' Invoice Date', style: styleNormal),
-                        pw.Text(' ${_getDateStr(strBillDate)}',
-                            style: styleNormal),
-                      ]),
-                      pw.TableRow(children: [
-                        pw.Text(' Deposit Amt.', style: styleNormal),
-                        pw.Text(' \$${getCommaNumberStr(depositAmount)}',
-                            style: styleNormal),
-                      ]),
-                      pw.TableRow(children: [
-                        pw.Text(' Payment Mode', style: styleNormal),
-                        pw.Text(' $paymentMode',
-                            style: styleNormal),
-                      ]),
-                    ]),
-                pw.SizedBox(height: 10),
-                pw.Table(
-                    border: pw.TableBorder.all(
-                        color: PdfColors.grey600, width: 0.5),
-                    columnWidths: {
-                      0: const pw.FixedColumnWidth(35),
-                      1: const pw.FixedColumnWidth(35),
-                    },
-                    defaultVerticalAlignment:
-                        pw.TableCellVerticalAlignment.middle,
+                      pw.Text(' Account No.', style: styleNormal),
+                      pw.Text(' $tenantAccountNumber', style: styleNormal),
+                    ],
+                  ),
+                  pw.TableRow(
                     children: [
-                      pw.TableRow(children: [
-                        pw.Text(' Total Amount Payable', style: styleNormal),
-                        pw.Text(
-                            ' \$${getCommaNumberStr(payableAmount!, decimal: 2)}',
-                            style: styleNormal.copyWith(
-                                fontWeight: pw.FontWeight.bold)),
-                      ]),
-                      pw.TableRow(children: [
-                        pw.Text(' Due Date', style: styleNormal),
-                        pw.Text(' ${_getDateStr(strDueDate)}',
-                            style: styleNormal.copyWith(
-                                fontWeight: pw.FontWeight.bold)),
-                      ]),
-                    ]),
-              ]),
+                      pw.Text(' Invoice No.', style: styleNormal),
+                      pw.Text(' $invoiceNumber', style: styleNormal),
+                    ],
+                  ),
+                  pw.TableRow(
+                    children: [
+                      pw.Text(' Invoice Date', style: styleNormal),
+                      pw.Text(
+                        ' ${_getDateStr(strBillDate)}',
+                        style: styleNormal,
+                      ),
+                    ],
+                  ),
+                  pw.TableRow(
+                    children: [
+                      pw.Text(' Deposit Amt.', style: styleNormal),
+                      pw.Text(
+                        ' \$${getCommaNumberStr(depositAmount)}',
+                        style: styleNormal,
+                      ),
+                    ],
+                  ),
+                  pw.TableRow(
+                    children: [
+                      pw.Text(' Payment Mode', style: styleNormal),
+                      pw.Text(' $paymentMode', style: styleNormal),
+                    ],
+                  ),
+                ],
+              ),
+              pw.SizedBox(height: 10),
+              pw.Table(
+                border: pw.TableBorder.all(
+                  color: PdfColors.grey600,
+                  width: 0.5,
+                ),
+                columnWidths: {
+                  0: const pw.FixedColumnWidth(35),
+                  1: const pw.FixedColumnWidth(35),
+                },
+                defaultVerticalAlignment: pw.TableCellVerticalAlignment.middle,
+                children: [
+                  pw.TableRow(
+                    children: [
+                      pw.Text(' Total Amount Payable', style: styleNormal),
+                      pw.Text(
+                        ' \$${getCommaNumberStr(payableAmount!, decimal: 2)}',
+                        style: styleNormal.copyWith(
+                          fontWeight: pw.FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  pw.TableRow(
+                    children: [
+                      pw.Text(' Due Date', style: styleNormal),
+                      pw.Text(
+                        ' ${_getDateStr(strDueDate)}',
+                        style: styleNormal.copyWith(
+                          fontWeight: pw.FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -625,8 +692,10 @@ class PagPdfBillCwP2Gen3 {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        pw.Text('Note for GIRO tenants:',
-            style: styleSmall.copyWith(fontWeight: pw.FontWeight.bold)),
+        pw.Text(
+          'Note for GIRO tenants:',
+          style: styleSmall.copyWith(fontWeight: pw.FontWeight.bold),
+        ),
         pw.Text(
           'If invoice due date falls on a non-business day, GIRO deduction (if applicable) will be processed on the next business day. If deduction is unsuccessful, late payment interest will accrue daily from the due date until the invoice is fully settled.',
           style: styleSmall,
@@ -638,8 +707,8 @@ class PagPdfBillCwP2Gen3 {
   String _getBillingPeriodStr(String fromStr, String toStr) {
     DateTime billFrom = DateTime.parse(fromStr);
     // subtract 1 second from billTo to avoid showing next day if billTo is at 00:00:00
-    DateTime billTo =
-        DateTime.parse(toStr).subtract(const Duration(seconds: 1));
+    DateTime billTo = DateTime.parse(toStr)
+        .subtract(const Duration(seconds: 1));
     String formattedFrom = DateFormat('dd MMM yyyy').format(billFrom);
     String formattedTo = DateFormat('dd MMM yyyy').format(billTo);
     return '$formattedFrom - $formattedTo';
@@ -663,20 +732,31 @@ class PagPdfBillCwP2Gen3 {
       child: pw.Row(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          pw.Row(children: [
-            pw.Text('Billing Period: ',
-                style: styleNormal.copyWith(fontWeight: pw.FontWeight.bold)),
-            pw.Text(
+          pw.Row(
+            children: [
+              pw.Text(
+                'Billing Period: ',
+                style: styleNormal.copyWith(fontWeight: pw.FontWeight.bold),
+              ),
+              pw.Text(
                 _getBillingPeriodStr(
-                    strFrom, strEffectiveTo.isEmpty ? strTo : strEffectiveTo),
-                style: styleNormal),
-          ]),
+                  strFrom,
+                  strEffectiveTo.isEmpty ? strTo : strEffectiveTo,
+                ),
+                style: styleNormal,
+              ),
+            ],
+          ),
           pw.SizedBox(width: 50),
-          pw.Row(children: [
-            pw.Text('Bill Date: ',
-                style: styleNormal.copyWith(fontWeight: pw.FontWeight.bold)),
-            pw.Text(_getDateStr(strBillDate), style: styleNormal),
-          ]),
+          pw.Row(
+            children: [
+              pw.Text(
+                'Bill Date: ',
+                style: styleNormal.copyWith(fontWeight: pw.FontWeight.bold),
+              ),
+              pw.Text(_getDateStr(strBillDate), style: styleNormal),
+            ],
+          ),
         ],
       ),
     );
@@ -688,11 +768,14 @@ class PagPdfBillCwP2Gen3 {
       child: pw.Row(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          pw.Row(children: [
-            pw.Text(
-                'For premise address(es) relating to this invoice, refer meter usage details page',
-                style: styleSmall),
-          ]),
+          pw.Row(
+            children: [
+              pw.Text(
+                'This is your tax invoice in respect to the premises referenced in the meter details page below',
+                style: styleSmall,
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -700,25 +783,33 @@ class PagPdfBillCwP2Gen3 {
 
   pw.Widget _getBillerInfo() {
     return pw.SizedBox(
-        height: 95,
-        child: pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            pw.Text(
-                showBillingGen2Hint ? '$cwBillingOnBehalfOf:' : cwBillingOnBehalfOf,
-                style: styleSmall),
-            pw.Text(billedAmgrCompanyTradingName ?? '',
-                maxLines: 2,
-                style: styleNormal.copyWith(fontWeight: pw.FontWeight.bold)),
-            pw.Text('Company Reg No: ${billedAmgrCompanyRegNumber ?? ''}',
-                style: styleNormal),
-            pw.Text('GST Reg No: ${billedAmgrGstRegNumber ?? ''}',
-                style: styleNormal),
-            pw.Text(amgrAddressLine1 ?? '', style: styleNormal),
-            pw.Text(amgrAddressLine2 ?? '', style: styleNormal),
-            pw.Text(amgrAddressLine3 ?? '', style: styleNormal),
-          ],
-        ));
+      height: 95,
+      child: pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Text(
+            showBillingGen2Hint ? '$cwBillingOnBehalfOf:' : cwBillingOnBehalfOf,
+            style: styleSmall,
+          ),
+          pw.Text(
+            billedAmgrCompanyTradingName ?? '',
+            maxLines: 2,
+            style: styleNormal.copyWith(fontWeight: pw.FontWeight.bold),
+          ),
+          pw.Text(
+            'Company Reg No: ${billedAmgrCompanyRegNumber ?? ''}',
+            style: styleNormal,
+          ),
+          pw.Text(
+            'GST Reg No: ${billedAmgrGstRegNumber ?? ''}',
+            style: styleNormal,
+          ),
+          pw.Text(amgrAddressLine1 ?? '', style: styleNormal),
+          pw.Text(amgrAddressLine2 ?? '', style: styleNormal),
+          pw.Text(amgrAddressLine3 ?? '', style: styleNormal),
+        ],
+      ),
+    );
   }
 
   pw.Widget _getContentFooter(pw.Context context) {
@@ -762,9 +853,7 @@ class PagPdfBillCwP2Gen3 {
             ],
           ),
         ),
-        pw.Expanded(
-          child: pw.SizedBox(),
-        ),
+        pw.Expanded(child: pw.SizedBox()),
       ],
     );
   }
@@ -800,55 +889,89 @@ class PagPdfBillCwP2Gen3 {
       }
     }
 
-    Map<String, dynamic> singleNoteE =
-        _getSingleNote(typeSingularUsageInfoListE);
-    Map<String, dynamic> singleNoteW =
-        _getSingleNote(typeSingularUsageInfoListW);
-    Map<String, dynamic> singleNoteB =
-        _getSingleNote(typeSingularUsageInfoListB);
-    Map<String, dynamic> singleNoteN =
-        _getSingleNote(typeSingularUsageInfoListN);
-    Map<String, dynamic> singleNoteG =
-        _getSingleNote(typeSingularUsageInfoListG);
-    Map<String, dynamic> singleNoteSE1 =
-        _getSingleNote(typeSingularUsageInfoListSE1);
+    Map<String, dynamic> singleNoteE = _getSingleNote(
+      typeSingularUsageInfoListE,
+    );
+    Map<String, dynamic> singleNoteW = _getSingleNote(
+      typeSingularUsageInfoListW,
+    );
+    Map<String, dynamic> singleNoteB = _getSingleNote(
+      typeSingularUsageInfoListB,
+    );
+    Map<String, dynamic> singleNoteN = _getSingleNote(
+      typeSingularUsageInfoListN,
+    );
+    Map<String, dynamic> singleNoteG = _getSingleNote(
+      typeSingularUsageInfoListG,
+    );
+    Map<String, dynamic> singleNoteSE1 = _getSingleNote(
+      typeSingularUsageInfoListSE1,
+    );
 
     List<pw.Widget> typeSingularStatListE = _getTypeSingularStatList(
-        'Electricity', 'E', 'kWh', typeSingularUsageInfoListE, singleNoteE);
+      'Electricity',
+      'E',
+      'kWh',
+      typeSingularUsageInfoListE,
+      singleNoteE,
+    );
     List<pw.Widget> typeSingularStatListW = _getTypeSingularStatList(
-        'Water', 'W', 'm³', typeSingularUsageInfoListW, singleNoteW);
+      'Water',
+      'W',
+      'm³',
+      typeSingularUsageInfoListW,
+      singleNoteW,
+    );
     List<pw.Widget> typeSingularStatListB = _getTypeSingularStatList(
-        'Chilled Water', 'B', 'kWh', typeSingularUsageInfoListB, singleNoteB);
+      'Chilled Water',
+      'B',
+      'kWh',
+      typeSingularUsageInfoListB,
+      singleNoteB,
+    );
     List<pw.Widget> typeSingularStatListN = _getTypeSingularStatList(
-        'Natural Gas', 'N', 'm³', typeSingularUsageInfoListN, singleNoteN);
+      'Natural Gas',
+      'N',
+      'm³',
+      typeSingularUsageInfoListN,
+      singleNoteN,
+    );
     List<pw.Widget> typeSingularStatListG = _getTypeSingularStatList(
-        'Gas', 'G', 'm³', typeSingularUsageInfoListG, singleNoteG);
+      'Gas',
+      'G',
+      'm³',
+      typeSingularUsageInfoListG,
+      singleNoteG,
+    );
     List<pw.Widget> typeSingularStatListSE1 = _getTypeSingularStatList(
-        'Solar Energy',
-        'SE1',
-        'kWh',
-        typeSingularUsageInfoListSE1,
-        singleNoteSE1);
+      'Solar Energy',
+      'SE1',
+      'kWh',
+      typeSingularUsageInfoListSE1,
+      singleNoteSE1,
+    );
 
     return pw.Column(
-        mainAxisAlignment: pw.MainAxisAlignment.start,
-        crossAxisAlignment: pw.CrossAxisAlignment.start,
-        children: [
-          _getTypeSet(typeSingularStatListE, singleNoteE),
-          _getTypeSet(typeSingularStatListW, singleNoteW),
-          _getTypeSet(typeSingularStatListB, singleNoteB),
-          _getTypeSet(typeSingularStatListN, singleNoteN),
-          _getTypeSet(typeSingularStatListG, singleNoteG),
-          _getTypeSet(typeSingularStatListSE1, singleNoteSE1),
-        ]);
+      mainAxisAlignment: pw.MainAxisAlignment.start,
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        _getTypeSet(typeSingularStatListE, singleNoteE),
+        _getTypeSet(typeSingularStatListW, singleNoteW),
+        _getTypeSet(typeSingularStatListB, singleNoteB),
+        _getTypeSet(typeSingularStatListN, singleNoteN),
+        _getTypeSet(typeSingularStatListG, singleNoteG),
+        _getTypeSet(typeSingularStatListSE1, singleNoteSE1),
+      ],
+    );
   }
 
   List<pw.Widget> _getTypeSingularStatList(
-      String typeName,
-      String typeKey,
-      String typeUnit,
-      List<Map<String, dynamic>> typeSingularUsageInfoList,
-      Map<String, dynamic> singleNote) {
+    String typeName,
+    String typeKey,
+    String typeUnit,
+    List<Map<String, dynamic>> typeSingularUsageInfoList,
+    Map<String, dynamic> singleNote,
+  ) {
     List<pw.Widget> typeSingularStatList = [];
 
     for (Map<String, dynamic> singularUsageInfo in typeSingularUsageInfoList) {
@@ -870,13 +993,21 @@ class PagPdfBillCwP2Gen3 {
             pw.Row(
               mainAxisAlignment: pw.MainAxisAlignment.start,
               children: [
-                pw.Text(slotStr,
-                    style: styleSmall.copyWith(fontWeight: pw.FontWeight.bold))
+                pw.Text(
+                  slotStr,
+                  style: styleSmall.copyWith(fontWeight: pw.FontWeight.bold),
+                ),
               ],
             ),
             pw.SizedBox(height: 2),
-            _getTypeRow2(boltIcon, typeName, typeUnit, singularUsageInfo,
-                singleNote, typeKey),
+            _getTypeRow2(
+              boltIcon,
+              typeName,
+              typeUnit,
+              singularUsageInfo,
+              singleNote,
+              typeKey,
+            ),
           ],
         ),
       );
@@ -890,7 +1021,8 @@ class PagPdfBillCwP2Gen3 {
   }
 
   Map<String, dynamic> _getSingleNote(
-      List<Map<String, dynamic>> singularInfoList) {
+    List<Map<String, dynamic>> singularInfoList,
+  ) {
     // check if all billed_tp_note are the same
     String singleBilledTpNote = '';
     String singleBilledTpNote2 = '';
@@ -948,7 +1080,9 @@ class PagPdfBillCwP2Gen3 {
   }
 
   pw.Widget _getTypeSet(
-      List<pw.Widget> singularStatList, Map<String, dynamic> singleNote) {
+    List<pw.Widget> singularStatList,
+    Map<String, dynamic> singleNote,
+  ) {
     String singleBilledTpNote = singleNote['singleBilledTpNote'] ?? '';
     String singleBilledTpNote2 = singleNote['singleBilledTpNote2'] ?? '';
     String singleBilledTptRateNote =
@@ -965,73 +1099,86 @@ class PagPdfBillCwP2Gen3 {
           pw.Padding(
             padding: const pw.EdgeInsets.only(top: 2),
             child: pw.Row(
-                crossAxisAlignment: pw.CrossAxisAlignment.start,
-                children: [
-                  pw.Text('    *: ', style: styleSmall),
-                  pw.SizedBox(
-                      width: footnoteWidth,
-                      child: pw.Text(singleBilledTpNote,
-                          maxLines: 2,
-                          style: styleSmall.copyWith(
-                              fontStyle: pw.FontStyle.italic))),
-                ]),
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Text('    *: ', style: styleSmall),
+                pw.SizedBox(
+                  width: footnoteWidth,
+                  child: pw.Text(
+                    singleBilledTpNote,
+                    maxLines: 2,
+                    style: styleSmall.copyWith(fontStyle: pw.FontStyle.italic),
+                  ),
+                ),
+              ],
+            ),
           ),
         if (singleBilledTpNote2.isNotEmpty)
           pw.Padding(
             padding: const pw.EdgeInsets.only(top: 2),
             child: pw.Row(
-                crossAxisAlignment: pw.CrossAxisAlignment.start,
-                children: [
-                  pw.Text('    *: ', style: styleSmall),
-                  pw.SizedBox(
-                      width: footnoteWidth,
-                      child: pw.Text(singleBilledTpNote2,
-                          maxLines: 2,
-                          style: styleSmall.copyWith(
-                              fontStyle: pw.FontStyle.italic))),
-                ]),
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Text('    *: ', style: styleSmall),
+                pw.SizedBox(
+                  width: footnoteWidth,
+                  child: pw.Text(
+                    singleBilledTpNote2,
+                    maxLines: 2,
+                    style: styleSmall.copyWith(fontStyle: pw.FontStyle.italic),
+                  ),
+                ),
+              ],
+            ),
           ),
         if (singleBilledTptRateNote.isNotEmpty)
           pw.Padding(
             padding: const pw.EdgeInsets.only(top: 2),
             child: pw.Row(
-                crossAxisAlignment: pw.CrossAxisAlignment.start,
-                children: [
-                  pw.Text('  **: ', style: styleSmall),
-                  pw.SizedBox(
-                      width: footnoteWidth,
-                      child: pw.Text(singleBilledTptRateNote,
-                          maxLines: 2,
-                          style: styleSmall.copyWith(
-                              fontStyle: pw.FontStyle.italic))),
-                ]),
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Text('  **: ', style: styleSmall),
+                pw.SizedBox(
+                  width: footnoteWidth,
+                  child: pw.Text(
+                    singleBilledTptRateNote,
+                    maxLines: 2,
+                    style: styleSmall.copyWith(fontStyle: pw.FontStyle.italic),
+                  ),
+                ),
+              ],
+            ),
           ),
         if (singleBilledTptCycleNote.isNotEmpty)
           pw.Padding(
             padding: const pw.EdgeInsets.only(top: 2),
             child: pw.Row(
-                crossAxisAlignment: pw.CrossAxisAlignment.start,
-                children: [
-                  pw.Text('***: ', style: styleSmall),
-                  pw.SizedBox(
-                      width: footnoteWidth,
-                      child: pw.Text(singleBilledTptCycleNote,
-                          maxLines: 2,
-                          style: styleSmall.copyWith(
-                              fontStyle: pw.FontStyle.italic))),
-                ]),
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Text('***: ', style: styleSmall),
+                pw.SizedBox(
+                  width: footnoteWidth,
+                  child: pw.Text(
+                    singleBilledTptCycleNote,
+                    maxLines: 2,
+                    style: styleSmall.copyWith(fontStyle: pw.FontStyle.italic),
+                  ),
+                ),
+              ],
+            ),
           ),
       ],
     );
   }
 
   pw.Widget _getTypeRow2(
-      int codePoint,
-      String typeStr,
-      String typeUnit,
-      Map<String, dynamic> singularUsageInfo,
-      Map<String, dynamic> singleNote,
-      String typeKeyPrefix) {
+    int codePoint,
+    String typeStr,
+    String typeUnit,
+    Map<String, dynamic> singularUsageInfo,
+    Map<String, dynamic> singleNote,
+    String typeKeyPrefix,
+  ) {
     PagEmsTypeUsageCalcRl2 usageCalc = singularUsageInfo['usage_calc_rl2'];
 
     EmsTypeUsageR2? typeUsage;
@@ -1099,18 +1246,22 @@ class PagPdfBillCwP2Gen3 {
           children: [
             pw.TableRow(
               children: [
-                pw.Text('  Item',
-                    style:
-                        styleNormal.copyWith(fontWeight: pw.FontWeight.bold)),
-                pw.Text('  Usage',
-                    style:
-                        styleNormal.copyWith(fontWeight: pw.FontWeight.bold)),
-                pw.Text('  Rate',
-                    style:
-                        styleNormal.copyWith(fontWeight: pw.FontWeight.bold)),
-                pw.Text('  Amount',
-                    style:
-                        styleNormal.copyWith(fontWeight: pw.FontWeight.bold)),
+                pw.Text(
+                  '  Item',
+                  style: styleNormal.copyWith(fontWeight: pw.FontWeight.bold),
+                ),
+                pw.Text(
+                  '  Usage',
+                  style: styleNormal.copyWith(fontWeight: pw.FontWeight.bold),
+                ),
+                pw.Text(
+                  '  Rate',
+                  style: styleNormal.copyWith(fontWeight: pw.FontWeight.bold),
+                ),
+                pw.Text(
+                  '  Amount',
+                  style: styleNormal.copyWith(fontWeight: pw.FontWeight.bold),
+                ),
               ],
             ),
             pw.TableRow(
@@ -1147,10 +1298,7 @@ class PagPdfBillCwP2Gen3 {
                 pw.Row(
                   children: [
                     pw.SizedBox(width: 5),
-                    pw.Text(
-                      _formatCurrency(cost),
-                      style: styleNormal,
-                    ),
+                    pw.Text(_formatCurrency(cost), style: styleNormal),
                   ],
                 ),
               ],
@@ -1163,58 +1311,78 @@ class PagPdfBillCwP2Gen3 {
           children: [
             if (billedTpNote.isNotEmpty && singleBilledTpNote.isEmpty)
               pw.Row(
-                  crossAxisAlignment: pw.CrossAxisAlignment.start,
-                  children: [
-                    pw.Text('    *: ', style: styleSmall),
-                    pw.SizedBox(
-                        width: footnoteWidth,
-                        child: pw.Text(billedTpNote,
-                            maxLines: 2,
-                            style: styleSmall.copyWith(
-                                fontStyle: pw.FontStyle.italic))),
-                  ]),
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Text('    *: ', style: styleSmall),
+                  pw.SizedBox(
+                    width: footnoteWidth,
+                    child: pw.Text(
+                      billedTpNote,
+                      maxLines: 2,
+                      style: styleSmall.copyWith(
+                        fontStyle: pw.FontStyle.italic,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             if (billedTpNote2.isNotEmpty && singleBilledTpNote2.isEmpty)
               pw.Row(
-                  crossAxisAlignment: pw.CrossAxisAlignment.start,
-                  children: [
-                    pw.Text('    *: ', style: styleSmall),
-                    pw.SizedBox(
-                        width: footnoteWidth,
-                        child: pw.Text(billedTpNote2,
-                            maxLines: 2,
-                            style: styleSmall.copyWith(
-                                fontStyle: pw.FontStyle.italic))),
-                  ]),
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Text('    *: ', style: styleSmall),
+                  pw.SizedBox(
+                    width: footnoteWidth,
+                    child: pw.Text(
+                      billedTpNote2,
+                      maxLines: 2,
+                      style: styleSmall.copyWith(
+                        fontStyle: pw.FontStyle.italic,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             if (billedTptRateNote.isNotEmpty && singleBilledTptRateNote.isEmpty)
               pw.Padding(
                 padding: const pw.EdgeInsets.only(top: 2),
                 child: pw.Row(
-                    crossAxisAlignment: pw.CrossAxisAlignment.start,
-                    children: [
-                      pw.Text('  **: ', style: styleSmall),
-                      pw.SizedBox(
-                          width: footnoteWidth,
-                          child: pw.Text(billedTptRateNote,
-                              maxLines: 2,
-                              style: styleSmall.copyWith(
-                                  fontStyle: pw.FontStyle.italic))),
-                    ]),
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Text('  **: ', style: styleSmall),
+                    pw.SizedBox(
+                      width: footnoteWidth,
+                      child: pw.Text(
+                        billedTptRateNote,
+                        maxLines: 2,
+                        style: styleSmall.copyWith(
+                          fontStyle: pw.FontStyle.italic,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             if (billedTptCycleNote.isNotEmpty &&
                 singleBilledTptCycleNote.isEmpty)
               pw.Padding(
                 padding: const pw.EdgeInsets.only(top: 2),
                 child: pw.Row(
-                    crossAxisAlignment: pw.CrossAxisAlignment.start,
-                    children: [
-                      pw.Text('***: ', style: styleSmall),
-                      pw.SizedBox(
-                          width: footnoteWidth,
-                          child: pw.Text(billedTptCycleNote,
-                              maxLines: 2,
-                              style: styleSmall.copyWith(
-                                  fontStyle: pw.FontStyle.italic))),
-                    ]),
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Text('***: ', style: styleSmall),
+                    pw.SizedBox(
+                      width: footnoteWidth,
+                      child: pw.Text(
+                        billedTptCycleNote,
+                        maxLines: 2,
+                        style: styleSmall.copyWith(
+                          fontStyle: pw.FontStyle.italic,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
           ],
         ),
@@ -1223,8 +1391,9 @@ class PagPdfBillCwP2Gen3 {
   }
 
   pw.Widget _getTotal() {
-    final interestAmountObj =
-        interestInfo != null ? interestInfo!['total_interest_amount'] : null;
+    final interestAmountObj = interestInfo != null
+        ? interestInfo!['total_interest_amount']
+        : null;
     double billedInterestAmount = 0;
     if (interestAmountObj != null) {
       if (interestAmountObj is double) {
@@ -1234,12 +1403,15 @@ class PagPdfBillCwP2Gen3 {
       }
     }
 
-    final openingBal =
-        miniSoaInfo != null ? miniSoaInfo!['opening_balance'] : null;
-    final closingBal =
-        miniSoaInfo != null ? miniSoaInfo!['closing_balance'] : null;
-    final paymentList =
-        miniSoaInfo != null ? miniSoaInfo!['payment_list'] : null;
+    final openingBal = miniSoaInfo != null
+        ? miniSoaInfo!['opening_balance']
+        : null;
+    final closingBal = miniSoaInfo != null
+        ? miniSoaInfo!['closing_balance']
+        : null;
+    final paymentList = miniSoaInfo != null
+        ? miniSoaInfo!['payment_list']
+        : null;
     double openingBalAmount = 0;
     if (openingBal != null) {
       if (openingBal is double) {
@@ -1260,27 +1432,28 @@ class PagPdfBillCwP2Gen3 {
     }
     closingBalAmount = -1 * closingBalAmount;
 
-// “Non-Taxable Panel” Consists of:
-// Late Payment Interest
-// [Line Item 2] - Line adjustable that is not GST liable AND interest generating
-// [Line Item 3] - Line adjustment that is not GST liable AND NOT interest generating
+    // “Non-Taxable Panel” Consists of:
+    // Late Payment Interest
+    // [Line Item 2] - Line adjustable that is not GST liable AND interest generating
+    // [Line Item 3] - Line adjustment that is not GST liable AND NOT interest generating
 
-// Sub-Total (Non-Taxable)
-// Late Payment Interest:
-// - is the interest generated based on the previous outstanding amounts that were not paid any day during the collection period of this current invoice.
-// - system generated
-// Line Item 2
-// - Definition as per background above
-// - keyed-in by C&W
-// Line Item 3
-// - Definition as per background aboved
-// - keyed-in by C&W
-// Sub-Total (Non-Taxable) = (1) + (2) + (3)
+    // Sub-Total (Non-Taxable)
+    // Late Payment Interest:
+    // - is the interest generated based on the previous outstanding amounts that were not paid any day during the collection period of this current invoice.
+    // - system generated
+    // Line Item 2
+    // - Definition as per background above
+    // - keyed-in by C&W
+    // Line Item 3
+    // - Definition as per background aboved
+    // - keyed-in by C&W
+    // Sub-Total (Non-Taxable) = (1) + (2) + (3)
 
     double latePaymentInterestAmount =
         billedInterestAmount - (lineItemValue3 ?? 0.0);
 
-    double subTotalNonTaxable = latePaymentInterestAmount +
+    double subTotalNonTaxable =
+        latePaymentInterestAmount +
         (lineItemValue2 ?? 0.0) +
         (lineItemValue3 ?? 0.0);
 
@@ -1295,8 +1468,10 @@ class PagPdfBillCwP2Gen3 {
                 border: pw.Border.all(color: PdfColors.grey600, width: 1),
                 borderRadius: pw.BorderRadius.circular(3.0),
               ),
-              padding:
-                  const pw.EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+              padding: const pw.EdgeInsets.symmetric(
+                horizontal: 5,
+                vertical: 3,
+              ),
               child: pw.Column(
                 children: [
                   if (lineItemLabel1 != null && lineItemValue1 != null)
@@ -1306,8 +1481,10 @@ class PagPdfBillCwP2Gen3 {
                         crossAxisAlignment: pw.CrossAxisAlignment.center,
                         children: [
                           pw.Text(lineItemLabel1!, style: styleNormal),
-                          pw.Text(_formatCurrency(lineItemValue1!),
-                              style: styleNormal),
+                          pw.Text(
+                            _formatCurrency(lineItemValue1!),
+                            style: styleNormal,
+                          ),
                         ],
                       ),
                   pw.Row(
@@ -1315,8 +1492,10 @@ class PagPdfBillCwP2Gen3 {
                     crossAxisAlignment: pw.CrossAxisAlignment.center,
                     children: [
                       pw.Text('Usage Total', style: styleNormal),
-                      pw.Text(_formatCurrency(totalUsageCost ?? 0),
-                          style: styleNormal),
+                      pw.Text(
+                        _formatCurrency(totalUsageCost ?? 0),
+                        style: styleNormal,
+                      ),
                     ],
                   ),
                   // bci
@@ -1328,17 +1507,22 @@ class PagPdfBillCwP2Gen3 {
                       pw.Text(
                         'Sub-Total (Taxable)',
                         style: styleNormal.copyWith(
-                            fontWeight: pw.FontWeight.bold),
+                          fontWeight: pw.FontWeight.bold,
+                        ),
                       ),
                       pw.Text(
                         _formatCurrency(subTotalAmount),
                         style: styleNormal.copyWith(
-                            fontWeight: pw.FontWeight.bold),
+                          fontWeight: pw.FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),
                   pw.Divider(
-                      color: PdfColors.grey600, thickness: 0.5, height: 5),
+                    color: PdfColors.grey600,
+                    thickness: 0.5,
+                    height: 5,
+                  ),
                   pw.Row(
                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: pw.CrossAxisAlignment.center,
@@ -1346,26 +1530,28 @@ class PagPdfBillCwP2Gen3 {
                       pw.Text(
                         'GST (${gst ?? 0}%)',
                         style: styleNormal.copyWith(
-                            fontWeight: pw.FontWeight.bold),
+                          fontWeight: pw.FontWeight.bold,
+                        ),
                       ),
                       pw.Text(
                         _formatCurrency(gstAmount),
                         style: styleNormal.copyWith(
-                            fontWeight: pw.FontWeight.bold),
+                          fontWeight: pw.FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),
                   pw.Divider(
-                      color: PdfColors.grey600, thickness: 0.5, height: 5),
+                    color: PdfColors.grey600,
+                    thickness: 0.5,
+                    height: 5,
+                  ),
                   if (latePaymentInterestAmount.abs() > 0.0001)
                     pw.Row(
                       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: pw.CrossAxisAlignment.center,
                       children: [
-                        pw.Text(
-                          'Late Payment Interest',
-                          style: styleNormal,
-                        ),
+                        pw.Text('Late Payment Interest', style: styleNormal),
                         pw.Text(
                           _formatCurrency(latePaymentInterestAmount),
                           style: styleNormal,
@@ -1379,10 +1565,7 @@ class PagPdfBillCwP2Gen3 {
                         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: pw.CrossAxisAlignment.center,
                         children: [
-                          pw.Text(
-                            lineItemLabel2!,
-                            style: styleNormal,
-                          ),
+                          pw.Text(lineItemLabel2!, style: styleNormal),
                           pw.Text(
                             _formatCurrency(lineItemValue2!),
                             style: styleNormal,
@@ -1396,10 +1579,7 @@ class PagPdfBillCwP2Gen3 {
                         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: pw.CrossAxisAlignment.center,
                         children: [
-                          pw.Text(
-                            lineItemLabel3!,
-                            style: styleNormal,
-                          ),
+                          pw.Text(lineItemLabel3!, style: styleNormal),
                           pw.Text(
                             _formatCurrency(lineItemValue3!),
                             style: styleNormal,
@@ -1415,39 +1595,49 @@ class PagPdfBillCwP2Gen3 {
                         pw.Text(
                           'Sub-Total (Non-Taxable)',
                           style: styleNormal.copyWith(
-                              fontWeight: pw.FontWeight.bold),
+                            fontWeight: pw.FontWeight.bold,
+                          ),
                         ),
                         pw.Text(
                           _formatCurrency(subTotalNonTaxable),
                           style: styleNormal.copyWith(
-                              fontWeight: pw.FontWeight.bold),
+                            fontWeight: pw.FontWeight.bold,
+                          ),
                         ),
                       ],
                     ),
                   pw.Divider(
-                      color: PdfColors.grey600, thickness: 0.5, height: 5),
+                    color: PdfColors.grey600,
+                    thickness: 0.5,
+                    height: 5,
+                  ),
                   pw.Container(
-                      color: PdfColors.grey300,
-                      child: pw.Padding(
-                        padding: const pw.EdgeInsets.symmetric(
-                            vertical: 3, horizontal: 1),
-                        child: pw.Row(
-                          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: pw.CrossAxisAlignment.center,
-                          children: [
-                            pw.Text(
-                              'Total Current Charge',
-                              style: styleNormal.copyWith(
-                                  fontWeight: pw.FontWeight.bold),
+                    color: PdfColors.grey300,
+                    child: pw.Padding(
+                      padding: const pw.EdgeInsets.symmetric(
+                        vertical: 3,
+                        horizontal: 1,
+                      ),
+                      child: pw.Row(
+                        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: pw.CrossAxisAlignment.center,
+                        children: [
+                          pw.Text(
+                            'Total Current Charge',
+                            style: styleNormal.copyWith(
+                              fontWeight: pw.FontWeight.bold,
                             ),
-                            pw.Text(
-                              _formatCurrency(cycleTotalAmount),
-                              style: styleNormal.copyWith(
-                                  fontWeight: pw.FontWeight.bold),
+                          ),
+                          pw.Text(
+                            _formatCurrency(cycleTotalAmount),
+                            style: styleNormal.copyWith(
+                              fontWeight: pw.FontWeight.bold,
                             ),
-                          ],
-                        ),
-                      )),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -1469,8 +1659,10 @@ class PagPdfBillCwP2Gen3 {
                           'Balance B/F from previous invoice',
                           style: styleNormal,
                         ),
-                        pw.Text(_formatCurrency(openingBalAmount),
-                            style: styleNormal),
+                        pw.Text(
+                          _formatCurrency(openingBalAmount),
+                          style: styleNormal,
+                        ),
                       ],
                     ),
                     if (paymentList != null)
@@ -1478,8 +1670,8 @@ class PagPdfBillCwP2Gen3 {
                         final paymentAmountObj = payment['credit_amount'];
                         final paymentDateStr =
                             payment['effective_value_timestamp'] ??
-                                payment['value_timestamp'] ??
-                                '';
+                            payment['value_timestamp'] ??
+                            '';
                         double paymentAmount = 0;
                         if (paymentAmountObj != null) {
                           if (paymentAmountObj is double) {
@@ -1509,7 +1701,9 @@ class PagPdfBillCwP2Gen3 {
                       color: PdfColors.grey300,
                       child: pw.Padding(
                         padding: const pw.EdgeInsets.symmetric(
-                            vertical: 3, horizontal: 1),
+                          vertical: 3,
+                          horizontal: 1,
+                        ),
                         child: pw.Row(
                           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: pw.CrossAxisAlignment.center,
@@ -1517,12 +1711,14 @@ class PagPdfBillCwP2Gen3 {
                             pw.Text(
                               'Balance C/F as at* ${_getDateStr(strCollectionEndDate)}',
                               style: styleNormal.copyWith(
-                                  fontWeight: pw.FontWeight.bold),
+                                fontWeight: pw.FontWeight.bold,
+                              ),
                             ),
                             pw.Text(
                               _formatCurrency(closingBalAmount),
                               style: styleNormal.copyWith(
-                                  fontWeight: pw.FontWeight.bold),
+                                fontWeight: pw.FontWeight.bold,
+                              ),
                             ),
                           ],
                         ),
@@ -1532,25 +1728,31 @@ class PagPdfBillCwP2Gen3 {
                 ),
               ),
             pw.SizedBox(height: 3),
-            pw.Row(children: [
-              pw.Text(
-                '* payments made close to this collection end date may not be reflected',
-                style: styleSmall.copyWith(fontStyle: pw.FontStyle.italic),
-              ),
-            ]),
+            pw.Row(
+              children: [
+                pw.Text(
+                  '* payments made close to this collection end date may not be reflected',
+                  style: styleSmall.copyWith(fontStyle: pw.FontStyle.italic),
+                ),
+              ],
+            ),
             pw.SizedBox(height: 3),
             pw.Container(
               decoration: pw.BoxDecoration(
                 border: pw.Border.all(color: PdfColors.grey600, width: 2),
                 borderRadius: pw.BorderRadius.circular(3),
               ),
-              padding:
-                  const pw.EdgeInsets.symmetric(vertical: 3, horizontal: 2),
+              padding: const pw.EdgeInsets.symmetric(
+                vertical: 3,
+                horizontal: 2,
+              ),
               child: pw.Container(
                 color: PdfColors.grey300,
                 child: pw.Padding(
-                  padding:
-                      const pw.EdgeInsets.symmetric(vertical: 3, horizontal: 1),
+                  padding: const pw.EdgeInsets.symmetric(
+                    vertical: 3,
+                    horizontal: 1,
+                  ),
                   child: pw.Row(
                     mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: pw.CrossAxisAlignment.center,
@@ -1558,13 +1760,15 @@ class PagPdfBillCwP2Gen3 {
                       pw.Text(
                         // 'Balance Due (Due Date: ${_getDateStr(dueDate)})',
                         'Balance Due',
-                        style:
-                            styleLarge.copyWith(fontWeight: pw.FontWeight.bold),
+                        style: styleLarge.copyWith(
+                          fontWeight: pw.FontWeight.bold,
+                        ),
                       ),
                       pw.Text(
                         _formatCurrency(payableAmount),
-                        style:
-                            styleLarge.copyWith(fontWeight: pw.FontWeight.bold),
+                        style: styleLarge.copyWith(
+                          fontWeight: pw.FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),
@@ -1619,10 +1823,7 @@ class PagPdfBillCwP2Gen3 {
           pw.SizedBox(height: 5),
           pw.Align(
             alignment: pw.Alignment.centerLeft,
-            child: pw.Text(
-              cwMeterReadingRemarks,
-              style: styleTiny,
-            ),
+            child: pw.Text(cwMeterReadingRemarks, style: styleTiny),
           ),
         ],
       ],
@@ -1653,30 +1854,33 @@ class PagPdfBillCwP2Gen3 {
       typeStatList.add(_getTypeStat(singularUsageInfo, 'B'));
       typeStatList.add(_getTypeStat(singularUsageInfo, 'N'));
       typeStatList.add(_getTypeStat(singularUsageInfo, 'G'));
-      singularStatList.add(pw.Container(
-        width: 550,
-        decoration: pw.BoxDecoration(
-          border: pw.Border.all(color: _darkColor, width: 1),
-          borderRadius: pw.BorderRadius.circular(3.0),
+      singularStatList.add(
+        pw.Container(
+          width: 550,
+          decoration: pw.BoxDecoration(
+            border: pw.Border.all(color: _darkColor, width: 1),
+            borderRadius: pw.BorderRadius.circular(3.0),
+          ),
+          margin: const pw.EdgeInsets.only(top: 8),
+          padding: const pw.EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+          child: pw.Column(
+            mainAxisSize: pw.MainAxisSize.min,
+            children: [
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.start,
+                children: [
+                  pw.Text(
+                    slotStr,
+                    style: styleNormal.copyWith(fontWeight: pw.FontWeight.bold),
+                  ),
+                ],
+              ),
+              pw.SizedBox(height: 5),
+              ...typeStatList,
+            ],
+          ),
         ),
-        margin: const pw.EdgeInsets.only(top: 8),
-        padding: const pw.EdgeInsets.symmetric(horizontal: 5, vertical: 3),
-        child: pw.Column(
-          mainAxisSize: pw.MainAxisSize.min,
-          children: [
-            pw.Row(
-              mainAxisAlignment: pw.MainAxisAlignment.start,
-              children: [
-                pw.Text(slotStr,
-                    style:
-                        styleNormal.copyWith(fontWeight: pw.FontWeight.bold)),
-              ],
-            ),
-            pw.SizedBox(height: 5),
-            ...typeStatList,
-          ],
-        ),
-      ));
+      );
     }
 
     return pw.Column(
@@ -1807,7 +2011,9 @@ class PagPdfBillCwP2Gen3 {
   }
 
   pw.Widget _getManualUsage(
-      Map<String, dynamic> singularUsageInfo, String typeStr) {
+    Map<String, dynamic> singularUsageInfo,
+    String typeStr,
+  ) {
     final manualUsageList = singularUsageInfo['manual_usage_list'] ?? [];
     if (manualUsageList.isEmpty) {
       return pw.Container();
@@ -1834,7 +2040,9 @@ class PagPdfBillCwP2Gen3 {
   }
 
   pw.Widget _getManualUsage2(
-      Map<String, dynamic> singularUsageInfo, String meterTypeTag) {
+    Map<String, dynamic> singularUsageInfo,
+    String meterTypeTag,
+  ) {
     final normalizedMeterTypeTag = meterTypeTag.toLowerCase();
     final manualUsageInfo = singularUsageInfo['manual_usage_info'];
     dynamic typeUsage =
@@ -1874,25 +2082,37 @@ class PagPdfBillCwP2Gen3 {
     final charts = <pw.Widget>[];
     void addChart(String label, String unit, List<Map<String, dynamic>>? data) {
       if (data == null || data.isEmpty) return;
-      charts.add(pw.Container(
-        height: 115,
-        margin: const pw.EdgeInsets.only(top: 5, bottom: 5),
-        padding: const pw.EdgeInsets.all(5),
-        decoration: pw.BoxDecoration(
-          border: pw.Border.all(color: PdfColors.grey500, width: 0.5),
-        ),
-        child: pw.Row(children: [
-          _getTrending(data),
-          pw.Expanded(child: pw.Column(
-            mainAxisAlignment: pw.MainAxisAlignment.center,
+      charts.add(
+        pw.Container(
+          height: 115,
+          margin: const pw.EdgeInsets.only(top: 5, bottom: 5),
+          padding: const pw.EdgeInsets.all(5),
+          decoration: pw.BoxDecoration(
+            border: pw.Border.all(color: PdfColors.grey500, width: 0.5),
+          ),
+          child: pw.Row(
             children: [
-              pw.Text(label, style: styleNormal.copyWith(fontWeight: pw.FontWeight.bold)),
-              pw.Text('Usage ($unit)', style: styleSmall),
+              _getTrending(data),
+              pw.Expanded(
+                child: pw.Column(
+                  mainAxisAlignment: pw.MainAxisAlignment.center,
+                  children: [
+                    pw.Text(
+                      label,
+                      style: styleNormal.copyWith(
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                    pw.Text('Usage ($unit)', style: styleSmall),
+                  ],
+                ),
+              ),
             ],
-          )),
-        ]),
-      ));
+          ),
+        ),
+      );
     }
+
     addChart('Electricity', 'kWh', trendingE);
     addChart('Water', 'm³', trendingW);
     addChart('Chilled Water', 'kWh', trendingB);
@@ -1903,8 +2123,10 @@ class PagPdfBillCwP2Gen3 {
     return [
       pw.Padding(
         padding: const pw.EdgeInsets.only(top: 8),
-        child: pw.Text('Consumption History',
-          style: styleLarge.copyWith(fontWeight: pw.FontWeight.bold)),
+        child: pw.Text(
+          'Consumption History',
+          style: styleLarge.copyWith(fontWeight: pw.FontWeight.bold),
+        ),
       ),
       ...charts,
       pw.SizedBox(height: 8),
@@ -1915,9 +2137,12 @@ class PagPdfBillCwP2Gen3 {
     if (trending == null || trending.isEmpty) return pw.SizedBox();
 
     // Work on copies so repeated downloads do not change the billed history.
-    final months = trending.take(6)
+    final months = trending
+        .take(6)
         .map((item) => Map<String, dynamic>.from(item))
-        .toList().reversed.toList();
+        .toList()
+        .reversed
+        .toList();
     // A first bill needs a nonzero x-axis range, without a fictitious month.
     if (months.length == 1) {
       months.insert(0, {'label': '', 'value': 0.0});
@@ -1941,11 +2166,17 @@ class PagPdfBillCwP2Gen3 {
               final label = item['label'] as String;
               return pw.Transform.translate(
                 offset: const PdfPoint(-10, 0),
-                child: pw.Column(children: [
-                  pw.Text(_getMonthLable(label), style: labelStyle),
-                  pw.Text(label.isEmpty ? '' : getBarNumberStr(item['value'] as double),
-                      style: labelStyle),
-                ]),
+                child: pw.Column(
+                  children: [
+                    pw.Text(_getMonthLable(label), style: labelStyle),
+                    pw.Text(
+                      label.isEmpty
+                          ? ''
+                          : getBarNumberStr(item['value'] as double),
+                      style: labelStyle,
+                    ),
+                  ],
+                ),
               );
             },
           ),
@@ -1958,16 +2189,25 @@ class PagPdfBillCwP2Gen3 {
             borderColor: PdfColors.grey,
             width: 15,
             offset: -10,
-            data: List<pw.PointChartValue>.generate(lastIndex, (i) =>
-                pw.PointChartValue(i.toDouble(), (months[i]['value'] as num).toDouble())),
+            data: List<pw.PointChartValue>.generate(
+              lastIndex,
+              (i) => pw.PointChartValue(
+                i.toDouble(),
+                (months[i]['value'] as num).toDouble(),
+              ),
+            ),
           ),
           pw.BarDataSet(
             color: PdfColors.grey,
             borderColor: PdfColors.grey,
             width: 15,
             offset: -10,
-            data: [pw.PointChartValue(lastIndex.toDouble(),
-                (months[lastIndex]['value'] as num).toDouble())],
+            data: [
+              pw.PointChartValue(
+                lastIndex.toDouble(),
+                (months[lastIndex]['value'] as num).toDouble(),
+              ),
+            ],
           ),
         ],
       ),
@@ -2034,7 +2274,7 @@ class PagPdfBillCwP2Gen3 {
       'Sep',
       'Oct',
       'Nov',
-      'Dec'
+      'Dec',
     ];
     List<String> dateList = label.split('-');
     if (dateList.length != 2) {
@@ -2062,9 +2302,9 @@ class PagPdfBillCwP2Gen3 {
         (useG
             ? 'G'
             : useM
-                ? 'M'
-                : useK
-                    ? 'K'
-                    : '');
+            ? 'M'
+            : useK
+            ? 'K'
+            : '');
   }
 }
