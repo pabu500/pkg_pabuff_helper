@@ -1,10 +1,17 @@
+import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/cw_bill/principal_address_cw.dart';
+import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/billing_helper.dart';
+import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/billing_helper2.dart';
+
 import 'dart:convert';
 import 'dart:io';
 import 'dart:ui' as ui;
+
 import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/meter_usage_cost_rounding.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_ems_type_usage_calc_rl.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_ems_type_usage_calc_rl2.dart';
+
 import 'dart:typed_data';
+
 import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/pag_pdf_bill.dart'
     as gen2;
 import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/pag_pdf_bill2.dart'
@@ -47,29 +54,72 @@ void main() {
     expect(MeterUsageCostRounding().add(1, null), isNull);
     expect(MeterUsageCostRounding().add(-10, 2), -20);
   });
+  test(
+    'principal address uses account premises and skips blank address parts',
+    () {
+      final bill = <String, dynamic>{
+        'from_timestamp': '2026-09-01T00:00:00',
+        'to_timestamp': '2026-10-01T00:00:00',
+        'tenant_building_address_line_1': ' 1 Choa Chu Kang Grove ',
+        'tenant_building_address_line_2': 'ITE College West',
+        'tenant_location_label': 'Blk 5 Rooftop',
+        'tenant_building_address_line_3': 'Singapore 688236',
+        'tenant_billing_address_line_1': 'Different mailing address',
+      'mini_soa_info': <String, dynamic>{},
+      'interest_info': <String, dynamic>{},
+      };
+      for (final prepare in [prepCalcedBillInfoRl, prepCalcedBillInfoRl2]) {
+        expect(
+          prepare(bill)['principalAddress'],
+          '1 Choa Chu Kang Grove, ITE College West, Blk 5 Rooftop, Singapore 688236',
+        );
+        for (final blank in [null, '', '   ']) {
+          expect(
+            prepare({
+              ...bill,
+              'tenant_building_address_line_2': blank,
+            })['principalAddress'],
+            '1 Choa Chu Kang Grove, Blk 5 Rooftop, Singapore 688236',
+          );
+        }
+      }
+      expect(
+        cwPrincipalAddress({
+          'tenant_billing_address_line_1': 'Mailing address',
+        }),
+        '',
+      );
+    },
+  );
   for (final gen in [2, 3]) {
-    test('Gen$gen compiled invoices retain each landlord logo when saved', () async {
-      final fallback = pw.MemoryImage(await _testPng(1));
-      final invoices = [
-        _invoice(gen, null, landlordLogo: base64Encode(await _testPng(7))),
-        _invoice(gen, null, landlordLogo: base64Encode(await _testPng(9))),
-        _invoice(gen, null),
-      ];
-      final doc = pw.Document();
-      for (final invoice in invoices) {
-        doc.addPage(await invoice.getPage1(logo: fallback));
-        doc.addPage(await invoice.getPage2(logo: fallback));
-      }
-      await doc.save();
+    test(
+      'Gen$gen compiled invoices retain each landlord logo when saved',
+      () async {
+        final fallback = pw.MemoryImage(await _testPng(1));
+        final invoices = [
+          _invoice(gen, null, landlordLogo: base64Encode(await _testPng(7))),
+          _invoice(gen, null, landlordLogo: base64Encode(await _testPng(9))),
+          _invoice(gen, null),
+        ];
+        final doc = pw.Document();
+        for (final invoice in invoices) {
+          doc.addPage(await invoice.getPage1(logo: fallback));
+          doc.addPage(await invoice.getPage2(logo: fallback));
+        }
+        await doc.save();
 
-      final pages = doc.document.pdfPageList.pages;
-      expect(pages.length, 6);
-      for (final (index, width) in [7, 9, 1].indexed) {
-        final images = pages[index * 2].xObjects.values.whereType<PdfImage>();
-        expect(images.single.width, width);
-        expect(pages[index * 2 + 1].xObjects.values.whereType<PdfImage>(), isEmpty);
-      }
-    });
+        final pages = doc.document.pdfPageList.pages;
+        expect(pages.length, 6);
+        for (final (index, width) in [7, 9, 1].indexed) {
+          final images = pages[index * 2].xObjects.values.whereType<PdfImage>();
+          expect(images.single.width, width);
+          expect(
+            pages[index * 2 + 1].xObjects.values.whereType<PdfImage>(),
+            isEmpty,
+          );
+        }
+      },
+    );
     test(
       'Gen$gen meter costs render with allocation and billing rate',
       () async {
@@ -132,6 +182,31 @@ void main() {
         if (output != null) {
           await File('$output/gen$gen-meter-cost.pdf').writeAsBytes(bytes);
         }
+        // The account address differs from the meters' building and unit.
+        for (final (label, address) in <String, String>{
+          'principal-address': '1 Choa Chu Kang Grove, ITE College West, Blk 5 Rooftop, Singapore 688236',
+          'optional-address-line':
+              '1 Choa Chu Kang Grove, Blk 5 Rooftop, Singapore 688236',
+          'long-address': '1 Choa Chu Kang Grove, ITE College West Training and Administration Building, Blk 5 Rooftop Mechanical and Electrical Services Area, Singapore 688236',
+        }.entries.map((entry) => (entry.key, entry.value))) {
+          final addressed = pw.Document();
+          final invoice = _invoice(
+            gen,
+            null,
+            singularUsage: [slot],
+            principalAddress: address,
+            electricityTrending: [
+              {'label': '2026-09', 'value': 10001.0},
+            ],
+          );
+          addressed.addPage(await invoice.getPage2());
+          final addressedBytes = await addressed.save();
+          expect(addressed.document.pdfPageList.pages.length, 1);
+          if (output != null) {
+            await File('$output/gen$gen-$label.pdf')
+                .writeAsBytes(addressedBytes);
+          }
+        }
         final multiSlot = pw.Document();
         multiSlot.addPage(
           await _invoice(
@@ -150,9 +225,8 @@ void main() {
         final multiSlotBytes = await multiSlot.save();
         expect(multiSlot.document.pdfPageList.pages.length, 1);
         if (output != null) {
-          await File(
-            '$output/gen$gen-multi-slot.pdf',
-          ).writeAsBytes(multiSlotBytes);
+          await File('$output/gen$gen-multi-slot.pdf')
+              .writeAsBytes(multiSlotBytes);
         }
       },
     );
@@ -204,12 +278,15 @@ dynamic _invoice(
   List<Map<String, dynamic>>? trending, {
   List<Map<String, dynamic>> singularUsage = const [],
   String? landlordLogo,
+  String principalAddress = '',
+  List<Map<String, dynamic>>? electricityTrending,
 }) {
   final constructor = gen == 2
       ? gen2.PagPdfBillCwP2.new
       : gen3.PagPdfBillCwP2Gen3.new;
   return Function.apply(constructor, [], <Symbol, dynamic>{
     #customerName: '',
+    #principalAddress: principalAddress,
     #tenantAccountNumber: '',
     #customerCompanyTradingName: '',
     #tenantBillingAddressLine1: '',
@@ -250,7 +327,7 @@ dynamic _invoice(
     #typeCostN: null,
     #typeCostG: null,
     #typeCostSE1: null,
-    #trendingE: trending,
+    #trendingE: electricityTrending ?? trending,
     #trendingW: trending,
     #trendingB: trending,
     #trendingN: trending,

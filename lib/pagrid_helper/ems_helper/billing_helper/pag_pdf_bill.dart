@@ -16,6 +16,7 @@ import '../../../util/util.dart';
 import 'cw_bill/invoice_label_cw.dart';
 import 'cw_bill/landlord_logo_cw.dart';
 import 'cw_bill/meter_reading_table.dart';
+import 'cw_bill/principal_address_cw.dart';
 import 'meter_usage_cost_rounding.dart';
 
 const int boltIcon = 0xea0b;
@@ -33,6 +34,7 @@ class PagPdfBillCwP2 {
   PagPdfBillCwP2({
     required this.customerName,
     required this.tenantAccountNumber,
+    this.principalAddress = '',
     required this.customerCompanyTradingName,
     required this.tenantBillingAddressLine1,
     required this.tenantBillingAddressLine2,
@@ -118,6 +120,7 @@ class PagPdfBillCwP2 {
   final String customerCompanyTradingName;
   final String customerName;
   final String tenantAccountNumber;
+  final String principalAddress;
   final String tenantLcs;
   final String tenantBillingAddressLine1;
   final String tenantBillingAddressLine2;
@@ -306,8 +309,8 @@ class PagPdfBillCwP2 {
       header: _buildHeaderP2,
       // footer: _buildFooter,
       build: (context) => [
-        ..._getUsageTrending(),
         _getMeterTypeMeterListUsage(),
+        ..._getUsageTrending(),
       ],
     );
   }
@@ -349,24 +352,11 @@ class PagPdfBillCwP2 {
     );
   }
 
-  pw.Widget _buildHeaderP2(pw.Context context) {
-    return pw.Column(
-      children: [
-        pw.Row(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            pw.SizedBox(
-              width: 250,
-              child: pw.Text(
-                'Meter Usage Details for $invoiceNumber',
-                style: styleLarge.copyWith(fontWeight: pw.FontWeight.bold),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
+  pw.Widget _buildHeaderP2(pw.Context context) => cwMeterDetailsHeader(
+    invoiceNumber: invoiceNumber,
+    principalAddress: principalAddress,
+    style: styleNormal,
+  );
 
   pw.Widget _buildFooter(pw.Context context) {
     return pw.Padding(

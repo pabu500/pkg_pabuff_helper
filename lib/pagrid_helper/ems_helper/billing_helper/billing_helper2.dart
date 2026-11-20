@@ -1,3 +1,4 @@
+import 'cw_bill/principal_address_cw.dart';
 import 'bill_usage_trending.dart';
 import '../../../util/date_time_util.dart';
 import '../tenant/pag_ems_type_usage_calc_rl2.dart';
@@ -202,6 +203,7 @@ Map<String, dynamic> prepCalcedBillInfoRl2(Map<String, dynamic> billInfo) {
     'customerCompanyTradingName':
         billInfo['customer_company_trading_name'] ?? '',
     'tenantAccountNumber': billInfo['tenant_account_number'] ?? '',
+    'principalAddress': cwPrincipalAddress(billInfo),
     'tenantLcs': billInfo['tenant_lcs'] ?? '',
     'strDepositAmount': billInfo['deposit_amount'] ?? '',
     'paymentMethod': billInfo['payment_method'] ?? '',
