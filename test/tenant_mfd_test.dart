@@ -16,6 +16,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:provider/provider.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_tenant.dart';
 import 'package:buff_helper/pag_helper/wgt/app/ems/tenant_lifecycle_changes.dart';
@@ -78,6 +79,13 @@ void main() {
             );
             await tester.pumpAndSettle();
             expect(previews, 1);
+            expect(find.byIcon(Symbols.chevron_forward), findsNWidgets(3));
+            final mfdRect = tester.getRect(find.text('mfd'));
+            final onboardingRect = tester.getRect(find.text('onb'));
+            expect(
+              onboardingRect.left - mfdRect.right,
+              greaterThanOrEqualTo(50),
+            );
             await tester.tap(find.text('mfd'));
             await tester.pumpAndSettle();
             await tester.tap(find.text('Commit'));

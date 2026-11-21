@@ -334,6 +334,76 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
     }
   }
 
+  Future<Map<String, dynamic>> _doDeleteTenant(String itemName) async {
+    if (_isDeleting) return {'error': 'Deletion is already in progress'};
+    setState(() {
+      _isDeleting = true;
+      _deleteResultText = '';
+    });
+    try {
+      final result = await ex(
+        endpoint: PagUrlBase.eptDeleteItem,
+        crudType: 'delete',
+        opStr: 'delete tenant',
+        appConfig: widget.appConfig,
+        user: _loggedInUser,
+        authenticated: true,
+        queryMap: {
+          'scope': _loggedInUser!.selectedScope.toScopeMap(),
+          'id': widget.strItemIndex,
+          'item_kind': PagItemKind.tenant.value,
+          'item_type': PagItemKind.tenant.name,
+          'item_id_type': 'id',
+          'item_id_key': 'id',
+          'item_id_value': widget.strItemIndex,
+          'item_name': itemName,
+        },
+        svcClaim: MdlPagSvcClaim(
+          username: _loggedInUser!.username,
+          userId: _loggedInUser!.id,
+          roleId: _loggedInUser!.selectedRole?.id,
+          target: 'ems.tenantManager.tenantList',
+          operation: 'delete',
+        ),
+      );
+      if (result is! Map<String, dynamic> || result['id']?.toString() != widget.strItemIndex) {
+        return {'error': 'Deletion could not be confirmed. Refresh the list to check the tenant'};
+      }
+      return result;
+    } catch (e) {
+      return {'error': getErrorText(e, defaultErrorText: 'Error deleting tenant')};
+    } finally {
+      if (mounted) setState(() => _isDeleting = false);
+    }
+  }
+
+  void _showDeleteTenantConfirmation(String itemName) {
+    showDialog(
+      context: context,
+      builder: (_) => WgtConfirmBox(
+        title: 'Delete Tenant',
+        opName: 'delete_tenant',
+        itemCount: 1,
+        footerWidget: Text(
+          '$itemName\n\n'
+          'This permanently deletes the MFD tenant and its user, tariff and cost-item associations.\n'
+          'Tenants with bills, payments, readings or audit history cannot be deleted.',
+        ),
+        onConfirm: () async {
+          final result = await _doDeleteTenant(itemName);
+          if (!mounted) return;
+          if (result['error'] != null) {
+            setState(() => _deleteResultText = result['error'].toString());
+            return;
+          }
+          setState(() => _deleteResultText = 'Item deleted');
+          widget.onUpdate?.call();
+          Navigator.of(context).pop();
+        },
+      ),
+    );
+  }
+
   Future<Map<String, dynamic>> _doDeleteMeterGroup(String itemName) async {
     if (_isDeleting) return {'error': 'Deletion is already in progress'};
     setState(() {
@@ -706,6 +776,9 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
       case PagItemKind.bill:
         isDeleteableItem = true;
         break;
+      case PagItemKind.tenant:
+        isDeleteableItem = true;
+        break;
       case PagItemKind.scope:
         isDeleteableItem = widget.itemTypeEnum is PagScopeType &&
             widget.itemTypeEnum != PagScopeType.project;
@@ -749,6 +822,11 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
       break;
     }
     String itemName = '';
+    if (widget.itemKind == PagItemKind.tenant) {
+      // Dropdown fields may omit MFD; use the record, as the status strip does.
+      isItemMFD = (_lcStatusDisplay?.value ?? widget.itemInfoMap?['lc_status']) ==
+          PagTenantLcStatus.mfd.value;
+    }
     for (Map<String, dynamic> field in widget.fieldList) {
       if (field['col_key'] == 'name') {
         itemName = field['value'];
@@ -810,9 +888,27 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(8, 0, 8, 12),
-                  child: getLcStatusOp(widget.fieldList.firstWhere(
-                      (element) => element['col_key'] == 'lc_status',
-                      orElse: () => {})),
+                  child: Row(
+                    children: [
+                      if (isDeleteableItem && isDeleteableByAcl && isItemMFD)
+                        SizedBox(
+                          width: 48,
+                          child: _isDeleting
+                              ? const WgtPagWait(size: 21)
+                              : IconButton(
+                                  tooltip: 'Delete tenant',
+                                  icon: Icon(Icons.delete,
+                                      color: Theme.of(context).colorScheme.error),
+                                  onPressed: () => _showDeleteTenantConfirmation(itemName),
+                                ),
+                        ),
+                      Expanded(
+                        child: getLcStatusOp(widget.fieldList.firstWhere(
+                            (element) => element['col_key'] == 'lc_status',
+                            orElse: () => {})),
+                      ),
+                    ],
+                  ),
                 ),
               ] else
               Stack(children: [
@@ -980,7 +1076,7 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
               ]),
               // verticalSpaceSmall,
               const Divider(height: 1),
-              if ((isAclItem || isResourceTypeItem || isScopeItem || isMeterGroupItem) &&
+              if ((isAclItem || isResourceTypeItem || isScopeItem || isMeterGroupItem || widget.itemKind == PagItemKind.tenant) &&
                   _deleteResultText.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.only(top: 8),

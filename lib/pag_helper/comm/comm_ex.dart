@@ -44,11 +44,14 @@ Future<dynamic> ex({
   svcClaim.svcName = PagSvcType.oresvc2.name;
   svcClaim.endpoint = endpoint;
 
-  final tenantWrite = const {
-    '/ems/tenant/save_tenant_onb_info',
-    '/ems/meter_group/update_ems_meter_group_meter_list',
-    '/key_val_update/do_op_key_val_update',
-  }.contains(endpoint);
+  final tenantWrite =
+      (endpoint == PagUrlBase.eptDeleteItem &&
+          queryMap['item_kind'] == 'tenant') ||
+      const {
+        '/ems/tenant/save_tenant_onb_info',
+        '/ems/meter_group/update_ems_meter_group_meter_list',
+        '/key_val_update/do_op_key_val_update',
+      }.contains(endpoint);
   String svcToken = '';
   if (authenticated && !tenantWrite) {
     const storage = FlutterSecureStorage();

@@ -244,6 +244,28 @@ class _TenantLcStatusState extends State<WgtPagTenantLcStatusOp> {
     }
   }
 
+  Widget _statusButton(BuildContext context, PagTenantLcStatus status) =>
+      Tooltip(
+        message: _reasons(status).join('\n'),
+        child: InkWell(
+          onTap: _eligible(status)
+              ? () => setState(() => _selected = status)
+              : null,
+          child: Opacity(
+            opacity: _eligible(status) || _selected == status ? 1 : 0.5,
+            child: getTenantLcStatusTagWidget(
+              context,
+              status,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onPrimary,
+                fontSize: _selected == status ? 25 : null,
+                fontWeight: _selected == status ? FontWeight.bold : null,
+              ),
+            ),
+          ),
+        ),
+      );
+
   @override
   Widget build(BuildContext context) => Column(
     mainAxisSize: MainAxisSize.min,
@@ -253,8 +275,14 @@ class _TenantLcStatusState extends State<WgtPagTenantLcStatusOp> {
         crossAxisAlignment: WrapCrossAlignment.center,
         runSpacing: 8,
         children: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _statusButton(context, PagTenantLcStatus.mfd),
+              horizontalSpaceLarge,
+            ],
+          ),
           for (final status in [
-            PagTenantLcStatus.mfd,
             PagTenantLcStatus.onboarding,
             PagTenantLcStatus.normal,
             PagTenantLcStatus.offboarding,
@@ -263,35 +291,12 @@ class _TenantLcStatusState extends State<WgtPagTenantLcStatusOp> {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (status != PagTenantLcStatus.mfd)
+                if (status != PagTenantLcStatus.onboarding)
                   Icon(
                     Symbols.chevron_forward,
                     color: Theme.of(context).hintColor,
                   ),
-                Tooltip(
-                  message: _reasons(status).join('\n'),
-                  child: InkWell(
-                    onTap: _eligible(status)
-                        ? () => setState(() => _selected = status)
-                        : null,
-                    child: Opacity(
-                      opacity: _eligible(status) || _selected == status
-                          ? 1
-                          : 0.5,
-                      child: getTenantLcStatusTagWidget(
-                        context,
-                        status,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onPrimary,
-                          fontSize: _selected == status ? 25 : null,
-                          fontWeight: _selected == status
-                              ? FontWeight.bold
-                              : null,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                _statusButton(context, status),
               ],
             ),
           if (_selected != _current)
