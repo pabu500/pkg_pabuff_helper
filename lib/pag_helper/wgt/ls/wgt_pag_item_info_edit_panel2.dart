@@ -893,8 +893,9 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
                       if (isDeleteableItem && isDeleteableByAcl && isItemMFD)
                         SizedBox(
                           width: 48,
+                          height: 48,
                           child: _isDeleting
-                              ? const WgtPagWait(size: 21)
+                              ? const Center(child: WgtPagWait(size: 21))
                               : IconButton(
                                   tooltip: 'Delete tenant',
                                   icon: Icon(Icons.delete,
