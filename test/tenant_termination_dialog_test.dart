@@ -40,15 +40,16 @@ void main() {
       await tester.tap(find.text('Open'));
       await tester.pumpAndSettle();
       expect(find.text('Deposit amount: not recorded'), findsOneWidget);
-      final button = find.widgetWithText(TextButton, 'Terminate');
+      final button = find.widgetWithText(TextButton, 'Confirm');
       expect(tester.widget<TextButton>(button).onPressed, isNull);
-      await tester.enterText(find.byType(TextField).last, 'terminate T1');
+      await tester.enterText(find.byType(TextField).first, 'terminate T1');
       await tester.pump();
       expect(tester.widget<TextButton>(button).onPressed, isNull);
       await tester.tap(find.byType(CheckboxListTile));
       await tester.pump();
       expect(tester.widget<TextButton>(button).onPressed, isNotNull);
-      await tester.enterText(find.byType(TextField).first, 'Returned in cash');
+      await tester.enterText(find.byType(TextField).last, 'Returned in cash');
+      await tester.pump();
       await tester.ensureVisible(button);
       await tester.tap(button);
       await tester.pumpAndSettle();
@@ -78,11 +79,10 @@ void main() {
       expect(find.text('Deposit amount: 0.00'), findsOneWidget);
       expect(
         tester
-            .widget<TextButton>(find.widgetWithText(TextButton, 'Terminate'))
+            .widget<TextButton>(find.widgetWithText(TextButton, 'Confirm'))
             .onPressed,
         isNull,
       );
     },
   );
 }
-

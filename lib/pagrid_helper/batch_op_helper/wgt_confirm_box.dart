@@ -13,6 +13,10 @@ class WgtConfirmBox extends StatefulWidget {
     this.opName = '',
     this.itemCount = 0,
     this.onEnableConfirm,
+    this.confirmEnabled = true,
+    this.confirmResult,
+    this.confirmLabel = 'Confirm',
+    this.showCancel = true,
     this.message1,
     this.message2,
   });
@@ -28,6 +32,14 @@ class WgtConfirmBox extends StatefulWidget {
   final int itemCount;
   final List<String> keyInConfirmStrList;
   final Function? onEnableConfirm;
+
+  /// Additional validation supplied by the confirmation content.
+  final bool confirmEnabled;
+
+  /// Result returned to callers awaiting the dialog route.
+  final Object? confirmResult;
+  final String confirmLabel;
+  final bool showCancel;
   final String? message1;
   final String? message2;
 
@@ -59,16 +71,17 @@ class _WgtConfirmBoxState extends State<WgtConfirmBox> {
       content: getContentWidget(),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       actions: [
+        if (widget.showCancel)
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Cancel'),
+          ),
         TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: const Text('Cancel'),
-        ),
-        TextButton(
-          onPressed: _isConfirmed
+          onPressed: _isConfirmed && widget.confirmEnabled
               ? () {
-                  Navigator.of(context).pop();
+                  Navigator.of(context).pop(widget.confirmResult);
                   widget.onConfirm();
                 }
               : null,
@@ -76,11 +89,14 @@ class _WgtConfirmBoxState extends State<WgtConfirmBox> {
             padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(5),
-              color: _isConfirmed
+              color: _isConfirmed && widget.confirmEnabled
                   ? commitColor
                   : Theme.of(context).disabledColor,
             ),
-            child: const Text('Confirm', style: TextStyle(color: Colors.white)),
+            child: Text(
+              widget.confirmLabel,
+              style: const TextStyle(color: Colors.white),
+            ),
           ),
         ),
       ],

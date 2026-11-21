@@ -85,6 +85,11 @@ class _TenantLcStatusState extends State<WgtPagTenantLcStatusOp> {
     }
   }
 
+  Future<void> _refreshCheck() async {
+    setState(() => _selected = _current);
+    await _loadCheck();
+  }
+
   Future<void> _loadCheck() async {
     final version = ++_version;
     if (!_hasManualTargets || !widget.enableEdit) {
@@ -132,10 +137,22 @@ class _TenantLcStatusState extends State<WgtPagTenantLcStatusOp> {
 
   Map<String, dynamic> _target(PagTenantLcStatus status) =>
       Map<String, dynamic>.from(_targets[status.value] as Map? ?? {});
-  List<String> _reasons(PagTenantLcStatus status) =>
-      (_target(status)['reasons'] as List? ?? [])
-          .map((e) => e.toString())
-          .toList();
+  List<String> _reasons(PagTenantLcStatus status) {
+    if (_current == PagTenantLcStatus.terminated &&
+        status == PagTenantLcStatus.offboarding &&
+        !_loading &&
+        _error.isEmpty &&
+        _targets.isNotEmpty &&
+        !_targets.containsKey('offb')) {
+      return [
+        'Reopening requires a Project Admin role for this project or a System Admin role.',
+      ];
+    }
+    return (_target(status)['reasons'] as List? ?? [])
+        .map((e) => e.toString())
+        .toList();
+  }
+
   bool _eligible(PagTenantLcStatus status) =>
       widget.enableEdit &&
       !_loading &&
@@ -143,6 +160,8 @@ class _TenantLcStatusState extends State<WgtPagTenantLcStatusOp> {
       ((_current == PagTenantLcStatus.offboarding &&
               (status == PagTenantLcStatus.normal ||
                   status == PagTenantLcStatus.terminated)) ||
+          (_current == PagTenantLcStatus.terminated &&
+              status == PagTenantLcStatus.offboarding) ||
           (status == PagTenantLcStatus.mfd &&
               (_current == PagTenantLcStatus.onboarding ||
                   _current == PagTenantLcStatus.terminated))) &&
@@ -163,26 +182,31 @@ class _TenantLcStatusState extends State<WgtPagTenantLcStatusOp> {
     if (!mounted ||
         _current != PagTenantLcStatus.terminated ||
         !sameContext() ||
-        !_targets.containsKey('offb')) {
+        _selected != PagTenantLcStatus.offboarding ||
+        !_eligible(PagTenantLcStatus.offboarding)) {
       return;
     }
     final version = _version;
     _confirming = true;
     Map<String, dynamic>? confirmation;
     try {
-      confirmation = await showDialog<Map<String, dynamic>>(
+      await showDialog<void>(
         context: context,
         builder: (_) => WgtTenantReopenDialog(
           tenantName: widget.tenantInfo['name']?.toString() ?? '',
           info: _target(PagTenantLcStatus.offboarding),
+          onConfirm: (value) => confirmation = value,
         ),
       );
     } finally {
       _confirming = false;
     }
+    final confirmedResult = confirmation;
     if (!mounted ||
-        confirmation == null ||
+        confirmedResult == null ||
         version != _version ||
+        _selected != PagTenantLcStatus.offboarding ||
+        !_eligible(PagTenantLcStatus.offboarding) ||
         !sameContext()) {
       return;
     }
@@ -194,7 +218,7 @@ class _TenantLcStatusState extends State<WgtPagTenantLcStatusOp> {
       await reopenTenant(widget.appConfig, user, {
         'scope': scope,
         'tenant_id': tenantId,
-        ...confirmation,
+        ...confirmedResult,
       });
       if (!mounted || tenantId != widget.tenantInfo['id'].toString()) return;
       setState(() {
@@ -221,6 +245,11 @@ class _TenantLcStatusState extends State<WgtPagTenantLcStatusOp> {
 
   Future<void> _commit() async {
     if (_confirming || !_eligible(_selected)) return;
+    if (_current == PagTenantLcStatus.terminated &&
+        _selected == PagTenantLcStatus.offboarding) {
+      await _reopen();
+      return;
+    }
     final tenantId = widget.tenantInfo['id'].toString();
     final selected = _selected;
     Map<String, dynamic> confirmation = {};
@@ -372,19 +401,6 @@ class _TenantLcStatusState extends State<WgtPagTenantLcStatusOp> {
                 _statusButton(context, status),
               ],
             ),
-          if (_current == PagTenantLcStatus.terminated &&
-              widget.enableEdit &&
-              _targets.containsKey('offb'))
-            Padding(
-              padding: const EdgeInsets.only(left: 21),
-              child: WgtCommButton(
-                enabled: !_loading && !_committing && !_confirming,
-                label: 'Reopen (back to Offboarding)',
-                onPressed: () {
-                  unawaited(_reopen());
-                },
-              ),
-            ),
           if (_selected != _current)
             Padding(
               padding: const EdgeInsets.only(left: 21),
@@ -405,7 +421,7 @@ class _TenantLcStatusState extends State<WgtPagTenantLcStatusOp> {
             ),
           if (widget.enableEdit && _hasManualTargets)
             IconButton(
-              onPressed: _loading || _committing ? null : _loadCheck,
+              onPressed: _loading || _committing ? null : _refreshCheck,
               tooltip: 'Refresh eligibility',
               icon: const Icon(Icons.refresh),
             ),
@@ -417,6 +433,8 @@ class _TenantLcStatusState extends State<WgtPagTenantLcStatusOp> {
           child: _TenantLcNotice.error(message: _error),
         ),
       for (final status in [
+        if (_current == PagTenantLcStatus.terminated)
+          PagTenantLcStatus.offboarding,
         if (_current == PagTenantLcStatus.offboarding) ...[
           PagTenantLcStatus.normal,
           PagTenantLcStatus.terminated,
@@ -432,6 +450,8 @@ class _TenantLcStatusState extends State<WgtPagTenantLcStatusOp> {
               key: ValueKey('lc-notice-${status.value}'),
               title: status == PagTenantLcStatus.mfd
                   ? 'Mark for deletion unavailable'
+                  : status == PagTenantLcStatus.offboarding
+                  ? 'Return to Offboarding unavailable'
                   : status == PagTenantLcStatus.normal
                   ? 'Return to Normal unavailable'
                   : 'Termination unavailable',

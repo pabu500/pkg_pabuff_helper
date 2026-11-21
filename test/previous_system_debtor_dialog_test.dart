@@ -32,7 +32,7 @@ void main() {
     );
     await tester.tap(find.text('Open'));
     await tester.pumpAndSettle();
-    final button = find.widgetWithText(TextButton, 'Convert');
+    final button = find.widgetWithText(TextButton, 'Confirm');
     expect(tester.widget<TextButton>(button).onPressed, isNull);
     expect(find.text('Outstanding: 100'), findsOneWidget);
     await tester.enterText(find.byType(TextField), 'convert T1 ');
