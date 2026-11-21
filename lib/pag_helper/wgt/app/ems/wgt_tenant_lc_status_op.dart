@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'tenant_lifecycle_changes.dart';
 import 'wgt_tenant_mfd_dialog.dart';
+import 'wgt_tenant_reopen_dialog.dart';
 import 'wgt_tenant_termination_dialog.dart';
 
 import 'package:material_ui/material_ui.dart';
@@ -146,6 +147,78 @@ class _TenantLcStatusState extends State<WgtPagTenantLcStatusOp> {
               (_current == PagTenantLcStatus.onboarding ||
                   _current == PagTenantLcStatus.terminated))) &&
       _target(status)['eligible'] == true;
+  Future<void> _reopen() async {
+    if (_confirming || _loading || _committing) return;
+    final tenantId = widget.tenantInfo['id'].toString();
+    final user = widget.loggedInUser;
+    if (user == null) return;
+    final scope = Map<String, dynamic>.from(user.selectedScope.toScopeMap());
+    final roleId = user.selectedRole?.id;
+    bool sameContext() =>
+        tenantId == widget.tenantInfo['id'].toString() &&
+        scope['project_name'] ==
+            user.selectedScope.toScopeMap()['project_name'] &&
+        roleId == user.selectedRole?.id;
+    await _loadCheck();
+    if (!mounted ||
+        _current != PagTenantLcStatus.terminated ||
+        !sameContext() ||
+        !_targets.containsKey('offb')) {
+      return;
+    }
+    final version = _version;
+    _confirming = true;
+    Map<String, dynamic>? confirmation;
+    try {
+      confirmation = await showDialog<Map<String, dynamic>>(
+        context: context,
+        builder: (_) => WgtTenantReopenDialog(
+          tenantName: widget.tenantInfo['name']?.toString() ?? '',
+          info: _target(PagTenantLcStatus.offboarding),
+        ),
+      );
+    } finally {
+      _confirming = false;
+    }
+    if (!mounted ||
+        confirmation == null ||
+        version != _version ||
+        !sameContext()) {
+      return;
+    }
+    setState(() {
+      _committing = true;
+      _error = '';
+    });
+    try {
+      await reopenTenant(widget.appConfig, user, {
+        'scope': scope,
+        'tenant_id': tenantId,
+        ...confirmation,
+      });
+      if (!mounted || tenantId != widget.tenantInfo['id'].toString()) return;
+      setState(() {
+        _current = PagTenantLcStatus.offboarding;
+        _selected = _current;
+      });
+      widget.onCommitted?.call(_current);
+      if (mounted) await _loadCheck();
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _error =
+              '${getErrorText(e, defaultErrorText: 'Unable to reopen tenant')}. Reload the tenant before trying again.';
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _committing = false;
+        });
+      }
+    }
+  }
+
   Future<void> _commit() async {
     if (_confirming || !_eligible(_selected)) return;
     final tenantId = widget.tenantInfo['id'].toString();
@@ -298,6 +371,19 @@ class _TenantLcStatusState extends State<WgtPagTenantLcStatusOp> {
                   ),
                 _statusButton(context, status),
               ],
+            ),
+          if (_current == PagTenantLcStatus.terminated &&
+              widget.enableEdit &&
+              _targets.containsKey('offb'))
+            Padding(
+              padding: const EdgeInsets.only(left: 21),
+              child: WgtCommButton(
+                enabled: !_loading && !_committing && !_confirming,
+                label: 'Reopen (back to Offboarding)',
+                onPressed: () {
+                  unawaited(_reopen());
+                },
+              ),
             ),
           if (_selected != _current)
             Padding(

@@ -160,3 +160,27 @@ Future<Map<String, dynamic>> convertPreviousSystemDebtor(
     result['previous_system_debtor'] as Map? ?? result,
   );
 }
+
+Future<Map<String, dynamic>> reopenTenant(
+  MdlPagAppConfig appConfig,
+  MdlPagUser user,
+  Map<String, dynamic> query,
+) async {
+  const endpoint = '/ems/tenant/reopen_tenant';
+  final claim = MdlPagSvcClaim(
+    svcName: PagSvcType.oresvc2.name,
+    endpoint: endpoint,
+  );
+  final response = await sendTenantOperation(
+    claim,
+    user,
+    (headers) => http.post(
+      Uri.parse(
+        PagUrlController(user, appConfig).getUrl(PagSvcType.oresvc2, endpoint),
+      ),
+      headers: headers,
+      body: jsonEncode(MdlPagSvcQuery(claim, query).toJson()),
+    ),
+  );
+  return Map<String, dynamic>.from(getResultFromResp(response.body) as Map);
+}
