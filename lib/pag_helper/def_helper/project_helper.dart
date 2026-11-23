@@ -16,4 +16,5 @@ const List<PagPortalProjectScope> activePortalPagProjectScopeList = [
   PagPortalProjectScope.MBFC,
   PagPortalProjectScope.SUNSEAP,
   PagPortalProjectScope.CW_P2,
+  PagPortalProjectScope.SP_PDM,
 ];

@@ -1334,6 +1334,9 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
             'address_line_3',
           }.contains(field['col_key']);
 
+      final currentValue = field['value'] ?? field['val'] ?? '';
+      final isPdm =
+          _loggedInUser?.selectedScope.projectProfile?.name == 'sp_pdm';
       fields.add((field['widget'] ?? 'input') == 'input'
           ? Padding(
               padding: const EdgeInsets.only(top: 5.0),
@@ -1346,7 +1349,7 @@ class _WgtPagItemInfoEditPanel2State extends State<WgtPagItemInfoEditPanel2> {
                   labelWidth: labelWidth,
                   hintText: hintText,
                   labelText: field['label'] ?? field['title'],
-                  originalValue: field['value'] ?? field['val'] ?? '',
+                  originalValue: isPdm ? currentValue.toString() : currentValue,
                   onFocus: (hasFocus) {
                     setState(() {
                       _currentField = field['col_key'];

@@ -7,6 +7,7 @@ import 'package:buff_helper/pag_helper/def_helper/dh_scope.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_list.dart';
 import 'package:buff_helper/pag_helper/def_helper/dh_pag_item.dart';
 import 'package:buff_helper/pag_helper/model/acl/mdl_pag_svc_claim.dart';
+import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_controller.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_context.dart';
@@ -128,6 +129,16 @@ class _WgtItemTypeSelectorState extends State<WgtItemTypeSelector> {
                   currentScopeType:
                       loggedInUser!.selectedScope.getScopeType(),
                   currentPortalType: widget.appConfig.portalType);
+          if (loggedInUser!.selectedScope.projectProfile?.name == 'sp_pdm') {
+            // PDM list definitions mark the identity with is_display_name_key.
+            for (final column in listController.listColControllerList) {
+              if (column.isDisplayNameKey &&
+                  column.filterGroupType == PagFilterGroupType.identity) {
+                column.isCompactFilter = true;
+                column.pinned = true;
+              }
+            }
+          }
           _listControllerList.add(listController);
         }
       }

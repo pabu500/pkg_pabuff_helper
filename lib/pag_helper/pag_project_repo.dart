@@ -16,6 +16,8 @@ enum PagPortalProjectScope {
   CW_P2_PLQ,
   CW_P2_AMIS,
   FARM,
+  // ignore: constant_identifier_names
+  SP_PDM,
 }
 
 // enum PagSiteScope {
@@ -109,7 +111,12 @@ final portalProjectProfileRepo = [
       'messagingSenderId': '559367262112',
       'measurementId': 'G-KWBCXHSFM5',
     },
-  }
+  },
+  {
+    'project_scope': PagPortalProjectScope.SP_PDM,
+    // TODO: Supply project-specific Firebase options if the portal requires them.
+    'firebase_options': <String, dynamic>{},
+  },
 ];
 
 // final siteProfileRepo = [

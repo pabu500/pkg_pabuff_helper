@@ -13,6 +13,7 @@ import 'package:buff_helper/pag_helper/wgt/app/am/wgt_create_sim.dart';
 
 import '../../../model/mdl_pag_app_config.dart';
 import 'wgt_create_meter_group.dart';
+import 'wgt_create_pdm_device.dart';
 
 class WgtCreateDevice extends StatefulWidget {
   const WgtCreateDevice({
@@ -54,6 +55,14 @@ class _CreateItemState extends State<WgtCreateDevice> {
 
   @override
   Widget build(BuildContext context) {
+    final isPdm =
+        widget.loggedInUser.selectedScope.projectProfile?.name == 'sp_pdm';
+    final fixedCategory = widget.itemTypeEnum;
+    if (isPdm && fixedCategory != null) {
+      return SingleChildScrollView(
+        child: getCreateDeviceForm(itemType: fixedCategory),
+      );
+    }
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -64,6 +73,8 @@ class _CreateItemState extends State<WgtCreateDevice> {
             itemKind: PagItemKind.device,
             enabledItemTypeList: widget.itemTypeEnum?.value != null
                 ? [widget.itemTypeEnum!.value]
+                : isPdm
+                ? pdmDeviceIdentityKeys.keys.map((type) => type.value).toList()
                 : [
                     PagDeviceCat.meter.value,
                     PagDeviceCat.meterGroup.value,
@@ -93,6 +104,16 @@ class _CreateItemState extends State<WgtCreateDevice> {
     }
     if (itemType is! PagDeviceCat) {
       return const SizedBox.shrink();
+    }
+    if (widget.loggedInUser.selectedScope.projectProfile?.name == 'sp_pdm' &&
+        pdmDeviceIdentityKeys.containsKey(itemType)) {
+      return WgtCreatePdmDevice(
+        key: ValueKey(itemType),
+        appConfig: widget.appConfig,
+        user: widget.loggedInUser,
+        category: itemType,
+        onCreated: () => widget.onCreated?.call(),
+      );
     }
     if (itemType == PagDeviceCat.meter) {
       return WgtCreateMeter(

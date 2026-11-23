@@ -8,6 +8,7 @@ import 'package:buff_helper/pag_helper/model/app/mdl_page_config.dart';
 class MdlPagProjectConfig {
   late final String appContextName;
   List<MdlPagPageConfig> pageConfigList;
+  final PagPageRoute? appHomePageRoute;
 
   // list of scope that this app context is visible
   List<PagScopeType> visibleScopeList;
@@ -17,6 +18,7 @@ class MdlPagProjectConfig {
 
   MdlPagProjectConfig({
     required this.appContextName,
+    this.appHomePageRoute,
     this.pageConfigList = const [],
     this.visibleScopeList = PagScopeType.values,
     this.ctxMenuVisibleScopeList = const [],
@@ -35,8 +37,10 @@ class MdlPagProjectConfig {
     return '';
   }
 
-  factory MdlPagProjectConfig.fromJson(Map<String, dynamic> json) {
+  factory MdlPagProjectConfig.fromJson(Map<String, dynamic> json,
+      {bool useProjectAppHomePageRoute = false}) {
     String appCtxName = json.keys.first;
+    PagPageRoute? appHomePageRoute;
 
     List<MdlPagPageConfig> pageConfigList = [];
     List<Map<String, dynamic>> ctxMenuVisibleScopeList = [];
@@ -54,7 +58,11 @@ class MdlPagProjectConfig {
           PagPageRoute route = PagPageRoute.values.byName(pr);
           for (MdlPagAppContext appCtx in appContextList) {
             if (appCtx.routeList!.contains(route)) {
-              appCtx.appHomePageRoute = route;
+              if (useProjectAppHomePageRoute) {
+                appHomePageRoute = route;
+              } else {
+                appCtx.appHomePageRoute = route;
+              }
               break;
             }
           }
@@ -130,6 +138,7 @@ class MdlPagProjectConfig {
 
     return MdlPagProjectConfig(
       appContextName: appCtxName,
+      appHomePageRoute: appHomePageRoute,
       pageConfigList: pageConfigList,
       visibleScopeList: scopeList,
       ctxMenuVisibleScopeList: ctxMenuVisibleScopeList,

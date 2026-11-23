@@ -110,6 +110,12 @@ class MdlPagListController /*extends ChangeNotifier*/ {
         case 'sensor':
           itemTypeEnum = PagDeviceCat.sensor;
           break;
+        case 'controller':
+          itemTypeEnum = PagDeviceCat.controller;
+          break;
+        case 'paq':
+          itemTypeEnum = PagDeviceCat.paq;
+          break;
         case 'lock':
           itemTypeEnum = PagDeviceCat.lock;
           break;

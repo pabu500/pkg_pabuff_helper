@@ -1349,8 +1349,12 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
   }
 
   String? getSingleIdFilterKey() {
-    if (widget.itemType is PagDeviceCat) {
-      switch (widget.itemType) {
+    final itemType = widget.itemType;
+    if (itemType is PagDeviceCat) {
+      if (widget.loggedInUser.selectedScope.projectProfile?.name == 'sp_pdm') {
+        return pdmDeviceIdentityKeys[itemType];
+      }
+      switch (itemType) {
         case PagDeviceCat.meter:
           return 'meter_sn';
         case PagDeviceCat.gateway:

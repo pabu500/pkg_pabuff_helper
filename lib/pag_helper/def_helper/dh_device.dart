@@ -19,7 +19,9 @@ enum PagDeviceCat {
   mcu('MCU', 'mcu', 'mcu', Symbols.memory),
   motherboard('Motherboard', 'motherboard', 'mb', Symbols.developer_board),
   sim('SIM', 'sim', 'sim', Symbols.sim_card),
-  none('None', 'none', 'non', Symbols.help);
+  none('None', 'none', 'non', Symbols.help),
+  controller('Controller', 'controller', 'ctrl', Symbols.memory),
+  paq('PAQ', 'paq', 'paq', Symbols.settings_input_component);
 
   const PagDeviceCat(
     this.label,
@@ -39,6 +41,12 @@ enum PagDeviceCat {
   static PagDeviceCat byValue(String? value) =>
       enumByValue(value, values, (e) => (e).value) ?? none;
 }
+
+const pdmDeviceIdentityKeys = {
+  PagDeviceCat.controller: 'mac',
+  PagDeviceCat.paq: 'serial',
+  PagDeviceCat.sensor: 'backend_sensor_id',
+};
 
 enum PagMeterType {
   electricity('Electricity', 'electricity', 'E', Symbols.bolt, 'kWh', 'MWh'),
@@ -104,6 +112,8 @@ enum MeterDataType {
 enum PagLinkOpType {
   gatewayToDevice,
   none,
+  controllerToPaq,
+  paqToTarget,
 }
 
 // String getPagDeviceTypeStr(dynamic itemType) {
@@ -692,6 +702,31 @@ List<Map<String, dynamic>> getDeviceConfigListByCat(PagDeviceCat cat) {
       return listConfigBaseDevice + listConfigBaseMeterGroup;
     case PagDeviceCat.sim:
       return listConfigBaseDevice + listConfigBaseSim;
+    case PagDeviceCat.controller:
+    case PagDeviceCat.paq:
+      final identityKey = pdmDeviceIdentityKeys[cat]!;
+      return [
+        {
+          'col_key': identityKey,
+          'title': cat == PagDeviceCat.controller ? 'MAC' : 'Serial',
+          'col_type': 'string',
+          'width': 150,
+          'is_mapping_required': true,
+          'validator': getPdmDeviceValidator(identityKey, isValueRequired: true),
+        },
+        if (cat == PagDeviceCat.paq)
+          {
+            'col_key': 'vendor',
+            'title': 'Vendor',
+            'col_type': 'string',
+            'width': 150,
+            'is_mapping_required': true,
+            'validator': getPdmDeviceValidator('vendor', isValueRequired: true),
+          },
+        ...listConfigBaseDevice.where(
+          (column) => const {'label', 'tag'}.contains(column['col_key']),
+        ),
+      ];
     default:
       return listConfigBaseDevice;
   }
@@ -906,8 +941,44 @@ enum PagSimPackageEnum {
       enumByLabel(label, values, (e) => e.label);
 }
 
+String? Function(String) getPdmDeviceValidator(String key,
+    {required bool isValueRequired}) {
+  return (value) {
+    if (value.trim().isEmpty) return isValueRequired ? 'required' : null;
+    switch (key) {
+      case 'mac':
+        final mac = RegExp(
+          r'^(?:[0-9a-f]{12}|[0-9a-f]{2}([:-])[0-9a-f]{2}(?:\1[0-9a-f]{2}){4})$',
+          caseSensitive: false,
+        );
+        return mac.hasMatch(value) ? null : 'invalid MAC address';
+      case 'serial':
+      case 'hailo_serial':
+        return RegExp(r'^[A-Za-z0-9][A-Za-z0-9._/-]{0,33}$').hasMatch(value)
+            ? null
+            : 'invalid serial number';
+      case 'vendor':
+        return const ['mr', 'pdv'].contains(value) ? null : 'use mr or pdv';
+      case 'lc_status':
+        return value == 'prov' ||
+                PagDeviceLsStatus.values.any((status) => status.value == value)
+            ? null
+            : 'invalid lifecycle status';
+      case 'factor':
+        return (num.tryParse(value)?.isFinite ?? false) ? null : 'enter a number';
+      default:
+        return null;
+    }
+  };
+}
+
 String? Function(String) getDeviceValidator(String key, dynamic itemType,
     {bool isValueRequired = true}) {
+  if (itemType == PagDeviceCat.controller ||
+      itemType == PagDeviceCat.paq ||
+      (itemType == PagDeviceCat.sensor && key == 'backend_sensor_id')) {
+    return getPdmDeviceValidator(key, isValueRequired: isValueRequired);
+  }
   switch (itemType) {
     case PagDeviceCat.meter:
     case PagDeviceCat.meterGroup:

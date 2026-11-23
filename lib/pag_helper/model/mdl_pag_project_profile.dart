@@ -6,6 +6,7 @@ import 'package:buff_helper/pag_helper/model/ems/mdl_pag_tenant.dart';
 import 'package:buff_helper/pag_helper/model/list/mdl_list_col_controller.dart';
 import 'package:buff_helper/pkg_buff_helper.dart';
 import 'package:flutter/foundation.dart';
+import '../def_helper/dh_device.dart';
 import '../def_helper/project_helper.dart';
 import 'scope/mdl_pag_site_group_profile.dart';
 import 'scope/mdl_pag_site_profile.dart';
@@ -386,12 +387,21 @@ class MdlPagProjectProfile {
       }
     }
 
+    final isPdm = projectName == 'sp_pdm';
+    if (isPdm && deviceTypeInfoList.isEmpty) {
+      // The pag-console project config may only contain the AM routes.
+      for (final category in pdmDeviceIdentityKeys.keys) {
+        deviceTypeInfoList.add({category.value: <String, dynamic>{}});
+      }
+    }
+
     List<MdlPagProjectConfig> appCtxConfigList = [];
     PagPageRoute homePageRoute = PagPageRoute.none;
     if (appInfoList.isNotEmpty) {
       for (var appInfo in appInfoList) {
         MdlPagProjectConfig appCtxConfig =
-            MdlPagProjectConfig.fromJson(appInfo);
+            MdlPagProjectConfig.fromJson(appInfo,
+                useProjectAppHomePageRoute: isPdm);
         appCtxConfigList.add(appCtxConfig);
 
         if (homePageRoute == PagPageRoute.none) {

@@ -35,6 +35,7 @@ class WgtListSearchKind2 extends StatefulWidget {
     this.iniItemType,
     this.selectedItemInfoList,
     this.onResult,
+    this.onSearching,
     this.additionalColumnConfig,
     this.onScopeTreeUpdate,
     this.isSingleItemMode = false,
@@ -58,6 +59,7 @@ class WgtListSearchKind2 extends StatefulWidget {
   final PagListContextType listContextType;
   final List<Map<String, dynamic>>? selectedItemInfoList;
   final Function(Map<String, dynamic>)? onResult;
+  final VoidCallback? onSearching;
   final dynamic iniItemType;
   final String prefKey;
   final List<Map<String, dynamic>>? additionalColumnConfig;
@@ -416,6 +418,7 @@ class _WgtListSearchKind2State extends State<WgtListSearchKind2> {
               getPaneWidget: getPaneWidget,
               // getSwitcher: getPaneModeSwitcher,
               onScopeTreeUpdate: widget.onScopeTreeUpdate,
+              onSearching: widget.onSearching,
               onResult: (result) {
                 // Handle the result here
                 widget.onResult?.call(result);
