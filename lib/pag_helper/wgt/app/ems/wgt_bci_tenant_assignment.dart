@@ -14,6 +14,7 @@ import '../../../../xt_ui/wdgt/datetime/wgt_date_picker.dart';
 import '../../../comm/comm_billing_cost_item.dart';
 import '../../../def_helper/dh_pag_tariff.dart';
 import '../../../model/mdl_pag_app_config.dart';
+import 'assignment_row_number_width.dart';
 import 'dart:developer' as dev;
 
 class WgtBciTenantAssignment extends StatefulWidget {
@@ -464,24 +465,24 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
   }
 
   Widget getScopeItemList() {
-    if (_itemGroupScopeMatchingItemList == null ||
-        _itemGroupScopeMatchingItemList!.isEmpty) {
+    final tenants = _itemGroupScopeMatchingItemList;
+    if (tenants == null || tenants.isEmpty) {
       return const Center(
         child: Text('No tenant found for this tariff package'),
       );
     }
 
+    final rowNumberWidth = getAssignmentRowNumberWidth(context, tenants.length);
     List<Widget> itemWidgetList = [];
     int index = 0;
 
-    for (Map<String, dynamic> itemInfo
-        in _itemGroupScopeMatchingItemList ?? []) {
+    for (final itemInfo in tenants) {
       bool showItem = _showItem(itemInfo);
       index++;
       if (!showItem) {
         continue; // Skip this item if it doesn't match the filter
       }
-      Widget tile = getItemRow(itemInfo, index);
+      Widget tile = getItemRow(itemInfo, index, rowNumberWidth);
       itemWidgetList.add(
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 5),
@@ -500,7 +501,11 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
     );
   }
 
-  Widget getItemRow(Map<String, dynamic> itemInfo, int index) {
+  Widget getItemRow(
+    Map<String, dynamic> itemInfo,
+    int index,
+    double rowNumberWidth,
+  ) {
     String tenantName = itemInfo['tenant_name'] ?? 'Unknown Tenant';
     String tenantLabel = itemInfo['tenant_label'] ?? '';
     bool assigned = itemInfo['assigned'] ?? false;
@@ -516,11 +521,13 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         SizedBox(
-          width: 21,
+          width: rowNumberWidth,
           child: Align(
             alignment: Alignment.centerRight,
             child: Text(
               index.toString(),
+              maxLines: 1,
+              softWrap: false,
               style: TextStyle(
                 color: Theme.of(context).hintColor,
               ),
