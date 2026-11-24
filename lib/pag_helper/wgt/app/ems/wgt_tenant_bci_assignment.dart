@@ -99,16 +99,9 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
       );
       final itemGroupScopeMatchingItemList =
           result['item_group_scope_matching_item_list'];
-      if (itemGroupScopeMatchingItemList == null ||
-          itemGroupScopeMatchingItemList.isEmpty) {
-        throw Exception('No item found for this item group');
+      if (itemGroupScopeMatchingItemList is! List) {
+        throw const FormatException('Invalid billing cost item list');
       }
-      // // list of items that are matching the item group scope
-      // final itemGroupScopeMatchingItemList =
-      //     result['item_group_scope_item_assignment'];
-      // if (itemGroupScopeMatchingItemList == null) {
-      //   throw Exception('item_group_scope_matching_item_list is null');
-      // }
 
       _itemGroupScopeMatchingItemList = List<Map<String, dynamic>>.from(
         itemGroupScopeMatchingItemList,
@@ -377,6 +370,16 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
   }
 
   Widget completedWidget() {
+    if (_itemGroupScopeMatchingItemList?.isEmpty ?? true) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Text(
+          'No Billing Cost Items are available for this location.',
+          textAlign: TextAlign.center,
+        ),
+      );
+    }
+
     return Container(
       height: 500,
       decoration: BoxDecoration(
@@ -407,7 +410,7 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
               controller: _itemNamefilterController,
               readOnly: _isCommitting ||
                   _isCommitted ||
-                  {_itemGroupScopeMatchingItemList ?? []}.isEmpty,
+                  (_itemGroupScopeMatchingItemList?.isEmpty ?? true),
               decoration: InputDecoration(
                   hintText: 'Billing Cost Item Name',
                   hintStyle: TextStyle(
@@ -520,10 +523,6 @@ class _WgtTenantBciAssignmentState extends State<WgtTenantBciAssignment> {
   }
 
   Widget getScopeItemList() {
-    if (_itemGroupScopeMatchingItemList == null ||
-        _itemGroupScopeMatchingItemList!.isEmpty) {
-      return const Center(child: Text('No item found for this item group'));
-    }
     List<Widget> itemWidgetList = [];
     int index = 0;
 

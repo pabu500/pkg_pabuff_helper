@@ -30,8 +30,10 @@ void main() {
   });
 
   for (final isBci in [true, false]) {
-    final assignment = isBci ? 'BCI' : 'TP';
-    testWidgets('$assignment shows full row numbers on one line', (
+    final scenario = isBci
+        ? 'BCI shows full row numbers, filters accounts and orders checked rows'
+        : 'TP shows full row numbers on one line';
+    testWidgets(scenario, (
       tester,
     ) async {
       await tester.binding.setSurfaceSize(const Size(1400, 900));
@@ -112,10 +114,63 @@ void main() {
         await tester.enterText(find.byType(TextField).first, 'tenant-1001');
         await tester.pumpAndSettle();
         expectFullNumber(tester, isBci ? '1001' : '1');
+        if (isBci) {
+          await verifyBciAccountSearchAndOrdering(tester);
+        }
         expect(tester.takeException(), isNull);
       }, () => MockClient((_) async => assignmentResponse(isBci)));
     });
   }
+}
+
+Future<void> verifyBciAccountSearchAndOrdering(WidgetTester tester) async {
+  await tester.enterText(find.byType(TextField).first, '');
+  await tester.pumpAndSettle();
+
+  final firstTenant = find.text('tenant-0001');
+  final accountTenant = find.text('tenant-0002');
+  final assignedTenant = find.text('tenant-0003');
+  final account = find.text('ABC-0002');
+  expect(account, findsOneWidget);
+  expect(
+    tester.getTopLeft(assignedTenant).dy,
+    lessThan(tester.getTopLeft(firstTenant).dy),
+  );
+
+  final accountTenantRow = find
+      .ancestor(of: accountTenant, matching: find.byType(Row))
+      .first;
+  final checkbox = find.descendant(
+    of: accountTenantRow,
+    matching: find.byType(Checkbox),
+  );
+  await tester.tap(checkbox);
+  await tester.pumpAndSettle();
+  expect(
+    tester.getTopLeft(accountTenant).dy,
+    lessThan(tester.getTopLeft(assignedTenant).dy),
+  );
+
+  final accountFilter = find.widgetWithText(TextField, 'Tenant Account No.');
+  await tester.enterText(accountFilter, '  bc-0002 ');
+  await tester.pumpAndSettle();
+  expect(account, findsOneWidget);
+  expect(firstTenant, findsNothing);
+  expect(assignedTenant, findsNothing);
+  expect(tester.widget<Checkbox>(checkbox).value, isTrue);
+
+  await tester.enterText(accountFilter, '');
+  await tester.pumpAndSettle();
+  await tester.tap(checkbox);
+  await tester.pumpAndSettle();
+  expect(
+    tester.getTopLeft(assignedTenant).dy,
+    lessThan(tester.getTopLeft(firstTenant).dy),
+  );
+  expect(
+    tester.getTopLeft(firstTenant).dy,
+    lessThan(tester.getTopLeft(accountTenant).dy),
+  );
 }
 
 void expectFullNumber(WidgetTester tester, String label) {
@@ -143,6 +198,8 @@ http.Response assignmentResponse(bool isBci) {
             'tenant-${i.toString().padLeft(4, '0')}',
         (isBci ? 'tenant_label' : 'label'):
             'Tenant ${i.toString().padLeft(4, '0')}',
+        if (isBci && i == 2) 'account_number': 'ABC-0002',
+        if (isBci && i == 3) 'is_assigned_to_this_bci': 'true',
         if (!isBci) 'tpt_label_e': 'Tariff type',
       },
   ];

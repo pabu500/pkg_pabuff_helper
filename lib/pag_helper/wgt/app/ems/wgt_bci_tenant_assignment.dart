@@ -79,6 +79,9 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
   final TextEditingController _itemLabelFilterController =
       TextEditingController();
   String _itemLabelFilterStr = '';
+  final TextEditingController _accountNumberFilterController =
+      TextEditingController();
+  String _accountNumberFilterStr = '';
 
   UniqueKey? _timePickerFromKey;
   UniqueKey? _timePickerToKey;
@@ -123,12 +126,8 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
       });
 
       for (Map<String, dynamic> tenant in _itemGroupScopeMatchingItemList!) {
-        bool isassignedThisBci = tenant['is_assigned_to_this_bci'] == 'true';
-
-        tenant['assigned'] = false;
-        if (isassignedThisBci) {
-          tenant['assigned'] = true;
-        }
+        final assigned = tenant['is_assigned_to_this_bci'];
+        tenant['assigned'] = assigned == true || assigned == 'true';
       }
     } catch (e) {
       dev.log(e.toString());
@@ -192,19 +191,18 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
   }
 
   bool _showItem(Map<String, dynamic> item) {
-    if (_itemNameFilterStr.isNotEmpty) {
-      String? name = item['tenant_name'];
-      bool nameMatches = (name ?? '').isNotEmpty &&
-          (name ?? '').toLowerCase().contains(_itemNameFilterStr);
-      return nameMatches;
-    }
-    if (_itemLabelFilterStr.isNotEmpty) {
-      String? label = item['tenant_label'];
-      bool labelMatches = (label ?? '').isNotEmpty &&
-          (label ?? '').toLowerCase().contains(_itemLabelFilterStr);
-      return labelMatches;
-    }
-    return true; // Include item if no filter is applied
+    final name = (item['tenant_name'] ?? '').toString().toLowerCase();
+    final label = (item['tenant_label'] ?? '').toString().toLowerCase();
+    final accountNumber = (item['account_number'] ?? '')
+        .toString()
+        .toLowerCase();
+    return name.contains(_itemNameFilterStr) &&
+        label.contains(_itemLabelFilterStr) &&
+        accountNumber.contains(_accountNumberFilterStr);
+  }
+
+  bool _isChecked(Map<String, dynamic> item) {
+    return (item['assigned_new'] ?? item['assigned']) == true;
   }
 
   bool _checkModified() {
@@ -244,8 +242,11 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
   }
 
   @override
-  void initState() {
-    super.initState();
+  void dispose() {
+    _itemNamefilterController.dispose();
+    _itemLabelFilterController.dispose();
+    _accountNumberFilterController.dispose();
+    super.dispose();
   }
 
   @override
@@ -382,6 +383,30 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
           ),
         ),
         horizontalSpaceSmall,
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 5),
+          child: SizedBox(
+            width: 150,
+            height: 39,
+            child: TextField(
+              controller: _accountNumberFilterController,
+              readOnly:
+                  _isCommitting ||
+                  _isCommitted ||
+                  (_itemGroupScopeMatchingItemList ?? []).isEmpty,
+              decoration: InputDecoration(
+                hintText: 'Tenant Account No.',
+                hintStyle: TextStyle(color: Theme.of(context).hintColor),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  _accountNumberFilterStr = value.trim().toLowerCase();
+                });
+              },
+            ),
+          ),
+        ),
+        horizontalSpaceSmall,
         InkWell(
           onTap: (_itemGroupScopeMatchingItemList ?? []).isEmpty
               ? null
@@ -473,10 +498,14 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
     }
 
     final rowNumberWidth = getAssignmentRowNumberWidth(context, tenants.length);
+    final orderedTenants = [
+      ...tenants.where(_isChecked),
+      ...tenants.where((tenant) => !_isChecked(tenant)),
+    ];
     List<Widget> itemWidgetList = [];
     int index = 0;
 
-    for (final itemInfo in tenants) {
+    for (final itemInfo in orderedTenants) {
       bool showItem = _showItem(itemInfo);
       index++;
       if (!showItem) {
@@ -508,7 +537,7 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
   ) {
     String tenantName = itemInfo['tenant_name'] ?? 'Unknown Tenant';
     String tenantLabel = itemInfo['tenant_label'] ?? '';
-    bool assigned = itemInfo['assigned'] ?? false;
+    final accountNumber = (itemInfo['account_number'] ?? '').toString();
 
     TextStyle disabledTextStyle =
         TextStyle(color: Theme.of(context).hintColor.withAlpha(150));
@@ -544,18 +573,35 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
         ),
         horizontalSpaceSmall,
         Container(
-          width: 350,
+          width: 190,
           decoration: boxDecoration,
           padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-          child: SelectableText(tenantLabel.isNotEmpty ? tenantLabel : '-',
-              style: disabled ? disabledTextStyle : null),
+          child: Tooltip(
+            message: tenantLabel,
+            child: SelectableText(
+              tenantLabel.isNotEmpty ? tenantLabel : '-',
+              maxLines: 1,
+              style: disabled ? disabledTextStyle : null,
+            ),
+          ),
+        ),
+        horizontalSpaceSmall,
+        Container(
+          width: 150,
+          decoration: boxDecoration,
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+          child: SelectableText(
+            accountNumber.isNotEmpty ? accountNumber : '-',
+            maxLines: 1,
+            style: disabled ? disabledTextStyle : null,
+          ),
         ),
         horizontalSpaceTiny,
         getEffectiveDateRange(itemInfo),
         Tooltip(
           message: disabled ? disabledText : '',
           child: Checkbox(
-            value: itemInfo['assigned_new'] ?? itemInfo['assigned'],
+            value: _isChecked(itemInfo),
             onChanged: disabled
                 ? null
                 : (bool? value) {
