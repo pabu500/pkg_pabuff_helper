@@ -31,12 +31,14 @@ void main() {
 
   for (final isBci in [true, false]) {
     final scenario = isBci
-        ? 'BCI shows full row numbers, filters accounts and orders checked rows'
+        ? 'BCI shows row numbers and tariff tags, filters and orders tenants'
         : 'TP shows full row numbers on one line';
     testWidgets(scenario, (
       tester,
     ) async {
-      await tester.binding.setSurfaceSize(const Size(1400, 900));
+      await tester.binding.setSurfaceSize(
+        isBci ? const Size(1024, 900) : const Size(1400, 900),
+      );
       addTearDown(() => tester.binding.setSurfaceSize(null));
       final appConfig = MdlPagAppConfig(
         portalType: PagPortalType.pagConsole,
@@ -131,7 +133,31 @@ Future<void> verifyBciAccountSearchAndOrdering(WidgetTester tester) async {
   final accountTenant = find.text('tenant-0002');
   final assignedTenant = find.text('tenant-0003');
   final account = find.text('ABC-0002');
+  final electricityTariffTag = find.text('E: FTF');
+  final combinedTariffTag = find.text('E: SP LT Cycle, W: SP');
   expect(account, findsOneWidget);
+  expect(electricityTariffTag, findsOneWidget);
+  expect(combinedTariffTag, findsOneWidget);
+  expect(find.text('W: SP'), findsOneWidget);
+  expect(
+    tester.getSize(find.byTooltip('E: SP LT Cycle, W: SP')).width,
+    160,
+  );
+  expect(
+    tester.renderObject<RenderParagraph>(combinedTariffTag).didExceedMaxLines,
+    isFalse,
+  );
+  final assignedTenantRow = find
+      .ancestor(of: assignedTenant, matching: find.byType(Row))
+      .first;
+  final assignedCheckbox = find.descendant(
+    of: assignedTenantRow,
+    matching: find.byType(Checkbox),
+  );
+  expect(
+    tester.getTopRight(combinedTariffTag).dx,
+    lessThan(tester.getTopLeft(assignedCheckbox).dx),
+  );
   expect(
     tester.getTopLeft(assignedTenant).dy,
     lessThan(tester.getTopLeft(firstTenant).dy),
@@ -140,6 +166,18 @@ Future<void> verifyBciAccountSearchAndOrdering(WidgetTester tester) async {
   final accountTenantRow = find
       .ancestor(of: accountTenant, matching: find.byType(Row))
       .first;
+  final effectiveFromDate = find.descendant(
+    of: accountTenantRow,
+    matching: find.text('Eff. From Date'),
+  );
+  expect(
+    tester.getTopRight(account).dx,
+    lessThan(tester.getTopLeft(electricityTariffTag).dx),
+  );
+  expect(
+    tester.getTopRight(electricityTariffTag).dx,
+    lessThan(tester.getTopLeft(effectiveFromDate).dx),
+  );
   final checkbox = find.descendant(
     of: accountTenantRow,
     matching: find.byType(Checkbox),
@@ -159,7 +197,26 @@ Future<void> verifyBciAccountSearchAndOrdering(WidgetTester tester) async {
   expect(assignedTenant, findsNothing);
   expect(tester.widget<Checkbox>(checkbox).value, isTrue);
 
+  final tariffTypeFilter = find.widgetWithText(TextField, 'TPT');
+  await tester.enterText(tariffTypeFilter, '  w: sP  ');
+  await tester.pumpAndSettle();
+  expect(accountTenant, findsNothing);
+  expect(assignedTenant, findsNothing);
+
   await tester.enterText(accountFilter, '');
+  await tester.pumpAndSettle();
+  expect(assignedTenant, findsOneWidget);
+  expect(find.text('W: SP'), findsOneWidget);
+  expect(firstTenant, findsNothing);
+  expect(accountTenant, findsNothing);
+
+  await tester.enterText(tariffTypeFilter, 'ftf');
+  await tester.pumpAndSettle();
+  expect(accountTenant, findsOneWidget);
+  expect(assignedTenant, findsNothing);
+  expect(find.text('W: SP'), findsNothing);
+
+  await tester.enterText(tariffTypeFilter, '');
   await tester.pumpAndSettle();
   await tester.tap(checkbox);
   await tester.pumpAndSettle();
@@ -200,6 +257,9 @@ http.Response assignmentResponse(bool isBci) {
             'Tenant ${i.toString().padLeft(4, '0')}',
         if (isBci && i == 2) 'account_number': 'ABC-0002',
         if (isBci && i == 3) 'is_assigned_to_this_bci': 'true',
+        if (isBci && i == 2) 'tpt_label_e': 'FTF',
+        if (isBci && i == 3) 'tpt_label_e': 'SP LT Cycle',
+        if (isBci && (i == 3 || i == 4)) 'tpt_label_w': 'SP',
         if (!isBci) 'tpt_label_e': 'Tariff type',
       },
   ];

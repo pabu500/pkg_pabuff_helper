@@ -82,6 +82,7 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
   final TextEditingController _accountNumberFilterController =
       TextEditingController();
   String _accountNumberFilterStr = '';
+  String _tariffTypeFilterStr = '';
 
   UniqueKey? _timePickerFromKey;
   UniqueKey? _timePickerToKey;
@@ -198,7 +199,18 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
         .toLowerCase();
     return name.contains(_itemNameFilterStr) &&
         label.contains(_itemLabelFilterStr) &&
-        accountNumber.contains(_accountNumberFilterStr);
+        accountNumber.contains(_accountNumberFilterStr) &&
+        (_tariffTypeFilterStr.isEmpty ||
+            _tariffTypeTag(item).toLowerCase().contains(_tariffTypeFilterStr));
+  }
+
+  String _tariffTypeTag(Map<String, dynamic> item) {
+    final electricityTariffType = (item['tpt_label_e'] ?? '').toString().trim();
+    final waterTariffType = (item['tpt_label_w'] ?? '').toString().trim();
+    return [
+      if (electricityTariffType.isNotEmpty) 'E: $electricityTariffType',
+      if (waterTariffType.isNotEmpty) 'W: $waterTariffType',
+    ].join(', ');
   }
 
   bool _isChecked(Map<String, dynamic> item) {
@@ -407,6 +419,30 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
           ),
         ),
         horizontalSpaceSmall,
+        Flexible(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5),
+            child: SizedBox(
+              width: 150,
+              height: 39,
+              child: TextField(
+                readOnly: _isCommitting ||
+                    _isCommitted ||
+                    (_itemGroupScopeMatchingItemList ?? []).isEmpty,
+                decoration: InputDecoration(
+                  hintText: 'TPT',
+                  hintStyle: TextStyle(color: Theme.of(context).hintColor),
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    _tariffTypeFilterStr = value.trim().toLowerCase();
+                  });
+                },
+              ),
+            ),
+          ),
+        ),
+        horizontalSpaceSmall,
         InkWell(
           onTap: (_itemGroupScopeMatchingItemList ?? []).isEmpty
               ? null
@@ -538,6 +574,7 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
     String tenantName = itemInfo['tenant_name'] ?? 'Unknown Tenant';
     String tenantLabel = itemInfo['tenant_label'] ?? '';
     final accountNumber = (itemInfo['account_number'] ?? '').toString();
+    final tariffTypeTag = _tariffTypeTag(itemInfo);
 
     TextStyle disabledTextStyle =
         TextStyle(color: Theme.of(context).hintColor.withAlpha(150));
@@ -564,24 +601,34 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
           ),
         ),
         horizontalSpaceSmall,
-        Container(
-          width: 200,
-          decoration: boxDecoration,
-          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-          child: SelectableText(tenantName,
-              style: disabled ? disabledTextStyle : null),
+        Flexible(
+          child: Container(
+            width: 200,
+            decoration: boxDecoration,
+            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+            child: Tooltip(
+              message: tenantName,
+              child: SelectableText(
+                tenantName,
+                maxLines: 1,
+                style: disabled ? disabledTextStyle : null,
+              ),
+            ),
+          ),
         ),
         horizontalSpaceSmall,
-        Container(
-          width: 190,
-          decoration: boxDecoration,
-          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-          child: Tooltip(
-            message: tenantLabel,
-            child: SelectableText(
-              tenantLabel.isNotEmpty ? tenantLabel : '-',
-              maxLines: 1,
-              style: disabled ? disabledTextStyle : null,
+        Flexible(
+          child: Container(
+            width: 190,
+            decoration: boxDecoration,
+            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+            child: Tooltip(
+              message: tenantLabel,
+              child: SelectableText(
+                tenantLabel.isNotEmpty ? tenantLabel : '-',
+                maxLines: 1,
+                style: disabled ? disabledTextStyle : null,
+              ),
             ),
           ),
         ),
@@ -594,6 +641,28 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
             accountNumber.isNotEmpty ? accountNumber : '-',
             maxLines: 1,
             style: disabled ? disabledTextStyle : null,
+          ),
+        ),
+        horizontalSpaceTiny,
+        Flexible(
+          flex: 2,
+          child: SizedBox(
+            width: 160,
+            child: tariffTypeTag.isEmpty
+                ? null
+                : Tooltip(
+                    message: tariffTypeTag,
+                    child: Container(
+                      decoration: boxDecoration,
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                      child: Text(
+                        tariffTypeTag,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
           ),
         ),
         horizontalSpaceTiny,
