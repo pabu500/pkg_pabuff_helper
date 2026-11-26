@@ -119,17 +119,23 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
       }
       _itemGroupScopeMatchingItemList =
           List<Map<String, dynamic>>.from(bciScopeMatchingTenantList);
-      // sort by label
-      _itemGroupScopeMatchingItemList!.sort((a, b) {
-        String labelA = a['tenant_label'] ?? '';
-        String labelB = b['tenant_label'] ?? '';
-        return labelA.compareTo(labelB);
-      });
 
       for (Map<String, dynamic> tenant in _itemGroupScopeMatchingItemList!) {
         final assigned = tenant['is_assigned_to_this_bci'];
         tenant['assigned'] = assigned == true || assigned == 'true';
       }
+
+      // Group by saved assignment once so pending edits keep rows in place.
+      _itemGroupScopeMatchingItemList!.sort((a, b) {
+        final assignedA = a['assigned'] == true;
+        final assignedB = b['assigned'] == true;
+        if (assignedA != assignedB) {
+          return assignedA ? -1 : 1;
+        }
+        final String labelA = a['tenant_label'] ?? '';
+        final String labelB = b['tenant_label'] ?? '';
+        return labelA.compareTo(labelB);
+      });
     } catch (e) {
       dev.log(e.toString());
 
@@ -534,14 +540,10 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
     }
 
     final rowNumberWidth = getAssignmentRowNumberWidth(context, tenants.length);
-    final orderedTenants = [
-      ...tenants.where(_isChecked),
-      ...tenants.where((tenant) => !_isChecked(tenant)),
-    ];
     List<Widget> itemWidgetList = [];
     int index = 0;
 
-    for (final itemInfo in orderedTenants) {
+    for (final itemInfo in tenants) {
       bool showItem = _showItem(itemInfo);
       index++;
       if (!showItem) {
@@ -557,7 +559,13 @@ class _WgtBciTenantAssignmentState extends State<WgtBciTenantAssignment> {
     }
 
     return ListView.builder(
-      key: UniqueKey(), // Add a key to force rebuild when the list changes
+      // Start at the top when the filters change.
+      key: ValueKey((
+        _itemNameFilterStr,
+        _itemLabelFilterStr,
+        _accountNumberFilterStr,
+        _tariffTypeFilterStr,
+      )),
       itemExtent: 35,
       itemCount: itemWidgetList.length,
       itemBuilder: (context, index) {

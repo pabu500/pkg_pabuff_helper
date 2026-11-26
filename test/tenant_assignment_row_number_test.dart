@@ -107,6 +107,26 @@ void main() {
           expectFullNumber(tester, label);
         }
 
+        if (isBci) {
+          final tenant = find.text('tenant-0100');
+          final row = find.ancestor(of: tenant, matching: find.byType(Row)).first;
+          final checkbox = find.descendant(
+            of: row,
+            matching: find.byType(Checkbox),
+          );
+          final offset = scroll.position.pixels;
+          final rowPosition = tester.getTopLeft(tenant);
+          expect(tester.widget<Checkbox>(checkbox).value, isFalse);
+          for (final checked in [true, false]) {
+            await tester.tap(checkbox);
+            await tester.pumpAndSettle();
+            expect(scroll.mounted, isTrue);
+            expect(scroll.position.pixels, offset);
+            expect(tester.getTopLeft(tenant), rowPosition);
+            expect(tester.widget<Checkbox>(checkbox).value, checked);
+          }
+        }
+
         scroll.position.jumpTo(scroll.position.maxScrollExtent);
         await tester.pumpAndSettle();
         for (final label in ['999', '1000', '1001']) {
@@ -182,12 +202,10 @@ Future<void> verifyBciAccountSearchAndOrdering(WidgetTester tester) async {
     of: accountTenantRow,
     matching: find.byType(Checkbox),
   );
+  final accountTenantPosition = tester.getTopLeft(accountTenant);
   await tester.tap(checkbox);
   await tester.pumpAndSettle();
-  expect(
-    tester.getTopLeft(accountTenant).dy,
-    lessThan(tester.getTopLeft(assignedTenant).dy),
-  );
+  expect(tester.getTopLeft(accountTenant), accountTenantPosition);
 
   final accountFilter = find.widgetWithText(TextField, 'Tenant Account No.');
   await tester.enterText(accountFilter, '  bc-0002 ');
