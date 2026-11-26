@@ -64,9 +64,12 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
   MdlPagAppContext? _selectedAppContext;
   PagPageRoute? _selectedPageRoute;
   PageSection? _selectedPageSection;
+  PageSectionView? _selectedPageSectionView;
   final TextEditingController _appContextController = TextEditingController();
   final TextEditingController _pageRouteController = TextEditingController();
   final TextEditingController _pageSectionController = TextEditingController();
+  final TextEditingController _pageSectionViewController =
+      TextEditingController();
 
   final Map<String, dynamic> _itemScopeMap = {};
   UniqueKey? _scopeSetterKey;
@@ -78,22 +81,26 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
 
   bool _isProjectScope = false;
 
-  bool get _isPageSectionResourceType {
-    final normalizedLabel = _resTypeLabel
-        ?.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '')
-        .toLowerCase();
-    return normalizedLabel == 'pagesection';
-  }
+  String? get _normalizedResTypeLabel =>
+      _resTypeLabel?.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '').toLowerCase();
 
-  bool get _isPageRouteResourceType {
-    final normalizedLabel = _resTypeLabel
-        ?.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '')
-        .toLowerCase();
-    return normalizedLabel == 'pagpageroute';
-  }
+  bool get _isPageSectionViewResourceType =>
+      _normalizedResTypeLabel == 'pagesectionview';
+
+  bool get _requiresPageSection =>
+      _normalizedResTypeLabel == 'pagesection' ||
+      _isPageSectionViewResourceType;
+
+  bool get _isPageRouteResourceType =>
+      _normalizedResTypeLabel == 'pagpageroute';
 
   bool get _isPageResourceType =>
-      _isPageRouteResourceType || _isPageSectionResourceType;
+      _isPageRouteResourceType || _requiresPageSection;
+
+  void _clearPageSectionViewSelection() {
+    _selectedPageSectionView = null;
+    _pageSectionViewController.clear();
+  }
 
   void _clearGeneratedLabel() {
     _generatedLabelCheckGeneration++;
@@ -110,6 +117,7 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
     _appContextController.clear();
     _pageRouteController.clear();
     _pageSectionController.clear();
+    _clearPageSectionViewSelection();
     if (clearLabel) {
       _clearGeneratedLabel();
     }
@@ -119,16 +127,26 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
     final appContext = _selectedAppContext;
     final pageRoute = _selectedPageRoute;
     final pageSection = _selectedPageSection;
+    final view = _selectedPageSectionView;
     if (appContext == null ||
         pageRoute == null ||
-        (_isPageSectionResourceType && pageSection == null)) {
+        (_requiresPageSection && pageSection == null) ||
+        (_isPageSectionViewResourceType &&
+            (view == null ||
+                pageRoute.pageSectionViews[pageSection]?.contains(view) !=
+                    true))) {
       setState(_clearGeneratedLabel);
       return;
     }
 
     final generatedLabel = _isPageRouteResourceType
         ? getResNameByPageRoute(appContext, pageRoute)
-        : getResNameByPageRouteSection(appContext, pageRoute, pageSection!)!;
+        : getResNameByPageRouteSection(
+            appContext,
+            pageRoute,
+            pageSection!,
+            view: _isPageSectionViewResourceType ? view : null,
+          )!;
     final validationResult = validateResLabel(generatedLabel);
     final requestGeneration = ++_generatedLabelCheckGeneration;
 
@@ -322,6 +340,7 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
     _appContextController.dispose();
     _pageRouteController.dispose();
     _pageSectionController.dispose();
+    _pageSectionViewController.dispose();
     super.dispose();
   }
 
@@ -417,6 +436,7 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
                                 }
 
                                 _itemScopeMap.clear();
+                                _isProjectScope = false;
                                 _scopeSetterKey = UniqueKey();
                               });
 
@@ -610,8 +630,25 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
   }
 
   Widget getPageResourceSelectors() {
-    final pageRoutes = _selectedAppContext?.routeList ?? const [];
-    final pageSections = _selectedPageRoute?.pageSectionList ?? const [];
+    bool hasViews(PagPageRoute route) =>
+        route.pageSectionViews.values.any((views) => views.isNotEmpty);
+    final appContexts = _isPageSectionViewResourceType
+        ? appContextList.where(
+            (appContext) => appContext.routeList?.any(hasViews) ?? false,
+          )
+        : appContextList;
+    final contextRoutes = _selectedAppContext?.routeList ?? const [];
+    final pageRoutes = _isPageSectionViewResourceType
+        ? contextRoutes.where(hasViews)
+        : contextRoutes;
+    final viewsBySection = _selectedPageRoute?.pageSectionViews;
+    final routeSections = _selectedPageRoute?.pageSectionList ?? const [];
+    final pageSections = _isPageSectionViewResourceType
+        ? routeSections.where(
+            (section) => viewsBySection?[section]?.isNotEmpty ?? false,
+          )
+        : routeSections;
+    final pageSectionViews = viewsBySection?[_selectedPageSection] ?? const [];
 
     return Container(
       decoration: BoxDecoration(
@@ -623,7 +660,7 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
         children: [
           WgtDropdownSelector(
             hint: 'Select App Context',
-            items: appContextList.map((appContext) => appContext.name).toList(),
+            items: appContexts.map((appContext) => appContext.name).toList(),
             controller: _appContextController,
             initialValue: _selectedAppContext?.name,
             height: 50,
@@ -632,13 +669,14 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
               setState(() {
                 _selectedAppContext = value == null
                     ? null
-                    : appContextList
+                    : appContexts
                           .where((appContext) => appContext.name == value)
                           .firstOrNull;
                 _selectedPageRoute = null;
                 _selectedPageSection = null;
                 _pageRouteController.clear();
                 _pageSectionController.clear();
+                _clearPageSectionViewSelection();
                 _clearGeneratedLabel();
                 _errorText = '';
                 _newItem = true;
@@ -665,6 +703,7 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
                             .firstOrNull;
                   _selectedPageSection = null;
                   _pageSectionController.clear();
+                  _clearPageSectionViewSelection();
                   _clearGeneratedLabel();
                   _errorText = '';
                   _newItem = true;
@@ -674,7 +713,7 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
               },
             ),
           ],
-          if (_isPageSectionResourceType && _selectedPageRoute != null) ...[
+          if (_requiresPageSection && _selectedPageRoute != null) ...[
             verticalSpaceTiny,
             WgtDropdownSelector(
               key: ValueKey('page-section-${_selectedPageRoute!.name}'),
@@ -693,6 +732,39 @@ class _WgtCreateResourceState extends State<WgtCreateResource> {
                       : pageSections
                             .where((pageSection) => pageSection.name == value)
                             .firstOrNull;
+                  _clearPageSectionViewSelection();
+                  _clearGeneratedLabel();
+                  _errorText = '';
+                  _newItem = true;
+                  _createSuccess = false;
+                });
+                await _updateGeneratedPageResourceLabel();
+              },
+            ),
+          ],
+          if (_isPageSectionViewResourceType &&
+              pageSectionViews.isNotEmpty) ...[
+            verticalSpaceTiny,
+            WgtDropdownSelector(
+              key: ValueKey(
+                'page-section-view-${_selectedPageRoute!.name}'
+                '-${_selectedPageSection!.name}',
+              ),
+              hint: 'Select Page Section View',
+              items: pageSectionViews.map((view) => view.name).toList(),
+              controller: _pageSectionViewController,
+              initialValue: _selectedPageSectionView?.name,
+              height: 50,
+              width: 420,
+              onSelected: (String? value) async {
+                setState(() {
+                  _selectedPageSectionView = pageSectionViews
+                      .where((view) => view.name == value)
+                      .firstOrNull;
+                  _clearGeneratedLabel();
+                  _errorText = '';
+                  _newItem = true;
+                  _createSuccess = false;
                 });
                 await _updateGeneratedPageResourceLabel();
               },

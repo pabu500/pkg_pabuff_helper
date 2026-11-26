@@ -50,6 +50,15 @@ void main() {
     );
   });
 
+  test('registers the landlord view only under Tenant Manager SoA', () {
+    const tenantManager = PagPageRoute.tenantManager;
+    expect(tenantManager.pageSectionList, contains(PageSection.tenantSoA));
+    expect(tenantManager.pageSectionViews, {
+      PageSection.tenantSoA: [PageSectionView.landlordOpsView],
+    });
+    expect(PagPageRoute.meterManager.pageSectionViews, isEmpty);
+  });
+
   group('Tenant Manager SoA access', () {
     const full = 'ems.tenantManager.tenantSoA';
     const restricted = '$full.landlordOpsView';

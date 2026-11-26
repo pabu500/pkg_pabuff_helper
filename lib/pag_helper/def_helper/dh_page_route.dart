@@ -59,8 +59,15 @@ enum PagPageRoute {
       Symbols.atr, [PageSection.meterGroupList]),
   creditTransaction(
       'Credit Transaction', 'credit_transaction', Symbols.credit_card),
-  tenantManager('Tenant Manager', 'tenant_manager', Symbols.location_away,
-      [PageSection.tenantList, PageSection.tenantUsage, PageSection.tenantSoA]),
+  tenantManager(
+    'Tenant Manager',
+    'tenant_manager',
+    Symbols.location_away,
+    [PageSection.tenantList, PageSection.tenantUsage, PageSection.tenantSoA],
+    {
+      PageSection.tenantSoA: [PageSectionView.landlordOpsView],
+    },
+  ),
   evsTenantManager(
       'Tenant Manager', 'evs_tenant_manager', Symbols.location_away),
   tariffManager('Tariff Manager', 'tariff_manager', Symbols.price_change,
@@ -127,13 +134,16 @@ enum PagPageRoute {
   forgotPassword('Forgot Password', 'forgot_password', Symbols.lock),
   resetPassword('Reset Password', 'reset_password', Symbols.restart_alt);
 
-  const PagPageRoute(this.label, this.route, this.iconData,
-      [this.pageSectionList = const []]);
+  const PagPageRoute(this.label, this.route, this.iconData, [
+    this.pageSectionList = const [],
+    this.pageSectionViews = const {},
+  ]);
 
   final String label;
   final String route;
   final IconData iconData;
   final List<PageSection> pageSectionList;
+  final Map<PageSection, List<PageSectionView>> pageSectionViews;
 
   static PagPageRoute byLabel(String? label) =>
       enumByLabel(label, values) ?? none;
