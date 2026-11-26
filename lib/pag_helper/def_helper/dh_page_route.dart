@@ -26,6 +26,10 @@ enum PageSection {
   userList,
 }
 
+enum PageSectionView {
+  landlordOpsView,
+}
+
 enum PagPageRoute {
   projectPublicFront('Project Public Front', 'project_public_front',
       Symbols.flag_filled_rounded),

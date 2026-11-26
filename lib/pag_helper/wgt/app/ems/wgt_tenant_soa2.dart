@@ -27,12 +27,16 @@ class WgtTenantSoA2 extends StatefulWidget {
     required this.loggedInUser,
     required this.pagAppContext,
     required this.tenantInfo,
+    this.view,
+    this.aclResLabel,
   });
 
   final MdlPagAppConfig appConfig;
   final MdlPagUser loggedInUser;
   final MdlPagAppContext pagAppContext;
   final Map<String, dynamic> tenantInfo;
+  final PageSectionView? view;
+  final String? aclResLabel;
 
   @override
   State<WgtTenantSoA2> createState() => _WgtTenantSoA2State();
@@ -41,6 +45,8 @@ class WgtTenantSoA2 extends StatefulWidget {
 class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
   late final tenantName;
   late final tenantLabel;
+
+  bool get _isLandlordSoa => widget.view == PageSectionView.landlordOpsView;
 
   late bool _enableSearch;
   DateTime? _fromDate;
@@ -60,7 +66,7 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
   String _updateSoaErrorText = '';
 
   Future<void> _populateMissingSoaEntry() async {
-    if (_isUpdatingSoa) return;
+    if (_isLandlordSoa || _isUpdatingSoa) return;
 
     // await Future.delayed(const Duration(milliseconds: 5000));
 
@@ -170,19 +176,21 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
           spacing: 8,
           runSpacing: 8,
           children: [
-            getPopulateMissingSoaEntryButton(),
-            WgtSoaCorrection(
-              key: _correctionKey,
-              appConfig: widget.appConfig,
-              user: widget.loggedInUser,
-              tenantId: widget.tenantInfo['id'].toString(),
-              onActionsChanged: (actions) {
-                if (mounted) setState(() => _reverseActions = actions);
-              },
-              onChanged: () {
-                if (mounted) setState(() => _correctionRefresh++);
-              },
-            ),
+            if (!_isLandlordSoa) ...[
+              getPopulateMissingSoaEntryButton(),
+              WgtSoaCorrection(
+                key: _correctionKey,
+                appConfig: widget.appConfig,
+                user: widget.loggedInUser,
+                tenantId: widget.tenantInfo['id'].toString(),
+                onActionsChanged: (actions) {
+                  if (mounted) setState(() => _reverseActions = actions);
+                },
+                onChanged: () {
+                  if (mounted) setState(() => _correctionRefresh++);
+                },
+              ),
+            ],
             Text(
               accountNumber.isEmpty
                   ? 'Tenant: $tenantName ($tenantLabel)'
@@ -194,7 +202,7 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
             ),
           ],
         ),
-        if (_updateSoaErrorText.isNotEmpty)
+        if (!_isLandlordSoa && _updateSoaErrorText.isNotEmpty)
           getErrorTextPrompt(context: context, errorText: _updateSoaErrorText),
         verticalSpaceSmall,
         Flexible(child: getSoAContainer()),
@@ -233,28 +241,36 @@ class _WgtTenantSoA2State extends State<WgtTenantSoA2> {
   Widget getSoA2() {
     return WgtListSearchItemFlexi(
       refreshCurrentSearchKey: ValueKey(_correctionRefresh),
-      rowLeadingBuilder: (row) {
-        final action = _reverseActions[row['id']?.toString()];
-        if (action == null) return const SizedBox.shrink();
-        return IconButton(
-          key: ValueKey('reverse-soa-${row['id']}'),
-          tooltip: 'Reverse this entry',
-          icon: const Icon(Symbols.undo),
-          color: Theme.of(context).colorScheme.error,
-          onPressed: () => _correctionKey.currentState?.openEntry(action, row),
-        );
-      },
+      rowLeadingBuilder: _isLandlordSoa
+          ? null
+          : (row) {
+              final action = _reverseActions[row['id']?.toString()];
+              if (action == null) return const SizedBox.shrink();
+              return IconButton(
+                key: ValueKey('reverse-soa-${row['id']}'),
+                tooltip: 'Reverse this entry',
+                icon: const Icon(Symbols.undo),
+                color: Theme.of(context).colorScheme.error,
+                onPressed: () =>
+                    _correctionKey.currentState?.openEntry(action, row),
+              );
+            },
       appConfig: widget.appConfig,
       pagAppContext: widget.pagAppContext,
       itemKind: PagItemKind.finance,
       // itemType: PagFinanceType.soa,
       itemTypeListStr: PagFinanceType.tenantSoa.value,
       prefKey: widget.pagAppContext.route,
-      aclResLabel: getResNameByPageRouteSection(
-        widget.pagAppContext,
-        PagPageRoute.tenantManager,
-        PageSection.tenantSoA,
-      ),
+      aclResLabel: widget.aclResLabel ??
+          getResNameByPageRouteSection(
+            widget.pagAppContext,
+            PagPageRoute.tenantManager,
+            PageSection.tenantSoA,
+            view: widget.view,
+          ),
+      aclListOperation: _isLandlordSoa ? AclOperation.list : AclOperation.read,
+      soaView: widget.view,
+      isInitialValueMutable: !_isLandlordSoa,
       listContextType: PagListContextType.soa,
       showTimeRangePicker: true,
       timeRangePickerWidget: getTimeRangePicker(),

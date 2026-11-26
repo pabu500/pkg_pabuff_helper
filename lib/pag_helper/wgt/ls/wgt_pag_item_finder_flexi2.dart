@@ -14,6 +14,7 @@ class WgtPagItemFinderFlexi2 extends WgtPagItemFinderFlexi {
     required super.onResult,
     required super.projectId,
     required super.aclResLabel,
+    super.aclListOperation,
     super.selectedItemInfoList,
     super.meterTypeList = const [],
     super.sectionName = '',

@@ -83,6 +83,13 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
       ...pageRoute.pageSectionList.map((pageSection) =>
           getResNameByPageRouteSection(
               widget.appContext, pageRoute, pageSection)!),
+      if (pageRoute == PagPageRoute.tenantManager)
+        getResNameByPageRouteSection(
+          widget.appContext,
+          pageRoute,
+          PageSection.tenantSoA,
+          view: PageSectionView.landlordOpsView,
+        )!,
     ];
   }
 
@@ -142,7 +149,7 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
       return;
     }
 
-    final grantedByResource = <String, bool>{};
+    final aclResults = aclResultList is List ? aclResultList : const [];
     if (aclResultList is! List) {
       // The ACL call failed (transport, or a BE error such as
       // 'role_id must be positive' / a bad scope id). Without this the menu
@@ -154,23 +161,13 @@ class _WgtAppContextMenuState extends State<WgtAppContextMenu> {
           ? 'ACL check failed'
           : 'ACL check failed: $rawMessage';
       dev.log('checkMenuAcl: $_aclErrorMessage');
-    } else {
-      for (final resultValue in aclResultList) {
-        if (resultValue is! Map) continue;
-
-        final result = Map<String, dynamic>.from(resultValue);
-        final resLabel = result['res_label']?.toString();
-        final resultOperation = result['operation']?.toString();
-        if (resLabel == null || resultOperation != operation) continue;
-
-        grantedByResource[resLabel] = result['result'] == 'granted';
-      }
     }
 
     setState(() {
       for (final route in routes) {
-        _aclGrantedByRoute[route] = resourceLabelsByRoute[route]!
-            .any((resLabel) => grantedByResource[resLabel] ?? false);
+        _aclGrantedByRoute[route] = resourceLabelsByRoute[route]!.any(
+          (resLabel) => hasPageAclGrant(aclResults, resLabel, AclOperation.read),
+        );
       }
       _aclCheckCompleted = true;
     });

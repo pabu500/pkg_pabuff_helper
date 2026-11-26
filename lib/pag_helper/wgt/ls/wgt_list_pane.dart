@@ -41,6 +41,8 @@ class WgtListPane extends StatefulWidget {
     this.displayMode = 'table',
     this.onResult,
     this.aclResLabel,
+    this.aclListOperation = AclOperation.read,
+    this.allowColumnCustomization = true,
     this.projectId,
     this.rowLeadingBuilder,
     this.onSearching,
@@ -70,6 +72,8 @@ class WgtListPane extends StatefulWidget {
   final String displayMode;
   final Function(Map<String, dynamic>)? onResult;
   final String? aclResLabel;
+  final AclOperation aclListOperation;
+  final bool allowColumnCustomization;
   final int? projectId;
   final Widget Function(Map<String, dynamic>)? rowLeadingBuilder;
   final VoidCallback? onSearching;
@@ -114,6 +118,10 @@ class _WgtListPaneState extends State<WgtListPane> {
         widget.projectId ?? prefUser?.selectedScope.projectProfile?.id;
     _columnPrefUserId = userId;
     _columnPrefProjectId = projectId;
+    if (!widget.allowColumnCustomization) {
+      _isLoadingColumnPref = false;
+      return;
+    }
     _defaultColumnVisibility = getListColumnDefaults(controller);
     for (final column in controller.listColControllerList) {
       if (_defaultColumnVisibility.containsKey(column.colKey)) {
@@ -204,7 +212,7 @@ class _WgtListPaneState extends State<WgtListPane> {
             {
               'res_label': widget.aclResLabel ??
                   getItemTypeValue(widget.listController.itemTypeEnum),
-              'operation': 'read',
+              'operation': widget.aclListOperation.name,
             }
           ],
         ),
@@ -386,6 +394,7 @@ class _WgtListPaneState extends State<WgtListPane> {
     if (!identical(oldWidget.listController, widget.listController) ||
         oldWidget.sectionName != widget.sectionName ||
         oldWidget.projectId != widget.projectId ||
+        oldWidget.allowColumnCustomization != widget.allowColumnCustomization ||
         oldWidget.appConfig.portalType != widget.appConfig.portalType) {
       _isLoadingColumnPref = true;
       _columnPrefRevision = 0;
@@ -422,7 +431,7 @@ class _WgtListPaneState extends State<WgtListPane> {
               listItems: _entityItems,
               rowLeadingBuilder: widget.rowLeadingBuilder,
               itemType: widget.itemType,
-              selectShowColumn: true,
+              selectShowColumn: widget.allowColumnCustomization,
               sectionName: widget.sectionName,
               defaultColumnVisibility: _defaultColumnVisibility,
               columnPrefRevision: _columnPrefRevision,

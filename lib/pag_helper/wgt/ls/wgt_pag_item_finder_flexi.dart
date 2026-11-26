@@ -25,6 +25,7 @@ import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
 import 'package:buff_helper/xt_ui/wdgt/wgt_pag_wait.dart';
 
 import '../../../pagrid_helper/comm_helper/local_storage.dart';
+import '../../../up_helper/enum/enum_acl.dart';
 import '../../../util/date_time_util.dart';
 import '../../../xt_ui/wdgt/dropdown/wgt_dropdown_selector.dart';
 import '../../../xt_ui/wdgt/get_collapsed_bar.dart';
@@ -91,6 +92,7 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
     this.autoCascadeScopeFilter = true,
     this.loadOnInit = false,
     this.aclResLabel,
+    this.aclListOperation = AclOperation.read,
     this.useServerPinPreference = false,
     this.projectId,
   });
@@ -140,6 +142,7 @@ class WgtPagItemFinderFlexi extends StatefulWidget {
   final bool autoCascadeScopeFilter;
   final bool loadOnInit;
   final String? aclResLabel;
+  final AclOperation aclListOperation;
   final bool useServerPinPreference;
   final int? projectId;
   final MdlPagScopeProfile? prevailingScopeProfile;
@@ -334,7 +337,7 @@ class _WgtPagItemFinderFlexiState extends State<WgtPagItemFinderFlexi> {
           permRequestList: [
             {
               'res_label': widget.aclResLabel ?? itemTypeStr,
-              'operation': 'read',
+              'operation': widget.aclListOperation.name,
             }
           ],
         ),

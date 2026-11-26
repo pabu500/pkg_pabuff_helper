@@ -23,6 +23,7 @@ class WgtPagLs extends StatefulWidget {
     required this.itemKind,
     required this.listContextType,
     required this.pageSection,
+    this.pageSectionView,
     this.additionalColumnConfig,
     this.onScopeTreeUpdate,
     this.getPaneWidget,
@@ -45,6 +46,7 @@ class WgtPagLs extends StatefulWidget {
   final MdlPagAppContext pagAppContext;
   final PagPageRoute pageRoute;
   final PageSection pageSection;
+  final PageSectionView? pageSectionView;
   final MdlPagUser? loggedInUser;
   final PagItemKind itemKind;
   final PagListContextType listContextType;
@@ -75,7 +77,14 @@ class _WgtPagLsState extends State<WgtPagLs> {
   late final prefKey = widget.pagAppContext.route;
 
   String get _aclResLabel => getResNameByPageRouteSection(
-      widget.pagAppContext, widget.pageRoute, widget.pageSection)!;
+        widget.pagAppContext,
+        widget.pageRoute,
+        widget.pageSection,
+        view: widget.pageSectionView,
+      )!;
+
+  bool get _isLandlordSoa =>
+      widget.pageSectionView == PageSectionView.landlordOpsView;
 
   String? _pageAclMessage;
   bool _isEditableByAcl = false;
@@ -93,18 +102,12 @@ class _WgtPagLsState extends State<WgtPagLs> {
         widget.pagAppContext,
         widget.loggedInUser!,
         [
-          {
-            'res_label': _aclResLabel,
-            'operation': AclOperation.read.name,
-          },
-          {
-            'res_label': _aclResLabel,
-            'operation': AclOperation.update.name,
-          },
-          {
-            'res_label': _aclResLabel,
-            'operation': AclOperation.create.name,
-          },
+          for (final operation in [
+            AclOperation.read,
+            if (_isLandlordSoa) AclOperation.list,
+            if (!_isLandlordSoa) ...[AclOperation.update, AclOperation.create],
+          ])
+            {'res_label': _aclResLabel, 'operation': operation.name},
         ],
       );
       if (!mounted) return;
@@ -120,21 +123,14 @@ class _WgtPagLsState extends State<WgtPagLs> {
         return;
       }
 
-      final grantedByOperation = <String, bool>{};
-      for (final resultValue in aclResultList) {
-        if (resultValue is! Map) continue;
-        final result = Map<String, dynamic>.from(resultValue);
-        final operation = result['operation']?.toString();
-        if (operation == null) continue;
-        grantedByOperation[operation] = result['result'] == 'granted';
-      }
-      final canRead = grantedByOperation[AclOperation.read.name] ?? false;
+      bool granted(AclOperation operation) =>
+          hasPageAclGrant(aclResultList, _aclResLabel, operation);
+      final canOpen = granted(AclOperation.read) &&
+          (!_isLandlordSoa || granted(AclOperation.list));
       setState(() {
-        _pageAclMessage = !canRead ? 'access denied: $_aclResLabel' : 'granted';
-        _isEditableByAcl =
-            grantedByOperation[AclOperation.update.name] ?? false;
-        _isCreatableByAcl =
-            grantedByOperation[AclOperation.create.name] ?? false;
+        _pageAclMessage = !canOpen ? 'access denied: $_aclResLabel' : 'granted';
+        _isEditableByAcl = !_isLandlordSoa && granted(AclOperation.update);
+        _isCreatableByAcl = !_isLandlordSoa && granted(AclOperation.create);
       });
     });
   }
@@ -236,6 +232,8 @@ class _WgtPagLsState extends State<WgtPagLs> {
           sortBy: widget.sortBy,
           sortOrder: widget.sortOrder,
           aclResLabel: _aclResLabel,
+          aclListOperation: _isLandlordSoa ? AclOperation.list : AclOperation.read,
+          soaView: widget.pageSectionView,
           isEditableByAcl: _isEditableByAcl,
           isCreatableByAcl: _isCreatableByAcl,
         );

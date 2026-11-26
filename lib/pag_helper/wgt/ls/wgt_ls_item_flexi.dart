@@ -20,6 +20,7 @@ import 'package:buff_helper/pagrid_helper/comm_helper/local_storage.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/billing_helper/wgt_pag_composite_bill_view.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/tenant/pag_ems_type_usage_calc.dart';
 import 'package:buff_helper/pagrid_helper/ems_helper/tenant/wgt_pag_tenant_usage_summary.dart';
+import 'package:buff_helper/up_helper/enum/enum_acl.dart';
 import 'package:buff_helper/up_helper/enum/enum_item.dart';
 import 'package:buff_helper/util/date_time_util.dart';
 import 'package:buff_helper/xt_ui/wdgt/info/get_empty_result_prompt.dart';
@@ -38,6 +39,7 @@ import '../../comm/comm_pref.dart';
 import '../../comm/pag_be_api_base.dart';
 import '../../def_helper/dh_acl.dart';
 import '../../def_helper/dh_meter_group.dart';
+import '../../def_helper/dh_page_route.dart';
 import '../../def_helper/dh_pag_acl.dart';
 import '../../model/mdl_pag_app_config.dart';
 import '../app/am/wgt_am_meter_group_assignment2.dart';
@@ -110,6 +112,8 @@ class WgtListSearchItemFlexi extends StatefulWidget {
     this.showFinder = true,
     this.loadOnInit = false,
     this.aclResLabel,
+    this.aclListOperation = AclOperation.read,
+    this.soaView,
     this.isEditableByAcl,
     this.isCreatableByAcl,
     this.rowLeadingBuilder,
@@ -163,6 +167,10 @@ class WgtListSearchItemFlexi extends StatefulWidget {
   final bool showFinder;
   final bool loadOnInit;
   final String? aclResLabel;
+
+  /// ACL operation for fetching rows; independent of page access and edits.
+  final AclOperation aclListOperation;
+  final PageSectionView? soaView;
   final bool? isEditableByAcl;
   final bool? isCreatableByAcl;
   final Widget Function(Map<String, dynamic>)? rowLeadingBuilder;
@@ -207,9 +215,40 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
 
   late final bool _legacyIsEditableByAcl;
 
-  bool get isEditableByAcl => widget.isEditableByAcl ?? _legacyIsEditableByAcl;
+  bool get _isLandlordSoa => widget.soaView == PageSectionView.landlordOpsView;
+  bool get isEditableByAcl =>
+      !_isLandlordSoa && (widget.isEditableByAcl ?? _legacyIsEditableByAcl);
   bool get isCreatableByAcl =>
-      widget.isCreatableByAcl ?? _legacyIsEditableByAcl;
+      !_isLandlordSoa && (widget.isCreatableByAcl ?? _legacyIsEditableByAcl);
+
+  static const _landlordStatementColumns = {
+    'effective_timestamp',
+    'entry_type',
+    'billing_rec_audit_label',
+    'debit_amount',
+    'credit_amount',
+    'balance_unapplied',
+    'pa_usage_amount',
+    'pa_interest_amount',
+    'balance_usage',
+    'balance_interest',
+    'balance',
+    'remark',
+  };
+  // The list service uses these inputs for tenant filtering, stable row order,
+  // effective payment dates and invoice labels on payment applications.
+  static const _landlordStatementQueryKeys = {
+    'id',
+    'entry_timestamp',
+    'created_timestamp',
+    'tenant_id',
+    'tenant_name',
+    'tenant_label',
+    'payment_effective_value_timestamp',
+    'pa_billing_rec_name',
+    'pa_billing_rec_label',
+    'pa_billing_rec_audit_label',
+  };
 
   final List<String> meterTypeList = [];
 
@@ -383,7 +422,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           {
             'res_label': widget.aclResLabel ??
                 getItemTypeValue(_selectedListController!.itemTypeEnum),
-            'operation': 'read',
+            'operation': widget.aclListOperation.name,
           }
         ],
       ),
@@ -456,10 +495,23 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
   }
 
   void _addPagAppContextColumns(MdlPagListController? listController) {
-    if (widget.pagAppContext == null) {
-      return;
-    }
-    if (listController == null) {
+    if (widget.pagAppContext == null || listController == null) return;
+
+    if (_isLandlordSoa && widget.itemKind == PagItemKind.finance) {
+      // Reuse the configured order and formatting, but keep only the allowed
+      // display columns and the hidden keys needed for the tenant/sort query.
+      listController.listColControllerList.removeWhere((column) =>
+          !_landlordStatementColumns.contains(column.colKey) &&
+          !_landlordStatementQueryKeys.contains(column.colKey));
+      for (final column in listController.listColControllerList) {
+        column.isMutable = false;
+        column.showEditPanel = false;
+        if (_landlordStatementQueryKeys.contains(column.colKey)) {
+          column.hidden = true;
+          column.showColumn = false;
+          column.showFilter = false;
+        }
+      }
       return;
     }
 
@@ -489,7 +541,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
     //   return;
     // }
 
-    bool addInfoViewEditColumn = true;
+    bool addInfoViewEditColumn = !_isLandlordSoa;
     bool isEmsDeviceLs = widget.pagAppContext == appCtxEms &&
         widget.itemKind == PagItemKind.device;
     bool isEmsMeterUsage = widget.pagAppContext == appCtxEms &&
@@ -1710,6 +1762,8 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                         loggedInUser: loggedInUser!,
                         pagAppContext: widget.pagAppContext!,
                         tenantInfo: item,
+                        view: widget.soaView,
+                        aclResLabel: widget.aclResLabel,
                       ),
                       onClosed: () {},
                     );
@@ -2040,8 +2094,18 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
       _selectedListController = widget.listController;
     }
 
-    if (_selectedListController == null) {
-      return Container();
+    final controller = _selectedListController;
+    if (controller == null) return Container();
+
+    if (_isLandlordSoa && widget.itemKind == PagItemKind.finance &&
+        ((initialFilterMap['tenant_name']?.toString().trim() ?? '').isEmpty ||
+            !controller.listColControllerList.any(
+              (column) => column.colKey == 'tenant_name',
+            ))) {
+      return getErrorTextPrompt(
+        context: context,
+        errorText: 'Unable to open SoA: the tenant filter is unavailable.',
+      );
     }
 
     if (widget.listContextType == PagListContextType.infoTp) {
@@ -2093,6 +2157,7 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
                 sortBy: _sortBy,
                 sortOrder: _sortOrder,
                 aclResLabel: widget.aclResLabel,
+                aclListOperation: widget.aclListOperation,
                 onSearching: () {
                   setState(() {
                     _isFetchingItemList = true;
@@ -2585,6 +2650,8 @@ class _WgtListSearchItemFlexiState extends State<WgtListSearchItemFlexi> {
           itemType: widget.itemTypeEnum ?? widget.listController?.itemTypeEnum,
           listPrefix: _getListPrefix(),
           aclResLabel: widget.aclResLabel,
+          aclListOperation: widget.aclListOperation,
+          allowColumnCustomization: !_isLandlordSoa,
           onResult: (Map<String, dynamic> result) {
             if (result['query_map'] is Map) {
               _queryMap = Map<String, dynamic>.from(result['query_map']);

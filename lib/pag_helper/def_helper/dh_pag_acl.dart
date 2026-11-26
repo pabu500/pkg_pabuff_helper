@@ -113,9 +113,46 @@ String? getResNameByItemType(dynamic itemType) {
 String? getResNameByPageRouteSection(
   MdlPagAppContext appContext,
   PagPageRoute pageRoute,
-  PageSection pageSection,
+  PageSection pageSection, {
+  PageSectionView? view,
+}) {
+  final sectionLabel = '${appContext.name}.${pageRoute.name}.${pageSection.name}';
+  return view == null ? sectionLabel : '$sectionLabel.${view.name}';
+}
+
+bool hasPageAclGrant(
+  Iterable<dynamic> results,
+  String resourceLabel,
+  AclOperation operation,
 ) {
-  return '${appContext.name}.${pageRoute.name}.${pageSection.name}';
+  var granted = false;
+  for (final result in results) {
+    if (result is! Map ||
+        result['res_label'] != resourceLabel ||
+        result['operation'] != operation.name) {
+      continue;
+    }
+    if (result['result'] != 'granted') return false;
+    granted = true;
+  }
+  return granted;
+}
+
+enum TenantSoaAccess { none, full, landlordOps }
+
+TenantSoaAccess resolveTenantSoaAccess(
+  Iterable<dynamic> results, {
+  required String fullLabel,
+  required String landlordOpsLabel,
+}) {
+  if (hasPageAclGrant(results, fullLabel, AclOperation.read)) {
+    return TenantSoaAccess.full;
+  }
+  if (hasPageAclGrant(results, landlordOpsLabel, AclOperation.read) &&
+      hasPageAclGrant(results, landlordOpsLabel, AclOperation.list)) {
+    return TenantSoaAccess.landlordOps;
+  }
+  return TenantSoaAccess.none;
 }
 
 String getResNameByPageRoute(
