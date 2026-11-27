@@ -1,9 +1,13 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
-pw.Widget buildCwInvoiceHeaderLogo(String? encoded, pw.ImageProvider? fallback) {
+pw.Widget buildCwInvoiceHeaderLogo(
+  String? encoded,
+  pw.ImageProvider? fallback,
+) {
   final landlordLogo = decodeLandlordLogo(encoded);
   final image = landlordLogo ?? fallback;
   final slot = pw.Container(
@@ -17,10 +21,20 @@ pw.Widget buildCwInvoiceHeaderLogo(String? encoded, pw.ImageProvider? fallback) 
 }
 
 pw.MemoryImage? decodeLandlordLogo(String? encoded) {
+  final bytes = decodeLandlordLogoBytes(encoded);
+  if (bytes == null) return null;
+  try {
+    return pw.MemoryImage(bytes);
+  } on Exception {
+    return null;
+  }
+}
+
+Uint8List? decodeLandlordLogoBytes(String? encoded) {
   if (encoded == null || encoded.isEmpty) return null;
   try {
-    return pw.MemoryImage(base64Decode(encoded));
-  } on Exception {
+    return base64Decode(encoded);
+  } on FormatException {
     return null;
   }
 }

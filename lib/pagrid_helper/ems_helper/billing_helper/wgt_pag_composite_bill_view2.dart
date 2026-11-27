@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer' as dev;
 
 import 'package:buff_helper/pag_helper/model/mdl_pag_app_config.dart';
@@ -18,6 +19,7 @@ import '../tenant/wgt_pag_tenant_composite_usage_summary_rl.dart';
 import '../../../pag_helper/model/acl/mdl_pag_svc_claim.dart';
 import '../../../pag_helper/def_helper/dh_pag_bill.dart';
 import 'billing_helper2.dart';
+import 'wgt_pag_invoice_details.dart';
 import 'wgt_pag_render_pdf.dart';
 
 double? _billFieldToDouble(dynamic value) {
@@ -64,9 +66,7 @@ class _WgtPagCompositeBillView2State extends State<WgtPagCompositeBillView2> {
   final defaultErrorText = 'Error getting bill';
 
   bool _gettingBill = false;
-  int _pullFails = 0;
-  bool _isSwitching = false;
-  String _errorText = '';
+  bool _billLoadFailed = false;
 
   // the actual lc status of the bill
   late PagBillingLcStatus _billLcStatusActual;
@@ -80,16 +80,15 @@ class _WgtPagCompositeBillView2State extends State<WgtPagCompositeBillView2> {
   late final String assetFolder;
 
   UniqueKey? _lcStatusOpsKey;
-  bool _isDisabledGn = false;
   bool _isDisabledPvRl = false;
 
   bool _isDeleting = false;
   String _deleteResultText = '';
 
-  Future<dynamic> _getCompositeBill() async {
+  Future<void> _getCompositeBill() async {
     setState(() {
-      _errorText = '';
       _gettingBill = true;
+      _billLoadFailed = false;
       _bill.clear();
     });
     Map<String, dynamic> queryMap = {
@@ -113,19 +112,23 @@ class _WgtPagCompositeBillView2State extends State<WgtPagCompositeBillView2> {
           operation: AclOperation.read.name,
         ),
       );
-      _bill.addAll(billResult);
-    } catch (err) {
-      _pullFails++;
-      dev.log('Error generating bill: $err');
-
-      _errorText = getErrorText(err, defaultErrorText: defaultErrorText);
-    } finally {
+      if (!mounted) return;
       setState(() {
+        _bill.addAll(billResult);
         _gettingBill = false;
-        if (_errorText.isNotEmpty) {
-          showInfoDialog(context, 'Error', _errorText);
-        }
       });
+    } catch (err) {
+      dev.log('Error loading bill: $err');
+      if (!mounted) return;
+      setState(() {
+        _billLoadFailed = true;
+        _gettingBill = false;
+      });
+      showInfoDialog(
+        context,
+        'Error',
+        getErrorText(err, defaultErrorText: defaultErrorText),
+      );
     }
   }
 
@@ -133,7 +136,6 @@ class _WgtPagCompositeBillView2State extends State<WgtPagCompositeBillView2> {
   void initState() {
     super.initState();
 
-    _pullFails = 0;
     _billLcStatusActual =
         PagBillingLcStatus.byValue(widget.defaultBillLcStatusStr);
     // if (_lcStatusDisplay == PagBillingLcStatus.pv) {
@@ -164,16 +166,12 @@ class _WgtPagCompositeBillView2State extends State<WgtPagCompositeBillView2> {
     MdlPagProjectProfile selectedProjectProfile =
         widget.loggedInUser.selectedScope.projectProfile!;
     assetFolder = selectedProjectProfile.assetFolder!;
+    unawaited(_getCompositeBill());
   }
 
   @override
   Widget build(BuildContext context) {
-    bool pullData = _bill.isEmpty && !_gettingBill;
-
-    if (_pullFails > 0) {
-      dev.log('item_group: pull fails more than $_pullFails times');
-
-      pullData = false;
+    if (_billLoadFailed) {
       return SizedBox(
         height: 60,
         child: Center(
@@ -260,28 +258,31 @@ class _WgtPagCompositeBillView2State extends State<WgtPagCompositeBillView2> {
                             key: _lcStatusOpsKey,
                             appConfig: widget.appConfig,
                             loggedInUser: widget.loggedInUser,
-                            enableEdit: enableEditLcStatus,
+                            enableEdit: enableEditLcStatus && !_gettingBill,
                             billInfo: _bill,
                             initialStatus: _billLcStatusActual,
                             onCommitted: (newStatus) {
                               setState(() {
                                 _lcStatusOpsKey = UniqueKey();
-                                _bill['lc_status'] = newStatus.value;
-                                _isDisabledGn =
-                                        false /*
-                                  newStatus == PagBillingLcStatus.pv ||
-                                      newStatus == PagBillingLcStatus.released*/
-                                    ;
                                 _isDisabledPvRl =
                                     newStatus == PagBillingLcStatus.generated;
                                 _billLcStatusActual = newStatus;
-                                _showGenTypeSwitch = newStatus ==
-                                        PagBillingLcStatus.pv ||
+                                final canShowReleased =
+                                    newStatus == PagBillingLcStatus.pv ||
                                     newStatus == PagBillingLcStatus.released;
-                                _showRenderModeSwitch = newStatus ==
-                                        PagBillingLcStatus.pv ||
-                                    newStatus == PagBillingLcStatus.released;
+                                if (!canShowReleased) {
+                                  _billLcStatusDisplay = newStatus;
+                                  _renderMode = 'wgt';
+                                }
+                                _showGenTypeSwitch =
+                                    canShowReleased && _renderMode != 'pdf';
+                                _showRenderModeSwitch = canShowReleased &&
+                                    _billLcStatusDisplay ==
+                                        PagBillingLcStatus.released;
                               });
+                              // The server may just have frozen or unfrozen
+                              // invoice values, so discard the previous payload.
+                              unawaited(_getCompositeBill());
                               widget.onUpdate?.call();
                             },
                           ),
@@ -311,32 +312,14 @@ class _WgtPagCompositeBillView2State extends State<WgtPagCompositeBillView2> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Center(
-                child: pullData
-                    ? FutureBuilder(
-                        future: _getCompositeBill(),
-                        builder:
-                            (BuildContext context, AsyncSnapshot snapshot) {
-                          switch (snapshot.connectionState) {
-                            case ConnectionState.waiting:
-                              dev.log('gen bill: pulling data');
-                              return SizedBox(
-                                height: 200,
-                                child: Align(
-                                  alignment: Alignment.center,
-                                  child: xtWait(
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                ),
-                              );
-                            default:
-                              if (snapshot.hasError) {
-                                return Text('Error: ${snapshot.error}');
-                              } else {
-                                return completedWidget();
-                              }
-                          }
-                        },
+                child: _gettingBill
+                    ? SizedBox(
+                        height: 200,
+                        child: Center(
+                          child: xtWait(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
                       )
                     : completedWidget(),
               ),
@@ -348,6 +331,10 @@ class _WgtPagCompositeBillView2State extends State<WgtPagCompositeBillView2> {
   }
 
   Widget completedWidget() {
+    final showInvoiceDetails = _bill['gen_type'] != 'initial_balance' &&
+        (_bill['lc_status'] == PagBillingLcStatus.generated.value ||
+            _bill['lc_status'] == PagBillingLcStatus.pv.value ||
+            _bill['lc_status'] == PagBillingLcStatus.released.value);
     return _bill.isEmpty
         ? Center(
             child: Text(
@@ -360,7 +347,12 @@ class _WgtPagCompositeBillView2State extends State<WgtPagCompositeBillView2> {
           )
         : Padding(
             padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-            child: getBillRender(),
+            child: Column(
+              children: [
+                if (showInvoiceDetails) WgtPagInvoiceDetails(billInfo: _bill),
+                getBillRender(),
+              ],
+            ),
           );
   }
 
@@ -370,17 +362,6 @@ class _WgtPagCompositeBillView2State extends State<WgtPagCompositeBillView2> {
     String tenantLabel = _bill['tenant_label'];
     String tenantAccountNumber = _bill['tenant_account_number'] ?? '';
     String tenantType = _bill['tenant_type'] ?? '';
-    String depositAmountStr = _bill['deposit_amount'] ?? '';
-    String paymentMethod = _bill['payment_method'] ?? '';
-    if (paymentMethod.toLowerCase() != 'giro') {
-      paymentMethod = 'Non-Giro';
-    }
-    String tenantBillingAddressLine1 =
-        _bill['tenant_billing_address_line_1'] ?? '';
-    String tenantBillingAddressLine2 =
-        _bill['tenant_billing_address_line_2'] ?? '';
-    String tenantBillingAddressLine3 =
-        _bill['tenant_billing_address_line_3'] ?? '';
     String strFromTimestamp = _bill['from_timestamp'];
     DateTime? fromDatetime = getTargetDatetimeFromTargetStr(strFromTimestamp);
     String strToTimestamp = _bill['to_timestamp'];
@@ -437,26 +418,6 @@ class _WgtPagCompositeBillView2State extends State<WgtPagCompositeBillView2> {
     // String strBilledUsageCostAmount = _bill['billed_usage_cost_amount'] ?? '';
     // String strBilledInterestAmount = _bill['billed_interest_amount'] ?? '';
     // String strBilledPayableAmount = _bill['billed_payable_amount'] ?? '';
-
-    // String billedAmgrCompanyTradingName =
-    //     _bill['billed_amgr_company_trading_name'] ?? '';
-    // String billedAmgrCompanyRegNumber =
-    //     _bill['billed_amgr_company_reg_number'] ?? '';
-    // String billedAmgrGstRegNumber = _bill['billed_amgr_gst_reg_number'] ?? '';
-    // String amgrAddressLine1 = _bill['amgr_address_line_1'] ?? '';
-    // String amgrAddressLine2 = _bill['amgr_address_line_2'] ?? '';
-    // String amgrAddressLine3 = _bill['amgr_address_line_3'] ?? '';
-
-    // String amgrBankAccountName = _bill['amgr_bank_account_name'] ?? '';
-    // String amgrBankAccountNumber = _bill['amgr_bank_account_number'] ?? '';
-    // String amgrBankName = _bill['amgr_bank_name'] ?? '';
-    // String amgrBankBranchCode = _bill['amgr_bank_branch_code'] ?? '';
-    // String amgrBankSwiftCode = _bill['amgr_bank_swift_code'] ?? '';
-    // String amgrBankPayNow = _bill['amgr_bank_paynow'] ?? '';
-
-    // String billedTpNote = _bill['billed_tp_note'] ?? '';
-    // String billedTptRateNote = _bill['billed_tpt_rate_note'] ?? '';
-    // String billedTptCycleNote = _bill['billed_tpt_cycle_note'] ?? '';
 
     List<Map<String, dynamic>> lineItemList = [];
     final lineItemInfo = _bill['line_item_info'] ?? {};
@@ -737,7 +698,6 @@ class _WgtPagCompositeBillView2State extends State<WgtPagCompositeBillView2> {
     return _renderMode == 'pdf'
         ? Container()
         : WgtPagTenantCompositeUsageSummary(
-            isDisabled: _isDisabledGn,
             costDecimals: widget.costDecimals,
             appConfig: widget.appConfig,
             loggedInUser: widget.loggedInUser,
@@ -803,7 +763,7 @@ class _WgtPagCompositeBillView2State extends State<WgtPagCompositeBillView2> {
                 DateTime.tryParse(calcedBillInfoRl['strEffectiveTo']),
             tenantName: calcedBillInfoRl['customerName'] ?? '',
             tenantLabel: calcedBillInfoRl['customerLabel'] ?? '',
-            tenantAccountId: calcedBillInfoRl['tenantAccountId'] ?? '',
+            tenantAccountId: calcedBillInfoRl['tenantAccountNumber'] ?? '',
             tenantType: calcedBillInfoRl['tenantType'] ?? '',
             lineItems: calcedBillInfoRl['lineItemList'] ?? [],
             billedBciInfoList: calcedBillInfoRl['billedBciInfoList'] ?? [],
@@ -843,7 +803,6 @@ class _WgtPagCompositeBillView2State extends State<WgtPagCompositeBillView2> {
               ? null
               : (value) {
                   setState(() {
-                    _isSwitching = true;
                     value ? _renderMode = 'pdf' : _renderMode = 'wgt';
                     if (_renderMode == 'pdf') {
                       _showGenTypeSwitch = false;
@@ -877,18 +836,13 @@ class _WgtPagCompositeBillView2State extends State<WgtPagCompositeBillView2> {
               ? null
               : (value) {
                   setState(() {
-                    _isSwitching = true;
                     _lcStatusOpsKey = UniqueKey();
-                    value
-                        ? _billLcStatusDisplay = PagBillingLcStatus.released
-                        : _billLcStatusDisplay = PagBillingLcStatus.generated;
-                    if (_billLcStatusDisplay == PagBillingLcStatus.generated) {
-                      _showRenderModeSwitch = false;
-                    } else {
-                      _showRenderModeSwitch = true;
-                    }
-                    _bill.clear();
+                    _billLcStatusDisplay = value
+                        ? PagBillingLcStatus.released
+                        : PagBillingLcStatus.generated;
+                    _showRenderModeSwitch = value;
                   });
+                  unawaited(_getCompositeBill());
                 },
         ),
         const Text('View in Rl Mode'),

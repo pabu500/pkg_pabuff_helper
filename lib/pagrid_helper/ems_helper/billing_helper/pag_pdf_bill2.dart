@@ -9,12 +9,12 @@ import 'package:printing/printing.dart';
 import 'dart:developer' as dev;
 
 import '../../../pag_helper/def_helper/dh_device.dart';
-import '../../../pag_helper/def_helper/dh_pag_tenant.dart';
 import '../../../util/string_util.dart';
 import '../../../util/util.dart';
 import 'cw_bill/invoice_label_cw.dart';
 import 'cw_bill/landlord_logo_cw.dart';
 import 'cw_bill/meter_reading_table.dart';
+import 'cw_bill/payment_cw.dart';
 import 'cw_bill/principal_address_cw.dart';
 import 'meter_usage_cost_rounding.dart';
 
@@ -350,10 +350,10 @@ class PagPdfBillCwP2Gen3 {
           children: [
             pw.SizedBox(width: 235, child: _getPayerInfo()),
             pw.Expanded(child: pw.Container()),
-            if (paymentMethod == 'giro')
+            if (cwShowsGiroNote(paymentMethod))
               pw.Padding(
                 padding: const pw.EdgeInsets.only(right: 6),
-                child: pw.SizedBox(width: 210, child: _getGrioNote()),
+                child: pw.SizedBox(width: 210, child: _getGiroNote()),
               ),
           ],
         ),
@@ -563,12 +563,7 @@ class PagPdfBillCwP2Gen3 {
     double depositAmount =
         double.tryParse(strDepositAmount.replaceAll(',', '')) ?? 0;
 
-    PagPaymentMethod paymentMethodEnum = PagPaymentMethod.byValue(
-      paymentMethod,
-    );
-    final paymentMode = paymentMethodEnum == PagPaymentMethod.giro
-        ? 'GIRO'
-        : paymentMethodEnum.label;
+    final paymentMode = cwPaymentModeLabel(paymentMethod);
 
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -678,18 +673,15 @@ class PagPdfBillCwP2Gen3 {
     );
   }
 
-  pw.Widget _getGrioNote() {
+  pw.Widget _getGiroNote() {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
         pw.Text(
-          'Note for GIRO tenants:',
+          cwGiroNoteTitle,
           style: styleSmall.copyWith(fontWeight: pw.FontWeight.bold),
         ),
-        pw.Text(
-          'If invoice due date falls on a non-business day, GIRO deduction (if applicable) will be processed on the next business day.',
-          style: styleSmall,
-        ),
+        pw.Text(cwGiroNoteText, style: styleSmall),
       ],
     );
   }
