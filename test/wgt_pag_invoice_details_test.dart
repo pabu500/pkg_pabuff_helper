@@ -37,9 +37,13 @@ Future<void> _pumpPanel(WidgetTester tester, Map<String, dynamic> info) =>
     );
 
 void main() {
-  testWidgets('shows invoice fields and every singular tariff slot', (
+  testWidgets('stacks invoice sections and every tariff slot on wide screens', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(1200, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     await _pumpPanel(tester, {
       'lc_status': 'generated',
       'customer_company_trading_name': 'Example Tenant Pte Ltd',
@@ -124,6 +128,22 @@ void main() {
     ]) {
       expect(find.text(value), findsOneWidget);
     }
+    final headings = [
+      'Invoice details',
+      'Payer',
+      'Premises',
+      'Biller (AMGR)',
+      'Remittance',
+      'Payment',
+      'Tariff notes',
+      'Electricity (01 Sep 2026 – 15 Sep 2026)',
+      'Electricity (16 Sep 2026 – 30 Sep 2026)',
+      'Water',
+    ].map((title) => tester.getTopLeft(find.text(title))).toList();
+    for (var i = 1; i < headings.length; i++) {
+      expect(headings[i].dx, headings.first.dx);
+      expect(headings[i].dy, greaterThan(headings[i - 1].dy));
+    }
     expect(tester.takeException(), isNull);
   });
 
@@ -164,12 +184,15 @@ void main() {
   });
 
   testWidgets(
-    'reloads invoice fields after status updates and shows them above both summaries',
+    'reloads invoice fields and keeps them inside the totals block in both views',
     (tester) async {
       tester.view.physicalSize = const Size(1200, 900);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
+      // Keep the fixed-width bill header from overflowing with the test font.
+      tester.platformDispatcher.textScaleFactorTestValue = 0.45;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
       final user = MdlPagUser(id: 1, username: 'tester')
         ..selectedScope = MdlPagScopeProfile(
           projectProfile: MdlPagProjectProfile(
@@ -204,7 +227,7 @@ void main() {
                   billingRecIndexStr: '77',
                   defaultBillLcStatusStr: 'generated',
                   listContextType: PagListContextType.info,
-                  isBillMode: false,
+                  isBillMode: true,
                   genTypes: const ['generated'],
                   modes: const ['wgt'],
                 ),
@@ -220,12 +243,63 @@ void main() {
             WgtPagTenantCompositeUsageSummaryRl,
           );
           final statusControl = find.byType(WgtPagBillLcStatusOp2);
+
+          void expectDetailsInTotals(Finder summary) {
+            final payable = find.descendant(
+              of: summary,
+              matching: find.text('Total Payable'),
+            );
+            expect(payable, findsOneWidget);
+            final primary = Theme.of(tester.element(payable))
+                .colorScheme
+                .primary;
+            final totals = find.ancestor(
+              of: payable,
+              matching: find.byWidgetPredicate((widget) {
+                if (widget is! Container) return false;
+                final decoration = widget.decoration;
+                return decoration is BoxDecoration &&
+                    decoration.border?.top.color == primary;
+              }),
+            );
+            expect(totals, findsOneWidget);
+            expect(
+              find.descendant(of: totals, matching: panel),
+              findsOneWidget,
+            );
+            TextStyle? styleOf(String text) =>
+                tester.widget<Text>(find.text(text)).style;
+            expect(styleOf('Invoice details'), styleOf('Cycle Total'));
+            expect(styleOf('Tariff notes'), styleOf('Cycle Total'));
+            for (final heading in [
+              'Payer',
+              'Premises',
+              'Biller (AMGR)',
+              'Remittance',
+              'Payment',
+            ]) {
+              expect(styleOf(heading), styleOf('Interest'));
+            }
+            final payableBottom = tester.getBottomLeft(payable).dy;
+            final detailsTop = tester.getTopLeft(panel).dy;
+            expect(detailsTop, greaterThan(payableBottom));
+            final dividers = find.descendant(
+              of: totals,
+              matching: find.byType(Divider),
+            );
+            final dividerPositions = [
+              for (var i = 0; i < dividers.evaluate().length; i++)
+                tester.getCenter(dividers.at(i)).dy,
+            ];
+            expect(
+              dividerPositions,
+              contains(inInclusiveRange(payableBottom, detailsTop)),
+            );
+          }
+
           expect(find.text(_generatedCaption), findsOneWidget);
           expect(find.text('Live payer'), findsOneWidget);
-          expect(
-            tester.getTopLeft(panel).dy,
-            lessThan(tester.getTopLeft(generatedSummary).dy),
-          );
+          expectDetailsInTotals(generatedSummary);
 
           status = PagBillingLcStatus.pv;
           payer = 'Frozen payer';
@@ -240,10 +314,7 @@ void main() {
 
           await tester.tap(find.byType(Switch).first);
           await tester.pumpAndSettle();
-          expect(
-            tester.getTopLeft(panel).dy,
-            lessThan(tester.getTopLeft(releasedSummary).dy),
-          );
+          expectDetailsInTotals(releasedSummary);
           expect(find.text('Frozen payer'), findsOneWidget);
 
           status = PagBillingLcStatus.generated;
@@ -272,7 +343,7 @@ void main() {
           await tester.pumpAndSettle();
           expect(loads, hasLength(7));
           expect(loads, everyElement(endsWith('/get_bill')));
-          expect(releasedSummary, findsOneWidget);
+          expectDetailsInTotals(releasedSummary);
           expect(find.text('Second frozen payer'), findsOneWidget);
           expect(find.text(_generatedCaption), findsNothing);
           expect(tester.takeException(), isNull);
@@ -290,13 +361,19 @@ void main() {
                     'gen_type': 'monthly',
                     'tenant_name': 'tenant',
                     'tenant_label': 'Test tenant',
+                    'cycle_str': '2026-09',
                     'from_timestamp': '2026-09-01T00:00:00',
                     'to_timestamp': '2026-10-01T00:00:00',
                     'bill_date_timestamp': '2026-10-02T00:00:00',
                     'billed_due_date_timestamp': '2026-10-15T00:00:00',
+                    'billed_gst': '9',
+                    'billed_payable_amount': '604.38',
                     'customer_company_trading_name': payer,
                     'mini_soa_info': {},
-                    'interest_info': {},
+                    'interest_info': {
+                      'total_interest_amount': '0.00',
+                      'outstanding_bill_info_list': [],
+                    },
                   },
                 },
               },

@@ -68,6 +68,7 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
     this.bciInfoList = const [],
     this.showInvoiceColon = false,
     this.useMeterMultiplierFactor = false,
+    this.totalsFooter,
   });
 
   final MdlPagAppConfig appConfig;
@@ -110,6 +111,7 @@ class WgtPagTenantCompositeUsageSummary extends StatefulWidget {
   final Map<String, dynamic> interestInfo;
   final bool showInvoiceColon;
   final bool useMeterMultiplierFactor;
+  final Widget? totalsFooter;
   final Function? onUpdate;
 
   @override
@@ -343,6 +345,7 @@ class _WgtPagTenantCompositeUsageSummaryState
                   widget.strCollectionEndDateTimestamp,
                   widget.interestInfo,
                   width: statWidth,
+                  footer: widget.totalsFooter,
                   showInterestDetail: _showInterestDetail,
                   onCheckInterestDetail: () {
                     setState(() {

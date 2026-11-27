@@ -330,11 +330,17 @@ class _WgtPagCompositeBillView2State extends State<WgtPagCompositeBillView2> {
     );
   }
 
+  bool get _showInvoiceDetails =>
+      _bill['gen_type'] != 'initial_balance' &&
+      (_bill['lc_status'] == PagBillingLcStatus.generated.value ||
+          _bill['lc_status'] == PagBillingLcStatus.pv.value ||
+          _bill['lc_status'] == PagBillingLcStatus.released.value);
+
+  Widget? get _totalsFooter => widget.isBillMode && _showInvoiceDetails
+      ? WgtPagInvoiceDetails(billInfo: _bill)
+      : null;
+
   Widget completedWidget() {
-    final showInvoiceDetails = _bill['gen_type'] != 'initial_balance' &&
-        (_bill['lc_status'] == PagBillingLcStatus.generated.value ||
-            _bill['lc_status'] == PagBillingLcStatus.pv.value ||
-            _bill['lc_status'] == PagBillingLcStatus.released.value);
     return _bill.isEmpty
         ? Center(
             child: Text(
@@ -349,8 +355,12 @@ class _WgtPagCompositeBillView2State extends State<WgtPagCompositeBillView2> {
             padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
             child: Column(
               children: [
-                if (showInvoiceDetails) WgtPagInvoiceDetails(billInfo: _bill),
                 getBillRender(),
+                if (_showInvoiceDetails &&
+                    (_renderMode == 'pdf' || !widget.isBillMode)) ...[
+                  const Divider(height: 24),
+                  WgtPagInvoiceDetails(billInfo: _bill),
+                ],
               ],
             ),
           );
@@ -707,6 +717,7 @@ class _WgtPagCompositeBillView2State extends State<WgtPagCompositeBillView2> {
             strCollectionStartDateTimestamp: strCollectionStartDateTimestamp,
             strCollectionEndDateTimestamp: strCollectionEndDateTimestamp,
             isBillMode: widget.isBillMode,
+            totalsFooter: _totalsFooter,
             billInfo: _bill,
             useMeterMultiplierFactor: true,
             showRenderModeSwitch: true,
@@ -752,6 +763,7 @@ class _WgtPagCompositeBillView2State extends State<WgtPagCompositeBillView2> {
             loggedInUser: widget.loggedInUser,
             displayContextStr: widget.displayContextStr,
             isBillMode: widget.isBillMode,
+            totalsFooter: _totalsFooter,
             billInfo: _bill,
             showRenderModeSwitch: true,
             itemType: PagDeviceCat.meter,

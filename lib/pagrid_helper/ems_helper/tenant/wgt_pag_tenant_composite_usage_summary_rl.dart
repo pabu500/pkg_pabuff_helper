@@ -53,6 +53,7 @@ class WgtPagTenantCompositeUsageSummaryRl extends StatefulWidget {
     this.onUpdate,
     this.interestInfo = const {},
     this.showInvoiceColon = false,
+    this.totalsFooter,
   });
 
   final MdlPagAppConfig appConfig;
@@ -93,6 +94,7 @@ class WgtPagTenantCompositeUsageSummaryRl extends StatefulWidget {
   final String collectionEndDateTimestampStr;
   final Map<String, dynamic> interestInfo;
   final bool showInvoiceColon;
+  final Widget? totalsFooter;
   final Function? onUpdate;
 
   @override
@@ -225,6 +227,7 @@ class _WgtPagTenantCompositeUsageSummaryRlState
                   widget.collectionStartDateTimestampStr,
                   widget.collectionEndDateTimestampStr,
                   widget.interestInfo,
+                  footer: widget.totalsFooter,
                   showInterestDetail: _showInterestDetail,
                   onCheckInterestDetail: () {
                     setState(() {

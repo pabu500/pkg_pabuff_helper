@@ -792,6 +792,7 @@ Widget getPagTotal(
     Map<String, dynamic> interestInfo,
     {Function? onCheckInterestDetail,
     bool showInterestDetail = false,
+    Widget? footer,
     double width = 750.0}) {
   bool applyGst = true;
 
@@ -1075,6 +1076,10 @@ Widget getPagTotal(
               ],
             ),
           ),
+        if (footer != null) ...[
+          const Divider(height: 24),
+          footer,
+        ],
       ],
     ),
   );
