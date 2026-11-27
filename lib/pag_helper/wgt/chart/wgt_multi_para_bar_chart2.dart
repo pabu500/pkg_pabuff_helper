@@ -776,14 +776,16 @@ class WgtMultiParaBarChart2State extends State<WgtMultiParaBarChart2> {
       fitInside: _fitInsideLeftTitle
           ? SideTitleFitInsideData.fromTitleMeta(meta)
           : SideTitleFitInsideData.disable(),
-      child: Text(
-        widget.showKonY != null
-            ? widget.showKonY!
-                  ? getK(value, yDecimalK)
-                  : value.toStringAsFixed(yDecimal)
-            : value.toStringAsFixed(yDecimal),
-        style: style,
-        textAlign: TextAlign.center,
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          widget.showKonY == true
+              ? getK(value, yDecimalK)
+              : value.toStringAsFixed(yDecimal),
+          style: style,
+          textAlign: TextAlign.center,
+          softWrap: false,
+        ),
       ),
     );
   }
