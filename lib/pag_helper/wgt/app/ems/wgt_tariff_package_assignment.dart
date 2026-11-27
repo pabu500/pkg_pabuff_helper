@@ -57,11 +57,11 @@ class _WgtTariffPackageAssignmentState
   bool _isFetching = false;
   bool _isFetched = false;
   bool _hasTptMismatchAssignmentError = false;
-  bool _modified = false;
 
   bool _isCommitting = false;
   bool _isCommitted = false;
   String _commitErrorText = '';
+  String _commitResultText = '✓ Committed';
 
   // List<Map<String, dynamic>>? _tariffPackageTenantList;
   List<Map<String, dynamic>>? _itemGroupScopeMatchingItemList;
@@ -184,23 +184,47 @@ class _WgtTariffPackageAssignmentState
     }
   }
 
+  bool get _canEditAssignments =>
+      !_isCommitting && !_isCommitted && !_hasTptMismatchAssignmentError;
+
+  bool _isAssignmentBlocked(Map<String, dynamic> tenant) =>
+      _hasTptMismatchAssignmentError ||
+      tenant['assigned_to_another_tp_name'] != null ||
+      tenant['tpt_mismatch'] == true ||
+      tenant['tpt_mismatch_assignment_error'] == true;
+
+  Iterable<Map<String, dynamic>> get _availableTenants =>
+      (_itemGroupScopeMatchingItemList ?? []).where(
+        (tenant) =>
+            !_isAssignmentBlocked(tenant) &&
+            tenant['assigned'] == false &&
+            tenant['assigned_new'] != true,
+      );
+
+  Iterable<Map<String, dynamic>> get _changedAssignments =>
+      (_itemGroupScopeMatchingItemList ?? []).where(
+        (tenant) =>
+            !_isAssignmentBlocked(tenant) &&
+            tenant['assigned_new'] != null &&
+            tenant['assigned_new'] != tenant['assigned'],
+      );
+
   Future<void> _doCommit() async {
-    if (_isCommitting) {
-      return;
-    }
-    // filter out items that are not modified
-    final List<Map<String, dynamic>> assignmentList =
-        _itemGroupScopeMatchingItemList!
-            .where((tenant) => tenant['assigned_new'] != null)
-            .toList();
+    if (!_canEditAssignments) return;
+    final assignmentList = _changedAssignments
+        .map((tenant) => {
+              'id': tenant['id'],
+              'assigned_new': tenant['assigned_new'],
+            })
+        .toList();
+    if (assignmentList.isEmpty) return;
     Map<String, dynamic> queryMap = {
       'scope': widget.loggedInUser!.selectedScope.toScopeMap(),
       'tariff_package_id': widget.itemGroupIndexStr,
       'tenant_assignment_list': assignmentList,
     };
+    setState(() => _isCommitting = true);
     try {
-      _isCommitting = true;
-
       final data = await commitTariffPackageTenantList(
         widget.appConfig,
         queryMap,
@@ -216,18 +240,22 @@ class _WgtTariffPackageAssignmentState
       if (data['error'] != null) {
         throw Exception(data['error']);
       }
+      final skipped = data['result']?['skipped_count'] as int? ?? 0;
+      if (skipped == assignmentList.length) {
+        _commitResultText = 'No changes saved ($skipped skipped)';
+      } else if (skipped > 0) {
+        _commitResultText = '✓ Committed ($skipped skipped)';
+      }
     } catch (e) {
       dev.log(e.toString());
-
-      setState(() {
-        _commitErrorText = 'Commit Error';
-      });
+      _commitErrorText = 'Commit Error';
     } finally {
-      setState(() {
-        _isCommitting = false;
-        _isCommitted = true;
-        _modified = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isCommitting = false;
+          _isCommitted = true;
+        });
+      }
     }
   }
 
@@ -331,6 +359,8 @@ class _WgtTariffPackageAssignmentState
   }
 
   Widget getOpRow() {
+    final canSelectAll = _canEditAssignments && _availableTenants.isNotEmpty;
+    final canCommit = _canEditAssignments && _changedAssignments.isNotEmpty;
     BoxDecoration boxDecoration = BoxDecoration(
       border: Border.all(color: Theme.of(context).hintColor.withAlpha(50)),
       borderRadius: BorderRadius.circular(5),
@@ -414,54 +444,40 @@ class _WgtTariffPackageAssignmentState
         ),
         horizontalSpaceSmall,
         InkWell(
-          onTap: (_itemGroupScopeMatchingItemList ?? []).isEmpty ||
-                  _hasTptMismatchAssignmentError
-              ? null
-              : () {
+          onTap: canSelectAll
+              ? () {
                   setState(() {
-                    for (Map<String, dynamic> tenant
-                        in _itemGroupScopeMatchingItemList!) {
-                      if (tenant['tpt_mismatch']) {
-                        continue;
-                      }
+                    for (final tenant in _availableTenants) {
                       tenant['assigned_new'] = true;
-                      if (tenant['assigned'] != tenant['assigned_new']) {
-                        _modified = true;
-                      }
                     }
                   });
-                },
+                }
+              : null,
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-            decoration: _hasTptMismatchAssignmentError
-                ? boxDecoration.copyWith(
+            decoration: canSelectAll
+                ? boxDecoration
+                : boxDecoration.copyWith(
                     color:
-                        Theme.of(context).colorScheme.secondary.withAlpha(130))
-                : boxDecoration,
+                        Theme.of(context).colorScheme.secondary.withAlpha(130)),
             child: Text(
-              'Select All',
+              'Select All Available',
               style: TextStyle(
-                color: _hasTptMismatchAssignmentError
-                    ? Theme.of(context).hintColor
-                    : null,
+                color: canSelectAll ? null : Theme.of(context).hintColor,
               ),
             ),
           ),
         ),
         horizontalSpaceSmall,
         InkWell(
-          onTap: !_modified ||
-                  _isCommitting ||
-                  _isCommitted ||
-                  (_itemGroupScopeMatchingItemList ?? []).isEmpty ||
-                  _hasTptMismatchAssignmentError
-              ? null
-              : () async {
+          onTap: canCommit
+              ? () async {
                   await _doCommit();
                   widget.onUpdate?.call();
-                },
+                }
+              : null,
           child: _isCommitted && _commitErrorText.isEmpty
-              ? Text('✓ Committed',
+              ? Text(_commitResultText,
                   style:
                       TextStyle(color: Theme.of(context).colorScheme.primary))
               : _commitErrorText.isNotEmpty
@@ -470,7 +486,7 @@ class _WgtTariffPackageAssignmentState
                   : _isCommitting
                       ? const WgtPagWait(size: 21)
                       : Icon(Icons.cloud_upload,
-                          color: _modified && !_hasTptMismatchAssignmentError
+                          color: canCommit
                               ? commitColor
                               : Theme.of(context).hintColor),
         ),
@@ -612,12 +628,7 @@ class _WgtTariffPackageAssignmentState
     TextStyle disabledTextStyle =
         TextStyle(color: Theme.of(context).hintColor.withAlpha(150));
 
-    bool disabled =
-        // meterTypeTptLabel == null ||
-        _hasTptMismatchAssignmentError ||
-            itemInfo['assigned_to_another_tp_name'] != null ||
-            itemInfo['tpt_mismatch'] ||
-            itemInfo['tpt_mismatch_assignment_error'];
+    final disabled = _isAssignmentBlocked(itemInfo);
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -703,16 +714,11 @@ class _WgtTariffPackageAssignmentState
         horizontalSpaceTiny,
         Checkbox(
           value: itemInfo['assigned_new'] ?? itemInfo['assigned'],
-          onChanged: disabled
+          onChanged: disabled || !_canEditAssignments
               ? null
               : (bool? value) {
-                  setState(() {
-                    if (value == null) return;
-                    itemInfo['assigned_new'] = value;
-                    if (itemInfo['assigned'] != itemInfo['assigned_new']) {
-                      _modified = true;
-                    }
-                  });
+                  if (value == null) return;
+                  setState(() => itemInfo['assigned_new'] = value);
                   widget.onScopeTreeUpdate?.call();
                 },
         ),

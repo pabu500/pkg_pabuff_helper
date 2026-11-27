@@ -33,9 +33,7 @@ void main() {
     final scenario = isBci
         ? 'BCI shows row numbers and tariff tags, filters and orders tenants'
         : 'TP shows full row numbers on one line';
-    testWidgets(scenario, (
-      tester,
-    ) async {
+    testWidgets(scenario, (tester) async {
       await tester.binding.setSurfaceSize(
         isBci ? const Size(1024, 900) : const Size(1400, 900),
       );
@@ -109,7 +107,9 @@ void main() {
 
         if (isBci) {
           final tenant = find.text('tenant-0100');
-          final row = find.ancestor(of: tenant, matching: find.byType(Row)).first;
+          final row = find
+              .ancestor(of: tenant, matching: find.byType(Row))
+              .first;
           final checkbox = find.descendant(
             of: row,
             matching: find.byType(Checkbox),
@@ -143,7 +143,208 @@ void main() {
       }, () => MockClient((_) async => assignmentResponse(isBci)));
     });
   }
+
+  for (final (skipped, status) in [
+    (0, '✓ Committed'),
+    (1, '✓ Committed (1 skipped)'),
+    (2, 'No changes saved (2 skipped)'),
+  ]) {
+    testWidgets(
+      'TP Select All Available sends only eligible changes ($status)',
+      (tester) async {
+        const tenants = [
+          {'id': '1', 'name': 'Existing FTF', 'tp_name_e': 'FTF'},
+          {'id': '2', 'name': 'Existing SP', 'tp_name_e': 'SP'},
+          {'id': '3', 'name': 'Available'},
+          {'id': '4', 'name': 'Assigned for water only', 'tp_name_w': 'FTF'},
+        ];
+        var commits = 0;
+        await http.runWithClient(
+          () async {
+            await pumpTariffAssignment(tester);
+            final otherPackage = tariffCheckbox('Existing FTF');
+            final currentPackage = tariffCheckbox('Existing SP');
+            final available = tariffCheckbox('Available');
+            expect(tester.widget<Checkbox>(otherPackage).onChanged, isNull);
+            expect(tester.widget<Checkbox>(otherPackage).value, isTrue);
+            expect(tester.widget<Checkbox>(available).value, isFalse);
+
+            // Toggling back to the loaded value shouldn't enable Commit.
+            await tester.tap(available);
+            await tester.pumpAndSettle();
+            await tester.tap(available);
+            await tester.pumpAndSettle();
+            expect(tariffCommitButton(tester).onTap, isNull);
+
+            final selectAll = find.text('Select All Available');
+            await tester.tap(selectAll);
+            await tester.pumpAndSettle();
+            for (final checkbox in [
+              otherPackage,
+              currentPackage,
+              available,
+              tariffCheckbox('Assigned for water only'),
+            ]) {
+              expect(tester.widget<Checkbox>(checkbox).value, isTrue);
+            }
+            expect(
+              tester
+                  .widget<InkWell>(
+                    find
+                        .ancestor(of: selectAll, matching: find.byType(InkWell))
+                        .first,
+                  )
+                  .onTap,
+              isNull,
+            );
+            await tester.tap(find.byIcon(Icons.cloud_upload));
+            await tester.pumpAndSettle();
+            expect(commits, 1);
+            expect(find.text(status), findsOneWidget);
+            expect(tester.takeException(), isNull);
+          },
+          () => MockClient((request) async {
+            if (request.url.path.endsWith(
+              'get_tariff_package_scope_tenant_list',
+            )) {
+              return tariffScopeResponse(tenants);
+            }
+            expect(
+              request.url.path,
+              endsWith('update_tariff_package_tenant_list'),
+            );
+            commits++;
+            final data = jsonDecode(request.body)['request'];
+            expect(data['tariff_package_id'], '2');
+            expect(
+              data['tenant_assignment_list'],
+              unorderedEquals([
+                {'id': '3', 'assigned_new': true},
+                {'id': '4', 'assigned_new': true},
+              ]),
+            );
+            return tariffCommitResponse(skipped);
+          }),
+        );
+      },
+    );
+  }
+
+  testWidgets('TP Select All Available preserves an explicit unassignment', (
+    tester,
+  ) async {
+    const tenants = [
+      {'id': '1', 'name': 'Existing SP', 'tp_name_e': 'SP'},
+      {'id': '2', 'name': 'Available'},
+    ];
+    Object? assignments;
+    await http.runWithClient(
+      () async {
+        await pumpTariffAssignment(tester);
+        final checkbox = tariffCheckbox('Existing SP');
+        await tester.tap(checkbox);
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Select All Available'));
+        await tester.pumpAndSettle();
+        expect(tester.widget<Checkbox>(checkbox).value, isFalse);
+        await tester.tap(find.byIcon(Icons.cloud_upload));
+        await tester.pumpAndSettle();
+        expect(
+          assignments,
+          unorderedEquals([
+            {'id': '1', 'assigned_new': false},
+            {'id': '2', 'assigned_new': true},
+          ]),
+        );
+      },
+      () => MockClient((request) async {
+        if (request.url.path.endsWith('get_tariff_package_scope_tenant_list')) {
+          return tariffScopeResponse(tenants);
+        }
+        assignments = jsonDecode(
+          request.body,
+        )['request']['tenant_assignment_list'];
+        return tariffCommitResponse(0);
+      }),
+    );
+  });
 }
+
+Future<void> pumpTariffAssignment(WidgetTester tester) async {
+  await tester.binding.setSurfaceSize(const Size(1400, 900));
+  addTearDown(() => tester.binding.setSurfaceSize(null));
+  final user = MdlPagUser(id: 1, username: 'tester');
+  user.selectedScope.projectProfile = MdlPagProjectProfile(
+    id: 1,
+    name: 'cw_p2',
+    label: 'CW',
+    timezone: 8,
+    portalProjectScope: PagPortalProjectScope.values.first,
+    appContextConfigList: [],
+  );
+  await tester.pumpWidget(
+    MaterialApp(
+      theme: ThemeData(fontFamily: 'AssignmentTestRoboto'),
+      home: Scaffold(
+        body: WgtTariffPackageAssignment(
+          appConfig: MdlPagAppConfig(
+            portalType: PagPortalType.pagConsole,
+            lazyLoadScope: '',
+            loadDashboard: false,
+            userSvcEnv: 'dev',
+            oreSvcEnv: 'dev',
+            activePortalPagProjectScopeList: [],
+          ),
+          loggedInUser: user,
+          itemGroupIndexStr: '2',
+          itemName: 'SP',
+          itemLabel: 'Tariff',
+          itemScope: MdlPagScope(projectName: 'cw_p2', projectId: '1'),
+          meterType: 'E',
+          itemInfo: const {},
+        ),
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
+
+Finder tariffCheckbox(String tenant) => find.descendant(
+  of: find.ancestor(of: find.text(tenant), matching: find.byType(Row)).first,
+  matching: find.byType(Checkbox),
+);
+
+InkWell tariffCommitButton(WidgetTester tester) => tester.widget<InkWell>(
+  find
+      .ancestor(
+        of: find.byIcon(Icons.cloud_upload),
+        matching: find.byType(InkWell),
+      )
+      .first,
+);
+
+http.Response tariffScopeResponse(List<Map<String, Object>> tenants) =>
+    http.Response(
+      jsonEncode({
+        'data': {
+          'tariff_package_assignment': {
+            'tariff_package_scope_matching_tenant_list': tenants,
+          },
+        },
+      }),
+      200,
+    );
+
+http.Response tariffCommitResponse(int skipped) => http.Response(
+  jsonEncode({
+    'success': true,
+    'data': {
+      'result_key': 'update_tariff_package_tenant_list_result',
+      'result': {'success': true, 'skipped_count': skipped},
+    },
+  }),
+  200,
+);
 
 Future<void> verifyBciAccountSearchAndOrdering(WidgetTester tester) async {
   await tester.enterText(find.byType(TextField).first, '');
@@ -159,10 +360,7 @@ Future<void> verifyBciAccountSearchAndOrdering(WidgetTester tester) async {
   expect(electricityTariffTag, findsOneWidget);
   expect(combinedTariffTag, findsOneWidget);
   expect(find.text('W: SP'), findsOneWidget);
-  expect(
-    tester.getSize(find.byTooltip('E: SP LT Cycle, W: SP')).width,
-    160,
-  );
+  expect(tester.getSize(find.byTooltip('E: SP LT Cycle, W: SP')).width, 160);
   expect(
     tester.renderObject<RenderParagraph>(combinedTariffTag).didExceedMaxLines,
     isFalse,
